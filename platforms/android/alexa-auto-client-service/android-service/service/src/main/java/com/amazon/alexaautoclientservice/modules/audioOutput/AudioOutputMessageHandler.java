@@ -18,6 +18,8 @@ import static com.amazon.aacsconstants.AASBConstants.AudioOutput;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -82,48 +84,50 @@ public class AudioOutputMessageHandler {
         if (!payload.isEmpty()) {
             try {
                 payloadJson = new JSONObject(payload);
-                mCurrentMediaPlayer = getMediaPlayer(payloadJson, aasbHandler);
-                if (mCurrentMediaPlayer == null) {
-                    Log.e(TAG, "Failed to get the media player, exiting");
-                    return;
-                }
-
-                switch (action) {
-                    case Action.AudioOutput.PREPARE:
-                        handlePrepare(payloadJson, aasbHandler);
-                        break;
-                    case Action.AudioOutput.PLAY:
-                        handlePlay(payloadJson);
-                        break;
-                    case Action.AudioOutput.PAUSE:
-                        handlePause(payloadJson);
-                        break;
-                    case Action.AudioOutput.RESUME:
-                        handleResume(payloadJson);
-                        break;
-                    case Action.AudioOutput.STOP:
-                        handleStop(payloadJson);
-                        break;
-                    case Action.AudioOutput.GET_POSITION:
-                        handleGetPosition(payloadJson, messageId);
-                        break;
-                    case Action.AudioOutput.GET_DURATION:
-                        handleGetDuration(payloadJson, messageId);
-                        break;
-                    case Action.AudioOutput.GET_NUM_BYTES_BUFFERED:
-                        handleGetNumBytesBuffered(payloadJson, messageId);
-                    case Action.AudioOutput.SET_POSITION:
-                        handleSetPosition(payloadJson);
-                        break;
-                    case Action.AudioOutput.VOLUME_CHANGED:
-                        handleVolumeChanged(payloadJson);
-                        break;
-                    case Action.AudioOutput.MUTED_STATE_CHANGED:
-                        handleMutedStateChanged(payloadJson);
-                        break;
-                    default:
-                        Log.w(TAG, action + " message not being handled.");
-                }
+                Handler mainHandler = new Handler(Looper.getMainLooper());
+                mainHandler.post(() -> {
+                    mCurrentMediaPlayer = getMediaPlayer(payloadJson, aasbHandler);
+                    if (mCurrentMediaPlayer == null) {
+                        Log.e(TAG, "Failed to get the media player, exiting");
+                        return;
+                    }
+                    switch (action) {
+                        case Action.AudioOutput.PREPARE:
+                            handlePrepare(payloadJson, aasbHandler);
+                            break;
+                        case Action.AudioOutput.PLAY:
+                            handlePlay(payloadJson);
+                            break;
+                        case Action.AudioOutput.PAUSE:
+                            handlePause(payloadJson);
+                            break;
+                        case Action.AudioOutput.RESUME:
+                            handleResume(payloadJson);
+                            break;
+                        case Action.AudioOutput.STOP:
+                            handleStop(payloadJson);
+                            break;
+                        case Action.AudioOutput.GET_POSITION:
+                            handleGetPosition(payloadJson, messageId);
+                            break;
+                        case Action.AudioOutput.GET_DURATION:
+                            handleGetDuration(payloadJson, messageId);
+                            break;
+                        case Action.AudioOutput.GET_NUM_BYTES_BUFFERED:
+                            handleGetNumBytesBuffered(payloadJson, messageId);
+                        case Action.AudioOutput.SET_POSITION:
+                            handleSetPosition(payloadJson);
+                            break;
+                        case Action.AudioOutput.VOLUME_CHANGED:
+                            handleVolumeChanged(payloadJson);
+                            break;
+                        case Action.AudioOutput.MUTED_STATE_CHANGED:
+                            handleMutedStateChanged(payloadJson);
+                            break;
+                        default:
+                            Log.w(TAG, action + " message not being handled.");
+                    }
+                });
 
             } catch (Exception e) {
                 Log.e(TAG, "Failed to parse payload");

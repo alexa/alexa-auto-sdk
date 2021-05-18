@@ -219,7 +219,7 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
     jobjectArray locales,
     jstring defaultLocale,
     jstring defaultTimezone,
-    jobjectArray localeCombinations = {}) {
+    jobjectArray localeCombinations) {
     try {
         std::vector<std::string> localesVector;
         std::vector<std::vector<std::string>> localeCombinationsVector;
@@ -231,6 +231,7 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
             locale = (jstring)env->GetObjectArrayElement(locales, j);
             localesVector.push_back(JString(locale).toStdStr());
         }
+
         for (int i = 0; i < localeCombinationsSize; i++) {
             int localeCombinationSize =
                 env->GetArrayLength((jobjectArray)env->GetObjectArrayElement(localeCombinations, i));
@@ -253,8 +254,7 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
 
         return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(
-            TAG, "Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDeviceSettingsConfigBinder", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
         return 0;
     }
 }

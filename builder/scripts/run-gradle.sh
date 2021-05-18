@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 THISDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -132,6 +133,9 @@ copy_aar() {
 	for aar in $(${FIND} ${src} 2> /dev/null) ; do
 		cp ${aar} ${AAR_DEPLOY_DIR}
 	done
+	if [ -f ${ANDROID_PLATFORM_DIR}/modules/apl-render/src/main/libs/aplRelease.aar ]; then
+		cp ${ANDROID_PLATFORM_DIR}/modules/apl-render/src/main/libs/*.aar ${AAR_DEPLOY_DIR}
+	fi
 }
 
 clean_aar() {
@@ -151,13 +155,13 @@ run_sample_gradle() {
 	gradle ${gradle_command}
 	popd
 	# Sample APL Build (optional)
-	if [ -f ${ANDROID_SAMPLE_DIR}/app/src/main/libs/aplRelease.aar ] || [ -f ${ANDROID_SAMPLE_DIR}/modules/sample-apl/src/main/libs/aplRelease.aar ]; then
+	if [ -f ${ANDROID_PLATFORM_DIR}/modules/apl-render/src/main/libs/aplRelease.aar ]; then
 		note "Running Sample APL Build"
 		pushd ${ANDROID_SAMPLE_DIR}/modules/sample-apl
 		if [ ${CLEAN} = "1" ]; then
 			gradle clean
 		fi
-		gradle ${gradle_command}
+		gradle -PaarDir=${AAR_DEPLOY_DIR} ${gradle_command}
 		popd
 	fi
 	# Sample Connectivity Build

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -1471,7 +1471,7 @@ std::string ExternalMediaPlayer::getPlayerInFocus() {
 // begin Auto SDK specific change
 void ExternalMediaPlayer::onPlayerActivityChanged(
     alexaClientSDK::avsCommon::avs::PlayerActivity state,
-    const alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface::Context& context) {
+    const alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface::Context& context) {
     AACE_VERBOSE(LX(TAG, "onPlayerActivityChanged").d("state", state));
     std::string playerInFocus;
     {

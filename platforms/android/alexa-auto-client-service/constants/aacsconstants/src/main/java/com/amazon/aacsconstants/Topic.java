@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ public class Topic {
     public static final String AUDIO_PLAYER = "AudioPlayer";
     public static final String AUTH_PROVIDER = "AuthProvider";
     public static final String AUTHORIZATION = "Authorization";
+    public static final String DEVICE_SETUP = "DeviceSetup";
+    public static final String DEVICE_USAGE = "DeviceUsage";
     public static final String DO_NOT_DISTURB = "DoNotDisturb";
     public static final String EQUALIZER_CONTROLLER = "EqualizerController";
     public static final String EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
@@ -38,11 +40,12 @@ public class Topic {
     public static final String AUDIO_OUTPUT = "AudioOutput";
     public static final String CAR_CONTROL = "CarControl";
     public static final String CBL = "CBL";
-    public static final String GADGET = "Gadget";
+    public static final String ALEXA_CONNECTIVITY = "AlexaConnectivity";
     public static final String LOCATION_PROVIDER = "LocationProvider";
     public static final String MESSAGING = "Messaging";
     public static final String NAVIGATION = "Navigation";
     public static final String NETWORK_INFO_PROVIDER = "NetworkInfoProvider";
     public static final String PHONE_CALL_CONTROLLER = "PhoneCallController";
     public static final String PROPERTY_MANAGER = "PropertyManager";
+    public static final String TTS = "TextToSpeech";
 }

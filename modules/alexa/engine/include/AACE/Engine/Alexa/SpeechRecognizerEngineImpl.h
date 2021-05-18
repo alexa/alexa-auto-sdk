@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@
 #include <AIP/Initiator.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/SDKInterfaces/AudioInputProcessorObserverInterface.h>
-
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/KeyWordObserverInterface.h>
@@ -34,19 +34,20 @@
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 
 #include <AVSCommon/SDKInterfaces/SystemSoundPlayerInterface.h>
+#include <AVSCommon/Utils/Metrics/MetricRecorderInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <ACL/AVSConnectionManager.h>
 #include <ContextManager/ContextManager.h>
-#include <Endpoints/EndpointBuilder.h>
 #include <KWD/AbstractKeywordDetector.h>
 #include <SpeechEncoder/SpeechEncoder.h>
 
 #include <AACE/Alexa/SpeechRecognizer.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
+#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
 #include <AACE/Alexa/AlexaClient.h>
 
+#include "InitiatorVerifier.h"
 #include "WakewordEngineAdapter.h"
-#include "WakewordVerifier.h"
 #include "WakewordObserverInterface.h"
 
 namespace aace {
@@ -67,27 +68,30 @@ private:
 
     bool initialize(
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
         const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface>& assetsManager,
         class DeviceSettingsDelegate& deviceSettingsDelegate,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
+        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
         std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
-        std::shared_ptr<aace::engine::alexa::WakewordVerifier> wakewordVerifier);
+        const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifier);
 
 public:
     static std::shared_ptr<SpeechRecognizerEngineImpl> create(
         std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
         const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat,
         std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
@@ -95,16 +99,18 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
         const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface>& assetsManager,
         class DeviceSettingsDelegate& deviceSettingsDelegate,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
+        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr,
         std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter = nullptr,
-        std::shared_ptr<aace::engine::alexa::WakewordVerifier> wakewordVerifier = nullptr);
+        const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers =
+            std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>());
 
     // SpeechRecognizerEngineInterface
     bool onStartCapture(Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword)
@@ -139,6 +145,11 @@ public:
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason)
         override;
+    void onConnectionStatusChanged(
+        const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+        const std::vector<
+            alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
+            engineStatuses) override;
 
 protected:
     virtual void doShutdown() override;
@@ -182,7 +193,7 @@ private:
     bool m_wakewordEnabled = false;
     bool m_initialWakewordEnabledState = true;
 
-    std::shared_ptr<aace::engine::alexa::WakewordVerifier> m_wakewordVerifier;
+    std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>> m_initiatorVerifiers;
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 
     // the aip state

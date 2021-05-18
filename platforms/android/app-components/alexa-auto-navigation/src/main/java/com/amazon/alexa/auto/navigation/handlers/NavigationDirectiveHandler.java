@@ -35,6 +35,9 @@ public class NavigationDirectiveHandler {
             case Action.Navigation.CANCEL_NAVIGATION:
                 mNavigationProvider.cancelNavigation();
                 break;
+            case Action.Navigation.GET_NAVIGATION_STATE:
+                mNavigationProvider.provideNavigationState(message.messageId);
+                break;
             default:
                 throw new RuntimeException(String.format("Unrecognized navigation command %s", message.action));
         }

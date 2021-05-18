@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -95,6 +95,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_auth_provider_engine_interface.html">AuthProviderEngineInterface</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_device_setup.html">DeviceSetup</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_device_setup_engine_interface.html">DeviceSetupEngineInterface</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_do_not_disturb.html">DoNotDisturb</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_do_not_disturb_engine_interface.html">DoNotDisturbEngineInterface</a></td></tr>
@@ -159,6 +163,8 @@ Functions</h2></td></tr>
 <tr class="separator:aaa09d97f0a502bb056f6eb8b610b39cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34edec6ce32fa2cc7fa9dddc3da15ce9"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaace_1_1alexa.html#a34edec6ce32fa2cc7fa9dddc3da15ce9">operator&lt;&lt;</a> (std::ostream &amp;stream, const <a class="el" href="classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3">EqualizerControllerEngineInterface::EqualizerBand</a> &amp;band)</td></tr>
 <tr class="separator:a34edec6ce32fa2cc7fa9dddc3da15ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8e789fa621df6a2f846918564cdb3f2"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceaace_1_1alexa.html#aa8e789fa621df6a2f846918564cdb3f2">deviceSetupStatusCodeToString</a> (const <a class="el" href="classaace_1_1alexa_1_1_device_setup.html#a9b27d4306350236719aed083ff389f00">DeviceSetup::StatusCode</a> &amp;statusCode)</td></tr>
+<tr class="separator:aa8e789fa621df6a2f846918564cdb3f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <code>alexa</code> namespace. </p>
@@ -311,12 +317,39 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="aa8e789fa621df6a2f846918564cdb3f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8e789fa621df6a2f846918564cdb3f2">&#9670;&nbsp;</a></span>deviceSetupStatusCodeToString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string aace::alexa::deviceSetupStatusCodeToString </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classaace_1_1alexa_1_1_device_setup.html#a9b27d4306350236719aed083ff389f00">DeviceSetup::StatusCode</a> &amp;&#160;</td>
+          <td class="paramname"><em>statusCode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This function returns the std::string equivalent of the input enum value </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.2.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public:
     /// @}
 
     /// Emit vehicle metric
-    void record(bool full);
+    void record();
 
     bool setProperty_operatingCountry(
         const std::string& value,
@@ -103,7 +103,7 @@ protected:
      * to the name of the attribute as required for metrics.
      */
     std::string getPropertyAttributeForMetric(VehiclePropertyType property);
-    std::shared_ptr<aace::engine::metrics::MetricEvent> generateVehiclePropertiesMetric(bool empty);
+    std::shared_ptr<aace::engine::metrics::MetricEvent> generateVehiclePropertiesMetric();
 
 private:
     bool registerProperties();
@@ -111,10 +111,10 @@ private:
 private:
     std::unordered_map<VehiclePropertyType, std::string, EnumHash> m_vehiclePropertyMap;
     std::string m_operatingCountry;
-    /// Record empty metric flag
-    bool m_recordEmpty;
+
     /// Record full metric flag
     bool m_recordFull;
+
     /// Whether "aace.vehicle.info" is configured
     bool m_vehicleInfoConfigured;
 };

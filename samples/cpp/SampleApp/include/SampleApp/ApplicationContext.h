@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ class ApplicationContext {
 private:
     bool m_audioFileSupported{false};
     bool m_authProviderAvailable{false};
+    bool m_disableAutoAuthorization{false};
     bool m_logEnabled{false};
     bool m_messagingResponsesEnabled{true};
     bool m_singleThreadedUI{false};
@@ -56,8 +57,8 @@ private:
     std::string m_authorizationInProgress{};
     std::string m_browserCommand{};
     std::string m_mediaPlayerCommand{};
+    std::string m_networkIdentifier{};
     std::string m_payloadScriptCommand{};
-    std::string m_userConfigFilePath{};
     std::deque<std::string> m_audioFilePaths{};
     std::vector<std::string> m_configFilePaths{};
     std::vector<std::string> m_menuFilePaths{};
@@ -73,9 +74,7 @@ public:
     auto addAudioFilePath(const std::string& audioFilePath) -> void;
     auto addConfigFilePath(const std::string& configFilePath) -> void;
     auto addMenuFilePath(const std::string& menuFilePath) -> void;
-    auto checkDcmConfiguration(const std::vector<json>& configs) -> bool;
     auto clearLevel() -> void;
-    auto clearUserConfigFilePath() -> void;
     auto executeCommand(const char* command) -> std::string;
     auto getApplicationDirPath() -> std::string;
     auto getApplicationPath() -> std::string;
@@ -94,14 +93,14 @@ public:
     auto getMenuPtr(const std::string& id) -> json*;
     auto getMenuValue(const std::string& id, json defaultValue = nullptr) -> json;
     auto getMinimumAVSVolume() -> int;
+    auto getNetworkIdentifier() -> std::string;
     auto getPayloadScriptCommand() -> std::string;
-    auto getUserConfigFilePath() -> std::string;
     auto hasDefaultMediaPlayer() -> bool;
     auto hasMenu(const std::string& id) -> bool;
     auto hasRefreshToken(const std::string& service) -> bool;
-    auto hasUserConfigFilePath() -> bool;
     auto isAlexaCommsSupported() -> bool;
     auto isAudioFileSupported() -> bool;
+    auto isAutoAuthorizationDisabled() -> bool;
     auto isConnectivitySupported() -> bool;
     auto isDcmSupported() -> bool;
     auto isLocalVoiceControlSupported() -> bool;
@@ -125,12 +124,13 @@ public:
     auto setAuthorizationInProgress(const std::string& service) -> void;
     auto setAuthProviderAvailability(bool available) -> void;
     auto setBrowserCommand(const std::string& browserCommand) -> void;
+    auto setDisableAutoAuthorizationCommand(bool disable) -> void;
     auto setLevel(logger::LoggerHandler::Level level) -> void;
     auto setMediaPlayerCommand(const std::string& mediaPlayerCommand) -> void;
     auto setMessagingResponses(bool messagingResponses) -> void;
+    auto setNetworkIdentifier(const std::string& networkIdentifier) -> void;
     auto setPayloadScriptCommand(const std::string& payloadScriptCommand) -> void;
     auto setSingleThreadedUI(bool singleThreadedUI) -> void;
-    auto setUserConfigFilePath(const std::string& userConfigFilePath) -> void;
     auto testExpression(const std::string& value) -> bool;
     auto testValue(const std::string& value) -> bool;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ struct Location {
     std::string toString() const;
     float latitude;
     float longitude;
+    float altitude = -1;
+    float accuracy = -1;
 };
 
 //JSON Serialization
@@ -48,11 +50,19 @@ inline void to_json(nlohmann::json& j, const Location& c) {
     j = nlohmann::json{
         {"latitude", c.latitude},
         {"longitude", c.longitude},
+        {"altitude", c.altitude},
+        {"accuracy", c.accuracy},
     };
 }
 inline void from_json(const nlohmann::json& j, Location& c) {
     j.at("latitude").get_to(c.latitude);
     j.at("longitude").get_to(c.longitude);
+    if (j.contains("altitude")) {
+        j.at("altitude").get_to(c.altitude);
+    }
+    if (j.contains("accuracy")) {
+        j.at("accuracy").get_to(c.accuracy);
+    }
 }
 
 inline std::string Location::toString() const {

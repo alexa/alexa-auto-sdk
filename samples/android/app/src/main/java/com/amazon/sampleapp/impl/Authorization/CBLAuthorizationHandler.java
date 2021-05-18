@@ -108,7 +108,7 @@ public class CBLAuthorizationHandler implements AuthorizationHandlerObserverInte
 
     @Override
     public void onAuthorizationError(String error, String message) {
-        if (error == "CODE_PAIR_EXPIRED") {
+        if (error.equals("CODE_PAIR_EXPIRED")) {
             showLoginButton();
             try {
                 JSONObject renderJSON = new JSONObject();
@@ -118,7 +118,7 @@ public class CBLAuthorizationHandler implements AuthorizationHandlerObserverInte
             } catch (JSONException e) {
                 mLogger.postError(sTag, e.getMessage());
             }
-        } else if (error == "AUTHORIZATION_EXPIRED") {
+        } else if (error.equals("AUTHORIZATION_EXPIRED")) {
             try {
                 JSONObject renderJSON = new JSONObject();
                 String expiredMessage = "The token has expired. Log in again.";
@@ -155,7 +155,7 @@ public class CBLAuthorizationHandler implements AuthorizationHandlerObserverInte
             }
             return refreshToken;
         } else {
-            mLogger.postError(sTag, "unhandeledKey");
+            mLogger.postError(sTag, "unhandledKey");
         }
         return "";
     }
@@ -173,66 +173,48 @@ public class CBLAuthorizationHandler implements AuthorizationHandlerObserverInte
 
     private void setupUI() {
         mLoginView = mActivity.findViewById(R.id.cblLogin);
-        mLoginView.findViewById(R.id.cblLoginButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLogger.postInfo(sTag, "Starting CBL Authorization login flow...");
-                StartAuthorizationFlow();
-            }
+        mLoginView.findViewById(R.id.cblLoginButton).setOnClickListener(v -> {
+            mLogger.postInfo(sTag, "Starting CBL Authorization login flow...");
+            StartAuthorizationFlow();
         });
 
         mCancelView = mActivity.findViewById(R.id.cblCancel);
-        mCancelView.findViewById(R.id.cblCancelButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLogger.postInfo(sTag, "Cancelling CBL Authorization login flow...");
-                mAuthorizationHandler.cancelAuth(CBL_AUTHORIZATION_SERVICE_NAME);
-                if ((mState == Authorization.AuthorizationState.AUTHORIZING)) {
-                    showLoginButton();
-                }
+        mCancelView.findViewById(R.id.cblCancelButton).setOnClickListener(v -> {
+            mLogger.postInfo(sTag, "Cancelling CBL Authorization login flow...");
+            mAuthorizationHandler.cancelAuth(CBL_AUTHORIZATION_SERVICE_NAME);
+            if ((mState == Authorization.AuthorizationState.AUTHORIZING)) {
+                showLoginButton();
             }
         });
 
         mLogoutView = mActivity.findViewById(R.id.cblLogout);
-        mLogoutView.findViewById(R.id.cblLogoutButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mLogger.postInfo(sTag, "Resetting CBL Authorization...");
-                mAuthorizationHandler.logoutAuth(CBL_AUTHORIZATION_SERVICE_NAME);
-            }
+        mLogoutView.findViewById(R.id.cblLogoutButton).setOnClickListener(v -> {
+            mLogger.postInfo(sTag, "Resetting CBL Authorization...");
+            mAuthorizationHandler.logoutAuth(CBL_AUTHORIZATION_SERVICE_NAME);
         });
     }
 
     private void showLoginButton() {
-        mMainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mLoginView.setVisibility(View.VISIBLE);
-                mCancelView.setVisibility(View.GONE);
-                mLogoutView.setVisibility(View.GONE);
-            }
+        mMainThreadHandler.post(() -> {
+            mLoginView.setVisibility(View.VISIBLE);
+            mCancelView.setVisibility(View.GONE);
+            mLogoutView.setVisibility(View.GONE);
         });
     }
 
     private void showCancelButton() {
-        mMainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mLoginView.setVisibility(View.GONE);
-                mCancelView.setVisibility(View.VISIBLE);
-                mLogoutView.setVisibility(View.GONE);
-            }
+        mMainThreadHandler.post(() -> {
+            mLoginView.setVisibility(View.GONE);
+            mCancelView.setVisibility(View.VISIBLE);
+            mLogoutView.setVisibility(View.GONE);
         });
     }
 
     private void showLogoutButton() {
-        mMainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mLoginView.setVisibility(View.GONE);
-                mCancelView.setVisibility(View.GONE);
-                mLogoutView.setVisibility(View.VISIBLE);
-            }
+        mMainThreadHandler.post(() -> {
+            mLoginView.setVisibility(View.GONE);
+            mCancelView.setVisibility(View.GONE);
+            mLogoutView.setVisibility(View.VISIBLE);
         });
     }
 

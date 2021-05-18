@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 
 // String to identify log entries originating from this file.
 static const char TAG[] = "aace.jni.alexa.LocationProviderBinder";
+
+// type aliases
+using LocationServiceAccess = aace::jni::location::LocationProviderHandler::LocationServiceAccess;
 
 namespace aace {
 namespace jni {
@@ -127,6 +130,26 @@ Java_com_amazon_aace_location_LocationProvider_disposeBinder(JNIEnv* env, jobjec
         delete locationProviderBinder;
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_location_LocationProvider_disposeBinder", ex.what());
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_amazon_aace_location_LocationProvider_locationServiceAccessChanged(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jobject access) {
+    try {
+        auto locationProviderBinder = LOCATION_PROVIDER_BINDER(ref);
+        ThrowIfNull(locationProviderBinder, "invalidLocationProviderBinder");
+
+        LocationServiceAccess statusType;
+        ThrowIfNot(
+            aace::jni::location::JLocationServiceAccess::checkType(access, &statusType),
+            "invalidLocationServiceAccessType");
+
+        locationProviderBinder->getLocationProviderHandler()->locationServiceAccessChanged(statusType);
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_location_LocationProvider_locationServiceAccessChanged", ex.what());
     }
 }
 }

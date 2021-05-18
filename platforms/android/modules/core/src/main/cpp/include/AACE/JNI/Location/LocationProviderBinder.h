@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,6 +51,10 @@ public:
         return m_locationProviderHandler;
     }
 
+    std::shared_ptr<LocationProviderHandler> getLocationProviderHandler() {
+        return m_locationProviderHandler;
+    }
+
 private:
     std::shared_ptr<LocationProviderHandler> m_locationProviderHandler;
 };
@@ -65,6 +69,25 @@ public:
     }
     aace::location::Location getLocation();
 };
+
+//
+// JLocationServiceAccess
+//
+
+class JLocationServiceAccessConfig : public EnumConfiguration<LocationProviderHandler::LocationServiceAccess> {
+public:
+    using T = LocationProviderHandler::LocationServiceAccess;
+
+    const char* getClassName() override {
+        return "com/amazon/aace/location/LocationProvider$LocationServiceAccess";
+    }
+
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::DISABLED, "DISABLED"}, {T::ENABLED, "ENABLED"}};
+    }
+};
+
+using JLocationServiceAccess = JEnum<LocationProviderHandler::LocationServiceAccess, JLocationServiceAccessConfig>;
 
 }  // namespace location
 }  // namespace jni

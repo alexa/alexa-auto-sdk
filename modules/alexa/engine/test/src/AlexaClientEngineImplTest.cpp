@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 
 #include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
+#include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 
 #include <AACE/Test/Alexa/AlexaTestHelper.h>
 #include "AACE/Engine/Alexa/AlexaClientEngineImpl.h"
@@ -123,6 +124,11 @@ TEST_F(AlexaClientEngineImplTest, verifyConnectionStatusCallbacks) {
         m_alexaMockFactory->getFocusManagerInterfaceMock());
     ASSERT_NE(alexaEngineClientImpl, nullptr) << "AlexaClientEngineImpl pointer is null!";
 
+    std::vector<alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus> engineStatuses1;
+    engineStatuses1.emplace_back(
+    alexaClientSDK::avsCommon::sdkInterfaces::ENGINE_TYPE_ALEXA_VOICE_SERVICES
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::SERVER_ENDPOINT_CHANGED
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED);
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(),
         connectionStatusChanged(
@@ -130,9 +136,13 @@ TEST_F(AlexaClientEngineImplTest, verifyConnectionStatusCallbacks) {
             aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_ENDPOINT_CHANGED));
     alexaEngineClientImpl->onConnectionStatusChanged(
         alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED,
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::
-            SERVER_ENDPOINT_CHANGED);
+        engineStatuses1);
 
+    std::vector<alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus> engineStatuses2;
+    engineStatuses2.emplace_back(
+    alexaClientSDK::avsCommon::sdkInterfaces::ENGINE_TYPE_ALEXA_VOICE_SERVICES
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::ACL_CLIENT_REQUEST
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED);
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(),
         connectionStatusChanged(
@@ -140,27 +150,13 @@ TEST_F(AlexaClientEngineImplTest, verifyConnectionStatusCallbacks) {
             aace::alexa::AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST));
     alexaEngineClientImpl->onConnectionStatusChanged(
         alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED,
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::ACL_CLIENT_REQUEST);
+        engineStatuses2);
 
-    EXPECT_CALL(
-        *m_alexaMockFactory->getAlexaClientMock(),
-        connectionStatusChanged(
-            aace::alexa::AlexaClient::ConnectionStatus::DISCONNECTED,
-            aace::alexa::AlexaClient::ConnectionChangedReason::PING_TIMEDOUT));
-    alexaEngineClientImpl->onConnectionStatusChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED,
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::PING_TIMEDOUT);
-
-    EXPECT_CALL(
-        *m_alexaMockFactory->getAlexaClientMock(),
-        connectionStatusChanged(
-            aace::alexa::AlexaClient::ConnectionStatus::DISCONNECTED,
-            aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_SIDE_DISCONNECT));
-    alexaEngineClientImpl->onConnectionStatusChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED,
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::
-            SERVER_SIDE_DISCONNECT);
-
+    std::vector<alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus> engineStatuses3;
+    engineStatuses3.emplace_back(
+    alexaClientSDK::avsCommon::sdkInterfaces::ENGINE_TYPE_ALEXA_VOICE_SERVICES
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::INTERNAL_ERROR
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::PENDING);
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(),
         connectionStatusChanged(
@@ -168,7 +164,45 @@ TEST_F(AlexaClientEngineImplTest, verifyConnectionStatusCallbacks) {
             aace::alexa::AlexaClient::ConnectionChangedReason::INTERNAL_ERROR));
     alexaEngineClientImpl->onConnectionStatusChanged(
         alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::PENDING,
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::INTERNAL_ERROR);
+        engineStatuses3);
+
+    std::vector<alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus> engineStatuses4;
+    engineStatuses4.emplace_back(
+    alexaClientSDK::avsCommon::sdkInterfaces::ENGINE_TYPE_ALEXA_VOICE_SERVICES
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::PING_TIMEDOUT
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED);
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(),
+        connectionStatusChanged(
+            aace::alexa::AlexaClient::ConnectionStatus::DISCONNECTED,
+            aace::alexa::AlexaClient::ConnectionChangedReason::PING_TIMEDOUT));
+        alexaEngineClientImpl->onConnectionStatusChanged(
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED,
+        engineStatuses4);
+
+    //Running a repeated test to ensure last status and next status are not matching, otherwise engine would ignore it
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(),
+        connectionStatusChanged(
+            aace::alexa::AlexaClient::ConnectionStatus::CONNECTED,
+            aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_ENDPOINT_CHANGED));
+    alexaEngineClientImpl->onConnectionStatusChanged(
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED,
+        engineStatuses1);
+
+    std::vector<alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus> engineStatuses5;
+    engineStatuses5.emplace_back(
+    alexaClientSDK::avsCommon::sdkInterfaces::ENGINE_TYPE_ALEXA_VOICE_SERVICES
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::SERVER_SIDE_DISCONNECT
+    , alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED);
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(),
+        connectionStatusChanged(
+            aace::alexa::AlexaClient::ConnectionStatus::DISCONNECTED,
+            aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_SIDE_DISCONNECT));
+         alexaEngineClientImpl->onConnectionStatusChanged(
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED,
+        engineStatuses5);
 }
 
 TEST_F(AlexaClientEngineImplTest, verifyStopForegroundActivity) {

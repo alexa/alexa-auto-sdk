@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -78,6 +78,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a97f95a88be0b6cf84f3295a11eed5ba5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea9910732c32ee028b109ff24bd61ef8"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location_provider.html#aea9910732c32ee028b109ff24bd61ef8">getCountry</a> ()</td></tr>
 <tr class="separator:aea9910732c32ee028b109ff24bd61ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada8a11d25bde2e2d760cbb38c445f9cf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1location_1_1_location_provider.html#ada8a11d25bde2e2d760cbb38c445f9cf">locationServiceAccessChanged</a> (<a class="el" href="classaace_1_1location_1_1_location_provider_engine_interface.html#af50b4c69d527d2c4eb15ca5b9169799c">LocationServiceAccess</a> access)</td></tr>
+<tr class="separator:ada8a11d25bde2e2d760cbb38c445f9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1location_1_1_location_provider.html">LocationProvider</a> should be extended to report geolocation to the Engine. </p>
@@ -136,12 +138,37 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ada8a11d25bde2e2d760cbb38c445f9cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada8a11d25bde2e2d760cbb38c445f9cf">&#9670;&nbsp;</a></span>locationServiceAccessChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void aace::location::LocationProvider::locationServiceAccessChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classaace_1_1location_1_1_location_provider_engine_interface.html#af50b4c69d527d2c4eb15ca5b9169799c">LocationServiceAccess</a>&#160;</td>
+          <td class="paramname"><em>access</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the Engine of a change in location service access. Use this function when the device's access to location service provider changes. E.g., system location access is not granted to the application.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">access</td><td>Access to the location service </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.2.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

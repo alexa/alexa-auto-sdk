@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ struct PrepareSpeechMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.1";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -65,7 +65,7 @@ struct PrepareSpeechMessage {
         std::string speechId;
         std::string text;
         std::string provider;
-        std::string options;
+        std::string options = "";
     };
     static const std::string& topic() {
         static std::string topic = "TextToSpeech";
@@ -76,7 +76,7 @@ struct PrepareSpeechMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.1";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {
@@ -101,7 +101,9 @@ inline void from_json(const nlohmann::json& j, PrepareSpeechMessage::Payload& c)
     j.at("speechId").get_to(c.speechId);
     j.at("text").get_to(c.text);
     j.at("provider").get_to(c.provider);
-    j.at("options").get_to(c.options);
+    if (j.contains("options")) {
+        j.at("options").get_to(c.options);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const PrepareSpeechMessage::Header::MessageDescription& c) {

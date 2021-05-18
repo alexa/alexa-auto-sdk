@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,11 +13,12 @@
  * permissions and limitations under the License.
  */
 
+#include "AASB/Engine/Connectivity/AASBConnectivityEngineService.h"
+
 #include <AACE/Engine/AASB/MessageBrokerInterface.h>
 #include <AACE/Engine/Core/EngineMacros.h>
 
 #include "AASB/Engine/Connectivity/AASBAlexaConnectivity.h"
-#include "AASB/Engine/Connectivity/AASBConnectivityEngineService.h"
 
 namespace aasb {
 namespace engine {

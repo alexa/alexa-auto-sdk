@@ -64,4 +64,16 @@ var menudata={children:[
 {text:"u",url:"functions_vars.html#index_u"},
 {text:"v",url:"functions_vars.html#index_v"}]},
 {text:"Typedefs",url:"functions_type.html"},
-{text:"Enumerations",url:"functions_enum.html"}]}]}]}
+{text:"Enumerations",url:"functions_enum.html",children:[
+{text:"a",url:"functions_enum.html#index_a"},
+{text:"c",url:"functions_enum.html#index_c"},
+{text:"d",url:"functions_enum.html#index_d"},
+{text:"e",url:"functions_enum.html#index_e"},
+{text:"i",url:"functions_enum.html#index_i"},
+{text:"l",url:"functions_enum.html#index_l"},
+{text:"m",url:"functions_enum.html#index_m"},
+{text:"n",url:"functions_enum.html#index_n"},
+{text:"p",url:"functions_enum.html#index_p"},
+{text:"s",url:"functions_enum.html#index_s"},
+{text:"t",url:"functions_enum.html#index_t"},
+{text:"v",url:"functions_enum.html#index_v"}]}]}]}]}

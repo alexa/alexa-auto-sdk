@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,8 +40,9 @@ public:
     using ManagedProvider = AlexaConnectivityListenerInterface::ManagedProvider;
     using ManagedProviderState = AlexaConnectivityListenerInterface::ManagedProviderState;
     using ManagedProviderType = AlexaConnectivityListenerInterface::ManagedProviderType;
+    using Terms = AlexaConnectivityListenerInterface::Terms;
+    using TermsState = AlexaConnectivityListenerInterface::TermsState;
     using TermsStatus = AlexaConnectivityListenerInterface::TermsStatus;
-    using TermsStatusState = AlexaConnectivityListenerInterface::TermsStatusState;
 
     /**
      * A unique identifier provided by the network provider to identify the device connected to the Internet.
@@ -82,11 +83,11 @@ public:
     virtual NetworkIdentifier getNetworkIdentifier() const = 0;
 
     /**
-     * Get the terms status.
+     * Get the terms.
      *
-     * @return The TermsStatus enum.
+     * @return The Terms object.
      */
-    virtual TermsStatus getTermsStatus() const = 0;
+    virtual Terms getTerms() const = 0;
 };
 
 }  // namespace connectivity

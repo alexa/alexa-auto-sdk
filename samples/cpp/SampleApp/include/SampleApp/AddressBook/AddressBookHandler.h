@@ -72,6 +72,8 @@ struct Name {
     std::string firstName;
     std::string lastName;
     std::string nickName;
+    std::string phoneticLastName;
+    std::string phoneticFirstName;
 };
 
 struct PostalAddress {

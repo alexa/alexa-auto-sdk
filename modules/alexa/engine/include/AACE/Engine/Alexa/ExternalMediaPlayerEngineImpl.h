@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,15 +28,12 @@
 #include <AVSCommon/AVS/CapabilityConfiguration.h>
 #include <AVSCommon/AVS/DirectiveHandlerConfiguration.h>
 #include <AVSCommon/AVS/NamespaceAndName.h>
-#include <AVSCommon/SDKInterfaces/CapabilitiesDelegateInterface.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
-// #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h>
-// #include <AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h>
-// #include <AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h>
 #include "ExternalMediaAdapterInterface.h"
 #include "ExternalMediaAdapterHandlerInterface.h"
 #include "ExternalMediaPlayerInterface.h"
@@ -47,8 +44,6 @@
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
-#include <Endpoints/EndpointBuilder.h>
-// #include <ExternalMediaPlayer/ExternalMediaPlayer.h>
 #include "ExternalMediaPlayer.h"
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
@@ -83,8 +78,8 @@ private:
     // functions without the "Locked" suffix must not be called when the calling thread already holds @c m_playersMutex
 
     bool initialize(
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
@@ -108,8 +103,8 @@ private:
 public:
     static std::shared_ptr<ExternalMediaPlayerEngineImpl> create(
         const std::string& agent,
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
@@ -163,6 +158,8 @@ public:
 
     // alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
     void onConnectionStatusChanged(const Status status, const ChangedReason reason) override;
+    void onConnectionStatusChanged(const Status status, const std::vector<EngineConnectionStatus>& engineStatuses)
+        override;
 
     // RenderPlayerInfoCardsObserver interface
     void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
@@ -199,16 +196,34 @@ private:
      * @c m_playersMutex.
      */
     DiscoveredPlayerMap m_pendingDiscoveredPlayerMap;
+
+    /**
+     * A map of all discovered players, used to rerun the authorization sequence when needed. Key is the player's
+     * localPlayerId and value is its @c DiscoveredPlayerInfo discovery metadata. Access is serialized by
+     * @c m_playersMutex
+     *
+     * note: Although possible to derive the contents of this map whenever it is needed using other info-caching
+     * members of this class, the simplicity is preferable.
+    */
+    DiscoveredPlayerMap m_allDiscoveredPlayersMap;
+
     /**
      * A map of players reported and acknowledged by an AuthorizeDiscoveredPlayers directive. Key is the player's 
      * localPlayerId and value is @c PlayerInfo metadata including its authorization status. Access is serialized by 
      * @c m_playersMutex.
      */
     std::unordered_map<std::string, PlayerInfo> m_authorizationStateMap;
+
     /**
      * The current state of connection to an Alexa endpoint. Access is serialized by @c m_connectionMutex
      */
     Status m_connectionStatus = Status::DISCONNECTED;
+
+    /**
+     * The current engine types connected to an Alexa endpoint. Access is serialized by @c m_connectionMutex
+     */
+    std::vector<int> m_currentConnectedEngineTypes;
+
     /**
      * Serializes access to @c m_pendingDiscoveredPlayerMap and @c m_authorizationStateMap
      */
@@ -250,15 +265,15 @@ private:
 //
 // AudioPlayerObserverDelegate
 //
-
-class AudioPlayerObserverDelegate : public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface {
+class AudioPlayerObserverDelegate : public alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface {
 public:
     AudioPlayerObserverDelegate() = default;
     void onPlayerActivityChanged(alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context) override;
-    void setDelegate(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> delegate);
+    void setDelegate(
+        std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface> delegate);
 
 private:
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> m_delegate;
+    std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface> m_delegate;
 };
 
 }  // namespace alexa

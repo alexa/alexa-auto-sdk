@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ struct CallFailedMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.1";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -67,7 +67,7 @@ struct CallFailedMessage {
 
         std::string callId;
         CallError code;
-        std::string message;
+        std::string message = "";
     };
     static const std::string& topic() {
         static std::string topic = "PhoneCallController";
@@ -78,7 +78,7 @@ struct CallFailedMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.1";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {
@@ -101,7 +101,9 @@ inline void to_json(nlohmann::json& j, const CallFailedMessage::Payload& c) {
 inline void from_json(const nlohmann::json& j, CallFailedMessage::Payload& c) {
     j.at("callId").get_to(c.callId);
     j.at("code").get_to(c.code);
-    j.at("message").get_to(c.message);
+    if (j.contains("message")) {
+        j.at("message").get_to(c.message);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const CallFailedMessage::Header::MessageDescription& c) {

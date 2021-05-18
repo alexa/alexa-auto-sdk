@@ -41,6 +41,9 @@ public class IPCConstants {
     public static final String AACS_IPC_ACK_STATE = "state";
     public static final String AACS_IPC_ACK_SUCCESS = "success";
 
+    // AACS AAR Check
+    public static final String AACS_IPC_PACKAGE_NAME_MATCHES = "aacsIncludedAsAAR";
+
     // AACS IPC protocol enum values
     public enum AacsIpcMessageType {
         EMBEDDED("embedded"),

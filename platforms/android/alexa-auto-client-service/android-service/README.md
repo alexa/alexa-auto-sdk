@@ -6,6 +6,7 @@ with a few additional fields unique to AACS.
 
 - [Auto SDK Modules](#auto-sdk-modules)
   - [localMediaSource](#localmediasource)
+- [AACS Module Enablement](#aacs-module-enablement)
 - [General](#general)
   - [persistentSystemService](#persistentsystemservice)
   - [startServiceOnBootEnabled](#startserviceonbootenabled)
@@ -35,7 +36,17 @@ The `aacs.aasb` module requires a field `version`, as detailed in [AASB README](
 ~~~
 {
     "aacs.aasb": {
-        "version": "3.1"
+        "version": "3.2"
+    }
+}
+~~~
+
+Optionally, you can also configure the timeout value of AASB synchronous messages in `aacs.aasb`, as detailed in [AASB README](../../../../extensions/aasb/README.md). The default timeout duration is 500 ms. 
+~~~
+{
+    "aacs.aasb": {
+        ...
+        "defaultMessageTimeout": 1000
     }
 }
 ~~~
@@ -75,6 +86,50 @@ Specifies which local media sources are available and handled in the application
 
 Specifies the available local media sources. Possible values are `BLUETOOTH`, `USB`, `FM_RADIO`, `AM_RADIO`, `SATELLITE_RADIO`, 
 `LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, and `DAB`.
+
+## AACS Module Enablement
+AACS allows your application to enable/disable certain modules using AACS configuration file. To enable or disable certain modules,
+add certain JSON blocks to the AACS configuration inside "aacs.modules" block, as shown in the following examples:
+
+- APL module is disabled by default. To enable APL, add the following configuration to the config file:
+
+```
+{
+    "aacs.modules": {
+       "aacs.apl": {
+            "APL": {
+                "enabled": true
+            }
+        }
+    }
+}
+```
+
+- `Authorization` and `CBL` cannot be enabled at the same time. CBL module is deprecated in version 3.1, your application should use the Authorization 
+modules instead. To disable `CBL`, add the following configuration to the config file:
+```
+{
+    "aacs.modules": {
+      "aacs.cbl": {
+        "CBL": {
+          "enabled": false
+        }
+      }
+    }
+}
+```
+If your application uses the deprecated `CBL` module, disable the `Authorization` module in the configuration:
+```
+{
+    "aacs.modules": {
+      "aacs.authorization": {
+        "Authorization": {
+          "enabled": false
+        }
+      }
+    }
+}
+```
 
 ## General
 `aacs.general` is used for most configurable values of AACS that are not required for the Auto SDK, as shown in the following example: 
@@ -150,7 +205,17 @@ Specifies the available local media sources. Possible values are `BLUETOOTH`, `U
                 "package": [],
                 "class": []
             },
-            "Connectivity" : {
+            "AlexaConnectivity" : {
+                "type": [],
+                "package": [],
+                "class": []
+            },
+            "DeviceSetup" : {
+                "type": [],
+                "package": [],
+                "class": []
+            },
+            "DeviceUsage" : {
                 "type": [],
                 "package": [],
                 "class": []

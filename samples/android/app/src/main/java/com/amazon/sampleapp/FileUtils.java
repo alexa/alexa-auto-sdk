@@ -2,8 +2,9 @@ package com.amazon.sampleapp;
 
 import android.content.res.AssetManager;
 import android.os.Environment;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;

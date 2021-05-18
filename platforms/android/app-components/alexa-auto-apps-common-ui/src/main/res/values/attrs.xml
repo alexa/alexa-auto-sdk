@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <attr name="hintColorOnBackground" format="color" />
+<attr name="dividerColorOnBackground" format="color" />
 <attr name="colorOnPrimary" format="color" />
 <attr name="colorSurface" format="color" />
 <attr name="colorOnSurface" format="color" />

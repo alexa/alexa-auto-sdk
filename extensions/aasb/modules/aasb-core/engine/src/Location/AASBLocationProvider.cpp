@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <AASB/Message/Location/LocationProvider/GetCountryMessageReply.h>
 #include <AASB/Message/Location/LocationProvider/GetLocationMessage.h>
 #include <AASB/Message/Location/LocationProvider/GetLocationMessageReply.h>
+#include <AASB/Message/Location/LocationProvider/LocationServiceAccessChangedMessage.h>
 
 namespace aasb {
 namespace engine {
@@ -53,6 +54,29 @@ bool AASBLocationProvider::initialize(std::shared_ptr<aace::engine::aasb::Messag
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
         m_messageBroker = messageBroker;
 
+        // create a wp reference
+        std::weak_ptr<AASBLocationProvider> wp = shared_from_this();
+
+        //
+        // LocationProvider:LocationServiceAccessChanged
+        //
+        messageBroker->subscribe(
+            aasb::message::location::locationProvider::LocationServiceAccessChangedMessage::topic(),
+            aasb::message::location::locationProvider::LocationServiceAccessChangedMessage::action(),
+            [wp](const Message& message) {
+                try {
+                    auto sp = wp.lock();
+                    ThrowIfNull(sp, "invalidWeakPtrReference");
+
+                    aasb::message::location::locationProvider::LocationServiceAccessChangedMessage::Payload payload =
+                        nlohmann::json::parse(message.payload());
+
+                    sp->locationServiceAccessChanged(static_cast<LocationServiceAccess>(payload.access));
+
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "LocationServiceAccessChangedMessage").d("reason", ex.what()));
+                }
+            });
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -80,8 +104,12 @@ aace::location::Location AASBLocationProvider::getLocation() {
         aasb::message::location::locationProvider::GetLocationMessageReply::Payload payload =
             nlohmann::json::parse(result.payload());
 
+        auto altitude = payload.location.altitude < 0 ? aace::location::Location::UNDEFINED : payload.location.altitude;
+        auto accuracy = payload.location.accuracy < 0 ? aace::location::Location::UNDEFINED : payload.location.accuracy;
+
         // parse the location from payload
-        m_location = aace::location::Location(payload.location.latitude, payload.location.longitude);
+        m_location =
+            aace::location::Location(payload.location.latitude, payload.location.longitude, altitude, accuracy);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }

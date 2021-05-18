@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/White">
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/dialogButtonClose"/>
+
+    <ImageButton
+        android:id="@+id/dialogButtonClose"
+        android:layout_width="@dimen/login_close_button_width"
+        android:layout_height="@dimen/login_close_button_width"
+        android:src="@drawable/ic_close" />
+</RelativeLayout>

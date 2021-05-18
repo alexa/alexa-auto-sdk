@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -62,12 +62,18 @@ public:
     /// @}
     void doShutDown();
 
+    void addEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener);
+    void removeEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener);
+
 private:
     /// Authorization platform interface handler reference
     std::shared_ptr<aace::authorization::Authorization> m_authorizationPlatformInterface;
 
     /// Reference to get the registered authorization service
     std::shared_ptr<AuthorizationServiceInterface> m_authorizationService;
+
+    /// The list of registered authorization event listeners
+    std::vector<std::weak_ptr<AuthorizationEventListenerInterface>> m_eventListeners;
 };
 
 }  // namespace authorization

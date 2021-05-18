@@ -21,6 +21,7 @@
 #include <AASB/Engine/Alexa/AASBAlexaEngineService.h>
 #include <AASB/Engine/Alexa/AASBAudioPlayer.h>
 #include <AASB/Engine/Alexa/AASBAuthProvider.h>
+#include <AASB/Engine/Alexa/AASBDeviceSetup.h>
 #include <AASB/Engine/Alexa/AASBDoNotDisturb.h>
 #include <AASB/Engine/Alexa/AASBEqualizerController.h>
 #include <AASB/Engine/Alexa/AASBExternalMediaAdapter.h>
@@ -60,6 +61,7 @@ AASBAlexaEngineService::AASBAlexaEngineService(const aace::engine::core::Service
              "AlexaSpeaker",
              "AudioPlayer",
              "AuthProvider",
+             "DeviceSetup",
              "DoNotDisturb",
              "EqualizerController",
              "ExternalMediaAdapter",
@@ -154,6 +156,13 @@ bool AASBAlexaEngineService::postRegister() {
             auto audioPlayer = AASBAudioPlayer::create(aasbServiceInterface->getMessageBroker());
             ThrowIfNull(audioPlayer, "invalidAudioPlayerHandler");
             context->registerPlatformInterface(audioPlayer);
+        }
+
+        // DeviceSetup
+        if (isInterfaceEnabled("DeviceSetup")) {
+            auto deviceSetup = AASBDeviceSetup::create(aasbServiceInterface->getMessageBroker());
+            ThrowIfNull(deviceSetup, "invalidDeviceSetupbHandler");
+            context->registerPlatformInterface(deviceSetup);
         }
 
         // DoNotDisturb

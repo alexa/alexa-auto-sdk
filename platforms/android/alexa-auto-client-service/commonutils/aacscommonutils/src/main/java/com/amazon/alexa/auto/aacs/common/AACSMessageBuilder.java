@@ -114,7 +114,7 @@ public class AACSMessageBuilder {
         try {
             String aasbMessage = "{\n"
                     + "  \"header\" : {\n"
-                    + "    \"version\" : \"1.0\",\n"
+                    + "    \"version\" : \"3.2\",\n"
                     + "    \"messageType\" : \"Reply\",\n"
                     + "    \"id\" : \"" + uniqueID + "\",\n"
                     + "    \"messageDescription\" : {\n"
@@ -146,11 +146,33 @@ public class AACSMessageBuilder {
      * @return Message encoded as JSON.
      */
     public static Optional<String> buildMessage(@NonNull String topic, @NonNull String action, String payload) {
+        Optional<String[]> message = AACSMessageBuilder.buildMessageReturnID(topic, action, payload);
+        if (message.isPresent()) {
+            return Optional.of(message.get()[0]);
+        } else {
+            Log.w(TAG,
+                    "Failed to build AACS payload for message. Topic: " + topic + " Action: " + action
+                            + " Message payload: " + payload);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Build a AACS Message JSON from its constituents.
+     *
+     * @param topic Topic of the message.
+     * @param action Action of the message.
+     * @param payload Payload of the message.
+     *
+     * @return Message encoded as JSON and unique ID for messageId
+     */
+    public static Optional<String[]> buildMessageReturnID(
+            @NonNull String topic, @NonNull String action, String payload) {
         String uniqueID = UUID.randomUUID().toString();
         try {
             String aasbMessage = "{\n"
                     + "  \"header\" : {\n"
-                    + "    \"version\" : \"1.0\",\n"
+                    + "    \"version\" : \"3.2\",\n"
                     + "    \"messageType\" : \"Publish\",\n"
                     + "    \"id\" : \"" + uniqueID + "\",\n"
                     + "    \"messageDescription\" : {\n"
@@ -165,7 +187,9 @@ public class AACSMessageBuilder {
                 JSONObject payloadJson = new JSONObject(payload);
                 msgObj.put("payload", payloadJson);
             }
-            return Optional.of(msgObj.toString());
+
+            // return both message JSON string at position [0] and unique messageId at position [1] as String array
+            return Optional.of(new String[] {msgObj.toString(), uniqueID});
         } catch (Exception e) {
             Log.e(TAG, "Failed to construct AACS message. Error: " + e);
             return Optional.empty();

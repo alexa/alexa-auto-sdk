@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/aacs_connection_loading_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <ProgressBar
+        android:id="@+id/aacs_connection_progress_spinner"
+        android:layout_width="@dimen/login_loading_item_width"
+        android:layout_height="@dimen/login_loading_item_width"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/aacs_connection_loading_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/aacs_connection_loading_text_view"
+        style="@style/Alexa.Heading3Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:text="@string/login_connect_to_aacs"
+        android:textColor="@android:color/holo_red_light"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/aacs_connection_progress_spinner" />
+</androidx.constraintlayout.widget.ConstraintLayout>

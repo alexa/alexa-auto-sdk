@@ -28,12 +28,13 @@ import androidx.annotation.NonNull;
 import com.amazon.aace.location.Location;
 import com.amazon.aace.location.LocationProvider;
 import com.amazon.aacsconstants.AACSConstants;
+import com.amazon.alexaautoclientservice.aacs_extra.EngineStatusListener;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 
-public class LocationProviderHandler extends LocationProvider implements LocationListener {
+public class LocationProviderHandler extends LocationProvider implements LocationListener, EngineStatusListener {
     private static final String TAG = AACSConstants.AACS + "-" + LocationProvider.class.getSimpleName();
     private static final int MIN_REFRESH_TIME = 60000;
     private static final int MIN_REFRESH_DISTANCE = 0;
@@ -53,12 +54,6 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
         for (String provider : availableProviders) {
             mAvailableProviders.add(provider);
         }
-
-        requestLocationUpdates(LocationManager.NETWORK_PROVIDER);
-        requestLocationUpdates(LocationManager.GPS_PROVIDER);
-
-        updateLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        updateLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
     @Override
@@ -120,12 +115,15 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
     @Override
     public void onProviderDisabled(String provider) {
         Log.v(TAG, String.format("provider disabled: %s", provider));
-        mCurrentLocation = null;
+        if (!isAnyProviderAvailable()) {
+            locationServiceAccessChanged(LocationServiceAccess.DISABLED);
+        }
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         Log.v(TAG, String.format("provider enabled: %s", provider));
+        locationServiceAccessChanged(LocationServiceAccess.ENABLED);
         requestLocationUpdates(provider);
         updateLastKnownLocation(provider);
     }
@@ -189,5 +187,28 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
         return String.format("Provider: %s, latitude: %s, longitude: %s, altitude: %s, accuracy: %s",
                 location.getProvider(), location.getLatitude(), location.getLongitude(), location.getAltitude(),
                 location.getAccuracy());
+    }
+
+    private boolean isAnyProviderAvailable() {
+        boolean available = false;
+        for (String provider : mAvailableProviders) {
+            available = available || mLocationManager.isProviderEnabled(provider);
+        }
+        return available;
+    }
+
+    @Override
+    public void onEngineStart() {
+        requestLocationUpdates(LocationManager.NETWORK_PROVIDER);
+        requestLocationUpdates(LocationManager.GPS_PROVIDER);
+
+        // Retrieve an initial location estimate cached by the location providers
+        updateLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        updateLastKnownLocation(LocationManager.GPS_PROVIDER);
+    }
+
+    @Override
+    public void onEngineStop() {
+        mLocationManager.removeUpdates(this);
     }
 }

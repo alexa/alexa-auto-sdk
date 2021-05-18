@@ -1,0 +1,125 @@
+From 9f5093c7d750f0dcd2897027bbaa7a27e0c9fba0 Mon Sep 17 00:00:00 2001
+From: Eze Cervantes <ezeqc@amazon.com>
+Date: Mon, 8 Mar 2021 14:45:23 -0800
+Subject: [PATCH 3/3] Disable APLClient dependency
+
+---
+ .../AlexaPresentation/AlexaPresentation.h     | 10 ++--
+ .../src/AlexaPresentation.cpp                 | 58 +++++++++----------
+ .../AlexaPresentation/src/CMakeLists.txt      |  2 +-
+ 3 files changed, 35 insertions(+), 35 deletions(-)
+
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
+index 7a99ecb..4f909d3 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
++++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
+@@ -42,7 +42,7 @@
+ #include <AVSCommon/Utils/Metrics/DataPointDurationBuilder.h>
+ #include <AVSCommon/Utils/Metrics/DataPointCounterBuilder.h>
+ 
+-#include <APLClient/AplRenderingEvent.h>
++// #include <APLClient/AplRenderingEvent.h>
+ #include <SmartScreenSDKInterfaces/ActivityEvent.h>
+ #include <SmartScreenSDKInterfaces/AlexaPresentationObserverInterface.h>
+ #include <SmartScreenSDKInterfaces/DisplayCardState.h>
+@@ -267,10 +267,10 @@ public:
+      */
+     void recordDropFrameCount(uint64_t dropFrameCount);
+ 
+-    /**
+-     * Record the APL event for currently rendering document
+-     */
+-    void recordAPLEvent(APLClient::AplRenderingEvent event);
++    // /**
++    //  * Record the APL event for currently rendering document
++    //  */
++    // void recordAPLEvent(APLClient::AplRenderingEvent event);
+ 
+     /**
+      * The placeholder token to use for rendering Non-APL documents
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
+index b59b155..98204dc 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
++++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
+@@ -1645,35 +1645,35 @@ void AlexaPresentation::recordDropFrameCount(uint64_t dropFrameCount) {
+     triggerMetricsEventWithData(MetricEvent::DROP_FRAME, dropFrameCount, ACTIVITY_DROP_FRAME);
+ }
+ 
+-void AlexaPresentation::recordAPLEvent(APLClient::AplRenderingEvent event) {
+-    switch (event) {
+-        case APLClient::AplRenderingEvent::INFLATE_BEGIN: {
+-            /* Document will start inflating now */
+-            startMetricsEvent(MetricEvent::INFLATE);
+-
+-            break;
+-        }
+-        case APLClient::AplRenderingEvent::INFLATE_END: {
+-            /* APL Core engine completed the context inflate */
+-            endMetricsEvent(MetricEvent::INFLATE, ACTIVITY_INFLATE_APL);
+-
+-            /* Text measurement ends after the document is inflated  */
+-            endMetricsEvent(MetricEvent::TEXT_MEASURE_COUNT, ACTIVITY_TEXT_MEASURE);
+-
+-            /* Start of the view layout draw*/
+-            startMetricsEvent(MetricEvent::LAYOUT);
+-
+-            break;
+-        }
+-        case APLClient::AplRenderingEvent::TEXT_MEASURE: {
+-            /* Text measurement was performed on the document */
+-            startMetricsEvent(MetricEvent::TEXT_MEASURE_COUNT);
+-            break;
+-        }
+-        default:
+-            ACSDK_DEBUG3(LX(__func__).m("Unhandled event type"));
+-    }
+-}
++// void AlexaPresentation::recordAPLEvent(APLClient::AplRenderingEvent event) {
++//     switch (event) {
++//         case APLClient::AplRenderingEvent::INFLATE_BEGIN: {
++//             /* Document will start inflating now */
++//             startMetricsEvent(MetricEvent::INFLATE);
++
++//             break;
++//         }
++//         case APLClient::AplRenderingEvent::INFLATE_END: {
++//             /* APL Core engine completed the context inflate */
++//             endMetricsEvent(MetricEvent::INFLATE, ACTIVITY_INFLATE_APL);
++
++//             /* Text measurement ends after the document is inflated  */
++//             endMetricsEvent(MetricEvent::TEXT_MEASURE_COUNT, ACTIVITY_TEXT_MEASURE);
++
++//             /* Start of the view layout draw*/
++//             startMetricsEvent(MetricEvent::LAYOUT);
++
++//             break;
++//         }
++//         case APLClient::AplRenderingEvent::TEXT_MEASURE: {
++//             /* Text measurement was performed on the document */
++//             startMetricsEvent(MetricEvent::TEXT_MEASURE_COUNT);
++//             break;
++//         }
++//         default:
++//             ACSDK_DEBUG3(LX(__func__).m("Unhandled event type"));
++//     }
++// }
+ 
+ void AlexaPresentation::executeProactiveStateReport() {
+     if (m_stateReportCheckInterval.count() == 0 || !m_lastDisplayedDirective || m_lastRenderedAPLToken.empty() ||
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt
+index 8a2fb7b..9022a87 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt
++++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt
+@@ -9,7 +9,7 @@ target_include_directories(AlexaPresentation
+         "${APLClient_SOURCE_DIR}/include"
+         "${ASDK_INCLUDE_DIRS}")
+ 
+-target_link_libraries(AlexaPresentation "${ASDK_LDFLAGS}" SmartScreenSDKInterfaces APLClient)
++target_link_libraries(AlexaPresentation "${ASDK_LDFLAGS}" SmartScreenSDKInterfaces)
+ 
+ # install target
+ asdk_install()
+\ No newline at end of file
+-- 
+2.28.0
+

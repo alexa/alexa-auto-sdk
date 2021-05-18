@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -89,15 +89,14 @@ protected:
             m_alexaMockFactory->getSpeechSynthesizerMock(),
             m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getAudioManagerMock(),
-            m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
             m_alexaMockFactory->getFocusManagerInterfaceMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
             m_alexaMockFactory->getAttachmentManagerMock(),
             m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-            m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-            m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+            m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+            m_alexaMockFactory->getMetricRecorder());
 
         return speechSynthesizerEngineImpl;
     }
@@ -124,15 +123,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithPlatformInterfaceAsNull) {
         nullptr,
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -144,33 +142,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithAudioManagerInterfaceAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
-
-    ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
-}
-
-TEST_F(SpeechSynthesizerEngineImplTest, createWithDirectiveSequencerAsNull) {
-    auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
-        m_alexaMockFactory->getSpeechSynthesizerMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        m_alexaMockFactory->getAudioManagerMock(),
-        nullptr,
-        m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getAttachmentManagerMock(),
-        m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -182,15 +161,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithMessageSenderAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -202,15 +180,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithFocusManagerAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -222,15 +199,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithContextManagerAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -242,15 +218,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithAttachmentManagerAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -262,35 +237,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithDialogUXStateAggregatorAsNull)
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         nullptr,
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
-
-    ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
-}
-
-TEST_F(SpeechSynthesizerEngineImplTest, createWithCapabilitiesDelegateAsNull) {
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
-
-    auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
-        m_alexaMockFactory->getSpeechSynthesizerMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getAttachmentManagerMock(),
-        m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        nullptr,
-        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -302,15 +256,14 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithSpeakerManagerAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
 }
@@ -322,14 +275,32 @@ TEST_F(SpeechSynthesizerEngineImplTest, createWithExceptionSenderAsNull) {
         m_alexaMockFactory->getSpeechSynthesizerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getAttachmentManagerMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
+        nullptr,
+        m_alexaMockFactory->getMetricRecorder());
+
+    ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";
+}
+
+TEST_F(SpeechSynthesizerEngineImplTest, createWithMetricRecorderAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
+
+    auto speechSynthesizerEngineImpl = aace::engine::alexa::SpeechSynthesizerEngineImpl::create(
+        m_alexaMockFactory->getSpeechSynthesizerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_alexaMockFactory->getAudioManagerMock(),
+        m_alexaMockFactory->getMessageSenderInterfaceMock(),
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getContextManagerInterfaceMock(),
+        m_alexaMockFactory->getAttachmentManagerMock(),
+        m_alexaMockFactory->getDialogUXStateAggregatorMock(),
+        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         nullptr);
 
     ASSERT_EQ(speechSynthesizerEngineImpl, nullptr) << "SpeechSynthesizerEngineImpl pointer expected to be null";

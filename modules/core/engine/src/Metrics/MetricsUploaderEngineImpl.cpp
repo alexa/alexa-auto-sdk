@@ -35,8 +35,13 @@ const std::string MetricsUploaderEngineImpl::COUNTER_KEY = "CT";
 const std::string MetricsUploaderEngineImpl::NORMAL_PRIORITY = "NR";
 const std::string MetricsUploaderEngineImpl::HIGH_PRIORITY = "HI";
 
+const std::string MetricsUploaderEngineImpl::BUFFER = "BF";
+const std::string MetricsUploaderEngineImpl::UNIQUE = "UNIQ";
+
 static const std::regex dataRegex("([^;=,:]+)=([^;=,:]+);([^;=,:]+);([0-9]+),");
 static const std::regex priorityRegex(":(NR|HI)");
+static const std::regex bufferRegex(":(BF|NB)");
+static const std::regex uniqueRegex(":(NUNI|UNIQ)");
 
 // Helper function to parse metric header for programName and sourceName
 size_t parseHeader(const std::string& metric, std::string& programName, std::string& sourceName) {
@@ -129,16 +134,27 @@ void MetricsUploaderEngineImpl::log(
         }
 
         // Delimitate priority from metric log message by last 3 character of the message
-        std::string metricPriority = logMessage.substr(logMessage.size() - 3, 3);
+        std::string metricPriority = logMessage.substr(logMessage.size() - 11, 3);
+        std::string metricBufferType = logMessage.substr(logMessage.size() - 8, 3);
+        std::string metricIdentityType = logMessage.substr(logMessage.size() - 5, 5);
         std::smatch metricPriorityMatch;
-        if (std::regex_match(metricPriority, metricPriorityMatch, priorityRegex)) {
+        std::smatch metricBufferTypeMatch;
+        std::smatch metricIdentityTypeMatch;
+        if (std::regex_match(metricPriority, metricPriorityMatch, priorityRegex) &&
+            std::regex_match(metricBufferType, metricBufferTypeMatch, bufferRegex) &&
+            std::regex_match(metricIdentityType, metricIdentityTypeMatch, uniqueRegex)) {
             //Handle datapoints string by delimitate log message from datapoint separate position to metric priority
-            std::string datapoints = logMessage.substr(dataPointSepPos, logMessage.size() - dataPointSepPos - 3);
-            //Handle priority string by delimitate last 2 charaters from log message
-            std::string priority = logMessage.substr(logMessage.size() - 2, 2);
+            std::string datapoints = logMessage.substr(dataPointSepPos, logMessage.size() - dataPointSepPos - 11);
+            //Handle identity type string by delimitate last 4 charaters ( UNIQ / NUNI ) from log message
+            std::string identityType = logMessage.substr(logMessage.size() - 4, 4);
+            //Handle buffer type string
+            std::string bufferType = logMessage.substr(logMessage.size() - 7, 2);
+            //Handle priority string
+            std::string priority = logMessage.substr(logMessage.size() - 10, 2);
 
             //Validate values are not empty/null
-            if (programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty()) {
+            if (programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty() ||
+                identityType.empty() || bufferType.empty()) {
                 return;
             }
 
@@ -179,7 +195,8 @@ void MetricsUploaderEngineImpl::log(
                 //Set datapoints string equal to next datapoint for parsing until all datapoints parsed
                 datapoints = data_match.suffix();
             }
-            m_platformMetricsUploaderInterface->record(datapointList, metadata);
+            m_platformMetricsUploaderInterface->record(
+                datapointList, metadata, bufferType == BUFFER, identityType == UNIQUE);
         }
     } catch (std::exception& ex) {
         //Exception occurred

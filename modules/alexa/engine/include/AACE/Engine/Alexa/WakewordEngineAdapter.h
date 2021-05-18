@@ -42,7 +42,8 @@ public:
      * @param audioInputStream The stream of audio data. This audio stream should be PCM
      * encoded, have 16 bits per sample, have a sample rate of 16 kHz, and be in
      * little endian format.
-     * 
+     *
+     * @param defaultLocale The default locale
      * @param audioFormat The format of the audio data located within the stream.
      * 
      * @return returns @c true on successful initialization, otherwise @false.
@@ -50,6 +51,7 @@ public:
      **/
 
     virtual bool initialize(
+        const std::string& defaultLocale,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& audioInputStream,
         alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat) = 0;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -73,6 +73,21 @@ public class Action {
         public static final String SEND_EVENT = "SendEvent";
         public static final String SET_AUTHORIZATION_DATA = "SetAuthorizationData";
         public static final String START_AUTHORIZATION = "StartAuthorization";
+    }
+
+    public static class AlexaConnectivity {
+        public static final String CONNECTIVITY_STATE_CHANGE = "ConnectivityStateChange";
+        public static final String GET_CONNECTIVITY_STATE = "GetConnectivityState";
+        public static final String GET_IDENTIFIER = "GetIdentifier";
+    }
+
+    public static class DeviceSetup {
+        public static final String SETUP_COMPLETED = "SetupCompleted";
+        public static final String SETUP_COMPLETED_RESPONSE = "SetupCompletedResponse";
+    }
+
+    public static class DeviceUsage {
+        public static final String REPORT_NETWORK_DATA_USAGE = "ReportNetworkDataUsage";
     }
 
     public static class DoNotDisturb {
@@ -154,13 +169,17 @@ public class Action {
         public static final String CLEAR_ALL_EXECUTE_COMMANDS = "ClearAllExecuteCommands";
         public static final String CLEAR_CARD = "ClearCard";
         public static final String CLEAR_DOCUMENT = "ClearDocument";
+        public static final String DATA_SOURCE_UPDATE = "DataSourceUpdate";
         public static final String EXECUTE_COMMANDS = "ExecuteCommands";
         public static final String EXECUTE_COMMANDS_RESULT = "ExecuteCommandsResult";
-        public static final String GET_VISUAL_CONTEXT = "GetVisualContext";
         public static final String INTERRUPT_COMMAND_SEQUENCE = "InterruptCommandSequence";
         public static final String PROCESS_ACTIVITY_EVENT = "ProcessActivityEvent";
         public static final String RENDER_DOCUMENT = "RenderDocument";
         public static final String RENDER_DOCUMENT_RESULT = "RenderDocumentResult";
+        public static final String SEND_DATA_SOURCE_FETCH_REQUEST_EVENT = "SendDataSourceFetchRequestEvent";
+        public static final String SEND_DEVICE_WINDOW_STATE = "SendDeviceWindowState";
+        public static final String SEND_DOCUMENT_STATE = "SendDocumentState";
+        public static final String SEND_RUNTIME_ERROR_EVENT = "SendRuntimeErrorEvent";
         public static final String SEND_USER_EVENT = "SendUserEvent";
         public static final String SET_APL_MAX_VERSION = "SetAPLMaxVersion";
         public static final String SET_DOCUMENT_IDLE_TIMEOUT = "SetDocumentIdleTimeout";
@@ -203,14 +222,10 @@ public class Action {
         public static final String START = "Start";
     }
 
-    public static class Gadget {
-        public static final String HANDLE_CUSTOM_DIRECTIVE = "HandleCustomDirective";
-        public static final String SEND_CUSTOM_EVENT = "SendCustomEvent";
-    }
-
     public static class LocationProvider {
         public static final String GET_COUNTRY = "GetCountry";
         public static final String GET_LOCATION = "GetLocation";
+        public static final String LOCATION_SERVICE_ACCESS_CHANGED = "LocationServiceAccessChanged";
     }
 
     public static class Messaging {
@@ -256,9 +271,9 @@ public class Action {
         public static final String DEVICE_CONFIGURATION_UPDATED = "DeviceConfigurationUpdated";
         public static final String DIAL = "Dial";
         public static final String REDIAL = "Redial";
-        public static final String SEND_FAILED = "SendDTMFFailed";
-        public static final String SEND = "SendDTMF";
-        public static final String SEND_SUCCEEDED = "SendDTMFSucceeded";
+        public static final String SEND_DTMF_FAILED = "SendDTMFFailed";
+        public static final String SEND_DTMF = "SendDTMF";
+        public static final String SEND_DTMF_SUCCEEDED = "SendDTMFSucceeded";
         public static final String STOP = "Stop";
     }
 
@@ -268,4 +283,12 @@ public class Action {
         public static final String PROPERTY_STATE_CHANGED = "PropertyStateChanged";
         public static final String SET_PROPERTY = "SetProperty";
     }
+
+    public static class TextToSpeech {
+        public static final String GET_CAPABILITIES = "GetCapabilities";
+        public static final String PREPARE_SPEECH = "PrepareSpeech";
+        public static final String PREPARE_SPEECH_COMPLETED = "PrepareSpeechCompleted";
+        public static final String PREPARE_SPEECH_FAILED = "PrepareSpeechFailed";
+    }
+    public static class Animation { public static final String ANIMATION_SWITCH = "ANIMATION_SWITCH"; }
 }

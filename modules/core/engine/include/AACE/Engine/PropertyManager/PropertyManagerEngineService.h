@@ -16,9 +16,8 @@
 #ifndef AACE_ENGINE_PROPERTY_MANAGER_PROPERTY_MANAGER_ENGINE_SERVICE_H
 #define AACE_ENGINE_PROPERTY_MANAGER_PROPERTY_MANAGER_ENGINE_SERVICE_H
 
-#include <AVSCommon/Utils/Threading/Executor.h>
-
 #include "AACE/Engine/Core/EngineService.h"
+#include "AACE/Engine/Utils/Threading/Executor.h"
 #include "AACE/PropertyManager/PropertyManager.h"
 #include "PropertyDescription.h"
 #include "PropertyManagerEngineImpl.h"
@@ -102,7 +101,7 @@ private:
     std::mutex m_listenerMutex;
     std::shared_ptr<PropertyManagerEngineImpl> m_propertyManagerEngineImpl;
 
-    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+    aace::engine::utils::threading::Executor m_executor;
 };
 
 }  // namespace propertyManager

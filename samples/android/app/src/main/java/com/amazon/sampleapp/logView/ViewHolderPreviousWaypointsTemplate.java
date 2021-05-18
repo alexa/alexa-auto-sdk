@@ -15,13 +15,12 @@
 
 package com.amazon.sampleapp.logView;
 
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.amazon.sampleapp.R;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import com.amazon.sampleapp.R;
 
 public class ViewHolderPreviousWaypointsTemplate extends RecyclerView.ViewHolder {
     private final TextView[] mNames = new TextView[5];

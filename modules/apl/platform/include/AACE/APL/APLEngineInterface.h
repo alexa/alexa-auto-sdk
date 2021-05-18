@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,14 +40,19 @@ public:
         // Guard option for unknown received state.
         UNKNOWN
     };
+
     virtual void onClearCard() = 0;
     virtual void onClearAllExecuteCommands() = 0;
     virtual void onSendUserEvent(const std::string& payload) = 0;
+    virtual void onSendDataSourceFetchRequestEvent(const std::string& type, const std::string& payload) = 0;
+    virtual void onSendRuntimeErrorEvent(const std::string& payload) = 0;
     virtual void onSetAPLMaxVersion(const std::string& aplMaxVersion) = 0;
     virtual void onSetDocumentIdleTimeout(std::chrono::milliseconds documentIdleTimeout) = 0;
     virtual void onRenderDocumentResult(const std::string& token, bool result, const std::string& error) = 0;
     virtual void onExecuteCommandsResult(const std::string& token, bool result, const std::string& error) = 0;
     virtual void onProcessActivityEvent(const std::string& source, ActivityEvent event) = 0;
+    virtual void onSendDocumentState(const std::string& state) = 0;
+    virtual void onSendDeviceWindowState(const std::string& state) = 0;
 };
 
 }  // namespace apl

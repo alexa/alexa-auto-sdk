@@ -32,8 +32,11 @@ public:
     MetricsUploaderHandler(jobject obj);
 
     // aace::metrics::MetricsUploader
-    bool record(const std::vector<Datapoint>& datapoints, const std::unordered_map<std::string, std::string>& metadata)
-        override;
+    bool record(
+        const std::vector<Datapoint>& datapoints,
+        const std::unordered_map<std::string, std::string>& metadata,
+        bool buffer,
+        bool unique) override;
 
 private:
     JObject m_obj;

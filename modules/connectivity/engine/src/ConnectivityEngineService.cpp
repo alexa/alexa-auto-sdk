@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  */
 
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Vehicle/VehiclePropertyInterface.h>
 #include <nlohmann/json.hpp>
 
 #include "AACE/Engine/Connectivity/ConnectivityConstants.h"
@@ -63,14 +64,20 @@ bool ConnectivityEngineService::registerPlatformInterfaceType(
             getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
         ThrowIfNull(alexaComponents, "alexaComponentsInvalid");
 
-        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
-        ThrowIfNull(defaultEndpointBuilder, "defaultEndpointBuilderInvalid");
+        auto defaultCapabilitiesRegistrar = alexaComponents->getDefaultEndpointCapabilitiesRegistrar();
+        ThrowIfNull(defaultCapabilitiesRegistrar, "defaultCapabilitiesRegistrarInvalid");
 
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
+        auto vehicleProperties =
+            getContext()->getServiceInterface<aace::engine::vehicle::VehiclePropertyInterface>("aace.vehicle");
+        ThrowIfNull(vehicleProperties, "vehiclePropertiesInvalid");
+        auto vehicleIdentifier =
+            vehicleProperties->getVehicleProperty(vehicle::VehiclePropertyType::VEHICLE_IDENTIFIER);
+
         m_alexaConnectivityEngineImpl = aace::engine::connectivity::AlexaConnectivityEngineImpl::create(
-            alexaConnectivity, defaultEndpointBuilder, contextManager, m_networkIdentifier);
+            alexaConnectivity, defaultCapabilitiesRegistrar, contextManager, vehicleIdentifier);
         ThrowIfNull(m_alexaConnectivityEngineImpl, "createAlexaConnectivityEngineImplFailed");
 
         return true;

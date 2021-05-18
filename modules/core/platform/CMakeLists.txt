@@ -9,6 +9,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Logger/LoggerEngineInterfaces.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Logger/LoggerConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Location/LocationProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Location/LocationProviderEngineInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Location/Location.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Network/NetworkInfoProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Network/NetworkEngineInterfaces.h

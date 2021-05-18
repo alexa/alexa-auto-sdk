@@ -13,6 +13,9 @@
  * permissions and limitations under the License.
  */
 
+// JSON for Modern C++
+#include <nlohmann/json.hpp>
+
 #include <typeinfo>
 #include <rapidjson/error/en.h>
 #include <rapidjson/pointer.h>
@@ -21,12 +24,15 @@
 #include <rapidjson/stringbuffer.h>
 
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <AACE/Engine/Network/NetworkEngineService.h>
 #include <AACE/Engine/AddressBook/AddressBookCloudUploader.h>
 
 namespace aace {
 namespace engine {
 namespace addressBook {
+
+using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBook.addressBookCloudUploader");
@@ -43,23 +49,17 @@ static const int MAX_ALLOWED_CHARACTERS = 1000;
 /// Max allowed EntryId size
 static const int MAX_ALLOWED_ENTRY_ID_SIZE = 200;
 
+/// Max allowed EntryId size
+static const int MAX_ALLOWED_ADDRESS_LINE_SIZE = 60;
+
 /// Max event retry
 static const int MAX_EVENT_RETRY = 3;
 
 /// Invalid Address Id
 static const std::string INVALID_ADDRESS_BOOK_SOURCE_ID = "INVALID";
 
-/// Program Name prefix for metrics
-static const std::string METRIC_PROGRAM_NAME_PREFIX = "AlexaAuto";
-
 /// Program Name for Metrics
 static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AddressBookCloudUploader";
-
-/// Delimiter
-static const std::string DELIMITER = "_";
-
-/// Program Name for metrics
-static const std::string METRIC_PROGRAM_NAME = METRIC_PROGRAM_NAME_PREFIX + DELIMITER + METRIC_PROGRAM_NAME_SUFFIX;
 
 /// Metric for adding contact
 static const std::string METRIC_ADD_ADDRESS_BOOK_CONTACT = "Add.Contact";
@@ -87,6 +87,8 @@ static const std::string METRIC_NETWORK_BAD_USER_INPUT = "Network.BadUserInput";
 
 /// Metric for any Network Error
 static const std::string METRIC_NETWORK_ERROR = "Network.Error";
+
+using json = nlohmann::json;
 
 AddressBookCloudUploader::AddressBookCloudUploader() :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG), m_isShuttingDown(false), m_isAuthRefreshed(false) {
@@ -213,9 +215,9 @@ bool AddressBookCloudUploader::addressBookAdded(std::shared_ptr<AddressBookEntit
 
         // For Metrics
         if (addressBookEntity->getType() == AddressBookType::CONTACT) {
-            emitCounterMetrics("addressBookAdded", METRIC_ADD_ADDRESS_BOOK_CONTACT, 1);
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "addressBookAdded", METRIC_ADD_ADDRESS_BOOK_CONTACT, 1);
         } else if (addressBookEntity->getType() == AddressBookType::NAVIGATION) {
-            emitCounterMetrics("addressBookAdded", METRIC_ADD_ADDRESS_BOOK_NAVIGATION, 1);
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "addressBookAdded", METRIC_ADD_ADDRESS_BOOK_NAVIGATION, 1);
         }
 
         std::lock_guard<std::mutex> guard(m_mutex);
@@ -238,9 +240,10 @@ bool AddressBookCloudUploader::addressBookRemoved(std::shared_ptr<AddressBookEnt
 
         // For Metrics
         if (addressBookEntity->getType() == AddressBookType::CONTACT) {
-            emitCounterMetrics("addressBookRemoved", METRIC_REMOVE_ADDRESS_BOOK_CONTACT, 1);
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "addressBookRemoved", METRIC_REMOVE_ADDRESS_BOOK_CONTACT, 1);
         } else if (addressBookEntity->getType() == AddressBookType::NAVIGATION) {
-            emitCounterMetrics("addressBookRemoved", METRIC_REMOVE_ADDRESS_BOOK_NAVIGATION, 1);
+            emitCounterMetrics(
+                METRIC_PROGRAM_NAME_SUFFIX, "addressBookRemoved", METRIC_REMOVE_ADDRESS_BOOK_NAVIGATION, 1);
         }
 
         std::lock_guard<std::mutex> guard(m_mutex);
@@ -349,7 +352,7 @@ private:
         }
     }
 
-    rapidjson::Value& getEntryDataField(const std::string& entryId) {
+    rapidjson::Value& getEntryDataNode(const std::string& entryId) {
         auto bucketIndex = m_ids[entryId] / UPLOAD_BATCH_SIZE;
         auto entriesIndex = m_ids[entryId] % UPLOAD_BATCH_SIZE;
 
@@ -367,25 +370,287 @@ private:
     }
 
 public:
+    bool addEntry(const std::string& payload) {
+        bool success = true;
+        try {
+            ThrowIf(payload.empty(), "payloadEmpty");
+            auto entryPayload = json::parse(payload);
+
+            ThrowIfNot(
+                entryPayload.contains("entryId") && entryPayload["entryId"].is_string(), "entryIdMissingOrNotString");
+            ThrowIf(entryPayload["entryId"].empty(), "entryIdEmpty");
+
+            std::string entryId = entryPayload["entryId"];
+            AACE_DEBUG(LX(TAG).d("entryId", entryId));
+
+            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdSizeExceedsMaxSize");
+            ThrowIfNot(entryPayload.contains("name") && entryPayload["name"].is_object(), "nameMissingOrInvalid");
+
+            auto& nameNode = entryPayload["name"];
+
+            // clang-format off
+            // Sanitize name  field types
+            ThrowIfNot((nameNode.contains("firstName") ? nameNode["firstName"].is_string() : true), "firstNameInvalid");
+            ThrowIfNot((nameNode.contains("lastName") ? nameNode["lastName"].is_string() : true), "lastNameInvalid");
+            ThrowIfNot((nameNode.contains("nickName") ? nameNode["nickName"].is_string() : true), "nickNameInvalid");
+            ThrowIfNot((nameNode.contains("phoneticFirstName") ? nameNode["phoneticFirstName"].is_string() : true), "phoneticFirstNameInvalid");
+            ThrowIfNot((nameNode.contains("phoneticLastName") ? nameNode["phoneticLastName"].is_string() : true), "phoneticLastNameInvalid");
+            // clang-format on
+
+            std::string firstName = nameNode.value("firstName", "");
+            std::string lastName = nameNode.value("lastName", "");
+            std::string nickName = nameNode.value("nickName", "");
+            std::string phoneticFirstName = nameNode.value("phoneticFirstName", "");
+            std::string phoneticLastName = nameNode.value("phoneticLastName", "");
+
+            // Sanitize field size
+            auto totalSize = firstName.size() + lastName.size() + nickName.size() + phoneticFirstName.size() +
+                             phoneticLastName.size();
+            if (totalSize > MAX_ALLOWED_CHARACTERS) {
+                AACE_ERROR(LX(TAG)
+                               .m("nameTotalLengthExceedsMaxSize")
+                               .d("entryId", entryId)
+                               .d("size", totalSize)
+                               .d("maxSize", MAX_ALLOWED_CHARACTERS));
+                return false;
+            }
+
+            ThrowIf(isEntryPresent(entryId), "entryAlreadyExists");
+
+            createEntryDataField(entryId);
+
+            auto& data = getEntryDataNode(entryId);
+            auto& allocator = GetAllocator(entryId);
+            rapidjson::Value name(rapidjson::kObjectType);
+
+            if (!firstName.empty()) name.AddMember("firstName", firstName, allocator);
+            if (!lastName.empty()) name.AddMember("lastName", lastName, allocator);
+            if (!nickName.empty()) name.AddMember("nickName", nickName, allocator);
+            if (!phoneticFirstName.empty()) name.AddMember("phoneticFirstName", phoneticFirstName, allocator);
+            if (!phoneticLastName.empty()) name.AddMember("phoneticLastName", phoneticLastName, allocator);
+
+            data.AddMember("name", name, allocator);
+
+            if (entryPayload.contains("phoneNumbers") && !entryPayload["phoneNumbers"].empty()) {
+                // Consider phone numbers only when the address book type is CONTACT
+                if (m_addressBookEntity->getType() == AddressBookType::CONTACT) {
+                    if (!entryPayload["phoneNumbers"].is_array()) {
+                        Throw("phoneNumbersFieldIsNotAnArrary");
+                    }
+
+                    if (!data.HasMember("addresses")) {
+                        auto addresses(rapidjson::kArrayType);
+                        data.AddMember("addresses", addresses, allocator);
+                    }
+
+                    auto& addresses = data["addresses"];
+
+                    int counter = 0;
+                    for (auto& phoneNumber : entryPayload["phoneNumbers"]) {
+                        if (++counter > MAX_ALLOWED_ADDRESSES_PER_ENTRY) {
+                            AACE_WARN(LX(TAG).m("maxAllowedPhoneNumberEntriesReached"));
+                            success = false;
+                            break;  // bail out
+                        }
+
+                        // clang-format off
+                        // Sanitize phone number field types
+                        ThrowIfNot((phoneNumber.contains("label") ? phoneNumber["label"].is_string() : true), "phoneNumberLabelInvalid");
+                        ThrowIfNot((phoneNumber.contains("number") ? phoneNumber["number"].is_string() : true), "phoneNumberNumberInvalid");
+                        // clang-format on
+
+                        // Sanitize phone number field sizes
+                        std::string label = phoneNumber.value("label", "");
+                        std::string number = phoneNumber.value("number", "");
+
+                        totalSize = label.size() + number.size();
+                        if (totalSize > MAX_ALLOWED_CHARACTERS) {
+                            AACE_WARN(LX(TAG)
+                                          .m("phoneNumberFieldExceedsMaxSize")
+                                          .d("label", label)
+                                          .d("number", number)
+                                          .d("size", totalSize)
+                                          .d("maxSize", MAX_ALLOWED_CHARACTERS));
+                            success = false;
+                            continue;
+                        }
+
+                        rapidjson::Value address(rapidjson::kObjectType);
+                        address.AddMember("addressType", "phonenumber", allocator);
+                        if (!label.empty()) address.AddMember("rawType", label, allocator);
+                        if (!number.empty()) address.AddMember("value", number, allocator);
+
+                        addresses.PushBack(address, allocator);
+                    }
+                } else {
+                    AACE_WARN(LX(TAG).m("phoneNumbersNotSupportedInNavigationType"));
+                    success = false;
+                }
+            }
+
+            if (entryPayload.contains("postalAddresses") && !entryPayload["postalAddresses"].empty()) {
+                // Consider postal addresses  only when the address book type is NAVIGATION
+                if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
+                    if (!entryPayload["postalAddresses"].is_array()) {
+                        Throw("postalAddressesFieldIsNotAnArrary");
+                    }
+
+                    if (!data.HasMember("addresses")) {
+                        auto addresses(rapidjson::kArrayType);
+                        data.AddMember("addresses", addresses, allocator);
+                    }
+
+                    auto& addresses = data["addresses"];
+
+                    int counter = 0;
+                    for (auto& postalAddress : entryPayload["postalAddresses"]) {
+                        if (++counter > MAX_ALLOWED_ADDRESSES_PER_ENTRY) {
+                            AACE_WARN(LX(TAG).m("maxAllowedPostalAddressEntriesReached"));
+                            success = false;
+                            break;  // bail out
+                        }
+
+                        // clang-format off
+                        // Sanitize postal address fields types
+                        ThrowIfNot((postalAddress.contains("label") ? postalAddress["label"].is_string() : true), "postalAddressLabelInvalid");
+                        ThrowIfNot((postalAddress.contains("addressLine1") ? postalAddress["addressLine1"].is_string() : true), "postalAddressAddressLine1Invalid");
+                        ThrowIfNot((postalAddress.contains("addressLine2") ? postalAddress["addressLine2"].is_string() : true), "postalAddressAddressLine2Invalid");
+                        ThrowIfNot((postalAddress.contains("city") ? postalAddress["city"].is_string() : true), "postalAddressCityInvalid");
+                        ThrowIfNot((postalAddress.contains("stateOrRegion") ? postalAddress["stateOrRegion"].is_string() : true), "postalAddressStateOrRegionInvalid");
+                        ThrowIfNot((postalAddress.contains("districtOrCounty") ? postalAddress["districtOrCounty"].is_string() : true), "postalAddressDistrictOrCountyInvalid");
+                        ThrowIfNot((postalAddress.contains("postalCode") ? postalAddress["postalCode"].is_string() : true), "postalAddressPostalCodeInvalid");
+                        ThrowIfNot((postalAddress.contains("countryCode") ? postalAddress["countryCode"].is_string() : true), "postalAddressCountryCodeInvalid");
+                        ThrowIfNot(postalAddress.contains("latitudeInDegrees") && postalAddress["latitudeInDegrees"].is_number(), "postalAddressLatitudeInDegreesNotPresetOrInvalid");
+                        ThrowIfNot(postalAddress.contains("longitudeInDegrees") && postalAddress["longitudeInDegrees"].is_number(), "postalAddressLongitudeInDegreesNotPresetOrInvalid");
+                        ThrowIfNot((postalAddress.contains("accuracyInMeters") ? postalAddress["accuracyInMeters"].is_number() : true), "postalAddressAccuracyInMetersInvalid");
+                        // clang-format on
+
+                        std::string label = postalAddress.value("label", "");
+                        std::string addressLine1 = postalAddress.value("addressLine1", "");
+                        std::string addressLine2 = postalAddress.value("addressLine2", "");
+                        std::string addressLine3 = postalAddress.value("addressLine3", "");
+                        std::string city = postalAddress.value("city", "");
+                        std::string stateOrRegion = postalAddress.value("stateOrRegion", "");
+                        std::string districtOrCounty = postalAddress.value("districtOrCounty", "");
+                        std::string postalCode = postalAddress.value("postalCode", "");
+                        std::string countryCode = postalAddress.value("countryCode", "");
+                        float latitudeInDegrees = postalAddress.value("latitudeInDegrees", 0.0f);
+                        float longitudeInDegrees = postalAddress.value("longitudeInDegrees", 0.0f);
+                        float accuracyInMeters = postalAddress.value("accuracyInMeters", 0.0f);
+
+                        // Sanitize postal address fields sizes
+                        if (addressLine1.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
+                            AACE_WARN(LX(TAG)
+                                          .m("addressLine1ExceedsMaxCharacterSize")
+                                          .d("entryId", entryId)
+                                          .d("size", addressLine1.size())
+                                          .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
+                            success = false;
+                            continue;
+                        }
+                        if (addressLine2.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
+                            AACE_WARN(LX(TAG)
+                                          .m("addressLine2ExceedsMaxCharacterSize")
+                                          .d("entryId", entryId)
+                                          .d("size", addressLine2.size())
+                                          .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
+                            success = false;
+                            continue;
+                        }
+                        if (addressLine3.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
+                            AACE_WARN(LX(TAG)
+                                          .m("addressLine3ExceedsMaxCharacterSize")
+                                          .d("entryId", entryId)
+                                          .d("size", addressLine3.size())
+                                          .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
+                            success = false;
+                            continue;
+                        }
+
+                        int totalSize = label.size() + addressLine1.size() + addressLine2.size() + addressLine3.size() +
+                                        city.size() + stateOrRegion.size() + districtOrCounty.size() +
+                                        postalCode.size() + countryCode.size();
+
+                        if (totalSize > MAX_ALLOWED_CHARACTERS) {
+                            AACE_WARN(LX(TAG)
+                                          .m("postalAddressExceedsMaxCharacterSize")
+                                          .d("entryId", entryId)
+                                          .d("size", totalSize)
+                                          .d("maxSize", MAX_ALLOWED_CHARACTERS));
+                            success = false;
+                            continue;
+                        }
+
+                        if (!(latitudeInDegrees >= -90 && latitudeInDegrees <= 90)) {
+                            AACE_WARN(LX(TAG).m("latitudeInDegreesInvalid").d("latitudeInDegrees", latitudeInDegrees));
+                            success = false;
+                            continue;
+                        }
+
+                        if (!(longitudeInDegrees >= -180 && longitudeInDegrees <= 180)) {
+                            AACE_WARN(
+                                LX(TAG).m("longitudeInDegreesInvalid").d("longitudeInDegrees", longitudeInDegrees));
+                            success = false;
+                            continue;
+                        }
+
+                        if (accuracyInMeters < 0) {
+                            AACE_WARN(LX(TAG).m("accuracyInMetersInvalid").d("accuracyInMeters", accuracyInMeters));
+                            success = false;
+                            continue;
+                        }
+
+                        rapidjson::Value address(rapidjson::kObjectType);
+                        address.AddMember("addressType", "postaladdress", allocator);
+                        if (!label.empty()) address.AddMember("rawType", label, allocator);
+
+                        rapidjson::Value postalAddressValue(rapidjson::kObjectType);
+                        if (!addressLine1.empty())
+                            postalAddressValue.AddMember("addressLine1", addressLine1, allocator);
+                        if (!addressLine2.empty())
+                            postalAddressValue.AddMember("addressLine2", addressLine2, allocator);
+                        if (!addressLine3.empty())
+                            postalAddressValue.AddMember("addressLine3", addressLine3, allocator);
+                        if (!city.empty()) postalAddressValue.AddMember("city", city, allocator);
+                        if (!stateOrRegion.empty())
+                            postalAddressValue.AddMember("stateOrRegion", stateOrRegion, allocator);
+                        if (!districtOrCounty.empty())
+                            postalAddressValue.AddMember("districtOrCounty", districtOrCounty, allocator);
+                        if (!postalCode.empty()) postalAddressValue.AddMember("postalCode", postalCode, allocator);
+                        if (!countryCode.empty()) postalAddressValue.AddMember("countryCode", countryCode, allocator);
+
+                        rapidjson::Value coordinate(rapidjson::kObjectType);
+                        coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
+                        coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
+                        if (accuracyInMeters > 0) coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
+                        postalAddressValue.AddMember("coordinate", coordinate, allocator);
+
+                        address.AddMember("postalAddress", postalAddressValue, allocator);
+
+                        addresses.PushBack(address, allocator);
+                    }
+                } else {
+                    AACE_WARN(LX(TAG).m("postalAddressesNotSupportedInContactType"));
+                    success = false;
+                }
+            }
+            return success;
+        } catch (json::parse_error& ex) {
+            AACE_ERROR(LX(TAG).m("payLoadParseError").d("exception", ex.what()));
+            return false;
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG).d("reason", ex.what()));
+            return false;
+        }
+    }
+
     bool addName(const std::string& entryId, const std::string& name) {
         try {
             ThrowIf(entryId.empty(), "entryIdEmpty");
-            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdInvalid");
-            ThrowIf(name.size() > MAX_ALLOWED_CHARACTERS, "nameInvalid");
+            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdExceedsMaxSize");
+            ThrowIf(name.size() > MAX_ALLOWED_CHARACTERS, "nameExceedsMaxSize");
 
-            if (!isEntryPresent(entryId)) {
-                createEntryDataField(entryId);
-            }
-            auto& data = getEntryDataField(entryId);
-            auto& allocator = GetAllocator(entryId);
-
-            rapidjson::Value nameValue(rapidjson::kObjectType);
-
-            ThrowIf(data.HasMember("name"), "nameFound");
-
-            if (!name.empty()) nameValue.AddMember("firstName", name, allocator);
-
-            data.AddMember("name", nameValue, allocator);
+            ThrowIfNot(addName(entryId, name, "", ""), "addNameFailed");
             return true;
 
         } catch (std::exception& ex) {
@@ -397,25 +662,13 @@ public:
     bool addName(const std::string& entryId, const std::string& firstName, const std::string& lastName) {
         try {
             ThrowIf(entryId.empty(), "entryIdEmpty");
-            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdInvalid");
-            ThrowIf(firstName.size() > MAX_ALLOWED_CHARACTERS, "firstNameInvalid");
-            ThrowIf(lastName.size() > MAX_ALLOWED_CHARACTERS, "lastNameInvalid");
-            ThrowIf(firstName.size() + lastName.size() > MAX_ALLOWED_CHARACTERS, "nameInvalid");
+            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdExceedsMaxSize");
+            ThrowIf(firstName.size() > MAX_ALLOWED_CHARACTERS, "firstNameExceedsMaxSize");
+            ThrowIf(lastName.size() > MAX_ALLOWED_CHARACTERS, "lastNameExceedsMaxSize");
+            ThrowIf(firstName.size() + lastName.size() > MAX_ALLOWED_CHARACTERS, "nameExceedsMaxSize");
 
-            if (!isEntryPresent(entryId)) {
-                createEntryDataField(entryId);
-            }
-            auto& data = getEntryDataField(entryId);
-            auto& allocator = GetAllocator(entryId);
-
-            rapidjson::Value name(rapidjson::kObjectType);
-
-            ThrowIf(data.HasMember("name"), "nameFound");
-
-            if (!firstName.empty()) name.AddMember("firstName", firstName, allocator);
-            if (!lastName.empty()) name.AddMember("lastName", lastName, allocator);
-
-            data.AddMember("name", name, allocator);
+            ThrowIfNot(addName(entryId, firstName, lastName, ""), "addNameFailed");
+            return true;
 
             return true;
         } catch (std::exception& ex) {
@@ -428,19 +681,33 @@ public:
         const std::string& entryId,
         const std::string& firstName,
         const std::string& lastName,
-        const std::string& nickname) {
+        const std::string& nickname,
+        const std::string& phoneticFirstName = "",
+        const std::string& phoneticLastName = "") {
         try {
             ThrowIf(entryId.empty(), "entryIdEmpty");
-            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdInvalid");
-            ThrowIf(firstName.size() > MAX_ALLOWED_CHARACTERS, "firstNameInvalid");
-            ThrowIf(lastName.size() > MAX_ALLOWED_CHARACTERS, "lastNameInvalid");
-            ThrowIf(nickname.size() > MAX_ALLOWED_CHARACTERS, "nickNameInvalid");
-            ThrowIf((firstName.size() + lastName.size() + nickname.size()) > MAX_ALLOWED_CHARACTERS, "nameInvalid");
+            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdExceedsMaxSize");
+            ThrowIf(firstName.size() > MAX_ALLOWED_CHARACTERS, "firstNameExceedsMaxSize");
+            ThrowIf(lastName.size() > MAX_ALLOWED_CHARACTERS, "lastNameExceedsMaxSize");
+            ThrowIf(nickname.size() > MAX_ALLOWED_CHARACTERS, "nickNameExceedsMaxSize");
+            ThrowIf(phoneticFirstName.size() > MAX_ALLOWED_CHARACTERS, "phoneticFirstNameExceedsMaxSize");
+            ThrowIf(phoneticLastName.size() > MAX_ALLOWED_CHARACTERS, "phoneticLastNameExceedsMaxSize");
+
+            auto totalSize = firstName.size() + lastName.size() + nickname.size() + phoneticFirstName.size() +
+                             phoneticLastName.size();
+            if (totalSize > MAX_ALLOWED_CHARACTERS) {
+                AACE_ERROR(LX(TAG)
+                               .m("nameTotalLengthExceedsMaxSize")
+                               .d("entryId", entryId)
+                               .d("size", totalSize)
+                               .d("maxSize", MAX_ALLOWED_CHARACTERS));
+                return false;
+            }
 
             if (!isEntryPresent(entryId)) {
                 createEntryDataField(entryId);
             }
-            auto& data = getEntryDataField(entryId);
+            auto& data = getEntryDataNode(entryId);
             auto& allocator = GetAllocator(entryId);
             rapidjson::Value name(rapidjson::kObjectType);
 
@@ -449,6 +716,8 @@ public:
             if (!firstName.empty()) name.AddMember("firstName", firstName, allocator);
             if (!lastName.empty()) name.AddMember("lastName", lastName, allocator);
             if (!nickname.empty()) name.AddMember("nickName", nickname, allocator);
+            if (!phoneticFirstName.empty()) name.AddMember("phoneticFirstName", phoneticFirstName, allocator);
+            if (!phoneticLastName.empty()) name.AddMember("phoneticLastName", phoneticLastName, allocator);
 
             data.AddMember("name", name, allocator);
 
@@ -462,7 +731,7 @@ public:
     bool addPhone(const std::string& entryId, const std::string& label, const std::string& number) {
         try {
             ThrowIf(entryId.empty(), "entryIdEmpty");
-            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdInvalid");
+            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdExceedsMaxSize");
             ThrowIfNot(
                 m_addressBookEntity->isAddressTypeSupported(AddressBookEntity::AddressType::PHONE),
                 "addressTypeNotSupported");
@@ -470,7 +739,7 @@ public:
             if (!isEntryPresent(entryId)) {
                 createEntryDataField(entryId);
             }
-            auto& data = getEntryDataField(entryId);
+            auto& data = getEntryDataNode(entryId);
             auto& allocator = GetAllocator(entryId);
 
             if (!data.HasMember("addresses")) {
@@ -480,7 +749,7 @@ public:
 
             auto& addresses = data["addresses"];
 
-            ThrowIf(isMaxAllowedReached(addresses), "maxAllowedReached");
+            ThrowIf(hasMaxAllowedReached(addresses), "maxAllowedReached");
 
             rapidjson::Value address(rapidjson::kObjectType);
             address.AddMember("addressType", "phonenumber", allocator);
@@ -513,7 +782,7 @@ public:
         float accuracyInMeters) {
         try {
             ThrowIf(entryId.empty(), "entryIdEmpty");
-            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdInvalid");
+            ThrowIf(entryId.size() > MAX_ALLOWED_ENTRY_ID_SIZE, "entryIdExceedsMaxSize");
             int totalCharSize = addressLine1.size() + addressLine2.size() + addressLine3.size() + city.size() +
                                 stateOrRegion.size() + districtOrCounty.size() + postalCode.size() + countryCode.size();
             ThrowIf(totalCharSize > MAX_ALLOWED_CHARACTERS, "postalAddressValueSizeExceedsLimit");
@@ -528,7 +797,7 @@ public:
             if (!isEntryPresent(entryId)) {
                 createEntryDataField(entryId);
             }
-            auto& data = getEntryDataField(entryId);
+            auto& data = getEntryDataNode(entryId);
             auto& allocator = GetAllocator(entryId);
 
             if (!data.HasMember("addresses")) {
@@ -538,7 +807,7 @@ public:
 
             auto& addresses = data["addresses"];
 
-            ThrowIf(isMaxAllowedReached(addresses), "maxAllowedReached");
+            ThrowIf(hasMaxAllowedReached(addresses), "maxAllowedReached");
 
             rapidjson::Value address(rapidjson::kObjectType);
             address.AddMember("addressType", "postaladdress", allocator);
@@ -573,7 +842,7 @@ public:
         }
     }
 
-    bool isMaxAllowedReached(rapidjson::Value& addresses) {
+    bool hasMaxAllowedReached(rapidjson::Value& addresses) {
         if (addresses.IsArray() && addresses.Size() < MAX_ALLOWED_ADDRESSES_PER_ENTRY) {
             return false;
         }
@@ -637,7 +906,8 @@ bool AddressBookCloudUploader::handleUpload(std::shared_ptr<AddressBookEntity> a
         // influence the latency for uploading one batch of address book entries.
         double totalDuration = getCurrentTimeInMs() - uploadStartTimer;
         double timeToUploadOneBatch = totalDuration / documents.size();
-        emitTimerMetrics("handleUpload", METRIC_TIME_TO_UPLOAD_ONE_BATCH, timeToUploadOneBatch);
+        emitTimerMetrics(
+            METRIC_PROGRAM_NAME_SUFFIX, "handleUpload", METRIC_TIME_TO_UPLOAD_ONE_BATCH, timeToUploadOneBatch);
 
         AACE_INFO(LX(TAG, "handleUpload")
                       .m("SuccessfullyUploaded")
@@ -726,11 +996,13 @@ void AddressBookCloudUploader::eventLoop() {
                 // For Metrics
                 if (Event::Type::ADD == event.getType()) {
                     emitTimerMetrics(
+                        METRIC_PROGRAM_NAME_SUFFIX,
                         "eventLoop",
                         METRIC_TIME_TO_UPLOAD_SINCE_ADD,
                         getCurrentTimeInMs() - event.getEventCreateTime());
                 } else {
                     emitTimerMetrics(
+                        METRIC_PROGRAM_NAME_SUFFIX,
                         "eventLoop",
                         METRIC_TIME_TO_UPLOAD_SINCE_REMOVE,
                         getCurrentTimeInMs() - event.getEventCreateTime());
@@ -765,12 +1037,12 @@ const Event AddressBookCloudUploader::popNextEventFromQ() {
 }
 
 std::string AddressBookCloudUploader::prepareForUpload(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+    AACE_DEBUG(LX(TAG));
     try {
         ThrowIfNot(m_addressBookCloudUploaderRESTAgent->isAccountProvisioned(), "accountNotProvisioned");
 
         // Try to delete any previous address book in cloud.
         ThrowIfNot(deleteAddressBook(addressBookEntity), "addressBookDeleteFailed");
-
         auto cloudAddressBookId = createAddressBook(addressBookEntity);
         ThrowIf(cloudAddressBookId.empty(), "addressBookCreateFailed");
 
@@ -899,7 +1171,7 @@ void AddressBookCloudUploader::logNetworkMetrics(const HTTPResponse& httpRespons
             // Do Nothing
             break;
         case HTTPResponseCode::BAD_REQUEST:
-            emitCounterMetrics("logNetworkMetrics", METRIC_NETWORK_BAD_USER_INPUT, 1);
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "logNetworkMetrics", METRIC_NETWORK_BAD_USER_INPUT, 1);
             break;
         case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
         case HTTPResponseCode::SUCCESS_NO_CONTENT:
@@ -907,7 +1179,7 @@ void AddressBookCloudUploader::logNetworkMetrics(const HTTPResponse& httpRespons
         case HTTPResponseCode::REDIRECTION_END_CODE:
         case HTTPResponseCode::FORBIDDEN:
         case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-            emitCounterMetrics("logNetworkMetrics", METRIC_NETWORK_ERROR, 1);
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "logNetworkMetrics", METRIC_NETWORK_ERROR, 1);
     }
 }
 
@@ -1007,37 +1279,6 @@ bool AddressBookCloudUploader::cleanAllCloudAddressBooks() {
         AACE_ERROR(LX(TAG, "cleanAllCloudAddressBooks").d("reason", ex.what()));
         return false;
     }
-}
-
-void AddressBookCloudUploader::emitCounterMetrics(
-    const std::string& methodName,
-    const std::string& key,
-    const int value) {
-    auto metricEvent = std::shared_ptr<aace::engine::metrics::MetricEvent>(
-        new aace::engine::metrics::MetricEvent(METRIC_PROGRAM_NAME, methodName));
-    if (metricEvent) {
-        metricEvent->addCounter(key, value);
-        metricEvent->record();
-    }
-}
-
-void AddressBookCloudUploader::emitTimerMetrics(
-    const std::string& methodName,
-    const std::string& key,
-    const double value) {
-    auto metricEvent = std::shared_ptr<aace::engine::metrics::MetricEvent>(
-        new aace::engine::metrics::MetricEvent(METRIC_PROGRAM_NAME, methodName));
-    if (metricEvent) {
-        metricEvent->addTimer(key, value);
-        metricEvent->record();
-    }
-}
-
-double AddressBookCloudUploader::getCurrentTimeInMs() {
-    auto now = std::chrono::system_clock::now();
-    auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-    double duration = now_ms.count();
-    return duration;
 }
 
 }  // namespace addressBook

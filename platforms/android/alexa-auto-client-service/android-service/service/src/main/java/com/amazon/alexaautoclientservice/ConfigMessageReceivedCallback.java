@@ -30,8 +30,8 @@ public class ConfigMessageReceivedCallback implements AACSReceiver.MessageReceiv
         if (mStateMachine.getState() == State.STARTED) {
             try {
                 JSONObject configMessage = new JSONObject(s);
-                boolean configSaved = FileUtil.saveConfiguration(mContext,
-                        configMessage.getJSONArray("configFilepaths"), configMessage.getJSONArray("configStrings"));
+                boolean configSaved = FileUtil.setConfiguration(mContext, configMessage.getJSONArray("configFilepaths"),
+                        configMessage.getJSONArray("configStrings"));
 
                 if (configSaved) {
                     if (FileUtil.lvcEnabled()) {

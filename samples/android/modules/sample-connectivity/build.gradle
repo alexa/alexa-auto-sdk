@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "3.1"
+        versionName "3.2"
     }
 
     buildTypes {
@@ -27,6 +27,7 @@ android {
 buildscript {
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -39,6 +40,7 @@ buildscript {
 allprojects {
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
 }
@@ -47,5 +49,5 @@ dependencies {
     // compileOnly fileTree(dir: "${aarDir}", include: ['connectivity*.aar', 'core*.aar', 'sample-core*.aar'])
     compileOnly fileTree(dir: "${project.rootDir}/../../../../builder/deploy/aar", include: ['core*.aar', 'connectivity*.aar'])
     compileOnly fileTree(dir: "${project.rootDir}/../../../../samples/android/modules/sample-core/build/outputs/aar", include: ['*.aar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
 }

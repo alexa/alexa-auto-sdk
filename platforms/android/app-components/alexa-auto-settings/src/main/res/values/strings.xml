@@ -1,0 +1,53 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="alexa_settings_label" tools:ignore="MissingTranslation">Alexa</string>
+
+    <!-- Settings -->
+    <!-- Voice Assistance -->
+    <string name="setting_voice_assistance_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
+    <string name="setting_voice_assistance_alexa" tools:ignore="MissingTranslation">Amazon Alexa</string>
+
+    <!-- General Settings -->
+    <string name="setting_alexa_signin" tools:ignore="MissingTranslation">Sign in</string>
+    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexa Hands-Free</string>
+    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">Say \"Alexa\" to get her attention</string>
+    <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">Do Not Disturb</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Disables Notifications</string>
+    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">Communication</string>
+    <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">Sounds</string>
+    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexa\'s language</string>
+    <string name="setting_alexa_signout" tools:ignore="MissingTranslation">Sign out</string>
+    <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Disable Alexa</string>
+
+    <!-- General Debug Settings -->
+    <string name="setting_aacs" tools:ignore="MissingTranslation">Alexa Auto Client Service</string>
+
+    <string name="settings_alexa" tools:ignore="MissingTranslation">Settings</string>
+    <string name="logout" tools:ignore="MissingTranslation">Sign out?</string>
+    <string name="disable_alexa" tools:ignore="MissingTranslation">Disable Alexa?</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">Do you want to sign out of Amazon Alexa?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">SIGN OUT</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">CANCEL</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">DISABLE</string>
+    <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">You will no longer be able to use Alexa in this vehicle.</string>
+
+    <!-- Preferences -->
+    <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">Override Base Configuration</string>
+    <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">All configurations below will be applied if this is selected</string>
+
+    <string name="preference_category_alexa_device" tools:ignore="MissingTranslation">Alexa Device</string>
+    <string name="preference_avsdevice_clientid" tools:ignore="MissingTranslation">Client Id</string>
+    <string name="preference_avsdevice_productid" tools:ignore="MissingTranslation">Product Id</string>
+    <string name="preference_avsdevice_dsn" tools:ignore="MissingTranslation">Device Serial Number</string>
+    <string name="preference_avsdevice_manufacturer" tools:ignore="MissingTranslation">Manufacturer</string>
+
+    <string name="preference_category_aacs_service" tools:ignore="MissingTranslation">AACS General</string>
+    <string name="preference_aacs_startonboot" tools:ignore="MissingTranslation">Start AACS on Device Bootup</string>
+
+    <string name="preference_category_aacs_defaults" tools:ignore="MissingTranslation">AACS Defaults</string>
+    <string name="preference_aacs_use_aacs_audio_input" tools:ignore="MissingTranslation">Use AACS Audio Input</string>
+
+    <string name="preference_category_aacs_control" tools:ignore="MissingTranslation">Control AACS</string>
+    <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">REBOOT AACS &amp; APPLY CONFIGURATION</string>
+    <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">SHUTDOWN AACS</string>
+    <string name="preference_aacs_start" tools:ignore="MissingTranslation">START AACS</string>
+</resources>

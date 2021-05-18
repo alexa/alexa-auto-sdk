@@ -6,34 +6,152 @@ The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features.
 
 **Table of Contents**
 
-* [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
-* [Handling Speech Input](#handling-speech-input)
-* [Handling Speech Output](#handling-speech-output)
-* [Handling Authorization](#handling-authorization)
-* [Handling Audio Output](#handling-gui-templates)
-* [Handling Alexa Speaker](#handling-alexa-speaker)
-* [Handling Audio Player Output](#handling-audio-player-output)
-* [Handling Playback Controller Events](#handling-playback-controller-events)
-* [Handling Equalizer Control](#handling-equalizer-control)
-* [Handling Display Card Templates](#handling-display-card-templates)
-* [Handling External Media Adapter with MACCAndroidClient](#handling-external-media-adapter-with-maccandroidclient)
-* [Handling Local Media Sources](#handling-local-media-sources)
-* [Handling Global Presets](#handling-global-presets)
-* [Handling Notifications](#handling-notifications)
-* [Handling Alerts](#handling-alerts)
-* [Handling Alexa State Changes](#handling-alexa-state-changes)
-* [Handling Do Not Disturb](#handling-do-not-disturb)
+- [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
+- [Configuring Alexa Module](#configuring-alexa-module)
+  - [Using a JSON File](#using-a-json-file)
+  - [Using Programmatic Configuration](#using-programmatic-configuration)
+- [Handling Speech Input](#handling-speech-input)
+- [Handling Speech Output](#handling-speech-output)
+- [Handling Authorization](#handling-authorization)
+  - [Using the Authorization Platform Interface to Carry out Auth Provider Authorization](#using-the-authorization-platform-interface-to-carry-out-auth-provider-authorization)
+  - [Sequence Diagrams for Auth Provider Authorization](#sequence-diagrams-for-auth-provider-authorization)
+  - [Optional Auth Provider Configuration](#optional-auth-provider-configuration)
+  - [(Deprecated) Implementing a Custom Handler for AuthProvider](#deprecated-implementing-a-custom-handler-for-authprovider)
+  - [Switching User Account](#switching-user-account)
+  - [AuthProvider Login/Logout Sequence Diagrams](#authprovider-loginlogout-sequence-diagrams)
+  - [Additional Authorization Resources](#additional-authorization-resources)
+- [Handling Device Setup](#handling-device-setup)
+  - [Implementing Custom Handler](#implementing-custom-handler)
+  - [Handling an Event Response](#handling-an-event-response)
+- [Handling Audio Output](#handling-audio-output)
+  - [Custom Volume Control for Alexa Devices](#custom-volume-control-for-alexa-devices)
+- [Handling Alexa Speaker](#handling-alexa-speaker)
+- [Handling Audio Player Output](#handling-audio-player-output)
+- [Handling Playback Controller Events](#handling-playback-controller-events)
+- [Handling Equalizer Control](#handling-equalizer-control)
+- [Handling Display Card Templates](#handling-display-card-templates)
+- [Handling External Media Adapter with MACCAndroidClient](#handling-external-media-adapter-with-maccandroidclient)
+- [Handling Local Media Sources](#handling-local-media-sources)
+- [Handling Global Presets](#handling-global-presets)
 
-## Alexa Module Sequence Diagrams<a id="alexa-module-sequence-diagrams"> </a>
+## Alexa Module Sequence Diagrams
 
 For a view of how the Alexa Auto SDK flow works in selected use cases, see these sequence diagrams:
 
 * [Tap to Talk Sequence Diagram](../../../../SEQUENCE_DIAGRAMS.md#tap-to-talk-sequence-diagram)
 * [Wake Word Enabled Sequence Diagram](../../../../SEQUENCE_DIAGRAMS.md#wake-word-enabled-sequence-diagram)
 
-## Handling Speech Input <a id="handling-speech-input"></a>
+## Configuring Alexa Module
 
-It is the responsibility of the `AudioInputProvider` platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to you. An audio playback noise (earcon) is played whenever speech input is invoked. The playback is handled by whichever audio channel is assigned to the EARCON type. [Read more about handling media and volume here](#handling-audio-output).
+The Alexa module can be configured in two ways:
+* Specifying Configuration Data Using a JSON File.
+* Specifying Configuration Data Programmatically.
+
+See the [core module README](../core/README.md#configuring-the-engine) for steps to specify configuration data.
+
+### Using a JSON File
+
+Include the following structure in the JSON file:
+
+```
+"aace.alexa": {
+        "avsDeviceSDK": {
+            "deviceInfo": {
+                "clientId": "${YOUR_CLIENT_ID}",
+                "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
+                "productId": "${YOUR_PRODUCT_ID}",
+                "manufacturerName": "${YOUR_MANUFACTURER_NAME}",
+                "description": "${YOUR_DESCRIPTION}"
+            },
+            "libcurlUtils": {
+                "CURLOPT_CAPATH" : "<CA_CERTIFICATES_FILE_PATH>"
+                "CURLOPT_INTERFACE" : "<NETWORK_INTERFACE_NAME>"
+            },
+            "miscDatabase": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "certifiedSender": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "alertsCapabilityAgent": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "notifications": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "capabilitiesDelegate": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+            },
+            "deviceSettings": {
+                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
+                "locales": [<LIST_OF_LOCALE_STRINGS>],
+                "defaultLocale": "<DEFAULT_LOCALE_STRING>",
+                "localeCombinations": [[<LOCALE_STRING_PAIR>]],
+                "defaultTimezone": "<TIMEZONE>"
+            }
+        }
+    }
+```
+The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `alertsCapabilityAgent`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
+
+The `deviceSettings` field specifies the settings on the device. The following list describes the settings:
+
+* `databaseFilePath` is the path to the SQLite database that stores persistent settings. The database will be created on initialization if it does not already exist.
+* `defaultLocale` specifies the default locale setting, which is Alexa's locale setting until updated on the device. The default value of `defaultLocale` is “en-US”.
+* `locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]`.
+* `localeCombinations` specifies the list of locale pairs available on a device that supports multi-locale mode. Through the Dynamic Language Switching feature, Alexa can communicate with the user of such device in languages specified in the locale pairs. In each pair, the first value is the primary locale, which Alexa uses most often when interacting with the user. The second value is the secondary locale, which specifies an additional language that Alexa uses when responding to an utterance in the corresponding language. For example, if ["en-US", "es-US"] is declared in `localeCombinations` and the device specifies this pair as the current locale setting, Alexa primarily operates in English for the U.S. but can understand and respond to utterances in Spanish for the U.S., without requiring the device to update the locale setting.
+  
+  By default, `localeCombinations` is a list of the following combinations, which are also the supported combinations as of 2021-02-02. It is possible for the default value to be different from the list of supported combinations in the future. For updates to the supported combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations).
+  
+  * ["en-US", "es-US"]
+  * ["es-US", "en-US"]
+  * ["en-IN", "hi-IN"]
+  * ["hi-IN", "en-IN"]
+  * ["en-CA", "fr-CA"]
+  * ["fr-CA", "en-CA"]
+  * ["en-US", "es-ES"]
+  * ["es-ES", "en-US"]
+  * ["en-US", "de-DE"]
+  * ["de-DE", "en-US"]
+  * ["en-US", "fr-FR"]
+  * ["fr-FR", "en-US"]
+  * ["en-US", "it-IT"]
+  * ["it-IT", "en-US"]
+  * ["en-US", "ja-JP"]
+  * ["ja-JP", "en-US"]
+
+
+  When a device operates in multi-locale mode, an application can select any locale pair in the list above as the locale setting if the following
+  conditions are met:
+  
+  * The device's primary locale setting is the first locale in the selected pair. 
+  * The device also supports the secondary locale in the pair.
+  * The pair is specified in `localeCombinations`.
+  
+  **Note:** Dynamic Language Switching is only available in online mode. 
+
+### Using Programmatic Configuration
+You can configure programmatically all of the above specified fields using the methods provided by the AlexaConfiguration platform interface. For example, to create deviceInfo config:
+
+```java
+AlexaConfiguration deviceConfig = AlexaConfiguration.createDeviceInfoConfig(
+    "<DEVICE_SERIAL_NUMBER>", "<CLIENT_ID>", "<PRODUCT_ID>", "<MANUFACTURER_NAME>", "<DESCRIPTION>");
+```
+
+```java
+final String[] LOCALES =  new String[]{"<LOCALE1>", "<LOCALE2>", ...};
+final String[][] LOCALE_COMBINATIONS = new String[][]{{"<LOCALE1>", "<LOCALE2>"}, ...};
+AlexaConfiguration deviceSettingsConfig = AlexaConfiguration.createDeviceSettingsConfig(
+    "<SQLITE_DATABASE_FILE_PATH>",
+    LOCALES,
+    "<DEFAULT_LOCALE>",
+    "<TIMEZONE>",
+    LOCALE_COMBINATIONS);
+```
+
+## Handling Speech Input
+
+It is the responsibility of the `AudioInputProvider` platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to you. An audio playback sound (earcon) is played whenever speech input is invoked. The playback is handled by whichever audio channel is assigned to the EARCON type. [Read more about handling media and volume here](#handling-audio-output).
 
 To implement a custom handler for speech input, extend the `SpeechRecognizer` class:
 
@@ -75,7 +193,7 @@ public class SpeechRecognizerHandler extends SpeechRecognizer {
 }
 ```
 
-## Handling Speech Output<a id="handling-speech-output"></a>
+## Handling Speech Output
 
 The `SpeechSynthesizer` is responsible for handling Alexa's speech. In v2.0.0 and later of the Auto SDK, this interface no longer has any platform-dependent implementation. However, you must still register it to enable the feature. The playback is handled by whichever audio channel is assigned to the TTS type. [Read more about handling media and volume here](#handling-audio-output).
 
@@ -319,7 +437,7 @@ When switching from one authorized user account to another, you must call the `a
 
 >**NOTE:** Starting with the Auto SDK 3.1, you don't have to restart the Engine after a user logs out. Immediately after the `authStateChanged(UNINITIALIZED)` API returns, you may start a fresh Auth Provider authorization by calling the `authStateChanged(REFRESHED)` API.
 
-### AuthProvider Login/Logout Sequence Diagrams<a id="loginlogout"></a>
+### AuthProvider Login/Logout Sequence Diagrams
 
 The following diagram illustrates the login sequence when using the AuthProvider platform interface to obtain access and refresh tokens.
 
@@ -337,7 +455,48 @@ See the following for additional information on Authorization:
 * [Implement Authorization for AVS Using Login With Amazon](https://developer.amazon.com/alexa-voice-service/auth)
 * [Understanding Login Authentication with the AVS Sample App and the Node.js Server](https://developer.amazon.com/blogs/alexa/post/bb4a34ad-f805-43d9-bbe0-c113105dd8fd/understanding-login-authentication-with-the-avs-sample-app-and-the-node-js-server)
 
-## Handling Audio Output<a id="handling-audio-output"></a>
+## Handling Device Setup
+>**Note:** Support for device setup is only for devices allow-listed by Amazon. If you want to use this feature, contact your Solutions Architect or Partner Manager.
+
+The `DeviceSetup` API handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, the `SetupCompleted` event is sent from the device to inform Alexa that device setup is complete. Alexa then starts the on-boarding experience, for example, by starting a short first-time conversation on the device.
+
+>**Note:** Alexa provides the on-boarding experience to first-time users only. The experience might be different for returning users.
+
+Because `SetupCompleted` is for triggering the on-boarding experience, call the API only if login is successful. Also, if the authorization session is started with an existing refresh token, do not call the `SetupCompleted`.
+
+### Implementing Custom Handler
+To implement a custom handler for device setup, extend the `DeviceSetup` class as follows:
+
+```java
+import com.amazon.aace.alexa.DeviceSetup;
+public class DeviceSetupHandler extends DeviceSetup {
+  ...
+};
+...
+
+// Register the platform interface with the Engine
+if (!mEngine.registerPlatformInterface(mDeviceSetupHandler = new DeviceSetupHandler()))
+  throw new RuntimeException("Could not register Device Setup platform interface");
+  
+// Call 'setupCompleted()' when the device is authenticated
+mDeviceSetupHandler -> setupCompleted();
+```
+
+### Handling an Event Response
+After calling `setupCompleted()`, implement the `setupCompletedResponse(StatusCode statusCode)` method to determine whether the event was sent successfully, as follows:
+
+```java
+import com.amazon.aace.alexa.DeviceSetup;
+public class DeviceSetupHandler extends DeviceSetup {
+  public void setupCompletedResponse(final StatusCode statusCode) {
+    // Handle or log the status
+  }
+};
+```
+
+`StatusCode` is "SUCCESS" or "FAIL", depending on whether the `setupCompleted` event was sent successfully to Alexa.
+
+## Handling Audio Output
 
 When audio data is received from Alexa it is the responsibility of the platform implementation to read the data from the Engine and play it using a platform-specific audio output channel. It is also the responsibility of the platform implementation to define how each `AudioOutput` channel is handled. Each `AudioOutput` implementation will handle one or more of the following media types depending on the behavior defined in the `AudioOutputProvider`:
 
@@ -362,7 +521,7 @@ Contact your Alexa Auto Solution Architect (SA) for help with allow lists. Placi
 
 This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by `AudioOutput` and `AlexaSpeaker` and map these values to the correct range in your implementation.
 
-## Handling Alexa Speaker <a id="handling-alexa-speaker"></a>
+## Handling Alexa Speaker
 
 The Alexa service keeps track of two device volume types. One is called `ALEXA_VOLUME`, and the other is `ALERTS_VOLUME`. The `AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI if applicable. 
 
@@ -390,7 +549,7 @@ public class AlexaSpeakerHandler extends AlexaSpeaker {
     localSetMute( type, true );
 ```  
 
-## Handling Audio Player Output <a id="handling-audio-player-output"></a>
+## Handling Audio Player Output
 
 When an audio media stream is received from Alexa it is the responsibility of the platform implementation to play the stream in a platform-specific media player. The `AudioPlayer` class informs the platform of the changes in player state being tracked by the Engine. This can be used to update the platform GUI.
 
@@ -406,7 +565,7 @@ public class AudioPlayerHandler extends AudioPlayer {
     ...
 }
 ```
-## Handling Playback Controller Events <a id="handling-playback-controller-events"></a>
+## Handling Playback Controller Events
 
 The Engine provides a platform interface `com.amazon.aace.alexa.PlaybackController` for the platform implementation to report on-device transport control button presses for media playing through Alexa. For example, if the user presses the on-screen pause button while listening to Amazon Music through Alexa's `AudioPlayer` interface, the platform implementation calls a `PlaybackController` method to report the button press to the Engine.
 
@@ -459,7 +618,7 @@ public class PlaybackControllerHandler extends PlaybackController {
     togglePressed(PlaybackButton.SHUFFLE, true); // should be called with opposing state from the PlayerInfo template
 ```
 
-## Handling Equalizer Control <a id="handling-equalizer-control"></a>
+## Handling Equalizer Control
 
 The Equalizer Controller enables Alexa voice control of the device's audio equalizer settings, which includes making gain level adjustments to any of the supported frequency bands ("BASS", "MIDRANGE", and/or "TREBLE") using the device's onboard audio processing. 
 
@@ -534,7 +693,7 @@ EqualizerBand[] bands = new EqualizerBand[]{ EqualizerBand.BASS, EqualizerBand.T
 mEqController.localResetBands( bands );
 ```
 
-## Handling Display Card Templates <a id="handling-display-card-templates"></a>
+## Handling Display Card Templates
 
 Alexa sends visual metadata (display card templates) for your device to display. When template information is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the information that is received from Alexa. There are two display card template types:
 
@@ -570,7 +729,7 @@ public class TemplateRuntimeHandler extends TemplateRuntime {
 ```
 >**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
-## Handling External Media Adapter with MACCAndroidClient <a id="handling-external-media-adapter-with-maccandroidclient"></a> 
+## Handling External Media Adapter with MACCAndroidClient 
 
 The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
 
@@ -676,8 +835,8 @@ The tables below describe the supported event and error names implemented accord
 
 | playerError() event name | Description |
 |:--|:--|
-| "INTERNAL\_ERROR" | Any fatal player error has occured
-| "UNKNOWN\_ERROR" | An unknown error occured
+| "INTERNAL\_ERROR" | Any fatal player error has occurred
+| "UNKNOWN\_ERROR" | An unknown error occurred
 | "UNPLAYABLE\_BY\_AUTHORIZATION" | The media couldn't be played due to an unauthorized account
 | "UNPLAYABLE\_BY\_STREAM\_CONCURRENCY" | The media couldn't be played due to the number of accounts currently streaming
 | "UNPLAYABLE\_BY\_ACCOUNT" | The media couldn't be played due to the account type
@@ -848,7 +1007,7 @@ SupportedPlaybackOperation.START_OVER
 ```
 >**Note:** Currently PLAY/PAUSE/STOP will always be supported for a source. Passing null will allow ALL supported operations for the source. 
 
-## Handling Local Media Sources <a id ="handling-local-media-sources"></a>
+## Handling Local Media Sources
 
 The `LocalMediaSource` interface allows the platform to register a local media source by type (`BLUETOOTH`, `USB`, `AM_RADIO`, `FM_RADIO`, `SATELLITE_RADIO`, `LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`). Registering a local media source allows playback control of a source via Alexa (e.g. "Alexa, play the CD player"). It will also enable playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
 
@@ -963,7 +1122,7 @@ The `LocalMediaSource` interface provides methods `playerEvent()` and `playerErr
 | playerEvent() event name | Description |
 |:--|:--|
 | "PlaybackStarted" |  During an active session, the local source has started to play or resumed from a paused state. The Engine considers the source active and in focus. |
-| "PlaybackStopped" | During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa. The player should not be considered stopped, unless it is not resumeable. |
+| "PlaybackStopped" | During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa. The player should not be considered stopped, unless it is not resumable. |
 
 | playerError() event name | Description |
 |:--|:--|
@@ -1063,7 +1222,7 @@ SupportedPlaybackOperation.START_OVER
 
 `launched` specifies whether the source is enabled. The player is disabled for use with Alexa when this value is false, such as when a removable source like USB is disconnected.
 
-## Handling Global Presets <a id="handling-global-presets"></a>
+## Handling Global Presets
 
 The Global Preset interface handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`) actually corresponds to the preset.
 
@@ -1079,7 +1238,7 @@ public void setGlobalPreset( int preset ) {
 ...
 ```	
 
-## Handling Notifications <a id="handling-notifications"></a>
+## Handling Notifications
 
 It is the responsibility of the platform implementation to provide a visual indication to the user when notifications (for example, package shipment notifications, notifications from skills, etc.) are available from Alexa. See the [AVS Notifications interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/notifications.html) for more information about notifications. The Engine uses the registered Notifications implementation to notify you when a notification indicator should be displayed or removed. It does not give any information about the notifications. Audio playback for the notification is handled by whichever audio channel is assigned to the `NOTIFICATION` type [Read more about handling media and volume here](#handling-media-and-volume).
 
@@ -1093,11 +1252,11 @@ public class NotificationsHandler extends Notifications {
 	}
 ```
 
-## Handling Alerts <a id="handling-alerts"></a>
+## Handling Alerts
 
-When an alert is received from Alexa, it is the responsibility of the platform implementation to play the alert sounds in a platform-specific media player. See the [AVS Alerts interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/alerts.html) for more information about notifications.The state of the alert is also made available for the platform to react to. The playback is handled by whichever audio channel is assigned to the `ALERT` type.
+When an alert is received from Alexa, it is the responsibility of the platform implementation to play the alert sounds in a platform-specific media player. See the [AVS Alerts interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/alerts.html) for more information about alerts. The state of the alert is also made available for the platform to react to. The playback is handled by whichever audio channel is assigned to the `ALERT` type.
 
-To implement a custom handler for alerts extend the `Alerts` class:
+To implement a custom handler for alerts, extend the `Alerts` class:
 
 ```
 public class AlertsHandler extends Alerts {
@@ -1128,7 +1287,7 @@ public class AlertsHandler extends Alerts {
 
 For local Alerts control, you should use the the methods `localStop` (stop current playing alert), and `removeAllAlerts` (remove all locally stored alerts).
 
-## Handling Do Not Disturb <a id ="handling-do-not-disturb"></a>
+## Handling Do Not Disturb
 
 The DoNotDisturb (DND) interface allows users to block all incoming notifications, announcements, and calls to their devices, and to set daily recurring schedules that turn DND off and on.  For details, see the [DND Interface documentation](https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html). The Engine uses the registered DND implementation to notify the client when DND has been set or unset. A user's voice request to change the DND state triggers audio playback, but no audio playback occurs when a user sets the DND state using the touch screen.
 
@@ -1149,9 +1308,9 @@ public class DoNotDisturbHandler extends DoNotDisturb {
     ...
 ```
 
-## Handling Alexa State Changes <a id="handling-alexa-state-changes"></a>
+## Handling Alexa State Changes
 
-The Alexa Auto SDK manages internal state information for Alexa and provides an interface for you to handle Alexa state changes in your platform. The information provided by method invocations of this class might be useful, for instance, to enable or disable certain functionality or trigger state changes in you Alexa attention state UI (such as Voice Chrome). To implement a custom handler for Alexa state changes, extend the `AlexaClient` class:
+The Alexa Auto SDK manages internal state information for Alexa and provides an interface for you to handle Alexa state changes in your platform implementation. The information provided by method invocations of this class might be useful, for instance, to enable or disable certain functionality or trigger state changes in your Alexa attention state UI (such as Voice Chrome). To implement a custom handler for Alexa state changes, extend the `AlexaClient` class:
 
 ```
 public class AlexaClientHandler extends AlexaClient {

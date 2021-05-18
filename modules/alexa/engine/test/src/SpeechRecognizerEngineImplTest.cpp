@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,11 +26,13 @@
 #include <AACE/Test/Audio/MockAudioManagerInterface.h>
 #include <AACE/Test/Audio/MockAudioOutputChannelInterface.h>
 #include <AACE/Test/Alexa/MockSpeechRecognizer.h>
+#include <AACE/Test/PropertyManager/MockPropertyManagerServiceInterface.h>
 
 #include <AVSCommon/SDKInterfaces/test/Settings/MockSetting.h>
 #include <Settings/Types/AlarmVolumeRampTypes.h>
 
 #include <AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h>
+#include "AACE/Alexa/AlexaProperties.h"
 
 using namespace aace::test::alexa;
 using namespace aace::test::audio;
@@ -42,6 +44,7 @@ class SpeechRecognizerEngineImplTest : public ::testing::Test {
 public:
     void SetUp() override {
         m_alexaMockFactory = AlexaTestHelper::createAlexaMockComponentFactory();
+        m_mockPropertyManager = std::make_shared<aace::test::core::MockPropertyManagerServiceInterface>();
 
         // initialize the avs device SDK
         ASSERT_TRUE(alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::initialize(
@@ -95,8 +98,11 @@ protected:
             EXPECT_CALL(*m_alexaMockFactory->getDeviceSettingsDelegateMock(), getWakeWordsSetting())
                 .WillOnce(::testing::Return(mockWakeWordsSetting));
 
-            EXPECT_CALL(*m_alexaMockFactory->getWakewordEngineAdapterMock(), initialize(testing::_, testing::_))
+            EXPECT_CALL(
+                *m_alexaMockFactory->getWakewordEngineAdapterMock(), initialize(testing::_, testing::_, testing::_))
                 .WillOnce(::testing::Return(true));
+            EXPECT_CALL(*m_mockPropertyManager, getProperty(aace::alexa::property::LOCALE))
+                .WillOnce(::testing::Return("en_US"));
 
             m_configured = true;
         }
@@ -117,16 +123,17 @@ protected:
             m_alexaMockFactory->getContextManagerInterfaceMock(),
             m_alexaMockFactory->getFocusManagerInterfaceMock(),
             m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-            m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getUserInactivityMonitorMock(),
             m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
             *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
             m_alexaMockFactory->getAVSConnectionManagerMock(),
             m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+            m_mockPropertyManager,
+            m_alexaMockFactory->getMetricRecorder(),
             m_alexaMockFactory->getSpeechEncoderMock(),
             m_alexaMockFactory->getWakewordEngineAdapterMock(),
-            m_alexaMockFactory->getWakewordVerifierMock());
+            createInitiatorVerifiers());
 
         return speechRecognizerEngineImpl;
     }
@@ -143,8 +150,15 @@ protected:
         return format;
     }
 
+    std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>> createInitiatorVerifiers() {
+        std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>> factoryList;
+        factoryList.push_back(std::make_shared<aace::engine::alexa::InitiatorVerifier>());
+        return factoryList;
+    }
+
 protected:
     std::shared_ptr<AlexaMockComponentFactory> m_alexaMockFactory;
+    std::shared_ptr<aace::test::core::MockPropertyManagerServiceInterface> m_mockPropertyManager;
 
 private:
     bool m_initialized = false;
@@ -171,16 +185,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithPlatformInterfaceAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -198,16 +213,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithAudioManagerInterfaceAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -223,16 +239,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithDirectiveSequencerAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -250,16 +267,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithMessageSenderAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -277,16 +295,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithContextManagerAsNull) {
         nullptr,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -304,16 +323,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithFocusManagerAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -331,43 +351,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithDialogUXStateAggregatorAsNull) 
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         nullptr,
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
-
-    ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
-}
-
-TEST_F(SpeechRecognizerEngineImplTest, createWithCapabilitiesDelegateAsNull) {
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
-
-    auto speechRecognizerEngineImpl = aace::engine::alexa::SpeechRecognizerEngineImpl::create(
-        m_alexaMockFactory->getSpeechRecognizerMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        createAudioFormat(),
-        m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getDirectiveSequencerInterfaceMock(),
-        m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        nullptr,
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
-        m_alexaMockFactory->getUserInactivityMonitorMock(),
-        m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
-        m_alexaMockFactory->getAVSConnectionManagerMock(),
-        m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
-        m_alexaMockFactory->getSpeechEncoderMock(),
-        m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -385,16 +379,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithExceptionSenderAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getUserInactivityMonitorMock(),
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }
@@ -412,16 +407,17 @@ TEST_F(SpeechRecognizerEngineImplTest, createWithUserInactivityMonitorAsNull) {
         m_alexaMockFactory->getContextManagerInterfaceMock(),
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getLocaleAssetsManagerInterfaceMock(),
         *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
         m_alexaMockFactory->getAVSConnectionManagerMock(),
         m_alexaMockFactory->getSystemSoundPlayerInterfaceMock(),
+        m_mockPropertyManager,
+        m_alexaMockFactory->getMetricRecorder(),
         m_alexaMockFactory->getSpeechEncoderMock(),
         m_alexaMockFactory->getWakewordEngineAdapterMock(),
-        m_alexaMockFactory->getWakewordVerifierMock());
+        createInitiatorVerifiers());
 
     ASSERT_EQ(speechRecognizerEngineImpl, nullptr) << "SpeechRecognizerEngineImpl pointer expected to be null";
 }

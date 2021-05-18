@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include <string.h>
 #include "AACE/Engine/Navigation/NavigationEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -25,8 +26,27 @@ namespace aace {
 namespace engine {
 namespace navigation {
 
+using namespace aace::engine::utils::metrics;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationEngineImpl");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "NavigationEngineImpl";
+
+/// Counter Metrics for Navigation Platform APIs
+static const std::string METRIC_NAVIGATION_SHOW_PREVIOUS_WAYPOINTS = "ShowPreviousWaypoints";
+static const std::string METRIC_NAVIGATION_NAVIGATE_TO_PREVIOUS_WAYPOINT = "NavigateToPreviousWaypoint";
+static const std::string METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES = "ShowAlternativeRoutes";
+static const std::string METRIC_NAVIGATION_CONTROL_DISPLAY = "ControlDisplay";
+static const std::string METRIC_NAVIGATION_CANCEL_NAVIGATION = "CancelNavigation";
+static const std::string METRIC_NAVIGATION_GET_NAVIGATION_STATE = "GetNavigationState";
+static const std::string METRIC_NAVIGATION_START_NAVIGATION = "StartNavigation";
+static const std::string METRIC_NAVIGATION_ANNOUNCE_MANEUVER = "AnnounceManeuver";
+static const std::string METRIC_NAVIGATION_ANNOUNCE_ROADREGULATION = "AnnounceRoadRegulation";
+static const std::string METRIC_NAVIGATION_NAVIGATION_EVENT = "NavigationEvent";
+static const std::string METRIC_NAVIGATION_NAVIGATION_ERROR = "NavigationError";
+static const std::string METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES_SUCCEEDED = "ShowAlternativeRoutesSucceeded";
 
 NavigationEngineImpl::NavigationEngineImpl(
     std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
@@ -37,7 +57,8 @@ NavigationEngineImpl::NavigationEngineImpl(
 }
 
 bool NavigationEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) {
@@ -55,9 +76,9 @@ bool NavigationEngineImpl::initialize(
         ThrowIfNull(m_displayManagerCapabilityAgent, "couldNotCreateDisplayManagerCapabilityAgent");
 
         // register capability with the default endpoint
-        defaultEndpointBuilder->withCapability(m_navigationCapabilityAgent, m_navigationCapabilityAgent);
-        defaultEndpointBuilder->withCapability(m_displayManagerCapabilityAgent, m_displayManagerCapabilityAgent);
-        defaultEndpointBuilder->withCapability(
+        capabilitiesRegistrar->withCapability(m_navigationCapabilityAgent, m_navigationCapabilityAgent);
+        capabilitiesRegistrar->withCapability(m_displayManagerCapabilityAgent, m_displayManagerCapabilityAgent);
+        capabilitiesRegistrar->withCapability(
             m_navigationAssistanceCapabilityAgent, m_navigationAssistanceCapabilityAgent);
 
         return true;
@@ -69,14 +90,15 @@ bool NavigationEngineImpl::initialize(
 
 std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
     std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     const std::string& navigationProviderName) {
     try {
         ThrowIfNull(navigationPlatformInterface, "nullNavigationPlatformInterface");
-        ThrowIfNull(defaultEndpointBuilder, "nullDefaultEndpointBuilder");
+        ThrowIfNull(capabilitiesRegistrar, "nullCapabilitiesRegistrar");
         ThrowIfNull(exceptionSender, "nullPlatformInterface");
         ThrowIfNull(contextManager, "nullNavigationContextManager");
 
@@ -84,7 +106,7 @@ std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
             new NavigationEngineImpl(navigationPlatformInterface, navigationProviderName));
 
         ThrowIfNot(
-            navigationEngineImpl->initialize(defaultEndpointBuilder, exceptionSender, messageSender, contextManager),
+            navigationEngineImpl->initialize(capabilitiesRegistrar, exceptionSender, messageSender, contextManager),
             "initializeNavigationEngineImplFailed");
 
         // set the platform engine interface reference
@@ -119,42 +141,64 @@ void NavigationEngineImpl::doShutdown() {
 }
 
 void NavigationEngineImpl::showPreviousWaypoints() {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "showPreviousWaypoints", {METRIC_NAVIGATION_SHOW_PREVIOUS_WAYPOINTS});
     m_navigationPlatformInterface->showPreviousWaypoints();
 }
 
 void NavigationEngineImpl::navigateToPreviousWaypoint() {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "navigateToPreviousWaypoint", {METRIC_NAVIGATION_NAVIGATE_TO_PREVIOUS_WAYPOINT});
     m_navigationPlatformInterface->navigateToPreviousWaypoint();
 }
 
 void NavigationEngineImpl::showAlternativeRoutes(aace::navigation::Navigation::AlternateRouteType alternateRouteType) {
+    std::stringstream ss;
+    ss << alternateRouteType;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "showAlternativeRoutes", {METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES, ss.str()});
     m_navigationPlatformInterface->showAlternativeRoutes(alternateRouteType);
 }
 
 void NavigationEngineImpl::controlDisplay(aace::navigation::Navigation::ControlDisplay controlDisplay) {
+    std::stringstream ss;
+    ss << controlDisplay;
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "controlDisplay", {METRIC_NAVIGATION_CONTROL_DISPLAY, ss.str()});
     m_navigationPlatformInterface->controlDisplay(controlDisplay);
 }
 
 void NavigationEngineImpl::startNavigation(const std::string& payload) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "startNavigation", {METRIC_NAVIGATION_START_NAVIGATION});
     m_navigationPlatformInterface->startNavigation(payload);
 }
 
 void NavigationEngineImpl::announceManeuver(const std::string& payload) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "announceManeuver", {METRIC_NAVIGATION_ANNOUNCE_MANEUVER});
     m_navigationPlatformInterface->announceManeuver(payload);
 }
 
 void NavigationEngineImpl::announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) {
+    std::stringstream ss;
+    ss << roadRegulation;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "announceRoadRegulation", {METRIC_NAVIGATION_ANNOUNCE_ROADREGULATION, ss.str()});
     m_navigationPlatformInterface->announceRoadRegulation(roadRegulation);
 }
 
 void NavigationEngineImpl::cancelNavigation() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "cancelNavigation", {METRIC_NAVIGATION_CANCEL_NAVIGATION});
     m_navigationPlatformInterface->cancelNavigation();
 }
 
 std::string NavigationEngineImpl::getNavigationState() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "getNavigationState", {METRIC_NAVIGATION_GET_NAVIGATION_STATE});
     return m_navigationPlatformInterface->getNavigationState();
 }
 
 void NavigationEngineImpl::onNavigationEvent(EventName event) {
+    std::stringstream ss;
+    ss << event;
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onNavigationEvent", {METRIC_NAVIGATION_NAVIGATION_EVENT, ss.str()});
     switch (event) {
         case aace::navigation::NavigationEngineInterface::EventName::NAVIGATION_STARTED:
         case aace::navigation::NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN:
@@ -198,6 +242,14 @@ void NavigationEngineImpl::onNavigationError(
     aace::navigation::NavigationEngineInterface::ErrorType type,
     aace::navigation::NavigationEngineInterface::ErrorCode code,
     const std::string& description) {
+    std::stringstream errorType;
+    std::stringstream errorCode;
+    errorType << type;
+    errorCode << code;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onNavigationError",
+        {METRIC_NAVIGATION_NAVIGATION_ERROR, errorType.str(), errorCode.str()});
     switch (type) {
         case aace::navigation::NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED:
         case aace::navigation::NavigationEngineInterface::ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED:
@@ -241,6 +293,10 @@ void NavigationEngineImpl::onNavigationError(
 }
 
 void NavigationEngineImpl::onShowAlternativeRoutesSucceeded(const std::string& payload) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onShowAlternativeRoutesSucceeded",
+        {METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES_SUCCEEDED});
     m_displayManagerCapabilityAgent->showAlternativeRoutesSucceeded(payload);
 }
 

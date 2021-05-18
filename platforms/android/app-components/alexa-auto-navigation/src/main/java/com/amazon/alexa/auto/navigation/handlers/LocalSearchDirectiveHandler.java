@@ -48,21 +48,18 @@ public class LocalSearchDirectiveHandler {
      */
     public void renderLocalSearchListTemplate(AACSMessage message) {
         AlexaApp app = AlexaApp.from(mContext.get());
-        app.getRootComponent()
-                .getScopedComponents()
-                .getComponent(SessionViewController.class)
-                .ifPresent(sessionViewController -> {
-                    sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
-                        TemplateRuntimeMessages.parseLocalSearchListTemplate(message.payload)
-                                .ifPresent(localSearchListTemplate -> {
-                                    try {
-                                        renderLocalSearchListView(viewGroup, localSearchListTemplate);
-                                    } catch (Exception e) {
-                                        Log.e(TAG, "Issue inflating template: " + e);
-                                    }
-                                });
-                    });
-                });
+        app.getRootComponent().getComponent(SessionViewController.class).ifPresent(sessionViewController -> {
+            sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
+                TemplateRuntimeMessages.parseLocalSearchListTemplate(message.payload)
+                        .ifPresent(localSearchListTemplate -> {
+                            try {
+                                renderLocalSearchListView(viewGroup, localSearchListTemplate);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Issue inflating template: " + e);
+                            }
+                        });
+            });
+        });
     }
 
     /**
@@ -71,21 +68,18 @@ public class LocalSearchDirectiveHandler {
      */
     public void renderLocalSearchDetailTemplate(AACSMessage message) {
         AlexaApp app = AlexaApp.from(mContext.get());
-        app.getRootComponent()
-                .getScopedComponents()
-                .getComponent(SessionViewController.class)
-                .ifPresent(sessionViewController -> {
-                    sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
-                        TemplateRuntimeMessages.parseLocalSearchDetailTemplate(message.payload)
-                                .ifPresent(localSearchDetailTemplate -> {
-                                    try {
-                                        renderLocalSearchDetailView(viewGroup, localSearchDetailTemplate);
-                                    } catch (Exception e) {
-                                        Log.e(TAG, "Issue inflating template: " + e);
-                                    }
-                                });
-                    });
-                });
+        app.getRootComponent().getComponent(SessionViewController.class).ifPresent(sessionViewController -> {
+            sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
+                TemplateRuntimeMessages.parseLocalSearchDetailTemplate(message.payload)
+                        .ifPresent(localSearchDetailTemplate -> {
+                            try {
+                                renderLocalSearchDetailView(viewGroup, localSearchDetailTemplate);
+                            } catch (Exception e) {
+                                Log.e(TAG, "Issue inflating template: " + e);
+                            }
+                        });
+            });
+        });
     }
 
     /**
@@ -96,7 +90,6 @@ public class LocalSearchDirectiveHandler {
         Log.i(TAG, "clearTemplate");
         AlexaApp.from(mContext.get())
                 .getRootComponent()
-                .getScopedComponents()
                 .getComponent(SessionViewController.class)
                 .ifPresent(SessionViewController::clearTemplate);
     }

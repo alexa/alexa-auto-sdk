@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/communication_pair_new_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/setting_item_horizontal_margin_start"
+    android:layout_marginEnd="@dimen/item_horizontal_margin_quadruple"
+    android:orientation="vertical">
+    <TextView android:id="@android:id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:textAppearance="@style/Alexa.Heading2Text"
+        android:layout_marginTop="@dimen/setting_item_vertical_margin"
+        android:text="@string/pair_new_device"/>
+</LinearLayout>

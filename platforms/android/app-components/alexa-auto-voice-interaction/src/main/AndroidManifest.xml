@@ -32,19 +32,10 @@
             android:permission="android.permission.BIND_VOICE_INTERACTION">
         </service>
 
-        <activity android:name=".settings.SettingsActivity"
-            android:label="Voice Interaction Settings">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-
         <receiver android:name=".receiver.AACSBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <category android:name="com.amazon.aacs.aasb.AlexaClient" />
-
                 <action android:name="com.amazon.aacs.aasb.DialogStateChanged"/>
                 <action android:name="com.amazon.aacs.aasb.ConnectionStatusChanged"/>
 

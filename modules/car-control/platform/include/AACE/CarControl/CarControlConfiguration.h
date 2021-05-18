@@ -475,6 +475,8 @@ public:
     virtual CarControlConfiguration& setDefaultZone(const std::string& zoneId) = 0;
 
     /**
+     * @deprecated
+     *
      * Specify the path to a file that defines the default assets. This creates an "assets.defaultAssetsPath" entry in
      * 'aace.carControl'.
      * 

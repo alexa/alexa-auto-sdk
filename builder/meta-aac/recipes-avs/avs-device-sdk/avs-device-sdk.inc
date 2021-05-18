@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=d92e60ee98664c54f68aa515a6169708"
 DEPENDS = "curl nghttp2 googletest sqlite3 openssl"
 
 SRC_URI = "https://github.com/alexa/avs-device-sdk/archive/v${PV}.tar.gz"
-SRC_URI += "file://0001-Fix-SIGBUS-due-to-unaligned-access.patch"
 
 # Skip checksum verification
 BB_STRICT_CHECKSUM = "0"
@@ -18,7 +17,9 @@ EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=${AAC_BUILD_TYPE} \
                   -DACSDK_EMIT_CURL_LOGS=${AAC_CURL_LOGS} \
                   -DACSDK_LATENCY_LOG=${AAC_LATENCY_LOGS} \
                   -DBUILD_TESTING=${AVS_ENABLE_TESTS} \
-				  -DENABLE_ALL_ENDPOINT_CONTROLLERS=ON"
+				  -DENABLE_ALL_ENDPOINT_CONTROLLERS=ON \
+				  -DRAPIDJSON_MEM_OPTIMIZATION=OFF \
+				  -DMETRICS=ON"
 
 
 # Install AVS artifacts explicitly into AAC_PREFIX dir

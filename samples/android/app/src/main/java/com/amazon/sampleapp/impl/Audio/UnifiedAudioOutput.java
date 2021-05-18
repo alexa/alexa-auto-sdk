@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import com.amazon.aace.audio.AudioFormat;
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.aace.audio.AudioOutputProvider;
 import com.amazon.aace.audio.AudioStream;
-import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
+import com.amazon.sampleapp.core.AuthStateObserver;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 

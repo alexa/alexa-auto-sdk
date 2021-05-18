@@ -16,7 +16,7 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_CAPABILITY_CONTROLLER_H
 #define AACE_ENGINE_CAR_CONTROL_CAPABILITY_CONTROLLER_H
 
-#include <Endpoints/EndpointBuilder.h>
+#include "AVSCommon/SDKInterfaces/Endpoints/EndpointBuilderInterface.h"
 
 #include "AACE/Engine/CarControl/AssetStore.h"
 #include "AACE/Engine/CarControl/CarControlEngineImpl.h"
@@ -32,7 +32,7 @@ class CapabilityController {
 public:
     /// Alias to improve readability
     /// @{
-    using EndpointBuilder = alexaClientSDK::endpoints::EndpointBuilder;
+    using EndpointBuilderInterface = alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointBuilderInterface;
     /// @}
 
     /**
@@ -62,7 +62,7 @@ public:
      */
     virtual void build(
         std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
-        std::unique_ptr<EndpointBuilder>& builder) = 0;
+        std::unique_ptr<EndpointBuilderInterface>& builder) = 0;
 
 private:
     /// The ID of the endpoint controlled by this controller

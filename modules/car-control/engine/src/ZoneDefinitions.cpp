@@ -82,17 +82,22 @@ std::shared_ptr<ZoneDefinitions> ZoneDefinitions::create(
                     ThrowIfNot(type == "asset", "invalidFriendlyNameType");
                     std::string assetId = friendlyName["value"]["assetId"];
                     const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
-                    for (auto& name : names) {
-                        // clang-format off
-                        json translatedName = {
-                            {"@type", "text"},
-                            {"value", {
-                                {"text", name.first},
-                                {"locale", name.second},
-                            }}
-                        };
-                        // clang-format on
-                        translatedNames.push_back(translatedName);
+                    if (names.empty()) {
+                        translatedNames.push_back(friendlyName);
+                    } else {
+                        // Expand asset to text if the asset is in the AssetStore
+                        for (auto& name : names) {
+                            // clang-format off
+                            json translatedName = {
+                                {"@type", "text"},
+                                {"value", {
+                                    {"text", name.first},
+                                    {"locale", name.second},
+                                }}
+                            };
+                            // clang-format on
+                            translatedNames.push_back(translatedName);
+                        }
                     }
                 }
             }

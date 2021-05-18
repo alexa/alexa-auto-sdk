@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/two_choice_dialog"
+    android:theme="@style/Theme.Alexa.Standard"
+    android:background="?attr/android:colorBackgroundFloating"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/header_text"
+        android:textAppearance="@style/Alexa.Heading2Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginTop="@dimen/margin_vertical_double"
+        android:layout_marginStart="@dimen/margin_horizontal_double"
+        android:layout_marginEnd="@dimen/margin_horizontal_double"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/content_text"
+        app:layout_constraintHorizontal_weight="2"
+        tools:text="Dialog Header">
+    </TextView>
+
+    <TextView
+        android:id="@+id/content_text"
+        android:textAppearance="@style/Alexa.Heading3Text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginTop="@dimen/margin_vertical_double"
+        android:layout_marginStart="@dimen/margin_horizontal_double"
+        android:layout_marginEnd="@dimen/margin_horizontal_double"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_text"
+        tools:text="Dialog Content" />
+
+    <TextView
+        android:id="@+id/btn1"
+        style="@style/Alexa.DarkButtonRoundSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_vertical_octuple"
+        android:layout_marginBottom="@dimen/margin_vertical_double"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/content_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn2"
+        tools:text="Button 1"/>
+
+    <TextView
+        android:id="@+id/btn2"
+        style="@style/Alexa.LightButtonRoundSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/btn1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn1"
+        tools:text="Button 2"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

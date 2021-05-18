@@ -73,20 +73,18 @@ public class AACSPropertyContentProvider extends ContentProvider {
 
     public static void updatePropertyAndNotifyObservers(String name, String value, boolean updated) {
         if (updated) {
-            if (mPreferences.contains(name)) {
-                mPreferences.edit().putString(name, value).apply();
-                mContext.getContentResolver().notifyChange(
-                        Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), null);
+            mPreferences.edit().putString(name, value).apply();
+            mContext.getContentResolver().notifyChange(
+                    Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), null);
+            if (mWaitForPropertyStateChanged != null) {
+                mWaitForPropertyStateChanged.complete(updated);
             }
-            mWaitForPropertyStateChanged.complete(updated);
         }
     }
 
     public static void updatePropertyAndNotifyObservers(String name, String value) {
-        if (mPreferences.contains(name)) {
-            mPreferences.edit().putString(name, value).apply();
-            mContext.getContentResolver().notifyChange(Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), null);
-        }
+        mPreferences.edit().putString(name, value).apply();
+        mContext.getContentResolver().notifyChange(Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), null);
     }
 
     /**
@@ -107,8 +105,20 @@ public class AACSPropertyContentProvider extends ContentProvider {
     public Cursor query(@Nullable Uri uri, @Nullable String[] strings, @Nullable String property,
             @Nullable String[] strings1, @Nullable String s1) {
         mPreferences = mContext.getSharedPreferences(AACSConstants.AACS_PROPERTY_URI, mContext.MODE_PRIVATE);
+        String value;
+        if (mPreferences.contains(property)) {
+            value = mPreferences.getString(property, null);
+        } else {
+            value = mPropertyManagerHandler.getProperty(property);
+            // save the property value only if it is not empty string
+            if (value != null && !value.isEmpty()) {
+                mPreferences.edit().putString(property, value).apply();
+            } else {
+                value = null;
+            }
+        }
         MatrixCursor cursor = new MatrixCursor(new String[] {"name", "value"});
-        cursor.addRow(new String[] {property, mPreferences.getString(property, null)});
+        cursor.addRow(new String[] {property, value});
         return cursor;
     }
 

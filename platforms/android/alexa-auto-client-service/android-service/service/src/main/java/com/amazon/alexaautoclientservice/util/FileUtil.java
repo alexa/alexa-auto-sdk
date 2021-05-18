@@ -59,9 +59,12 @@ public class FileUtil {
     public static final String CERTS_DIR = "certs";
     public static final String EXTERNAL_FILE_DIR = "externalFiles";
     public static final String MODEL_DIR = "aacs.amazonLite";
+
     public static final String CONFIG_KEY = "aacs-configuration";
-    public static final String AACS_GENERAL_CONFIG = "aacs-general";
-    public static final String AACS_EXTRAS_CONFIG = "aacs-extras";
+    public static final String EXTRAS_CONFIG_KEY = "aacs-extras";
+
+    public static final String AACS_GENERAL_CONFIG = "aacs.general";
+    public static final String AACS_DEFAULT_PLATFORM_IMPL_CONFIG = "aacs.defaultPlatformHandlers";
 
     public static final String AACS_CONFIG_NETWORK_INFO_PROVIDER = "NetworkInfoProvider";
     public static final String AACS_CONFIG_LOCATION_PROVIDER = "LocationProvider";
@@ -76,6 +79,11 @@ public class FileUtil {
             put(AACS_CONFIG_PROPERTY_MANAGER, "propertyManager");
         }
     };
+
+    private static JSONObject mEngineConfiguration = new JSONObject();
+    private static JSONObject mGeneralConfiguration = new JSONObject();
+    private static JSONObject mDefaultHandlerConfiguration = new JSONObject();
+    private static JSONObject mExtrasConfiguration = new JSONObject();
 
     private static boolean copyFileFromAssetPath(
             String assetPath, File destFile, boolean force, AssetManager assetManager) {
@@ -141,8 +149,8 @@ public class FileUtil {
         File certsDir = new File(context.getCacheDir(), CERTS_DIR);
         File appDataDir = new File(context.getFilesDir(), APPDATA_DIR);
 
-        InputStream configStream = new ByteArrayInputStream(
-                getSavedConfigurationForEngine(context).toString().getBytes(StandardCharsets.UTF_8));
+        InputStream configStream =
+                new ByteArrayInputStream(mEngineConfiguration.toString().getBytes(StandardCharsets.UTF_8));
 
         // Construct and return EngineConfigurations list
         return new ArrayList<EngineConfiguration>(Arrays.asList(AlexaConfiguration.createCurlConfig(certsDir.getPath()),
@@ -161,38 +169,46 @@ public class FileUtil {
         return context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }
 
-    public static JSONObject getSavedConfigurationForEngine(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
-        JSONObject configJson = null;
-        try {
-            configJson = new JSONObject(config);
-            configJson.remove("aacs.general");
-            configJson.remove("aacs.defaultPlatformHandlers");
-        } catch (JSONException e) {
-            Log.e(TAG, "Error while constructing InputStream from stored configuration.");
-        }
-        return configJson;
-    }
-
-    private static void updateEngineConfigurationInSharedPref(Context context, JSONObject engineConfig) {
-        SharedPreferences sp = getSharedPreferences(context);
-        try {
-            JSONObject fullConfig = new JSONObject(sp.getString(CONFIG_KEY, ""));
-            engineConfig.put("aacs.general", fullConfig.get("aacs.general"));
-            engineConfig.put("aacs.defaultPlatformHandlers", fullConfig.get("aacs.defaultPlatformHandlers"));
-            sp.edit().putString(CONFIG_KEY, engineConfig.toString()).apply();
-        } catch (JSONException e) {
-            Log.e(TAG, "Error while saving engine configuration: " + e.getMessage());
-        }
-    }
-
     public static boolean isConfigurationSaved(@NonNull Context context) {
         return getSharedPreferences(context).contains(CONFIG_KEY);
     }
 
-    public static boolean saveConfiguration(
+    public static void saveConfigToSharedPref(@NonNull Context context) {
+        SharedPreferences.Editor sp = getSharedPreferences(context).edit();
+
+        try {
+            if (mEngineConfiguration == null) {
+                Log.e(TAG, "Not saving shared preferences because engine configuration is null.");
+                return;
+            }
+            JSONObject config = new JSONObject(mEngineConfiguration.toString());
+            config.put(AACS_GENERAL_CONFIG, mGeneralConfiguration);
+            config.put(AACS_DEFAULT_PLATFORM_IMPL_CONFIG, mDefaultHandlerConfiguration);
+
+            sp.putString(CONFIG_KEY, config.toString()).apply();
+            sp.putString(EXTRAS_CONFIG_KEY, mExtrasConfiguration.toString()).apply();
+        } catch (JSONException e) {
+            Log.e(TAG, "Error while saving config to SharedPref. Error: " + e.getMessage());
+        }
+    }
+
+    public static void setConfiguration(@NonNull Context context) {
+        Log.i(TAG, "Setting configuration using SharedPreferences.");
+        try {
+            JSONObject config = new JSONObject(getSharedPreferences(context).getString(CONFIG_KEY, ""));
+            mDefaultHandlerConfiguration = (JSONObject) config.remove(AACS_DEFAULT_PLATFORM_IMPL_CONFIG);
+            mGeneralConfiguration = (JSONObject) config.remove(AACS_GENERAL_CONFIG);
+            mEngineConfiguration = config;
+
+            mExtrasConfiguration = new JSONObject(getSharedPreferences(context).getString(EXTRAS_CONFIG_KEY, ""));
+        } catch (JSONException e) {
+            Log.e(TAG, "Setting config with SharedPref failed. Error: " + e.getMessage());
+        }
+    }
+
+    public static boolean setConfiguration(
             @NonNull Context context, @NonNull JSONArray configFilepaths, @NonNull JSONArray configs) {
-        Log.i(TAG, "Constructing configuration and saving into SharedPreferences.");
+        Log.i(TAG, "Setting configuration using config message.");
 
         JSONObject fullConfig = constructFullConfiguration(configFilepaths, configs);
         fullConfig = translateToEngineConfiguration(context, fullConfig);
@@ -200,25 +216,21 @@ public class FileUtil {
         if (fullConfig == null || !validateConfig(fullConfig))
             return false;
 
-        getSharedPreferences(context).edit().putString(CONFIG_KEY, fullConfig.toString()).apply();
-        try {
-            getSharedPreferences(context)
-                    .edit()
-                    .putString(AACS_GENERAL_CONFIG, fullConfig.get("aacs.general").toString())
-                    .apply();
-        } catch (JSONException e) {
-            Log.e(TAG, "Error while storing aacs.general config into shared preferences.");
-        }
-
-        // Delete extras config stored in SharedPref
-        getSharedPreferences(context).edit().remove(AACS_EXTRAS_CONFIG).apply();
+        mDefaultHandlerConfiguration = (JSONObject) fullConfig.remove(AACS_DEFAULT_PLATFORM_IMPL_CONFIG);
+        mGeneralConfiguration = (JSONObject) fullConfig.remove(AACS_GENERAL_CONFIG);
+        mEngineConfiguration = fullConfig;
+        mExtrasConfiguration = new JSONObject();
 
         // Add config to deregister AASB platform interfaces that have default impl
         for (String pi : mInterfaceToModuleNames.keySet()) {
-            if (isDefaultImplementationEnabled(context, pi)) {
-                deregisterAASBPlatformInterface(context, mInterfaceToModuleNames.get(pi), pi);
+            if (isDefaultImplementationEnabled(pi)) {
+                deregisterAASBPlatformInterface(mInterfaceToModuleNames.get(pi), pi);
             }
         }
+
+        // Check and disable AASB.APL accordingly
+        checkAndChangeAPLEnablement(context, mEngineConfiguration);
+
         return true;
     }
 
@@ -289,14 +301,14 @@ public class FileUtil {
     private static boolean validateAudioSource(JSONObject config) {
         try {
             Object voiceAudioSource = getLeafNodeValueFromJson(
-                    config, "aacs.defaultPlatformHandlers", "audioInput", "audioType", "VOICE", "audioSource");
-            Object commsAudioSource = getLeafNodeValueFromJson(
-                    config, "aacs.defaultPlatformHandlers", "audioInput", "audioType", "COMMUNICATION", "audioSource");
+                    config, AACS_DEFAULT_PLATFORM_IMPL_CONFIG, "audioInput", "audioType", "VOICE", "audioSource");
+            Object commsAudioSource = getLeafNodeValueFromJson(config, AACS_DEFAULT_PLATFORM_IMPL_CONFIG, "audioInput",
+                    "audioType", "COMMUNICATION", "audioSource");
 
             Object voiceIsDefault = getLeafNodeValueFromJson(
-                    config, "aacs.defaultPlatformHandlers", "audioInput", "audioType", "VOICE", "useDefault");
-            Object commsIsDefault = getLeafNodeValueFromJson(
-                    config, "aacs.defaultPlatformHandlers", "audioInput", "audioType", "COMMUNICATION", "useDefault");
+                    config, AACS_DEFAULT_PLATFORM_IMPL_CONFIG, "audioInput", "audioType", "VOICE", "useDefault");
+            Object commsIsDefault = getLeafNodeValueFromJson(config, AACS_DEFAULT_PLATFORM_IMPL_CONFIG, "audioInput",
+                    "audioType", "COMMUNICATION", "useDefault");
 
             // Fail if AudioSources are unequal and non-external. If missing, config is still considered valid
             if (!(voiceAudioSource instanceof String) || !(commsAudioSource instanceof String)) {
@@ -337,6 +349,10 @@ public class FileUtil {
             }
             while (iter.hasNext()) {
                 String key = iter.next();
+                if (key.length() < 4) {
+                    translatedConfig.put(key, config.getJSONObject(key));
+                    continue;
+                }
                 if (key.substring(0, 4).equals("aacs")
                         && (!key.contains("modules") && !key.contains("general")
                                 && !key.contains("defaultPlatformHandlers"))) {
@@ -359,7 +375,15 @@ public class FileUtil {
                         translatedConfig.put("aace" + key.substring(4), config.getJSONObject(key));
                     }
                 } else if (key.contains("modules")) {
-                    translatedConfig.put("aasb" + key.substring(4), config.getJSONObject(key));
+                    JSONObject modulesConfig = config.getJSONObject(key);
+                    Iterator<String> modulesIter = modulesConfig.keys();
+                    while (modulesIter.hasNext()) {
+                        String modulesKey = modulesIter.next();
+                        if (modulesKey.length() >= 4 && modulesKey.substring(0, 4).equals("aacs")) {
+                            translatedConfig.put(
+                                    "aasb" + modulesKey.substring(4), modulesConfig.getJSONObject(modulesKey));
+                        }
+                    }
                 } else {
                     translatedConfig.put(key, config.getJSONObject(key));
                 }
@@ -374,59 +398,38 @@ public class FileUtil {
     }
 
     public static JSONObject removeExtrasModuleConfiguration(@NonNull Context context, @NonNull String configKey) {
-        JSONObject engineConfig = getSavedConfigurationForEngine(context);
+        JSONObject engineConfig = mEngineConfiguration;
         JSONObject moduleConfig = new JSONObject();
-        SharedPreferences sp = getSharedPreferences(context);
-        SharedPreferences.Editor editor = sp.edit();
 
         // Support both aacs and aace in config key
         if (configKey.substring(0, 4).equals("aacs")) {
             configKey = "aace" + configKey.substring(4);
         }
 
-        // Check full configuration in SharedPref for extras config first
+        // Check engine configuration first for module
         if (engineConfig.has(configKey)) {
             try {
                 moduleConfig = (JSONObject) engineConfig.remove(configKey);
-                updateEngineConfigurationInSharedPref(context, engineConfig);
             } catch (Exception e) {
                 Log.w(TAG, String.format("Failed to remove and retrieve config for %s", configKey));
             }
 
-            // Save config for extras module factory in separate SharedPreferences field
-            JSONObject extrasJson = new JSONObject();
-            if (sp.contains(AACS_EXTRAS_CONFIG)) {
-                String extrasConfig = sp.getString(AACS_EXTRAS_CONFIG, "");
-                try {
-                    extrasJson = new JSONObject(extrasConfig);
-                } catch (JSONException e) {
-                    Log.w(TAG,
-                            String.format(
-                                    "Error while creating JSON object for extras config. Error: %s", e.getMessage()));
-                }
-            }
-
+            // Save config for extras module factory
             try {
-                extrasJson.put(configKey, moduleConfig);
+                mExtrasConfiguration.put(configKey, moduleConfig);
             } catch (JSONException e) {
                 Log.w(TAG,
                         String.format(
                                 "Error while constructing JSON object for extras config. Error: %s", e.getMessage()));
             }
-            editor.putString(AACS_EXTRAS_CONFIG, extrasJson.toString()).apply();
         } else {
-            // If not in full configuration, check SharedPref for extras (Using stored config)
-            if (sp.contains(AACS_EXTRAS_CONFIG)) {
-                String extrasConfig = sp.getString(AACS_EXTRAS_CONFIG, "");
-                try {
-                    JSONObject extrasJson = new JSONObject(extrasConfig);
-                    if (extrasJson.has(configKey))
-                        moduleConfig = new JSONObject(extrasJson.getString(configKey));
-                } catch (JSONException e) {
-                    Log.w(TAG,
-                            String.format(
-                                    "Error while getting JSON object for extras config. Error: %s", e.getMessage()));
-                }
+            // If not in engine configuration, check extras config
+            try {
+                if (mExtrasConfiguration.has(configKey))
+                    moduleConfig = new JSONObject(mExtrasConfiguration.getString(configKey));
+            } catch (JSONException e) {
+                Log.w(TAG,
+                        String.format("Error while getting JSON object for extras config. Error: %s", e.getMessage()));
             }
         }
 
@@ -434,10 +437,8 @@ public class FileUtil {
     }
 
     public static boolean isPersistentSystemService(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
         try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "persistentSystemService");
+            Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "persistentSystemService");
             if (!(leafNodeValue instanceof Boolean)) {
                 Log.w(TAG, "Defaulting to persistentSystemService=false, since the leaf node value was not valid");
                 return false;
@@ -450,10 +451,8 @@ public class FileUtil {
     }
 
     public static boolean isStartServiceOnBootEnabled(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
         try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "startServiceOnBootEnabled");
+            Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "startServiceOnBootEnabled");
             if (!(leafNodeValue instanceof Boolean)) {
                 Log.w(TAG, "Defaulting to startServiceOnBootEnabled=false, since the leaf node value was not valid");
                 return false;
@@ -465,13 +464,10 @@ public class FileUtil {
         }
     }
 
-    public static boolean isDefaultImplementationEnabled(
-            @NonNull Context context, @NonNull String platformInterfaceName) {
-        String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
+    public static boolean isDefaultImplementationEnabled(@NonNull String platformInterfaceName) {
         try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(
-                    configJson, "aacs.defaultPlatformHandlers", "useDefault" + platformInterfaceName);
+            Object leafNodeValue =
+                    getLeafNodeValueFromJson(mDefaultHandlerConfiguration, "useDefault" + platformInterfaceName);
             if (!(leafNodeValue instanceof Boolean)) {
                 Log.w(TAG,
                         String.format(
@@ -489,12 +485,10 @@ public class FileUtil {
         }
     }
 
-    public static boolean isAudioInputTypeEnabled(@NonNull Context context, @NonNull String AudioInputType) {
-        String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
+    public static boolean isAudioInputTypeEnabled(@NonNull String AudioInputType) {
         try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "aacs.defaultPlatformHandlers", "audioInput",
-                    "audioType", AudioInputType, "useDefault");
+            Object leafNodeValue = getLeafNodeValueFromJson(
+                    mDefaultHandlerConfiguration, "audioInput", "audioType", AudioInputType, "useDefault");
             if (!(leafNodeValue instanceof Boolean)) {
                 Log.w(TAG,
                         String.format(
@@ -512,12 +506,10 @@ public class FileUtil {
         }
     }
 
-    public static boolean isAudioOutputTypeEnabled(@NonNull Context context, @NonNull String AudioOutputType) {
-        String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
+    public static boolean isAudioOutputTypeEnabled(@NonNull String AudioOutputType) {
         try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "aacs.defaultPlatformHandlers", "audioOutput",
-                    "audioType", AudioOutputType, "useDefault");
+            Object leafNodeValue = getLeafNodeValueFromJson(
+                    mDefaultHandlerConfiguration, "audioOutput", "audioType", AudioOutputType, "useDefault");
             if (!(leafNodeValue instanceof Boolean)) {
                 Log.w(TAG,
                         String.format(
@@ -534,8 +526,8 @@ public class FileUtil {
         }
     }
 
-    public static int getAudioSourceForAudioType(@NonNull Context context, @NonNull String audioType) {
-        String audioSourceString = getAudioSourceStringForAudioType(context, audioType);
+    public static int getAudioSourceForAudioType(@NonNull String audioType) {
+        String audioSourceString = getAudioSourceStringForAudioType(audioType);
         int audioSource;
         switch (audioSourceString) {
             case AudioSourceConstants.MIC:
@@ -560,18 +552,16 @@ public class FileUtil {
         return audioSource;
     }
 
-    public static boolean isAudioSourceExternal(@NonNull Context context, @NonNull String audioType) {
-        String audioSourceString = getAudioSourceStringForAudioType(context, audioType);
+    public static boolean isAudioSourceExternal(@NonNull String audioType) {
+        String audioSourceString = getAudioSourceStringForAudioType(audioType);
         return AudioSourceConstants.EXTERNAL.equals(audioSourceString);
     }
 
-    private static String getAudioSourceStringForAudioType(@NonNull Context context, @NonNull String audioType) {
-        String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
+    private static String getAudioSourceStringForAudioType(@NonNull String audioType) {
         String audioSourceString = AudioSourceConstants.MIC;
         try {
-            JSONObject configJson = new JSONObject(config);
             Object leafNodeValue = getLeafNodeValueFromJson(
-                    configJson, "aacs.defaultPlatformHandlers", "audioInput", "audioType", audioType, "audioSource");
+                    mDefaultHandlerConfiguration, "audioInput", "audioType", audioType, "audioSource");
             if (!(leafNodeValue instanceof String)) {
                 Log.w(TAG,
                         String.format(
@@ -590,12 +580,10 @@ public class FileUtil {
         }
     }
 
-    public static JSONObject getAudioExternalSourceForAudioType(@NonNull Context context, @NonNull String audioType) {
-        String config = getSharedPreferences(context).getString(CONFIG_KEY, "");
+    public static JSONObject getAudioExternalSourceForAudioType(@NonNull String audioType) {
         try {
-            JSONObject configJson = new JSONObject(config);
             Object leafNodeValue = getLeafNodeValueFromJson(
-                    configJson, "aacs.defaultPlatformHandlers", "audioInput", "audioType", audioType, "externalSource");
+                    mDefaultHandlerConfiguration, "audioInput", "audioType", audioType, "externalSource");
             if (!(leafNodeValue instanceof JSONObject)) {
                 Log.e(TAG,
                         String.format(
@@ -621,24 +609,17 @@ public class FileUtil {
         }
     }
 
-    public static JSONArray getIntentTargets(@NonNull Context context, @NonNull String topic, @NonNull String target) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
-        try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "intentTargets", topic, target);
-            if (leafNodeValue instanceof JSONArray) {
-                return (JSONArray) leafNodeValue;
-            } else {
-                Log.w(TAG,
-                        String.format(
-                                "Returning null due to invalid leaf node value retrieved from config for topic=%s, target=%s",
-                                topic, target));
-                return null;
-            }
-        } catch (JSONException e) {
-            Log.w(TAG, String.format("Could not find a target for topic=%s from config", topic));
+    public static JSONArray getIntentTargets(@NonNull String topic, @NonNull String target) {
+        Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "intentTargets", topic, target);
+        if (leafNodeValue instanceof JSONArray) {
+            return (JSONArray) leafNodeValue;
+        } else {
+            Log.w(TAG,
+                    String.format(
+                            "Returning null due to invalid leaf node value retrieved from config for topic=%s, target=%s",
+                            topic, target));
+            return null;
         }
-        return null;
     }
 
     public static Object getLeafNodeValueFromJson(@NonNull JSONObject root, @NonNull String... jsonObjectTree) {
@@ -658,36 +639,19 @@ public class FileUtil {
         return node;
     }
 
-    public static String getLVCConfiguration(@NonNull Context context) {
-        JSONObject config = getSavedConfigurationForEngine(context);
+    public static String getLVCConfiguration() {
         String lvcModule = "aace.localVoiceControl";
 
-        if (config.has(lvcModule)) {
+        if (mEngineConfiguration.has(lvcModule)) {
             // Remove LVC config and store in SharedPref; Used for LVC apk, rather than Auto SDK
-            JSONObject lvcConfig = (JSONObject) config.remove(lvcModule);
-
-            JSONObject extrasJson = new JSONObject();
-            SharedPreferences sp = getSharedPreferences(context);
-            if (sp.contains(AACS_EXTRAS_CONFIG)) {
-                String extrasConfig = sp.getString(AACS_EXTRAS_CONFIG, "");
-                try {
-                    extrasJson = new JSONObject(extrasConfig);
-                } catch (JSONException e) {
-                    Log.w(TAG,
-                            String.format(
-                                    "Error while creating JSON object for extras config. Error: %s", e.getMessage()));
-                }
-            }
-
+            JSONObject lvcConfig = (JSONObject) mEngineConfiguration.remove(lvcModule);
             try {
-                extrasJson.put(lvcModule, lvcConfig);
+                mExtrasConfiguration.put(lvcModule, lvcConfig);
             } catch (JSONException e) {
                 Log.w(TAG,
                         String.format(
                                 "Error while constructing JSON object for extras config. Error: %s", e.getMessage()));
             }
-            sp.edit().putString(AACS_EXTRAS_CONFIG, extrasJson.toString()).apply();
-
             return lvcConfig.toString();
         } else {
             Log.d(TAG, "The optional LVC Configuration is not included.");
@@ -704,37 +668,24 @@ public class FileUtil {
         }
     }
 
-    public static double getVersionNumber(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
-        try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "version");
-            if (leafNodeValue instanceof String) {
-                return Double.parseDouble((String) leafNodeValue);
-            } else {
-                Log.e(TAG, "Invalid value for version number");
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "Exception encountered: " + e.getMessage());
+    public static double getVersionNumber() {
+        Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "version");
+        if (leafNodeValue instanceof String) {
+            return Double.parseDouble((String) leafNodeValue);
+        } else {
+            Log.e(TAG, "Invalid value for version number");
         }
         return 0.0;
     }
 
-    public static int getIPCCacheCapacity(@NonNull Context context) {
-        String config = getSharedPreferences(context).getString(AACS_GENERAL_CONFIG, "");
-        try {
-            JSONObject configJson = new JSONObject(config);
-            Object leafNodeValue = getLeafNodeValueFromJson(configJson, "ipc", "cacheCapacity");
-            if (leafNodeValue instanceof Integer) {
-                return (int) leafNodeValue;
-            } else {
-                Log.e(TAG, "invalid leaf node cacheCapacity, using default=20");
-                return IPCConstants.DEFAULT_CACHE_CAPACITY;
-            }
-        } catch (JSONException e) {
-            Log.w(TAG, "Could not find capacity from config");
+    public static int getIPCCacheCapacity() {
+        Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "ipc", "cacheCapacity");
+        if (leafNodeValue instanceof Integer) {
+            return (int) leafNodeValue;
+        } else {
+            Log.e(TAG, "invalid leaf node cacheCapacity, using default=20");
+            return IPCConstants.DEFAULT_CACHE_CAPACITY;
         }
-        return IPCConstants.DEFAULT_CACHE_CAPACITY;
     }
 
     public static void copyExternalFileToAACS(
@@ -797,23 +748,46 @@ public class FileUtil {
         }
     }
 
-    public static void deregisterAASBPlatformInterface(
-            @NonNull Context context, @NonNull String module, @NonNull String interfaceName) {
-        JSONObject config = getSavedConfigurationForEngine(context);
+    public static void deregisterAASBPlatformInterface(@NonNull String module, @NonNull String interfaceName) {
         String aasbModule = "aasb." + module;
         try {
             Log.d(TAG, String.format("Deregistering %s.%s PI from AASB", module, interfaceName));
             JSONObject enabled = new JSONObject();
             enabled.put("enabled", false);
             JSONObject moduleJson = new JSONObject();
-            if (config.has(aasbModule)) {
-                moduleJson = config.getJSONObject(aasbModule);
+            if (mEngineConfiguration.has(aasbModule)) {
+                moduleJson = mEngineConfiguration.getJSONObject(aasbModule);
             }
             moduleJson.put(interfaceName, enabled);
-            config.put(aasbModule, moduleJson);
-            updateEngineConfigurationInSharedPref(context, config);
+            mEngineConfiguration.put(aasbModule, moduleJson);
         } catch (JSONException e) {
-            Log.e(TAG, String.format("Error while deregistering AASB PI. Error: %s", e.getMessage()));
+            Log.e(TAG, String.format("Error while de-registering AASB PI. Error: %s", e.getMessage()));
         }
+    }
+
+    private static void checkAndChangeAPLEnablement(@NonNull Context context, @NonNull JSONObject fullConfig) {
+        try {
+            Object isAPLEnabled = getLeafNodeValueFromJson(fullConfig, "aasb.apl", "APL", "enabled");
+            if (isAPLEnabled instanceof Boolean) {
+                if ((Boolean) isAPLEnabled) {
+                    Log.i(TAG, "AASB APL module is enabled, not de-registering the PI.");
+                    return;
+                }
+            } else {
+                Log.e(TAG, "invalid APL enablement configuration. APL will be disabled by default.");
+            }
+            // Adding config for disabling AASB APL module by default
+            deregisterAASBPlatformInterface("apl", "APL");
+        } catch (Exception e) {
+            Log.e(TAG, String.format("Error while checking APL configuration. Error: %s", e.getMessage()));
+        }
+    }
+
+    public static void cleanup() {
+        mInterfaceToModuleNames.clear();
+        mGeneralConfiguration = null;
+        mEngineConfiguration = null;
+        mDefaultHandlerConfiguration = null;
+        mExtrasConfiguration = null;
     }
 }

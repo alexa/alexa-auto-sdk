@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -66,9 +66,7 @@ protected:
             m_alexaMockFactory->getPlaybackControllerMock(),
             m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
-            m_alexaMockFactory->getContextManagerInterfaceMock(),
-            m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-            m_alexaMockFactory->getFocusManagerInterfaceMock());
+            m_alexaMockFactory->getContextManagerInterfaceMock());
 
         return playbackControllerEngineImpl;
     }
@@ -93,9 +91,17 @@ TEST_F(PlaybackControllerEngineImplTest, createWithPlatformInterfaceAsNull) {
         nullptr,
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getContextManagerInterfaceMock());
+
+    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
+}
+
+TEST_F(PlaybackControllerEngineImplTest, createWithCapabilitiesRegistrarAsNull) {
+    auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
+        m_alexaMockFactory->getPlaybackControllerMock(),
+        nullptr,
+        m_alexaMockFactory->getMessageSenderInterfaceMock(),
+        m_alexaMockFactory->getContextManagerInterfaceMock());
 
     ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }
@@ -105,9 +111,7 @@ TEST_F(PlaybackControllerEngineImplTest, createWithMessageSenderAsNull) {
         m_alexaMockFactory->getPlaybackControllerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getContextManagerInterfaceMock());
 
     ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
 }
@@ -117,32 +121,6 @@ TEST_F(PlaybackControllerEngineImplTest, createWithContextManagerAsNull) {
         m_alexaMockFactory->getPlaybackControllerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        nullptr,
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
-
-    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
-}
-
-TEST_F(PlaybackControllerEngineImplTest, createWithCapabilitiesDelegateAsNull) {
-    auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
-        m_alexaMockFactory->getPlaybackControllerMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        nullptr,
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
-
-    ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";
-}
-
-TEST_F(PlaybackControllerEngineImplTest, createWithFocusManagerAsNull) {
-    auto playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
-        m_alexaMockFactory->getPlaybackControllerMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr);
 
     ASSERT_EQ(playbackControllerEngineImpl, nullptr) << "PlaybackControllerEngineImpl pointer expected to be null";

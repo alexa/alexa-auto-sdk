@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 
 #ifndef AACE_ENGINE_CAR_CONTROL_ENDPOINT_H
 #define AACE_ENGINE_CAR_CONTROL_ENDPOINT_H
+
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointRegistrationManagerInterface.h>
 
 #include <nlohmann/json.hpp>
 
@@ -113,6 +115,8 @@ public:
     bool build(
         std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
         std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> endpointBuilderFactory,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+            endpointRegistrationManager,
         const AssetStore& assetStore,
         const std::string& manufacturer = "",
         const std::string& description = "");

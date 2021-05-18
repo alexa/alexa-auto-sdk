@@ -158,7 +158,10 @@ std::shared_ptr<FileAudioStream> FileAudioStream::create(const std::string& path
 }
 
 bool FileAudioStream::open(const std::string& path) {
-    m_stream = std::ifstream(path, std::ios::binary);
+    if (m_stream.is_open()) {
+        m_stream.close();
+    }
+    m_stream.open(path, std::ios::binary);
 
     return m_stream.is_open();
 }

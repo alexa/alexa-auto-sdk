@@ -38,9 +38,9 @@ std::shared_ptr<rapidjson::Document> parse(
     rapidjson::Type type = rapidjson::kObjectType);
 std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::Type type = rapidjson::kObjectType);
 
-std::string toString(const rapidjson::Document& document, bool prettyPrint = true);
+std::string toString(const rapidjson::Document& document, bool prettyPrint = false);
 
-std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint = true);
+std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint = false);
 
 }  // namespace json
 }  // namespace utils

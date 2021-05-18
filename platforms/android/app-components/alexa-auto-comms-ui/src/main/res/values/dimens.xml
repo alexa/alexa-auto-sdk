@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Communication setup dimensions -->
+    <dimen name="contacts_permission_alexa_image_width">250dp</dimen>
+    <dimen name="contacts_permission_alexa_image_height">180dp</dimen>
+    <dimen name="contacts_permission_item_margin_top">32dp</dimen>
+    <dimen name="contacts_permission_action_item_margin_top">220dp</dimen>
+    <dimen name="contacts_permission_item_margin_bottom">50dp</dimen>
+    <dimen name="contacts_permission_item_margin_start">100dp</dimen>
+    <dimen name="contacts_permission_item_margin_end">100dp</dimen>
+    <dimen name="contacts_permission_item_regular_text_size">20sp</dimen>
+
+    <dimen name="contacts_permission_header_footer_vertical_margin">8dp</dimen>
+    <dimen name="contacts_permission_margin_start">50dp</dimen>
+    <dimen name="contacts_permission_margin_top">32dp</dimen>
+    <dimen name="contacts_permission_margin_end">50dp</dimen>
+    <dimen name="contacts_permission_margin_start_double">32dp</dimen>
+
+    <!-- Communication settings dimensions -->
+    <dimen name="comms_nav_icon_height_width">64dp</dimen>
+    <dimen name="item_horizontal_margin_quadruple">64dp</dimen>
+    <dimen name="setting_item_horizontal_margin_start">122dp</dimen>
+    <dimen name="setting_item_horizontal_margin_double">32dp</dimen>
+    <dimen name="setting_item_vertical_margin">8dp</dimen>
+    <dimen name="setting_item_width_wrap">0dp</dimen>
+    <dimen name="setting_item_divider_height">1dp</dimen>
+</resources>

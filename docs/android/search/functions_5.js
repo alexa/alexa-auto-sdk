@@ -24,6 +24,5 @@ var searchData=
   ['getrefreshtoken',['getRefreshToken',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#aa7a91ec3198415d309d3a5d061cb974f',1,'com::amazon::aace::cbl::CBL']]],
   ['getsource',['getSource',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#ab8cf2993bd0dce8a71cf147a08fbe2cb',1,'com::amazon::aace::alexa::LocalMediaSource']]],
   ['getstate',['getState',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a2c32897522b03df84e84a04e2c15296b',1,'com.amazon.aace.alexa.ExternalMediaAdapter.getState()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a92fddae42be67359a902ee89315eeaf0',1,'com.amazon.aace.alexa.LocalMediaSource.getState()'],['../classcom_1_1amazon_1_1maccandroid_1_1_m_a_c_c_android_client.html#a2e24d1ebe98738117581d814732f8e3e',1,'com.amazon.maccandroid.MACCAndroidClient.getState()']]],
-  ['getvisualcontext',['getVisualContext',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#adcc4a9f0217d1de27ca3ab5759124289',1,'com::amazon::aace::apl::APL']]],
   ['getwifisignalstrength',['getWifiSignalStrength',['../classcom_1_1amazon_1_1aace_1_1network_1_1_network_info_provider.html#a3f4cfef555cc827bdaa47eea87ba330a',1,'com::amazon::aace::network::NetworkInfoProvider']]]
 ];

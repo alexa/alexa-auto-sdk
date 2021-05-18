@@ -30,7 +30,6 @@
 #include <AACE/Network/NetworkInfoProvider.h>
 #include <AACE/Engine/Network/NetworkInfoObserver.h>
 #include <AACE/Engine/Network/NetworkObservableInterface.h>
-#include <AACE/Engine/Metrics/MetricEvent.h>
 
 #include "AddressBookObserver.h"
 #include "AddressBookServiceInterface.h"
@@ -170,10 +169,6 @@ private:
     UploadFlowState handleError(const std::string& addressBookId);
 
     void logNetworkMetrics(const HTTPResponse& httpResponse);
-
-    void emitCounterMetrics(const std::string& methodName, const std::string& key, const int value);
-    void emitTimerMetrics(const std::string& methodName, const std::string& key, const double value);
-    double getCurrentTimeInMs();
 
     friend std::ostream& operator<<(std::ostream& stream, const UploadFlowState& state);
 

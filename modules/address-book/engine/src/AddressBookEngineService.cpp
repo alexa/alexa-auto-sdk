@@ -22,6 +22,7 @@
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/Alexa/AlexaEngineService.h>
 #include <AACE/Engine/Network/NetworkEngineService.h>
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 #include <AACE/Engine/AddressBook/AddressBookEngineService.h>
 
@@ -29,8 +30,13 @@ namespace aace {
 namespace engine {
 namespace addressBook {
 
+using namespace aace::engine::utils::metrics;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBook.addressBookEngineService");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AddressBookEngineService";
 
 // register the service
 REGISTER_SERVICE(AddressBookEngineService);
@@ -93,6 +99,7 @@ bool AddressBookEngineService::registerPlatformInterfaceType(
         ThrowIfNull(deviceInfo, "deviceInfoInvalid");
 
         auto networkProvider = getContext()->getServiceInterface<aace::network::NetworkInfoProvider>("aace.network");
+        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "registerPlatformInterfaceType", "GetNetworkStatus", 1);
 
         // get the initial network status from the network provider - if the network provider is not
         // available then we always treat the network status as CONNECTED

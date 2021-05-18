@@ -1,0 +1,13 @@
+{
+  "header" : {
+    "version" : "3.1",
+    "messageType" : "Publish",
+    "id" : "testIdForGetNavState",
+    "messageDescription" : {
+      "topic" : "Navigation",
+      "action" : "GetNavigationState"
+    }
+  },
+  "payload" : {
+  }
+}

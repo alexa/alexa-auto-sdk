@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,19 +18,15 @@
 
 #include <AASB/Message/Alexa/LocalMediaSource/AdjustSeekMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/ContentSelector.h>
-#include <AASB/Message/Alexa/LocalMediaSource/GetSourceMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/GetStateMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/GetStateMessageReply.h>
 #include <AASB/Message/Alexa/LocalMediaSource/LocalMediaSourceState.h>
 #include <AASB/Message/Alexa/LocalMediaSource/MutedStateChangedMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/PlaybackState.h>
 #include <AASB/Message/Alexa/LocalMediaSource/PlayControlMessage.h>
-//#include <AASB/Message/Alexa/LocalMediaSource/PlayerErrorMessage.h>
-//#include <AASB/Message/Alexa/LocalMediaSource/PlayerEventMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/PlayMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/SeekMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/SessionState.h>
-//#include <AASB/Message/Alexa/LocalMediaSource/SetFocusMessage.h>
 #include <AASB/Message/Alexa/LocalMediaSource/Source.h>
 #include <AASB/Message/Alexa/LocalMediaSource/VolumeChangedMessage.h>
 

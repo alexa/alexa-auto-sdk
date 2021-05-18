@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,10 +55,20 @@ public class AACSSender {
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(5);
 
     public interface StreamFetchedFromReceiverCallback {
+        /**
+         * <p> Note: While overriding this method, Close the readPipe after the use to ensure file descriptor is
+         * released by the system</P>
+         */
         void onStreamFetchedFromServer(ParcelFileDescriptor readPipe);
     }
 
-    public interface PushToStreamIdCallback { void onPushToStreamId(String streamId, ParcelFileDescriptor writePipe); }
+    public interface PushToStreamIdCallback {
+        /**
+         * <p> Note: While overriding this method, Close the writePipe after the use to ensure file descriptor is
+         * released by the system</P>
+         */
+        void onPushToStreamId(String streamId, ParcelFileDescriptor writePipe);
+    }
 
     public int getMaxEmbeddedMessageSize() {
         return MAX_NUM_BYTES_IN_EMBEDDED_MESSAGE_INTENT;
@@ -239,6 +250,8 @@ public class AACSSender {
         String intentAction = IPCConstants.ACTION_FETCH;
         String intentCategory = IPCConstants.CATEGORY_SERVICE;
         Bundle bundle = constructFetchOrPushBundle(streamId, mFetchMessenger);
+        bundle.putBoolean(IPCConstants.AACS_IPC_PACKAGE_NAME_MATCHES,
+                Objects.equals(context.getPackageName(), target.packageName));
         Intent intent = constructIntent(intentAction, intentCategory, target, bundle);
         sendIntent(intent, target, context);
     }
@@ -267,6 +280,8 @@ public class AACSSender {
         String intentAction = IPCConstants.ACTION_PUSH;
         String intentCategory = IPCConstants.CATEGORY_SERVICE;
         Bundle bundle = constructFetchOrPushBundle(streamId, mPushMessenger);
+        bundle.putBoolean(IPCConstants.AACS_IPC_PACKAGE_NAME_MATCHES,
+                Objects.equals(context.getPackageName(), target.packageName));
         Intent intent = constructIntent(intentAction, intentCategory, target, bundle);
         sendIntent(intent, target, context);
     }

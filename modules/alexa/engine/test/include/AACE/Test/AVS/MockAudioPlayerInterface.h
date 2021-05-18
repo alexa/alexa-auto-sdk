@@ -16,20 +16,20 @@
 #ifndef AACE_TEST_UNIT_MOCK_AUDIOPLAYER_INTERFACE_H_
 #define AACE_TEST_UNIT_MOCK_AUDIOPLAYER_INTERFACE_H_
 
-#include <AVSCommon/SDKInterfaces/AudioPlayerInterface.h>
+#include <acsdkAudioPlayerInterfaces/AudioPlayerInterface.h>
 
 namespace aace {
 namespace test {
 namespace avs {
 
-class MockAudioPlayerInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerInterface {
+class MockAudioPlayerInterface : public alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerInterface {
 public:
     MOCK_METHOD1(
         addObserver,
-        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer));
+        void(std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface> observer));
     MOCK_METHOD1(
         removeObserver,
-        void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> observer));
+        void(std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface> observer));
     MOCK_METHOD0(stopPlayback, void());
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
+#include <AVSCommon/Utils/Threading/Executor.h>
 #include <AlexaPresentation/AlexaPresentation.h>
 #include <Endpoints/EndpointBuilder.h>
 #include <SmartScreenSDKInterfaces/AlexaPresentationObserverInterface.h>
 #include <SmartScreenSDKInterfaces/VisualStateProviderInterface.h>
+#include <VisualCharacteristics/VisualCharacteristics.h>
 
 #include "AACE/APL/APL.h"
 #include "AACE/APL/APLEngineInterface.h"
@@ -43,8 +45,9 @@ private:
     APLEngineImpl(std::shared_ptr<aace::apl::APL> aplPlatformInterface);
 
     bool initialize(
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -53,8 +56,9 @@ private:
 public:
     static std::shared_ptr<APLEngineImpl> create(
         std::shared_ptr<aace::apl::APL> aplPlatformInterface,
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
@@ -63,30 +67,54 @@ public:
     // AlexaPresentationObserverInterface
     virtual void renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId)
         override;
-    virtual void clearDocument() override;
+    virtual void clearDocument(const std::string& token) override;
     virtual void executeCommands(const std::string& jsonPayload, const std::string& token) override;
-    virtual void interruptCommandSequence() override;
+    virtual void dataSourceUpdate(
+        const std::string& sourceType,
+        const std::string& jsonPayload,
+        const std::string& token) override;
+    virtual void interruptCommandSequence(const std::string& token) override;
+    virtual void onPresentationSessionChanged(const std::string& id, const std::string& skillId) override;
 
     // VisualStateProviderInterface
-    virtual void provideState(const unsigned int stateRequestToken) override;
+    virtual void provideState(const std::string& aplToken, const unsigned int stateRequestToken) override;
 
     // APLEngineInterface
     virtual void onClearCard() override;
     virtual void onClearAllExecuteCommands() override;
     virtual void onSendUserEvent(const std::string& payload) override;
+    virtual void onSendDataSourceFetchRequestEvent(const std::string& type, const std::string& payload) override;
+    virtual void onSendRuntimeErrorEvent(const std::string& payload) override;
     virtual void onSetAPLMaxVersion(const std::string& aplMaxVersion) override;
     virtual void onSetDocumentIdleTimeout(std::chrono::milliseconds documentIdleTimeout) override;
     virtual void onRenderDocumentResult(const std::string& token, bool result, const std::string& error) override;
     virtual void onExecuteCommandsResult(const std::string& token, bool result, const std::string& error) override;
     virtual void onProcessActivityEvent(const std::string& source, ActivityEvent event) override;
+    virtual void onSendDocumentState(const std::string& state) override;
+    virtual void onSendDeviceWindowState(const std::string& state) override;
 
 protected:
     void doShutdown() override;
 
 private:
+    void executeProvideState(const unsigned int stateRequestToken);
+
+private:
     std::shared_ptr<aace::apl::APL> m_aplPlatformInterface;
+
+    /// The Alexa Presentation capability agent
     std::shared_ptr<alexaSmartScreenSDK::smartScreenCapabilityAgents::alexaPresentation::AlexaPresentation>
         m_aplCapabilityAgent;
+
+    /// The VisualCharacteristics capability agent
+    std::shared_ptr<alexaSmartScreenSDK::smartScreenCapabilityAgents::visualCharacteristics::VisualCharacteristics>
+        m_visualCharacteristics;
+
+    // Executor
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
+    // Rendered document state
+    std::string m_lastReportedDocumentState;
 };
 
 }  // namespace apl

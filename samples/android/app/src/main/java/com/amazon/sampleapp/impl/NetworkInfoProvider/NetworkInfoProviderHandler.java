@@ -26,14 +26,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.amazon.aace.core.Engine;
+import androidx.appcompat.widget.SwitchCompat;
+
 import com.amazon.aace.network.NetworkInfoProvider;
 import com.amazon.aace.network.NetworkProperties;
 import com.amazon.sampleapp.R;

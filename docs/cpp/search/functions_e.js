@@ -1,10 +1,14 @@
 var searchData=
 [
   ['seek',['seek',['../classaace_1_1alexa_1_1_local_media_source.html#af1bdc078c4702c3f8b7a864dd0095a47',1,'aace::alexa::LocalMediaSource']]],
+  ['senddatasourcefetchrequestevent',['sendDataSourceFetchRequestEvent',['../classaace_1_1apl_1_1_a_p_l.html#a306d1701b8132eb2306b22880e4401e8',1,'aace::apl::APL']]],
+  ['senddevicewindowstate',['sendDeviceWindowState',['../classaace_1_1apl_1_1_a_p_l.html#ac3b76e6d3ad96161c5e37f2d3728ae1d',1,'aace::apl::APL']]],
+  ['senddocumentstate',['sendDocumentState',['../classaace_1_1apl_1_1_a_p_l.html#a87d590c8a9a8f32c36bf15b41ce6d1a0',1,'aace::apl::APL']]],
   ['senddtmf',['sendDTMF',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#af236ece858fd897886f7d62fc175665c',1,'aace::phoneCallController::PhoneCallController']]],
   ['senddtmffailed',['sendDTMFFailed',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a7711ff33033a10bb6ec080269ac30ba6',1,'aace::phoneCallController::PhoneCallController']]],
   ['senddtmfsucceeded',['sendDTMFSucceeded',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a4d89b0bc7309cd32a096641a45f559e5',1,'aace::phoneCallController::PhoneCallController']]],
   ['sendevent',['sendEvent',['../classaace_1_1authorization_1_1_authorization.html#a7c5073cd65feff21a46022ab6e6d2274',1,'aace::authorization::Authorization']]],
+  ['sendruntimeerrorevent',['sendRuntimeErrorEvent',['../classaace_1_1apl_1_1_a_p_l.html#a3a3bba659088b4e3d4fed3f14ebf7f69',1,'aace::apl::APL']]],
   ['senduserevent',['sendUserEvent',['../classaace_1_1apl_1_1_a_p_l.html#a650185d2e461fa04a54ca6389cea9b7e',1,'aace::apl::APL']]],
   ['sessionstate',['SessionState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#a4d0362ceeb3aeb4a5523e3a9c1b355b2',1,'aace::alexa::ExternalMediaAdapter::SessionState']]],
   ['setaplmaxversion',['setAPLMaxVersion',['../classaace_1_1apl_1_1_a_p_l.html#ae78b5ed9cf53ac882d12bdff99d69638',1,'aace::apl::APL']]],
@@ -20,6 +24,8 @@ var searchData=
   ['setproperty',['setProperty',['../classaace_1_1property_manager_1_1_property_manager.html#a07bd961c86047b1b1e5de7366bf83820',1,'aace::propertyManager::PropertyManager']]],
   ['setrangecontrollervalue',['setRangeControllerValue',['../classaace_1_1car_control_1_1_car_control.html#a6eb554713a311dcf2dbe6aca00e1739e',1,'aace::carControl::CarControl']]],
   ['setrefreshtoken',['setRefreshToken',['../classaace_1_1cbl_1_1_c_b_l.html#aeb62feeb8cdaad65b1d8dea41f243d7b',1,'aace::cbl::CBL']]],
+  ['setupcompleted',['setupCompleted',['../classaace_1_1alexa_1_1_device_setup.html#a7c2c215c0f18b326aaf7cf57569a2814',1,'aace::alexa::DeviceSetup']]],
+  ['setupcompletedresponse',['setupCompletedResponse',['../classaace_1_1alexa_1_1_device_setup.html#a24abfcf7ec0b5f52d976f14bcb913909',1,'aace::alexa::DeviceSetup']]],
   ['setuserprofile',['setUserProfile',['../classaace_1_1cbl_1_1_c_b_l.html#a5ce90c8c986bdb7afa6ce7fcfb6a4be5',1,'aace::cbl::CBL']]],
   ['showalternativeroutessucceeded',['showAlternativeRoutesSucceeded',['../classaace_1_1navigation_1_1_navigation.html#a0ddacd8f63a00cdcf322b11007345c9a',1,'aace::navigation::Navigation']]],
   ['shutdown',['shutdown',['../classaace_1_1core_1_1_engine.html#a8d127cbe960a7e4e86fb404289011901',1,'aace::core::Engine']]],

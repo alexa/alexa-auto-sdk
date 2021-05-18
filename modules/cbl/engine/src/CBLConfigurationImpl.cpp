@@ -23,11 +23,14 @@ namespace config {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.cbl.config.CBLConfiguationImpl");
 
-std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLConfig(const int seconds) {
+std::shared_ptr<aace::core::config::EngineConfiguration> CBLConfiguration::createCBLConfig(
+    const int seconds,
+    bool enableUserProfile) {
     rapidjson::Document document(rapidjson::kObjectType);
     rapidjson::Value aaceCBLNode(rapidjson::kObjectType);
 
     aaceCBLNode.AddMember("requestTimeout", rapidjson::Value().SetInt(seconds), document.GetAllocator());
+    aaceCBLNode.AddMember("enableUserProfile", rapidjson::Value().SetBool(enableUserProfile), document.GetAllocator());
 
     document.AddMember("aace.cbl", aaceCBLNode, document.GetAllocator());
 

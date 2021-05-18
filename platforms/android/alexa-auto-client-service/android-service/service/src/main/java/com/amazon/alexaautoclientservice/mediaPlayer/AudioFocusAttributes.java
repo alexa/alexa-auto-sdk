@@ -22,8 +22,10 @@ public class AudioFocusAttributes {
         mType = type;
         switch (type) {
             case AudioType.TTS:
+                // when asked to duck, TTS should pause rather than decrease its volume.
+                // set willPauseWhenDucked to true for TTS type to turn off the automatic ducking.
                 setAudioFocusAttributesForType(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK,
-                        AudioAttributes.USAGE_ASSISTANT, AudioAttributes.CONTENT_TYPE_SPEECH, false, false);
+                        AudioAttributes.USAGE_ASSISTANT, AudioAttributes.CONTENT_TYPE_SPEECH, true, false);
                 break;
             case AudioType.NOTIFICATION:
                 setAudioFocusAttributesForType(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT,

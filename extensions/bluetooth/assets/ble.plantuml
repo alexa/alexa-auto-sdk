@@ -1,0 +1,36 @@
+@startuml
+skinparam roundcorner 10
+participant "Remote Bluetooth Device" as RBTD
+participant "Bluetooth Stack" as STACK
+participant "BluetoothProviderHandler" as BTPH
+participant "GATTServer" as GATTS
+participant "Auto SDK" as AAC
+
+== Listening ==
+
+AAC -> BTPH : createGATTServer
+BTPH -> STACK : initialize system GATT server
+BTPH --> AAC : return a GATTServer
+
+AAC -> GATTS : start
+GATTS -> STACK : create GATT services\n specified in JSON configuration
+
+== Connected ==
+
+RBTD -> STACK : write characteristic
+STACK -> GATTS : requestCharacteristic
+GATTS -> AAC : requestCharacteristic
+
+== == 
+
+AAC -> GATTS : setCharacteristicValue
+GATTS -> STACK : set characteristic value
+
+RBTD -> STACK : read characteristic value
+STACK --> RBTD : return cached value
+
+== Shutdown ==
+
+AAC -> GATTS : stop
+GATTS -> STACK : remove all added GATT services
+@enduml

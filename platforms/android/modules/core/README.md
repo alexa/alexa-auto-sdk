@@ -2,18 +2,32 @@
 
 The Alexa Auto SDK module contains the Engine base classes and the abstract platform interfaces that can be utilized by the platform and/or other modules.
 
-**Table of Contents**
+<!-- omit in toc -->
+## Table of Contents
+- [Overview](#overview)
+- [Creating the Engine](#creating-the-engine)
+- [Configuring the Engine](#configuring-the-engine)
+  - [Configuration Database Files](#configuration-database-files)
+  - [Specifying Configuration Data Using a JSON File](#specifying-configuration-data-using-a-json-file)
+  - [Specifying Configuration Data Programmatically](#specifying-configuration-data-programmatically)
+  - [Vehicle Information Requirements](#vehicle-information-requirements)
+- [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
+  - [Implementing a Location Provider](#implementing-a-location-provider)
+  - [Implementing a Network Information Provider](#implementing-a-network-information-provider)
+  - [Implementing Log Events](#implementing-log-events)
+  - [Implementing Audio](#implementing-audio)
+- [Starting the Engine](#starting-the-engine)
+- [Stopping the Engine](#stopping-the-engine)
+- [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
+  - [Property Manager Sequence Diagrams](#property-manager-sequence-diagrams)
+  - [Implementing a Custom Property Manager Handler](#implementing-a-custom-property-manager-handler)
+  - [Property Definitions](#property-definitions)
+- [Managing Authorization](#managing-authorization)
+  - [Authorization Sequence Diagrams](#authorization-sequence-diagrams)
+- [Using the Authorization Module](#using-the-authorization-module)
 
-* [Overview](#overview)
-* [Creating the Engine](#creating-the-engine)
-* [Configuring the Engine](#configuring-the-engine)
-* [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
-* [Starting the Engine](#starting-the-engine)
-* [Stopping the Engine](#stopping-the-engine)
-* [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
-* [Managing Authorization](#managing-authorization)
 
-## Overview <a id="overview"></a>
+## Overview
 The Core module provides an easy way to integrate Alexa Auto SDK into an application or a framework. To do this, follow these steps:
 
 1. [Create](#creating-the-engine) and [configure](#configuring-the-engine) an instance of `aace.core.Engine`.
@@ -21,13 +35,13 @@ The Core module provides an easy way to integrate Alexa Auto SDK into an applica
 4. [Start the Engine](#starting-the-engine).
 5. [Change the runtime settings](#getting-and-setting-core-engine-properties) if desired.
 
-## Creating the Engine <a id="creating-the-engine"></a>
+## Creating the Engine
 
-To create an instance of the Engine, call the static function `Engine.create()`:
+To create an instance of the Engine, call the static method `Engine.create()`:
 
     m_engine = Engine.create();
 
-## Configuring the Engine <a id= "configuring-the-engine"></a>
+## Configuring the Engine
 
 Before you can start the Engine, you must configure it using the required `aace.core.config.EngineConfiguration` object(s) for the services you will be using:
 
@@ -35,7 +49,7 @@ Before you can start the Engine, you must configure it using the required `aace.
 
     >**Note:** You can generate a single `EngineConfiguration` object that includes all configuration data for the services you will be using, or you can break the configuration data into logical sections and generate multiple `EngineConfiguration` objects. For example, you might generate one `EngineConfiguration` object for each module.
   
-2. Call the Engine's `configure()` function, passing in the `EngineConfiguration` object(s): 
+2. Call the Engine's `configure()` method, passing in the `EngineConfiguration` object(s): 
 
   * For a single `EngineConfiguration` object, use:
 
@@ -55,7 +69,7 @@ Some values in the configuration, such as `"defaultlocale"`, are used only to co
 
 By default, the Auto SDK stores the configuration database files in the `/opt/AAC/data/` directory, but you have the option to change the path to the configuration database files as part of your Engine configuration. If you delete the database files, the Auto SDK will create new ones the next time you run the application.
 
-### Specifying Configuration Data Using a JSON File <a id = "specifying-configuration-data-using-a-json-file"></a>
+### Specifying Configuration Data Using a JSON File
 
 The Auto SDK provides a class in [`EngineConfiguration.java`](./src/main/java/com/amazon/aace/core/config/EngineConfiguration.java) that reads the configuration from a specified JSON file and creates an `EngineConfiguration` object from that configuration:
 
@@ -75,7 +89,7 @@ auto navigationConfig = com.amazon.aace.core.config.ConfigurationFile.create( â€
 
 The [config.json.in](../../../../samples/cpp/assets/config.json.in) file provides an example of a JSON configuration file. If desired, you can use this file as a starting point for customizing the Engine configuration to suit your needs.
 
-### Specifying Configuration Data Programmatically <a id ="specifying-configuration-data-programmatically"></a>
+### Specifying Configuration Data Programmatically
 
 You can also specify the configuration data programmatically by using the configuration factory methods provided in the library. The following code sample provides an example of using factory methods to instantiate an `EngineConfiguration` object:
 
@@ -123,14 +137,14 @@ For details about the vehicle properties included in the `VehicleConfiguration` 
 
 >**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN).
 
-## Extending the Default Platform Implementation <a id="extending-the-default-platform-implementation"></a>
+## Extending the Default Platform Implementation
 
 To extend each Auto SDK interface you will use in your platform implementation:
 
 1. Create a handler for the interface by overriding the various classes in the library that, when registered with the Engine, allow your application to interact with Amazon services.
 2. Register the handler with the Engine by passing an instance to `registerPlatformInterface`.
 
-The functions that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The functions that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping however, because the Alexa Auto SDK attempts to simplify the interaction with AVS.
+The methods that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The methods that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping however, because the Alexa Auto SDK attempts to simplify the interaction with AVS.
 
 The code sample below provides an example of creating and registering platform interface handlers with the Engine.
 
@@ -148,9 +162,23 @@ The code sample below provides an example of creating and registering platform i
 ```
 The sections below provide information about and examples for creating [location provider](#implementing-a-location-provider), [network information provider](#implementing-a-network-information-provider), [logging](#implementing-log-events) and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
 
-### Implementing a Location Provider<a id="implementing-a-location-provider"></a>
-The Engine provides a callback for implementing location requests from Alexa and other modules and a location type definition. This is optional and dependent on the platform implementation.
+### Implementing a Location Provider
 
+The Engine provides a platform interface for implementing location requests from Alexa and other modules and a Location type definition. For some features, the platform interface is optional and dependent on the platform implementation. For other features, such as navigation and local search, the platform interface is required.
+
+The following sections describe the `LocationProvider` APIs.
+
+#### `getLocation()` and `getCountry()` 
+These abstract methods allow the Engine to retrieve the device's geographic coordinates and country code (based on the coordinates).
+
+The Engine calls `getLocation()` for each voice request to Alexa. Your application needs to construct a `Location` object with geographic coordinates obtained from the location service provider on the device. If the platform cannot retrieve the device location, your application must return the `Location` object with its fields set to `UNDEFINED`.
+
+#### `locationServiceAccessChanged(LocationServiceAccess access)`
+This method notifies the Engine of any change in the state of the location service access. 
+
+If the location provider on the device is disabled, for example, when GPS or network service is down, call `locationServiceAccessChanged(LocationServiceAccess.DISABLED)` to inform the Engine. This API allows the Engine to avoid querying the device location unnecessarily each time a voice request to Alexa is received. If the location provider is enabled again, for example, when the GPS or network service is restored, call `locationServiceAccessChanged(LocationServiceAccess.ENABLED)`. The Engine then resumes calling `getLocation()` to query the device location.
+
+#### Implementing `LocationProvider` Handler
 To implement a custom `LocationProvider` handler to provide location using the default Engine `LocationProvider` class, extend the `LocationProvider` class:
 
 ```java
@@ -163,9 +191,11 @@ public class LocationProviderHandler extends LocationProvider {
 	...
 }	
 ```
-### Implementing a Network Information Provider <a id = "implementing-a-network-information-provider"></a>
+### Implementing a Network Information Provider
 
-The `NetworkInfoProvider` platform interface provides methods that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events whenever the network status changes. Methods such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` method informs the Engine about network status changes.
+>**Note:** The `NetworkInfoProvider` platform interface is mandatory if you use the Local Voice Control (LVC) extension.
+
+The `NetworkInfoProvider` platform interface provides methods that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events to the Engine. Methods such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` method informs the Engine about network status changes.
 
 The `NetworkInfoProvider` methods are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the methods provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
 
@@ -196,7 +226,7 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
 ```
 >**Note:** Refer to the Android Sample App for an example of how to call `networkStatusChanged()` when network status changes.
 
-### Implementing Log Events<a id="implementing-log-events"></a>
+### Implementing Log Events
 
 The Engine provides a callback for implementing log events from the AVS SDK. This is optional, but useful for the platform implementation.
 
@@ -215,6 +245,70 @@ public class LoggerHandler extends Logger
 
 ```    
 
+#### Configuring Logger to Use a File Sink
+
+By default, the Engine writes logs to Logcat. You can configure the Engine to save logs to a file with an *"aace.logger"* JSON object:
+
+```jsonc
+{
+  "aace.logger": {
+    "sinks": [
+        {
+            "id": "{STRING}",
+            "type": "aace.logger.sink.file",
+            "config": {
+                "path": "{STRING}",
+                "prefix": "{STRING}",
+                "maxSize": {INTEGER},
+                "maxFiles": {INTEGER},
+                "append": {BOOLEAN}
+            },
+            "rules": [
+                {
+                    "level": "{STRING}"
+                }
+            ]
+        }
+    ]
+}
+```
+
+| Property | Type | Required | Description | Example
+|-|-|-|-|-|
+| aace.logger.<br>sinks[i].<br>id | string | Yes | A unique identifier for the log sink. | "debug-logs"
+| aace.logger.<br>sinks[i].<br>type | string | Yes | The type of the log sink. Use "aace.logger.sink.file" to write logs to a file. | "aace.logger.sink.file"
+| aace.logger.<br>sinks[i].<br>config.<br>path | string | Yes | An absolute path where the Engine creates the log file. | "/opt/AAC/data"
+| aace.logger.<br>sinks[i].<br>config.<br>prefix | string | Yes | The prefix for the log file. | "auto-sdk"
+| aace.logger.<br>sinks[i].<br>config.<br>maxSize | integer | Yes | The maximum size of the log file in bytes. | 5242880
+| aace.logger.<br>sinks[i].<br>config.<br>maxFiles | integer | Yes | The maximum number of logs files. | 5
+| aace.logger.<br>sinks[i].<br>config.<br>append | boolean | Yes | Use true to append logs to the existing file. Use false to overwrite the log files.  | false
+| aace.logger.<br>sinks[i].<br>rules[j].<br>level | enum (log level) | Yes | The log level used to filter logs written to the sink. <br><br>**Accepted values:**<ul><li>`"VERBOSE"`</li><li>`"INFO"`</li><li>`"WARN"`</li><li>`"ERROR"`</li><li>`"CRITICAL"`</li><li>`"METRIC"`</li></ul> | "VERBOSE"
+
+
+You can either define this JSON in a file and construct an `EngineConfiguration` from that file, or you can use the provided configuration factory method [com.amazon.aace.logger.LoggerConfiguration](./src/main/java/com/amazon/aace/logger/config/LoggerConfiguration.java) to programmatically construct the `EngineConfiguration` in the proper format.
+
+```java
+import com.amazon.aace.logger.Logger;
+import com.amazon.aace.logger.config.LoggerConfiguration;
+
+// ...
+
+LoggerConfiguration fileSinkConfig = LoggerConfiguration.createFileSinkConfig(
+    "debug-logs",
+    Logger.Level.VERBOSE,
+    getCacheDir().getAbsolutePath() + "data",
+    "auto-sdk",
+    5242880,
+    5,
+    false);
+mEngine.configure( new EngineConfiguration[]{
+	// other config objects,
+	fileSinkConfig,
+	// ...
+});
+
+...
+```
 #### Source Tags
 There are generally three different log `tag` values, depending on the `source`.
 
@@ -222,7 +316,7 @@ There are generally three different log `tag` values, depending on the `source`.
 * `AAC` refers to logs being passed from the Alexa Auto SDK.
 * `CLI` refers to logs coming from the client itself, by convention.
 
-### Implementing Audio<a id="implementing-audio"></a>
+### Implementing Audio
 
 The platform should implement audio input and audio output handling. Other Auto SDK components will make use of the provided implementation to provision audio input and output channels. 
   
@@ -418,7 +512,7 @@ public class AudioOutputHandler extends AudioOutput implements AuthStateObserver
 };
 ```
 
-## Starting the Engine<a id="starting-the-engine"></a>
+## Starting the Engine
 
 After creating and registering handlers for all required platform interfaces, you can start the Engine. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
 
@@ -426,7 +520,7 @@ After creating and registering handlers for all required platform interfaces, yo
 m_engine.start();
 ```
 
-## Stopping the Engine<a id="stopping-the-engine"></a>
+## Stopping the Engine
 
 If you need to stop the engine for any reason except for logging out the user, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
 
@@ -444,7 +538,7 @@ if( m_engine != null ) {
 }
 ```
 
-## Managing Runtime Properties with the Property Manager <a id ="managing-runtime-properties-with-the-property-manager"></a>
+## Managing Runtime Properties with the Property Manager
 
 Certain modules in the Auto SDK define constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set the values of runtime properties in the Engine. Changes to property values may also be initiated from the Alexa Voice Service (AVS). For example, the `TIMEZONE` property may be changed through AVS when the user changes the timezone setting in the Alexa Companion App.
 

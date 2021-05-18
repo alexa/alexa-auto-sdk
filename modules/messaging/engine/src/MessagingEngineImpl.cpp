@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 #include "AACE/Engine/Messaging/MessagingEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -23,8 +24,24 @@ namespace aace {
 namespace engine {
 namespace messaging {
 
+using namespace aace::engine::utils::metrics;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.messaging.MessagingEngineImpl");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "MessagingEngineImpl";
+
+/// Counter metrics for Messaging Platform APIs
+static const std::string METRIC_MESSAGING_SEND_MESSAGE = "SendMessage";
+static const std::string METRIC_MESSAGING_UPLOAD_CONVERSATIONS = "UploadConversations";
+static const std::string METRIC_MESSAGING_UPDATE_MESSAGES_STATUS = "UpdateMessagesStatus";
+static const std::string METRIC_MESSAGING_SEND_MESSAGE_SUCCEEDED = "SendMessageSucceeded";
+static const std::string METRIC_MESSAGING_SEND_MESSAGE_FAILED = "SendMessageFailed";
+static const std::string METRIC_MESSAGING_CONVERSATIONS_REPORT = "ConversationsReport";
+static const std::string METRIC_MESSAGING_UPDATE_MESSAGES_STATUS_SUCCEEDED = "UpdateMessagesStatusSucceeded";
+static const std::string METRIC_MESSAGING_UPDATE_MESSAGES_STATUS_FAILED = "UpdateMessagesStatusFailed";
+static const std::string METRIC_MESSAGING_UPDATE_MESSAGING_ENDPOINT_STATE = "UpdateMessagingEndpointState";
 
 using namespace alexaClientSDK::capabilityAgents::messaging;
 
@@ -34,7 +51,8 @@ MessagingEngineImpl::MessagingEngineImpl(std::shared_ptr<aace::messaging::Messag
 }
 
 bool MessagingEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender) {
@@ -49,7 +67,7 @@ bool MessagingEngineImpl::initialize(
         m_messagingCapabilityAgent->addObserver(shared_from_this());
 
         // Register capability with the default endpoint
-        defaultEndpointBuilder->withCapability(m_messagingCapabilityAgent, m_messagingCapabilityAgent);
+        capabilitiesRegistrar->withCapability(m_messagingCapabilityAgent, m_messagingCapabilityAgent);
 
         return true;
     } catch (std::exception& ex) {
@@ -60,13 +78,14 @@ bool MessagingEngineImpl::initialize(
 
 std::shared_ptr<MessagingEngineImpl> MessagingEngineImpl::create(
     std::shared_ptr<aace::messaging::Messaging> messagingPlatformInterface,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender) {
     try {
         ThrowIfNull(messagingPlatformInterface, "nullPlatformInterface");
-        ThrowIfNull(defaultEndpointBuilder, "nullDefaultEndpointBuilder");
+        ThrowIfNull(capabilitiesRegistrar, "nullCapabilitiesRegistrar");
         ThrowIfNull(contextManager, "nullContextManager");
         ThrowIfNull(exceptionSender, "nullExceptionSender");
         ThrowIfNull(messageSender, "nullMessageSender");
@@ -75,7 +94,7 @@ std::shared_ptr<MessagingEngineImpl> MessagingEngineImpl::create(
             std::shared_ptr<MessagingEngineImpl>(new MessagingEngineImpl(messagingPlatformInterface));
 
         ThrowIfNot(
-            messagingEngineImpl->initialize(defaultEndpointBuilder, exceptionSender, contextManager, messageSender),
+            messagingEngineImpl->initialize(capabilitiesRegistrar, exceptionSender, contextManager, messageSender),
             "initializeMessagingEngineImplFailed");
 
         // set the platform engine interface reference
@@ -107,6 +126,7 @@ void MessagingEngineImpl::sendMessage(
     MessagingEndpoint endpoint,
     const std::string& payload) {
     AACE_INFO(LX(TAG).sensitive("payload", payload));
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "sendMessage", {METRIC_MESSAGING_SEND_MESSAGE});
     if (m_messagingPlatformInterface != nullptr) {
         try {
             auto messageJson = json::parse(payload);
@@ -137,6 +157,7 @@ void MessagingEngineImpl::updateMessagesStatus(
     MessagingEndpoint endpoint,
     const std::string& payload) {
     AACE_INFO(LX(TAG).sensitive("payload", payload));
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "updateMessagesStatus", {METRIC_MESSAGING_UPDATE_MESSAGES_STATUS});
     if (m_messagingPlatformInterface != nullptr) {
         try {
             auto messageJson = json::parse(payload);
@@ -162,12 +183,14 @@ void MessagingEngineImpl::uploadConversations(
     MessagingEndpoint endpoint,
     const std::string& payload) {
     AACE_INFO(LX(TAG).sensitive("payload", payload));
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "uploadConversations", {METRIC_MESSAGING_UPLOAD_CONVERSATIONS});
     if (m_messagingPlatformInterface != nullptr) {
         m_messagingPlatformInterface->uploadConversations(token);
     }
 }
 
 void MessagingEngineImpl::onConversationsReport(const std::string& token, const std::string& conversations) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onConversationsReport", {METRIC_MESSAGING_CONVERSATIONS_REPORT});
     if (m_messagingCapabilityAgent != nullptr) {
         AACE_INFO(LX(TAG).d("token", token).sensitive("conversations", conversations));
         m_messagingCapabilityAgent->conversationsReport(token, conversations);
@@ -175,6 +198,10 @@ void MessagingEngineImpl::onConversationsReport(const std::string& token, const 
 }
 
 void MessagingEngineImpl::onSendMessageFailed(const std::string& token, ErrorCode code, const std::string& message) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onSendMessageFailed",
+        {METRIC_MESSAGING_SEND_MESSAGE_FAILED, errorCodeToString(code)});
     if (m_messagingCapabilityAgent != nullptr) {
         AACE_INFO(LX(TAG).d("token", token).d("code", static_cast<int>(code)).d("message", message));
         m_messagingCapabilityAgent->sendMessageFailed(token, convertErrorCode(code), message);
@@ -182,6 +209,7 @@ void MessagingEngineImpl::onSendMessageFailed(const std::string& token, ErrorCod
 }
 
 void MessagingEngineImpl::onSendMessageSucceeded(const std::string& token) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSendMessageSucceeded", {METRIC_MESSAGING_SEND_MESSAGE_SUCCEEDED});
     if (m_messagingCapabilityAgent != nullptr) {
         AACE_INFO(LX(TAG).d("token", token));
         m_messagingCapabilityAgent->sendMessageSucceeded(token);
@@ -192,6 +220,10 @@ void MessagingEngineImpl::onUpdateMessagesStatusFailed(
     const std::string& token,
     ErrorCode code,
     const std::string& message) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onUpdateMessagesStatusFailed",
+        {METRIC_MESSAGING_UPDATE_MESSAGES_STATUS_FAILED, errorCodeToString(code)});
     if (m_messagingCapabilityAgent != nullptr) {
         AACE_INFO(LX(TAG).d("token", token).d("code", static_cast<int>(code)).d("message", message));
         m_messagingCapabilityAgent->updateMessagesStatusFailed(token, convertErrorCode(code), message);
@@ -199,6 +231,10 @@ void MessagingEngineImpl::onUpdateMessagesStatusFailed(
 }
 
 void MessagingEngineImpl::onUpdateMessagesStatusSucceeded(const std::string& token) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onUpdateMessagesStatusSucceeded",
+        {METRIC_MESSAGING_UPDATE_MESSAGES_STATUS_SUCCEEDED});
     if (m_messagingCapabilityAgent != nullptr) {
         AACE_INFO(LX(TAG).d("token", token));
         m_messagingCapabilityAgent->updateMessagesStatusSucceeded(token);
@@ -209,6 +245,13 @@ void MessagingEngineImpl::onUpdateMessagingEndpointState(
     ConnectionState connectionState,
     PermissionState sendPermission,
     PermissionState readPermission) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onUpdateMessagingEndpointState",
+        {METRIC_MESSAGING_UPDATE_MESSAGING_ENDPOINT_STATE,
+         connectionStateToString(connectionState),
+         permissionStateToString(sendPermission),
+         permissionStateToString(readPermission)});
     if (m_messagingCapabilityAgent != nullptr) {
         AACE_INFO(LX(TAG)
                       .d("connectionState", static_cast<int>(connectionState))

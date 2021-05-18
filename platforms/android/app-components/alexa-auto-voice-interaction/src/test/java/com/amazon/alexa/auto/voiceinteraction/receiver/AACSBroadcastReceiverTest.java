@@ -9,12 +9,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.Action;
-import com.amazon.aacsconstants.Topic;
 import com.amazon.alexa.auto.voiceinteraction.TestResourceFileReader;
 import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
 import com.amazon.alexa.auto.voiceinteraction.common.Constants;
-import com.amazon.autovoicechrome.util.AutoVoiceChromeState;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -39,6 +38,7 @@ public class AACSBroadcastReceiverTest {
 
     private String receiveMessageTopic;
     private String receiveMessageAction;
+    private String receiveMessagePayload;
 
     @Before
     public void setup() {
@@ -53,10 +53,11 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedListening.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceInteractionMessage(
-                        Constants.TOPIC_VOICE_CHROME, AutoVoiceChromeState.LISTENING.toString(), "");
-        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_CHROME);
-        Assert.assertEquals(receiveMessageAction, AutoVoiceChromeState.LISTENING.toString());
+                .sendAutoVoiceInteractionMessage(Constants.TOPIC_VOICE_ANIMATION,
+                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_LISTENING);
+        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
+        Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
+        Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_LISTENING);
     }
 
     @Test
@@ -64,10 +65,11 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedThinking.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceInteractionMessage(
-                        Constants.TOPIC_VOICE_CHROME, AutoVoiceChromeState.THINKING.toString(), "");
-        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_CHROME);
-        Assert.assertEquals(receiveMessageAction, AutoVoiceChromeState.THINKING.toString());
+                .sendAutoVoiceInteractionMessage(Constants.TOPIC_VOICE_ANIMATION,
+                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_THINKING);
+        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
+        Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
+        Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_THINKING);
     }
 
     @Test
@@ -75,10 +77,11 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedSpeaking.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceInteractionMessage(
-                        Constants.TOPIC_VOICE_CHROME, AutoVoiceChromeState.SPEAKING.toString(), "");
-        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_CHROME);
-        Assert.assertEquals(receiveMessageAction, AutoVoiceChromeState.SPEAKING.toString());
+                .sendAutoVoiceInteractionMessage(Constants.TOPIC_VOICE_ANIMATION,
+                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_SPEAKING);
+        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
+        Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
+        Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_SPEAKING);
     }
 
     @Test
@@ -86,10 +89,11 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedIdle.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceInteractionMessage(
-                        Constants.TOPIC_VOICE_CHROME, AutoVoiceChromeState.IDLE.toString(), "");
-        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_CHROME);
-        Assert.assertEquals(receiveMessageAction, AutoVoiceChromeState.IDLE.toString());
+                .sendAutoVoiceInteractionMessage(Constants.TOPIC_VOICE_ANIMATION,
+                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_IDLE);
+        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
+        Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
+        Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_IDLE);
     }
 
     @Test
@@ -118,8 +122,12 @@ public class AACSBroadcastReceiverTest {
     public void handle_aacs_wakeword_detected_intent() {
         generateIntent("aacs/WakewordDetected.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
-        Assert.assertEquals(receiveMessageTopic, Topic.SPEECH_RECOGNIZER);
+        verify(aacsBroadcastReceiver, times(1))
+                .sendAutoVoiceInteractionMessage(Constants.TOPIC_VOICE_ANIMATION,
+                        Action.SpeechRecognizer.WAKEWORD_DETECTED, "wakeword-SampleText");
+        Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
         Assert.assertEquals(receiveMessageAction, Action.SpeechRecognizer.WAKEWORD_DETECTED);
+        Assert.assertEquals(receiveMessagePayload, "wakeword-SampleText");
     }
 
     @Test
@@ -142,5 +150,6 @@ public class AACSBroadcastReceiverTest {
     public void testOnReceiveEvent(AutoVoiceInteractionMessage message) {
         receiveMessageTopic = message.getTopic();
         receiveMessageAction = message.getAction();
+        receiveMessagePayload = message.getPayload();
     }
 }

@@ -34,6 +34,7 @@ set(ALEXA_SOURCE
     ${ALEXA_CPP_DIR}/src/Alexa/GlobalPresetBinder.cpp
     ${ALEXA_CPP_DIR}/src/Alexa/AlexaSpeakerBinder.cpp
     ${ALEXA_CPP_DIR}/src/Alexa/DoNotDisturbBinder.cpp
+    ${ALEXA_CPP_DIR}/src/Alexa/DeviceSetupBinder.cpp
 )
 set(ALEXA_DEPENDENCIES
     AACEAlexaPlatform
@@ -64,18 +65,26 @@ add_custom_command(
         $<TARGET_FILE:AACEAlexaPlatform>
         $<TARGET_FILE:AACEAlexaEngine>
         ${AAC_HOME}/lib/libACL.so
+        ${AAC_HOME}/lib/libacsdkAlerts.so
+        ${AAC_HOME}/lib/libacsdkAudioPlayer.so
+        ${AAC_HOME}/lib/libacsdkBluetooth.so
+        ${AAC_HOME}/lib/libacsdkDoNotDisturb.so
+        ${AAC_HOME}/lib/libacsdkEqualizer.so
+        ${AAC_HOME}/lib/libacsdkEqualizerImplementations.so
+        ${AAC_HOME}/lib/libacsdkManufactory.so
+        ${AAC_HOME}/lib/libacsdkMultiRoomMusic.so
+        ${AAC_HOME}/lib/libacsdkNotifications.so
+        ${AAC_HOME}/lib/libacsdkShutdownManager.so
+        ${AAC_HOME}/lib/libDeviceSetupCA.so
         ${AAC_HOME}/lib/libADSL.so
         ${AAC_HOME}/lib/libAFML.so
         ${AAC_HOME}/lib/libAIP.so
-        ${AAC_HOME}/lib/libAlerts.so
         ${AAC_HOME}/lib/libAlexa.so
         ${AAC_HOME}/lib/libApiGateway.so
-        ${AAC_HOME}/lib/libAudioPlayer.so
         ${AAC_HOME}/lib/libAudioResources.so
         ${AAC_HOME}/lib/libAVSCommon.so
         ${AAC_HOME}/lib/libAVSGatewayManager.so
         ${AAC_HOME}/lib/libAVSSystem.so
-        ${AAC_HOME}/lib/libBluetooth.so
         ${AAC_HOME}/lib/libCapabilitiesDelegate.so
         ${AAC_HOME}/lib/libCaptions.so
         ${AAC_HOME}/lib/libCaptionsLib.so
@@ -83,24 +92,21 @@ add_custom_command(
         ${AAC_HOME}/lib/libCertifiedSender.so
         ${AAC_HOME}/lib/libContextManager.so
         ${AAC_HOME}/lib/libDeviceSettings.so
-        ${AAC_HOME}/lib/libDoNotDisturbCA.so
+        ${AAC_HOME}/lib/libDeviceSetupCA.so
         ${AAC_HOME}/lib/libEndpoints.so
-        ${AAC_HOME}/lib/libEqualizer.so
-        ${AAC_HOME}/lib/libEqualizerImplementations.so
-        ${AAC_HOME}/lib/libExternalMediaPlayer.so
         ${AAC_HOME}/lib/libInteractionModel.so
         ${AAC_HOME}/lib/libInterruptModel.so
         ${AAC_HOME}/lib/libKWD.so
         ${AAC_HOME}/lib/libMessaging.so
+        ${AAC_HOME}/lib/libMetricRecorder.so
         ${AAC_HOME}/lib/libModeController.so
-        ${AAC_HOME}/lib/libMRM.so
-        ${AAC_HOME}/lib/libNotifications.so
         ${AAC_HOME}/lib/libOpusEncoderContext.so
         ${AAC_HOME}/lib/libPlaybackController.so
         ${AAC_HOME}/lib/libPlaylistParser.so
         ${AAC_HOME}/lib/libPowerController.so
         ${AAC_HOME}/lib/libRangeController.so
         ${AAC_HOME}/lib/libRegistrationManager.so
+        ${AAC_HOME}/lib/libSampleMetricSink.so
         ${AAC_HOME}/lib/libSpeakerManager.so
         ${AAC_HOME}/lib/libSpeechEncoder.so
         ${AAC_HOME}/lib/libSQLiteStorage.so
@@ -112,6 +118,27 @@ add_custom_command(
         ${AAC_HOME}/lib/libcurl.so
         ${AAC_HOME}/lib/libnghttp2.so
         ${AAC_HOME}/lib/libopus.so
+        ${AAC_HOME}/lib/libacsdkExternalMediaPlayer.so
+        ${AAC_HOME}/lib/libacsdkExternalMediaPlayerInterfaces.so
+        ${AAC_HOME}/lib/libacsdkCBLAuthorizationDelegate.so
+        ${AAC_HOME}/lib/libacsdkManufactory.so
+        ${AAC_HOME}/lib/libacsdkCore.so
+        ${AAC_HOME}/lib/libacsdkShared.so
+        ${AAC_HOME}/lib/libacsdkNullMetricRecorder.so
+        ${AAC_HOME}/lib/libacsdkDefaultDeviceSettingsManager.so
+        ${AAC_HOME}/lib/libacsdkDefaultInternetConnectionMonitor.so
+        ${AAC_HOME}/lib/libacsdkDefaultSampleApplicationOptions.so
+        ${AAC_HOME}/lib/libacsdkLibcurlAlexaCommunications.so
+        ${AAC_HOME}/lib/libacsdkLibcurlHTTPContentFetcher.so
+        ${AAC_HOME}/lib/libacsdkNullSystemTimeZone.so
+        ${AAC_HOME}/lib/libacsdkSampleApplicationCBLAuthRequester.so
+        ${AAC_HOME}/lib/libCaptionsComponent.so
+        ${AAC_HOME}/lib/libacsdkPostConnectOperationProviderRegistrar.so
+        ${AAC_HOME}/lib/libSoftwareComponentReporter.so
+        ${AAC_HOME}/lib/libSDKComponent.so
+        ${AAC_HOME}/lib/libacsdkStartupManager.so
+        ${AAC_HOME}/lib/libUplCalculator.so
+        ${AAC_HOME}/lib/libVisualCharacteristics.so
         $<TARGET_FILE_DIR:AACEAlexaAndroid>
 )
 

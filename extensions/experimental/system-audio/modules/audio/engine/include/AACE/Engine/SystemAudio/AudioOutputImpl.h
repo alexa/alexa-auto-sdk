@@ -73,10 +73,14 @@ private:
     void executeStartStreaming();
     void executeStopStreaming();
 
-    bool executePrepare(const std::shared_ptr<aace::audio::AudioStream>& stream, bool repeating);
-    bool executePrepare(const std::string& url, bool repeating);
-    bool prepareLocked(const std::string& url, const std::shared_ptr<aace::audio::AudioStream>& stream, bool repeating);
-    void preparePlayer(const std::string& url, const std::shared_ptr<aace::audio::AudioStream>& stream);
+    bool executePrepare(
+        const std::string& url,
+        const std::shared_ptr<aace::audio::AudioStream>& stream,
+        bool repeating);
+    bool prepareUrl(const std::string& url);
+    bool prepareStream(const std::shared_ptr<aace::audio::AudioStream>& stream);
+    void preparePlayer(
+        const std::function<aal_audio_parameters_t*(aal_attributes_t*, aal_audio_parameters_t*)>& configure);
     bool executePlay();
     bool executeStop();
     bool executePause();

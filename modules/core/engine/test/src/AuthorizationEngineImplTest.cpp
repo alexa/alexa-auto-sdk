@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include <AACE/Engine/Authorization/AuthorizationEngineImpl.h>
+#include <AACE/Engine/Authorization/AuthorizationEventListenerInterface.h>
 
 using namespace aace::authorization;
 using namespace aace::engine::authorization;
@@ -50,6 +51,13 @@ class MockAuthorizationServiceInterface
 public:
     MOCK_METHOD2(registerProvider, bool(std::shared_ptr<AuthorizationProvider> provider, const std::string& service));
     MOCK_METHOD1(getProvider, std::shared_ptr<AuthorizationProvider>(const std::string& service));
+    MOCK_METHOD1(addEventListener, void(std::shared_ptr<AuthorizationEventListenerInterface>));
+    MOCK_METHOD1(removeEventListener, void(std::shared_ptr<AuthorizationEventListenerInterface>));
+};
+
+class MockAuthorizationEventListener : public AuthorizationEventListenerInterface {
+public:
+    MOCK_METHOD2(onEventReceived, void(const std::string& service, const std::string& event));
 };
 
 /// Test harness for @c AuthorizationEngineImpl class
@@ -227,4 +235,37 @@ TEST_F(AuthorizationEngineImplTest, test_verifyAuthorizationProviderListenerCall
 
     EXPECT_CALL(*m_mockAuthorizationPlatformInterface, setAuthorizationData("service2", "Mock-Key", "{\"Mock-Data\"}"));
     m_authorizationEngineImpl->onSetAuthorizationData("service2", "Mock-Key", "{\"Mock-Data\"}");
+}
+
+TEST_F(AuthorizationEngineImplTest, test_verifyEventListeners) {
+    auto mockEventListener = std::make_shared<MockAuthorizationEventListener>();
+
+    const auto service = "service";
+    const auto event = R"({"type":"cbl-code","payload":{"code":"<code>","url":"<url>"}})";
+
+    // Platform interface should always be notified about the event.
+    EXPECT_CALL(*m_mockAuthorizationPlatformInterface, eventReceived(service, event)).Times(3);
+
+    // No harm to add a null listener
+    m_authorizationEngineImpl->addEventListener(nullptr);
+
+    // Listener should not receive any event before being added.
+    EXPECT_CALL(*mockEventListener, onEventReceived(_, _)).Times(0);
+    m_authorizationEngineImpl->onEventReceived(service, event);
+
+    // Listener should receive an event after being added.
+    m_authorizationEngineImpl->addEventListener(mockEventListener);
+    EXPECT_CALL(*mockEventListener, onEventReceived(service, event)).Times(1);
+    m_authorizationEngineImpl->onEventReceived(service, event);
+
+    // Listener should not receive any event after being removed.
+    m_authorizationEngineImpl->removeEventListener(mockEventListener);
+    EXPECT_CALL(*mockEventListener, onEventReceived(_, _)).Times(0);
+    m_authorizationEngineImpl->onEventReceived(service, event);
+
+    // The null listener can be removed.
+    m_authorizationEngineImpl->removeEventListener(nullptr);
+
+    // No harm to remove non-existing listener
+    m_authorizationEngineImpl->removeEventListener(mockEventListener);
 }

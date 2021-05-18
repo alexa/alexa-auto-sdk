@@ -8,7 +8,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -19,7 +18,6 @@ import com.amazon.alexa.auto.aacs.common.LocalSearchListTemplate;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
-import com.amazon.alexa.auto.apis.app.AlexaAppScopedComponents;
 import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
 import com.amazon.alexa.auto.navigation.receiver.TestResourceFileReader;
@@ -54,16 +52,13 @@ public class LocalSearchDirectiveHandlerTest {
     private SessionViewController mMockSessionController;
     @Mock
     private ViewGroup mViewGroup;
-    @Mock
-    private AlexaAppScopedComponents mMockScopedComponents;
     private LocalSearchDirectiveHandler mClassUnderTest;
 
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
         when(mMockAlexaApp.getRootComponent()).thenReturn(mMockRootComponent);
-        when(mMockRootComponent.getScopedComponents()).thenReturn(mMockScopedComponents);
-        when(mMockScopedComponents.getComponent(SessionViewController.class))
+        when(mMockRootComponent.getComponent(SessionViewController.class))
                 .thenReturn(Optional.of(mMockSessionController));
         when(mMockSessionController.getTemplateRuntimeViewContainer()).thenReturn(Optional.of(mViewGroup));
         mClassUnderTest = new LocalSearchDirectiveHandler(new WeakReference<>(mContext), mNavigationProvider);

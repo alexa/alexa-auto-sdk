@@ -138,22 +138,29 @@ bool AASBAddressBook::getEntries(
             const auto& addressBook = addressBookIter->second;
 
             for (const auto& navName : addressBook.navigationNames) {
-                AACE_VERBOSE(LX(TAG).d("adding navName", navName.name));
-                sp->addName(navName.entryId, navName.name);
+                AACE_DEBUG(LX(TAG).d("navName:entryId", navName.entryId));
+                sp->addName(navName.entryId, navName.name, "", "", navName.phoneticName);
             }
 
             for (const auto& contactName : addressBook.contactNames) {
-                AACE_VERBOSE(LX(TAG).d("adding contactName", contactName.firstName));
-                sp->addName(contactName.entryId, contactName.firstName, contactName.lastName, contactName.nickname);
+                AACE_DEBUG(LX(TAG).d("contactName:entryId", contactName.entryId));
+                sp->addName(
+                    contactName.entryId,
+                    contactName.firstName,
+                    contactName.lastName,
+                    contactName.nickname,
+                    contactName.phoneticFirstName,
+                    contactName.phoneticLastName);
             }
 
             for (const auto& phone : addressBook.phoneData) {
-                AACE_VERBOSE(LX(TAG).d("adding phone", phone.label));
+                AACE_DEBUG(LX(TAG).d("phone:entryId", phone.entryId).sensitive("label", phone.label));
                 sp->addPhone(phone.entryId, phone.label, phone.number);
             }
 
             for (const auto& postalAddress : addressBook.postalAddresses) {
-                AACE_VERBOSE(LX(TAG).d("adding postalAddress", postalAddress.label));
+                AACE_DEBUG(
+                    LX(TAG).d("postalAddress:entryId", postalAddress.entryId).sensitive("label", postalAddress.label));
                 sp->addPostalAddress(
                     postalAddress.entryId,
                     postalAddress.label,

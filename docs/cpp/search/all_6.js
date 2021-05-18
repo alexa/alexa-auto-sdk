@@ -29,6 +29,5 @@ var searchData=
   ['gettime',['getTime',['../classaace_1_1location_1_1_location.html#a20ba8e872b6b255d46dd5ea231cffb1a',1,'aace::location::Location']]],
   ['gettimeasstring',['getTimeAsString',['../classaace_1_1location_1_1_location.html#aea77abc6aa7edc610312fde96cb77d7a',1,'aace::location::Location']]],
   ['getvalue',['getValue',['../classaace_1_1audio_1_1_audio_stream_property.html#a9d8ef88c1f40c83b75d0f1928f09605f',1,'aace::audio::AudioStreamProperty']]],
-  ['getvisualcontext',['getVisualContext',['../classaace_1_1apl_1_1_a_p_l.html#a97bcf6e8f7709626c6e5f9b2b06861ef',1,'aace::apl::APL']]],
   ['getwifisignalstrength',['getWifiSignalStrength',['../classaace_1_1network_1_1_network_info_provider.html#a605775f8cfa22e10ca7a9144dc636a62',1,'aace::network::NetworkInfoProvider']]]
 ];

@@ -12,14 +12,16 @@ set(AASB_APL_MESSAGES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/ClearAllExecuteCommandsMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/ClearCardMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/ClearDocumentMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/DataSourceUpdateMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/ExecuteCommandsMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/ExecuteCommandsResultMessage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/GetVisualContextMessage.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/GetVisualContextMessageReply.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/InterruptCommandSequenceMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/ProcessActivityEventMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/RenderDocumentMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/RenderDocumentResultMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/SendDataSourceFetchRequestEventMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/SendDeviceWindowStateMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/SendRuntimeErrorEventMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/SendUserEventMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/SetAPLMaxVersionMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Apl/APL/SetDocumentIdleTimeoutMessage.h

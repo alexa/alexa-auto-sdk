@@ -89,13 +89,15 @@ bool AASBEngineService::configure(std::shared_ptr<std::istream> configuration) {
         if (defaultMessageTimeout != nullptr) {
             ThrowIfNot(
                 defaultMessageTimeout.is_number_integer() && defaultMessageTimeout.is_number_unsigned(),
-                "invalidConfiguration");
+                "invalidMessageTimeout");
             m_defaultMessageTimeout = defaultMessageTimeout.get<uint16_t>();
         }
 
+        m_messageBroker->setMessageTimeout(std::chrono::milliseconds(m_defaultMessageTimeout));
+
         auto version = root["/version"_json_pointer];
         if (version.is_string()) {
-            m_configuredVersion = VERSION(version.get<std::string>());
+            m_configuredVersion = aace::engine::core::Version(version.get<std::string>());
             aace::engine::core::Version minRequiredVersion = m_minRequiredVersion;
             ThrowIfNot(
                 (minRequiredVersion < m_configuredVersion || minRequiredVersion == m_configuredVersion) &&
@@ -182,7 +184,7 @@ aace::engine::core::Version AASBEngineService::getConfiguredVersion() {
 }
 
 aace::engine::core::Version AASBEngineService::getCurrentVersion() {
-    return VERSION("3.1");
+    return VERSION("3.2");
 }
 
 bool AASBEngineService::getAutoEnableInterfaces() {

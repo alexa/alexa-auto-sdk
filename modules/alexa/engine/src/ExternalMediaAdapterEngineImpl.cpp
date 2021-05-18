@@ -17,6 +17,7 @@
 
 #include "AACE/Engine/Alexa/ExternalMediaAdapterEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -27,6 +28,8 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
+using namespace aace::engine::utils::metrics;
+
 static const uint8_t MAX_SPEAKER_VOLUME = 100;
 
 // String to identify log entries originating from this file.
@@ -34,6 +37,29 @@ static const std::string TAG("aace.alexa.ExternalMediaAdapterEngineImpl");
 
 // external media player agent constant
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "Alexa Auto SDK";
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "ExternalMediaAdapterEngineImpl";
+
+/// Counter metrics for ExternalMediaPlayer Platform APIs
+static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGIN = "Login";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGOUT = "Logout";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAY = "Play";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAY_CONTROL = "PlayControl";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_SEEK = "Seek";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_ADJUST_SEEK = "AdjustSeek";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_AUTHORIZE = "Authorize";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_GET_OFFSET = "GetOffset";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_VOLUME_CHANGED = "VolumeChanged";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_MUTED_STATE_CHANGED = "MutedStateChanged";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_REPORT_DISCOVERED_PLAYERS = "ReportDiscoveredPlayers";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_REQUEST_TOKEN = "RequestToken";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGIN_COMPLETE = "LoginComplete";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGOUT_COMPLETE = "LogoutComplete";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAYER_EVENT = "PlayerEvent";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAYER_ERROR = "PlayerError";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_SET_FOCUS = "SetFocus";
+static const std::string METRIC_EXTERNALMEDIAPLAYER_REMOVE_DISCOVERED_PLAYER = "RemoveDiscoveredPlayer";
 
 ExternalMediaAdapterEngineImpl::ExternalMediaAdapterEngineImpl(
     std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter,
@@ -95,6 +121,7 @@ bool ExternalMediaAdapterEngineImpl::initialize(
 
 bool ExternalMediaAdapterEngineImpl::handleAuthorization(
     const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleAuthorization", {METRIC_EXTERNALMEDIAPLAYER_AUTHORIZE});
     try {
         ThrowIfNot(m_platformMediaAdapter->authorize(authorizedPlayerList), "platformMediaAdapterAuthorizeFailed");
 
@@ -111,6 +138,7 @@ bool ExternalMediaAdapterEngineImpl::handleLogin(
     const std::string& userName,
     bool forceLogin,
     std::chrono::milliseconds tokenRefreshInterval) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleLogin", {METRIC_EXTERNALMEDIAPLAYER_LOGIN});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->login(localPlayerId, accessToken, userName, forceLogin, tokenRefreshInterval),
@@ -124,6 +152,7 @@ bool ExternalMediaAdapterEngineImpl::handleLogin(
 }
 
 bool ExternalMediaAdapterEngineImpl::handleLogout(const std::string& localPlayerId) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleLogout", {METRIC_EXTERNALMEDIAPLAYER_LOGOUT});
     try {
         ThrowIfNot(m_platformMediaAdapter->logout(localPlayerId), "platformMediaAdapterLogoutFailed");
 
@@ -143,6 +172,7 @@ bool ExternalMediaAdapterEngineImpl::handlePlay(
     aace::alexa::ExternalMediaAdapter::Navigation navigation,
     const std::string& playbackSessionId,
     const std::string& skillToken) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlay", {METRIC_EXTERNALMEDIAPLAYER_PLAY});
     try {
         // note: playRequestor.id not needed by client for now
         ThrowIfNot(
@@ -160,6 +190,10 @@ bool ExternalMediaAdapterEngineImpl::handlePlay(
 bool ExternalMediaAdapterEngineImpl::handlePlayControl(
     const std::string& localPlayerId,
     aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) {
+    std::stringstream type;
+    type << playControlType;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "handlePlayControl", {METRIC_EXTERNALMEDIAPLAYER_PLAY_CONTROL, type.str()});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->playControl(localPlayerId, playControlType),
@@ -176,6 +210,7 @@ bool ExternalMediaAdapterEngineImpl::handlePlayControl(
 }
 
 bool ExternalMediaAdapterEngineImpl::handleSeek(const std::string& localPlayerId, std::chrono::milliseconds offset) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSeek", {METRIC_EXTERNALMEDIAPLAYER_SEEK});
     try {
         ThrowIfNot(m_platformMediaAdapter->seek(localPlayerId, offset), "platformMediaAdapterSeekFailed");
 
@@ -189,6 +224,7 @@ bool ExternalMediaAdapterEngineImpl::handleSeek(const std::string& localPlayerId
 bool ExternalMediaAdapterEngineImpl::handleAdjustSeek(
     const std::string& localPlayerId,
     std::chrono::milliseconds deltaOffset) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleAdjustSeek", {METRIC_EXTERNALMEDIAPLAYER_ADJUST_SEEK});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->adjustSeek(localPlayerId, deltaOffset), "platformMediaAdapterAdjustSeekFailed");
@@ -324,6 +360,7 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState(
 }
 
 std::chrono::milliseconds ExternalMediaAdapterEngineImpl::handleGetOffset(const std::string& localPlayerId) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleGetOffset", {METRIC_EXTERNALMEDIAPLAYER_GET_OFFSET});
     try {
         // get the external media adapter offset from the platform interface
         return m_platformMediaAdapter->getOffset(localPlayerId);
@@ -334,6 +371,7 @@ std::chrono::milliseconds ExternalMediaAdapterEngineImpl::handleGetOffset(const 
 }
 
 bool ExternalMediaAdapterEngineImpl::handleSetVolume(int8_t volume) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSetVolume", {METRIC_EXTERNALMEDIAPLAYER_VOLUME_CHANGED});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->volumeChanged((float)volume / MAX_SPEAKER_VOLUME),
@@ -346,6 +384,7 @@ bool ExternalMediaAdapterEngineImpl::handleSetVolume(int8_t volume) {
 }
 
 bool ExternalMediaAdapterEngineImpl::handleSetMute(bool mute) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSetMute", {METRIC_EXTERNALMEDIAPLAYER_MUTED_STATE_CHANGED});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->mutedStateChanged(
@@ -366,6 +405,10 @@ bool ExternalMediaAdapterEngineImpl::handleSetMute(bool mute) {
 
 void ExternalMediaAdapterEngineImpl::onReportDiscoveredPlayers(
     const std::vector<DiscoveredPlayerInfo>& discoveredPlayers) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onReportDiscoveredPlayers",
+        {METRIC_EXTERNALMEDIAPLAYER_REPORT_DISCOVERED_PLAYERS});
     try {
         reportDiscoveredPlayers(discoveredPlayers);
     } catch (std::exception& ex) {
@@ -374,6 +417,7 @@ void ExternalMediaAdapterEngineImpl::onReportDiscoveredPlayers(
 }
 
 void ExternalMediaAdapterEngineImpl::onRequestToken(const std::string& localPlayerId) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onRequestToken", {METRIC_EXTERNALMEDIAPLAYER_REQUEST_TOKEN});
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
 
@@ -390,6 +434,7 @@ void ExternalMediaAdapterEngineImpl::onRequestToken(const std::string& localPlay
 }
 
 void ExternalMediaAdapterEngineImpl::onLoginComplete(const std::string& localPlayerId) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onLoginComplete", {METRIC_EXTERNALMEDIAPLAYER_LOGIN_COMPLETE});
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
 
@@ -406,6 +451,7 @@ void ExternalMediaAdapterEngineImpl::onLoginComplete(const std::string& localPla
 }
 
 void ExternalMediaAdapterEngineImpl::onLogoutComplete(const std::string& localPlayerId) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onLogoutComplete", {METRIC_EXTERNALMEDIAPLAYER_LOGOUT_COMPLETE});
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
 
@@ -422,6 +468,8 @@ void ExternalMediaAdapterEngineImpl::onLogoutComplete(const std::string& localPl
 }
 
 void ExternalMediaAdapterEngineImpl::onPlayerEvent(const std::string& localPlayerId, const std::string& eventName) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_EXTERNALMEDIAPLAYER_PLAYER_EVENT, eventName});
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
         // player has begun playing, acquire focus
@@ -479,6 +527,10 @@ void ExternalMediaAdapterEngineImpl::onPlayerError(
     long code,
     const std::string& description,
     bool fatal) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onPlayerError",
+        {METRIC_EXTERNALMEDIAPLAYER_PLAYER_ERROR, errorName, std::to_string(code)});
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
 
@@ -514,6 +566,7 @@ void ExternalMediaAdapterEngineImpl::onPlayerError(
 }
 
 void ExternalMediaAdapterEngineImpl::onSetFocus(const std::string& localPlayerId) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSetFocus", {METRIC_EXTERNALMEDIAPLAYER_SET_FOCUS});
     try {
         ThrowIfNot(setFocus(localPlayerId, true), "setFocusFailed");
     } catch (std::exception& ex) {
@@ -522,6 +575,8 @@ void ExternalMediaAdapterEngineImpl::onSetFocus(const std::string& localPlayerId
 }
 
 void ExternalMediaAdapterEngineImpl::onRemoveDiscoveredPlayer(const std::string& localPlayerId) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onRemoveDiscoveredPlayer", {METRIC_EXTERNALMEDIAPLAYER_REMOVE_DISCOVERED_PLAYER});
     try {
         ThrowIfNot(removeDiscoveredPlayer(localPlayerId), "removeDiscoveredPlayerFailed");
     } catch (std::exception& ex) {

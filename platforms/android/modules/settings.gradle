@@ -3,6 +3,11 @@ rootProject.name = 'aace'
 // Include all basic modules
 include ':alexa', ':apl', 'car-control', ':cbl', ':connectivity', ':contactuploader', ':core', ':maccandroid', ':messaging', ':navigation', ':phonecontrol', ':addressbook', ':text-to-speech', ':text-to-speech-provider'
 
+// Include APL render module if present
+if (file('./apl-render/src/main/libs/aplRelease.aar').exists()){
+  include ':apl-render'
+}
+
 // Include extra modules if any
 if (hasProperty('aace.extraModules')) {
 	for (String module : getProperty('aace.extraModules').split(',')) {

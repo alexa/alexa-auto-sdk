@@ -17,6 +17,7 @@
                 <category android:name="com.amazon.aacs.aasb.Navigation" />
                 <action android:name="com.amazon.aacs.aasb.StartNavigation"/>
                 <action android:name="com.amazon.aacs.aasb.CancelNavigation"/>
+                <action android:name="com.amazon.aacs.aasb.GetNavigationState"/>
             </intent-filter>
         </receiver>
 

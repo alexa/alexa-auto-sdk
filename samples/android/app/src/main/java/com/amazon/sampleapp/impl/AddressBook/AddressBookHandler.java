@@ -3,10 +3,12 @@ package com.amazon.sampleapp.impl.AddressBook;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v7.widget.SwitchCompat;
+import android.os.Environment;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.amazon.aace.addressbook.AddressBook;
 import com.amazon.aace.addressbook.IAddressBookEntriesFactory;
@@ -20,7 +22,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * The handler class which handles contact upload, cancel and delete.
@@ -32,8 +33,8 @@ public class AddressBookHandler extends AddressBook {
     private static final String sNavigationFavoritesSourceId = "0002";
     private static final String[] sSourceIds = {sContactsSourceId, sNavigationFavoritesSourceId};
 
-    private final String mContactsDataPath;
-    private final String mNavigationFavoritesDataPath;
+    public static final String CONTACTS_FILE_NAME = "Contacts.json";
+    public static final String NAVIGATION_FAVORITES_FILE_NAME = "NavigationFavorites.json";
 
     private View mContactsUploadView;
     private TextView mContactsUploadAccessStatus;
@@ -44,12 +45,12 @@ public class AddressBookHandler extends AddressBook {
     private final Activity mActivity;
     private final LoggerHandler mLogger;
 
-    public AddressBookHandler(final Activity activity, final LoggerHandler logger, final String contactsDataPath,
-            final String navigationFavoritesDataPath) {
+    private final File mSampleDataDir;
+
+    public AddressBookHandler(final Activity activity, final LoggerHandler logger, final File sampleDataDir) {
         mActivity = activity;
         mLogger = logger;
-        mContactsDataPath = contactsDataPath;
-        mNavigationFavoritesDataPath = navigationFavoritesDataPath;
+        mSampleDataDir = sampleDataDir;
     }
 
     public void onInitialize() {
@@ -181,52 +182,6 @@ public class AddressBookHandler extends AddressBook {
                 .show();
     }
 
-    private boolean parseNameFromContact(String id, JSONObject contact, IAddressBookEntriesFactory factory)
-            throws JSONException {
-        JSONObject fullname = contact.getJSONObject("name");
-        String firstname = fullname.getString("firstName");
-        String lastname = fullname.getString("lastName");
-        String nickname = fullname.getString("nickName");
-        return factory.addName(id, firstname, lastname, nickname);
-    }
-
-    private boolean parsePhoneNumbers(String id, JSONObject contact, IAddressBookEntriesFactory factory)
-            throws JSONException {
-        if (contact.has("phoneNumbers")) {
-            JSONArray phoneNumbers = contact.getJSONArray("phoneNumbers");
-            for (int j = 0; j < phoneNumbers.length(); ++j) {
-                JSONObject phoneNumber = phoneNumbers.getJSONObject(j);
-
-                String label = phoneNumber.getString("label");
-                String number = phoneNumber.getString("number");
-
-                if (!factory.addPhone(id, label, number)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean parsePostalAddress(String id, JSONObject contact, IAddressBookEntriesFactory factory)
-            throws JSONException {
-        JSONObject postalAddress = contact.getJSONObject("postalAddress");
-        String label = postalAddress.getString("label");
-        String addressLine1 = postalAddress.getString("addressLine1");
-        String addressLine2 = postalAddress.getString("addressLine2");
-        String addressLine3 = postalAddress.getString("addressLine3");
-        String city = postalAddress.getString("city");
-        String stateOrRegion = postalAddress.getString("stateOrRegion");
-        String districtOrCounty = postalAddress.getString("districtOrCounty");
-        String postalCode = postalAddress.getString("postalCode");
-        String country = postalAddress.getString("country");
-        double latitudeInDegrees = postalAddress.getDouble("latitudeInDegrees");
-        double longitudeInDegrees = postalAddress.getDouble("longitudeInDegrees");
-        double accuracyInMeters = postalAddress.getDouble("accuracyInMeters");
-        return factory.addPostalAddress(id, label, addressLine1, addressLine2, addressLine3, city, stateOrRegion,
-                districtOrCounty, postalCode, country, latitudeInDegrees, longitudeInDegrees, accuracyInMeters);
-    }
-
     private JSONObject parseFileAsJSONObject(String filePath) throws IOException, JSONException {
         mLogger.postInfo(sTag, String.format("parsing JSON from %s", filePath));
         File file = new File(filePath);
@@ -244,17 +199,23 @@ public class AddressBookHandler extends AddressBook {
             JSONArray contacts = json.getJSONArray("contacts");
             for (int i = 0; i < contacts.length(); ++i) {
                 JSONObject contact = contacts.getJSONObject(i);
+                JSONObject payload = new JSONObject();
+
                 String id = contact.getString("id");
-                if (!parseNameFromContact(id, contact, factory)) {
-                    mLogger.postError(sTag, String.format("parseNameFromContact returned false"));
+                if (id.isEmpty()) {
+                    mLogger.postError(sTag, String.format("contactsIdEmpty"));
                     return false;
+                }
+                payload.put("entryId", id);
+                payload.put("name", contact.getJSONObject("name"));
+
+                if (contact.has("phoneNumbers")) {
+                    payload.put("phoneNumbers", contact.getJSONArray("phoneNumbers"));
                 }
 
-                if (!parsePhoneNumbers(id, contact, factory)) {
-                    mLogger.postError(sTag, String.format("parsePhoneNumbers returned false"));
-                    return false;
-                }
+                factory.addEntry(payload.toString());
             }
+            return true;
         } catch (IOException e) {
             mLogger.postError(
                     sTag, String.format("Cannot read %s from assets directory. Error: %s", filename, e.getMessage()));
@@ -262,7 +223,7 @@ public class AddressBookHandler extends AddressBook {
             mLogger.postError(sTag, String.format("Cannot create json object. Error: %s", e.getMessage()));
         }
 
-        return true;
+        return false;
     }
 
     private boolean parseFileAsNavigationFavorites(String filename, IAddressBookEntriesFactory factory) {
@@ -271,17 +232,25 @@ public class AddressBookHandler extends AddressBook {
             JSONArray navigationFavorites = json.getJSONArray("navigationFavorites");
             for (int i = 0; i < navigationFavorites.length(); ++i) {
                 JSONObject navigationFavorite = navigationFavorites.getJSONObject(i);
+                JSONObject payload = new JSONObject();
+
                 String id = navigationFavorite.getString("id");
-                if (!parseNameFromContact(id, navigationFavorite, factory)) {
-                    mLogger.postError(sTag, String.format("parseNameFromNavigation returned false"));
+                if (id.isEmpty()) {
+                    mLogger.postError(sTag, String.format("navigationFavoriteIdEmpty"));
                     return false;
                 }
 
-                if (!parsePostalAddress(id, navigationFavorite, factory)) {
-                    mLogger.postError(sTag, String.format("parsePostalAddress returned false"));
-                    return false;
+                payload.put("entryId", id);
+                payload.put("name", navigationFavorite.getJSONObject("name"));
+
+                if (navigationFavorite.has("postalAddress")) {
+                    JSONArray postalAddresses = new JSONArray();
+                    postalAddresses.put(navigationFavorite.getJSONObject("postalAddress"));
+                    payload.put("postalAddresses", postalAddresses);
                 }
+                factory.addEntry(payload.toString());
             }
+            return true;
         } catch (IOException e) {
             mLogger.postError(
                     sTag, String.format("Cannot read %s from assets directory. Error: %s", filename, e.getMessage()));
@@ -289,20 +258,37 @@ public class AddressBookHandler extends AddressBook {
             mLogger.postError(sTag, String.format("Cannot create json object. Error: %s", e.getMessage()));
         }
 
-        return true;
+        return false;
     }
 
     @Override
     public boolean getEntries(String contactsSourceId, IAddressBookEntriesFactory factory) {
         boolean success = false;
+
         if (contactsSourceId.equals(sContactsSourceId)) {
-            success = parseFileAsContacts(mContactsDataPath, factory);
+            // Always use sample data from external storage if available
+            File contactsFile = new File(Environment.getExternalStorageDirectory(), CONTACTS_FILE_NAME);
+            if (!contactsFile.exists()) {
+                // Use the default from the assets folder
+                contactsFile = new File(mSampleDataDir, CONTACTS_FILE_NAME);
+            }
+
+            success = parseFileAsContacts(contactsFile.getPath(), factory);
         } else if (contactsSourceId.equals(sNavigationFavoritesSourceId)) {
-            success = parseFileAsNavigationFavorites(mNavigationFavoritesDataPath, factory);
+            // Always use sample data from external storage if available
+            File navigationFavoritesFile =
+                    new File(Environment.getExternalStorageDirectory(), NAVIGATION_FAVORITES_FILE_NAME);
+            if (!navigationFavoritesFile.exists()) {
+                // Use the default from the assets folder
+                navigationFavoritesFile = new File(mSampleDataDir, NAVIGATION_FAVORITES_FILE_NAME);
+            }
+
+            success = parseFileAsNavigationFavorites(navigationFavoritesFile.getPath(), factory);
         }
 
         mLogger.postInfo(sTag,
-                String.format("success status of adding contacts with ID: (%s): (%b)", contactsSourceId, success));
+                String.format(
+                        "success status of adding contacts/navigation with ID: (%s): (%b)", contactsSourceId, success));
         return success;
     }
 

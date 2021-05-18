@@ -13,12 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-
 #include "AACE/Engine/PhoneCallController/PhoneCallControllerRESTAgent.h"
 
 #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
@@ -27,6 +21,7 @@
 #include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
 #include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include "AACE/Engine/Utils/JSON/JSON.h"
 
 namespace aace {
 namespace engine {
@@ -198,14 +193,8 @@ static std::string convertHTTPErrorStringForLogging(
 static std::string buildAutoAccountProvisionJson() {
     rapidjson::Document document;
     document.SetObject();
-
     document.AddMember("autoProvision", rapidjson::Value().SetBool(true), document.GetAllocator());
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-    return (std::string(buffer.GetString()));
+    return aace::engine::utils::json::toString(document);
 }
 
 /**

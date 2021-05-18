@@ -60,7 +60,9 @@ JNIEXPORT jboolean JNICALL Java_com_amazon_aace_addressbook_IAddressBookEntriesF
     jstring entryId,
     jstring firstName,
     jstring lastName,
-    jstring nickName) {
+    jstring nickName,
+    jstring phoneticFirstName,
+    jstring phoneticLastName) {
     try {
         auto iAddressBookEntriesFactoryBinder = I_ADDRESS_BOOK_ENTRIES_FACTORY_BINDER(ref);
         ThrowIfNull(iAddressBookEntriesFactoryBinder, "invalidIAddressBookEntriesFactoryBinder");
@@ -69,7 +71,9 @@ JNIEXPORT jboolean JNICALL Java_com_amazon_aace_addressbook_IAddressBookEntriesF
             JString(entryId).toStdStr(),
             JString(firstName).toStdStr(),
             JString(lastName).toStdStr(),
-            JString(nickName).toStdStr()));
+            JString(nickName).toStdStr(),
+            JString(phoneticFirstName).toStdStr(),
+            JString(phoneticLastName).toStdStr()));
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_addressbook_IAddressBookEntriesFactory_addName", ex.what());
         return false;
@@ -135,6 +139,23 @@ JNIEXPORT jboolean JNICALL Java_com_amazon_aace_addressbook_IAddressBookEntriesF
                 accuracyInMeters));
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_addressbook_IAddressBookEntriesFactory_addPostalAddress", ex.what());
+        return false;
+    }
+}
+
+JNIEXPORT jboolean JNICALL Java_com_amazon_aace_addressbook_IAddressBookEntriesFactory_addEntry(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring payload) {
+    try {
+        auto iAddressBookEntriesFactoryBinder = I_ADDRESS_BOOK_ENTRIES_FACTORY_BINDER(ref);
+        ThrowIfNull(iAddressBookEntriesFactoryBinder, "invalidIAddressBookEntriesFactoryBinder");
+
+        return static_cast<jboolean>(
+            iAddressBookEntriesFactoryBinder->getIAddressBookEntriesFactory()->addEntry(JString(payload).toStdStr()));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_addressbook_IAddressBookEntriesFactory_addEntry", ex.what());
         return false;
     }
 }

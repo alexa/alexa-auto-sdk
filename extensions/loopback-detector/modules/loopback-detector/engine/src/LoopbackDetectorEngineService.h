@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: LicenseRef-.amazon.com.-ASL-1.0
  *
@@ -21,7 +21,7 @@
 #include <memory>
 #include <AACE/Engine/Core/EngineService.h>
 #include <AACE/Engine/Alexa/AlexaEngineService.h>
-#include <AACE/Engine/Alexa/WakewordVerifier.h>
+#include <AACE/Engine/Alexa/InitiatorVerifier.h>
 
 namespace aace {
 namespace engine {
@@ -43,7 +43,7 @@ private:
     bool prepareVerifier();
 
     std::string m_wakewordEngineName;
-    std::shared_ptr<alexa::WakewordVerifier> m_wakewordVerifier;
+    std::shared_ptr<alexa::InitiatorVerifier> m_initiatorVerifier;
 };
 
 }  // namespace loopbackDetector

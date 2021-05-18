@@ -13,15 +13,26 @@
  * permissions and limitations under the License.
  */
 
+#include <sstream>
+
 #include "AACE/Engine/Network/NetworkInfoProviderEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace network {
 
+using namespace aace::engine::utils::metrics;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.core.NetworkInfoProviderEngineImpl");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "NetworkInfoProviderEngineImpl";
+
+/// Counter metrics for Network Info provider
+static const std::string METRIC_NETWORK_INFO_PROVIDER_NETWORK_STATUS_CHANGED = "NetworkStatusChanged";
 
 std::shared_ptr<NetworkInfoProviderEngineImpl> NetworkInfoProviderEngineImpl::create() {
     try {
@@ -46,6 +57,12 @@ void NetworkInfoProviderEngineImpl::removeObserver(std::shared_ptr<NetworkInfoOb
 }
 
 void NetworkInfoProviderEngineImpl::networkInfoChanged(NetworkStatus status, int wifiSignalStrength) {
+    std::stringstream networkStatus;
+    networkStatus << status;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "networkInfoChanged",
+        {METRIC_NETWORK_INFO_PROVIDER_NETWORK_STATUS_CHANGED, networkStatus.str()});
     std::lock_guard<std::mutex> lock(m_mutex);
 
     for (const auto& next : m_observers) {

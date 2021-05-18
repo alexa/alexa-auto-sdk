@@ -36,7 +36,7 @@
     "zones":[]
   },
   "aacs.aasb": {
-    "version": "3.1"
+    "version": "3.2"
   },
   "aacs.general" : {
     "version": "1.0",
@@ -116,7 +116,17 @@
             "package": [], 
             "class": []
         },
-        "Connectivity" : {
+        "AlexaConnectivity" : {
+            "type": [],
+            "package": [],
+            "class": []
+        },
+        "DeviceSetup" : {
+            "type": [],
+            "package": [],
+            "class": []
+        },
+        "DeviceUsage" : {
             "type": [],
             "package": [],
             "class": []
@@ -191,17 +201,18 @@
             "package": [], 
             "class": []
         },
-      "TextToSpeech" : {
-        "type": [],
-        "package": [],
-        "class": []
-      }
+        "TextToSpeech" : {
+          "type": [],
+          "package": [],
+          "class": []
+        }
     }
   },
   "aacs.defaultPlatformHandlers": {
     "useDefaultLocationProvider": true,
     "useDefaultNetworkInfoProvider": true,
     "useDefaultExternalMediaAdapter": true,
+    "useDefaultPropertyManager": true,
     "audioInput": {
       "audioType": {
         "VOICE": {

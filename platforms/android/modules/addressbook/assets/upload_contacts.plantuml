@@ -1,0 +1,54 @@
+@startuml
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+actor Driver Order 10
+participant PhoneCallControllerHandler  order 20
+participant AddressBookHandler  order 30
+participant "Auto SDK"  as AutoSDK  <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+note right of Driver
+connects phone to car
+head unit and
+grants access to upload
+end note
+
+Driver -> AddressBookHandler
+AddressBookHandler -> AutoSDK: addAddressBook (UNIQUE_ID, "MyPhone",AddressBookType::CONTACT)
+...
+
+AutoSDK -> AddressBookHandler: getEntries (UNIQUE_ID, factory)
+loop for each contact
+AddressBookHandler -> AutoSDK: factory.addEntry("<json-with-name-and-phone-number>")
+end
+
+AddressBookHandler --> AutoSDK: getEntries call returns with "true"
+...
+AutoSDK -> Alexa: uploads contacts
+...
+
+note right of Driver
+"call bob"
+end note
+
+Driver -> Alexa
+
+Alexa -> AutoSDK: dail directive
+
+AutoSDK -> PhoneCallControllerHandler: dail(payload wtih Bob's details)
+
+@enduml

@@ -29,7 +29,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ConnectivityEngineService.cpp
 )
 
-set(SOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 source_group("Header Files" FILES ${HEADERS})
 
@@ -40,7 +40,7 @@ add_library(AACEConnectivityEngine SHARED
 
 target_include_directories(AACEConnectivityEngine
     PUBLIC
-        $<BUILD_INTERFACE:${SOURCES_DIR}>
+        $<BUILD_INTERFACE:${INCLUDE_DIR}>
         $<INSTALL_INTERFACE:include>
     PRIVATE
         ${AVS_INCLUDE_DIRS}

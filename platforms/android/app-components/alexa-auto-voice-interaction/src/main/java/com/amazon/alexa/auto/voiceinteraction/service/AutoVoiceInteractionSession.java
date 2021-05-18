@@ -21,7 +21,10 @@ import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.aacs.common.SpeechRecognizerMessages;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.AnimationProvider;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.EarconProvider;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
+import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.voiceinteraction.R;
 import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
@@ -35,7 +38,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 import java.util.Optional;
 
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -45,7 +47,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
  * to interact with the user in the voice interaction layer.
  */
 public class AutoVoiceInteractionSession extends VoiceInteractionSession {
-    private static final String TAG = AutoVoiceInteractionSession.class.getSimpleName();
+    private static final String TAG = AutoVoiceInteractionSession.class.getCanonicalName();
 
     @NonNull
     private final WeakReference<Context> mApplicationContext;
@@ -59,11 +61,16 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
     @VisibleForTesting
     @NonNull
     SpeechRecognizerMessages mSpeechRecognizerMessages;
+    @VisibleForTesting
     @NonNull
     EarconController mEarconController;
 
     @VisibleForTesting
     View mContentView;
+
+    AnimationProvider mAnimationProvider;
+    EarconProvider mEarconProvider;
+
     private boolean mVoiceSessionInUse;
     private boolean mSessionEnded;
     private Disposable mViewControllerDisposable;
@@ -85,6 +92,7 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
         super.onCreate();
         EventBus.getDefault().register(this);
         mEarconController.initEarcon();
+        initializeProviders();
     }
 
     @Override
@@ -94,9 +102,11 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
         EventBus.getDefault().unregister(this);
         mEarconController.uninitEarcon();
         mAutoVoiceChromeController.onDestroy();
+
+        uninitializeProviders();
+
         AlexaApp.from(getContext())
                 .getRootComponent()
-                .getScopedComponents()
                 .getComponent(SessionViewController.class)
                 .ifPresent(sessionViewController -> sessionViewController.setSessionView(null));
         if (mViewControllerDisposable != null) {
@@ -111,17 +121,38 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
         super.onShow(args, showFlags);
 
         if (args.containsKey(Topic.SPEECH_RECOGNIZER)) {
-            if (Objects.equals(args.getString(Topic.SPEECH_RECOGNIZER), Action.SpeechRecognizer.START_CAPTURE)) {
-                mEarconController.playAudioCueStartTouch();
-            } else if (Objects.equals(
-                               args.getString(Topic.SPEECH_RECOGNIZER), Action.SpeechRecognizer.WAKEWORD_DETECTED)) {
-                mEarconController.playAudioCueStartVoice();
+            String action = args.getString(Topic.SPEECH_RECOGNIZER);
+            if (mEarconProvider != null) {
+                if (Action.SpeechRecognizer.WAKEWORD_DETECTED.equals(action)) {
+                    mEarconController.playAudioCueStartVoice(
+                            mEarconProvider.shouldUseAudioCueStartVoice(args.getString(action)));
+                }
+            } else {
+                if (Action.SpeechRecognizer.WAKEWORD_DETECTED.equals(action)) {
+                    mEarconController.playAudioCueStartVoice();
+                }
             }
-            mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
+
+            if (mAnimationProvider != null) {
+                switchAnimation(AutoVoiceChromeState.LISTENING.toString());
+            } else {
+                mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
+            }
         } else if (args.containsKey(Constants.TOPIC_ALEXA_CONNECTION)) {
-            if (Objects.equals(
-                        args.getString(Constants.TOPIC_ALEXA_CONNECTION), Constants.ACTION_ALEXA_NOT_CONNECTED)) {
+            if (Constants.ACTION_ALEXA_NOT_CONNECTED.equals(args.getString(Constants.TOPIC_ALEXA_CONNECTION))) {
                 mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IN_ERROR);
+            }
+        } else {
+            // User presses PTT, notifying AACS to start capture
+            mSpeechRecognizerMessages.sendStartCapture(AASBConstants.SpeechRecognizer.SPEECH_INITIATOR_TAP_TO_TALK);
+            mEarconController.playAudioCueStartTouch();
+
+            if (mAnimationProvider != null) {
+                // Prepare animation for PTT action
+                mAnimationProvider.prepareAnimationForPTT();
+                switchAnimation(AutoVoiceChromeState.LISTENING.toString());
+            } else {
+                mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
             }
         }
     }
@@ -135,8 +166,16 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
         ViewGroup v = (ViewGroup) mContentView;
 
         // Getting voice chrome view group for auto voice chrome controller
-        ViewGroup child = (ViewGroup) v.getChildAt(1);
-        mAutoVoiceChromeController.initialize(child);
+        ViewGroup autoVoiceChromeBarView = (ViewGroup) v.getChildAt(1);
+        mAutoVoiceChromeController.initialize(autoVoiceChromeBarView);
+
+        // Initializing animation provider if it exists
+        if (mAnimationProvider != null) {
+            // Inflate custom animation layout onto the root view
+            getLayoutInflater().inflate(mAnimationProvider.getCustomLayout(), v);
+            ViewGroup autoCustomAnimationView = (ViewGroup) v.getChildAt(2);
+            mAnimationProvider.initialize(getContext(), autoCustomAnimationView);
+        }
 
         // TODO: we provide user a way to cancel Alexa voice request anytime needed, now it can be anywhere on the
         // screen,
@@ -168,7 +207,7 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
 
         AlexaApp app = AlexaApp.from(getContext());
         Optional<SessionViewController> viewController =
-                app.getRootComponent().getScopedComponents().getComponent(SessionViewController.class);
+                app.getRootComponent().getComponent(SessionViewController.class);
 
         viewController.ifPresent(sessionViewController -> {
             sessionViewController.setSessionView(view);
@@ -199,8 +238,6 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
             @Nullable Bundle data, @Nullable AssistStructure structure, @Nullable AssistContent content) {
         Log.d(TAG, "onHandleAssist");
         super.onHandleAssist(data, structure, content);
-
-        mSpeechRecognizerMessages.sendStartCapture(AASBConstants.SpeechRecognizer.SPEECH_INITIATOR_TAP_TO_TALK);
     }
 
     @Subscribe
@@ -208,20 +245,75 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
         Log.d(TAG,
                 "Receiving voice interaction message, topic: " + message.getTopic()
                         + " action: " + message.getAction());
-        if (message.getTopic().equals(Constants.TOPIC_VOICE_CHROME)) {
-            mAutoVoiceChromeController.onStateChanged(convertToAutoVoiceChromeDialogState(message.getAction()));
 
-            if (message.getAction().equals(AutoVoiceChromeState.IDLE.toString())) {
-                mSessionEnded = true;
-                if (!mVoiceSessionInUse) {
-                    Log.d(TAG, "voice session idle, so finishing voice session.");
-                    finish();
-                }
-            } else if (message.getAction().equals(AutoVoiceChromeState.LISTENING.toString())) {
-                mSessionEnded = false;
+        if (message.getTopic().equals(Constants.TOPIC_VOICE_ANIMATION)) {
+            switch (message.getAction()) {
+                case Action.AlexaClient.DIALOG_STATE_CHANGED:
+                    if (mAnimationProvider != null) {
+                        // Switching animation for dialog state changed
+                        switchAnimation(message.getPayload());
+                    } else {
+                        mAutoVoiceChromeController.onStateChanged(
+                                convertToAutoVoiceChromeDialogState(message.getPayload()));
+                    }
+
+                    if (message.getAction().equals(AutoVoiceChromeState.IDLE.toString())) {
+                        mSessionEnded = true;
+                        if (!mVoiceSessionInUse) {
+                            Log.d(TAG, "voice session idle, so finishing voice session.");
+                            finish();
+                        }
+                    } else if (message.getAction().equals(AutoVoiceChromeState.LISTENING.toString())) {
+                        mSessionEnded = false;
+                    }
+                    break;
+                case Action.Animation.ANIMATION_SWITCH:
+                    if (mAnimationProvider != null) {
+                        switchAnimation(AutoVoiceChromeState.SPEAKING.toString());
+                    }
             }
         } else if (message.getAction().equals(Action.SpeechRecognizer.END_OF_SPEECH_DETECTED)) {
-            mEarconController.playAudioCueEnd();
+            if (mEarconProvider != null) {
+                mEarconController.playAudioCueEnd(mEarconProvider.shouldUseAudioCueEnd(""));
+            } else {
+                mEarconController.playAudioCueEnd();
+            }
+        }
+    }
+
+    private void initializeProviders() {
+        if (getContext() != null) {
+            AlexaApp app = AlexaApp.from(getContext());
+            AlexaAppRootComponent alexaAppRootComponent = app.getRootComponent();
+            if (alexaAppRootComponent != null
+                    && alexaAppRootComponent.getComponent(AnimationProvider.class).isPresent()) {
+                mAnimationProvider = alexaAppRootComponent.getComponent(AnimationProvider.class).get();
+            }
+            if (alexaAppRootComponent != null && alexaAppRootComponent.getComponent(EarconProvider.class).isPresent()) {
+                mEarconProvider = alexaAppRootComponent.getComponent(EarconProvider.class).get();
+            }
+        }
+    }
+
+    private void uninitializeProviders() {
+        if (mAnimationProvider != null) {
+            mAnimationProvider = null;
+        }
+
+        if (mEarconProvider != null) {
+            mEarconProvider = null;
+        }
+    }
+
+    private void switchAnimation(String dialogState) {
+        if (mAnimationProvider.shouldTakeOver()) {
+            // Clear alexa chrome before switching to custom animation provider
+            mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IDLE);
+            mAnimationProvider.doTakeOver(dialogState);
+        } else {
+            // Clear custom animation provider before switching to alexa chrome
+            mAnimationProvider.doTakeOver(AutoVoiceChromeState.IDLE.toString());
+            mAutoVoiceChromeController.onStateChanged(convertToAutoVoiceChromeDialogState(dialogState));
         }
     }
 

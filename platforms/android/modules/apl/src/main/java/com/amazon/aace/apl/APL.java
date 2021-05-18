@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import com.amazon.aace.core.PlatformInterface;
  * APL should be extended to handle receiving Alexa Presentation @c RenderDocument and @c ExecuteCommands directives
  * from AVS. These directives contain metadata for rendering or operating on display cards for devices with GUI support.
  * For more information about Alexa Presentation Language (APL) see the interface overview:
+ *
  * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html
+ *
  */
 abstract public class APL extends PlatformInterface {
     public APL() {}
@@ -79,15 +81,6 @@ abstract public class APL extends PlatformInterface {
     }
 
     /**
-     * Retrieve the visual context from the platform implementation.
-     *
-     * @return the current VisualContext payload.
-     */
-    public String getVisualContext() {
-        return "";
-    }
-
-    /**
      * Notifies the platform implementation that a @c RenderDocument directive has been received. Once called, the
      * client should render the document based on the APL specification in the payload in structured JSON format.
      *
@@ -96,7 +89,7 @@ abstract public class APL extends PlatformInterface {
      *
      * @param [in] jsonPayload The payload of the Alexa.Presentation.APL.RenderDocument directive which follows the APL
      *         specification.
-     * @param [in] token The APL presentation token associated with this payload.
+     * @param [in] token The APL presentation token associated with the document in the payload.
      * @param [in] windowId The target windowId.
      */
     public void renderDocument(String jsonPayload, String token, String windowId) {}
@@ -104,22 +97,38 @@ abstract public class APL extends PlatformInterface {
     /**
      * Notifies the platform implementation when the client should clear the APL display card.
      * Once the card is cleared, the platform implementation should call clearCard().
+     *
+     * @param [in] token The APL presentation token associated with the current rendered document.
      */
-    public void clearDocument() {}
+    public void clearDocument(String token) {}
 
     /**
      * Notifies the platform implementation that an ExecuteCommands directive has been received.
      *
      * @param [in] jsonPayload The payload of the Alexa.Presentation.APL.ExecuteCommands directive in structured JSON
      *         format.
-     * @param [in] token Directive token used to bind result processing.
+     * @param [in] token The APL presentation token associated with the current rendered document.
      */
     public void executeCommands(String jsonPayload, String token) {}
 
     /**
-     * Notifies the platform implementation that a command execution sequence should be interrupted.
+     * Notifies the platform implementation of a dynamic data source update. Please refer to
+     * APL documentation for more information.
+     *
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-data-source.html
+     *
+     * @param [in] sourceType DataSource type.
+     * @param [in] jsonPayload The payload of the directive in structured JSON format.
+     * @param [in] token The APL presentation token associated with the current rendered document.
      */
-    public void interruptCommandSequence() {}
+    public void dataSourceUpdate(String sourceType, String jsonPayload, String token) {}
+
+    /**
+     * Notifies the platform implementation that a command execution sequence should be interrupted.
+     *
+     * @param [in] token The APL presentation token associated with the current rendered document.
+     */
+    public void interruptCommandSequence(String token) {}
 
     /**
      * Notifies the Engine to clear the card from the screen and release any focus being held.
@@ -136,13 +145,41 @@ abstract public class APL extends PlatformInterface {
     }
 
     /**
-     * Notifies the Engine to send @c UserEvent to AVS.
+     * Notifies the Engine to send @c UserEvent event to AVS.
+     *
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-interface.html#userevent-request
      *
      * @param [in] payload The @c UserEvent event payload. The caller of this
      * function is responsible to pass the payload as it defined by AVS.
      */
     final protected void sendUserEvent(String payload) {
         sendUserEvent(getNativeRef(), payload);
+    }
+
+    /**
+     * Notifies the Engine to send a @c LoadIndexListData event to AVS.
+     *
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-interface.html#loadindexlistdata-request
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-data-source.html
+     *
+     * @param type The type of data source fetch request. The only supported value is "dynamicIndexList".
+     * @param payload The @c DataSourceFetchRequest event payload. The caller of this
+     * function is responsible to pass the payload as defined by AVS.
+     */
+    final protected void sendDataSourceFetchRequestEvent(String type, String payload) {
+        sendDataSourceFetchRequestEvent(getNativeRef(), type, payload);
+    }
+
+    /**
+     * Notifies the Engine to send an APL @c RuntimeError event to AVS
+     *
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/apl-interface.html#runtimeerror-request
+     *
+     * @param payload The @c RuntimeError event payload. The caller of this
+     * function is responsible to pass the payload as defined by AVS.
+     */
+    final protected void sendRuntimeErrorEvent(String payload) {
+        sendRuntimeErrorEvent(getNativeRef(), payload);
     }
 
     /**
@@ -155,7 +192,8 @@ abstract public class APL extends PlatformInterface {
     }
 
     /**
-     * Set a custom document idle timeout.
+     * Set a custom document idle timeout. When the idle timeout is reached,
+     * @c clearDocument will be called.
      *
      * @param [in] documentIdleTimeout The timeout in milliseconds.
      * @note Will be reset for every directive received from AVS.
@@ -167,7 +205,7 @@ abstract public class APL extends PlatformInterface {
     /**
      * Notifies the Engine with the result of a @c renderDocument notification.
      *
-     * @param [in] token The document presentation token.
+     * @param [in] token The APL presentation token associated with the current rendered document.
      * @param [in] result Rendering result (true on executed, false on exception).
      * @param [in] error Error message provided in case result is false.
      */
@@ -178,7 +216,7 @@ abstract public class APL extends PlatformInterface {
     /**
      * Notifies the Engine with the result of an @c executeCommands notification.
      *
-     * @param [in] token The document presentation token.
+     * @param [in] token The APL presentation token associated with the current rendered document.
      * @param [in] result Rendering result (true on executed, false on exception).
      * @param [in] error Error message provided in case result is false.
      */
@@ -187,13 +225,41 @@ abstract public class APL extends PlatformInterface {
     }
 
     /**
-     * Notifies the Engine of an activity change event.
+     * Notifies the Engine of an activity change event. The APL runtime can
+     * report whether the rendered document is active or inactive. If active,
+     * the idle timer is stopped and prevents @c clearDocument. If inactive, the
+     * idle timer is started and @c clearDocument will be called after timer expiration.
      *
      * @param [in] source The source of the activity event.
      * @param [in] event The activity change event.
      */
     final protected void processActivityEvent(String token, ActivityEvent event) {
         processActivityEvent(getNativeRef(), token, event);
+    }
+    /**
+     * Notifies the Engine of rendered document state. The format of the state is
+     * a JSON string representing the payload object of the @c RenderedDocumentState
+     * sent with APL events.
+     *
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/presentation-apl.html#rendereddocumentstate
+     *
+     * @param [in] state The visual state of the rendered components.
+     */
+    final protected void sendDocumentState(String state) {
+        sendDocumentState(getNativeRef(), state);
+    }
+
+    /**
+     * Notifies the Engine of the current window state. The format of the state is
+     * a JSON string representing the payload object of the @c WindowState
+     * context sent for the @c Alexa.Display.Window interface.
+     *
+     * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/display-window.html#windowstate-context-object
+     *
+     * @param [in] state The window state context object.
+     */
+    final protected void sendDeviceWindowState(String state) {
+        sendDeviceWindowState(getNativeRef(), state);
     }
 
     // NativeRef implementation
@@ -211,9 +277,13 @@ abstract public class APL extends PlatformInterface {
     private native void clearCard(long nativeRef);
     private native void clearAllExecuteCommands(long nativeRef);
     private native void sendUserEvent(long nativeRef, String payload);
+    private native void sendDataSourceFetchRequestEvent(long nativeRef, String type, String payload);
+    private native void sendRuntimeErrorEvent(long nativeRef, String payload);
     private native void setAPLMaxVersion(long nativeRef, String aplMaxVersion);
     private native void setDocumentIdleTimeout(long nativeRef, long documentIdleTimeout);
     private native void renderDocumentResult(long nativeRef, String token, boolean result, String error);
     private native void executeCommandsResult(long nativeRef, String token, boolean result, String error);
     private native void processActivityEvent(long nativeRef, String token, ActivityEvent event);
+    private native void sendDocumentState(long nativeRef, String state);
+    private native void sendDeviceWindowState(long nativeRef, String state);
 }

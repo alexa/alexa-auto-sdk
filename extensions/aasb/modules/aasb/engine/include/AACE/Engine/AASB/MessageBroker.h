@@ -73,6 +73,8 @@ public:
     PublishMessage publish(const std::string& message, Message::Direction direction = Message::Direction::OUTGOING)
         override;
 
+    void setMessageTimeout(const std::chrono::milliseconds& value);
+
 private:
     // executor for deferred asynchronous message sending
     aace::engine::utils::threading::Executor m_incomingMessageExecutor;
@@ -85,6 +87,9 @@ private:
     std::mutex m_pub_sub_mutex;
     std::mutex m_promise_map_access_mutex;
     std::unordered_map<std::string, std::shared_ptr<SyncPromiseType>> m_syncMessagePromiseMap;
+
+    // message time out
+    std::chrono::milliseconds m_timeout;
 };
 
 }  // namespace aasb

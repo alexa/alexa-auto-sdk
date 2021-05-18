@@ -43,6 +43,8 @@ void from_json(const json& j, Name& p) {
     j.at("firstName").get_to(p.firstName);
     j.at("lastName").get_to(p.lastName);
     j.at("nickName").get_to(p.nickName);
+    if (j.contains("phoneticFirstName")) j.at("phoneticFirstName").get_to(p.phoneticFirstName);
+    if (j.contains("phoneticLastName")) j.at("phoneticLastName").get_to(p.phoneticLastName);
 }
 
 void from_json(const json& j, PostalAddress& p) {
@@ -210,32 +212,62 @@ bool AddressBookHandler::getEntries(
     if (auto factory = contactFactory.lock()) {
         if (addressBookId == CONTACTS_ID) {
             for (auto&& contact : m_contacts) {
-                auto& name = contact.name;
-                factory->addName(contact.id, name.firstName, name.lastName, name.nickName);
-                for (auto&& phone : contact.phoneNumbers) {
-                    factory->addPhone(contact.id, phone.label, phone.number);
+                json payload;
+                payload["entryId"] = contact.id;
+                payload["name"] = json::object();
+                auto& nameNode = payload["name"];
+
+                if (!contact.name.firstName.empty()) nameNode["firstName"] = contact.name.firstName;
+                if (!contact.name.lastName.empty()) nameNode["lastName"] = contact.name.lastName;
+                if (!contact.name.nickName.empty()) nameNode["nickName"] = contact.name.nickName;
+                if (!contact.name.phoneticFirstName.empty())
+                    nameNode["phoneticFirstName"] = contact.name.phoneticFirstName;
+                if (!contact.name.phoneticLastName.empty())
+                    nameNode["phoneticLastName"] = contact.name.phoneticLastName;
+
+                if (contact.phoneNumbers.size() > 0) {
+                    payload["phoneNumbers"] = json::array();
                 }
+
+                for (auto&& phone : contact.phoneNumbers) {
+                    // clang-format off
+                payload["phoneNumbers"].push_back({
+                    {"label", phone.label},
+                    {"number", phone.number}
+                });
+                    // clang-format on
+                }
+                factory->addEntry(payload.dump());
             }
             return true;
         } else if (addressBookId == NAVIGATION_FAVORITES_ID) {
             for (auto&& navigationFavorite : m_navigationFavorites) {
-                auto& name = navigationFavorite.name;
-                factory->addName(navigationFavorite.id, name.firstName);
-                auto& address = navigationFavorite.postalAddress;
-                factory->addPostalAddress(
-                    navigationFavorite.id,
-                    address.label,
-                    address.addressLine1,
-                    address.addressLine2,
-                    address.addressLine3,
-                    address.city,
-                    address.stateOrRegion,
-                    address.districtOrCounty,
-                    address.postalCode,
-                    address.country,
-                    address.latitudeInDegrees,
-                    address.longitudeInDegrees,
-                    address.accuracyInMeters);
+                json payload;
+                payload["entryId"] = navigationFavorite.id;
+                payload["name"] = json::object();
+                auto& nameNode = payload["name"];
+
+                if (!navigationFavorite.name.firstName.empty())
+                    nameNode["firstName"] = navigationFavorite.name.firstName;
+                if (!navigationFavorite.name.phoneticFirstName.empty())
+                    nameNode["phoneticFirstName"] = navigationFavorite.name.phoneticFirstName;
+
+                payload["postalAddresses"] = json::array();
+                json postalAddress = {{"label", navigationFavorite.postalAddress.label},
+                                      {"addressLine1", navigationFavorite.postalAddress.addressLine1},
+                                      {"addressLine2", navigationFavorite.postalAddress.addressLine2},
+                                      {"addressLine3", navigationFavorite.postalAddress.addressLine3},
+                                      {"city", navigationFavorite.postalAddress.city},
+                                      {"stateOrRegion", navigationFavorite.postalAddress.stateOrRegion},
+                                      {"districtOrCounty", navigationFavorite.postalAddress.districtOrCounty},
+                                      {"postalCode", navigationFavorite.postalAddress.postalCode},
+                                      {"country", navigationFavorite.postalAddress.country},
+                                      {"latitudeInDegrees", navigationFavorite.postalAddress.latitudeInDegrees},
+                                      {"longitudeInDegrees", navigationFavorite.postalAddress.longitudeInDegrees},
+                                      {"accuracyInMeters", navigationFavorite.postalAddress.accuracyInMeters}};
+
+                payload["postalAddresses"].push_back(postalAddress);
+                factory->addEntry(payload.dump());
             }
             return true;
         } else {

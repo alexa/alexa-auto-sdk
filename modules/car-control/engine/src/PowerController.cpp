@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ PowerController::PowerController(const std::string& endpointId, const std::strin
 
 void PowerController::build(
     std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
-    std::unique_ptr<EndpointBuilder>& builder) {
+    std::unique_ptr<EndpointBuilderInterface>& builder) {
     m_carControlServiceInterface = carControlServiceInterface;
     builder->withPowerController(shared_from_this(), false, false);
 }

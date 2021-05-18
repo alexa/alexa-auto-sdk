@@ -47,6 +47,7 @@ public class MACCAndroidClient {
     private final DiscoverAndReportMediaAppsHandler mDiscoverAndReportMediaAppshandler;
     private MACCAndroidClientCallback mMACCAndroidClientCallback;
     private final SupportedOperations mSupportedOperations;
+    private boolean isPackageChangedReceiverRegistered = false;
 
     /**
      * App initiated connection to  MACCAndroidClient
@@ -114,10 +115,22 @@ public class MACCAndroidClient {
 
     public void cleanup() {
         Log.i(TAG, "unregistering mPackageChangedReceiver & mAppInitiatedBroadcastReceiver");
-        if (mAppInitiatedBroadcastReceiver != null)
-            mContext.unregisterReceiver(mAppInitiatedBroadcastReceiver);
-        if (mPackageChangedReceiver != null)
-            mContext.unregisterReceiver(mPackageChangedReceiver);
+        try {
+            if (mAppInitiatedBroadcastReceiver != null)
+                mContext.unregisterReceiver(mAppInitiatedBroadcastReceiver);
+
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG,
+                    "Exception while unregistering AppInitiatedBroadcastReceiver most likely because its not registered.");
+        }
+        try {
+            if (mPackageChangedReceiver != null && isPackageChangedReceiverRegistered) {
+                mContext.unregisterReceiver(mPackageChangedReceiver);
+                isPackageChangedReceiverRegistered = false;
+            }
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "Exception while unregistering PackageChangedReceiver most likely because its not registered.");
+        }
     }
 
     /**
@@ -220,6 +233,7 @@ public class MACCAndroidClient {
         intentFilter.addAction(Intent.ACTION_PACKAGE_REMOVED);
         intentFilter.addDataScheme("package");
         mContext.registerReceiver(mPackageChangedReceiver, intentFilter);
+        isPackageChangedReceiverRegistered = true;
     }
 
     public void requestToken(String localPlayerId) {

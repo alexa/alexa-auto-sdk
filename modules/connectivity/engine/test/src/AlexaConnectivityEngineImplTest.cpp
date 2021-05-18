@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -79,7 +79,9 @@ public:
 
         // Mock the ConnectivityHandler and NetworkIdentifier.
         m_mockConnectivityHandler = std::make_shared<StrictMock<MockAlexaConnectivity>>();
-        m_mockNetworkIdentifier = "DummyNetworkIdentifier";
+
+        // Mock the vehicle identifier.
+        m_mockVehicleIdentifier = "SAMPLE123";
 
         // Initialization succeeded.
         m_initialized = true;
@@ -109,7 +111,7 @@ protected:
         }
 
         auto alexaConnectivityEngineImpl = aace::engine::connectivity::AlexaConnectivityEngineImpl::create(
-            mockConnectivityHandler, m_mockEndpointBuilder, m_mockContextManager, m_mockNetworkIdentifier);
+            mockConnectivityHandler, m_mockEndpointBuilder, m_mockContextManager, m_mockVehicleIdentifier);
 
         return alexaConnectivityEngineImpl;
     }
@@ -119,7 +121,7 @@ protected:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> m_mockContextManager;
     std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> m_mockEndpointBuilder;  // std::unique_ptr
     std::shared_ptr<StrictMock<MockAlexaConnectivity>> m_mockConnectivityHandler;
-    std::string m_mockNetworkIdentifier;
+    std::string m_mockVehicleIdentifier;
 
 private:
     bool m_initialized = false;
@@ -131,6 +133,20 @@ private:
  */
 TEST_F(AlexaConnectivityEngineImplTest, createWithDefaultConnectivityState) {
     EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(std::string()));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
+
+    auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
+    ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
+
+    alexaConnectivityEngineImpl->shutdown();
+}
+
+/**
+ * @test createWithDefaultConnectivityStateAndIdentifier
+ */
+TEST_F(AlexaConnectivityEngineImplTest, createWithDefaultConnectivityStateAndIdentifier) {
+    EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(std::string()));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string("SAMPLE123")));
 
     auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
     ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
@@ -141,7 +157,7 @@ TEST_F(AlexaConnectivityEngineImplTest, createWithDefaultConnectivityState) {
 /**
  * @test createWithInitialConnectivityState
  */
-TEST_F(AlexaConnectivityEngineImplTest, createWithInitialConnectivityState) {
+TEST_F(AlexaConnectivityEngineImplTest, createWithInitialConnectivityStateWithoutTermsVersion) {
     // clang-format off
     const std::string& value = nlohmann::json({
         {"managedProvider",{
@@ -160,6 +176,38 @@ TEST_F(AlexaConnectivityEngineImplTest, createWithInitialConnectivityState) {
     // clang-format on
 
     EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(value));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
+
+    auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
+    ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
+
+    alexaConnectivityEngineImpl->shutdown();
+}
+
+/**
+ * @test createWithInitialConnectivityState
+ */
+TEST_F(AlexaConnectivityEngineImplTest, createWithInitialConnectivityStateWithTermsVersion) {
+    // clang-format off
+    const std::string& value = nlohmann::json({
+        {"managedProvider",{
+            {"type","MANAGED"},
+            {"id","AMAZON"}
+        }},
+        {"dataPlan",{
+            {"type","AMAZON_SPONSORED"},
+            {"endDate","2021-12-31T23:59:59.999Z"}
+        }},
+        {"dataPlansAvailable",{
+            "TRIAL","PAID","AMAZON_SPONSORED"
+        }},
+        {"termsStatus","ACCEPTED"},
+        {"termsVersion","1"}
+    }).dump();
+    // clang-format on
+
+    EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(value));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
 
     auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
     ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
@@ -190,6 +238,7 @@ TEST_F(AlexaConnectivityEngineImplTest, createWithPlatformInterfaceAsNull) {
  */
 TEST_F(AlexaConnectivityEngineImplTest, connectivityStateChangeAfterShutdown) {
     EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(std::string()));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
 
     auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
     ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
@@ -219,6 +268,7 @@ TEST_P(AlexaConnectivityEngineImplTest, connectivityStateChange) {
         .Times(2)
         .WillOnce(Return(std::string()))  // initial connectivity state
         .WillOnce(Return(value));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
 
     auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
     ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
@@ -253,7 +303,7 @@ INSTANTIATE_TEST_CASE_P(
          * @test connectivityStateChange/2
          *
          * Requires dataPlan.type to be a valid DataPlanType enum string value.
-         * Expecting connectivityStateChange() to log "dataPlanTypeResultNotValid" and return false.
+         * Expecting connectivityStateChange() to log "dataPlanTypeNotValid" and return false.
          */
         std::make_pair(
             // clang-format off
@@ -269,7 +319,8 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "TRIAL","PAID","AMAZON_SPONSORED"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             false),
@@ -294,7 +345,8 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "TRIAL","PAID","AMAZON_SPONSORED"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             false),
@@ -303,7 +355,7 @@ INSTANTIATE_TEST_CASE_P(
          * @test connectivityStateChange/4
          *
          * Requires dataPlansAvailable item to be a valid DataPlanType enum string value.
-         * Expecting connectivityStateChange() to log "dataPlanAvailableResultNotValid" and return false.
+         * Expecting connectivityStateChange() to log "dataPlanAvailableNotValid" and return false.
          */
         std::make_pair(
             // clang-format off
@@ -319,7 +371,8 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "TRIAL","PAID","AMAZON_SPONSORED", "TPG_TELECOM" // invalid type (unknown)
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             false),
@@ -342,7 +395,7 @@ INSTANTIATE_TEST_CASE_P(
          * @test connectivityStateChange/6
          *
          * Requires managedProvider.type to be a valid ManagedProviderType enum string value.
-         * Expecting connectivityStateChange() to log "managedProviderTypeResultNotValid" and return false.
+         * Expecting connectivityStateChange() to log "managedProviderTypeNotValid" and return false.
          */
         std::make_pair(
             // clang-format off
@@ -358,7 +411,8 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "TRIAL","PAID","AMAZON_SPONSORED"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             false),
@@ -366,8 +420,8 @@ INSTANTIATE_TEST_CASE_P(
         /**
          * @test connectivityStateChange/7
          *
-         * Requires termsStatus item to be a valid TermsStatus enum string value.
-         * Expecting connectivityStateChange() to log "termsStatusResultNotValid" and return false.
+         * Requires terms status item to be a valid terms status enum string value.
+         * Expecting connectivityStateChange() to log "termsStatusNotValid" and return false.
          */
         std::make_pair(
             // clang-format off
@@ -383,13 +437,90 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "TRIAL","PAID","AMAZON_SPONSORED"
                 }},
-                {"termsStatus","NOT_ACCEPTED"} // invalid type (unknown)
+                {"termsStatus","NOT_ACCEPTED"}, // invalid status (unknown)
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             false),
 
         /**
          * @test connectivityStateChange/8
+         *
+         * Requires terms version item to be a non empty string value.
+         * Expecting connectivityStateChange() to log "termsVersionNotValid" and return false.
+         */
+        std::make_pair(
+            // clang-format off
+            nlohmann::json({
+                {"managedProvider",{
+                    {"type","MANAGED"},
+                    {"id","AMAZON"}
+                }},
+                {"dataPlan",{
+                    {"type","AMAZON_SPONSORED"},
+                    {"endDate","2021-12-31T23:59:59.999Z"}
+                }},
+                {"dataPlansAvailable",{
+                    "TRIAL","PAID","AMAZON_SPONSORED"
+                }},
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion",""} // empty string
+            }).dump(),
+            // clang-format on
+            false),
+
+        /**
+         * @test connectivityStateChange/9
+         *
+         * Requires terms status when terms version exists.
+         * Expecting connectivityStateChange() to log "termsVersionExistsWithoutTermsStatus" and return false.
+         */
+        std::make_pair(
+            // clang-format off
+            nlohmann::json({
+                {"managedProvider",{
+                    {"type","MANAGED"},
+                    {"id","AMAZON"}
+                }},
+                {"dataPlan",{
+                    {"type","AMAZON_SPONSORED"},
+                    {"endDate","2021-12-31T23:59:59.999Z"}
+                }},
+                {"dataPlansAvailable",{
+                    "TRIAL","PAID","AMAZON_SPONSORED"
+                }},
+                {"termsVersion","1"}
+            }).dump(),
+            // clang-format on
+            false),
+
+        /**
+         * @test connectivityStateChange/10
+         *
+         * Optional termsVersion element 
+         * Expecting return true.
+         */
+        std::make_pair(
+            // clang-format off
+            nlohmann::json({
+                {"managedProvider",{
+                    {"type","MANAGED"},
+                    {"id","AMAZON"}
+                }},
+                {"dataPlan",{
+                    {"type","AMAZON_SPONSORED"},
+                    {"endDate","2021-12-31T23:59:59.999Z"}
+                }},
+                {"dataPlansAvailable",{
+                    "TRIAL","PAID","AMAZON_SPONSORED"
+                }},
+                {"termsStatus","ACCEPTED"}
+            }).dump(),
+            // clang-format on
+            true),
+
+        /**
+         * @test connectivityStateChange/11
          *
          * Full Experience (Not Managed)
          */
@@ -404,7 +535,7 @@ INSTANTIATE_TEST_CASE_P(
             true),
 
         /**
-         * @test connectivityStateChange/9
+         * @test connectivityStateChange/12
          *
          * Full Experience (Paid)
          */
@@ -418,13 +549,14 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlan",{
                     {"type","PAID"}
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             true),
 
         /**
-         * @test connectivityStateChange/10
+         * @test connectivityStateChange/13
          *
          * Full Experience (Trial)
          */
@@ -442,13 +574,14 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "PAID","AMAZON_SPONSORED"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             true),
 
         /**
-         * @test connectivityStateChange/11
+         * @test connectivityStateChange/14
          *
          * Full Experience (Trial Expiring in 5 days)
          */
@@ -466,13 +599,14 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "PAID","AMAZON_SPONSORED"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             true),
 
         /**
-         * @test connectivityStateChange/12
+         * @test connectivityStateChange/15
          *
          * Partial Experience (Amazon Sponsored)
          */
@@ -489,13 +623,14 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "PAID","TRIAL"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             true),
 
         /**
-         * @test connectivityStateChange/13
+         * @test connectivityStateChange/16
          *
          * Partial Experience (Terms Declined)
          */
@@ -509,13 +644,35 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlan",{
                     {"type","AMAZON_SPONSORED"}
                 }},
-                {"termsStatus","DECLINED"}
+                {"termsStatus","DECLINED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             true),
 
         /**
-         * @test connectivityStateChange/14
+         * @test connectivityStateChange/17
+         *
+         * Partial Experience (Terms Deferred)
+         */
+        std::make_pair(
+            // clang-format off
+            nlohmann::json({
+                {"managedProvider",{
+                    {"type","MANAGED"},
+                    {"id","AMAZON"}
+                }},
+                {"dataPlan",{
+                    {"type","AMAZON_SPONSORED"}
+                }},
+                {"termsStatus","DEFERRED"},
+                {"termsVersion","1"}
+            }).dump(),
+            // clang-format on
+            true),
+
+        /**
+         * @test connectivityStateChange/18
          *
          * Partial Experience (Trial Expired)
          */
@@ -532,7 +689,8 @@ INSTANTIATE_TEST_CASE_P(
                 {"dataPlansAvailable",{
                     "PAID"
                 }},
-                {"termsStatus","ACCEPTED"}
+                {"termsStatus","ACCEPTED"},
+                {"termsVersion","1"}
             }).dump(),
             // clang-format on
             true)

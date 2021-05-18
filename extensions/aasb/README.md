@@ -280,6 +280,17 @@ After receiving the `GetLocation` message, your application must respond immedia
 }
 ```
 
+#### Customizing the Timeout for Synchronous Messages (Optional)
+The default timeout value for synchronous messages is 500 (in milliseconds). You can customize this value by adding the optional field `defaultMessageTimeout` to the `aace.aasb` JSON block. The following example shows how to change the timeout to 1000 ms.
+```
+{
+    "aace.aasb": {
+        ...
+        "defaultMessageTimeout": 1000
+    }
+}
+```
+
 ### Handling Audio and Other Stream-based Messages with AASB
 Some interfaces (such as `AudioOutput`) have methods that require an object (such as `AudioStream`) to read and write their data. When these interfaces are implemented by an AASB handler, the underlying I/O implementation is wrapped by an object that implements the `AASBStream` interface.
 

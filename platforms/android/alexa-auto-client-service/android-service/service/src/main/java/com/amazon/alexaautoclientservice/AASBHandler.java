@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import static com.amazon.alexaautoclientservice.util.FileUtil.isAudioOutputTypeE
 
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
 import com.amazon.aace.aasb.AASB;
-import com.amazon.aace.aasb.AASBStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.AASBConstants.AudioInput;
@@ -37,6 +37,7 @@ import com.amazon.aacsipc.TargetComponent;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AlexaClientMessageHandler;
 import com.amazon.alexaautoclientservice.modules.audioInput.AudioInputMessageHandler;
 import com.amazon.alexaautoclientservice.modules.audioOutput.AudioOutputMessageHandler;
+import com.amazon.alexaautoclientservice.receiver.InstrumentationReceiver;
 import com.amazon.alexaautoclientservice.util.AASBUtil;
 import com.amazon.alexaautoclientservice.util.FileUtil;
 
@@ -55,6 +56,7 @@ public class AASBHandler extends AASB {
     private AlexaClientMessageHandler mAlexaClient;
     private HashMap<String, String> mAudioInputStreamMap;
     private long mCachedBufferedBytes;
+    private static AACSMessageLogger mAACSMessageLogger;
 
     public AASBHandler(@NonNull Context context) {
         mContext = context;
@@ -64,13 +66,20 @@ public class AASBHandler extends AASB {
         mAudioOutput = new AudioOutputMessageHandler(context, mAlexaClient);
         mAudioInput = new AudioInputMessageHandler(context, mAACSSender);
         mAudioInputStreamMap = new HashMap<>();
-        int cacheCapacity = FileUtil.getIPCCacheCapacity(context);
+        if (BuildConfig.DEBUG) {
+            mAACSMessageLogger = new AACSMessageLogger();
+        }
+        int cacheCapacity = FileUtil.getIPCCacheCapacity();
         mAACSSender = new AACSSender(cacheCapacity);
         mCachedBufferedBytes = 0;
     }
 
     @Override
     public void messageReceived(String message) {
+        handleMessage(false, message);
+    }
+
+    public void handleMessage(boolean isToEngine, String message) {
         try {
             JSONObject aasbMessage = new JSONObject(message);
             String topic = aasbMessage.getJSONObject(AASBConstants.HEADER)
@@ -79,6 +88,15 @@ public class AASBHandler extends AASB {
             String action = aasbMessage.getJSONObject(AASBConstants.HEADER)
                                     .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
                                     .getString(AASBConstants.ACTION);
+            String replyToId = "";
+            if (aasbMessage.getJSONObject(AASBConstants.HEADER)
+                            .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
+                            .has(AASBConstants.REPLY_TO_ID)) {
+                replyToId = aasbMessage.getJSONObject(AASBConstants.HEADER)
+                                    .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
+                                    .getString(AASBConstants.REPLY_TO_ID);
+            }
+
             String messageId = aasbMessage.getJSONObject(AASBConstants.HEADER).getString(AASBConstants.ID);
             String payload = "";
             if (aasbMessage.has(AASBConstants.PAYLOAD) && !aasbMessage.isNull(AASBConstants.PAYLOAD)) {
@@ -88,7 +106,25 @@ public class AASBHandler extends AASB {
             if (!action.equals(Action.AudioOutput.GET_NUM_BYTES_BUFFERED)) {
                 Log.v(TAG, String.format("Receiving AASBMessage: Topic: %s, Action: %s", topic, action));
             }
-            sendDirective(messageId, topic, action, payload, message);
+
+            if (BuildConfig.DEBUG) {
+                if (InstrumentationReceiver.mIsLogEnabled && !message.isEmpty()) {
+                    mAACSMessageLogger.setLogFileLocation(InstrumentationReceiver.mFileLocation);
+                    if (isToEngine) {
+                        mAACSMessageLogger.buffer(
+                                AACSMessageLogger.TO_ENGINE, topic, action, payload, messageId, replyToId);
+                    } else {
+                        mAACSMessageLogger.buffer(
+                                AACSMessageLogger.FROM_ENGINE, topic, action, payload, messageId, replyToId);
+                    }
+                }
+            }
+            if (isToEngine) {
+                publish(message);
+            } else {
+                sendDirective(messageId, topic, action, payload, message);
+            }
+
         } catch (Exception e) {
             Log.e(TAG, String.format("Failed to parse AASB message: %s", message));
         }
@@ -100,7 +136,7 @@ public class AASBHandler extends AASB {
                 JSONObject payloadJSON = new JSONObject(payload);
                 String channel = payloadJSON.getString(AudioOutput.CHANNEL);
                 String type = AudioOutputMessageHandler.convertAudioChannelToAudioType(channel);
-                if (isAudioOutputTypeEnabled(mContext, type)) {
+                if (isAudioOutputTypeEnabled(type)) {
                     Log.i(TAG,
                             String.format("Default audio output implementation for type=%s is enabled. "
                                             + "Routing the message to AACS-AudioOutputMessageHandler.",
@@ -128,7 +164,7 @@ public class AASBHandler extends AASB {
                     type = mAudioInputStreamMap.get(streamId);
                     mAudioInputStreamMap.remove(streamId);
                 }
-                if (isAudioInputTypeEnabled(mContext, type)) {
+                if (isAudioInputTypeEnabled(type)) {
                     Log.i(TAG,
                             String.format("Default audio input implementation for audioType=%s is enabled. "
                                             + "Routing the message to AACS-AudioInputMessageHandler.",
@@ -155,26 +191,30 @@ public class AASBHandler extends AASB {
     }
 
     public void publish(@NonNull String topic, @NonNull String action, @NonNull String payload) {
-        String message = AASBUtil.constructAASBMessage(
-                "", removePackageNameFromString(topic), removePackageNameFromString(action), payload);
-        if (!message.isEmpty()) {
-            if (!action.equals(Action.AudioOutput.GET_NUM_BYTES_BUFFERED)) {
-                Log.v(TAG, String.format("Publishing AASB message. Topic: %s. Action: %s.", topic, action));
-            }
-            publish(message);
-        } else {
-            Log.e(TAG, "Failed to publish AASB message");
-        }
+        publish("", topic, action, payload);
     }
 
     public void publish(
             @NonNull String replyToId, @NonNull String topic, @NonNull String action, @NonNull String payload) {
-        String message = AASBUtil.constructAASBMessage(
-                replyToId, removePackageNameFromString(topic), removePackageNameFromString(action), payload);
+        Pair<String, String> messageWithID = AASBUtil.constructAASBMessageReturnID(replyToId,
+                removePackageNameFromString(mContext.getPackageName(), topic),
+                removePackageNameFromString(mContext.getPackageName(), action), payload);
+        String messageID = messageWithID.first;
+        String message = messageWithID.second;
+
         if (!message.isEmpty()) {
             if (!action.equals(Action.AudioOutput.GET_NUM_BYTES_BUFFERED)) {
                 Log.v(TAG, String.format("Publishing AASB message. Topic: %s. Action: %s.", topic, action));
             }
+
+            if (BuildConfig.DEBUG) {
+                if (InstrumentationReceiver.mIsLogEnabled && !message.isEmpty()) {
+                    mAACSMessageLogger.setLogFileLocation(InstrumentationReceiver.mFileLocation);
+                    mAACSMessageLogger.buffer(
+                            AACSMessageLogger.TO_ENGINE, topic, action, payload, messageID, replyToId);
+                }
+            }
+
             publish(message);
         } else {
             Log.e(TAG, "Failed to publish AASB message");

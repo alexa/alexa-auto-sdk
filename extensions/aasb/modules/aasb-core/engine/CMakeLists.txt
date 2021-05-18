@@ -69,6 +69,8 @@ set(AASB_LOCATION_MESSAGES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Location/LocationProvider/GetLocationMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Location/LocationProvider/GetLocationMessageReply.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Location/LocationProvider/Location.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Location/LocationProvider/LocationServiceAccess.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Location/LocationProvider/LocationServiceAccessChangedMessage.h
 )
 
 source_group("Location Message Headers" FILES ${AASB_LOCATION_MESSAGES})

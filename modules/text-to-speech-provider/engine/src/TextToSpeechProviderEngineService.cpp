@@ -94,14 +94,14 @@ bool TextToSpeechProviderEngineService::postRegister() {
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull(exceptionSender, "exceptionSenderInvalid");
 
-        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
-        ThrowIfNull(defaultEndpointBuilder, "defaultEndpointBuilderInvalid");
+        auto defaultCapabilitiesRegistrar = alexaComponents->getDefaultEndpointCapabilitiesRegistrar();
+        ThrowIfNull(defaultCapabilitiesRegistrar, "defaultCapabilitiesRegistrarInvalid");
 
         auto connectionManager = alexaComponents->getConnectionManager();
         ThrowIfNull(connectionManager, "connectionManagerInvalid");
 
         m_textToSpeechProviderEngine = aace::engine::textToSpeechProvider::TextToSpeechProviderEngine::create(
-            defaultEndpointBuilder,
+            defaultCapabilitiesRegistrar,
             exceptionSender,
             messageSender,
             connectionManager,

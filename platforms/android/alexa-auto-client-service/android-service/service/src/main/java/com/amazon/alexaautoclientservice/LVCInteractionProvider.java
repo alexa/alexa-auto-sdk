@@ -150,7 +150,7 @@ public class LVCInteractionProvider {
     private ILVCClient mLVCClient = new ILVCClient.Stub() {
         @Override
         public String getConfiguration() {
-            String configString = FileUtil.getLVCConfiguration(mContext.get());
+            String configString = FileUtil.getLVCConfiguration();
 
             File fileDir = mContext.get().getFilesDir();
             JSONObject configToLvcApk = new JSONObject();

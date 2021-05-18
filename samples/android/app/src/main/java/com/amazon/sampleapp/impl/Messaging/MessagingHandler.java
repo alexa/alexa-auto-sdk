@@ -18,12 +18,14 @@ package com.amazon.sampleapp.impl.Messaging;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v7.widget.SwitchCompat;
+import android.os.Environment;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.amazon.aace.messaging.Messaging;
 import com.amazon.sampleapp.FileUtils;
@@ -34,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -47,10 +50,12 @@ import java.util.concurrent.Executors;
 public class MessagingHandler extends Messaging {
     private static String sTag = "Messaging";
 
+    public static final String CONVERSATIONS_REPORT_FILE_NAME = "ConversationsReport.json";
+
     // External
     private final Activity mActivity;
-    private final String mConversationsDataPath;
     private final LoggerHandler mLogger;
+    private final File mSampleDataDir;
 
     // UI Components
     private TextView mConfigurePermissionsButton;
@@ -91,12 +96,12 @@ public class MessagingHandler extends Messaging {
      * Constructor for messaging handler.
      * @param activity The Android activity instance.
      * @param logger The logger instance.
-     * @param conversationsDataPath The path to the sample conversations report.
+     * @param sampleDataDir The path to the sample app data folder.
      */
-    public MessagingHandler(Activity activity, LoggerHandler logger, String conversationsDataPath) {
+    public MessagingHandler(Activity activity, LoggerHandler logger, final File sampleDataDir) {
         mActivity = activity;
-        mConversationsDataPath = conversationsDataPath;
         mLogger = logger;
+        mSampleDataDir = sampleDataDir;
         mToken = "";
         mConversationId = "";
         mStatusJson = null;
@@ -445,8 +450,15 @@ public class MessagingHandler extends Messaging {
      */
     private void onConversationsReport() {
         try {
+            // Always use sample data from external storage if available
+            File conversationFile = new File(Environment.getExternalStorageDirectory(), CONVERSATIONS_REPORT_FILE_NAME);
+            if (!conversationFile.exists()) {
+                // Use the default from the assets folder
+                conversationFile = new File(mSampleDataDir, CONVERSATIONS_REPORT_FILE_NAME);
+            }
+
             // Token may be empty or contain the value from an uploadConversations request
-            mConversations = FileUtils.parseFileAsJSONArray(mConversationsDataPath);
+            mConversations = FileUtils.parseFileAsJSONArray(conversationFile.getPath());
             StringBuffer buffer = new StringBuffer();
             boolean valid = validateConversationsReport(buffer);
             if (valid) {

@@ -24,6 +24,8 @@
 #include <AACE/Engine/CBL/CBLAuthorizationProvider.h>
 #include <AACE/Engine/CBL/CBLConfigurationInterface.h>
 #include <AACE/Engine/Alexa/AuthorizationManagerInterface.h>
+#include <AACE/Engine/PropertyManager/PropertyListenerInterface.h>
+#include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
 
 namespace aace {
 namespace test {
@@ -55,6 +57,20 @@ public:
     MOCK_CONST_METHOD0(getDefaultLocale, std::string());
 };
 
+class MockPropertyManagerServiceInterface : public engine::propertyManager::PropertyManagerServiceInterface {
+public:
+    MOCK_METHOD1(registerProperty, bool(const engine::propertyManager::PropertyDescription& propertyDescription));
+    MOCK_METHOD2(updatePropertyValue, void(const std::string& name, const std::string& newValue));
+    MOCK_METHOD2(
+        addListener,
+        bool(const std::string& name, std::shared_ptr<engine::propertyManager::PropertyListenerInterface> listener));
+    MOCK_METHOD2(
+        removeListener,
+        void(const std::string& name, std::shared_ptr<engine::propertyManager::PropertyListenerInterface> listener));
+    MOCK_METHOD3(setProperty, bool(const std::string&, const std::string&, const bool&));
+    MOCK_METHOD1(getProperty, std::string(const std::string& name));
+};
+
 /**
  * 
  * GTest class test @CBLAuthorizationProvider. 
@@ -69,6 +85,7 @@ public:
     void SetUp() override {
         m_mockAuthorizationManager = std::make_shared<StrictMock<MockAuthorizationManager>>();
         m_mockAuthorizationProviderListener = std::make_shared<StrictMock<MockAuthorizationProviderListener>>();
+        m_mockPropertyManagerServiceInterface = std::make_shared<StrictMock<MockPropertyManagerServiceInterface>>();
         m_configuration = std::make_shared<NiceMock<MockCBLConfiguration>>();
     }
 
@@ -86,8 +103,8 @@ public:
 
 protected:
     std::shared_ptr<aace::engine::cbl::CBLAuthorizationProvider> createCBLAuthorizationProvider() {
-        auto cblAuthorizationProvider =
-            aace::engine::cbl::CBLAuthorizationProvider::create("TEST_ME", m_mockAuthorizationManager, m_configuration);
+        auto cblAuthorizationProvider = aace::engine::cbl::CBLAuthorizationProvider::create(
+            "TEST_ME", m_mockAuthorizationManager, m_configuration, m_mockPropertyManagerServiceInterface);
         cblAuthorizationProvider->setListener(m_mockAuthorizationProviderListener);
         return cblAuthorizationProvider;
     }
@@ -99,28 +116,40 @@ protected:
     /// The mocked @c AuthorizationProviderListenerInterface.
     std::shared_ptr<MockAuthorizationProviderListener> m_mockAuthorizationProviderListener;
 
+    /// The mocked @c PropertyManagerServiceInterface
+    std::shared_ptr<MockPropertyManagerServiceInterface> m_mockPropertyManagerServiceInterface;
+
     /// The mocked @c CBLConfigurationInterface.
     std::shared_ptr<MockCBLConfiguration> m_configuration;
 };
 
 TEST_F(CBLAuthorizationProviderTest, createWithNullParameters) {
-    auto cblAuthorizationProvider =
-        aace::engine::cbl::CBLAuthorizationProvider::create("", m_mockAuthorizationManager, m_configuration);
+    auto cblAuthorizationProvider = aace::engine::cbl::CBLAuthorizationProvider::create(
+        "", m_mockAuthorizationManager, m_configuration, m_mockPropertyManagerServiceInterface);
     ASSERT_EQ(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 
-    auto cblAuthorizationProvider1 =
-        aace::engine::cbl::CBLAuthorizationProvider::create("testMe", nullptr, m_configuration);
+    auto cblAuthorizationProvider1 = aace::engine::cbl::CBLAuthorizationProvider::create(
+        "testMe", nullptr, m_configuration, m_mockPropertyManagerServiceInterface);
     ASSERT_EQ(cblAuthorizationProvider1, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 
-    auto cblAuthorizationProvider2 =
-        aace::engine::cbl::CBLAuthorizationProvider::create("testMe", m_mockAuthorizationManager, nullptr);
+    auto cblAuthorizationProvider2 = aace::engine::cbl::CBLAuthorizationProvider::create(
+        "testMe", m_mockAuthorizationManager, nullptr, m_mockPropertyManagerServiceInterface);
     ASSERT_EQ(cblAuthorizationProvider2, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
+
+    auto cblAuthorizationProvider3 = aace::engine::cbl::CBLAuthorizationProvider::create(
+        "testMe", m_mockAuthorizationManager, m_configuration, nullptr);
+    ASSERT_EQ(cblAuthorizationProvider3, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 }
 
 TEST_F(CBLAuthorizationProviderTest, simpleHappyUsecase) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
+
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 
@@ -146,6 +175,10 @@ TEST_F(CBLAuthorizationProviderTest, simpleHappyUsecase) {
 TEST_F(CBLAuthorizationProviderTest, subsequentStartAndStop) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent1, waitEvent2;
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 
@@ -195,6 +228,10 @@ TEST_F(CBLAuthorizationProviderTest, subsequentStartAndLogout) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     bool receivedUnauthorized = false;
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 
@@ -230,6 +267,10 @@ TEST_F(CBLAuthorizationProviderTest, subsequentStartAndLogout) {
 
 TEST_F(CBLAuthorizationProviderTest, invalidJsonPassedToStartAuthorization) {
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 
@@ -245,6 +286,10 @@ TEST_F(CBLAuthorizationProviderTest, emptyJsonPassedToStartAuthorization) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 
@@ -271,6 +316,10 @@ TEST_F(CBLAuthorizationProviderTest, validJsonButEmtpyRefreshTokenToStartAuthori
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 
@@ -296,6 +345,10 @@ TEST_F(CBLAuthorizationProviderTest, validJsonButEmtpyRefreshTokenToStartAuthori
 TEST_F(CBLAuthorizationProviderTest, testPossibleFailurePaths) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
+        .WillOnce(::testing::Return("en-US"));
+    EXPECT_CALL(*m_mockPropertyManagerServiceInterface, addListener(::testing::_, ::testing::_))
+        .WillOnce(::testing::Return(true));
     auto cblAuthorizationProvider = createCBLAuthorizationProvider();
     ASSERT_NE(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be not null!";
 

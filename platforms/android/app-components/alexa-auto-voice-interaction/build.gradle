@@ -8,7 +8,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "3.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -30,10 +30,6 @@ android {
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
-    }
-
-    buildFeatures {
-        viewBinding = true
     }
 
     libraryVariants.all { variant ->
@@ -58,31 +54,20 @@ dependencies {
     implementation project(':alexa-auto-apis')
     implementation project(':alexa-auto-apps-common-util')
     implementation project(':alexa-auto-apps-common-ui')
+    implementation project(':alexa-auto-settings')
 
     // AndroidX dependencies
     implementation deps.androidx_annotation
     implementation deps.androidx_appcompat
     implementation deps.androidx_core
-    implementation deps.androidx_constraint
-    implementation deps.androidx_preference
 
     // RX
     implementation deps.rxjava3
 
-    //Eventbus
+    // Eventbus
     implementation deps.eventbus
 
-    // Navigation between UI components.
-    implementation deps.androidx_navigation_fragment
-    implementation deps.androidx_navigation_ui
-
-    // Dagger
-    api deps.dagger
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.1'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.3.1'
-    kapt deps.dagger_compiler
-
-    //Test Dependencies
+    // Test Dependencies
     testImplementation deps.junit
     testImplementation deps.mockito
     testImplementation deps.roboelectric

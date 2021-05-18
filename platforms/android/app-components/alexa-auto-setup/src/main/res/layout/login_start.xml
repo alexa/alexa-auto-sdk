@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_start_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/alexa_img_view"
+        android:layout_width="@dimen/login_alexa_image_width"
+        android:layout_height="@dimen/login_alexa_image_height"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:src="@drawable/amazon_alexa_placeholder_logo"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/login_dialog_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/login_dialog_text_view"
+        android:textAppearance="@style/Alexa.Heading2Text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:text="@string/login_message"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/login_progress_spinner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view" />
+
+    <ProgressBar
+        android:id="@+id/login_progress_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/login_error_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/login_dialog_text_view" />
+
+    <TextView
+        android:id="@+id/login_error_text_view"
+        style="@style/Alexa.BodyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:text="@string/login_error_message"
+        android:textColor="@android:color/holo_red_light"
+        app:layout_constraintBottom_toBottomOf="@+id/preview_mode_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_progress_spinner" />
+
+    <TextView
+        android:id="@+id/preview_mode_text_view"
+        style="@style/Alexa.BodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:layout_gravity="center_vertical"
+        android:text="@string/preview_mode_message"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="@+id/terms_of_use_buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_error_text_view"
+        android:visibility="invisible"/>
+
+    <LinearLayout
+        android:id="@+id/terms_of_use_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:layout_marginTop="@dimen/login_item_margin_bottom"
+        android:layout_marginBottom="@dimen/login_item_margin_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preview_mode_text_view"
+        android:visibility="invisible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/privacy_notice_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Alexa.Button"
+                android:text="@string/privacy_notice_button"
+                android:layout_marginStart="@dimen/login_item_margin_start"
+                app:layout_constraintTop_toTopOf="@+id/terms_of_use_button"
+                app:layout_constraintStart_toEndOf="@+id/terms_of_use_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <TextView
+                android:id="@+id/terms_of_use_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Alexa.Button"
+                android:text="@string/terms_of_use_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/privacy_notice_button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:orientation="vertical" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/get_started_action_button"
+        style="@style/Alexa.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_item_margin_bottom"
+        android:layout_marginBottom="@dimen/login_item_margin_bottom"
+        android:text="@string/login_action_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/terms_of_use_buttons" />
+</androidx.constraintlayout.widget.ConstraintLayout>

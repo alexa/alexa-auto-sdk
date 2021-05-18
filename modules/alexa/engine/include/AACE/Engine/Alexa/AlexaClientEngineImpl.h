@@ -56,6 +56,11 @@ public:
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason)
         override;
+    void onConnectionStatusChanged(
+        const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+        const std::vector<
+            alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
+            engineStatuses) override;
 
     // DialogUXStateObserverInterface
     void onDialogUXStateChanged(
@@ -68,6 +73,7 @@ private:
     std::shared_ptr<aace::alexa::AlexaClient> m_alexaClientPlatformInterface;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_audioFocusManager;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_visualFocusManager;
+    alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status m_connectionStatus;
 };
 
 }  // namespace alexa

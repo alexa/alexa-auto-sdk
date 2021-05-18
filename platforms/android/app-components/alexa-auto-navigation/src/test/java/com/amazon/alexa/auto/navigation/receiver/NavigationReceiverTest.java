@@ -57,9 +57,9 @@ public class NavigationReceiverTest {
 
     @Test
     public void cancelNavigationTest() {
-        Intent startNavigationIntent =
+        Intent cancelNavigationIntent =
                 generateIntent("aacs/CancelNavigation.json", "com.amazon.aacs.aasb.CancelNavigation");
-        mClassUnderTest.onReceive(Mockito.mock(Context.class), startNavigationIntent);
+        mClassUnderTest.onReceive(Mockito.mock(Context.class), cancelNavigationIntent);
         ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
         Mockito.verify(mNavigationDirectiveHandler, Mockito.times(1))
                 .handleNavigationCommand(aacsMessageArgumentCaptor.capture());
@@ -69,6 +69,28 @@ public class NavigationReceiverTest {
 
         Optional<String> sampleAACSNavigationMessage =
                 TestResourceFileReader.readFileContent("aacs/CancelNavigation.json");
+        try {
+            JSONObject sampleMessageJsonObject = new JSONObject(sampleAACSNavigationMessage.get());
+            sampleMessageJsonObject.get("payload").equals(aacsMessage.payload);
+        } catch (JSONException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Test
+    public void getNavigationStateTest() {
+        Intent getNavigationStateIntent =
+                generateIntent("aacs/GetNavigationState.json", "com.amazon.aacs.aasb.GetNavigationState");
+        mClassUnderTest.onReceive(Mockito.mock(Context.class), getNavigationStateIntent);
+        ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
+        Mockito.verify(mNavigationDirectiveHandler, Mockito.times(1))
+                .handleNavigationCommand(aacsMessageArgumentCaptor.capture());
+        AACSMessage aacsMessage = aacsMessageArgumentCaptor.getValue();
+        Assert.assertEquals(aacsMessage.topic, Topic.NAVIGATION);
+        Assert.assertEquals(aacsMessage.action, Action.Navigation.GET_NAVIGATION_STATE);
+
+        Optional<String> sampleAACSNavigationMessage =
+                TestResourceFileReader.readFileContent("aacs/GetNavigationState.json");
         try {
             JSONObject sampleMessageJsonObject = new JSONObject(sampleAACSNavigationMessage.get());
             sampleMessageJsonObject.get("payload").equals(aacsMessage.payload);

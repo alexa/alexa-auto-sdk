@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -74,6 +74,8 @@ public class AASBConstants {
 
         // Parameters of VolumeChangedMessage
         public static final String VOLUME = "volume";
+
+        public static final int TIME_UNKNOWN = -1;
     }
 
     public static class AudioInput {
@@ -87,6 +89,8 @@ public class AASBConstants {
         public static final String STREAM_ID = "streamId";
         public static final String TYPE = "audioType";
     }
+
+    public static class AudioPlayer { public static final int TIME_UNKNOWN = -1; }
 
     public static class AlexaClient {
         public static final String ALEXA_CLIENT_STATUS_CONNECTED = "CONNECTED";
@@ -123,6 +127,20 @@ public class AASBConstants {
         public static final String AUTH_ERROR_INVALID_CBL_CLIENT_ID = "INVALID_CBL_CLIENT_ID";
     }
 
+    public static class LocationProvider {
+        public static final String COUNTRY = "country";
+
+        public static final String LOCATION = "location";
+        public static final String LOCATION_LATITUDE = "latitude";
+        public static final String LOCATION_LONGITUDE = "longitude";
+        public static final String LOCATION_ALTITUDE = "altitude";
+        public static final String LOCATION_ACCURACY = "accuracy";
+
+        public static final String LOCATION_SERVICE_ACCESS = "access";
+        public static final String LOCATION_SERVICE_ACCESS_DISABLED = "DISABLED";
+        public static final String LOCATION_SERVICE_ACCESS_ENABLED = "ENABLED";
+    }
+
     public static class PhoneCallController {
         public static final String CONNECTION_STATE_CONNECTED = "CONNECTED";
         public static final String CONNECTION_STATE_DISCONNECTED = "DISCONNECTED";
@@ -138,6 +156,7 @@ public class AASBConstants {
     public static class PropertyManager {
         public static final String PROPERTY_NAME = "name";
         public static final String PROPERTY_VALUE = "value";
+        public static final String PROPERTY_NEW_VALUE = "newValue";
 
         public static final String LOCALE = "aace.alexa.setting.locale";
         public static final String WAKEWORD_SUPPORTED = "aace.alexa.wakewordSupported";
@@ -147,8 +166,11 @@ public class AASBConstants {
     public static class SpeechRecognizer {
         public static final String SPEECH_INITIATOR = "initiator";
         public static final String SPEECH_INITIATOR_TAP_TO_TALK = "TAP_TO_TALK";
+        public static final String SPEECH_INITIATOR_HOLD_TO_TALK = "HOLD_TO_TALK";
+        public static final String SPEECH_INITIATOR_WAKEWORD = "WAKEWORD";
         public static final String KEYWORD = "keyword";
         public static final String KEYWORD_BEGIN = "keywordBegin";
         public static final String KEYWORD_END = "keywordEnd";
+        public static final int UNSPECIFIED_INDEX = -1;
     }
 }

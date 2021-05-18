@@ -3,5 +3,5 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:sessionService="com.amazon.alexa.auto.voiceinteraction.service.AutoVoiceInteractionSessionService"
     android:recognitionService="com.amazon.alexa.auto.voiceinteraction.service.AutoVoiceInteractionService"
-    android:settingsActivity="com.amazon.alexa.auto.voiceinteraction.settings.SettingsActivity"
+    android:settingsActivity="com.amazon.alexa.auto.settings.SettingsActivity"
     android:supportsAssist="true" />

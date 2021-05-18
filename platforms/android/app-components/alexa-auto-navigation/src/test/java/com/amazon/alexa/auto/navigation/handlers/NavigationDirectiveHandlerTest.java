@@ -1,5 +1,7 @@
 package com.amazon.alexa.auto.navigation.handlers;
 
+import static org.mockito.ArgumentMatchers.anyString;
+
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -56,6 +58,16 @@ public class NavigationDirectiveHandlerTest {
         mClassUnderTest.handleNavigationCommand(aacsMessage.get());
 
         Mockito.verify(mGoogleMapsNavigationProvider, Mockito.times(1)).cancelNavigation();
+    }
+
+    @Test
+    public void getNavigationStateTest() {
+        Intent getNavigationStateIntent =
+                generateIntent("aacs/GetNavigationState.json", "com.amazon.aacs.aasb.GetNavigationState");
+        Optional<AACSMessage> aacsMessage = AACSMessageBuilder.parseEmbeddedIntent(getNavigationStateIntent);
+        mClassUnderTest.handleNavigationCommand(aacsMessage.get());
+
+        Mockito.verify(mGoogleMapsNavigationProvider, Mockito.times(1)).provideNavigationState(anyString());
     }
 
     private Intent generateIntent(String resPath, String action) {

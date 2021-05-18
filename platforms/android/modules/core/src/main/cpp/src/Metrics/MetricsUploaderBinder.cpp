@@ -40,7 +40,9 @@ MetricsUploaderHandler::MetricsUploaderHandler(jobject obj) :
 
 bool MetricsUploaderHandler::record(
     const std::vector<aace::metrics::MetricsUploader::Datapoint>& datapoints,
-    const std::unordered_map<std::string, std::string>& metadata) {
+    const std::unordered_map<std::string, std::string>& metadata,
+    bool buffer,
+    bool unique) {
     try_with_context {
         auto dataPointClass =
             aace::jni::native::JavaClass::find("com/amazon/metricuploadservice/MetricsUploader$Datapoint");
@@ -82,10 +84,12 @@ bool MetricsUploaderHandler::record(
         ThrowIfNot(
             m_obj.invoke(
                 "record",
-                "([Lcom/amazon/metricuploadservice/MetricsUploader$Datapoint;Ljava/util/HashMap;)Z",
+                "([Lcom/amazon/metricuploadservice/MetricsUploader$Datapoint;Ljava/util/HashMap;Z)Z",
                 &result,
                 arr.get(),
-                map.get()),
+                map.get(),
+                buffer,
+                unique),
             "invokeMethodFailed");
         return result;
     }

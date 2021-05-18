@@ -24,9 +24,12 @@ namespace aasb {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.aasb.PublishMessage");
 
-PublishMessage::PublishMessage(Message::Direction direction, const std::string& message, InvokeHandler invokeHandler) :
-        m_direction(direction), m_message(message), m_invokeHandler(invokeHandler) {
-    m_timeout = std::chrono::milliseconds(500);
+PublishMessage::PublishMessage(
+    Message::Direction direction,
+    const std::string& message,
+    const std::chrono::milliseconds& timeout,
+    InvokeHandler invokeHandler) :
+        m_direction(direction), m_message(message), m_timeout(timeout), m_invokeHandler(invokeHandler) {
 }
 
 PublishMessage::PublishMessage(const PublishMessage& pm) {

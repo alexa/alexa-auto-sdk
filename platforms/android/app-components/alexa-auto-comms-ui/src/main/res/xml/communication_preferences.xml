@@ -1,0 +1,19 @@
+<androidx.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:iconSpaceReserved="false">
+
+    <SwitchPreferenceCompat
+        app:key="contacts-consent-settings"
+        app:title="@string/contacts_upload_consent_title"
+        app:summary="@string/contacts_upload_consent_summary"
+        app:defaultValue="true"
+        app:layout="@layout/communication_preference_layout" />
+    <SwitchPreferenceCompat
+        app:key="sms-consent-settings"
+        app:title="@string/sms_consent_title"
+        app:summary="@string/sms_consent_summary"
+        app:defaultValue="true"
+        app:layout="@layout/communication_preference_layout"
+        app:isPreferenceVisible="false"/>
+</androidx.preference.PreferenceScreen>

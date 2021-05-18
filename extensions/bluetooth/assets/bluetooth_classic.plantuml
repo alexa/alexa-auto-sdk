@@ -1,0 +1,41 @@
+@startuml
+skinparam roundcorner 10
+participant "Remote Bluetooth Device" as RBTD
+participant "Bluetooth Stack" as STACK
+participant "BluetoothProviderHandler" as BTPH
+participant "BluetoothServerSocket" as BTSS
+participant "BluetoothSocket" as BTS
+participant "Auto SDK" as AAC
+
+== Listening ==
+
+AAC -> BTPH : listenUsingRfcomm
+BTPH -> STACK : Publish SDP record and\n allocate RFCOMM channel
+BTPH --> AAC : return a BluetoothServerSocket
+
+AAC -> BTSS : accept
+RBTD -> STACK : incoming RFCOMM connection
+STACK -> BTSS : new connection
+
+BTSS --> AAC : return a BluetoothSocket
+
+== Connection Accepted ==
+
+AAC -> BTS : write
+BTS -> STACK : write
+STACK -> RBTD : send data
+
+== ==
+
+RBTD -> STACK : data received
+STACK -> BTS : data buffered in socket
+AAC -> BTS : read
+AAC -> BTS : close
+BTS -> STACK : close
+STACK -> RBTD : tear down connection
+
+== Shutdown ==
+
+AAC -> BTSS : close
+BTSS -> STACK : unpublish SDP record and\n deallocate RFCOMM channel
+@enduml

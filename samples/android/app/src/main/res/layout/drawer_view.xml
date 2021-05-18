@@ -85,6 +85,18 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/auth_cbl_logout" />
+
+            <TextView
+                android:id="@+id/sendSetupCompleted"
+                style="@style/button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/sendSetupCompleted" />
         </LinearLayout>
 
         <!-- Config Info -->

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -95,8 +95,8 @@ public:
     void onManagedProviderStateChanged(
         const ManagedProviderState& managedProviderState,
         alexaClientSDK::avsCommon::sdkInterfaces::AlexaStateChangeCauseType cause) override;
-    void onTermsStatusStateChanged(
-        const TermsStatusState& termsStatusState,
+    void onTermsStateChanged(
+        const TermsState& termsState,
         alexaClientSDK::avsCommon::sdkInterfaces::AlexaStateChangeCauseType cause) override;
     /// @}
 
@@ -157,9 +157,9 @@ private:
     /**
      * Helper method to build the @c CapabilityState.
      *
-     * @param termsStatusState The terms status state defined using @c TermsStatusState.
+     * @param termsState The terms status state defined using @c TermsState.
      */
-    alexaClientSDK::avsCommon::avs::CapabilityState buildCapabilityState(const TermsStatusState& termsStatusState);
+    alexaClientSDK::avsCommon::avs::CapabilityState buildCapabilityState(const TermsState& termsState);
 
     /// Reference to @c AlexaConnectivityInterface.
     std::shared_ptr<AlexaConnectivityInterface> m_connectivity;

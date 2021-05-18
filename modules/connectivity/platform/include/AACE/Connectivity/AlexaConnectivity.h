@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -47,7 +47,8 @@ public:
      * `managedProvider`    | Provides information about connectivity of the device.            | `Object`  | Required
      * `dataPlan`           | Provides the active data plan type and end date.                  | `Object`  | Optional
      * `dataPlansAvailable` | Indicates the data plans that can be activated on a device.       | `Array`   | Optional
-     * `termsStatus`        | Indicates whether the customer has accepted the terms and conditions of the OEM and network provider. | `String`  | Optional
+     * `termsStatus`        | Indicates whether the customer has accepted the terms and conditions of the OEM and network provider. | `String`  | Optional
+     * `termsVersion`       | Indicates the version of the terms and conditions put forward to the user. Max 250 characters | `String`  | Optional
      *
      * **managedProvider**
      *
@@ -99,15 +100,31 @@ public:
      *   "dataPlansAvailable": [
      *     "TRIAL", "PAID", "AMAZON_SPONSORED"
      *   ],
-     *   "termsStatus": "ACCEPTED"
+     *   "termsStatus": "ACCEPTED",
+     *   "termsVersion": "1"
      * }
      * @endcode
      *
-     * Note: You may return an empty string to indicate that connectivity state is not available.
+     * @note AlexaConnectivity platform interface registration requires a valid connectivity state.
+     * @note You may return an empty string to indicate that connectivity state is not available.
      *
      * @return A @c std::string representing the connectivity state in structured JSON format.
      */
     virtual std::string getConnectivityState() = 0;
+
+    /**
+     * Retrieve the network identifier from the platform implementation.
+     *
+     * The network identifier is agnostic of the data plan and is assigned when initially integrated
+     * into the vehicle. It links the device with the network provider and enables the network provider
+     * to identify and provide device connectivity. The network identifier is optional, return an
+     * empty string to automatically use VEHICLE_IDENTIFIER from Engine configuration instead.
+     *
+     * @return A @c std::string representing the network identifier, or empty for default behavior.
+     *
+     * @sa VehicleConfiguration
+     */
+    virtual std::string getIdentifier();
 
     /**
      * Notifies the Engine of a change in the connectivity state. The Engine calls @c getConnectivityState

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,9 +52,10 @@
 #include <AACE/Test/AVS/MockWakeWordConfirmationSetting.h>
 #include <AACE/Test/AVS/MockWakeWordsSetting.h>
 #include <AACE/Test/AVS/MockRenderPlayerInfoCardsProviderInterface.h>
+#include <AACE/Test/AVS/MockMetricRecorder.h>
 
 #include <AACE/Test/Alexa/MockWakewordEngineAdapter.h>
-#include <AACE/Test/Alexa/MockWakewordVerifier.h>
+#include <AACE/Test/Alexa/MockInitiatorVerifier.h>
 #include <AACE/Test/Alexa/MockDeviceSettingsDelegate.h>
 #include <AACE/Engine/Alexa/DeviceSettingsDelegate.h>
 
@@ -109,7 +110,7 @@ public:
     std::shared_ptr<aace::test::avs::MockEndpointRegistrationManagerInterface>
     getEndpointRegistrationManagerInterfaceMock();
     std::shared_ptr<aace::test::alexa::MockWakewordEngineAdapter> getWakewordEngineAdapterMock();
-    std::shared_ptr<aace::test::alexa::MockWakewordVerifier> getWakewordVerifierMock();
+    std::shared_ptr<aace::test::alexa::MockInitiatorVerifier> getInitiatorVerifierMock();
     std::shared_ptr<aace::test::alexa::MockDeviceSettingsDelegate> getDeviceSettingsDelegateMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockLocaleAssetsManager>
     getLocaleAssetsManagerInterfaceMock();
@@ -147,6 +148,7 @@ public:
     std::shared_ptr<aace::test::avs::MockAudioPlayerObserverInterface> getAudioPlayerObserverInterfaceMock();
     std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> getEndpointBuilderMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> getAuthDelegate();
+    std::shared_ptr<aace::test::avs::MockMetricRecorder> getMetricRecorder();
 
     // platform interface mocks
     std::shared_ptr<MockAlerts> getAlertsMock();
@@ -183,7 +185,7 @@ private:
     std::shared_ptr<aace::test::avs::MockEndpointRegistrationManagerInterface>
         m_mockEndpointRegistrationManagerInterface;
     std::shared_ptr<aace::test::alexa::MockWakewordEngineAdapter> m_mockWakewordEngineAdapter;
-    std::shared_ptr<aace::test::alexa::MockWakewordVerifier> m_mockWakewordVerifier;
+    std::shared_ptr<aace::test::alexa::MockInitiatorVerifier> m_mockInitiatorVerifier;
     std::shared_ptr<aace::test::alexa::MockDeviceSettingsDelegate> m_mockDeviceSettingsDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> m_mockContextManagerInterface;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockFocusManager> m_mockFocusManagerInterface;
@@ -214,6 +216,7 @@ private:
     std::shared_ptr<aace::test::avs::MockAudioPlayerInterface> m_mockAudioPlayerInterface;
     std::shared_ptr<aace::test::avs::MockAudioPlayerObserverInterface> m_mockAudioPlayerObserverInterface;
     std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> m_mockEndpointBuilder;
+    std::shared_ptr<aace::test::avs::MockMetricRecorder> m_mockMetricRecorder;
 
     // platform interface mocks
     std::shared_ptr<MockAlerts> m_mockAlerts;

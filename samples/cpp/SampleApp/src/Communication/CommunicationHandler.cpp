@@ -25,6 +25,41 @@
 namespace sampleApp {
 namespace communication {
 
+REGISTER_EXTENSION("AlexaComms", CommunicationExtension);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  CommunicationExtension
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool CommunicationExtension::initialize(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler,
+    std::weak_ptr<aace::propertyManager::PropertyManager> propertyManagerHandler) {
+    m_communicationHandler = CommunicationHandler::create(activity, loggerHandler);
+    return true;
+}
+
+bool CommunicationExtension::validate(const std::vector<nlohmann::json>& configs) {
+    // Look for comms config
+    for (auto const& j : configs) {
+        try {
+            auto obj = j.at("aace.alexa").at("avsDeviceSDK").at("communications");
+            if (obj.is_object()) {
+                return true;
+            }
+        } catch (nlohmann::json::exception& e) {
+        }
+    }
+
+    return false;
+}
+
+std::shared_ptr<aace::core::PlatformInterface> CommunicationExtension::getPlatformInterfaceHandler() {
+    return m_communicationHandler;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  CommunicationHandler
@@ -151,7 +186,7 @@ void CommunicationHandler::log(logger::LoggerHandler::Level level, const std::st
 }
 
 void CommunicationHandler::showDisplayInfo() {
-    log(logger::LoggerHandler::Level::VERBOSE, "Showing communications display info");
+    log(logger::LoggerHandler::Level::VERBOSE, "Showing communication display info");
     if (auto console = m_console.lock()) {
         console->printRuler();
         console->printLine("Communication call display info: " + m_callDisplayInfo);
@@ -160,7 +195,7 @@ void CommunicationHandler::showDisplayInfo() {
 }
 
 void CommunicationHandler::showState() {
-    log(logger::LoggerHandler::Level::VERBOSE, "Showing communications state");
+    log(logger::LoggerHandler::Level::VERBOSE, "Showing communication state");
     if (auto console = m_console.lock()) {
         console->printRuler();
         console->printLine("Communication call state: " + callStateToString(m_callState));
@@ -176,21 +211,6 @@ std::string CommunicationHandler::callStateToString(CallState state) {
                                                                {CallState::NONE, "NONE"}};
 
     return callStateMap.at(state);
-}
-
-bool CommunicationHandler::checkConfiguration(const std::vector<json>& configs) {
-    // Look for comms config
-    for (auto const& j : configs) {
-        try {
-            auto obj = j.at("aace.alexa").at("avsDeviceSDK").at("communications");
-            if (obj.is_object()) {
-                return true;
-            }
-        } catch (json::exception& e) {
-        }
-    }
-
-    return false;
 }
 
 }  // namespace communication

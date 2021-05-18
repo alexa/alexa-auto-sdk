@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -73,7 +73,6 @@ protected:
             m_alexaMockFactory->getEndpointBuilderMock(),
             m_playerInfoInterfaceMock,
             m_alexaMockFactory->getFocusManagerInterfaceMock(),
-            m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getDialogUXStateAggregatorMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
 
@@ -107,20 +106,18 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithPlatformInterfaceAsNull) {
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
 
     ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
 }
 
-TEST_F(TemplateRuntimeEngineImplTest, createWithDirectiveSequencerAsNull) {
+TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesRegistrarAsNull) {
     auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
         m_alexaMockFactory->getTemplateRuntimeMock(),
         nullptr,
         m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
 
@@ -134,22 +131,6 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithFocusManagerAsNull) {
         m_alexaMockFactory->getTemplateRuntimeMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_playerInfoInterfaceMock,
-        nullptr,
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
-        m_alexaMockFactory->getDialogUXStateAggregatorMock(),
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
-
-    ASSERT_EQ(templateRuntimeEngineImpl, nullptr) << "TemplateRuntimeEngineImpl pointer expected to be null";
-}
-
-TEST_F(TemplateRuntimeEngineImplTest, createWithCapabilitiesDelegateAsNull) {
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
-
-    auto templateRuntimeEngineImpl = aace::engine::alexa::TemplateRuntimeEngineImpl::create(
-        m_alexaMockFactory->getTemplateRuntimeMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        m_playerInfoInterfaceMock,
-        m_alexaMockFactory->getFocusManagerInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
@@ -165,7 +146,6 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithDialogUXStateAggregatorAsNull) {
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock());
 
@@ -180,7 +160,6 @@ TEST_F(TemplateRuntimeEngineImplTest, createWithExceptionSenderAsNull) {
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_playerInfoInterfaceMock,
         m_alexaMockFactory->getFocusManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getDialogUXStateAggregatorMock(),
         nullptr);
 

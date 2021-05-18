@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,16 +22,18 @@ import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SwitchCompat;
+
 import com.amazon.aace.location.Location;
 import com.amazon.aace.location.LocationProvider;
 import com.amazon.sampleapp.R;
+import com.amazon.sampleapp.core.EngineStatusListener;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 import java.io.IOException;
@@ -43,7 +45,7 @@ import java.util.List;
  * network providers. It includes a means to provide a user-entered mock location to the Engine
  * instead of the current physical location.
  */
-public class LocationProviderHandler extends LocationProvider implements LocationListener {
+public class LocationProviderHandler extends LocationProvider implements LocationListener, EngineStatusListener {
     /// A string to identify log entries originating from this file
     private static final String TAG = "LocationProvider";
     /// The minimum time interval in milliseconds between updates from the location provider
@@ -94,13 +96,6 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
         for (String provider : availableProviders) {
             mAvailableProviders.add(provider);
         }
-
-        requestLocationUpdates(LocationManager.NETWORK_PROVIDER);
-        requestLocationUpdates(LocationManager.GPS_PROVIDER);
-
-        // Retrieve an initial location estimate cached by the location providers
-        updateCurrentLocation(LocationManager.NETWORK_PROVIDER);
-        updateCurrentLocation(LocationManager.GPS_PROVIDER);
 
         // Set an initial default mock location
         mMockLocation = new android.location.Location("");
@@ -158,12 +153,15 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
     @Override
     public void onProviderDisabled(String provider) {
         mLogger.postVerbose(TAG, String.format("provider disabled: %s", provider));
-        mCurrentLocation = null;
+        if (!isAnyProviderAvailable()) {
+            locationServiceAccessChanged(LocationServiceAccess.DISABLED);
+        }
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         mLogger.postVerbose(TAG, String.format("provider enabled: %s", provider));
+        locationServiceAccessChanged(LocationServiceAccess.ENABLED);
         requestLocationUpdates(provider);
         updateCurrentLocation(provider);
     }
@@ -374,5 +372,28 @@ public class LocationProviderHandler extends LocationProvider implements Locatio
         return String.format("provider: %s, latitude: %s, longitude: %s, altitude: %s, accuracy: %s",
                 location.getProvider(), location.getLatitude(), location.getLongitude(), location.getAltitude(),
                 location.getAccuracy());
+    }
+
+    private boolean isAnyProviderAvailable() {
+        boolean available = false;
+        for (String provider : mAvailableProviders) {
+            available = available || mLocationManager.isProviderEnabled(provider);
+        }
+        return available;
+    }
+
+    @Override
+    public void onEngineStart() {
+        requestLocationUpdates(LocationManager.NETWORK_PROVIDER);
+        requestLocationUpdates(LocationManager.GPS_PROVIDER);
+
+        // Retrieve an initial location estimate cached by the location providers
+        updateCurrentLocation(LocationManager.NETWORK_PROVIDER);
+        updateCurrentLocation(LocationManager.GPS_PROVIDER);
+    }
+
+    @Override
+    public void onEngineStop() {
+        mLocationManager.removeUpdates(this);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -144,12 +144,12 @@ std::shared_ptr<aace::test::alexa::MockWakewordEngineAdapter> AlexaMockComponent
     return m_mockWakewordEngineAdapter;
 }
 
-std::shared_ptr<aace::test::alexa::MockWakewordVerifier> AlexaMockComponentFactory::getWakewordVerifierMock() {
-    if (m_mockWakewordVerifier == nullptr) {
-        m_mockWakewordVerifier = std::make_shared<aace::test::alexa::MockWakewordVerifier>();
+std::shared_ptr<aace::test::alexa::MockInitiatorVerifier> AlexaMockComponentFactory::getInitiatorVerifierMock() {
+    if (m_mockInitiatorVerifier == nullptr) {
+        m_mockInitiatorVerifier = std::make_shared<aace::test::alexa::MockInitiatorVerifier>();
     }
 
-    return m_mockWakewordVerifier;
+    return m_mockInitiatorVerifier;
 }
 
 std::shared_ptr<aace::test::alexa::MockDeviceSettingsDelegate> AlexaMockComponentFactory::
@@ -277,6 +277,14 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectio
     return m_mockAVSConnectionManagerInterface;
 }
 
+std::shared_ptr<aace::test::avs::MockMetricRecorder> AlexaMockComponentFactory::getMetricRecorder() {
+    if (m_mockMetricRecorder == nullptr) {
+        m_mockMetricRecorder = std::make_shared<aace::test::avs::MockMetricRecorder>();
+    }
+
+    return m_mockMetricRecorder;
+}
+
 std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> AlexaMockComponentFactory::getAVSConnectionManagerMock() {
     if (m_mockAVSConnectionManager == nullptr) {
         auto messageRouter = getMessageRouterMock();
@@ -319,9 +327,8 @@ std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> AlexaMockComponentFa
         auto contextManager = getContextManagerInterfaceMock();
         auto exceptionSender = getExceptionEncounteredSenderInterfaceMock();
         auto alexaInternalInterface = getAlexaInterfaceMessageSenderInternalInterfaceMock();
-        auto endpointRegistrationManagerInterface = getEndpointRegistrationManagerInterfaceMock();
         m_mockEndpointBuilder = alexaClientSDK::endpoints::EndpointBuilder::create(
-            *deviceInfo, endpointRegistrationManagerInterface, contextManager, exceptionSender, alexaInternalInterface);
+            std::move(deviceInfo), contextManager, exceptionSender, alexaInternalInterface);
     }
 
     return std::move(m_mockEndpointBuilder);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@ package com.amazon.sampleapp.impl.DoNotDisturb;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.amazon.aace.alexa.AlexaClient.AuthError;
 import com.amazon.aace.alexa.AlexaClient.AuthState;
 import com.amazon.aace.alexa.DoNotDisturb;
 import com.amazon.sampleapp.R;
-import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
+import com.amazon.sampleapp.core.AuthStateObserver;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
 public class DoNotDisturbHandler extends DoNotDisturb implements AuthStateObserver {

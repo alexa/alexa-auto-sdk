@@ -5,7 +5,7 @@ android {
     defaultConfig {
         minSdkVersion 26
         versionCode 1
-        versionName "1.0"
+        versionName "3.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':alexa-auto-apis')
     implementation project(':alexa-auto-apps-common-ui')
     implementation project(':alexa-auto-apps-common-util')
+    implementation project(':aacsipc')
 
     implementation deps.androidx_appcompat
     implementation 'androidx.recyclerview:recyclerview:1.1.0'

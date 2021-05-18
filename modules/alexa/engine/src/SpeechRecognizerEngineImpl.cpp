@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,17 +16,19 @@
 #include <climits>
 #include <exception>
 
-#include "AACE/Engine/Alexa/AlexaMetrics.h"
 #include "AACE/Engine/Alexa/DeviceSettingsDelegate.h"
 #include "AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h"
-#include "AACE/Engine/Alexa/UPLService.h"
 #include "AACE/Engine/Alexa/WakewordObservableInterface.h"
 #include "AACE/Engine/Alexa/WakewordObserverInterface.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Alexa/AlexaProperties.h"
+#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
+
+using namespace aace::engine::utils::metrics;
 
 /// The maximum number of readers of the stream.
 static const size_t MAX_READERS = 10;
@@ -40,6 +42,58 @@ static const std::chrono::milliseconds VERIFICATION_TIMEOUT = std::chrono::milli
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.SpeechRecognizerEngineImpl");
 
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "SpeechRecognizerEngineImpl";
+
+/// Counter metrics for SpeechRecognizer Platform APIs
+static const std::string METRIC_SPEECHRECOGNIZER_START_CAPTURE = "StartCapture";
+static const std::string METRIC_SPEECHRECOGNIZER_STOP_CAPTURE = "StopCapture";
+static const std::string METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED = "WakewordDetected";
+
+// Evaluates the correct startOfSpeechTimestamp by subtracting how long ago the wakeword started from steady clock now.
+static bool computeStartOfSpeechTimestamp(
+    const alexaClientSDK::avsCommon::avs::AudioInputStream::Index wakewordBeginIndex,
+    const alexaClientSDK::avsCommon::avs::AudioInputStream::Index wakewordEndIndex,
+    const unsigned int sampleRateHz,
+    const std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& stream,
+    std::chrono::steady_clock::time_point& startOfSpeechTimestamp) {
+    // Create a reader to get the current index position
+    static const auto startWithNewData = true;
+    if (not stream) {
+        return false;
+    }
+
+    auto reader = stream->createReader(
+        alexaClientSDK::avsCommon::avs::AudioInputStream::Reader::Policy::NONBLOCKING, startWithNewData);
+    if (not reader) {
+        return false;
+    }
+
+    // Get the current index position
+    const auto currentIndex = reader->tell();
+
+    // Start with the current time in the startOfSpeechTimestamp corresponding with the currentIndex from the reader.
+    startOfSpeechTimestamp = std::chrono::steady_clock::now();
+
+    if (currentIndex <= wakewordBeginIndex) {
+        // Note: this should never happen, since it should not be possible for millions of years w/ 64-bit indexes.
+        return false;
+    }
+
+    // Translate the currentIndex position to a time duration elapsed since the end of wakeword.
+    const auto sampleRatePerMillisec = sampleRateHz / 1000;
+
+    const auto timeSinceStartOfWW =
+        std::chrono::milliseconds((currentIndex - wakewordBeginIndex) / sampleRatePerMillisec);
+
+    // Adjust the start of speech timestamp to be the start of the WW.
+    startOfSpeechTimestamp -= timeSinceStartOfWW;
+
+    AACE_DEBUG(LX(TAG).d("timeSinceStartOfWW", timeSinceStartOfWW.count()));
+
+    return true;
+}
+
 SpeechRecognizerEngineImpl::SpeechRecognizerEngineImpl(
     std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
     const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat) :
@@ -52,22 +106,24 @@ SpeechRecognizerEngineImpl::SpeechRecognizerEngineImpl(
 
 bool SpeechRecognizerEngineImpl::initialize(
     std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
     const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface>& assetsManager,
     DeviceSettingsDelegate& deviceSettingsDelegate,
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
+    std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
     std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
-    std::shared_ptr<aace::engine::alexa::WakewordVerifier> wakewordVerifier) {
+    const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers) {
     try {
         // create the audio channel
         m_audioInputChannel = audioManager->openAudioInputChannel(
@@ -105,7 +161,10 @@ bool SpeechRecognizerEngineImpl::initialize(
             deviceSettingsDelegate.getWakeWordConfirmationSetting(),
             deviceSettingsDelegate.getSpeechConfirmationSetting(),
             deviceSettingsDelegate.getWakeWordsSetting(),
-            speechEncoder);
+            speechEncoder,
+            alexaClientSDK::capabilityAgents::aip::AudioProvider::null(),
+            nullptr,
+            metricRecorder);
 
         ThrowIfNull(m_audioInputProcessor, "couldNotCreateAudioInputProcessor");
         ThrowIfNot(initializeAudioInputStream(), "initializeAudioInputStreamFailed");
@@ -116,17 +175,19 @@ bool SpeechRecognizerEngineImpl::initialize(
         m_dialogUXStateAggregator = dialogUXStateAggregator;
 
         // register capability with the default endpoint
-        defaultEndpointBuilder->withCapability(m_audioInputProcessor, m_audioInputProcessor);
+        capabilitiesRegistrar->withCapability(m_audioInputProcessor, m_audioInputProcessor);
 
         m_wakewordEngineAdapter = wakewordEngineAdapter;
         if (m_wakewordEngineAdapter != nullptr) {
+            auto defaultLocale = propertyManager->getProperty(aace::alexa::property::LOCALE);
             ThrowIfNot(
-                m_wakewordEngineAdapter->initialize(m_audioInputStream, m_audioFormat), "wakewordInitializeFailed");
+                m_wakewordEngineAdapter->initialize(defaultLocale, m_audioInputStream, m_audioFormat),
+                "wakewordInitializeFailed");
             m_wakewordEngineAdapter->addKeyWordObserver(shared_from_this());
         }
 
         m_directiveSequencer = directiveSequencer;
-        m_wakewordVerifier = wakewordVerifier;
+        m_initiatorVerifiers = initiatorVerifiers;
 
         // get the initialize wakeword enabled state from the platform interface
         m_wakewordEnabled = isWakewordSupported() && m_initialWakewordEnabledState;
@@ -140,7 +201,8 @@ bool SpeechRecognizerEngineImpl::initialize(
 
 std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizerPlatformInterface,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat,
     std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
@@ -148,24 +210,24 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
     const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface>& assetsManager,
     DeviceSettingsDelegate& deviceSettingsDelegate,
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
+    std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
     std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
-    std::shared_ptr<aace::engine::alexa::WakewordVerifier> wakewordVerifier) {
+    const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers) {
     std::shared_ptr<SpeechRecognizerEngineImpl> speechRecognizerEngineImpl = nullptr;
 
     try {
         ThrowIfNull(speechRecognizerPlatformInterface, "invlaidSpeechRecognizerPlatformInterface");
         ThrowIfNull(audioManager, "invalidAudioManager");
-        ThrowIfNull(defaultEndpointBuilder, "invalidEndpointBuilder");
+        ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(directiveSequencer, "invalidDirectiveSequencer");
-        ThrowIfNull(capabilitiesDelegate, "invalidCapabilitiesDelegate");
         ThrowIfNull(messageSender, "invalidMessageSender");
         ThrowIfNull(focusManager, "invalidFocusManager");
         ThrowIfNull(contextManager, "invalidContextManager");
@@ -174,6 +236,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
         ThrowIfNull(userInactivityMonitor, "invalidUserInactivityMonitor");
         ThrowIfNull(connectionManager, "invalidConnectionManager");
         ThrowIfNull(systemSoundPlayer, "invalidSystemSoundPlayer");
+        ThrowIfNull(metricRecorder, "invalidMetricsRecorder");
 
         speechRecognizerEngineImpl = std::shared_ptr<SpeechRecognizerEngineImpl>(
             new SpeechRecognizerEngineImpl(speechRecognizerPlatformInterface, audioFormat));
@@ -181,22 +244,23 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
         ThrowIfNot(
             speechRecognizerEngineImpl->initialize(
                 audioManager,
-                defaultEndpointBuilder,
+                capabilitiesRegistrar,
                 directiveSequencer,
                 messageSender,
                 contextManager,
                 focusManager,
                 dialogUXStateAggregator,
-                capabilitiesDelegate,
                 exceptionSender,
                 userInactivityMonitor,
                 assetsManager,
                 deviceSettingsDelegate,
                 connectionManager,
                 systemSoundPlayer,
+                propertyManager,
+                metricRecorder,
                 speechEncoder,
                 wakewordEngineAdapter,
-                wakewordVerifier),
+                initiatorVerifiers),
             "initializeSpeechRecognizerEngineImplFailed");
 
         // set the platform engine interface reference
@@ -237,6 +301,8 @@ void SpeechRecognizerEngineImpl::doShutdown() {
         m_audioInputChannel->doShutdown();
         m_audioInputChannel.reset();
     }
+
+    m_initiatorVerifiers.clear();
 }
 
 bool SpeechRecognizerEngineImpl::initializeAudioInputStream() {
@@ -336,6 +402,9 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
     uint64_t keywordBegin,
     uint64_t keywordEnd,
     const std::string& keyword) {
+    std::stringstream ss;
+    ss << initiator;
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStartCapture", {METRIC_SPEECHRECOGNIZER_START_CAPTURE, ss.str()});
     if (m_connectionStatus != aace::alexa::AlexaClient::ConnectionStatus::CONNECTED) {
         AACE_WARN(LX(TAG, "onStartCapture").d("reason", "AlexaClient is not connected"));
         return false;
@@ -349,6 +418,17 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
 
         // create a new audio provider for the specified initiator type
         std::shared_ptr<alexaClientSDK::capabilityAgents::aip::AudioProvider> audioProvider;
+
+        if (initiator != Initiator::WAKEWORD) {
+            for (const auto& initiatorVerifier : m_initiatorVerifiers) {
+                if (initiatorVerifier &&
+                    initiatorVerifier->shouldBlock(
+                        static_cast<alexaClientSDK::capabilityAgents::aip::Initiator>(initiator))) {
+                    AACE_WARN(LX(TAG, "onStartCapture: Cancelled by Initiator Verifier for PTT"));
+                    return false;
+                }
+            }
+        }
 
         switch (initiator) {
             case Initiator::HOLD_TO_TALK:
@@ -407,6 +487,7 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
 }
 
 bool SpeechRecognizerEngineImpl::onStopCapture() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStopCapture", {METRIC_SPEECHRECOGNIZER_STOP_CAPTURE});
     try {
         ThrowIfNot(m_audioInputProcessor->stopCapture().get(), "stopCaptureFailed");
         return true;
@@ -447,13 +528,20 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex,
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex,
     std::shared_ptr<const std::vector<char>> KWDMetadata) {
-    if (m_state == AudioInputProcessorObserverInterface::State::IDLE &&
-        m_speechRecognizerPlatformInterface->wakewordDetected(keyword)) {
+    if (m_state == AudioInputProcessorObserverInterface::State::IDLE) {
         m_executor.submit([this, beginIndex, endIndex, keyword] {
-            if (m_wakewordVerifier && m_wakewordVerifier->verify(keyword, VERIFICATION_TIMEOUT)) {
-                AACE_INFO(LX(TAG, "onKeyWordDetected: Cancelled by Wakeword Verifier"));
-                return;
+            std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>::iterator it;
+            for (const auto& initiatorVerifier : m_initiatorVerifiers) {
+                if (initiatorVerifier && initiatorVerifier->shouldBlock(keyword, VERIFICATION_TIMEOUT)) {
+                    AACE_WARN(LX(TAG, "onKeyWordDetected: Cancelled by Initiator Verifier for wakeword"));
+                    return;
+                }
             }
+            emitCounterMetrics(
+                METRIC_PROGRAM_NAME_SUFFIX, "onKeyWordDetected", {METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED});
+            // Only notifies platform interface after passing wakeword verifiers,
+            // otherwise earcon might still play even if keyword is dropped
+            m_speechRecognizerPlatformInterface->wakewordDetected(keyword);
 
             // notify observers about the wakeword detected
             std::lock_guard<std::mutex> lock(m_mutex);
@@ -470,6 +558,15 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
 void SpeechRecognizerEngineImpl::onConnectionStatusChanged(
     const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
     const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason) {
+    // no-op
+}
+
+void SpeechRecognizerEngineImpl::onConnectionStatusChanged(
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+    const std::vector<
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
+        engineStatuses) {
+    AACE_VERBOSE(LX(TAG).d("status", status).d("engineCount", engineStatuses.size()));
     m_connectionStatus = static_cast<aace::alexa::AlexaClient::ConnectionStatus>(status);
 }
 
@@ -481,15 +578,20 @@ bool SpeechRecognizerEngineImpl::startCapture(
     const std::string& keyword) {
     try {
         // ask the aip to start recognizing input
-        ALEXA_METRIC(LX(TAG, "startCapture"), aace::engine::alexa::AlexaMetrics::Location::SPEECH_START_CAPTURE);
-        aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(
-            aace::engine::alexa::UPLService::DialogState::START_CAPTURE,
-            "",
-            m_directiveSequencer->isDialogRequestOnline());
-
+        auto startOfSpeechTimestamp = std::chrono::steady_clock::now();
+        if (alexaClientSDK::capabilityAgents::aip::Initiator::WAKEWORD == initiator) {
+            ThrowIfNot(
+                computeStartOfSpeechTimestamp(
+                    begin,
+                    keywordEnd,
+                    audioProvider->format.sampleRateHz,
+                    audioProvider->stream,
+                    startOfSpeechTimestamp),
+                "computeStartOfSpeechTimestampFailed");
+        }
         ThrowIfNot(
             m_audioInputProcessor
-                ->recognize(*audioProvider, initiator, std::chrono::steady_clock::now(), begin, keywordEnd, keyword)
+                ->recognize(*audioProvider, initiator, startOfSpeechTimestamp, begin, keywordEnd, keyword)
                 .get(),
             "recognizeFailed");
 
@@ -575,25 +677,12 @@ void SpeechRecognizerEngineImpl::onStateChanged(
     // state changed to BUSY means that either the StopCapture directive has been received
     // or the speech recognizer was stopped manually
     if (state == alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::BUSY) {
-        ALEXA_METRIC(LX(TAG, "onStateChanged"), aace::engine::alexa::AlexaMetrics::Location::SPEECH_STOP_CAPTURE);
-        ALEXA_METRIC(
-            LX(TAG, "stopCapture").d("dialogRequestId", m_directiveSequencer->getDialogRequestId()),
-            aace::engine::alexa::AlexaMetrics::Location::SPEECH_STOP_CAPTURE);
-
-        aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(
-            aace::engine::alexa::UPLService::DialogState::STOP_CAPTURE,
-            m_directiveSequencer->getDialogRequestId(),
-            m_directiveSequencer->isDialogRequestOnline());
-
         if (isExpectingAudio()) {
-            ALEXA_METRIC(LX(TAG, "onStateChanged"), aace::engine::alexa::AlexaMetrics::Location::END_OF_SPEECH);
             m_speechRecognizerPlatformInterface->endOfSpeechDetected();
-
             if (m_wakewordEnabled == false) {
                 if (stopAudioInput() == false) {
                     AACE_ERROR(LX(TAG, "handleAudioStateChanged").d("reason", "stopAudioInputFailed"));
                 }
-
                 //setExpectingAudioState( false );
             }
         }

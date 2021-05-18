@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,17 +27,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,26 +41,37 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+
 import com.amazon.aace.alexa.AlexaProperties;
+import com.amazon.aace.alexa.DeviceSetup;
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.aace.alexa.config.AlexaConfiguration;
 import com.amazon.aace.audio.AudioOutputProvider;
-import com.amazon.aace.core.CoreProperties;
 import com.amazon.aace.core.Engine;
 import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.core.config.ConfigurationFile;
 import com.amazon.aace.core.config.EngineConfiguration;
-import com.amazon.aace.core.config.StreamConfiguration;
-import com.amazon.aace.logger.Logger;
-import com.amazon.aace.navigation.Navigation;
 import com.amazon.aace.navigation.config.NavigationConfiguration;
 import com.amazon.aace.propertyManager.PropertyManager;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
+import com.amazon.sampleapp.core.AuthStateObserver;
 import com.amazon.sampleapp.core.AuthorizationHandlerFactoryInterface;
 import com.amazon.sampleapp.core.AuthorizationHandlerObserverInterface;
+import com.amazon.sampleapp.core.EngineStatusListener;
 import com.amazon.sampleapp.core.LoggerControllerInterface;
 import com.amazon.sampleapp.core.ModuleFactoryInterface;
+import com.amazon.sampleapp.core.PropertyListener;
 import com.amazon.sampleapp.core.SampleAppContext;
 import com.amazon.sampleapp.impl.AddressBook.AddressBookHandler;
 import com.amazon.sampleapp.impl.Alerts.AlertsHandler;
@@ -84,6 +84,7 @@ import com.amazon.sampleapp.impl.Authorization.AuthorizationHandler;
 import com.amazon.sampleapp.impl.Authorization.CBLAuthorizationHandler;
 import com.amazon.sampleapp.impl.CarControl.CarControlDataProvider;
 import com.amazon.sampleapp.impl.CarControl.CarControlHandler;
+import com.amazon.sampleapp.impl.DeviceSetup.DeviceSetupHandler;
 import com.amazon.sampleapp.impl.DoNotDisturb.DoNotDisturbHandler;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerConfiguration;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
@@ -113,12 +114,11 @@ import com.amazon.sampleapp.impl.SpeechSynthesizer.SpeechSynthesizerHandler;
 import com.amazon.sampleapp.impl.TemplateRuntime.TemplateRuntimeHandler;
 import com.amazon.sampleapp.impl.TextToSpeech.TextToSpeechHandler;
 import com.amazon.sampleapp.logView.LogEntry;
+import com.google.android.material.tabs.TabLayout;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -142,6 +142,20 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             "es-MX", "es-US", "fr-CA", "fr-FR", "hi-IN", "it-IT", "ja-JP", "pt-BR", "en-CA/fr-CA", "en-IN/hi-IN",
             "en-US/es-US", "es-US/en-US", "fr-CA/en-CA", "hi-IN/en-IN"};
 
+    /// Default list supported device locale
+    private static final String[] sDefaultSupportedLocales = {"en-US", "en-GB", "de-DE", "en-IN", "en-CA", "ja-JP",
+            "en-AU", "fr-FR", "it-IT", "es-ES", "es-MX", "fr-CA", "es-US", "hi-IN", "pt-BR"};
+
+    /// Default list of supported dual locale
+    private static final String[][] sDefaultSupportedDualLocales = {{"en-CA", "fr-CA"}, {"fr-CA", "en-CA"},
+            {"en-US", "es-US"}, {"es-US", "en-US"}, {"en-IN", "hi-IN"}, {"hi-IN", "en-IN"}};
+
+    /// Device default locale.
+    private static final String sDefaultDeviceLocale = "en-US";
+
+    /// Device default timezone
+    private static final String sDefaultDeviceTimeZone = "America/Vancouver";
+
     /* AACE Platform Interface Handlers */
 
     // Alexa
@@ -159,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     private TemplateRuntimeHandler mTemplateRuntime;
     private AlexaSpeakerHandler mAlexaSpeaker;
     private DoNotDisturbHandler mDoNotDisturb;
+    private DeviceSetupHandler mDeviceSetupHandler;
 
     // Core
     private Engine mEngine;
@@ -243,6 +258,13 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     ArrayAdapter<String> timezoneAdapter;
     /* AutoVoiceChrome Controller */
 
+    // Locale
+    private Spinner mLocaleSpinnerView;
+    private ArrayAdapter<String> mLocaleAdapter;
+
+    // A list of listeners to be notified of changes in the Engine lifecycle
+    private List<EngineStatusListener> mEngineStatusListeners = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -309,6 +331,29 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     @Override
     public PropertyManager getPropertyManager() {
         return (PropertyManager) mPropertyManager;
+    }
+
+    @Override
+    public void registerPropertyListener(String name, PropertyListener propertyListener) {
+        if (mPropertyManager != null) {
+            mPropertyManager.registerListener(name, propertyListener);
+        }
+    }
+
+    @Override
+    public void addEngineStatusListener(EngineStatusListener listener) {
+        synchronized (mEngineStatusListeners) {
+            if (listener != null) {
+                mEngineStatusListeners.add(listener);
+            }
+        }
+    }
+
+    @Override
+    public void registerAuthStateObserver(AuthStateObserver observer) {
+        if (mAlexaClient != null && observer != null) {
+            mAlexaClient.registerAuthStateObserver(observer);
+        }
     }
 
     @Override
@@ -434,7 +479,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     /**
      * Continue starting the Engine with the config received from LVC Service.
-     * @param config  json string with LVC config if LVC is supported, null otherwise
+     *
+     * @param config json string with LVC config if LVC is supported, null otherwise
      */
     private void onLVCConfigReceived(String config) {
         // Initialize AAC engine and register platform interfaces
@@ -454,6 +500,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     /**
      * Configure the Engine and register platform interface instances
+     *
      * @param json JSON string with LVC config if LVC is supported, null otherwise.
      * @throws RuntimeException
      */
@@ -473,9 +520,12 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         File modelsDir = new File(appDataDir, "models");
         FileUtils.copyAllAssets(getAssets(), "models", modelsDir, true);
 
-        copyAsset("Contacts.json", new File(sampleDataDir, "Contacts.json"), false);
-        copyAsset("NavigationFavorites.json", new File(sampleDataDir, "NavigationFavorites.json"), false);
-        copyAsset("ConversationsReport.json", new File(sampleDataDir, "ConversationsReport.json"), false);
+        copyAsset(AddressBookHandler.CONTACTS_FILE_NAME, new File(sampleDataDir, AddressBookHandler.CONTACTS_FILE_NAME),
+                false);
+        copyAsset(AddressBookHandler.NAVIGATION_FAVORITES_FILE_NAME,
+                new File(sampleDataDir, AddressBookHandler.NAVIGATION_FAVORITES_FILE_NAME), false);
+        copyAsset(MessagingHandler.CONVERSATIONS_REPORT_FILE_NAME,
+                new File(sampleDataDir, MessagingHandler.CONVERSATIONS_REPORT_FILE_NAME), false);
 
         // Create AAC engine
         mEngine = Engine.create(this);
@@ -524,20 +574,10 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         // LocationProvider
         if (!mEngine.registerPlatformInterface(mLocationProvider = new LocationProviderHandler(this, mLogger)))
             throw new RuntimeException("Could not register LocationProvider platform interface");
-
-        // Messaging sample datafile
-        String conversationsDataPath = sampleDataDir.getPath() + "/ConversationsReport.json";
-
-        // Always use sample data from external storage if available
-        File sampleConversationsFile =
-                new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/ConversationsReport.json");
-
-        if (sampleConversationsFile.exists()) {
-            conversationsDataPath = sampleConversationsFile.getPath();
-        }
+        addEngineStatusListener(mLocationProvider);
 
         // Messaging
-        if (!mEngine.registerPlatformInterface(mMessaging = new MessagingHandler(this, mLogger, conversationsDataPath)))
+        if (!mEngine.registerPlatformInterface(mMessaging = new MessagingHandler(this, mLogger, sampleDataDir)))
             throw new RuntimeException("Could not register MessagingController platform interface");
 
         // PhoneCallController
@@ -622,27 +662,12 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         if (!mEngine.registerPlatformInterface(mTextToSpeech = new TextToSpeechHandler(this, mLogger)))
             throw new RuntimeException("Could not register TextToSpeech platform interface");
 
-        // Contacts/NavigationFavorites
-        String sampleContactsDataPath = sampleDataDir.getPath() + "/Contacts.json";
-        String sampleNavigationFavoritesDataPath = sampleDataDir.getPath() + "/NavigationFavorites.json";
-
-        // Always use sample data from external storage if available
-        File sampleContactsFile =
-                new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Contacts.json");
-        File sampleNavigationFavoritesFile =
-                new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/NavigationFavorites.json");
-
-        if (sampleContactsFile.exists()) {
-            sampleContactsDataPath = sampleContactsFile.getPath();
-        }
-
-        if (sampleNavigationFavoritesFile.exists()) {
-            sampleNavigationFavoritesDataPath = sampleNavigationFavoritesFile.getPath();
-        }
-
-        if (!mEngine.registerPlatformInterface(mAddressBook = new AddressBookHandler(this, mLogger,
-                                                       sampleContactsDataPath, sampleNavigationFavoritesDataPath)))
+        if (!mEngine.registerPlatformInterface(mAddressBook = new AddressBookHandler(this, mLogger, sampleDataDir))) {
             throw new RuntimeException("Could not register AddressBook platform interface");
+        }
+
+        if (!mEngine.registerPlatformInterface(mDeviceSetupHandler = new DeviceSetupHandler(this, mLogger)))
+            throw new RuntimeException("Could not register Device Setup platform interface");
 
         // AlexaComms Handler
 
@@ -722,22 +747,21 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         loadPlatformInterfacesAndLoadUI(mEngine, extraFactories, this);
 
         // Alexa Locale
-        ArrayAdapter<String> localeAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, sSupportedLocales);
+        mLocaleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, sSupportedLocales);
 
-        Spinner spinnerView = (Spinner) findViewById(R.id.locale_spinner);
-        spinnerView.setAdapter(localeAdapter);
+        mLocaleSpinnerView = (Spinner) findViewById(R.id.locale_spinner);
+        mLocaleSpinnerView.setAdapter(mLocaleAdapter);
 
         final String defaultLocale = mPropertyManager.getProperty(AlexaProperties.LOCALE);
 
-        int localePosition = localeAdapter.getPosition(defaultLocale);
+        int localePosition = mLocaleAdapter.getPosition(defaultLocale);
         if (localePosition < 0) {
             Log.e(TAG, defaultLocale + " is not in the Supported Locales");
             localePosition = 0;
         }
-        spinnerView.setSelection(localePosition);
+        mLocaleSpinnerView.setSelection(localePosition);
 
-        spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mLocaleSpinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> arg0, View arg1, int position, long arg3) {
                 String s = sSupportedLocales[position];
@@ -757,10 +781,20 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         // Timezone
         setUpTimeZoneUI();
 
+        mPropertyManager.registerListener(AlexaProperties.TIMEZONE, this::updateTimezoneSpinner);
+        mPropertyManager.registerListener(AlexaProperties.LOCALE, this::updateLocaleSpinner);
+
         // Start the engine
         if (!mEngine.start())
             throw new RuntimeException("Could not start engine");
         mEngineStarted = true;
+
+        synchronized (mEngineStatusListeners) {
+            // Notify the EngineStatusListeners of the change in engine status
+            for (EngineStatusListener listener : mEngineStatusListeners) {
+                listener.onEngineStart();
+            }
+        }
 
         // Check if Amazonlite is supported
         if (mPropertyManager.getProperty(AlexaProperties.WAKEWORD_SUPPORTED).equals("true")) {
@@ -795,6 +829,18 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         });
     }
 
+    public void updateLocaleSpinner(String locale) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                if (mLocaleSpinnerView != null && mLocaleAdapter != null
+                        && !locale.equals(mLocaleSpinnerView.getSelectedItem())) {
+                    int localePosition = mLocaleAdapter.getPosition(locale);
+                    mLocaleSpinnerView.setSelection(localePosition);
+                }
+            }
+        });
+    }
+
     private void setupCallOnDestroyButton() {
         TextView callOnDestroyButton = findViewById(R.id.callOnDestroy_button);
         callOnDestroyButton.setOnClickListener(new View.OnClickListener() {
@@ -807,6 +853,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     /**
      * Get the configurations to start the Engine
+     *
      * @param json JSON string with LVC config if LVC is supported, null otherwise.
      * @param appDataDir path to app's data directory
      * @param certsDir path to certificates directory
@@ -830,7 +877,19 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                                 .DISPLAY_CARD_AUDIO_PLAYBACK_STOPPED_PAUSED_TIMEOUT,
                         1800000)};
 
-        JSONObject config = null;
+        String defaultLocale = sDefaultDeviceLocale;
+
+        // Retrieve device setting configuration data from config file
+        JSONObject deviceSettingsConfig = getConfigFromFile("app_config.json", "deviceSettings");
+        if (deviceSettingsConfig != null) {
+            // To override the default locale set deviceSettings.defaultLocale to desired value in
+            // config file. For example:
+            //  "deviceSettings": {
+            //     "defaultLocale": "en-IN"
+            //  }
+            defaultLocale = deviceSettingsConfig.optString("defaultLocale", sDefaultDeviceLocale);
+        }
+
         ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration>(Arrays.asList(
                 // AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify
                 // the interface name to use by AVS.
@@ -843,7 +902,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                         appDataDir.getPath() + "/capabilitiesDelegate.sqlite"),
                 AlexaConfiguration.createAlertsConfig(appDataDir.getPath() + "/alerts.sqlite"),
                 AlexaConfiguration.createNotificationsConfig(appDataDir.getPath() + "/notifications.sqlite"),
-                AlexaConfiguration.createDeviceSettingsConfig(appDataDir.getPath() + "/deviceSettings.sqlite"),
+                AlexaConfiguration.createDeviceSettingsConfig(appDataDir.getPath() + "/deviceSettings.sqlite",
+                        sDefaultSupportedLocales, defaultLocale, sDefaultDeviceTimeZone, sDefaultSupportedDualLocales),
                 AlexaConfiguration.createEqualizerControllerConfig(EqualizerConfiguration.getSupportedBands(),
                         EqualizerConfiguration.getMinBandLevel(), EqualizerConfiguration.getMaxBandLevel(),
                         EqualizerConfiguration.getDefaultBandLevels()),
@@ -969,6 +1029,13 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
         if (mEngine != null) {
             mEngine.dispose();
+        }
+
+        synchronized (mEngineStatusListeners) {
+            for (EngineStatusListener listener : mEngineStatusListeners) {
+                listener.onEngineStop();
+            }
+            mEngineStatusListeners.clear();
         }
 
         // AutoVoiceChrome cleanup
@@ -1319,24 +1386,26 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         }
     }
 
-    //     Register platform interfaces and load UI of extra modules
+    // Register platform interfaces and load UI of extra modules
     private void loadPlatformInterfacesAndLoadUI(
             Engine engine, List<ModuleFactoryInterface> extraModuleFactories, SampleAppContext sampleAppContext) {
         for (ModuleFactoryInterface moduleFactory : extraModuleFactories) {
-            //     Inflate any drawer view UIs. Must inflate UI before registering platform interfaces
+            // Inflate any drawer view UIs. Must inflate UI before registering platform interfaces
             LinearLayout llDisplayData = findViewById(R.id.drawer_linear_layout);
             LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             for (int layoutResourceNumber : moduleFactory.getLayoutResourceNums()) {
                 View tempView = linflater.inflate(layoutResourceNumber, null);
                 llDisplayData.addView(tempView);
             }
-            //     Add adapter fragments
+
+            // Add adapter fragments
             List<Fragment> fragments = moduleFactory.getFragments(sampleAppContext);
             for (Fragment fragment : fragments) {
                 mAdapter.addFragment(fragment);
                 mAdapter.notifyDataSetChanged();
             }
-            //     Register platform interfaces
+
+            // Register platform interfaces
             List<PlatformInterface> platformInterfaces = moduleFactory.getModulePlatformInterfaces(sampleAppContext);
             for (PlatformInterface platformInterface : platformInterfaces) {
                 if (!engine.registerPlatformInterface(platformInterface))

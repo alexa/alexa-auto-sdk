@@ -1,5 +1,5 @@
 #  Alexa Auto Client Service (AACS)
-Alexa Auto Client Service (AACS) is an Alexa Auto SDK feature packaged in an Android application package (APK). By providing a common service framework, AACS simplifies the integration of the Auto SDK with your Android device and supports all the Auto SDK extensions.
+Alexa Auto Client Service (AACS) is an Alexa Auto SDK feature packaged in a stand alone Android application package (APK) or in an Android archive library (AAR). By providing a common service framework, AACS simplifies the integration of the Auto SDK with your Android device and supports all the Auto SDK extensions.
 
 Your application communicates with AACS through an intent, which is a messaging object on an Android device. AACS provides the platform implementation for certain interfaces, which speeds up Alexa integration for in-vehicle infotainment (IVI). Without AACS, typical integration of the Auto SDK in the IVI involves the implementation of abstract interfaces provided by each Auto SDK module to handle platform-specific functionality. To implement all required platform interfaces, the Auto SDK is integrated to an event-based system that converts from direct method APIs to an event-based architecture.
 
@@ -9,19 +9,28 @@ This document assumes that you understand how the Auto SDK and Alexa Auto Servic
 ## Table of Contents
 - [AACS Architecture](#aacs-architecture)
 - [Obtaining the AACS APK](#obtaining-the-aacs-apk)
+- [Obtaining the AACS AAR](#obtaining-the-aacs-aar)
 - [Using AACS with Your Application](#using-aacs-with-your-application)
   - [AACS as Foreground Service or System Application](#aacs-as-foreground-service-or-system-application)
   - [AACS Initialization and Configuration](#aacs-initialization-and-configuration)
 - [Default Platform Implementation](#default-platform-implementation)
-  - [Text-to-Speech Service Implementation](#text-to-speech-service-implementation)
   - [Property Content Provider Implementation (Optional)](#property-content-provider-implementation-optional)
+- [Including App Components in AACS APK](#including-app-components-in-aacs-apk)
+  - [Text-to-Speech Service](#text-to-speech-service)
+  - [Contacts Library](#contacts-library)
+  - [Telephony Library](#telephony-library)
+  - [Media Player Library](#media-player-library)
 - [Specifying the Intent Targets for Handling Messages](#specifying-the-intent-targets-for-handling-messages)
+  - [Using Android Manifest](#using-android-manifest)
+  - [Using AACS Configuration File](#using-aacs-configuration-file)
 - [Platform Implementation in Your Application](#platform-implementation-in-your-application)
   - [Initial Authentication Sequence Diagram](#initial-authentication-sequence-diagram)
   - [Wake Word Enabled Sequence Diagram](#wake-word-enabled-sequence-diagram)
 - [Client Utility Library](#client-utility-library)
 - [Device Settings Required for AACS](#device-settings-required-for-aacs)
 - [Checking AACS Connection State](#checking-aacs-connection-state)
+- [Request list of extras from AACS](#request-list-of-extras-from-aacs)
+- [Using Instrumentation](#using-instrumentation)
 - [AACS Sample App](#aacs-sample-app)
 
 ## AACS Architecture
@@ -61,10 +70,19 @@ You can obtain the AACS APK in one of two ways:
 * To build the AACS APK from source code, 
 use the SDK build script. It takes a single option, `--aacs-android`, to build all needed dependencies (such as AASB and IPC) and the AACS application. It also generates AAR files that are used for communicating with AACS from your application. For more information about building AACS, see the [Builder README](../../../builder/README.md).
 
+## Obtaining the AACS AAR
+You can obtain the AACS AAR in one of two ways:
+
+* To obtain the pre-built AACS AAR with supported extensions and dependencies, contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
+
+* To build the AACS AAR from source code, 
+use the SDK build script. It takes two mandatory options, `--aacs-android` and `--aacs-aar`, to build all needed dependencies (such as AASB and IPC) and the AACS AAR. It also generates AAR files that are used for communicating with AACS from your application. For more information about building AACS, see the [Builder README](../../../builder/README.md).
+
+
 ## Using AACS with Your Application
 This section provides information about how AACS works with your application.
 
->**Note:** The AACS APK provides the IPC and constants for you to include in your applications so that they can communicate with AACS. For information about the AACS APK, see the [Builder README](../../../builder/README.md).
+>**Note:** The AACS APK or AAR provides the IPC and constants for you to include in your applications so that they can communicate with AACS. For information about the AACS APK, see the [Builder README](../../../builder/README.md).
 
 ### AACS as Foreground Service or System Application
 AACS runs as a started service on Android. The [Initialization](#initialization) section describes how it is started; this section describes what you do to run AACS as a foreground service or a system application. 
@@ -180,7 +198,7 @@ The following documents provide more information about configuration:
     "zones":[]
   },
   "aacs.aasb": {
-    "version": "3.1"
+    "version": "3.2"
   },
   "aacs.general" : {
     "version": "1.0",
@@ -310,6 +328,8 @@ private void shareFilePermissionsOfSameModule(File parent, String[] filenames, S
 }
 ~~~
 
+>**Note:** `AACSConstants.AACS_PACKAGE_NAME` is deprecated and it shall be removed from the future Alexa Auto SDK versions. Use `AACSConstants.getAACSPackageName(Context)` instead.
+
 #### Initialization Protocol
 After starting the service, send file sharing intents for any files outside of AACS that will be needed for configuration. Then, send the configuration message. If there are no files to be shared, the configuration can be sent immediately after AACS is initialized. The configuration is not part of the initial intent to start the service because intents in Android have size limits, which the configuration might exceed. Using the provided IPC library allows for sending configuration of any size. 
 
@@ -391,9 +411,6 @@ configuration file to instruct AACS to handle `LocationProvider` and `NetworkInf
   }
 ~~~
 
-### Text-to-Speech Service Implementation
-AACS supports the Android Text-to-Speech APIs and provides a default implementation for Text-to-Speech Service. For more information, see this [README](./tts/README.md).
-
 ### Property Content Provider Implementation (Optional)
 
 AACS supports the Android `ContentProvider` class, which is a standard Android mechanism for performing CRUD (Create, Read, Update, Delete) operations on stored data. By extending this class, you can use a content provider, instead of AACS messages, to manage Auto SDK properties and retrieve state information. Using a content provider offers the following advantages:
@@ -428,6 +445,7 @@ By using the native Android `ContentProvider` class, you can initiate `query` an
 
 #### Implementation Examples
 1. Add `useDefaultPropertyManager` in the `config.json` file and set it to `true`, as shown in the following example:
+
 ~~~
 ...
     "aacs.defaultPlatformHandlers": {
@@ -526,11 +544,54 @@ if (mExecutor == null ) {
 
 * Valid property value for `aace.alexa.wakewordEnabled` is `true` or `false`. All the other Auto SDK properties will be validated by Auto SDK. Auto SDK will provide value validation for `aace.alexa.wakewordEnabled` in the future.
 
+## Including App Components in AACS APK
+The Auto SDK provides packages (also called "app components") in the `$AAC_SDK_HOME/platforms/android/app-components` directory. App components could be included in AACS APK or in your application to speed up the Alexa integration. The app components supported in the AACS APK are listed below.
+
+>**Note:** Some app components implement the handling of AASB messages for certain topics, allowing your applications to interface with AACS by using standard Android APIs. If you include such app components in the AACS APK, your application does not need to handle the AASB messages for those particular AASB topics. 
+
+### Text-to-Speech Service
+AACS supports the Android Text-to-Speech (TTS) APIs and provides a default implementation for Text-to-Speech Service. Your application can interact with standard Android TTS APIs to convert text to speech. AACS TTS Service communicates with the AACS Core Service using AASB `TextToSpeech` messages to fulfill TTS requests issued by your application. AACS TTS Service is by default built and packaged in the AACS APK. For more information, see this [README](../app-components/alexa-auto-tts/README.md).
+
+### Contacts Library
+AACS Contacts Library provides an implementation of Android Contacts Provider that handles AASB `AddressBook` messages, enabling your app to easily add or remove an address book. To build and include this library with AACS, see this [README](../app-components/alexa-auto-contacts/README.md).
+
+### Telephony Library
+AACS Telephony Library handles AASB `PhoneCallController` messages, enabling Alexa Phone Call Controller functionalities by integrating with Android Telephony Framework. To build and include this library with AACS, see this [README](../app-components/alexa-auto-telephony/README.md).
+
+### Media Player Library
+AACS Media Player enables a multi-modal media player experience with Alexa by handling AASB `AudioOutput` messages and the `TemplateRuntime.RenderPlayerInfo` message. It implements a media session so that media can be controlled with standard Android Media Session APIs. This capability also enables Alexa Media with the Android Automotive Media UI. For more information, see this [README](../app-components/alexa-auto-media-player/README.md). 
+>**Note:** When you build AACS with Alexa Auto Media Player, your application does not need to include a media player for Alexa music.
+
+To build and include this library with AACS, follow these steps:
+1) Use the Auto SDK builder script to build the AARs required by AACS:
+```shell
+    $ ${AAC_SDK_HOME}/builder/build.sh android -t androidarm --aacs-android
+```
+2) Include the following app-component AARs in the `$AAC_SDK_HOME/platforms/android/alexa-auto-client-service/android-service/service/libs/` directory. See this [README](../../../samples/android-aacs-sample-app/alexa-auto-app/README.md#building-and-signing-the-aacs-sample-app-apk) for app-component build instructions.
+    *  alexa-auto-apis
+    *  alexa-auto-apps-common-ui
+    *  alexa-auto-apps-common-util
+    *  alexa-auto-media-player
+    
+3) Change directory to `$AAC_SDK_HOME/platforms/android/alexa-auto-client-service/android-service/` and use the following command to build the AACS APK:
+```shell
+    $ ./gradlew assembleLocalRelease
+```
+The unsigned version of the AACS APK is generated to `$AAC_SDK_HOME/platforms/android/alexa-auto-client-service/android-service/service/build/outputs/apk/local/release/`.
+
+  >**Note:** Use `./gradlew assembleLocalDebug` to generate an AACS debug build. The unsigned APK is generated to `$AAC_SDK_HOME/platforms/android/alexa-auto-client-service/android-service/service/build/outputs/apk/local/debug` instead. 
+
+  You can also build AACS using Android Studio. To build with Android Studio, following these steps:
+  1) Click the `Open an Existing Project` option in Android Studio and select `$AAC_SDK_HOME/platforms/android/alexa-auto-client-service/android-service` folder. 
+  2) Go to `View` > `Tool Windows` > `Build Variant`. Make sure the build variant of the `service` module is either `localRelease` or `localDebug`. 
+  3) Select the `Make Project` option in the `Build` tab to generate the APK.
+
 ## Specifying the Intent Targets for Handling Messages
 
 The AASB message intent targets can be `ACTIVITY`, `RECEIVER`, or `SERVICE`. There are two ways to specify the intent targets for AASB message intents from AACS.
 
-* Define intent filters in your application's Android Manifest. The intent filter must exactly match the intents' categories and actions. In the intent filter for an intent that wraps an AASB message, specify the category as `com.amazon.aacs.aasb.<AASB_Message_Topic>` and action as `com.amazon.aacs.aasb.<AASB_Message_Action>`. 
+### Using Android Manifest
+You can define intent filters in your application's Android Manifest. The intent filter must exactly match the intents' categories and actions. In the intent filter for an intent that wraps an AASB message, specify the category as `com.amazon.aacs.aasb.<AASB_Message_Topic>` and action as `com.amazon.aacs.aasb.<AASB_Message_Action>`. 
 
 The following example shows an intent filter of all the CBL message intents for a broadcast receiver target:
 ~~~
@@ -550,9 +611,14 @@ To receive the message specified through the Android Manifest, the application m
 <uses-permission android:name="com.amazon.alexaautoclientservice" />
 ~~~
 
-**NOTE**: If the target is an activity, you must add `<category android:name="android.intent.category.DEFAULT" />` to the intent filter as explained [here](https://developer.android.com/guide/components/intents-filters).
+Follow these important guidelines if the intent target is an activity:
 
-* Use the AACS configuration file to specify the app that can handle AASB messages with a specific "topic". This method of specifying intent targets has the highest priority, meaning it can *override* the ones specified through intent filters in manifests. After you use the AACS configuration to specify the app, intents with all the actions belonging to the topic go to the specified targets.
+* You must add `<category android:name="android.intent.category.DEFAULT" />` to the intent filter as explained [here](https://developer.android.com/guide/components/intents-filters). 
+
+* Be aware that if you start applications with AACS (for example, by specifying Activity as the intent targets from AACS), the target Activity will move to the foreground or become in focus, causing distraction or confusion to the user. AACS does not request `SYSTEM_ALERT_WINDOW` permission to directly create windows on top of all other apps. Amazon recommends using VIS (VoiceInteractionService) to launch activities, and using Android Services or Broadcast Receivers to receive intents from AACS.
+
+### Using AACS Configuration File
+You can use the AACS configuration file to specify the app that can handle AASB messages with a specific "topic". This method of specifying intent targets has the highest priority, meaning it can *override* the ones specified through intent filters in manifests. After you use the AACS configuration to specify the app, intents with all the actions belonging to the topic go to the specified targets.
 Fill the optional fields in `intentTargets` in the AACS configuration file as needed. See the  [Configuration Reference documentation](./android-service/README.md) for information about `intentTargets`. The following sample configuration shows how to populate `intentTargets` for each topic. The field `type` accepts `RECEIVER`, `ACTIVITY`, and `SERVICE`, depending on the type of the target that handles the intents with the topic. The targets can be broadcast receiver, application activity, and service.
 
 The format for specifying AASB message intent targets for an AASB message topic is as follows:
@@ -652,9 +718,66 @@ If AACS responds to the ping request, the `AACSPingResponse.AACSState` string re
 * `STARTED` 
 * `WAIT_FOR_LVC_CONFIG`
 * `CONFIGURED` 
+* `ENGINE_INITIALIZED`
+* `CONNECTED`
 * `STOPPED`
 
 If AACS does not respond within the default timeout of 1 second, `AACSPingResponse.hasResponse` is `false`.
+
+
+## Request list of extras from AACS
+
+Your application can receive the list of AACS extra modules by sending an intent with the action `GET_SERVICE_METADATA` and the category `GET_SERVICE_METADATA`, which returns a response by receiving an intent `GET_SERVICE_METADATA_REPLY`.
+
+To get the extras list from AACS-
+
+- Specify the permission name in your application's Android Manifest file as follows:
+
+~~~ xml
+<uses-permission android:name="com.amazon.alexaautoclientservice.getservicemetadata"/>
+~~~
+
+- Register a receiver in you application's Android Manifest file as follows:
+Following block shows an example of requesting list of extras:
+
+~~~ xml
+<receiver android:name=".<Receiver Class>"
+          android:enabled="true"
+          android:exported="true" />
+~~~
+
+- Send a request intent to AACS. Following code snippet shows an example
+
+~~~ java
+Intent intent = new Intent();
+intent.setAction(AACSConstants.IntentAction.GET_SERVICE_METADATA);
+intent.addCategory(AACSConstants.IntentCategory.GET_SERVICE_METADATA);
+intent.putExtra(AACSConstants.REPLY_TO_PACKAGE,getPackageName());
+intent.putExtra(AACSConstants.REPLY_TO_CLASS, <Receiver Class Name>.class.getName());
+intent.putExtra(AACSConstants.REPLY_TYPE, "RECEIVER");
+sendBroadcast(intent);
+~~~
+
+- Your receiver class will receive an intent with the following payload
+
+~~~ json
+{
+  "metaData": {
+    "extrasModuleList": []
+  }
+}
+~~~
+
+- You can get the payload from the received intent `GET_SERVICE_METADATA_REPLY`. Following code snippet shows the example:
+
+~~~ java
+String payload = intent.getStringExtra(AACSConstants.PAYLOAD);
+~~~
+
+## Using Instrumentation
+You can use AACS instrumentation to log AASB messages for debugging purposes. For more information about how to use instrumentation, see the [AACS Instrumentation README](./android-service/service/src/debug/java/com/amazon/alexaautoclientservice/README.md).
+
+>**Note:** You can use instrumentation only if you use the debug option when building the Auto SDK with AACS.
 
 ## AACS Sample App
 The Auto SDK includes an Android-based application that demonstrates how an application uses AACS. For more information about the AACS Sample App, see the [AACS Sample App README](../../../samples/android-aacs-sample-app/alexa-auto-app/README.md).

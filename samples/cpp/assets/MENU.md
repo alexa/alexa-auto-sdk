@@ -14,6 +14,7 @@ This document outlines the menu system that drives the C++ Sample App.
     - [Login<a id="login"></a>](#login)
     - [Logout<a id="logout"></a>](#logout)
     - [Quit<a id="quit"></a>](#quit)
+    - [DeviceSetupCompleted<a id="deviceSetupCompleted"></a>](#deviceSetupCompleted)
     - [Restart<a id="restart"></a>](#restart)
     - [Select<a id="select"></a>](#select)
     - [SetLocale<a id="setlocale"></a>](#setlocale)
@@ -103,6 +104,11 @@ For example:
             "do": "Restart",
             "key": "R",
             "name": "Restart application"
+        },
+        {
+            "do": "SetupCompleted",
+            "key": "3",
+            "name": "Setup Completed"
         },
         {
             "do": "Quit",
@@ -297,40 +303,17 @@ For example:
 }
 ```
 
-### Login<a id="login"></a>
+### DeviceSetupCompleted<a id="deviceSetupCompleted"></a>
 
-***(Experimental)*** The **Login** action sets the user config file path and restarts the application (without confirmation). The application will stop and shut down, then reload and configure, register platform interfaces, and start the Engine. The user config file path is added to the configuration files.
-
-For example:
-
-```json
-{
-    "do": "Login",
-    "key": "A",
-    "name": "Login User A",
-    "value": "./user-a.json"
-},
-{
-    "do": "Login",
-    "key": "B",
-    "name": "Login User B",
-    "value": "./user-b.json"
-}
-```
-
->**Note:** In this example, the main config file (config.json) contains device information and general settings, and the user config files (user-a.json and user-b.json) contain custom settings (e.g. database paths) for individual users A and B. The user config file paths are relative to the menu file.
-
-### Logout<a id="logout"></a>
-
-***(Experimental)*** The **Logout** action logs out the current user and restarts the application (with confirmation). The application will stop and shut down, then reload and configure, register platform interfaces, and start the Engine. The user config file path and authentication refresh token are both cleared.
+The **DeviceSetupCompleted** action informs Alexa when a product has completed setup after an out-of-box experience (OOBE). Alexa can use this event to trigger on-boarding experiences like a short first time conversation on supported devices.
 
 For example:
 
 ```json
 {
-    "do": "Logout",
-    "key": "O",
-    "name": "Logout"
+    "do": "SetupCompleted",
+    "key": "3",
+    "name": "Setup Completed"
 }
 ```
 

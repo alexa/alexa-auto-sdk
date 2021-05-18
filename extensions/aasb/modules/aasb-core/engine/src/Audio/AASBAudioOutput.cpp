@@ -373,7 +373,7 @@ int64_t AASBAudioOutput::getNumBytesBuffered() {
         message.payload.channel = m_name;
         message.payload.token = m_currentToken;
 
-        auto result = m_messageBroker_lock->publish(message.toString()).timeout(std::chrono::milliseconds(500)).get();
+        auto result = m_messageBroker_lock->publish(message.toString()).get();
 
         ThrowIfNot(result.valid(), "waitForMessageResponseFailed");
 

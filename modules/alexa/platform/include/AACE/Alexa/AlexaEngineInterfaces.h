@@ -192,6 +192,51 @@ public:
     virtual void onTogglePressed(PlaybackToggle toggle, bool action) = 0;
 };
 
+inline std::ostream& operator<<(std::ostream& stream, const PlaybackControllerEngineInterface::PlaybackToggle& toggle) {
+    switch (toggle) {
+        case PlaybackControllerEngineInterface::PlaybackToggle::SHUFFLE:
+            stream << "SHUFFLE";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackToggle::LOOP:
+            stream << "LOOP";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackToggle::REPEAT:
+            stream << "REPEAT";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackToggle::THUMBS_UP:
+            stream << "THUMBS_UP";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackToggle::THUMBS_DOWN:
+            stream << "THUMBS_DOWN";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const PlaybackControllerEngineInterface::PlaybackButton& button) {
+    switch (button) {
+        case PlaybackControllerEngineInterface::PlaybackButton::PLAY:
+            stream << "PLAY";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackButton::PAUSE:
+            stream << "PAUSE";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackButton::NEXT:
+            stream << "NEXT";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackButton::PREVIOUS:
+            stream << "PREVIOUS";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackButton::SKIP_FORWARD:
+            stream << "SKIP_FORWARD";
+            break;
+        case PlaybackControllerEngineInterface::PlaybackButton::SKIP_BACKWARD:
+            stream << "SKIP_BACKWARD";
+            break;
+    }
+    return stream;
+}
+
 /**
  * AuthProviderEngineInterface
  */
@@ -560,6 +605,14 @@ public:
 class AlexaClientEngineInterface {
 public:
     virtual void onStopForegroundActivity() = 0;
+};
+
+/**
+ * DeviceSetupEngineInterface
+ */
+class DeviceSetupEngineInterface {
+public:
+    virtual void onSetupCompleted() = 0;
 };
 
 }  // namespace alexa

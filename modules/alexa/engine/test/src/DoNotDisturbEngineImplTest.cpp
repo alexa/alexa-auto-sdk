@@ -86,7 +86,9 @@ public:
             m_alexaMockFactory->getCustomerDataManagerMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
-            *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+            *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+            std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+            m_alexaMockFactory->getMetricRecorder());
 
         if (DEBUG) {
             std::cout << "Exit " << __PRETTY_FUNCTION__ << std::endl;
@@ -141,7 +143,9 @@ TEST_F(DoNotDisturbEngineImplTest, createWithDoNotDisturbAsNull) {
         m_alexaMockFactory->getCustomerDataManagerMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+        std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+        m_alexaMockFactory->getMetricRecorder());
 
     EXPECT_EQ(nullptr, DoNotDisturbEngineImplTemp) << "DoNotDisturbEngineImpl should be null";
 }
@@ -158,7 +162,9 @@ TEST_F(DoNotDisturbEngineImplTest, createWithEndpointBuilderAsNull) {
         m_alexaMockFactory->getCustomerDataManagerMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+        std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+        m_alexaMockFactory->getMetricRecorder());
 
     EXPECT_EQ(nullptr, DoNotDisturbEngineImplTemp) << "DoNotDisturbEngineImpl should be null";
 }
@@ -175,7 +181,9 @@ TEST_F(DoNotDisturbEngineImplTest, createWithConnectionManagerAsNull) {
         m_alexaMockFactory->getCustomerDataManagerMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+        std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+        m_alexaMockFactory->getMetricRecorder());
     EXPECT_EQ(nullptr, DoNotDisturbEngineImplTemp) << "DoNotDisturbEngineImpl should be null";
 }
 
@@ -191,7 +199,9 @@ TEST_F(DoNotDisturbEngineImplTest, createWithCustomerDataManagerAsNull) {
         nullptr,
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+        std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+        m_alexaMockFactory->getMetricRecorder());
     EXPECT_EQ(nullptr, DoNotDisturbEngineImplTemp) << "DoNotDisturbEngineImpl should be null";
 }
 
@@ -207,7 +217,9 @@ TEST_F(DoNotDisturbEngineImplTest, createWithExceptionEncounteredSenderInterface
         m_alexaMockFactory->getCustomerDataManagerMock(),
         nullptr,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+        std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+        m_alexaMockFactory->getMetricRecorder());
     EXPECT_EQ(nullptr, DoNotDisturbEngineImplTemp) << "DoNotDisturbEngineImpl should be null";
 }
 
@@ -223,7 +235,9 @@ TEST_F(DoNotDisturbEngineImplTest, createWithMessageSenderAsNull) {
         m_alexaMockFactory->getCustomerDataManagerMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         nullptr,
-        *m_alexaMockFactory->getDeviceSettingsDelegateMock());
+        *m_alexaMockFactory->getDeviceSettingsDelegateMock(),
+        std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>(),
+        m_alexaMockFactory->getMetricRecorder());
     EXPECT_EQ(nullptr, DoNotDisturbEngineImplTemp) << "DoNotDisturbEngineImpl should be null";
 }
 

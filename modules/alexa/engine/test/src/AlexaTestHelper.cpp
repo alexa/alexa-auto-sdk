@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,9 +34,12 @@ static const std::string ALEXA_CONFIG =
     "            \"deviceInfo\":{"
     "                \"deviceSerialNumber\":\"12345678\", "
     "                \"clientId\":\"DummyClientId\","
-    "                \"productId\":\"DummyProductID\""
+    "                \"productId\":\"DummyProductID\","
+    "                \"manufacturerName\":\"DummyManufacturerName\","
+    "                \"description\": \"desc\""
     "            },"
     "            \"capabilitiesDelegate\":{"
+    "                \"databaseFilePath\":\"capabilitiesDatabase.db\""
     "            },"
     "            \"miscDatabase\":{"
     "                \"databaseFilePath\":\"miscDatabase.db\""
@@ -56,9 +59,14 @@ static const std::string ALEXA_CONFIG =
     "            \"certifiedSender\":{"
     "                \"databaseFilePath\":\"certifiedSender.db\""
     "            },"
-    "            \"notifications\":{ "
+    "            \"notifications\":{"
     "                \"databaseFilePath\":\"notifications.db\""
-    "            }"
+    "            },"
+    "            \"deviceSettings\": {"
+    "               \"databaseFilePath\": \"deviceSettings.db\","
+    "               \"defaultLocale\" : \"en-US\","
+    "               \"defaultTimezone\" :\"America/Vancouver\""
+    "           }"
     "        }"
     "    }"
     "}";

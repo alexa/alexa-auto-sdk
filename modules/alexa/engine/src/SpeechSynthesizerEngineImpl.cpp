@@ -13,9 +13,7 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Engine/Alexa/AlexaMetrics.h"
 #include "AACE/Engine/Alexa/SpeechSynthesizerEngineImpl.h"
-#include "AACE/Engine/Alexa/UPLService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -35,16 +33,16 @@ SpeechSynthesizerEngineImpl::SpeechSynthesizerEngineImpl(
 
 bool SpeechSynthesizerEngineImpl::initialize(
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     try {
         ThrowIfNot(initializeAudioChannel(audioOutputChannel, speakerManager), "initializeAudioChannelFailed");
 
@@ -55,17 +53,17 @@ bool SpeechSynthesizerEngineImpl::initialize(
                 focusManager,
                 contextManager,
                 exceptionSender,
+                metricRecorder,
+                dialogUXStateAggregator,
                 nullptr,
-                dialogUXStateAggregator);
+                nullptr);
         ThrowIfNull(m_speechSynthesizerCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         // add dialog state observer
         m_speechSynthesizerCapabilityAgent->addObserver(dialogUXStateAggregator);
 
         // register capability with the default endpoint
-        defaultEndpointBuilder->withCapability(m_speechSynthesizerCapabilityAgent, m_speechSynthesizerCapabilityAgent);
-
-        m_directiveSequencer = directiveSequencer;
+        capabilitiesRegistrar->withCapability(m_speechSynthesizerCapabilityAgent, m_speechSynthesizerCapabilityAgent);
 
         return true;
     } catch (std::exception& ex) {
@@ -76,25 +74,23 @@ bool SpeechSynthesizerEngineImpl::initialize(
 
 std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create(
     std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizerPlatformInterface,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<aace::engine::audio::AudioManagerInterface> audioManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentManagerInterface> attachmentManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     std::shared_ptr<SpeechSynthesizerEngineImpl> speechSynthesizerEngineImpl = nullptr;
 
     try {
         ThrowIfNull(speechSynthesizerPlatformInterface, "invalidSpeechSynthesizerPlatformInterface");
-        ThrowIfNull(defaultEndpointBuilder, "invalidEndpointBuilder");
+        ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(audioManager, "invalidAudioManager");
-        ThrowIfNull(directiveSequencer, "invalidDirectiveSequencer");
-        ThrowIfNull(capabilitiesDelegate, "invalidCapabilitiesDelegate");
         ThrowIfNull(messageSender, "invalidMessageSender");
         ThrowIfNull(focusManager, "invalidFocusManager");
         ThrowIfNull(speakerManager, "invalidSpeakerManager");
@@ -116,16 +112,15 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
         ThrowIfNot(
             speechSynthesizerEngineImpl->initialize(
                 audioOutputChannel,
-                defaultEndpointBuilder,
-                directiveSequencer,
+                capabilitiesRegistrar,
                 messageSender,
                 focusManager,
                 contextManager,
                 attachmentManager,
                 dialogUXStateAggregator,
-                capabilitiesDelegate,
                 speakerManager,
-                exceptionSender),
+                exceptionSender,
+                metricRecorder),
             "initializeSpeechSynthesizerEngineImplFailed");
 
         return speechSynthesizerEngineImpl;
@@ -144,42 +139,6 @@ void SpeechSynthesizerEngineImpl::doShutdown() {
     if (m_speechSynthesizerCapabilityAgent != nullptr) {
         m_speechSynthesizerCapabilityAgent->shutdown();
         m_speechSynthesizerCapabilityAgent.reset();
-    }
-}
-
-void SpeechSynthesizerEngineImpl::handlePrePlaybackStarted(SourceId id) {
-    try {
-        auto m_directiveSequencer_lock = m_directiveSequencer.lock();
-        ThrowIfNull(m_directiveSequencer_lock, "invalidDirectiveSequencer");
-
-        ALEXA_METRIC(
-            LX(TAG, "executePlaybackStarted").d("dialogrequestid", m_directiveSequencer_lock->getDialogRequestId()),
-            aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_STARTED);
-
-        aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(
-            aace::engine::alexa::UPLService::DialogState::PLAYBACK_STARTED,
-            m_directiveSequencer_lock->getDialogRequestId(),
-            m_directiveSequencer_lock->isDialogRequestOnline());
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
-    }
-}
-
-void SpeechSynthesizerEngineImpl::handlePrePlaybackFinished(SourceId id) {
-    try {
-        auto m_directiveSequencer_lock = m_directiveSequencer.lock();
-        ThrowIfNull(m_directiveSequencer_lock, "invalidDirectiveSequencer");
-
-        ALEXA_METRIC(
-            LX(TAG, "executePlaybackFinished").d("dialogrequestid", m_directiveSequencer_lock->getDialogRequestId()),
-            aace::engine::alexa::AlexaMetrics::Location::PLAYBACK_FINISHED);
-
-        aace::engine::alexa::UPLService::getInstance()->updateDialogStateForId(
-            aace::engine::alexa::UPLService::DialogState::PLAYBACK_FINISHED,
-            m_directiveSequencer_lock->getDialogRequestId(),
-            m_directiveSequencer_lock->isDialogRequestOnline());
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", id));
     }
 }
 

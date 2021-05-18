@@ -13,15 +13,35 @@
  * permissions and limitations under the License.
  */
 
+#include <sstream>
+
 #include <AACE/Engine/Audio/AudioOutputEngineImpl.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 // String to identify log entries originating from this file.
 static const std::string TAG("AudioOutputEngineImpl");
 
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioOutputEngineImpl";
+
+/// Counter metrics for AudioOutput Platform APIs
+static const std::string METRIC_AUDIOOUTPUT_PREPARE_STREAM = "Prepare_Stream";
+static const std::string METRIC_AUDIOOUTPUT_PREPARE_URL = "Prepare_Url";
+static const std::string METRIC_AUDIOOUTPUT_PLAY = "Play";
+static const std::string METRIC_AUDIOOUTPUT_STOP = "Stop";
+static const std::string METRIC_AUDIOOUTPUT_PAUSE = "Pause";
+static const std::string METRIC_AUDIOOUTPUT_RESUME = "Resume";
+static const std::string METRIC_AUDIOOUTPUT_VOLUME_CHANGED = "VolumeChanged";
+static const std::string METRIC_AUDIOOUTPUT_MUTED_STATE_CHANGED = "MutedStateChanged";
+static const std::string METRIC_AUDIOOUTPUT_MEDIA_STATE_CHANGED = "MediaStateChanged";
+static const std::string METRIC_AUDIOOUTPUT_MEDIA_ERROR = "MediaError";
+
 namespace aace {
 namespace engine {
 namespace audio {
+
+using namespace aace::engine::utils::metrics;
 
 AudioOutputEngineImpl::AudioOutputEngineImpl(std::shared_ptr<aace::audio::AudioOutput> platformAudioOutput) :
         m_platformAudioOutput(platformAudioOutput) {
@@ -50,6 +70,7 @@ std::shared_ptr<AudioOutputEngineImpl> AudioOutputEngineImpl::create(
 //
 
 bool AudioOutputEngineImpl::prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "prepare", {METRIC_AUDIOOUTPUT_PREPARE_STREAM});
     try {
         return m_platformAudioOutput->prepare(stream, repeating);
     } catch (std::exception& ex) {
@@ -59,6 +80,7 @@ bool AudioOutputEngineImpl::prepare(std::shared_ptr<aace::audio::AudioStream> st
 }
 
 bool AudioOutputEngineImpl::prepare(const std::string& url, bool repeating) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "prepare", {METRIC_AUDIOOUTPUT_PREPARE_URL});
     try {
         return m_platformAudioOutput->prepare(url, repeating);
     } catch (std::exception& ex) {
@@ -68,6 +90,7 @@ bool AudioOutputEngineImpl::prepare(const std::string& url, bool repeating) {
 }
 
 bool AudioOutputEngineImpl::play() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "play", {METRIC_AUDIOOUTPUT_PLAY});
     try {
         return m_platformAudioOutput->play();
     } catch (std::exception& ex) {
@@ -77,6 +100,7 @@ bool AudioOutputEngineImpl::play() {
 }
 
 bool AudioOutputEngineImpl::stop() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "stop", {METRIC_AUDIOOUTPUT_STOP});
     try {
         return m_platformAudioOutput->stop();
     } catch (std::exception& ex) {
@@ -86,6 +110,7 @@ bool AudioOutputEngineImpl::stop() {
 }
 
 bool AudioOutputEngineImpl::pause() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "pause", {METRIC_AUDIOOUTPUT_PAUSE});
     try {
         return m_platformAudioOutput->pause();
     } catch (std::exception& ex) {
@@ -95,6 +120,7 @@ bool AudioOutputEngineImpl::pause() {
 }
 
 bool AudioOutputEngineImpl::resume() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "resume", {METRIC_AUDIOOUTPUT_RESUME});
     try {
         return m_platformAudioOutput->resume();
     } catch (std::exception& ex) {
@@ -140,6 +166,7 @@ int64_t AudioOutputEngineImpl::getNumBytesBuffered() {
 }
 
 bool AudioOutputEngineImpl::volumeChanged(float volume) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "volumeChanged", {METRIC_AUDIOOUTPUT_VOLUME_CHANGED});
     try {
         return m_platformAudioOutput->volumeChanged(volume);
     } catch (std::exception& ex) {
@@ -149,6 +176,10 @@ bool AudioOutputEngineImpl::volumeChanged(float volume) {
 }
 
 bool AudioOutputEngineImpl::mutedStateChanged(MutedState state) {
+    std::stringstream mutedState;
+    mutedState << state;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "mutedStateChanged", {METRIC_AUDIOOUTPUT_MUTED_STATE_CHANGED, mutedState.str()});
     try {
         return m_platformAudioOutput->mutedStateChanged(state);
     } catch (std::exception& ex) {
@@ -167,6 +198,10 @@ void AudioOutputEngineImpl::setEngineInterface(
 //
 
 void AudioOutputEngineImpl::onMediaStateChanged(MediaState state) {
+    std::stringstream mediaState;
+    mediaState << state;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onMediaStateChanged", {METRIC_AUDIOOUTPUT_MEDIA_STATE_CHANGED, mediaState.str()});
     try {
         Throw("unhandledMethod");
     } catch (std::exception& ex) {
@@ -175,6 +210,9 @@ void AudioOutputEngineImpl::onMediaStateChanged(MediaState state) {
 }
 
 void AudioOutputEngineImpl::onMediaError(MediaError error, const std::string& description) {
+    std::stringstream mediaError;
+    mediaError << error;
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onMediaError", {METRIC_AUDIOOUTPUT_MEDIA_ERROR, mediaError.str()});
     try {
         Throw("unhandledMethod");
     } catch (std::exception& ex) {

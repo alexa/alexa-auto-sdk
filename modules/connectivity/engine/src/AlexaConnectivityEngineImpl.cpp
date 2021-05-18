@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,37 +19,49 @@
 
 #include "AACE/Engine/Connectivity/AlexaConnectivityEngineImpl.h"
 #include "AACE/Engine/Connectivity/ConnectivityConstants.h"
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace connectivity {
 
+using namespace aace::engine::utils::metrics;
+
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.connectivity.AlexaConnectivityEngineImpl");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaConnectivityEngineImpl";
+
+/// Counter metrics for Alexa Connectivity Platform APIs
+static const std::string METRIC_CONNECTIVITY_GET_CONNECTIVITY_STATE = "GetConnectivityState";
+static const std::string METRIC_CONNECTIVITY_GET_IDENTIFIER = "GetIdentifier";
+static const std::string METRIC_CONNECTIVITY_CONNECTIVITY_STATE_CHANGE = "ConnectivityStateChange";
 
 AlexaConnectivityEngineImpl::AlexaConnectivityEngineImpl(
     std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivityPlatformInterface) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown{TAG},
-        m_alexaConnectivityPlatformInterface{alexaConnectivityPlatformInterface},
-        m_termsStatus{TermsStatus::UNKNOWN} {
+        m_alexaConnectivityPlatformInterface{alexaConnectivityPlatformInterface} {
 }
 
 bool AlexaConnectivityEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    const std::string& networkIdentifier) {
+    const std::string& vehicleIdentifier) {
     AACE_INFO(LX(TAG));
     try {
         // Initialize the connectivity state.
         ThrowIfNot(updateConnectivityState(), "updateConnectivityStateFailed");
 
-        // Store the network identifier.
-        m_networkIdentifier = NetworkIdentifier(networkIdentifier);
+        // Save the vehicle identifier before creating instance of capability agent.
+        // Note: vehicle identifier is NOT the vehicle identification number (VIN).
+        m_vehicleIdentifier = vehicleIdentifier;
 
         // Create instance of capability agent.
         m_connectivityCapabilityAgent = ConnectivityCapabilityAgent::create(shared_from_this(), contextManager);
         ThrowIfNull(m_connectivityCapabilityAgent, "createConnectivityCapabilityAgentFailed");
-        defaultEndpointBuilder->withCapabilityConfiguration(m_connectivityCapabilityAgent);
+        capabilitiesRegistrar->withCapabilityConfiguration(m_connectivityCapabilityAgent);
 
         return true;
     } catch (std::exception& ex) {
@@ -60,20 +72,21 @@ bool AlexaConnectivityEngineImpl::initialize(
 
 std::shared_ptr<AlexaConnectivityEngineImpl> AlexaConnectivityEngineImpl::create(
     std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivityPlatformInterface,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    const std::string& networkIdentifier) {
+    const std::string& vehicleIdentifier) {
     AACE_INFO(LX(TAG));
     try {
         ThrowIfNull(alexaConnectivityPlatformInterface, "invalidPlatformInterface");
-        ThrowIfNull(defaultEndpointBuilder, "invalidDefaultEndpointBuilder");
+        ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(contextManager, "invalidContextManager");
 
         auto alexaConnectivityEngineImpl = std::shared_ptr<AlexaConnectivityEngineImpl>(
             new AlexaConnectivityEngineImpl(alexaConnectivityPlatformInterface));
 
         ThrowIfNot(
-            alexaConnectivityEngineImpl->initialize(defaultEndpointBuilder, contextManager, networkIdentifier),
+            alexaConnectivityEngineImpl->initialize(capabilitiesRegistrar, contextManager, vehicleIdentifier),
             "initializeAlexaConnectivityEngineImplFailed");
 
         // Set the platform engine interface reference.
@@ -89,11 +102,13 @@ std::shared_ptr<AlexaConnectivityEngineImpl> AlexaConnectivityEngineImpl::create
 bool AlexaConnectivityEngineImpl::onConnectivityStateChange() {
     AACE_INFO(LX(TAG));
     try {
+        emitCounterMetrics(
+            METRIC_PROGRAM_NAME_SUFFIX, "onConnectivityStateChange", METRIC_CONNECTIVITY_CONNECTIVITY_STATE_CHANGE, 1);
         // Save the old values.
         auto oldDataPlan = getDataPlan();
-        auto oldDataPlansAvailable = DataPlansAvailable(getDataPlansAvailable());  // deep copy
+        auto oldDataPlansAvailable = DataPlansAvailable(getDataPlansAvailable());
         auto oldManagedProvider = getManagedProvider();
-        auto oldTermsStatus = getTermsStatus();
+        auto oldTerms = getTerms();
 
         // Update the connectivity state.
         ThrowIfNot(updateConnectivityState(), "updateConnectivityStateFailed");
@@ -102,7 +117,7 @@ bool AlexaConnectivityEngineImpl::onConnectivityStateChange() {
         auto newDataPlan = getDataPlan();
         auto newDataPlansAvailable = getDataPlansAvailable();
         auto newManagedProvider = getManagedProvider();
-        auto newTermsStatus = getTermsStatus();
+        auto newTerms = getTerms();
 
         // Same time for all supported property updates.
         alexaClientSDK::avsCommon::utils::timing::TimePoint timeOfSample =
@@ -124,9 +139,8 @@ bool AlexaConnectivityEngineImpl::onConnectivityStateChange() {
             m_connectivityCapabilityAgent->onManagedProviderStateChanged(
                 ManagedProviderState(newManagedProvider, timeOfSample), cause);
         }
-        if ((newTermsStatus != oldTermsStatus) && (newTermsStatus != TermsStatus::UNKNOWN)) {
-            m_connectivityCapabilityAgent->onTermsStatusStateChanged(
-                TermsStatusState(newTermsStatus, timeOfSample), cause);
+        if ((newTerms != oldTerms) && (newTerms.status != TermsStatus::UNKNOWN)) {
+            m_connectivityCapabilityAgent->onTermsStateChanged(TermsState(newTerms, timeOfSample), cause);
         }
 
         return true;
@@ -152,13 +166,32 @@ AlexaConnectivityInterface::ManagedProvider AlexaConnectivityEngineImpl::getMana
 }
 
 AlexaConnectivityInterface::NetworkIdentifier AlexaConnectivityEngineImpl::getNetworkIdentifier() const {
-    std::lock_guard<std::mutex> guard{m_mutex};
-    return m_networkIdentifier;
+    AACE_INFO(LX(TAG));
+    try {
+        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "getNetworkIdentifier", METRIC_CONNECTIVITY_GET_IDENTIFIER, 1);
+        ThrowIfNull(m_alexaConnectivityPlatformInterface, "invalidPlatformInterface");
+
+        // FOR SECURITY REASONS, GET THE NETWORK IDENTIFIER FROM THE PLATFORM
+        // IMPLEMENTATION ONLY WHEN NEEDED. DO NOT STORE THE NETWORK IDENTIFIER.
+        std::string identifier = m_alexaConnectivityPlatformInterface->getIdentifier();
+        if (identifier.empty()) {
+            // If identifier is empty then use the vehicle identifier from configuration.
+            // Note: vehicle identifier is NOT the vehicle identification number (VIN).
+            identifier = m_vehicleIdentifier;
+            AACE_DEBUG(LX(TAG).d("identifier", identifier));
+        } else {
+            AACE_DEBUG(LX(TAG).sensitive("identifier", identifier));
+        }
+        return NetworkIdentifier(identifier);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return NetworkIdentifier();
+    }
 }
 
-AlexaConnectivityInterface::TermsStatus AlexaConnectivityEngineImpl::getTermsStatus() const {
+AlexaConnectivityInterface::Terms AlexaConnectivityEngineImpl::getTerms() const {
     std::lock_guard<std::mutex> guard{m_mutex};
-    return m_termsStatus;
+    return m_terms;
 }
 
 void AlexaConnectivityEngineImpl::doShutdown() {
@@ -185,7 +218,7 @@ AlexaConnectivityInterface::DataPlan AlexaConnectivityEngineImpl::parseDataPlan(
         // Required dataPlan.type enum string (type checked).
         std::pair<bool, DataPlanType> dataPlanTypeResult =
             dataPlanTypeFromString(object.at(TYPE_KEY).get<std::string>());
-        ThrowIfNot(dataPlanTypeResult.first == true, "dataPlanTypeResultNotValid");
+        ThrowIfNot(dataPlanTypeResult.first == true, "dataPlanTypeNotValid");
         dataPlan.type = dataPlanTypeResult.second;
 
         // Optional dataPlan.endDate date string (format checked).
@@ -216,7 +249,7 @@ AlexaConnectivityInterface::DataPlansAvailable AlexaConnectivityEngineImpl::pars
         for (const auto& dataPlanAvailable : document.at(DATAPLANSAVAILABLE_KEY)) {
             std::pair<bool, DataPlanType> dataPlanAvailableResult =
                 dataPlanTypeFromString(dataPlanAvailable.get<std::string>());
-            ThrowIfNot(dataPlanAvailableResult.first == true, "dataPlanAvailableResultNotValid");
+            ThrowIfNot(dataPlanAvailableResult.first == true, "dataPlanAvailableNotValid");
             dataPlansAvailable.push_back(dataPlanAvailable.get<std::string>());
         }
     }
@@ -237,7 +270,7 @@ AlexaConnectivityInterface::ManagedProvider AlexaConnectivityEngineImpl::parseMa
         // Required managedProvider.type enum string (type checked).
         std::pair<bool, ManagedProviderType> managedProviderTypeResult =
             managedProviderTypeFromString(object.at(TYPE_KEY).get<std::string>());
-        ThrowIfNot(managedProviderTypeResult.first == true, "managedProviderTypeResultNotValid");
+        ThrowIfNot(managedProviderTypeResult.first == true, "managedProviderTypeNotValid");
         managedProvider.type = managedProviderTypeResult.second;
 
         // Optional managedProvider.id string (format checked).
@@ -254,28 +287,39 @@ AlexaConnectivityInterface::ManagedProvider AlexaConnectivityEngineImpl::parseMa
     return managedProvider;
 }
 
-AlexaConnectivityInterface::TermsStatus AlexaConnectivityEngineImpl::parseTermsStatus(
-    const nlohmann::json& document) const {
+AlexaConnectivityInterface::Terms AlexaConnectivityEngineImpl::parseTerms(const nlohmann::json& document) const {
     AACE_INFO(LX(TAG));
-    TermsStatus termsStatus = TermsStatus::UNKNOWN;
+    Terms terms = {TermsStatus::UNKNOWN, UNKNOWN_VERSION};
 
-    // Parse termsStatus enum string (type checked).
+    // Parse terms object.
     // Important: Calling function must catch exceptions!
     if (document.contains(TERMSSTATUS_KEY)) {
-        auto string = document.at(TERMSSTATUS_KEY).get<std::string>();
-        if (!string.empty()) {
-            std::pair<bool, TermsStatus> termsStatusResult = termsStatusFromString(string);
-            ThrowIfNot(termsStatusResult.first == true, "termsStatusResultNotValid");
-            termsStatus = termsStatusResult.second;
+        auto& termsStatus = document.at(TERMSSTATUS_KEY);
+
+        // Optional terms.status enum string (type checked).
+        std::pair<bool, TermsStatus> termsStatusResult = termsStatusFromString(termsStatus.get<std::string>());
+        ThrowIfNot(termsStatusResult.first, "termsStatusNotValid");
+        terms.status = termsStatusResult.second;
+
+        // Optional terms.version string (cannot be empty).
+        if (document.contains(TERMSVERSION_KEY)) {
+            auto& termsVersion = document.at(TERMSVERSION_KEY);
+            terms.version = termsVersion.get<std::string>();
+            ThrowIf(terms.version.empty(), "termsVersionNotValid");
+            ThrowIf((terms.version.length() > VERSION_SIZE_MAX_LIMIT), "termsVersionExceedsMaxLengthLimit");
         }
+    } else {
+        ThrowIf(document.contains(TERMSVERSION_KEY), "termsVersionExistsWithoutTermsStatus");
     }
 
-    return termsStatus;
+    return terms;
 }
 
 bool AlexaConnectivityEngineImpl::updateConnectivityState() {
     AACE_INFO(LX(TAG));
     try {
+        emitCounterMetrics(
+            METRIC_PROGRAM_NAME_SUFFIX, "updateConnectivityState", METRIC_CONNECTIVITY_GET_CONNECTIVITY_STATE, 1);
         ThrowIfNull(m_alexaConnectivityPlatformInterface, "invalidPlatformInterface");
 
         // Lock to ensure supported properties are updated as a single block.
@@ -297,12 +341,12 @@ bool AlexaConnectivityEngineImpl::updateConnectivityState() {
             DataPlan dataPlan = parseDataPlan(document);  // required when managed is true
             ThrowIf(managed && dataPlan.type == DataPlanType::UNKNOWN, "dataPlanElementNotFound");
             DataPlansAvailable dataPlansAvailable = parseDataPlansAvailable(document);
-            TermsStatus termsStatus = parseTermsStatus(document);
+            Terms terms = parseTerms(document);
 
             m_dataPlan = std::move(dataPlan);
             m_dataPlansAvailable.swap(dataPlansAvailable);
             m_managedProvider = std::move(managedProvider);
-            m_termsStatus = std::move(termsStatus);
+            m_terms = std::move(terms);
         }
 
         return true;

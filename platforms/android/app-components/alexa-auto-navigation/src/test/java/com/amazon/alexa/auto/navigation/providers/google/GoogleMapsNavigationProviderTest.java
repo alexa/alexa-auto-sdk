@@ -6,8 +6,12 @@ import static com.amazon.alexa.auto.navigation.providers.google.GoogleMapsNaviga
 import static com.amazon.alexa.auto.navigation.providers.google.GoogleMapsNavigationProvider.GOOGLE_MAPS_START_NAV_URI;
 import static com.amazon.alexa.auto.navigation.providers.google.GoogleMapsNavigationProvider.GOOGLE_MAPS_ZOOM_TO_POI;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 
 import com.amazon.alexa.auto.aacs.common.Address;
@@ -48,11 +52,17 @@ public class GoogleMapsNavigationProviderTest {
     private Context mContext;
     private StartNavigation startNavigation;
     private PointOfInterest mPointOfInterest;
+    private SharedPreferences mSharedPrefs;
+    private SharedPreferences.Editor mEditor;
 
     @Before
     public void setup() {
         mContext = Mockito.mock(Context.class);
         mClassUnderTest = new GoogleMapsNavigationProvider(new WeakReference<>(mContext));
+        mSharedPrefs = Mockito.mock(SharedPreferences.class);
+        mEditor = Mockito.mock(SharedPreferences.Editor.class);
+        Mockito.when(mContext.getSharedPreferences(anyString(), anyInt())).thenReturn(mSharedPrefs);
+        Mockito.when(mSharedPrefs.edit()).thenReturn(mEditor);
         createTestStartNavigationDirective();
         createTestPOI();
     }

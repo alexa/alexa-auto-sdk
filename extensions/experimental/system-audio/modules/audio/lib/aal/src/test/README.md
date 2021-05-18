@@ -4,7 +4,7 @@ AAL Unit Tests are built with [Googletest](https://github.com/google/googletest)
 
 ## Running player tests
 
-Refer to [Running Test Programs: Advanced Options](https://github.com/google/googletest/blob/master/googletest/docs/advanced.md#running-test-programs-advanced-options) for details about specifying which tests to run.
+Refer to [Running Test Programs: Advanced Options](https://github.com/google/googletest/blob/master/docs/advanced.md#running-test-programs-advanced-options) for details about specifying which tests to run.
 
 Several new parameters are added to allow customizing tests for different setup and platforms:
 

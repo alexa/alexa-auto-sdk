@@ -5,7 +5,7 @@ if(EXTERNALMEDIAPLAYER_1_1)
 endif()
 
 # Find AVS
-find_package(AVS 1.19)
+find_package(AVS 1.22)
 
 add_definitions(-DRAPIDJSON_HAS_STDSTRING)
 
@@ -15,9 +15,9 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaClientEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEndpointInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineLocationStateProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineLogger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaEngineClientObserver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaMetrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioChannelEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioDuckingConfig.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AudioPlayerEngineImpl.h
@@ -42,16 +42,16 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaPlayerInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaPlayerObserverInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/ExternalMediaAdapterRegistrationInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/GeolocationServiceInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/DoNotDisturbEngineImpl.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/UPLService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/VehicleData.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaSpeakerEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordEngineAdapter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordEngineManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordObservableInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordObserverInterface.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/WakewordVerifier.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/InitiatorVerifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/LocaleAssetsManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/SystemSoundPlayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/DeviceSettingsDelegate.h
@@ -61,6 +61,10 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationManagerStorageInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AuthorizationManagerStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaAuthorizationProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/MetricsEmissionInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/MetricsEmissionListenerInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/DeviceSetupEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Alexa/AlexaMetricSink.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -73,6 +77,7 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaConfigurationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEndpointInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineClientObserver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineLocationStateProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineLogger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaSpeakerEngineImpl.cpp
@@ -97,12 +102,14 @@ add_library(AACEAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizerEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SystemSoundPlayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TemplateRuntimeEngineImpl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/UPLService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VehicleData.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/WakewordEngineManager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/InitiatorVerifier.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationManagerStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaAuthorizationProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceSetupEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaMetricSink.cpp
 )
 
 find_path(NLOHMANN_INCLUDE_DIR nlohmann/json.hpp

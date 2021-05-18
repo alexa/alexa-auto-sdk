@@ -13,17 +13,13 @@
 package com.amazon.sampleapp.connectivity;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
-import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.core.config.EngineConfiguration;
-import com.amazon.sampleapp.connectivity.AlexaConnectivityHandler;
 import com.amazon.sampleapp.core.ModuleFactoryInterface;
 import com.amazon.sampleapp.core.SampleAppContext;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;

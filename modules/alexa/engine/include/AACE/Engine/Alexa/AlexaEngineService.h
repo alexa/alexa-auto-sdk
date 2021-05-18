@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 #include <vector>
 #include <atomic>
 
+#include <acsdkShutdownManager/ShutdownNotifier.h>
+#include <acsdkShutdownManagerInterfaces/ShutdownManagerInterface.h>
 #include <ACL/AVSConnectionManager.h>
 #include <ACL/Transport/PostConnectSequencerFactory.h>
 #include <ACL/Transport/TransportFactoryInterface.h>
@@ -50,6 +52,7 @@
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
+#include "AVSCommon/SDKInterfaces/Endpoints/EndpointBuilderInterface.h"
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/GlobalSettingsObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
@@ -61,12 +64,12 @@
 #include <AVSCommon/Utils/HTTP2/HTTP2ConnectionFactoryInterface.h>
 #include <AVSCommon/Utils/LibcurlUtils/HttpPutInterface.h>
 #include <AVSCommon/Utils/Logger/Logger.h>
+#include <AVSCommon/Utils/Metrics/MetricRecorderInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSGatewayManager/AVSGatewayManager.h>
 #include <CapabilitiesDelegate/CapabilitiesDelegate.h>
 #include <CertifiedSender/CertifiedSender.h>
 #include <ContextManager/ContextManager.h>
-#include <Endpoints/EndpointBuilder.h>
 #include <Endpoints/EndpointRegistrationManager.h>
 #include <InteractionModel/InteractionModelCapabilityAgent.h>
 #include <RegistrationManager/RegistrationManager.h>
@@ -75,7 +78,8 @@
 #include <SQLiteStorage/SQLiteMiscStorage.h>
 #include <System/SoftwareInfoSender.h>
 #include <System/UserInactivityMonitor.h>
-
+#include <AACE/Engine/Alexa/AlexaEngineLocationStateProvider.h>
+#include "AACE/Engine/Alexa/DeviceSetupEngineImpl.h"
 #include "AACE/Engine/Alexa/LocaleAssetsManager.h"
 #include "AACE/Engine/Alexa/ExternalMediaAdapterRegistrationInterface.h"
 #include "AACE/Engine/Audio/AudioEngineService.h"
@@ -104,6 +108,7 @@
 #include "EndpointBuilderFactory.h"
 #include "EqualizerControllerEngineImpl.h"
 #include "ExternalMediaPlayerEngineImpl.h"
+#include "GeolocationServiceInterface.h"
 #include "NotificationsEngineImpl.h"
 #include "PlaybackControllerEngineImpl.h"
 #include "SpeechRecognizerEngineImpl.h"
@@ -120,7 +125,6 @@ namespace engine {
 namespace alexa {
 
 class AlexaEngineGlobalSettingsObserver;
-class AlexaEngineLocationStateProvider;
 class AlexaEngineSoftwareInfoSenderObserver;
 class AuthDelegateProxy;
 class HttpPutDelegate;
@@ -168,7 +172,9 @@ public:
     /// @{
     void onCapabilitiesStateChange(
         CapabilitiesObserverInterface::State newState,
-        CapabilitiesObserverInterface::Error newError) override;
+        CapabilitiesObserverInterface::Error newError,
+        const std::vector<std::string>& addedOrUpdatedEndpointIds,
+        const std::vector<std::string>& deletedEndpointIds) override;
     /// @}
 
     /// aace::engine::network::NetworkInfoObserver
@@ -193,19 +199,24 @@ public:
         override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> getContextManager() override;
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() override;
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> getDefaultEndpointBuilder() override;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+    getDefaultEndpointCapabilitiesRegistrar() override;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() override;
     std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> getDeviceSettingStorage()
         override;
+    DeviceSettingsDelegate& getDeviceSettingsDelegate() override;
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> getDialogUXStateAggregator() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> getDirectiveSequencer()
         override;
     std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> getEndpointBuilderFactory() override;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+    getEndpointRegistrationManager() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>
     getExceptionEncounteredSender() override;
     std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> getExternalMediaPlayer() override;
     std::shared_ptr<alexaClientSDK::adsl::MessageInterpreter> getMessageInterpreter() override;
     std::shared_ptr<alexaClientSDK::acl::MessageRouterInterface> getMessageRouter() override;
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> getMetricRecorder() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> getMessageSender() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> getSpeakerManager() override;
     std::shared_ptr<alexaClientSDK::capabilityAgents::speechSynthesizer::SpeechSynthesizer> getSpeechSynthesizer()
@@ -213,6 +224,8 @@ public:
     std::shared_ptr<alexaClientSDK::acl::TransportFactoryInterface> getTransportFactory() override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> getVisualFocusManager() override;
     std::shared_ptr<AuthorizationManager> getAuthorizationManager() override;
+    std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> getDeviceSettingsManager() override;
+    std::shared_ptr<alexaClientSDK::acl::PostConnectSequencerFactory> getPostConnectSequencerFactory() override;
     /// @}
 
     /// AlexaEndpointInterface
@@ -288,6 +301,7 @@ public:
 protected:
     bool initialize() override;
     bool configure(std::shared_ptr<std::istream> configuration) override;
+    bool preRegister() override;
     bool setup() override;
     bool start() override;
     bool stop() override;
@@ -298,7 +312,7 @@ private:
     bool configureDeviceSDK(std::shared_ptr<std::istream> configuration);
     bool connect();
     bool disconnect();
-    void recordVehicleMetric(bool full);
+    void recordVehicleMetric();
     bool registerProperties();
 
     // platform interface registration
@@ -322,6 +336,7 @@ private:
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizer);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizer);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntime);
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::DeviceSetup> deviceSetupPlatformInterface);
 
     bool createExternalMediaPlayerImpl();
 
@@ -340,7 +355,8 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> m_dialogUXStateAggregator;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> m_defaultEndpointBuilder;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointBuilderInterface>
+        m_defaultEndpointBuilder;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> m_exceptionSender;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_audioFocusManager;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_visualFocusManager;
@@ -365,6 +381,7 @@ private:
     std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManager> m_registrationManager;
     std::shared_ptr<AuthorizationManager> m_authorizationManager;
     std::unique_ptr<DeviceSettingsDelegate> m_deviceSettingsDelegate;
+    std::shared_ptr<alexaClientSDK::acl::PostConnectSequencerFactory> m_postConnectSequencerFactory;
     std::shared_ptr<alexaClientSDK::storage::sqliteStorage::SQLiteMiscStorage> m_miscStorage;
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> m_alexaMessageSender;
 
@@ -380,6 +397,11 @@ private:
     std::shared_ptr<AlexaAuthorizationProvider> m_alexaAuthorizationProvider;
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
+
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> m_metricRecorder;
+
+    std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> m_shutdownNotifier;
+    std::shared_ptr<alexaClientSDK::acsdkShutdownManagerInterfaces::ShutdownManagerInterface> m_shutdownManager;
 
     std::string m_avsGateway;
     std::string m_lwaEndpoint;
@@ -422,6 +444,7 @@ private:
     std::shared_ptr<aace::engine::alexa::SpeechRecognizerEngineImpl> m_speechRecognizerEngineImpl;
     std::shared_ptr<aace::engine::alexa::SpeechSynthesizerEngineImpl> m_speechSynthesizerEngineImpl;
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> m_templateRuntimeEngineImpl;
+    std::shared_ptr<aace::engine::alexa::DeviceSetupEngineImpl> m_deviceSetupEngineImpl;
 
     // logger
     std::shared_ptr<AlexaEngineLogger> m_logger;
@@ -430,7 +453,7 @@ private:
     std::shared_ptr<AlexaEngineClientObserver> m_clientObserver;
 
     // location service
-    std::shared_ptr<AlexaEngineLocationStateProvider> m_locationStateProvider;
+    std::shared_ptr<GeolocationServiceInterface> m_geolocationProvider;
 
     std::shared_ptr<WakewordEngineManager> m_wakewordEngineManager;
     std::string m_wakewordEngineName;
@@ -445,41 +468,6 @@ private:
     std::atomic<bool> m_isShuttingDown;
 
     std::mutex m_setPropertyResultCallbackMutex;
-};
-
-//
-// AlexaEngineLocationStateProvider
-//
-
-class AlexaEngineLocationStateProvider
-        : public alexaClientSDK::avsCommon::sdkInterfaces::StateProviderInterface
-        , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
-private:
-    AlexaEngineLocationStateProvider(
-        std::shared_ptr<aace::location::LocationProvider> locationProvider,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
-
-public:
-    static std::shared_ptr<AlexaEngineLocationStateProvider> create(
-        std::shared_ptr<aace::location::LocationProvider> locationProvider,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
-
-    void provideState(
-        const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,
-        const unsigned int stateRequestToken) override;
-
-protected:
-    void doShutdown() override;
-
-private:
-    void executeProvideState(
-        const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,
-        const unsigned int stateRequestToken);
-
-private:
-    std::shared_ptr<aace::location::LocationProvider> m_locationProvider;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
-    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 };
 
 //
@@ -512,13 +500,17 @@ public:
     void buttonPressed(alexaClientSDK::avsCommon::avs::PlaybackButton button) override;
     void togglePressed(alexaClientSDK::avsCommon::avs::PlaybackToggle toggle, bool action) override;
     void setHandler(
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> handler) override;
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> handler,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocalPlaybackHandlerInterface> localHandler) override;
     void switchToDefaultHandler() override;
+    void useDefaultHandlerWith(
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocalPlaybackHandlerInterface> localHandler) override;
     void setDelegate(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> delegate);
 
 private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> m_delegate;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface> m_handler;
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocalPlaybackHandlerInterface> m_localHandler;
 };
 
 //

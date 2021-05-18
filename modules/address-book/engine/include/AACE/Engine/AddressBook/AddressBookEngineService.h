@@ -32,7 +32,6 @@ public:
 protected:
     // EngineService
     bool shutdown() override;
-
     AddressBookEngineService(const aace::engine::core::ServiceDescription& description);
 
 public:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -42,6 +42,18 @@ void APL::sendUserEvent(const std::string& payload) {
     }
 }
 
+void APL::sendDataSourceFetchRequestEvent(const std::string& type, const std::string& payload) {
+    if (m_aplEngineInterface != nullptr) {
+        m_aplEngineInterface->onSendDataSourceFetchRequestEvent(type, payload);
+    }
+}
+
+void APL::sendRuntimeErrorEvent(const std::string& payload) {
+    if (m_aplEngineInterface != nullptr) {
+        m_aplEngineInterface->onSendRuntimeErrorEvent(payload);
+    }
+}
+
 void APL::setAPLMaxVersion(const std::string& aplMaxVersion) {
     if (m_aplEngineInterface != nullptr) {
         m_aplEngineInterface->onSetAPLMaxVersion(aplMaxVersion);
@@ -69,6 +81,18 @@ void APL::executeCommandsResult(const std::string& token, bool result, const std
 void APL::processActivityEvent(const std::string& source, ActivityEvent event) {
     if (m_aplEngineInterface != nullptr) {
         m_aplEngineInterface->onProcessActivityEvent(source, event);
+    }
+}
+
+void APL::sendDocumentState(const std::string& state) {
+    if (m_aplEngineInterface != nullptr) {
+        m_aplEngineInterface->onSendDocumentState(state);
+    }
+}
+
+void APL::sendDeviceWindowState(const std::string& state) {
+    if (m_aplEngineInterface != nullptr) {
+        m_aplEngineInterface->onSendDeviceWindowState(state);
     }
 }
 

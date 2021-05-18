@@ -86,12 +86,15 @@ public:
      *
      * @param [in] datapoints The list of datapoints to be added to the metric and recorded
      * @param [in] metadata Additional information in the form of key, value pairs to be added to the metric
-     * 
+     * @param [in] buffer Flag to indicate if the metric needs to be buffered while the user is not authorized
+     * @param [in] unique Flag to indicate if the metric needs to be added with a unique identifier
      * @return Returns true if record was successful and false if not implemented or recording failed
      */
     virtual bool record(
         const std::vector<Datapoint>& datapoints,
-        const std::unordered_map<std::string, std::string>& metadata) = 0;
+        const std::unordered_map<std::string, std::string>& metadata,
+        bool buffer,
+        bool unique) = 0;
 };
 
 }  // namespace metrics

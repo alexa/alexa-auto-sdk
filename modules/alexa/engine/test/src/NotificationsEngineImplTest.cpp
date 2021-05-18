@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -97,12 +97,12 @@ protected:
             m_alexaMockFactory->getAudioManagerMock(),
             m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
-            m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
             m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
             m_alexaMockFactory->getCustomerDataManagerMock(),
-            m_alexaMockFactory->getFocusManagerInterfaceMock());
+            m_alexaMockFactory->getFocusManagerInterfaceMock(),
+            m_alexaMockFactory->getMetricRecorder());
 
         return notificationsEngineImpl;
     }
@@ -130,17 +130,17 @@ TEST_F(NotificationsEngineImplTest, createWithPlatformInterfaceAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
 
-TEST_F(NotificationsEngineImplTest, createWithAudioManagerInterfaceAsNull) {
+TEST_F(NotificationsEngineImplTest, createWithAudioManagerAsNull) {
     EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
@@ -148,17 +148,17 @@ TEST_F(NotificationsEngineImplTest, createWithAudioManagerInterfaceAsNull) {
         nullptr,
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
 
-TEST_F(NotificationsEngineImplTest, createWithDirectiveSequencerAsNull) {
+TEST_F(NotificationsEngineImplTest, createWithCapabilitiesRegistrarAsNull) {
     EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
 
     auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
@@ -166,12 +166,12 @@ TEST_F(NotificationsEngineImplTest, createWithDirectiveSequencerAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         nullptr,
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
@@ -184,30 +184,12 @@ TEST_F(NotificationsEngineImplTest, createWithContextManagerAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         nullptr,
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
-
-    ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
-}
-
-TEST_F(NotificationsEngineImplTest, createWithCapabilitiesDelegateAsNull) {
-    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
-
-    auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
-        m_alexaMockFactory->getNotificationsMock(),
-        m_alexaMockFactory->getAudioManagerMock(),
-        m_alexaMockFactory->getEndpointBuilderMock(),
-        m_alexaMockFactory->getContextManagerInterfaceMock(),
-        nullptr,
-        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
-        m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
-        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
-        m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
@@ -220,12 +202,12 @@ TEST_F(NotificationsEngineImplTest, createWithExceptionSenderAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
@@ -238,12 +220,12 @@ TEST_F(NotificationsEngineImplTest, createWithAudioFactoryAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
@@ -256,12 +238,12 @@ TEST_F(NotificationsEngineImplTest, createWithSpeakerManagerAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         nullptr,
         m_alexaMockFactory->getCustomerDataManagerMock(),
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }
@@ -274,12 +256,48 @@ TEST_F(NotificationsEngineImplTest, createWithCustomerDataManagerAsNull) {
         m_alexaMockFactory->getAudioManagerMock(),
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_alexaMockFactory->getContextManagerInterfaceMock(),
-        m_alexaMockFactory->getCapabilitiesDelegateInterfaceMock(),
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
         m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
         m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
         nullptr,
-        m_alexaMockFactory->getFocusManagerInterfaceMock());
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        m_alexaMockFactory->getMetricRecorder());
+
+    ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
+}
+
+TEST_F(NotificationsEngineImplTest, createWithFocusManagerAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
+
+    auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
+        m_alexaMockFactory->getNotificationsMock(),
+        m_alexaMockFactory->getAudioManagerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_alexaMockFactory->getContextManagerInterfaceMock(),
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
+        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
+        m_alexaMockFactory->getCustomerDataManagerMock(),
+        nullptr,
+        m_alexaMockFactory->getMetricRecorder());
+
+    ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
+}
+
+TEST_F(NotificationsEngineImplTest, createWithMetricRecorderAsNull) {
+    EXPECT_CALL(*m_alexaMockFactory->getDirectiveSequencerInterfaceMock(), doShutdown());
+
+    auto notificationsEngineImpl = aace::engine::alexa::NotificationsEngineImpl::create(
+        m_alexaMockFactory->getNotificationsMock(),
+        m_alexaMockFactory->getAudioManagerMock(),
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_alexaMockFactory->getContextManagerInterfaceMock(),
+        m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
+        m_alexaMockFactory->getNotificationsAudioFactoryInterfaceMock(),
+        m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
+        m_alexaMockFactory->getCustomerDataManagerMock(),
+        m_alexaMockFactory->getFocusManagerInterfaceMock(),
+        nullptr);
 
     ASSERT_EQ(notificationsEngineImpl, nullptr) << "AlertEngineImpl pointer expected to be null";
 }

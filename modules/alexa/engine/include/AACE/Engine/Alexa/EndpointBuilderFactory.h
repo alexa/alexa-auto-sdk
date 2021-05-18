@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 #ifndef AACE_ENGINE_ENDPOINT_BUILDER_FACTORY_H
 #define AACE_ENGINE_ENDPOINT_BUILDER_FACTORY_H
 
-#include <AVSCommon/SDKInterfaces/Endpoints/EndpointRegistrationManagerInterface.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+#include "AVSCommon/SDKInterfaces/Endpoints/EndpointBuilderInterface.h"
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <Alexa/AlexaInterfaceMessageSender.h>
-#include <Endpoints/EndpointBuilder.h>
 
 #include "AACE/Engine/Core/EngineMacros.h"
 
@@ -39,7 +38,6 @@ public:
      * Creates an EndpointBuilderFactory
      *
      * @param deviceInfo Structure with information about the Alexa client device
-     * @param endpointRegistrationManager Object responsible for registering a new endpoint
      * @param contextManager Object used to retrieve the current state of an endpoint
      * @param exceptionSender Object used to send exceptions
      * @param alexaInterfaceMessageSender Object used to send AlexaInterface events
@@ -47,8 +45,6 @@ public:
      */
     static std::shared_ptr<EndpointBuilderFactory> create(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
-            endpointRegistrationManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> alexaMessageSender);
@@ -60,7 +56,8 @@ public:
      * @warning All endpoints must be built by the time you call @c Engine::start(). Building new endpoints after the
      * client has been connected will fail.
      */
-    std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> createEndpointBuilder();
+    std::unique_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointBuilderInterface>
+    createEndpointBuilder();
 
 protected:
     /// RequiresShutdown
@@ -72,24 +69,18 @@ private:
      * Constructor
      *
      * @param deviceInfo Structure with information about the Alexa client device
-     * @param endpointRegistrationManager Object responsible for registering a new endpoint
      * @param contextManager Object used to retrieve the current state of an endpoint
      * @param exceptionSender Object used to send exceptions
      * @param alexaInterfaceMessageSender Object used to send AlexaInterface events
      */
     EndpointBuilderFactory(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
-            endpointRegistrationManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> alexaMessageSender);
 
     /// Information about the Alexa client device
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
-    /// Registers new endpoints
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
-        m_endpointManager;
     /// Retrieves the state of an endpoint
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
     /// Sends exceptions

@@ -1,4 +1,13 @@
-apply plugin: 'com.android.application'
+if(getGradle().getStartParameter().getTaskRequests()[0] != null && getGradle().getStartParameter().getTaskRequests()[0].getArgs().size() > 0
+        && getGradle().getStartParameter().getTaskRequests()[0].getArgs().contains("aacs_aar")) {
+    project.logger.lifecycle("Building AACS library")
+    apply plugin: 'com.android.library'
+}else{
+    project.logger.lifecycle("Building AACS application")
+    apply plugin: 'com.android.application'
+}
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -6,13 +15,14 @@ android {
         minSdkVersion 26
         targetSdkVersion 27
         versionCode 1
-        versionName "3.1"
+        versionName "3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         debug {
             debuggable true
             jniDebuggable true
+            testCoverageEnabled true
         }
         release {
             minifyEnabled false
@@ -50,7 +60,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "3.1+"
+    remoteLibVersion = "3.2+"
 }
 dependencies {
     implementation fileTree(include: ['*.aar'], dir: 'src/main/libs')
@@ -87,14 +97,34 @@ dependencies {
         remoteImplementation "com.amazon.alexa.aacs:aacscommonutils:${remoteLibVersion}@aar" 
         remoteImplementation "com.amazon.alexa.aacs:aacstts:${remoteLibVersion}@aar" 
     }
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.android.support:support-media-compat:27.1.1'
+
+    implementation deps.androidx_core
+    implementation deps.androidx_media
+    implementation deps.androidx_annotation
+
+    // Kotlin
+    implementation deps.kotlin_stdlib
+    implementation deps.androidx_core_ktx
+
+    // Dagger
+    implementation deps.dagger
+    kapt deps.dagger_compiler
+
+    // RX
+    implementation deps.rxjava3
+
+    // Glide
+    implementation deps.glide
+
+    // Exo Player
+    implementation deps.exoplayer_core
+    implementation deps.exoplayer_dash
+    implementation deps.exoplayer_smooth
+    implementation deps.exoplayer_hls
+
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'com.squareup.okhttp3:okhttp:4.0.1'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.1'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.7.1'
-    implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.7.1'
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.7.1'
+
     implementation 'com.google.android.material:material:1.1.0'
     implementation "androidx.preference:preference:1.1.0"
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
@@ -108,5 +138,4 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.25.0'
     testImplementation 'org.robolectric:robolectric:4.3'
 }
-
 

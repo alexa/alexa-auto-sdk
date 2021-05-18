@@ -63,6 +63,21 @@ std::weak_ptr<logger::LoggerHandler> AuthorizationHandler::getLoggerHandler() {
     return m_loggerHandler;
 }
 
+void AuthorizationHandler::startAuth() {
+    auto activity = m_activity.lock();
+    if (!activity) {
+        return;
+    }
+    if (m_applicationContext->isCBLAuthorizationActive()) {
+        activity->notify(Event::onStartCBLAuthorization);
+        return;
+    }
+    if (m_applicationContext->isAuthProviderAuthorizationActive()) {
+        activity->notify(Event::onStartAuthProviderAuthorization);
+        return;
+    }
+}
+
 // aace::authorization::Authorization interface
 void AuthorizationHandler::eventReceived(const std::string& service, const std::string& event) {
     if (service == APPLICATION_PROVIDED) {

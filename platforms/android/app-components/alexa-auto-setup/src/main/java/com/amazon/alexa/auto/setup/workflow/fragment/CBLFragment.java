@@ -1,0 +1,201 @@
+package com.amazon.alexa.auto.setup.workflow.fragment;
+
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
+import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
+import com.amazon.alexa.auto.apis.auth.CodePair;
+import com.amazon.alexa.auto.apps.common.util.Preconditions;
+import com.amazon.alexa.auto.setup.R;
+import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
+import com.amazon.alexa.auto.setup.workflow.event.LoginEvent;
+import com.amazon.alexa.auto.setup.workflow.util.QRCodeGenerator;
+
+import org.greenrobot.eventbus.EventBus;
+
+/**
+ * Fragment for CBL display screen.
+ */
+public class CBLFragment extends Fragment {
+    private static final String TAG = CBLFragment.class.getSimpleName();
+
+    CBLViewModel mViewModel;
+    QRCodeGenerator mQRCodeGenerator;
+    NavController mNavController;
+
+    /**
+     * Constructs an instance of CBLFragment.
+     */
+    public CBLFragment() {
+        mQRCodeGenerator = new QRCodeGenerator();
+    }
+
+    /**
+     * Constructs an instance of CBLFragment.
+     *
+     * @param viewModel View Model for CBL.
+     * @param generator QR Code Generator.
+     */
+    @VisibleForTesting
+    CBLFragment(@NonNull CBLViewModel viewModel, @NonNull QRCodeGenerator generator) {
+        this.mViewModel = viewModel;
+        this.mQRCodeGenerator = generator;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (mViewModel == null) { // It would be non-null for test injected dependencies.
+            mViewModel = new ViewModelProvider(this).get(CBLViewModel.class);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.cbl_fragment, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mViewModel.loginWorkflowState().observe(getViewLifecycleOwner(), this::authWorkflowStateChanged);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        setContentForCBLViewTitle();
+
+        View fragmentView = requireView();
+        mNavController = findNavController(fragmentView);
+
+        mViewModel.startLogin();
+
+        ProgressBar spinner = fragmentView.findViewById(R.id.login_progress_spinner);
+        spinner.getIndeterminateDrawable().setColorFilter(
+                ResourcesCompat.getColor(getResources(), R.color.Cyan, null), PorterDuff.Mode.MULTIPLY);
+
+        TextView getStartedButtonText = fragmentView.findViewById(R.id.try_again_action_button);
+        getStartedButtonText.setOnClickListener(view -> mNavController.popBackStack());
+    }
+
+    private void authWorkflowStateChanged(AuthWorkflowData loginData) {
+        switch (loginData.getAuthState()) {
+            case CBL_Auth_Started:
+                updateQRCodeContainerVisibility(View.GONE);
+                updateVisibilitySpinner(View.VISIBLE);
+                updateLoginInContainerVisibility(View.VISIBLE);
+                break;
+            case CBL_Auth_CodePair_Received:
+                Preconditions.checkNotNull(loginData.getCodePair());
+
+                updateLoginErrorMessageVisibility(View.GONE);
+                updateQRCodeContainerVisibility(View.VISIBLE);
+                updateVisibilitySpinner(View.GONE);
+                updateLoginInContainerVisibility(View.GONE);
+                updateCBLCodePair(loginData.getCodePair());
+                break;
+            case CBL_Auth_Finished:
+                updateLoginErrorMessageVisibility(View.GONE);
+                updateCBLLoginFinishedVisibility(View.VISIBLE);
+                updateQRCodeContainerVisibility(View.GONE);
+                updateVisibilitySpinner(View.GONE);
+                updateLoginInContainerVisibility(View.GONE);
+                EventBus.getDefault().post(new WorkflowMessage(LoginEvent.CBL_AUTH_FINISHED));
+                break;
+            case CBL_Auth_Start_Failed:
+                updateLoginErrorMessageVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void updateCBLCodePair(CodePair codePair) {
+        String URL_PARAM = "?cbl-code=";
+        Bitmap qrCodeBitmap =
+                mQRCodeGenerator.generateQRCode(codePair.getValidationUrl() + URL_PARAM + codePair.getValidationCode());
+        showQRCodeScreen(codePair.getValidationCode(), qrCodeBitmap);
+    }
+
+    private void updateVisibilitySpinner(int visible) {
+        View view = requireView();
+        ProgressBar spinner = view.findViewById(R.id.login_progress_spinner);
+        spinner.setVisibility(visible);
+    }
+
+    private void updateQRCodeContainerVisibility(int visible) {
+        View view = requireView();
+        view.findViewById(R.id.login_display_cbl_code_layout).setVisibility(visible);
+    }
+
+    private void setCBLCodeText(String cblCode) {
+        View view = requireView();
+        TextView cblCodeTextView = view.findViewById(R.id.cbl_code);
+        cblCodeTextView.setText(cblCode);
+    }
+
+    private void setQRCodeImage(Bitmap qrCode) {
+        View view = requireView();
+        ImageView qrCodeImageView = view.findViewById(R.id.qr_code);
+        qrCodeImageView.setImageBitmap(qrCode);
+    }
+
+    private void updateLoginInContainerVisibility(int visible) {
+        View view = requireView();
+        view.findViewById(R.id.cbl_loading_layout).setVisibility(visible);
+    }
+
+    private void showQRCodeScreen(String cblCode, Bitmap qrCodeBitmap) {
+        setCBLCodeText(cblCode);
+        setQRCodeImage(qrCodeBitmap);
+    }
+
+    private void updateCBLLoginFinishedVisibility(int visible) {
+        View view = requireView();
+        view.findViewById(R.id.cbl_login_finished_layout).setVisibility(visible);
+    }
+
+    private void updateLoginErrorMessageVisibility(int visible) {
+        View view = requireView();
+        view.findViewById(R.id.login_error_text_view).setVisibility(visible);
+
+        TextView getStartedButton = (TextView) view.findViewById(R.id.try_again_action_button);
+        getStartedButton.setVisibility(visible);
+        getStartedButton.setText(R.string.login_action_retry_button);
+    }
+
+    private void setContentForCBLViewTitle() {
+        View view = requireView();
+
+        // Make multicolor text for title.
+        TextView titleTextView = view.findViewById(R.id.qr_code_title_textview);
+        String titleText = getResources().getString(R.string.login_qr_code_message);
+        Spanned spanned = Html.fromHtml(titleText, Html.FROM_HTML_MODE_COMPACT);
+        titleTextView.setText(spanned);
+    }
+
+    @VisibleForTesting
+    NavController findNavController(@NonNull View view) {
+        return Navigation.findNavController(view);
+    }
+}

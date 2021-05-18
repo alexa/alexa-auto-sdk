@@ -64,9 +64,14 @@ static aal_handle_t gstreamer_recorder_create(const aal_attributes_t* attr, aal_
     GstElement* pipeline = NULL;
     GstElement* sink = NULL;
 
-    gchar src_desc[128] = {0};
+    gchar src_desc[256] = {0};
     if (!attr->device || IS_EMPTY_STRING(attr->device)) {
         strncpy(src_desc, "autoaudiosrc", sizeof(src_desc) - 1);
+#ifdef USE_UDPSRC
+    } else if (strstr(attr->device, "udpsrc") == attr->device) {
+        // treat the device name as the initial part of pipeline description
+        strncpy(src_desc, attr->device, sizeof(src_desc) - 1);
+#endif
     } else {
 #ifdef USE_PIPEWIRE
         snprintf(src_desc, sizeof(src_desc), "pwaudiosrc stream-properties=\"properties,media.role=%s\"", attr->device);

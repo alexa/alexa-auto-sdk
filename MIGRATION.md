@@ -2,11 +2,14 @@
 
 This guide outlines the changes you need to make to migrate from Auto SDK v2.0 to later versions of the Auto SDK.
 
->**Note:** If you migrate from a version earlier than v2.3, be sure to read the relevant sections of this guide to understand all changes introduced between your current version and v3.1. The information helps you decide what changes you must include. For example, if you migrate from v2.0, include the changes described in [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21), the changes described in [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22), and so on, taking into consideration the deprecated or removed features in each version.
+>**Note:** If you migrate from a version earlier than v2.3, be sure to read the relevant sections of this guide to understand all changes introduced between your current version and v3.2. The information helps you decide what changes you must include. For example, if you migrate from v2.0, include the changes described in [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21), the changes described in [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22), and so on, taking into consideration the deprecated or removed features in each version.
 
 <!-- omit in toc -->
 ## Table of Contents
 
+- [Migrating from Auto SDK v3.1.0 to v3.2.0](#migrating-from-auto-sdk-v310-to-v320)
+  - [Using the Alexa Communication Extension](#using-the-alexa-communication-extension)
+  - [Using the Device Client Metrics (DCM) Extension](#using-the-device-client-metrics-dcm-extension)
 - [Migrating from Auto SDK v3.0.0 to v3.1.0](#migrating-from-auto-sdk-v300-to-v310)
   - [Migrating to the Authorization Platform Interface](#migrating-to-the-authorization-platform-interface)
 - [Deprecated Features Removed in Auto SDK v3.0.0](#deprecated-features-removed-in-auto-sdk-v300)
@@ -27,6 +30,21 @@ This guide outlines the changes you need to make to migrate from Auto SDK v2.0 t
   - [Navigation Enhancements](#navigation-enhancements)
   - [Car Control Source File Relocation](#car-control-source-file-relocation)
   - [Code-Based-Linking (CBL) Handler in the Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+
+## Migrating from Auto SDK v3.1.0 to v3.2.0
+This section provides the information you need to migrate from Auto SDK v3.1.0 to Auto SDK 3.2.0.
+
+### Using the Alexa Communication Extension
+The Alexa Comms library in Auto SDK v3.2.0 uses Device Client Metrics (DCM) instead of AWS IoT for uploading metrics. Therefore, remove the `iotCertificateDirPath`, `iotHostAddress`, and `deviceTypeId` fields from the communication configuration file. For information about the configuration file format, see the Alexa Communication extension README.
+
+If you build the Alexa Comms module configuration using the programmatic factory function `AlexaCommsConfiguration::createCommsConfig()` (C++) or `AlexaCommsConfiguration.createCommsConfig()` (Java), remove the parameters that are no longer present in the signature.
+
+### Using the Device Client Metrics (DCM) Extension
+The Device Client Metrics extension in Auto SDK v3.2.0 requires a field called `metricsTag` to be defined in the DCM configuration. The value of `metricsTag` is used for generating a unique identifier for anonymous registration metrics. 
+
+>**Note:** You must not use the vehicle identification number (VIN) or device serial number (DSN) as `metricsTag`. For information about how to use this field, see the Device Client Metric extension README.
+
+If you build the DCM module configuration using the programmatic factory function `DCMConfiguration::createDCMConfig()` (C++) or `DCMConfiguration.createDCMConfig()` (Java), add the `metricsTag` parameter as instructed in the API documentation.
 
 ## Migrating from Auto SDK v3.0.0 to v3.1.0
 This section provides the information you need to migrate from Auto SDK v3.0.0 to Auto SDK v3.1.0.

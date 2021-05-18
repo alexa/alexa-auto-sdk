@@ -19,8 +19,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <AVSCommon/Utils/RequiresShutdown.h>
-
 #include "AACE/PropertyManager/PropertyManager.h"
 #include "AACE/PropertyManager/PropertyManagerEngineInterface.h"
 #include "PropertyManagerServiceInterface.h"
@@ -29,21 +27,19 @@ namespace aace {
 namespace engine {
 namespace propertyManager {
 
-class PropertyManagerEngineImpl
-        : public aace::propertyManager::PropertyManagerEngineInterface
-        , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
+class PropertyManagerEngineImpl : public aace::propertyManager::PropertyManagerEngineInterface {
 private:
     PropertyManagerEngineImpl(std::shared_ptr<aace::propertyManager::PropertyManager> platformPropertyManagerInterface);
 
     bool initialize(std::shared_ptr<PropertyManagerServiceInterface> propertyManagerServiceInterface);
 
-protected:
-    void doShutdown() override;
-
 public:
     static std::shared_ptr<PropertyManagerEngineImpl> create(
         std::shared_ptr<aace::propertyManager::PropertyManager> platformPropertyManagerInterface,
         std::shared_ptr<PropertyManagerServiceInterface> propertyManagerServiceInterface);
+
+    virtual ~PropertyManagerEngineImpl() = default;
+    void shutdown();
 
     // PropertyManagerEngineInterface
     virtual bool onSetProperty(const std::string& name, const std::string& value) override;

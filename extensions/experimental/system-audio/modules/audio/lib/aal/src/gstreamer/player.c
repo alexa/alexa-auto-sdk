@@ -124,6 +124,10 @@ static aal_handle_t gstreamer_player_create(const aal_attributes_t* attr, aal_au
     ctx = gstreamer_create_context(NULL, "playbin", attr);
     if (!ctx) goto exit;
 
+    // Force to render only audio content
+    const unsigned int GST_PLAY_FLAG_AUDIO = (1u << 1u);
+    g_object_set(ctx->pipeline, "flags", GST_PLAY_FLAG_AUDIO, NULL);
+
     /* Setup the sink bin */
     bin = gst_bin_new("sink_bin");
 
@@ -139,6 +143,18 @@ static aal_handle_t gstreamer_player_create(const aal_attributes_t* attr, aal_au
 
     if (!attr->device || IS_EMPTY_STRING(attr->device)) {
         sink = gstreamer_create_and_add_element(bin, "autoaudiosink", "sink");
+#ifdef USE_UDPSINK
+    } else if (strstr(attr->device, "udpsink") == attr->device) {
+        GError* err = NULL;
+        // treat the device name as the initial part of pipeline description
+        sink =
+            gst_parse_bin_from_description_full(attr->device, FALSE, NULL, GST_PARSE_FLAG_NO_SINGLE_ELEMENT_BINS, &err);
+        if (err) {
+            g_critical("Failed to create udpsink: %s\n", err->message);
+            g_error_free(err);
+            goto exit;
+        }
+#endif
     } else {
 #ifdef USE_PIPEWIRE
         g_info("Using Pipewire device: %s\n", attr->device);

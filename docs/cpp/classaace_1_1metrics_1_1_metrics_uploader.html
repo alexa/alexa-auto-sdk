@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -93,8 +93,8 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a38c46d5b8ceca480df72187afc5739d6"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1metrics_1_1_metrics_uploader.html#a38c46d5b8ceca480df72187afc5739d6">record</a> (const std::vector&lt; <a class="el" href="classaace_1_1metrics_1_1_metrics_uploader_1_1_datapoint.html">Datapoint</a> &gt; &amp;datapoints, const std::unordered_map&lt; std::string, std::string &gt; &amp;metadata)=0</td></tr>
-<tr class="separator:a38c46d5b8ceca480df72187afc5739d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed82a63aeae759182dd2f9d744b729f9"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1metrics_1_1_metrics_uploader.html#aed82a63aeae759182dd2f9d744b729f9">record</a> (const std::vector&lt; <a class="el" href="classaace_1_1metrics_1_1_metrics_uploader_1_1_datapoint.html">Datapoint</a> &gt; &amp;datapoints, const std::unordered_map&lt; std::string, std::string &gt; &amp;metadata, bool buffer, bool unique)=0</td></tr>
+<tr class="separator:aed82a63aeae759182dd2f9d744b729f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1metrics_1_1_metrics_uploader.html">MetricsUploader</a> interface for recording metrics </p>
@@ -131,8 +131,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a38c46d5b8ceca480df72187afc5739d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a38c46d5b8ceca480df72187afc5739d6">&#9670;&nbsp;</a></span>record()</h2>
+<a id="aed82a63aeae759182dd2f9d744b729f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed82a63aeae759182dd2f9d744b729f9">&#9670;&nbsp;</a></span>record()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +150,19 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::unordered_map&lt; std::string, std::string &gt; &amp;&#160;</td>
-          <td class="paramname"><em>metadata</em>&#160;</td>
+          <td class="paramname"><em>metadata</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>unique</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -168,7 +180,9 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">datapoints</td><td>The list of datapoints to be added to the metric and recorded </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">metadata</td><td>Additional information in the form of key, value pairs to be added to the metric</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">metadata</td><td>Additional information in the form of key, value pairs to be added to the metric </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>Flag to indicate if the metric needs to be buffered while the user is not authorized </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">unique</td><td>Flag to indicate if the metric needs to be added with a unique identifier </td></tr>
   </table>
   </dd>
 </dl>
@@ -181,7 +195,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.2.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

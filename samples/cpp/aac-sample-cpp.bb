@@ -13,6 +13,7 @@ PACKAGECONFIG[system-audio] = "-DSYSTEMAUDIO=ON,,aac-module-system-audio"
 PACKAGECONFIG[dcm] = "-DDCM=ON,,aac-module-dcm-native-metrics"
 PACKAGECONFIG[loopback-detector] = "-DLOOPBACK_DETECTOR=ON,,aac-module-loopback-detector"
 PACKAGECONFIG[spotify] = "-DSPOTIFY=ON,,aac-module-spotify"
+PACKAGECONFIG[geolocation] = "-DGEOLOCATION=ON,,aac-module-geolocation"
 
 AAC_ENABLE_ADDRESS_SANITIZER ?= "OFF"
 EXTRA_OECMAKE += "-DAAC_ENABLE_ADDRESS_SANITIZER=${AAC_ENABLE_ADDRESS_SANITIZER} \

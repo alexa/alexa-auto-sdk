@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ struct NavigationName {
     std::string toString() const;
     std::string entryId;
     std::string name;
+    std::string phoneticName = "";
 };
 
 //JSON Serialization
@@ -49,11 +50,15 @@ inline void to_json(nlohmann::json& j, const NavigationName& c) {
     j = nlohmann::json{
         {"entryId", c.entryId},
         {"name", c.name},
+        {"phoneticName", c.phoneticName},
     };
 }
 inline void from_json(const nlohmann::json& j, NavigationName& c) {
     j.at("entryId").get_to(c.entryId);
     j.at("name").get_to(c.name);
+    if (j.contains("phoneticName")) {
+        j.at("phoneticName").get_to(c.phoneticName);
+    }
 }
 
 inline std::string NavigationName::toString() const {

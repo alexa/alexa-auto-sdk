@@ -9,7 +9,6 @@ find_library(AVS_RANGE_CONTROLLER_LIBRARY RangeController)
 find_library(AVS_TOGGLE_CONTROLLER_LIBRARY ToggleController)
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/AssetsDefault.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/AssetStore.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/CapabilityController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/CarControl/CarControlConfigurationImpl.h

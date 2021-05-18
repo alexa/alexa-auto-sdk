@@ -1,8 +1,5 @@
 # AACE Core Engine
 
-find_path(AVS_INCLUDE_DIRS AVSCommon)
-find_library(AVS_AVS_COMMON_LIBRARY AVSCommon)
-
 configure_file (
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h.in"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Core/EngineVersion.h"
@@ -117,6 +114,9 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/Sinks/FileSink.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Logger/Sinks/SyslogSink.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Location/LocationEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Location/LocationProviderEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Location/LocationServiceInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Location/LocationServiceObserverInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkInfoObserver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Network/NetworkInfoProviderEngineImpl.h
@@ -130,6 +130,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsUploaderEngineImpl.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricEvent.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Metrics/Metrics.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/JSON/JSON.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/Executor.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Utils/Threading/TaskQueue.h
@@ -180,6 +181,7 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/Sinks/FileSink.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/Sinks/SyslogSink.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkInfoProviderEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Network/NetworkObservableInterface.cpp
@@ -194,6 +196,7 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricsUploaderEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Metrics/MetricEvent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Metrics/Metrics.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/JSON/JSON.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/Executor.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Utils/Threading/TaskQueue.cpp
@@ -234,8 +237,6 @@ target_link_libraries(AACECoreEngine
         AACECorePlatform
     PRIVATE
         ${SQLITE3_LIBRARIES}
-        ${AVS_AVS_COMMON_LIBRARY}
-        ${AVS_ENDPOINTS_LIBRARY}
 )
 
 install(

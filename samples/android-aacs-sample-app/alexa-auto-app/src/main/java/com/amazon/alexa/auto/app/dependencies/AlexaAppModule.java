@@ -2,16 +2,16 @@ package com.amazon.alexa.auto.app.dependencies;
 
 import android.content.Context;
 
-import com.amazon.alexa.auto.apis.app.AlexaAppScopedComponents;
-import com.amazon.alexa.auto.apis.app.AlexaAppScopedComponentsActivator;
-import com.amazon.alexa.auto.apis.app.DefaultScopedComponents;
+import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
+import com.amazon.alexa.auto.app.DefaultAlexaAppRootComponent;
 import com.amazon.alexa.auto.app.setup.AlexaSetupControllerImpl;
 import com.amazon.alexa.auto.lwa.LWAAuthController;
 
 import java.lang.ref.WeakReference;
 
+import dagger.Lazy;
 import dagger.Module;
 import dagger.Provides;
 
@@ -46,25 +46,16 @@ public class AlexaAppModule {
     }
 
     /**
-     * Provides {@link AlexaAppScopedComponents}.
+     * Provides {@link AlexaAppRootComponent} implementation for Alexa App.
      *
-     * @return An instance of {@link AlexaAppScopedComponents}.
+     * @param setupController Setup controller.
+     * @param authController Auth Controller.
+     * @return an instance of {@link AlexaAppRootComponent}.
      */
     @Provides
     @AlexaAppScope
-    public AlexaAppScopedComponents provideScopedComponents() {
-        return new DefaultScopedComponents();
-    }
-
-    /**
-     * Provides {@link AlexaAppScopedComponentsActivator} from implementation class.
-     *
-     * @param components Implementation of {@link AlexaAppScopedComponentsActivator}
-     * @return An instance of {@link AlexaAppScopedComponentsActivator}.
-     */
-    @Provides
-    @AlexaAppScope
-    public AlexaAppScopedComponentsActivator provideComponentsActivator(AlexaAppScopedComponents components) {
-        return (DefaultScopedComponents) components;
+    public AlexaAppRootComponent provideApplicationRootComponent(
+            Lazy<AlexaSetupController> setupController, Lazy<AuthController> authController) {
+        return new DefaultAlexaAppRootComponent(setupController, authController);
     }
 }

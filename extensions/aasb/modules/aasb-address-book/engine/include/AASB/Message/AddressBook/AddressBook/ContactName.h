@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ struct ContactName {
     std::string firstName;
     std::string lastName;
     std::string nickname;
+    std::string phoneticFirstName = "";
+    std::string phoneticLastName = "";
 };
 
 //JSON Serialization
@@ -53,6 +55,8 @@ inline void to_json(nlohmann::json& j, const ContactName& c) {
         {"firstName", c.firstName},
         {"lastName", c.lastName},
         {"nickname", c.nickname},
+        {"phoneticFirstName", c.phoneticFirstName},
+        {"phoneticLastName", c.phoneticLastName},
     };
 }
 inline void from_json(const nlohmann::json& j, ContactName& c) {
@@ -60,6 +64,12 @@ inline void from_json(const nlohmann::json& j, ContactName& c) {
     j.at("firstName").get_to(c.firstName);
     j.at("lastName").get_to(c.lastName);
     j.at("nickname").get_to(c.nickname);
+    if (j.contains("phoneticFirstName")) {
+        j.at("phoneticFirstName").get_to(c.phoneticFirstName);
+    }
+    if (j.contains("phoneticLastName")) {
+        j.at("phoneticLastName").get_to(c.phoneticLastName);
+    }
 }
 
 inline std::string ContactName::toString() const {

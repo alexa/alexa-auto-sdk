@@ -148,42 +148,31 @@ class MediaSourceFactory {
         private int mRetryCount = 0;
 
         @Override
-        public void onLoadStarted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
-                long elapsedRealtimeMs) {
+        public void onLoadStarted(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo,
+                MediaLoadData mediaLoadData) {
             mRetryCount = 1;
             Log.v(TAG, String.format("(%s) Load media started.", mName));
         }
 
         @Override
-        public void onLoadCompleted(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
-                long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+        public void onLoadCompleted(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId,
+                LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
             mRetryCount = 0;
             Log.v(TAG, String.format("(%s) Load media completed.", mName));
         }
 
         @Override
-        public void onLoadCanceled(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
-                long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded) {
+        public void onLoadCanceled(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId,
+                LoadEventInfo loadEventInfo, MediaLoadData mediaLoadData) {
             Log.v(TAG, String.format("(%s) Load media cancelled.", mName));
             mRetryCount = 0;
         }
 
         @Override
-        public void onLoadError(DataSpec dataSpec, int dataType, int trackType, Format trackFormat,
-                int trackSelectionReason, Object trackSelectionData, long mediaStartTimeMs, long mediaEndTimeMs,
-                long elapsedRealtimeMs, long loadDurationMs, long bytesLoaded, IOException error, boolean wasCanceled) {
+        public void onLoadError(int windowIndex, MediaSource.MediaPeriodId mediaPeriodId, LoadEventInfo loadEventInfo,
+                MediaLoadData mediaLoadData, IOException error, boolean wasCanceled) {
             Log.v(TAG, String.format("(%s) Error loading media. Attempts: %s", mName, mRetryCount));
             mRetryCount++;
         }
-
-        @Override
-        public void onUpstreamDiscarded(int trackType, long mediaStartTimeMs, long mediaEndTimeMs) {}
-
-        @Override
-        public void onDownstreamFormatChanged(int trackType, Format trackFormat, int trackSelectionReason,
-                Object trackSelectionData, long mediaTimeMs) {}
     }
 }

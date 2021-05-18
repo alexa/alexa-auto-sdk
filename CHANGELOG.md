@@ -1,5 +1,132 @@
 # Change Log
 ___
+## v3.2.0 released on 2021-05-19
+
+### Enhancements
+* Added the `DeviceSetup` platform interface that handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, Alexa is informed that device setup is complete and starts the on-boarding experience, for example, by starting a short first-time conversation. For more information, see the Alexa module README for [C++](./modules/alexa/README.md) or [Android](./platforms/android/modules/alexa/README.md).
+    
+* Added support in the Connectivity module to provide the network identifier from the vehicle to Alexa, which enables automakers to offer full connectivity plans to customers. For connectivity status, the module supports sending the version of the terms and conditions through a field called `termsVersion`. Also, the `termsStatus` field accepts `DEFERRED`, which means Alexa can remind users to respond to the terms and conditions at a later time.  
+
+* Added the Mobile Authorization extension, which enables applications running on the vehicle's head unit to simplify the login experience. To log in to Alexa, the user uses the Alexa mobile app on a paired smartphone, instead of opening a web browser and entering a code.
+
+* Added the Bluetooth extension, which allows the Alexa Auto SDK to connect to devices through the Bluetooth Classic or Bluetooth Low Energy (BLE) protocol. 
+
+* Added the Geolocation extension, which provides geolocation consent support. The user can grant consent to location sharing with Alexa from your application.
+
+* Added the `locationServiceAccessChanged(LocationServiceAccess access)` API in the `LocationProvider` interface, which allows the Engine not to query the device location when the location service access is turned off on the device.
+
+* Added the APL Render module, which enables APL rendering capabilities in an Android application.
+  >**Note:** This module is for you to experiment with APL document rendering on an automotive device. Do not use the module to render APL documents in a production vehicle.
+
+* Added support in the Address Book module for a phonetic field. The phonetic field is required for resolving the name of a contact or navigation favorite if the name uses Kanji characters in Japanese.
+
+* Updated the Docker container for the Auto SDK builder script to use OpenSSL 1.1.1k by default. Added an environment variable for you to change the OpenSSL version, if desired. For information about the OpenSSL version, see the [Builder README](./builder/README.md#builder-setup-in-a-docker-environment).
+  
+* Updated the Auto SDK to use AVS Device SDK Version 1.22.0. For information about the AVS Device SDK, see the [AVS Device SDK Release Notes](https://developer.amazon.com/en-US/docs/alexa/avs-device-sdk/release-notes.html#version-1220).
+  
+* Enhancements for AACS:
+
+    * Added AACS instrumentation, which enables you to better understand the interactions between your application and AACS. Through instrumentation, you log Alexa Auto Service Bridge (AASB) messages to a file, which you can review for debugging purposes. For information about AACS instrumentation, see the [README](./platforms/android/alexa-auto-client-service/android-service/service/src/debug/java/com/amazon/alexaautoclientservice/README.md).
+  
+    * Added an app component called `alexa-auto-telephony`, which enables you to pre-integrate Alexa Phone Call Controller functionalities with Android Telephony.
+   
+    * Added an app component called `alexa-auto-contacts` to enable AACS Core Service to fetch contact information from the vehicle's head unit and send it to Alexa. The AACS Core Service can also use this library to remove from Alexa the uploaded contact information.
+  
+    * Added the AACS AAR, which you can include in your application.
+
+    * The timeout for AASB synchronous messages is now configurable. For information about configuring the timeout, see the [README](./platforms/android/alexa-auto-client-service/android-service/README.md#auto-sdk-modules).
+
+* Enhancements for AACS Sample App:
+  
+    * Added support for new features in the AACS Sample App. For example, it includes a menu for the user to select a language if the in-vehicle infotainment (IVI) language is not supported by Alexa, and it supports authorization with Preview Mode.
+
+    * Added support for the Alexa Custom Assistant extension to the Alexa Auto Client Service (AACS) Sample App. The sample app demonstrates how an application can use AACS with this extension. With app components included with the sample app, you can develop an application that handles assistant handoff and displays custom animation for your custom assistant.
+        >**Note:** In order to use Alexa Custom Assistant extension with the AACS Sample App, you must install an extra component in the Auto SDK. [Contact your Amazon Solutions Architect (SA) or Partner Manager](./NEED_HELP.md#requesting-additional-functionality) for details.
+
+* Enhancements for metrics uploading:
+  
+    * The Auto SDK emits only registration metrics before user login is complete. Other metrics are emitted after user login.
+  
+    * The Device Client Metrics (DCM) extension supports uploading more metrics from the vehicle than in previous versions.
+  
+    * The DCM extension supports anonymizing all Auto SDK metrics.
+
+* Enhancements for car control:
+  
+  * Added prompt improvements. Alexa can provide a recommendation or ask for clarification after receiving an invalid or ambiguous user request. Suppose a user request targets the wrong mode, setting, or value for an appliance, such as "Alexa, set fan speed to 100", Alexa responds, "Sorry, you can only set the fan between 1 and 10". When the target in a user request is ambiguous, Alexa prompts for more information to determine the exact meaning of the request. For example, when a user says, "Turn on fan" (when the fan's default zone is not set), Alexa responds, "For the driver, the passenger, or the rear?" This feature is supported online and offline.
+  
+  * Improved asset management for car control, which enables Alexa to accept utterances only a few seconds after the user logs in. Previously, the user had to wait up to 20 seconds for Alexa to accept utterances.
+
+* Improved the Auto SDK Voice Chrome extension to allow the height and width of the linear voice chrome to be controlled by the parent layout. Previously, the dimensions were fixed.
+
+### Resolved Issues
+* Disabled APL by default in AACS to make sure utterances like "tell me a joke" work correctly without handling APL. If your platform wants to implement APL, see the AACS [Configuration README](./platforms/android/alexa-auto-client-service/android-service/README.md#aacs-module-enablement) to enable it.
+  
+* An SMS message can be sent to an Alexa contact correctly. A user request to send an SMS message to an Alexa contact no longer results in an Alexa-to-Alexa message.
+  
+* For car control, there is no longer a limit of two Device Serial Numbers (DSN) per account or Customer ID (CID).
+  
+* After the AmazonLite Wake Word locale model is switched from the default (en-US) to another locale model (e.g., de-DE), the newly selected locale remains in effect after the user quits and then restarts the application.
+  
+* Numeric weather IDs are passed to AVS for the `TemplateRunTime` API, making it easier for you to display weather icons that are consistent with your user interface.
+  
+* After the user disconnects the phone, if the user tries to use Alexa to make a call, Alexa responds correctly by reminding the user to connect the phone. Previously, Alexa tried to dial the number.
+
+* After the user pauses on Spotify and presses “Play” to resume, the player starts correctly from the point where the player stops. Previously the player skipped ahead, resuming from an incorrect place.
+  
+* `AutoVoiceChromeController` and `StateChangeAnimationScheduler` of the Voice Chrome extension are thread-safe now, preventing the Alexa app from crashing in different scenarios (e.g. when changing to the previous music track).
+
+### Known Issues
+* General
+    * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
+        ["en-US", "es-US"],
+        ["es-US", "en-US"],
+        ["en-IN", "hi-IN"],
+        ["hi-IN", "en-IN"],
+        ["fr-CA", "en-CA"],
+        ["en-CA", "fr-CA"].
+    
+      The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
+
+    * The `wakewordEnabled` property is not persistent across device reboots. If you use AACS, however, this issue does not occur. 
+    
+    * For Linux platforms, if your hardware does not use AVX2 instructions, the wake word library initialization causes an illegal instruction error.
+
+* Car Control   
+    * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+  
+    * Car control utterances that are variations of supported utterances but do not follow the supported utterance patterns return errors. Examples include “please turn on the light in the car” instead of the supported “turn on the light“, and ”put on the defroster“ or “defrost the windshield” instead of the supported ”turn on the defroster”.  
+
+* Communications
+  
+    * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+  
+    * Calling numbers such as 1-800-xxx-xxxx by using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, when you call numbers by using utterances that include "triple," "hundred," and "thousand," or press special characters such as # or * by saying "Alexa press *#", you may experience unexpected results. We recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+  
+    * A user playing any skill with extended multi-turn dialogs (such as Jeopardy or Skyrim) cannot use voice to accept or reject incoming Alexa-to-Alexa calls.
+
+* Entertainment
+    * A user playing notifications while music is playing hears the music for a split second between the end of one notification and the start of the next.
+  
+    * The word, "line-in," in an utterance is sometimes misinterpreted as "line" or other words. For example, if the user says, "Switch to line-in," the misinterpretation of "line-in" might cause an incorrect response.
+  
+    * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
+
+    * If your Android app displays the NowPlaying Display Card whenever Alexa plays media, the card might be erroneously dismissed. For example, during music playback, if a user invokes Alexa, putting Alexa in LISTENING, THINKING, or SPEAKING state, and then cancels the Alexa session by tapping the Cancel button, the NowPlaying card is dismissed. A media Display Card should not be automatically dismissed in this scenario.
+
+* Authentication
+    * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
+
+* AACS
+  
+    * For some platform interface APIs in the Core module, when an application fails to handle a directive, there is no way to report the failure to the Engine. This is because AASB assumes that the application always handles messages correctly. When AASB incorrectly reports how the application handles the message, the Engine state might become inconsistent with the application state. For example, suppose the Engine sends a directive to the application to set the audio volume but the application fails to make the change. AASB does not report the failure to the Engine. As a result, the Engine's and the application's settings become out of sync. The following list shows the affected APIs:
+        * `AudioInput`: 
+            * `startAudioInput()`
+        * `AudioOutput`: 
+            * `setPosition(int64_t position)`
+            * `volumeChanged(float volume)`
+            * `mutedStateChanged(MutedState state)`  
+   
 ## v3.1.0 released on 2020-12-15
 
 ### Enhancements

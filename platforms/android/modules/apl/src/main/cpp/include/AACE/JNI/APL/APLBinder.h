@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,14 +28,14 @@ class APLHandler : public aace::apl::APL {
 public:
     APLHandler(jobject obj);
 
-    std::string getVisualContext() override;
-
     // aace::apl::APL
 
     void renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId) override;
-    void clearDocument() override;
+    void clearDocument(const std::string& token) override;
     void executeCommands(const std::string& jsonPayload, const std::string& token) override;
-    void interruptCommandSequence() override;
+    void dataSourceUpdate(const std::string& sourceType, const std::string& jsonPayload, const std::string& token)
+        override;
+    void interruptCommandSequence(const std::string& token) override;
 
 private:
     JObject m_obj;

@@ -187,10 +187,38 @@ bool CBLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::cbl::
             m_enableUserProfile);
         ThrowIfNull(m_cblEngineImpl, "createCBLEngineImplFailed");
 
+        ThrowIfNot(
+            registerServiceInterface<CBLServiceInterface>(shared_from_this()),
+            "registerAuthorizationServiceInterfaceFailed");
+
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<CBL>").d("reason", ex.what()));
         return false;
+    }
+}
+
+void CBLEngineService::startCBL() {
+    if (m_cblEngineImpl) {
+        m_cblEngineImpl->onStart();
+    }
+}
+
+void CBLEngineService::cancelCBL() {
+    if (m_cblEngineImpl) {
+        m_cblEngineImpl->onCancel();
+    }
+}
+
+void CBLEngineService::addEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener) {
+    if (m_cblEngineImpl) {
+        m_cblEngineImpl->addEventListener(eventListener);
+    }
+}
+
+void CBLEngineService::removeEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener) {
+    if (m_cblEngineImpl) {
+        m_cblEngineImpl->removeEventListener(eventListener);
     }
 }
 

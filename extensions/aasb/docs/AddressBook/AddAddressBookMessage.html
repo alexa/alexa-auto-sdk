@@ -312,6 +312,14 @@ ToEngine:
 
 <a href='../APL/RenderDocumentResultMessage.html'>RenderDocumentResult</a>
 
+<a href='../APL/SendDataSourceFetchRequestEventMessage.html'>SendDataSourceFetchRequestEvent</a>
+
+<a href='../APL/SendDeviceWindowStateMessage.html'>SendDeviceWindowState</a>
+
+<a href='../APL/SendDocumentStateMessage.html'>SendDocumentState</a>
+
+<a href='../APL/SendRuntimeErrorEventMessage.html'>SendRuntimeErrorEvent</a>
+
 <a href='../APL/SendUserEventMessage.html'>SendUserEvent</a>
 
 <a href='../APL/SetAPLMaxVersionMessage.html'>SetAPLMaxVersion</a>
@@ -319,15 +327,13 @@ ToEngine:
 <a href='../APL/SetDocumentIdleTimeoutMessage.html'>SetDocumentIdleTimeout</a>
 
             
-<a href='../APL/GetVisualContextMessageReply.html'>GetVisualContext Reply</a>
-
 FromEngine:
             
 <a href='../APL/ClearDocumentMessage.html'>ClearDocument</a>
 
-<a href='../APL/ExecuteCommandsMessage.html'>ExecuteCommands</a>
+<a href='../APL/DataSourceUpdateMessage.html'>DataSourceUpdate</a>
 
-<a href='../APL/GetVisualContextMessage.html'>GetVisualContext</a>
+<a href='../APL/ExecuteCommandsMessage.html'>ExecuteCommands</a>
 
 <a href='../APL/InterruptCommandSequenceMessage.html'>InterruptCommandSequence</a>
 
@@ -407,14 +413,18 @@ ToEngine:
 <a href='../AlexaConnectivity/ConnectivityStateChangeMessage.html'>ConnectivityStateChange</a>
 
             
-<a href='../AlexaConnectivity/ConnectivityStateChangeMessageReply.html'>ConnectivityStateChange Reply</a>
+<a href='../AlexaConnectivity/GetConnectivityStateMessageReply.html'>GetConnectivityState Reply</a>
+
+<a href='../AlexaConnectivity/GetIdentifierMessageReply.html'>GetIdentifier Reply</a>
 
 FromEngine:
             
 <a href='../AlexaConnectivity/GetConnectivityStateMessage.html'>GetConnectivityState</a>
 
+<a href='../AlexaConnectivity/GetIdentifierMessage.html'>GetIdentifier</a>
+
             
-<a href='../AlexaConnectivity/GetConnectivityStateMessageReply.html'>GetConnectivityState Reply</a>
+<a href='../AlexaConnectivity/ConnectivityStateChangeMessageReply.html'>ConnectivityStateChange Reply</a>
           
 
 </div>
@@ -612,17 +622,9 @@ FromEngine:
 ToEngine:
             
             
-<a href='../CarControl/AdjustModeControllerValueMessageReply.html'>AdjustModeControllerValue Reply</a>
+<a href='../CarControl/AdjustControllerValueMessageReply.html'>AdjustControllerValue Reply</a>
 
-<a href='../CarControl/AdjustRangeControllerValueMessageReply.html'>AdjustRangeControllerValue Reply</a>
-
-<a href='../CarControl/SetModeControllerValueMessageReply.html'>SetModeControllerValue Reply</a>
-
-<a href='../CarControl/SetPowerControllerValueMessageReply.html'>SetPowerControllerValue Reply</a>
-
-<a href='../CarControl/SetRangeControllerValueMessageReply.html'>SetRangeControllerValue Reply</a>
-
-<a href='../CarControl/SetToggleControllerValueMessageReply.html'>SetToggleControllerValue Reply</a>
+<a href='../CarControl/SetControllerValueMessageReply.html'>SetControllerValue Reply</a>
 
 FromEngine:
             
@@ -637,6 +639,22 @@ FromEngine:
 <a href='../CarControl/SetRangeControllerValueMessage.html'>SetRangeControllerValue</a>
 
 <a href='../CarControl/SetToggleControllerValueMessage.html'>SetToggleControllerValue</a>
+
+                      
+
+</div>
+</div>
+<div class="navitem">
+<button class="dropdown">+ DeviceSetup</button>
+<div class="dropdown-container">
+ToEngine:
+            
+<a href='../DeviceSetup/SetupCompletedMessage.html'>SetupCompleted</a>
+
+            
+FromEngine:
+            
+<a href='../DeviceSetup/SetupCompletedResponseMessage.html'>SetupCompletedResponse</a>
 
                       
 
@@ -748,8 +766,6 @@ FromEngine:
 <div class="dropdown-container">
 ToEngine:
             
-<a href='../LocalMediaSource/GetSourceMessage.html'>GetSource</a>
-
 <a href='../LocalMediaSource/PlayerErrorMessage.html'>PlayerError</a>
 
 <a href='../LocalMediaSource/PlayerEventMessage.html'>PlayerEvent</a>
@@ -784,6 +800,8 @@ FromEngine:
 <div class="dropdown-container">
 ToEngine:
             
+<a href='../LocationProvider/LocationServiceAccessChangedMessage.html'>LocationServiceAccessChanged</a>
+
             
 <a href='../LocationProvider/GetCountryMessageReply.html'>GetCountry Reply</a>
 
@@ -1068,7 +1086,7 @@ Notifies the engine on an availability of an address book
 <pre>
 {
   <span class="json-key">"header"</span> : {
-    "<span class="json-key">version"</span> : <span class="json-val">"3.1"</span>,
+    "<span class="json-key">version"</span> : <span class="json-val">"3.2"</span>,
     "<span class="json-key">messageType"</span> : <span class="json-val">"Publish"</span>,
     "<span class="json-key">id"</span> : {{<span class="json-input">String</span>}},
     <span class="json-key">"messageDescription"</span> : {
@@ -1084,7 +1102,8 @@ Notifies the engine on an availability of an address book
       <span class="json-key">"navigationNames"</span> : [
         {
           "<span class="json-key">entryId"</span> : {{<span class="json-input">String</span>}},
-          "<span class="json-key">name"</span> : {{<span class="json-input">String</span>}}
+          "<span class="json-key">name"</span> : {{<span class="json-input">String</span>}},
+          "<span class="json-key">phoneticName"</span> : {{<span class="json-input">String</span>}}
         },
         ...
       ],
@@ -1093,7 +1112,9 @@ Notifies the engine on an availability of an address book
           "<span class="json-key">entryId"</span> : {{<span class="json-input">String</span>}},
           "<span class="json-key">firstName"</span> : {{<span class="json-input">String</span>}},
           "<span class="json-key">lastName"</span> : {{<span class="json-input">String</span>}},
-          "<span class="json-key">nickname"</span> : {{<span class="json-input">String</span>}}
+          "<span class="json-key">nickname"</span> : {{<span class="json-input">String</span>}},
+          "<span class="json-key">phoneticFirstName"</span> : {{<span class="json-input">String</span>}},
+          "<span class="json-key">phoneticLastName"</span> : {{<span class="json-input">String</span>}}
         },
         ...
       ],
@@ -1142,7 +1163,7 @@ Notifies the engine on an availability of an address book
     </tr> </thead>
         <tr>
         <td>version</td>
-        <td style="color:blue">"3.1"</td>
+        <td style="color:blue">"3.2"</td>
         <td>String</td>
     </tr>
     <tr>
@@ -1259,6 +1280,15 @@ Notifies the engine on an availability of an address book
             String
         </td>
     </tr>
+    <tr>
+        <td>addressBookData.navigationNames.phoneticName</td>
+        
+        <td>Optional. Phonetic name of the entry if available.
+        </td>
+        <td>
+            String
+        </td>
+    </tr>
 
     <tr>
         <td>addressBookData.contactNames</td>
@@ -1300,6 +1330,24 @@ Notifies the engine on an availability of an address book
         <td>addressBookData.contactNames.nickname</td>
         
         <td>Name of the entry, or an empty string if not available.
+        </td>
+        <td>
+            String
+        </td>
+    </tr>
+    <tr>
+        <td>addressBookData.contactNames.phoneticFirstName</td>
+        
+        <td>Optional. Phonetic first name of entry if available.
+        </td>
+        <td>
+            String
+        </td>
+    </tr>
+    <tr>
+        <td>addressBookData.contactNames.phoneticLastName</td>
+        
+        <td>Optional. Phonetic last name of entry if available.
         </td>
         <td>
             String
@@ -1454,7 +1502,7 @@ Notifies the engine on an availability of an address book
     <tr>
         <td>addressBookData.postalAddresses.longitudeInDegrees</td>
         
-        <td>Geo longitute in degrees.
+        <td>Geo longitude in degrees.
         </td>
         <td>
             Float
@@ -1485,7 +1533,7 @@ Notifies the engine on an availability of an address book
 <pre>
 {
   <span class="json-key">"header"</span> : {
-    <span class="json-key">"version"</span> : <span class="json-val">"3.1"</span>,
+    <span class="json-key">"version"</span> : <span class="json-val">"3.2"</span>,
     <span class="json-key">"messageType"</span> : <span class="json-val">"Publish"</span>,
     <span class="json-key">"id"</span> : <span class="json-val">"id-SampleText"</span>,
     <span class="json-key">"messageDescription"</span> : {
@@ -1501,7 +1549,8 @@ Notifies the engine on an availability of an address book
       <span class="json-key">"navigationNames"</span> : [
         {
           <span class="json-key">"entryId"</span> : <span class="json-val">"entryId-SampleText"</span>,
-          <span class="json-key">"name"</span> : <span class="json-val">"name-SampleText"</span>
+          <span class="json-key">"name"</span> : <span class="json-val">"name-SampleText"</span>,
+          <span class="json-key">"phoneticName"</span> : <span class="json-val">"phoneticName-SampleText"</span>
         }
       ],
       <span class="json-key">"contactNames"</span> : [
@@ -1509,7 +1558,9 @@ Notifies the engine on an availability of an address book
           <span class="json-key">"entryId"</span> : <span class="json-val">"entryId-SampleText"</span>,
           <span class="json-key">"firstName"</span> : <span class="json-val">"firstName-SampleText"</span>,
           <span class="json-key">"lastName"</span> : <span class="json-val">"lastName-SampleText"</span>,
-          <span class="json-key">"nickname"</span> : <span class="json-val">"nickname-SampleText"</span>
+          <span class="json-key">"nickname"</span> : <span class="json-val">"nickname-SampleText"</span>,
+          <span class="json-key">"phoneticFirstName"</span> : <span class="json-val">"phoneticFirstName-SampleText"</span>,
+          <span class="json-key">"phoneticLastName"</span> : <span class="json-val">"phoneticLastName-SampleText"</span>
         }
       ],
       <span class="json-key">"phoneData"</span> : [

@@ -1,17 +1,27 @@
 package com.amazon.alexa.auto.navigation.providers.google;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
+import com.amazon.aacsconstants.Action;
+import com.amazon.aacsconstants.Topic;
+import com.amazon.aacsipc.AACSSender;
+import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.aacs.common.AlexaWaypoint;
 import com.amazon.alexa.auto.aacs.common.Coordinate;
 import com.amazon.alexa.auto.aacs.common.PointOfInterest;
 import com.amazon.alexa.auto.aacs.common.StartNavigation;
+import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
+
+import org.json.JSONException;
+import org.json.JSONStringer;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -26,6 +36,12 @@ public class GoogleMapsNavigationProvider implements NavigationProvider {
     public static final String GOOGLE_MAPS_PREVIEW_ROUTE = "geo:0,0?q=%f,%f(%s)";
     public static final String GOOGLE_MAPS_ZOOM_TO_POI = "geo:%f,%f";
 
+    private static final String NAVIGATION_STATE_KEY = "navigation.state.key";
+    public static final String NAVIGATION_STATE = "navigationState";
+    public static final String NOT_NAVIGATING_STATE =
+            "{\"state\": \"NOT_NAVIGATING\",\"waypoints\": [],\"shapes\": []}";
+    public static final String NAVIGATING_STATE = "{\"state\": \"NAVIGATING\",\"waypoints\": [],\"shapes\": []}";
+
     private final WeakReference<Context> mContext;
 
     public GoogleMapsNavigationProvider(WeakReference<Context> context) {
@@ -39,25 +55,25 @@ public class GoogleMapsNavigationProvider implements NavigationProvider {
         AlexaWaypoint waypoint = startNavigation.getWaypoints().get(0);
         List<Double> coordinates = waypoint.getCoordinate();
 
-        mContext.get().startActivity(createStartNavigationIntent(coordinates.get(0), coordinates.get(1)));
+        startActivity(createStartNavigationIntent(coordinates.get(0), coordinates.get(1)));
     }
 
     @Override
     public void startNavigation(PointOfInterest poi) {
-        mContext.get().startActivity(createStartNavigationIntent(
+        startActivity(createStartNavigationIntent(
                 poi.getCoordinate().getLatitudeInDegrees(), poi.getCoordinate().getLongitudeInDegrees()));
     }
 
     @Override
     public void startNavigation(Coordinate coordinate) {
-        mContext.get().startActivity(
+        startActivity(
                 createStartNavigationIntent(coordinate.getLatitudeInDegrees(), coordinate.getLongitudeInDegrees()));
     }
 
     @Override
     public void cancelNavigation() {
         Log.i(TAG, "cancel navigation");
-        mContext.get().startActivity(createCancelNavigationIntent());
+        startActivity(createCancelNavigationIntent());
     }
 
     @Override
@@ -69,7 +85,7 @@ public class GoogleMapsNavigationProvider implements NavigationProvider {
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mapIntent.setPackage(GOOGLE_MAPS_PACKAGE);
-        mContext.get().startActivity(mapIntent);
+        startActivity(mapIntent);
     }
 
     @Override
@@ -81,7 +97,24 @@ public class GoogleMapsNavigationProvider implements NavigationProvider {
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mapIntent.setPackage("com.google.android.apps.maps");
-        mContext.get().startActivity(mapIntent);
+        startActivity(mapIntent);
+    }
+
+    @Override
+    public void provideNavigationState(String messageId) {
+        SharedPreferences preferences = mContext.get().getSharedPreferences(NAVIGATION_STATE_KEY, Context.MODE_PRIVATE);
+        String navigationState = preferences.getString(NAVIGATION_STATE_KEY, null);
+
+        if (navigationState != null) {
+            try {
+                String payload =
+                        new JSONStringer().object().key(NAVIGATION_STATE).value(navigationState).endObject().toString();
+                new AACSMessageSender(mContext, new AACSSender())
+                        .sendReplyMessage(messageId, Topic.NAVIGATION, Action.Navigation.GET_NAVIGATION_STATE, payload);
+            } catch (JSONException e) {
+                Log.e(TAG, "Fail to generate reply message for getting navigation state data.");
+            }
+        }
     }
 
     /**
@@ -97,6 +130,12 @@ public class GoogleMapsNavigationProvider implements NavigationProvider {
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
         mapIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mapIntent.setPackage(GOOGLE_MAPS_PACKAGE);
+
+        SharedPreferences preferences = mContext.get().getSharedPreferences(NAVIGATION_STATE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(NAVIGATION_STATE_KEY, NAVIGATING_STATE);
+        editor.apply();
+
         return mapIntent;
     }
 
@@ -114,6 +153,25 @@ public class GoogleMapsNavigationProvider implements NavigationProvider {
         stopGoogleMapsIntent.setData(intentUri);
         stopGoogleMapsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         stopGoogleMapsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        SharedPreferences preferences = mContext.get().getSharedPreferences(NAVIGATION_STATE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(NAVIGATION_STATE_KEY, NOT_NAVIGATING_STATE);
+        editor.apply();
+
         return stopGoogleMapsIntent;
+    }
+
+    /**
+     * Start activity with intent.
+     * @param intent intent.
+     */
+    private void startActivity(Intent intent) {
+        try {
+            Preconditions.checkNotNull(mContext.get());
+            mContext.get().startActivity(intent);
+        } catch (ActivityNotFoundException activityNotFound) {
+            Log.e(TAG, "Activity is not found.");
+        }
     }
 }

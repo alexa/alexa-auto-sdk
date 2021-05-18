@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sharedUserId="com.amazon.AlexaAutoUserId"
+    package="com.amazon.alexaautoclientservice">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <permission android:name="com.amazon.alexaautoclientservice.aacsmessagelogger"
+        android:protectionLevel= "signature|privileged" />
+    <uses-permission android:name="com.amazon.alexaautoclientservice.aacsmessagelogger" />
+
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:persistent="true"
+        android:extractNativeLibs="true">
+
+        <receiver
+            android:name="com.amazon.alexaautoclientservice.receiver.InstrumentationReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.amazon.aacs.startinstrumentation" />
+                <category android:name="com.amazon.alexaautoclientservice.InstrumentationReceiver" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

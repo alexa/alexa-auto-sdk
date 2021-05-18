@@ -152,7 +152,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/call_button_text"
                     android:gravity="center"
-                    style="@style/LocalSearchDarkButtonBackground"
+                    style="@style/Alexa.LightButtonRound"
                     android:layout_weight="1"
                     />
 
@@ -163,7 +163,7 @@
                     android:layout_marginStart="@dimen/button_margin_start"
                     android:text="@string/navigate_button_text"
                     android:gravity="center"
-                    style="@style/LocalSearchLightButtonBackground"
+                    style="@style/Alexa.DarkButtonRound"
                     android:layout_weight="1"
                     />
             </LinearLayout>

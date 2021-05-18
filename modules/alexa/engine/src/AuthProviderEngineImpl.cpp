@@ -13,15 +13,18 @@
  * permissions and limitations under the License.
  */
 
+#include <sstream>
 #include <nlohmann/json.hpp>
 
 #include "AACE/Engine/Alexa/AuthProviderEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
+using namespace aace::engine::utils::metrics;
 using json = nlohmann::json;
 
 // String to identify log entries originating from this file.
@@ -35,6 +38,15 @@ static const std::chrono::seconds START_AUTH_TIMEOUT(15);
 
 /// Timeout to wait for the callbacks from authorization provider.
 static const std::chrono::seconds DEFAULT_TIMEOUT(2);
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AuthProviderEngineImpl";
+
+/// Counter metrics for AuthProvider Platform APIs
+static const std::string METRIC_AUTH_PROVIDER_GET_AUTH_TOKEN = "GetAuthToken";
+static const std::string METRIC_AUTH_PROVIDER_GET_AUTH_STATE = "GetAuthState";
+static const std::string METRIC_AUTH_PROVIDER_AUTH_FAILURE = "AuthFailure";
+static const std::string METRIC_AUTH_PROVIDER_AUTH_STATE_CHANGED = "AuthStateChanged";
 
 std::shared_ptr<AuthProviderEngineImpl> AuthProviderEngineImpl::create(
     std::shared_ptr<aace::alexa::AuthProvider> authProvider,
@@ -146,6 +158,14 @@ void AuthProviderEngineImpl::stopAuthorization() {
 }
 
 void AuthProviderEngineImpl::onAuthStateChanged(AuthState authState, AuthError authError) {
+    std::stringstream state;
+    std::stringstream error;
+    state << authState;
+    error << authError;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onAuthStateChanged",
+        {METRIC_AUTH_PROVIDER_AUTH_STATE_CHANGED, state.str(), error.str()});
     AACE_DEBUG(LX(TAG).d("authState", authState).d("authError", authError));
     try {
         std::unique_lock<std::mutex> lock(m_mutex);
@@ -232,6 +252,7 @@ void AuthProviderEngineImpl::onAuthorizationError(
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
 
         if (error == "AUTH_FAILURE") {
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onAuthorizationError", {METRIC_AUTH_PROVIDER_AUTH_FAILURE});
             m_authProviderPlatformInterface->authFailure(message);
         } else if (error == "START_AUTHORIZATION_FAILED" || error == "LOGOUT_FAILED") {
             AACE_ERROR(LX(TAG).d("service", service).d("error", error));
@@ -257,6 +278,8 @@ void AuthProviderEngineImpl::onEventReceived(const std::string& service, const s
             auto type = requestPayload["type"];
             if (type == "requestAuthorization") {
                 if (!m_resetToAuthorizingState) {  // Prevent calling platform API when we are silently falling back to AUTHORIZING
+                    emitCounterMetrics(
+                        METRIC_PROGRAM_NAME_SUFFIX, "onEventReceived", {METRIC_AUTH_PROVIDER_GET_AUTH_STATE});
                     auto state = m_authProviderPlatformInterface->getAuthState();
                     json payload;
                     if (state == AuthState::REFRESHED) {
@@ -296,6 +319,8 @@ std::string AuthProviderEngineImpl::onGetAuthorizationData(const std::string& se
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
 
         if (key == "accessToken") {
+            emitCounterMetrics(
+                METRIC_PROGRAM_NAME_SUFFIX, "onGetAuthorizationData", {METRIC_AUTH_PROVIDER_GET_AUTH_TOKEN});
             json accessTokenJson;
             accessTokenJson["accessToken"] = m_authProviderPlatformInterface->getAuthToken();
             return accessTokenJson.dump();

@@ -26,7 +26,7 @@ namespace apl {
 static const std::string TAG("aasb.apl.AASBAPLEngineService");
 
 // Minimum version this module supports
-static const aace::engine::core::Version minRequiredVersion = VERSION("3.0");
+static const aace::engine::core::Version minRequiredVersion = VERSION("3.2");
 
 // register the service
 REGISTER_SERVICE(AASBAPLEngineService);

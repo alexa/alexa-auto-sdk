@@ -66,6 +66,7 @@ add_executable(AACECoreTests
     ${CMAKE_CURRENT_SOURCE_DIR}/src/EngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/VehicleConfigurationImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationEngineImplTest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/LocationProviderEngineImplTest.cpp
 )
 
 target_include_directories(AACECoreTests

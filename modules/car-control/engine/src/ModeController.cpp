@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Engine/CarControl/ModeController.h"
-
-#include <AVSCommon/AVS/CapabilitySemantics.h>
-#include <ModeController/ModeControllerAttributeBuilder.h>
-
 #include <nlohmann/json.hpp>
 
+#include <AVSCommon/AVS/CapabilitySemantics/CapabilitySemantics.h>
+#include <ModeController/ModeControllerAttributeBuilder.h>
+
+#include "AACE/Engine/CarControl/ModeController.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
@@ -44,21 +43,13 @@ std::shared_ptr<ModeController> ModeController::create(
         std::string instance = controllerConfig.at("instance");
         ThrowIf(instance.empty(), "missingInstance");
 
+        ThrowIfNot(controllerConfig.contains("capabilityResources"), "missingCapabilityResources");
+        alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilityResources>
+            capabilityResources = getResources(controllerConfig.at("capabilityResources"), assetStore);
+        ThrowIfNot(capabilityResources.hasValue(), "failedToParseCapabilityResourcesConfig");
         auto attributeBuilder =
             alexaClientSDK::capabilityAgents::modeController::ModeControllerAttributeBuilder::create();
-        alexaClientSDK::avsCommon::avs::CapabilityResources capabilityResources;
-
-        auto& friendlyNames = controllerConfig.at("capabilityResources").at("friendlyNames");
-        for (auto& item : friendlyNames.items()) {
-            // Note: this is assuming the friendly name label is "asset" type
-            auto& value = item.value().at("value");
-            std::string assetId = value.at("assetId");
-            const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
-            for (auto name = names.begin(); name != names.end(); ++name) {
-                capabilityResources.addFriendlyNameWithText(name->first, name->second);
-            }
-        }
-        attributeBuilder->withCapabilityResources(capabilityResources);
+        attributeBuilder->withCapabilityResources(capabilityResources.value());
 
         auto& configuration = controllerConfig.at("configuration");
         if (configuration.contains("ordered")) {
@@ -68,25 +59,20 @@ std::shared_ptr<ModeController> ModeController::create(
 
         auto& supportedModes = configuration.at("supportedModes");
         for (auto& supportedMode : supportedModes.items()) {
-            alexaClientSDK::avsCommon::sdkInterfaces::modeController::ModeResources modeResources;
             std::string value = supportedMode.value().at("value");
-            auto& friendlyNames = supportedMode.value().at("modeResources").at("friendlyNames");
-            std::vector<std::string> assetIds;
-            for (auto& item : friendlyNames.items()) {
-                auto& value = item.value().at("value");
-                std::string assetId = value.at("assetId");
-                const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
-                for (auto name = names.begin(); name != names.end(); ++name) {
-                    modeResources.addFriendlyNameWithText(name->first, name->second);
-                }
-            }
-            attributeBuilder->addMode(value, modeResources);
+            ThrowIfNot(supportedMode.value().contains("modeResources"), "missingModeResources");
+            // Note: ModeResources is a type alias for CapabilityResources
+            alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilityResources>
+                modeResources = getResources(supportedMode.value().at("modeResources"), assetStore);
+            ThrowIfNot(modeResources.hasValue(), "failedToParseModeResourcesConfig");
+            attributeBuilder->addMode(value, modeResources.value());
         }
 
         if (controllerConfig.contains("semantics")) {
             auto& semanticsJson = controllerConfig.at("semantics");
-            alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilitySemantics> semantics =
-                getSemantics(semanticsJson);
+            alexaClientSDK::avsCommon::utils::Optional<
+                alexaClientSDK::avsCommon::avs::capabilitySemantics::CapabilitySemantics>
+                semantics = getSemantics(semanticsJson);
             ThrowIfNot(semantics.hasValue(), "failedToParseSemanticsConfig");
             attributeBuilder->withSemantics(semantics.value());
         }
@@ -117,7 +103,7 @@ ModeController::ModeController(
 
 void ModeController::build(
     std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
-    std::unique_ptr<EndpointBuilder>& builder) {
+    std::unique_ptr<EndpointBuilderInterface>& builder) {
     m_carControlServiceInterface = carControlServiceInterface;
     builder->withModeController(shared_from_this(), getInstance(), m_attributes, false, false, false);
 }

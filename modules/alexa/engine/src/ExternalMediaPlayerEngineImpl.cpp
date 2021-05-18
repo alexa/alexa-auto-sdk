@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,15 +23,14 @@
 #include "AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Core/EngineService.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "AACE/Engine/Utils/JSON/JSON.h"
+#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
+
+using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.ExternalMediaPlayerEngineImpl");
@@ -41,13 +40,19 @@ static const std::string GLOBAL_PRESET_KEY = "preset";
 /// Timeout for setting focus operation.
 static const std::chrono::seconds SET_FOCUS_TIMEOUT{5};
 
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "ExternalMediaPlayerEngineImpl";
+
+/// Counter metric for GlobalPreset Platform API
+static const std::string METRIC_GLOBAL_PRESET_GLOBAL_PRESET = "GlobalPreset";
+
 ExternalMediaPlayerEngineImpl::ExternalMediaPlayerEngineImpl(const std::string& agent) :
         ExternalMediaAdapterHandlerInterface(agent), m_agent(agent) {
 }
 
 bool ExternalMediaPlayerEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
@@ -60,8 +65,7 @@ bool ExternalMediaPlayerEngineImpl::initialize(
     try {
         AACE_VERBOSE(LX(TAG));
 
-        ThrowIfNull(defaultEndpointBuilder, "invalidDefaultEndpointBuilder");
-        ThrowIfNull(capabilitiesDelegate, "invalidCapabilitiesDelegate");
+        ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(messageSender, "invalidMessageSender");
 
         m_externalMediaPlayerCapabilityAgent = aace::engine::alexa::ExternalMediaPlayer::create(
@@ -83,7 +87,7 @@ bool ExternalMediaPlayerEngineImpl::initialize(
         audioPlayerObserverDelegate->setDelegate(m_externalMediaPlayerCapabilityAgent);
 
         // register capability with the default endpoint
-        defaultEndpointBuilder->withCapability(
+        capabilitiesRegistrar->withCapability(
             m_externalMediaPlayerCapabilityAgent, m_externalMediaPlayerCapabilityAgent);
 
         // add ourself as an adapter handler in the external media player capability agent
@@ -102,8 +106,8 @@ bool ExternalMediaPlayerEngineImpl::initialize(
 
 std::shared_ptr<ExternalMediaPlayerEngineImpl> ExternalMediaPlayerEngineImpl::create(
     const std::string& agent,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
@@ -124,8 +128,7 @@ std::shared_ptr<ExternalMediaPlayerEngineImpl> ExternalMediaPlayerEngineImpl::cr
             std::shared_ptr<ExternalMediaPlayerEngineImpl>(new ExternalMediaPlayerEngineImpl(agent));
         ThrowIfNot(
             externalMediaPlayerEngineImpl->initialize(
-                defaultEndpointBuilder,
-                capabilitiesDelegate,
+                capabilitiesRegistrar,
                 speakerManager,
                 messageSender,
                 certifiedMessageSender,
@@ -354,6 +357,7 @@ bool ExternalMediaPlayerEngineImpl::play(
                 token.substr(gpindex + GLOBAL_PRESET_KEY.length() + 1);  //  from "preset:" to end
             int preset = std::stoi(presetString);
             ThrowIfNull(m_globalPresetHandler, "platformGlobalPresetHandlerNull");
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "play", {METRIC_GLOBAL_PRESET_GLOBAL_PRESET});
             // send global preset to platform
             m_globalPresetHandler->setGlobalPreset(preset);
             return true;
@@ -531,14 +535,8 @@ std::string ExternalMediaPlayerEngineImpl::createReportDiscoveredPlayersEventLoc
         // add the player list to the payload
         payload.AddMember("players", playerList, document.GetAllocator());
 
-        // create payload string
-        rapidjson::StringBuffer buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-        document.Accept(writer);
-
         return alexaClientSDK::avsCommon::avs::buildJsonEventString(
-                   "ExternalMediaPlayer", "ReportDiscoveredPlayers", "", buffer.GetString())
+                   "ExternalMediaPlayer", "ReportDiscoveredPlayers", "", aace::engine::utils::json::toString(document))
             .second;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -591,14 +589,8 @@ std::string ExternalMediaPlayerEngineImpl::createAuthorizationCompleteEventLocke
         payload.AddMember("authorized", authorizedList, document.GetAllocator());
         payload.AddMember("deauthorized", deauthorizedList, document.GetAllocator());
 
-        // create payload string
-        rapidjson::StringBuffer buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-        document.Accept(writer);
-
         return alexaClientSDK::avsCommon::avs::buildJsonEventString(
-                   "ExternalMediaPlayer", "AuthorizationComplete", "", buffer.GetString())
+                   "ExternalMediaPlayer", "AuthorizationComplete", "", aace::engine::utils::json::toString(document))
             .second;
 
     } catch (std::exception& ex) {
@@ -622,6 +614,7 @@ void ExternalMediaPlayerEngineImpl::reportDiscoveredPlayers(
                     AACE_VERBOSE(
                         LX(TAG).m("addingDiscoveredPlayerToPendingMap").d("localPlayerId", next.localPlayerId));
                     m_pendingDiscoveredPlayerMap[next.localPlayerId] = next;
+                    m_allDiscoveredPlayersMap[next.localPlayerId] = next;
                 } else {
                     AACE_WARN(
                         LX(TAG).d("reason", "discoveredPlayerAlreadyPending").d("localPlayerId", next.localPlayerId));
@@ -757,21 +750,45 @@ void ExternalMediaPlayerEngineImpl::setFocus(const std::string& playerId, bool f
     }
 }
 
-// alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
 void ExternalMediaPlayerEngineImpl::onConnectionStatusChanged(const Status status, const ChangedReason reason) {
-    AACE_VERBOSE(LX(TAG).d("status", status));
+    // no-op
+}
+
+void ExternalMediaPlayerEngineImpl::onConnectionStatusChanged(
+    const Status status,
+    const std::vector<EngineConnectionStatus>& engineStatuses) {
+    AACE_VERBOSE(LX(TAG).d("status", status).d("engineCount", engineStatuses.size()));
+    bool newConnection = false;
 
     std::lock_guard<std::mutex> lock(m_connectionMutex);
-    if (m_connectionStatus != status) {
-        m_connectionStatus = status;
+    m_connectionStatus = status;
+
+    for (const auto& engineStatus : engineStatuses) {
+        auto engineType = engineStatus.engineType;
+        auto it = std::find(m_currentConnectedEngineTypes.begin(), m_currentConnectedEngineTypes.end(), engineType);
+        auto wasPreviouslyConnected = it != m_currentConnectedEngineTypes.end();
+        if (!wasPreviouslyConnected && engineStatus.status == Status::CONNECTED) {
+            // The engine type is newly connected. Flag it and keep track of the connection
+            AACE_VERBOSE(LX(TAG).m("adding new engine connection").d("engine type", engineType));
+            m_currentConnectedEngineTypes.push_back(engineType);
+            newConnection = true;
+        } else if (wasPreviouslyConnected && engineStatus.status != Status::CONNECTED) {
+            // The engine type is no longer connected. Remove the connection
+            AACE_VERBOSE(LX(TAG).m("removing engine connection").d("engine type", engineType));
+            m_currentConnectedEngineTypes.erase(it);
+        }
+    }
+
+    if (newConnection) {
+        // Redo authorization sequence. We either became connected to an Alexa engine when
+        // previously not, or our connection switched between different Alexa engines.
         m_executor.submit([this]() {
             std::lock_guard<std::mutex> lock(m_playersMutex);
-            sendDiscoveredPlayersIfReadyLocked(m_pendingDiscoveredPlayerMap);
+            sendDiscoveredPlayersIfReadyLocked(m_allDiscoveredPlayersMap);
         });
     }
 }
 
-// alexaClientSDK::avsCommon::utils::RequiresShutdown
 void ExternalMediaPlayerEngineImpl::doShutdown() {
     AACE_INFO(LX(TAG));
 
@@ -816,7 +833,7 @@ void AudioPlayerObserverDelegate::onPlayerActivityChanged(
 }
 
 void AudioPlayerObserverDelegate::setDelegate(
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface> delegate) {
+    std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface> delegate) {
     m_delegate = delegate;
 }
 

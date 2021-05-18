@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -98,12 +98,18 @@ static void usageExit(std::string& name) {
                  "  --media-player COMMAND\n"
                  "      Play audio with the specified media player.\n"
                  "\n"
+                 "  --network-identifier NETWORK_IDENTIFIER\n"
+                 "      Specify the network identifier for Alexa Connectivity.\n"
+                 "\n"
                  "  --payload-script COMMAND\n"
                  "      Parse a JSON payload to print in the console.\n"
                  "      Supported payloads include PlayerInfo and Template.\n"
                  "\n"
                  "  --single-threaded-ui\n"
                  "      Application UI runs on the main thread (default is async).\n"
+                 "\n"
+                 "  --disable-auto-authorization COMMAND\n"
+                 "      Disable the starting previously active authorization.\n"
                  "\n"
                  "  -h\n"
                  "  --help\n"
@@ -141,7 +147,7 @@ int main(int argc, const char* argv[]) {
                         missingArgumentExit(name, arg);
                     }
                     arg = list[i];
-                    auto input = std::ifstream(std::string(arg), std::ifstream::in);
+                    std::ifstream input(std::string(arg), std::ifstream::in);
                     if (!input.good()) {
                         errorExit(name, "file not found " + arg);
                     }
@@ -175,7 +181,7 @@ int main(int argc, const char* argv[]) {
                         missingArgumentExit(name, arg);
                     }
                     arg = list[i];
-                    auto input = std::ifstream(std::string(arg), std::ifstream::in);
+                    std::ifstream input(std::string(arg), std::ifstream::in);
                     if (!input.good()) {
                         errorExit(name, "file not found " + arg);
                     }
@@ -199,6 +205,12 @@ int main(int argc, const char* argv[]) {
                     }
                     arg = list[i];
                     applicationContext->setMediaPlayerCommand(arg);
+                } else if (c2(arg, ' ', "network-identifier")) {
+                    if (++i == size) {
+                        missingArgumentExit(name, arg);
+                    }
+                    arg = list[i];
+                    applicationContext->setNetworkIdentifier(arg);
                 } else if (c2(arg, ' ', "payload-script")) {
                     if (++i == size) {
                         missingArgumentExit(name, arg);
@@ -217,6 +229,8 @@ int main(int argc, const char* argv[]) {
                     std::cerr << "--wake-word option is deprecated (" << support << ")\n";
                 } else if (c2(arg, 'h', "help") || c2(arg, '?')) {
                     usageExit(name);
+                } else if (c2(arg, ' ', "disable-auto-authorization")) {
+                    applicationContext->setDisableAutoAuthorizationCommand(true);
                 } else {
                     unknownArgumentExit(name, arg);
                 }

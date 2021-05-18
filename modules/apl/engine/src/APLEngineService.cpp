@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ bool APLEngineService::registerPlatformInterface(std::shared_ptr<aace::core::Pla
 
 bool APLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::apl::APL> apl) {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNull(apl, "platformInterfaceNull");
         ThrowIfNotNull(m_aplEngineImpl, "platformInterfaceAlreadyRegistered");
 
@@ -69,8 +70,8 @@ bool APLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::apl::
             getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
         ThrowIfNull(alexaComponents, "invalidAlexaComponentInterface");
 
-        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
-        ThrowIfNull(defaultEndpointBuilder, "defaultEndpointBuilderInvalid");
+        auto defaultCapabilitiesRegistrar = alexaComponents->getDefaultEndpointCapabilitiesRegistrar();
+        ThrowIfNull(defaultCapabilitiesRegistrar, "defaultCapabilitiesRegistrarInvalid");
 
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull(exceptionSender, "exceptionSenderInvalid");
@@ -81,16 +82,16 @@ bool APLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::apl::
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
-        auto focusManager = alexaComponents->getVisualFocusManager();
-        ThrowIfNull(focusManager, "focusManagerInvalid");
+        auto visualFocusManager = alexaComponents->getVisualFocusManager();
+        ThrowIfNull(visualFocusManager, "visualFocusManagerInvalid");
 
         auto dialogUXStateAggregator = alexaComponents->getDialogUXStateAggregator();
         ThrowIfNull(dialogUXStateAggregator, "dialogUXStateAggregatorInvalid");
 
         m_aplEngineImpl = aace::engine::apl::APLEngineImpl::create(
             apl,
-            defaultEndpointBuilder,
-            focusManager,
+            defaultCapabilitiesRegistrar,
+            visualFocusManager,
             exceptionSender,
             messageSender,
             contextManager,

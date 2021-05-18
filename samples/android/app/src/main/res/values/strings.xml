@@ -95,6 +95,7 @@
     <string name="auth_product_dsn">PRODUCT DSN</string>
 
     <!-- Alexa Client -->
+    <string name="sendSetupCompleted">SETUP COMPLETED</string>
     <string name="client_state">ALEXA CLIENT STATE</string>
     <string name="client_connection_status">CONNECTION STATUS:</string>
     <string name="client_auth_state">AUTH STATE:</string>

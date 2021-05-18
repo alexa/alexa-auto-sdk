@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #define AACE_ENGINE_LOCATION_LOCATION_ENGINE_SERVICE_H
 
 #include "AACE/Engine/Core/EngineService.h"
-#include "AACE/Location/LocationProvider.h"
+#include "LocationProviderEngineImpl.h"
 
 namespace aace {
 namespace engine {
@@ -35,6 +35,7 @@ public:
 
 protected:
     bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
+    bool shutdown() override;
 
 private:
     // platform interface registration
@@ -47,7 +48,7 @@ private:
     bool registerPlatformInterfaceType(std::shared_ptr<aace::location::LocationProvider> locationProvider);
 
 private:
-    std::shared_ptr<aace::location::LocationProvider> m_locationProvider;
+    std::shared_ptr<aace::engine::location::LocationProviderEngineImpl> m_locationProviderEngineImpl;
 };
 
 }  // namespace location

@@ -8,10 +8,10 @@ import androidx.annotation.NonNull;
 import java.util.Optional;
 
 /**
- * Store for LWA Auth Refresh Token.
+ * Store for Auth Refresh Token.
  */
 public class TokenStore {
-    private static final String REFRESH_TOKEN_KEY = "com.amazon.alexa.lwa.key";
+    private static final String REFRESH_TOKEN_KEY = "com.amazon.alexa.auth.refreshToken.key";
 
     /**
      * Fetch refresh token if available.

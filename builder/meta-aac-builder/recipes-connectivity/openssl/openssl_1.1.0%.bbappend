@@ -22,10 +22,10 @@ do_configure_android() {
 	  no-idea \
 	  no-nextprotoneg \
 	  no-psk \
-	  no-shared \
 	  no-srp \
 	  no-ssl3 \
 	  no-weak-ssl-ciphers \
+	  no-shared \
 	  --prefix=${prefix} \
 	  --openssldir=${libdir}/ssl-1.1 \
 	  --libdir=`basename ${libdir}` \

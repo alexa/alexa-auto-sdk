@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -73,14 +73,18 @@ $(function() {
 <table class="directory">
   <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a7ea358a32c50da5fbe733bb370e640a2">clearAllExecuteCommands</a>()</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a6831186c4572d71e2094271563c1a805">clearCard</a>()</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a9659ffea560f0be933c506a0bba2de13">clearDocument</a>()=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a14091f7b0a6e8898098d04ec67abac8c">executeCommands</a>(const std::string &amp;jsonPayload, const std::string &amp;token)=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a3599f0eec806b4e0d1315ca1f1e8d1b1">executeCommandsResult</a>(const std::string &amp;token, const bool result, const std::string &amp;error)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a97bcf6e8f7709626c6e5f9b2b06861ef">getVisualContext</a>()=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#abe1e559640f83434304f1b2b826fda62">interruptCommandSequence</a>()=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a4c115c7161d6061ae7a1d72436e5c587">clearDocument</a>(const std::string &amp;token)=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a2c8c2bc29a5c9b8f684069743b586bc5">dataSourceUpdate</a>(const std::string &amp;sourceType, const std::string &amp;jsonPayload, const std::string &amp;token)=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a14091f7b0a6e8898098d04ec67abac8c">executeCommands</a>(const std::string &amp;jsonPayload, const std::string &amp;token)=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a3599f0eec806b4e0d1315ca1f1e8d1b1">executeCommandsResult</a>(const std::string &amp;token, const bool result, const std::string &amp;error)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a9441e36376baf10f844837b80e769c28">interruptCommandSequence</a>(const std::string &amp;token)=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a1e382051d18bc09a39e1f3cd9b9ddb9a">processActivityEvent</a>(const std::string &amp;source, const ActivityEvent event)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a605da3ae66ca91baa83f71442e0c4273">renderDocument</a>(const std::string &amp;jsonPayload, const std::string &amp;token, const std::string &amp;windowId)=0</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
   <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a42ad9effa8cb1ae3ca95fa65c3378993">renderDocumentResult</a>(const std::string &amp;token, const bool result, const std::string &amp;error)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a306d1701b8132eb2306b22880e4401e8">sendDataSourceFetchRequestEvent</a>(const std::string &amp;type, const std::string &amp;payload)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#ac3b76e6d3ad96161c5e37f2d3728ae1d">sendDeviceWindowState</a>(const std::string &amp;state)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a87d590c8a9a8f32c36bf15b41ce6d1a0">sendDocumentState</a>(const std::string &amp;state)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a3a3bba659088b4e3d4fed3f14ebf7f69">sendRuntimeErrorEvent</a>(const std::string &amp;payload)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a650185d2e461fa04a54ca6389cea9b7e">sendUserEvent</a>(const std::string &amp;payload)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
   <tr><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#ae78b5ed9cf53ac882d12bdff99d69638">setAPLMaxVersion</a>(const std::string &amp;aplMaxVersion)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#ad6270378b772440b1d4679b844d4d928">setDocumentIdleTimeout</a>(std::chrono::milliseconds documentIdleTimeout)</td><td class="entry"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">aace::apl::APL</a></td><td class="entry"></td></tr>
@@ -89,7 +93,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.2.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

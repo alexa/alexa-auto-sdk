@@ -13,9 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
-
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/AddressBook/AddressBookCloudUploaderRESTAgent.h>
 
@@ -402,12 +399,7 @@ std::string AddressBookCloudUploaderRESTAgent::buildCreateAddressBookDataJson(
         rapidjson::Value().SetString(addressBookType.c_str(), addressBookType.length()),
         document.GetAllocator());
 
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-    return (std::string(buffer.GetString()));
+    return aace::engine::utils::json::toString(document);
 }
 
 bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId(
@@ -466,7 +458,7 @@ AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgen
     auto httpHeaderData = buildCommonHTTPHeader();
     httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
 
-    auto entriesJson = buildEntriesJsonString(document);
+    auto entriesJson = aace::engine::utils::json::toString(*document);
 
     auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
                ADDRESSBOOK_PATH + FORWARD_SLASH + cloudAddressBookId + FORWARD_SLASH + ENTRIES_PATH;
@@ -487,20 +479,6 @@ AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgen
     }
 
     return httpResponse;
-}
-
-std::string AddressBookCloudUploaderRESTAgent::buildEntriesJsonString(std::shared_ptr<rapidjson::Document> document) {
-    try {
-        rapidjson::StringBuffer buffer;
-        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-        document->Accept(writer);
-
-        return std::string(buffer.GetString());
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "buildEntriesJsonString").d("reason", ex.what()));
-        return "";
-    }
 }
 
 bool AddressBookCloudUploaderRESTAgent::parseCreateAddressBookEntryResponse(
@@ -579,12 +557,7 @@ std::string AddressBookCloudUploaderRESTAgent::buildFailedEntriesJson(std::queue
 
     document.AddMember("failedContact", failedContacts, document.GetAllocator());
 
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-    return (std::string(buffer.GetString()));
+    return aace::engine::utils::json::toString(document);
 }
 
 void AddressBookCloudUploaderRESTAgent::setPceId(const std::string& pceId) {

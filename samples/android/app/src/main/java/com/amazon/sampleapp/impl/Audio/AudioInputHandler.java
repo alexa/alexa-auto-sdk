@@ -16,9 +16,12 @@
 package com.amazon.sampleapp.impl.Audio;
 
 import android.app.Activity;
+import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 import com.amazon.aace.audio.AudioInput;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
@@ -27,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
-public class AudioInputHandler extends AudioInput {
+public class AudioInputHandler extends AudioInput implements AudioFocusController.PlaybackController {
     private static final String sTag = "AudioInputHandler";
 
     // All audio input consumers expect PCM 16 data @ 16 Khz. We divide this consumption into 10 ms
@@ -40,6 +43,7 @@ public class AudioInputHandler extends AudioInput {
     private final Activity mActivity;
     private final LoggerHandler mLogger;
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(1);
+    private final AudioFocusController mAudioFocusController;
 
     private AudioRecord mAudioInput;
     private AudioReaderRunnable mReaderRunnable;
@@ -48,6 +52,9 @@ public class AudioInputHandler extends AudioInput {
         mActivity = activity;
         mLogger = logger;
         mAudioInput = createAudioInput();
+        AudioManager audioManager =
+                (AudioManager) mActivity.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        mAudioFocusController = new AudioFocusController(audioManager, this, "AudioInputHandler");
     }
 
     private AudioRecord createAudioInput() {
@@ -80,11 +87,21 @@ public class AudioInputHandler extends AudioInput {
             }
         }
 
-        return startRecording();
+        boolean isRecording = startRecording();
+
+        // Acquire audio focus
+        if (isRecording) {
+            mAudioFocusController.startPlaybackAfterAcquiringFocus();
+        }
+
+        return isRecording;
     }
 
     @Override
     public boolean stopAudioInput() {
+        // Release audio focus
+        mAudioFocusController.relinquishAudioFocusIfCurrentlyAcquired();
+
         if (mAudioInput == null) {
             mLogger.postWarn(sTag, "stopAudioInput() called but AudioRecord was never initialized");
             return false;
@@ -155,5 +172,35 @@ public class AudioInputHandler extends AudioInput {
                 }
             }
         }
+    }
+
+    @Override
+    public void startPlaybackNow() {
+        mLogger.postVerbose(sTag, "startPlaybackNow: ");
+    }
+
+    @Override
+    public void requestResumingPlayback() {
+        mLogger.postVerbose(sTag, "requestResumingPlayback: ");
+    }
+
+    @Override
+    public void requestPausePlayback() {
+        mLogger.postVerbose(sTag, "requestPausePlayback: ");
+    }
+
+    @Override
+    public void requestStopPlayback() {
+        mLogger.postVerbose(sTag, "requestStopPlayback: ");
+    }
+
+    @Override
+    public void adjustPlaybackVolume(float volumeMultiplier) {
+        mLogger.postVerbose(sTag, "adjustPlaybackVolume: " + volumeMultiplier);
+    }
+
+    @Override
+    public void failedToAcquireFocus() {
+        mLogger.postError(sTag, "failedToAcquireFocus: ");
     }
 }

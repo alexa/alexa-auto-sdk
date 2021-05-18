@@ -69,7 +69,7 @@ public class AACSMessageSenderTest {
         assertTrue(message.isPresent());
         assertEquals(action, message.get().action);
 
-        assertEquals(targetArgCaptor.getValue().packageName, AACSConstants.AACS_PACKAGE_NAME);
+        assertEquals(targetArgCaptor.getValue().packageName, AACSConstants.getAACSPackageName(mockContext));
         assertEquals(targetArgCaptor.getValue().component.getClassName(), AACSConstants.AACS_CLASS_NAME);
     }
 
@@ -117,7 +117,7 @@ public class AACSMessageSenderTest {
         assertTrue(replyMessage.isPresent());
         assertEquals(replyToId, replyMessage.get().replyToId);
 
-        assertEquals(AACSConstants.AACS_PACKAGE_NAME, targetArgCaptor.getValue().packageName);
+        assertEquals(AACSConstants.getAACSPackageName(mockContext), targetArgCaptor.getValue().packageName);
         assertEquals(AACSConstants.AACS_CLASS_NAME, targetArgCaptor.getValue().component.getClassName());
     }
 

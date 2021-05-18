@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 
 #include <unordered_map>
 
-#include <RegistrationManager/CustomerDataHandler.h>
 #include <RegistrationManager/RegistrationManager.h>
 
 #include "AuthorizationManagerInterface.h"
 #include "AuthorizationManagerStorage.h"
+#include "MetricsEmissionInterface.h"
 
 namespace aace {
 namespace engine {
@@ -31,7 +31,7 @@ namespace alexa {
 class AuthorizationManager
         : public AuthorizationManagerInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
-        , public alexaClientSDK::registrationManager::CustomerDataHandler
+        , public MetricsEmissionInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<AuthorizationManager> {
 public:
@@ -82,9 +82,10 @@ public:
     void onAuthFailure(const std::string& token) override;
     /// @}
 
-    /// @name CustomerDataHandler
+    /// @name MetricsEmissionInterface
     /// @{
-    void clearData() override;
+    void addListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) override;
+    void removeListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) override;
     /// @}
 
 protected:
@@ -112,23 +113,27 @@ private:
     /**
      * Updates the internal auth state and notifies auth state to @c AuthObserverInterface 
      * observers.
-     * 
-     * @note This function to be called holding @c m_mutex lock.
      */
-    void updateAuthStateAndNotifyAuthObserversLocked(State authState, Error authError);
+    void updateAuthStateAndNotifyAuthObservers(State authState, Error authError);
 
     /**
-     * Function to reset the internal auth state and perform logout process.
+     * Perform the logout by calling the RegistrationManager.
      * 
-     * @note This function to be called holding @c m_mutex lock.
-      * 
-     * @return Returns @c false if @c m_registrationManager could not be locked, otherwise @c true.
+     * @note This function to be called holding @c m_callMutex lock.
      */
-    bool resetAuthStateAndLogoutLocked();
+    bool performLogoutLocked();
 
     /**
-     * Helper function to save the @c m_currentAdapterState to storage
-     * Caller need to synchronize the access using @c m_mutex.
+     * Makes the synchronus @c deregister() on the active adapter.
+     * 
+     * @note This function to be called holding @c m_activeAdapterMutex lock.
+     */
+    void performDeregisterLocked();
+
+    /**
+     * Helper function to save the @c m_activeAdapter to storage
+     * 
+     * @note Caller need to synchronize the access using @c m_activeAdapterMutex.
      * 
      * @return Returns @c true on successful storage, otherwise @c false.
      */
@@ -136,11 +141,12 @@ private:
 
     /**
      * Clear the adapter state from storage.
-     * 
+     * Caller need to synchronize the access using @c m_activeAdapterMutex.
+     *
      * @return Returns @c true on successful clearing the adapter state from the storage,
      * otherwise @c false.
      */
-    bool clearAdapterState();
+    bool clearAdapterStateLocked();
 
 private:
     /// Alias for @c AdapterState
@@ -150,7 +156,7 @@ private:
     std::unordered_map<std::string, std::shared_ptr<AuthorizationAdapterInterface>> m_serviceAndAuthorizationAdapterMap;
 
     /// Represents the current active authorization.
-    AdapterState m_activeAdapterState;
+    AdapterState m_activeAdapter;
 
     /// Current state of authorization. Access is synchronized with @c m_mutex.
     alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State m_authState;
@@ -168,11 +174,20 @@ private:
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>>
         m_authDelegateObservers;
 
-    /// To serialize the access to class API
-    std::mutex m_mutex;
+    /// An observer to be notified for the change metrics emission state. Access is synchronized with @c m_metricEmissionListenerMutex.
+    std::shared_ptr<MetricsEmissionListenerInterface> m_metricsEmissionListener;
+
+    /// The mutex for synchronizing calls into AuthorizationManager.
+    std::mutex m_callMutex;
+
+    /// The mutex for synchronizing access to @c m_activeAdapter
+    std::mutex m_activeAdapterMutex;
 
     /// To serialize the access to @c m_authDelegateObservers
     std::mutex m_authDelegateObserverMutex;
+
+    /// To serialize the access to @c m_metricsEmissionListener
+    std::mutex m_metricEmissionListenerMutex;
 };
 
 }  // namespace alexa

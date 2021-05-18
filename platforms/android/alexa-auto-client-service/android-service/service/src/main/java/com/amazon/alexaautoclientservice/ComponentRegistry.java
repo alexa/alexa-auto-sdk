@@ -18,13 +18,12 @@ package com.amazon.alexaautoclientservice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.util.Log;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsipc.IPCConstants;
 import com.amazon.aacsipc.TargetComponent;
+import com.amazon.alexa.auto.aacs.common.AACSComponentRegistryUtil;
 import com.amazon.alexaautoclientservice.util.FileUtil;
 
 import org.json.JSONArray;
@@ -39,7 +38,6 @@ public class ComponentRegistry {
     private static final String TAG = AACSConstants.AACS + "-" + ComponentRegistry.class.getSimpleName();
 
     private static final ComponentRegistry COMPONENT_REGISTRY_INSTANCE = new ComponentRegistry();
-    private static final int PACKAGE_MANAGER_QUERY_FLAGS = 0;
 
     private Map<String, List<TargetComponent>> mTargetCache;
 
@@ -75,7 +73,9 @@ public class ComponentRegistry {
         Log.v(TAG,
                 String.format("No targets found in mTargetCache for topic=%s action=%s, querying package manager",
                         topic, action));
-        targets = queryPackageManager(context, topic, action);
+        final Intent queryIntent = new Intent(IPCConstants.AASB_INTENT_PREFIX + action);
+        queryIntent.addCategory(IPCConstants.AASB_INTENT_PREFIX + topic);
+        targets = AACSComponentRegistryUtil.queryPackageManager(context, queryIntent, AACSConstants.AACS_PERMISSION);
         if (targets == null) {
             Log.e(TAG, String.format("No targets found for topic=%s action=%s ", topic, action));
             return null;
@@ -87,9 +87,9 @@ public class ComponentRegistry {
     }
 
     private List<TargetComponent> queryConfig(Context context, String topic) {
-        JSONArray packageNames = FileUtil.getIntentTargets(context, topic, "package");
-        JSONArray classNames = FileUtil.getIntentTargets(context, topic, "class");
-        JSONArray types = FileUtil.getIntentTargets(context, topic, "type");
+        JSONArray packageNames = FileUtil.getIntentTargets(topic, "package");
+        JSONArray classNames = FileUtil.getIntentTargets(topic, "class");
+        JSONArray types = FileUtil.getIntentTargets(topic, "type");
 
         if (packageNames == null) {
             Log.e(TAG, String.format("Target package names for topic=%s is null", topic));
@@ -129,7 +129,7 @@ public class ComponentRegistry {
                 Log.e(TAG, "Error reading JSONArray's from config");
                 break;
             }
-            if (checkPermission(context, AACSConstants.AACS_PERMISSION, target)) {
+            if (AACSComponentRegistryUtil.checkPermission(context, AACSConstants.AACS_PERMISSION, target)) {
                 Log.v(TAG,
                         String.format(
                                 "Target for topic=%s found in config: %s", topic, target.component.getClassName()));
@@ -144,96 +144,6 @@ public class ComponentRegistry {
                     String.format(
                             "None of the specified targets in config for topic=%s have the AACS permission", topic));
             return null;
-        }
-    }
-
-    private boolean checkPermission(Context context, String permission, TargetComponent target) {
-        if (context == null) {
-            Log.e(TAG, "Service context unavailable to check target permission.");
-            return false;
-        }
-
-        if (permission == null) {
-            Log.e(TAG, "Null permission.");
-            return false;
-        }
-
-        return context.getPackageManager().checkPermission(permission, target.packageName)
-                == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private List<TargetComponent> queryPackageManager(Context context, String topic, String action) {
-        if (context == null) {
-            Log.e(TAG, "Service context unavailable to query package manager.");
-            return null;
-        }
-
-        final Intent queryIntent = new Intent(IPCConstants.AASB_INTENT_PREFIX + action);
-        queryIntent.addCategory(IPCConstants.AASB_INTENT_PREFIX + topic);
-
-        List<TargetComponent> targets = new ArrayList<>();
-
-        // Query broadcast receivers
-        queryReceivers(context, queryIntent, targets, topic, action);
-
-        // Query activities
-        queryActivities(context, queryIntent, targets, topic, action);
-
-        // Query services
-        queryServices(context, queryIntent, targets, topic, action);
-
-        if (targets.size() == 0) {
-            Log.e(TAG, String.format("No targets found by package manager for topic=%s action=%s", topic, action));
-            return null;
-        }
-
-        return targets;
-    }
-
-    private void queryReceivers(
-            Context context, Intent queryIntent, List<TargetComponent> targets, String topic, String action) {
-        List<ResolveInfo> receivers =
-                context.getPackageManager().queryBroadcastReceivers(queryIntent, PACKAGE_MANAGER_QUERY_FLAGS);
-        filterByPermission(context, receivers, targets, TargetComponent.Type.RECEIVER, topic, action);
-    }
-
-    private void queryActivities(
-            Context context, Intent queryIntent, List<TargetComponent> targets, String topic, String action) {
-        List<ResolveInfo> receivers =
-                context.getPackageManager().queryIntentActivities(queryIntent, PACKAGE_MANAGER_QUERY_FLAGS);
-        filterByPermission(context, receivers, targets, TargetComponent.Type.ACTIVITY, topic, action);
-    }
-
-    private void queryServices(
-            Context context, Intent queryIntent, List<TargetComponent> targets, String topic, String action) {
-        List<ResolveInfo> receivers =
-                context.getPackageManager().queryIntentServices(queryIntent, PACKAGE_MANAGER_QUERY_FLAGS);
-        filterByPermission(context, receivers, targets, TargetComponent.Type.SERVICE, topic, action);
-    }
-
-    private void filterByPermission(Context context, List<ResolveInfo> infos, List<TargetComponent> targets,
-            TargetComponent.Type type, String topic, String action) {
-        if (infos.size() > 0) {
-            for (ResolveInfo info : infos) {
-                TargetComponent target = null;
-                if (type == TargetComponent.Type.ACTIVITY || type == TargetComponent.Type.RECEIVER) {
-                    target = TargetComponent.withComponent(
-                            new ComponentName(info.activityInfo.packageName, info.activityInfo.name), type);
-                } else if (type == TargetComponent.Type.SERVICE) {
-                    target = TargetComponent.withComponent(
-                            new ComponentName(info.serviceInfo.packageName, info.serviceInfo.name), type);
-                }
-                if (checkPermission(context, AACSConstants.AACS_PERMISSION, target)) {
-                    if (target != null) {
-                        Log.v(TAG,
-                                String.format("Target in type=%s for topic=%s action=%s found by package manager: %s",
-                                        type, topic, action, target.component.getClassName()));
-                        targets.add(target);
-                    }
-                }
-            }
-        } else {
-            Log.i(TAG, String.format("Targets in type=%s for topic=%s not found by package manager", type, topic));
         }
     }
 

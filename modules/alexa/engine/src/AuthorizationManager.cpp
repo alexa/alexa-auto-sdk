@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -48,9 +48,8 @@ std::shared_ptr<AuthorizationManager> AuthorizationManager::create(
 AuthorizationManager::AuthorizationManager(
     std::shared_ptr<AuthorizationManagerStorageInterface> storage,
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager) :
-        CustomerDataHandler{customerDataManager},
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-        m_activeAdapterState{"", ""},
+        m_activeAdapter{"", ""},
         m_authState{AuthObserverInterface::State::UNINITIALIZED},
         m_authError{AuthObserverInterface::Error::SUCCESS},
         m_storage(storage) {
@@ -60,7 +59,7 @@ bool AuthorizationManager::initialize() {
     try {
         AdapterState adapterState;
         ThrowIfNot(m_storage->loadAdapterState(adapterState), "loadAdapterStateFailed");
-        m_activeAdapterState = adapterState;
+        m_activeAdapter = adapterState;
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -93,7 +92,7 @@ void AuthorizationManager::registerAuthorizationAdapter(
         ThrowIfNull(adapter, "invalidAuthorizationAdapter");
         ThrowIf(service.empty(), "emtpyService");
 
-        std::lock_guard<std::mutex> lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_callMutex);
         if (m_serviceAndAuthorizationAdapterMap.find(service) != m_serviceAndAuthorizationAdapterMap.end()) {
             AACE_WARN(LX(TAG).m("replacingAlreadyRegisteredAdapter").d("service", service));
         }
@@ -108,23 +107,30 @@ AuthorizationManager::StartAuthorizationResult AuthorizationManager::startAuthor
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIf(service.empty(), "emtpyService");
-
-        std::lock_guard<std::mutex> lock(m_mutex);
         ThrowIf(
             m_serviceAndAuthorizationAdapterMap.find(service) == m_serviceAndAuthorizationAdapterMap.end(),
             "serviceNotRegistered");
 
-        if (m_activeAdapterState.first.empty()) {
-            m_activeAdapterState = {service, "NOT_AUTHORIZED"};
+        std::lock_guard<std::mutex> lock(m_callMutex);
+        std::unique_lock<std::mutex> activeAdapterLock(m_activeAdapterMutex);
+
+        if (m_activeAdapter.first.empty()) {
+            m_activeAdapter = {service, "NOT_AUTHORIZED"};
             ThrowIfNot(saveCurrentAdapterStateLocked(), "saveCurrentAdapterStateLockedFailed");
             return StartAuthorizationResult::AUTHORIZE;
         } else {
-            if (m_activeAdapterState.first == service) {
+            if (m_activeAdapter.first == service) {
                 return StartAuthorizationResult::REAUTHORIZE;
             } else {
-                ThrowIfNot(resetAuthStateAndLogoutLocked(), "resetAuthStateAndLogoutFailed");
-                m_activeAdapterState = {service, "NOT_AUTHORIZED"};
+                // Unlock the activeAdapterLock function of AuthDelegateInterface could get called.
+                activeAdapterLock.unlock();
+                updateAuthStateAndNotifyAuthObservers(State::UNINITIALIZED, Error::SUCCESS);
+                ThrowIfNot(performLogoutLocked(), "performLogoutLockedFailed");
 
+                // Lock activeAdapterLock, as we are using m_activeAdapter
+                activeAdapterLock.lock();
+                performDeregisterLocked();
+                m_activeAdapter = {service, "NOT_AUTHORIZED"};
                 ThrowIfNot(saveCurrentAdapterStateLocked(), "saveCurrentAdapterStateLockedFailed");
 
                 return StartAuthorizationResult::AUTHORIZE;
@@ -136,7 +142,7 @@ AuthorizationManager::StartAuthorizationResult AuthorizationManager::startAuthor
     }
 }
 
-void AuthorizationManager::updateAuthStateAndNotifyAuthObserversLocked(State authState, Error authError) {
+void AuthorizationManager::updateAuthStateAndNotifyAuthObservers(State authState, Error authError) {
     AACE_DEBUG(LX(TAG));
     try {
         m_authState = authState;
@@ -146,32 +152,61 @@ void AuthorizationManager::updateAuthStateAndNotifyAuthObserversLocked(State aut
         auto copyOfObservers = m_authDelegateObservers;
         lock.unlock();
 
+        // Enable the metrics emitter module first when the auth state changes to REFRESHED, so that
+        // it could accept the mertics that could be emitted immediately by the auth delegate observers.
+        std::unique_lock<std::mutex> metricsLock(m_metricEmissionListenerMutex);
+        if (m_authState == State::REFRESHED && m_metricsEmissionListener) {
+            m_metricsEmissionListener->onMetricEmissionStateChanged(true);
+        }
+        metricsLock.unlock();
+
         for (auto& observer : copyOfObservers) {
             observer->onAuthStateChange(m_authState, m_authError);
         }
+
+        // Disable the metrics emitter module only after auth delegate observers are notified about the
+        // auth state as UNINITIALIZED. This allows any metrics from the auth observer to be emitted and
+        // are not dropped.
+        metricsLock.lock();
+        if (m_authState == State::UNINITIALIZED && m_metricsEmissionListener) {
+            m_metricsEmissionListener->onMetricEmissionStateChanged(false);
+        }
+        metricsLock.unlock();
+
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
-bool AuthorizationManager::resetAuthStateAndLogoutLocked() {
+bool AuthorizationManager::performLogoutLocked() {
     AACE_DEBUG(LX(TAG));
     try {
-        updateAuthStateAndNotifyAuthObserversLocked(State::UNINITIALIZED, Error::SUCCESS);
         auto m_registrationManager_lock = m_registrationManager.lock();
         ThrowIfNull(m_registrationManager_lock, "invalidRegistrationManagerReference");
         m_registrationManager_lock->logout();
+
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
+    }
+}
+
+void AuthorizationManager::performDeregisterLocked() {
+    AACE_DEBUG(LX(TAG));
+    // It is possible that previously active authorization adapter may not be registered after
+    // Engine stop and start. So, check before calling deregister()
+    if (m_serviceAndAuthorizationAdapterMap.find(m_activeAdapter.first) != m_serviceAndAuthorizationAdapterMap.end()) {
+        m_serviceAndAuthorizationAdapterMap.at(m_activeAdapter.first)->deregister();
+    } else {
+        AACE_WARN(LX(TAG).m("serviceNotFound").d("service", m_activeAdapter.first));
     }
 }
 
 bool AuthorizationManager::saveCurrentAdapterStateLocked() {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIfNot(m_storage->saveAdapterState(m_activeAdapterState), "saveAdapterStateFailed");
+        ThrowIfNot(m_storage->saveAdapterState(m_activeAdapter), "saveAdapterStateFailed");
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -179,7 +214,7 @@ bool AuthorizationManager::saveCurrentAdapterStateLocked() {
     }
 }
 
-bool AuthorizationManager::clearAdapterState() {
+bool AuthorizationManager::clearAdapterStateLocked() {
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIfNot(m_storage->clearAdapterStateTable(), "clearAdapterStateFailed");
@@ -194,20 +229,26 @@ void AuthorizationManager::authStateChanged(const std::string& service, State st
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIf(service.empty(), "emtpyService");
-        ThrowIf(m_activeAdapterState.first.empty(), "noActiveAuthorization");
+        ThrowIf(m_activeAdapter.first.empty(), "noActiveAuthorization");
 
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (service == m_activeAdapterState.first) {
-            if (state == State::REFRESHED && m_activeAdapterState.second == "NOT_AUTHORIZED") {
-                m_activeAdapterState = {m_activeAdapterState.first, "AUTHORIZED"};
+        std::unique_lock<std::mutex> lock(m_callMutex);
+        std::unique_lock<std::mutex> activeAdapterLock(m_activeAdapterMutex);
+        if (m_serviceAndAuthorizationAdapterMap.find(service) == m_serviceAndAuthorizationAdapterMap.end()) {
+            Throw("serviceNotRegistered");
+        }
+        if (service == m_activeAdapter.first) {
+            if (state == State::REFRESHED && m_activeAdapter.second == "NOT_AUTHORIZED") {
+                m_activeAdapter = {m_activeAdapter.first, "AUTHORIZED"};
                 ThrowIfNot(saveCurrentAdapterStateLocked(), "saveCurrentAdapterStateLockedFailed");
             }
-            updateAuthStateAndNotifyAuthObserversLocked(state, reason);
+            // Unlock the activeAdapterLock function of AuthDelegateInterface could get called.
+            activeAdapterLock.unlock();
+            updateAuthStateAndNotifyAuthObservers(state, reason);
         } else {
-            AACE_ERROR(LX(TAG).m("notActiveService").d("service", service));
+            Throw("notActiveService");
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("service", service));
     }
 }
 
@@ -215,40 +256,33 @@ bool AuthorizationManager::logout(const std::string& service) {
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIf(service.empty(), "emtpyService");
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_serviceAndAuthorizationAdapterMap.find(service) == m_serviceAndAuthorizationAdapterMap.end()) {
-            Throw("serviceNotRegistered");
-        }
+        ThrowIf(
+            m_serviceAndAuthorizationAdapterMap.find(service) == m_serviceAndAuthorizationAdapterMap.end(),
+            "serviceNotRegistered");
 
-        // Check if the service is the previously used service.
-        if (m_activeAdapterState.first == service) {
-            ThrowIfNot(resetAuthStateAndLogoutLocked(), "resetAuthStateAndLogoutFailed");
+        std::lock_guard<std::mutex> lock(m_callMutex);
+        std::unique_lock<std::mutex> activeAdapterLock(m_activeAdapterMutex);
+
+        // Check if the service is previously active adapter
+        if (m_activeAdapter.first == service) {
+            // Unlock the activeAdapterLock function of AuthDelegateInterface could get called.
+            activeAdapterLock.unlock();
+            updateAuthStateAndNotifyAuthObservers(State::UNINITIALIZED, Error::SUCCESS);
+            ThrowIfNot(performLogoutLocked(), "performLogoutLockedFailed");
+
+            // Lock activeAdapterLock, as we are using m_activeAdapter
+            activeAdapterLock.lock();
+            performDeregisterLocked();
+            m_activeAdapter = {"", ""};
+            ThrowIfNot(clearAdapterStateLocked(), "clearAdapterStateFailed");
+
             return true;
-        }
-        return false;
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
-        return false;
-    }
-}
-
-// clearData() could get called in 3 scenarios. 1) starting a new authorization that results in
-// previous authorization to be logged out, 2) explict logout() call, or 3) direct call to the
-// registration manager to log out.  Also, this function does not acquire the mutex as this
-// will be called on registration manager logout() function thread.
-void AuthorizationManager::clearData() {
-    AACE_DEBUG(LX(TAG));
-    try {
-        if (m_serviceAndAuthorizationAdapterMap.find(m_activeAdapterState.first) ==
-            m_serviceAndAuthorizationAdapterMap.end()) {
-            AACE_WARN(LX(TAG).m("adapterNotRegistered").d("service", m_activeAdapterState.first));
         } else {
-            m_serviceAndAuthorizationAdapterMap[m_activeAdapterState.first]->deregister();
+            Throw("notActiveService");
         }
-        m_activeAdapterState = {"", ""};
-        ThrowIfNot(clearAdapterState(), "clearAdapterStateFailed");
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("service", service));
+        return false;
     }
 }
 
@@ -275,12 +309,43 @@ void AuthorizationManager::removeAuthObserver(
     }
 }
 
-std::string AuthorizationManager::getAuthToken() {
+void AuthorizationManager::addListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) {
     try {
-        ThrowIf(m_activeAdapterState.first.empty(), "NoActiveAuthorization");
-        return m_serviceAndAuthorizationAdapterMap[m_activeAdapterState.first]->getAuthToken();
+        std::unique_lock<std::mutex> lock(m_metricEmissionListenerMutex);
+        ThrowIfNull(listener, "nullListener");
+        m_metricsEmissionListener = listener;
+        lock.unlock();
+
+        m_metricsEmissionListener->onMetricEmissionStateChanged(m_authState == State::REFRESHED);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+void AuthorizationManager::removeListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) {
+    try {
+        std::lock_guard<std::mutex> lock(m_metricEmissionListenerMutex);
+        ThrowIfNull(listener, "nullListener");
+        ThrowIfNot(m_metricsEmissionListener == listener, "invalidListenerReceived");
+        m_metricsEmissionListener.reset();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+std::string AuthorizationManager::getAuthToken() {
+    try {
+        std::lock_guard<std::mutex> lock(m_activeAdapterMutex);
+        ThrowIf(m_activeAdapter.first.empty(), "noActiveAuthorization");
+        // Shutdown may have be called or authorization adapter is not registered
+        ThrowIf(
+            m_serviceAndAuthorizationAdapterMap.find(m_activeAdapter.first) ==
+                m_serviceAndAuthorizationAdapterMap.end(),
+            "adapterNotRegistered");
+
+        return m_serviceAndAuthorizationAdapterMap.at(m_activeAdapter.first)->getAuthToken();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("activeAdapter", m_activeAdapter.first));
         return "";
     }
 }
@@ -288,18 +353,23 @@ std::string AuthorizationManager::getAuthToken() {
 void AuthorizationManager::onAuthFailure(const std::string& token) {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIf(m_activeAdapterState.first.empty(), "NoActiveAuthorization");
-        m_serviceAndAuthorizationAdapterMap[m_activeAdapterState.first]->onAuthFailure(token);
+        std::lock_guard<std::mutex> lock(m_activeAdapterMutex);
+        ThrowIf(m_activeAdapter.first.empty(), "noActiveAuthorization");
+        // Shutdown may have be called or authorization adapter is not registered
+        ThrowIf(
+            m_serviceAndAuthorizationAdapterMap.find(m_activeAdapter.first) ==
+                m_serviceAndAuthorizationAdapterMap.end(),
+            "adapterNotRegistered");
+
+        m_serviceAndAuthorizationAdapterMap.at(m_activeAdapter.first)->onAuthFailure(token);
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("activeAdapter", m_activeAdapter.first));
     }
 }
 
 void AuthorizationManager::doShutdown() {
     AACE_DEBUG(LX(TAG));
-    // The mutex makes sure that shutdown and logout do not happen at the
-    // same time
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_callMutex);
     m_registrationManager.reset();
     m_authDelegateObservers.clear();
     m_storage.reset();

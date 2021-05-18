@@ -8,7 +8,6 @@ The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features.
 
 - [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
 - [Configuring Alexa Module](#configuring-alexa-module)
-- [Configuring using a JSON File](#configuring-using-a-json-file)
   - [Using a JSON File](#using-a-json-file)
   - [Using Programmatic Configuration](#using-programmatic-configuration)
 - [Handling Speech Input](#handling-speech-input)
@@ -18,6 +17,9 @@ The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features.
   - [Sequence Diagrams for Auth Provider Authorization](#sequence-diagrams-for-auth-provider-authorization)
   - [Optional Auth Provider Configuration](#optional-auth-provider-configuration)
   - [(Deprecated) Implementing a Custom Handler for AuthProvider](#deprecated-implementing-a-custom-handler-for-authprovider)
+- [Handling Device Setup](#handling-device-setup)
+  - [Implementing Custom Handler](#implementing-custom-handler)
+  - [Handling an Event Response](#handling-an-event-response)
 - [Handling Audio Output](#handling-audio-output)
   - [Custom Volume Control for Alexa Devices](#custom-volume-control-for-alexa-devices)
 - [Handling Alexa Speaker](#handling-alexa-speaker)
@@ -43,13 +45,14 @@ For a view of how the Alexa Auto SDK flow works in selected use cases, see these
 
 ## Configuring Alexa Module
 
-The Alexa module can be configured in two different ways:
-* Specifying Configuration Data Programmatically.
+The Alexa module can be configured in two ways:
 * Specifying Configuration Data Using a JSON File.
+* Specifying Configuration Data Programmatically.
 
-## Configuring using a JSON File
+See the [core module README](../core/README.md#configuring-the-engine) for steps to specify configuration data.
 
-### Using a JSON File 
+### Using a JSON File
+
 Include the following structure in the JSON file:
 
 ```
@@ -93,18 +96,44 @@ Include the following structure in the JSON file:
 ```
 The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `alertsCapabilityAgent`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
 
-The `deviceSettings` field specifies the settings on the device. The `databaseFilePath` is the path to the SQLite database that stores persistent settings. The database will be created on initialization if it does not already exist.
-`defaultLocale` specifies the default locale string. The default value is "en-US".
-`locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]`.
-`localeCombinations` specifies the list of locale pairs available on the device, which enables the Engine to support Dual Language Switching. The permitted combinations are `[["en-CA","fr-CA"],["fr-CA","en-CA"],["en-US","es-US"],["es-US","en-US"],["en-IN","hi-IN"],["hi-IN","en-IN"]]`. Ensure each locale included in a pair in the `localeCombinations` field also exists in the "locales" field, which declares all locales supported by the device. 
-Any application can select the pair as a locale setting on the device based on the primary locale ( first locale in the pair), only if the secondary locale ( second locale in the pair) is supported by the application. The Engine should also be configured with this permitted pair.
+The `deviceSettings` field specifies the settings on the device. The following list describes the settings:
 
-**Note:** Dynamic Language Switching is only available in online mode. 
+* `databaseFilePath` is the path to the SQLite database that stores persistent settings. The database will be created on initialization if it does not already exist.
+* `defaultLocale` specifies the default locale setting, which is Alexa's locale setting until updated on the device. The default value of `defaultLocale` is “en-US”.
+* `locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]`.
+* `localeCombinations` specifies the list of locale pairs available on a device that supports multi-locale mode. Through the Dynamic Language Switching feature, Alexa can communicate with the user of such device in languages specified in the locale pairs. In each pair, the first value is the primary locale, which Alexa uses most often when interacting with the user. The second value is the secondary locale, which specifies an additional language that Alexa uses when responding to an utterance in the corresponding language. For example, if ["en-US", "es-US"] is declared in `localeCombinations` and the device specifies this pair as the current locale setting, Alexa primarily operates in English for the U.S. but can understand and respond to utterances in Spanish for the U.S., without requiring the device to update the locale setting.
+  
+  By default, `localeCombinations` is a list of the following combinations, which are also the supported combinations as of 2021-02-02. It is possible for the default value to be different from the list of supported combinations in the future. For updates to the supported combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations).
+  
+  * ["en-US", "es-US"]
+  * ["es-US", "en-US"]
+  * ["en-IN", "hi-IN"]
+  * ["hi-IN", "en-IN"]
+  * ["en-CA", "fr-CA"]
+  * ["fr-CA", "en-CA"]
+  * ["en-US", "es-ES"]
+  * ["es-ES", "en-US"]
+  * ["en-US", "de-DE"]
+  * ["de-DE", "en-US"]
+  * ["en-US", "fr-FR"]
+  * ["fr-FR", "en-US"]
+  * ["en-US", "it-IT"]
+  * ["it-IT", "en-US"]
+  * ["en-US", "ja-JP"]
+  * ["ja-JP", "en-US"]
 
-For file-based configuration, if `locales` field is not specified, the Engine gets automatically configured with the default locale combinations.
+
+  When a device operates in multi-locale mode, an application can select any locale pair in the list above as the locale setting if the following
+  conditions are met:
+  
+  * The device's primary locale setting is the first locale in the selected pair. 
+  * The device also supports the secondary locale in the pair.
+  * The pair is specified in `localeCombinations`.
+  
+  **Note:** Dynamic Language Switching is only available in online mode. 
 
 ### Using Programmatic Configuration
-All of the above specified fields can be configured programmatically using the methods provided by the AlexaConfiguration platform interface. For example, to create `DeviceInfoConfig`:
+You can configure programmatically all of the above specified fields using the methods provided by the AlexaConfiguration platform interface. For example, to create deviceInfo config:
 
 ```cpp
 auto deviceConfig = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig
@@ -116,7 +145,6 @@ auto deviceSettingsConfig = aace::alexa::config::AlexaConfiguration::createDevic
     "<SQLITE_DATABASE_FILE_PATH>", [<LIST_OF_LOCALE_STRINGS>], "<DEFAULT_LOCALE_STRING>", "<TIMEZONE>", [[<LOCALE_STRING_PAIR>]]);
 ```
 
-Refer to the [core module](../core/README.md) documentation for steps to specify configuration data programmatically or through a JSON file.
 
 ## Handling Speech Input
 
@@ -196,7 +224,9 @@ class MySpeechSynthesizer : public aace::alexa::SpeechSynthesizer {
 // Register the platform interface with the Engine
 auto mySpeechSynthesizer = std::make_shared<MySpeechSynthesizer>();
 engine->registerPlatformInterface( mySpeechSynthesizer );
-```   
+
+```
+
 
 ## Handling Authorization
 
@@ -444,9 +474,53 @@ The following diagram illustrates the logout sequence when using the AuthProvide
 
 ![AuthProvider_logout](./assets/AuthProvider_logout.png)
 
+## Handling Device Setup
+>**Note:** Support for device setup is only for devices allow-listed by Amazon. If you want to use this feature, contact your Solutions Architect or Partner Manager.
+ 
+The `DeviceSetup` API handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, the `SetupCompleted` event is sent from the device to inform Alexa that device setup is complete. Alexa then starts the on-boarding experience, for example, by starting a short first-time conversation on the device.
+
+>**Note:** Alexa provides the on-boarding experience to first-time users only. The experience might be different for returning users.
+
+>**Note:** Do not call `setupCompleted()` API if user is in [Connectivity Mode](../connectivity/README.MD), or `Preview Mode`, or Alexa wake word is disabled. Calling `setupCompleted()` API in such conditions results in undesired user experience.
+
+Because `SetupCompleted` is for triggering the on-boarding experience, call the API only if login is successful. Also, if the authorization session is started with an existing refresh token, do not call the `SetupCompleted`.
+
+### Implementing Custom Handler
+To implement a custom handler for device setup, extend the `DeviceSetup` class as follows:
+
+```cpp
+#include <AACE/Alexa/DeviceSetup.h>
+class DeviceSetupHandler : public aace::alexa::DeviceSetup {
+    ...
+};
+...
+
+// Register the platform interface with the Engine
+auto deviceSetupHandler = std::make_shared<DeviceSetupHandler>();
+engine->registerPlatformInterface( deviceSetupHandler );
+
+// Call 'setupCompleted()' when the device is authenticated
+deviceSetupHandler->setupCompleted();
+```
+
+### Handling an Event Response
+After calling `setupCompleted()`, implement the `setupCompletedResponse(StatusCode statusCode)` function to determine whether the event was sent successfully, as follows:
+
+```cpp
+#include <AACE/Alexa/DeviceSetup.h>
+class DeviceSetupHandler : public aace::alexa::DeviceSetup {
+    public:
+        void setupCompletedResponse(StatusCode statusCode) {
+            // Handle or log the status
+        }
+};
+```
+
+`StatusCode` is "SUCCESS" or "FAIL", depending on whether the `setupCompleted` event was sent successfully to Alexa.
+
 ## Handling Audio Output
 
-When audio data is received from Alexa it is the responsibility of the platform implementation to read the data from the Engine and play it using a platform-specific audio output channel. It is also the responsibility of the platform implementation to define how each `AudioOutput` channel is handled. Each `AudioOutput` implementation will handle one or more of the following media types depending on the behavior defined in the `AudioOutputProvider`:
+When audio data is received from Alexa, it is the responsibility of the platform implementation to read the data from the Engine and play it using a platform-specific audio output channel. It is also the responsibility of the platform implementation to define how each `AudioOutput` channel is handled. Each `AudioOutput` implementation will handle one or more of the following media types depending on the behavior defined in the `AudioOutputProvider`:
 
 * TTS
 * MUSIC
@@ -490,7 +564,7 @@ You can programmatically generate speaker manager configuration using the `aace:
 
 ## Handling Audio Player
 
-When an audio media stream is received from Alexa it is the responsibility of the platform implementation to play the stream in a platform-specific media player. The `aace::alexa::AudioPlayer` class informs the platform of the changes in player state being tracked by the Engine. This can be used to update the platform GUI, for example.
+When an audio media stream is received from Alexa, it is the responsibility of the platform implementation to play the stream in a platform-specific media player. The `aace::alexa::AudioPlayer` class informs the platform of the changes in player state being tracked by the Engine. This can be used to update the platform GUI, for example.
 
 To implement a custom handler for audio player output, extend the `AudioPlayer` class:
 

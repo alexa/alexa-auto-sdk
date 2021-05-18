@@ -64,8 +64,8 @@ bool PhoneCallControllerEngineService::registerPlatformInterfaceType(
             getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
         ThrowIfNull(alexaComponents, "invalidAlexaComponentInterface");
 
-        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
-        ThrowIfNull(defaultEndpointBuilder, "defaultEndpointBuilderInvalid");
+        auto defaultCapabilitiesRegistrar = alexaComponents->getDefaultEndpointCapabilitiesRegistrar();
+        ThrowIfNull(defaultCapabilitiesRegistrar, "defaultCapabilitiesRegistrarInvalid");
 
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull(exceptionSender, "exceptionSenderInvalid");
@@ -91,7 +91,7 @@ bool PhoneCallControllerEngineService::registerPlatformInterfaceType(
 
         m_phoneCallControllerEngineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
             phoneCallController,
-            defaultEndpointBuilder,
+            defaultCapabilitiesRegistrar,
             contextManager,
             exceptionSender,
             messageSender,

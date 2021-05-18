@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -89,6 +89,34 @@ void LocationProviderHandler::setupUI() {
         return;
     }
     m_console = activity->findViewById("id:console");
+
+    // LocationServiceAccess set to ENABLED
+    activity->registerObserver(Event::onLocationProviderLocationServiceAccessEnabled, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onLocationProviderLocationServiceAccessEnabled");
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printRuler();
+                console->printLine("location service access enabled");
+                console->printRuler();
+            }
+        });
+        locationServiceAccessChanged(LocationServiceAccess::ENABLED);
+        return true;
+    });
+
+    // LocationServiceAccess set to DISABLED
+    activity->registerObserver(Event::onLocationProviderLocationServiceAccessDisabled, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onLocationProviderLocationServiceAccessDisabled");
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printRuler();
+                console->printLine("location service access disabled");
+                console->printRuler();
+            }
+        });
+        locationServiceAccessChanged(LocationServiceAccess::DISABLED);
+        return true;
+    });
 }
 
 }  // namespace location

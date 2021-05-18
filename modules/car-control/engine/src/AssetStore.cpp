@@ -14,7 +14,6 @@
  */
 
 #include <AACE/Engine/CarControl/AssetStore.h>
-#include <AACE/Engine/CarControl/AssetsDefault.h>
 #include <AACE/Engine/Core/EngineMacros.h>
 
 #include <sstream>
@@ -42,11 +41,6 @@ bool AssetStore::addAssets(const std::string& path) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
-}
-
-bool AssetStore::addDefaultAssets() {
-    std::stringstream stream(ASSETS_DEFAULT);
-    return addAssets(stream);
 }
 
 bool AssetStore::addAssets(std::istream& stream) {

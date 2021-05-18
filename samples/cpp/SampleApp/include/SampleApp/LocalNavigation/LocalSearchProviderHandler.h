@@ -18,10 +18,35 @@
 
 #include <string>
 #include <AACE/LocalNavigation/LocalSearchProvider.h>
-#include "SampleApp/Logger/LoggerHandler.h"
+
+#include "SampleApp/Extension.h"
 
 namespace sampleApp {
 namespace localNavigation {
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  LocalSearchProviderExtension
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+class LocalSearchProviderExtension : public extension::Extension {
+    // Enable extension for dynamic loading
+    ENABLE_EXTENSION;
+
+public:
+    LocalSearchProviderExtension(const std::string& name) : Extension(name){};
+    virtual ~LocalSearchProviderExtension() = default;
+
+    bool initialize(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        std::weak_ptr<aace::propertyManager::PropertyManager> propertyManager) override;
+    bool validate(const std::vector<nlohmann::json>& configs) override;
+    std::shared_ptr<aace::core::PlatformInterface> getPlatformInterfaceHandler() override;
+
+private:
+    std::shared_ptr<aace::localNavigation::LocalSearchProvider> m_localSearchProviderHandler;
+};
 
 /**
  * This sample implementation of LocalSearchProvider provides sample error
@@ -35,10 +60,13 @@ private:
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
 
 protected:
-    LocalSearchProviderHandler(std::shared_ptr<logger::LoggerHandler> loggerHandler);
+    LocalSearchProviderHandler(std::weak_ptr<logger::LoggerHandler> loggerHandler);
 
 public:
-    static std::shared_ptr<LocalSearchProviderHandler> create(std::shared_ptr<logger::LoggerHandler> loggerHandler);
+    template <typename... Args>
+    static auto create(Args&&... args) -> std::shared_ptr<LocalSearchProviderHandler> {
+        return std::shared_ptr<LocalSearchProviderHandler>(new LocalSearchProviderHandler(args...));
+    }
 
     /// @name @c LocalSearchProvider methods
     /// @{

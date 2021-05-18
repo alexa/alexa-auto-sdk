@@ -124,6 +124,7 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/AlexaSpeakerHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/GlobalPresetHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/DoNotDisturbHandler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Alexa/DeviceSetupHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Audio/AudioInputProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Audio/AudioOutputProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Application.h
@@ -139,6 +140,7 @@ set(CXX_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/CarControl/RangeController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Event.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Executor.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Extension.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Location/LocationProviderHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Logger/LoggerHandler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Messaging/MessagingHandler.h
@@ -164,6 +166,12 @@ endif()
 if(CONNECTIVITY)
     set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/Connectivity/AlexaConnectivityHandler.h
+    )
+endif()
+
+if(DCM)
+    set(CXX_HEADER_FILES ${CXX_HEADER_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/SampleApp/DCM/DCMHandler.h
     )
 endif()
 
@@ -196,6 +204,7 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlexaSpeakerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/GlobalPresetHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/DoNotDisturbHandler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/DeviceSetupHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioInputProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AudioOutputProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Application.cpp
@@ -205,6 +214,7 @@ set(CXX_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlDataProvider.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/CarControl/CarControlHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Executor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Extension.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/LocationProviderHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Logger/LoggerHandler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Messaging/MessagingHandler.cpp
@@ -228,6 +238,12 @@ endif()
 if(CONNECTIVITY)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Connectivity/AlexaConnectivityHandler.cpp
+    )
+endif()
+
+if(DCM)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/DCM/DCMHandler.cpp
     )
 endif()
 

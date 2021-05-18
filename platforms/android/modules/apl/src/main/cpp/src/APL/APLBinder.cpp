@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,18 +40,6 @@ APLBinder::APLBinder(jobject obj) {
 APLHandler::APLHandler(jobject obj) : m_obj(obj, "com/amazon/aace/apl/APL") {
 }
 
-std::string APLHandler::getVisualContext() {
-    try_with_context {
-        jstring result;
-        ThrowIfNot(m_obj.invoke("getVisualContext", "()Ljava/lang/String;", &result), "invokeFailed");
-        return JString(result).toStdStr();
-    }
-    catch_with_ex {
-        AACE_JNI_ERROR(TAG, "getVisualContext", ex.what());
-        return std::string("");
-    }
-}
-
 void APLHandler::renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId) {
     try_with_context {
         ThrowIfNot(
@@ -65,16 +53,18 @@ void APLHandler::renderDocument(const std::string& jsonPayload, const std::strin
             "invokeMethodFailed");
     }
     catch_with_ex {
-        AACE_JNI_ERROR(TAG, "renderDocument", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
-void APLHandler::clearDocument() {
+void APLHandler::clearDocument(const std::string& token) {
     try_with_context {
-        ThrowIfNot(m_obj.invoke<void>("clearDocument", "()V", nullptr), "invokeMethodFailed");
+        ThrowIfNot(
+            m_obj.invoke<void>("clearDocument", "(Ljava/lang/String;)V", nullptr, JString(token).get()),
+            "invokeMethodFailed");
     }
     catch_with_ex {
-        AACE_JNI_ERROR(TAG, "clearDocument", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -90,16 +80,38 @@ void APLHandler::executeCommands(const std::string& jsonPayload, const std::stri
             "invokeMethodFailed");
     }
     catch_with_ex {
-        AACE_JNI_ERROR(TAG, "executeCommands", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
-void APLHandler::interruptCommandSequence() {
+void APLHandler::dataSourceUpdate(
+    const std::string& sourceType,
+    const std::string& jsonPayload,
+    const std::string& token) {
     try_with_context {
-        ThrowIfNot(m_obj.invoke<void>("interruptCommandSequence", "()V", nullptr), "invokeMethodFailed");
+        ThrowIfNot(
+            m_obj.invoke<void>(
+                "dataSourceUpdate",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                nullptr,
+                JString(sourceType).get(),
+                JString(jsonPayload).get(),
+                JString(token).get()),
+            "invokeMethodFailed");
     }
     catch_with_ex {
-        AACE_JNI_ERROR(TAG, "interruptCommandSequence", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
+    }
+}
+
+void APLHandler::interruptCommandSequence(const std::string& token) {
+    try_with_context {
+        ThrowIfNot(
+            m_obj.invoke<void>("interruptCommandSequence", "(Ljava/lang/String;)V", nullptr, JString(token).get()),
+            "invokeMethodFailed");
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -120,7 +132,7 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_disposeBinder(JNIEnv* env, j
         ThrowIfNull(aplBinder, "invalidAPLBinder");
         delete aplBinder;
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_disposeBinder", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -131,7 +143,7 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_clearCard(JNIEnv* env, jobje
 
         aplBinder->getAPL()->clearCard();
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_clearCard", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -143,7 +155,7 @@ Java_com_amazon_aace_apl_APL_clearAllExecuteCommands(JNIEnv* env, jobject /* thi
 
         aplBinder->getAPL()->clearAllExecuteCommands();
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_clearAllExecuteCommands", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -155,7 +167,35 @@ Java_com_amazon_aace_apl_APL_sendUserEvent(JNIEnv* env, jobject /* this */, jlon
 
         aplBinder->getAPL()->sendUserEvent(JString(payload).toStdStr());
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_sendUserEvent", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_sendDataSourceFetchRequestEvent(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring type,
+    jstring payload) {
+    try {
+        auto aplBinder = APL_BINDER(ref);
+        ThrowIfNull(aplBinder, "invalidAPLBinder");
+
+        aplBinder->getAPL()->sendDataSourceFetchRequestEvent(JString(type).toStdStr(), JString(payload).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_apl_APL_sendRuntimeErrorEvent(JNIEnv* env, jobject /* this */, jlong ref, jstring payload) {
+    try {
+        auto aplBinder = APL_BINDER(ref);
+        ThrowIfNull(aplBinder, "invalidAPLBinder");
+
+        aplBinder->getAPL()->sendRuntimeErrorEvent(JString(payload).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -167,7 +207,7 @@ Java_com_amazon_aace_apl_APL_setAPLMaxVersion(JNIEnv* env, jobject /* this */, j
 
         aplBinder->getAPL()->setAPLMaxVersion(JString(aplMaxVersion).toStdStr());
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_setAPLMaxVersion", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -183,7 +223,7 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_setDocumentIdleTimeout(
         std::chrono::milliseconds timeout(documentIdleTimeout);
         aplBinder->getAPL()->setDocumentIdleTimeout(timeout);
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_setDocumentIdleTimeout", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -200,7 +240,7 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_renderDocumentResult(
 
         aplBinder->getAPL()->renderDocumentResult(JString(token).toStdStr(), result, JString(error).toStdStr());
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_renderDocumentResult", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -217,7 +257,7 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_executeCommandsResult(
 
         aplBinder->getAPL()->executeCommandsResult(JString(token).toStdStr(), result, JString(error).toStdStr());
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_executeCommandsResult", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -236,7 +276,31 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_apl_APL_processActivityEvent(
 
         aplBinder->getAPL()->processActivityEvent(JString(source).toStdStr(), eventType);
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_apl_APL_processActivityEvent", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_apl_APL_sendDocumentState(JNIEnv* env, jobject /* this */, jlong ref, jstring state) {
+    try {
+        auto aplBinder = APL_BINDER(ref);
+        ThrowIfNull(aplBinder, "invalidAPLBinder");
+
+        aplBinder->getAPL()->sendDocumentState(JString(state).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_apl_APL_sendDeviceWindowState(JNIEnv* env, jobject /* this */, jlong ref, jstring state) {
+    try {
+        auto aplBinder = APL_BINDER(ref);
+        ThrowIfNull(aplBinder, "invalidAPLBinder");
+
+        aplBinder->getAPL()->sendDeviceWindowState(JString(state).toStdStr());
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 }

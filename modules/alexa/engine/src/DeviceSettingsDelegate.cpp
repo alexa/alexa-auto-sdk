@@ -1,5 +1,5 @@
 /*
-* Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+* Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License").
 * You may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 
 #include "AACE/Engine/Alexa/DeviceSettingsDelegate.h"
 
+#include <acsdkAlerts/AlertsCapabilityAgent.h>
 #include <AIP/AudioInputProcessor.h>
-#include <Alerts/AlertsCapabilityAgent.h>
 #include <Settings/DeviceControlledSettingProtocol.h>
 #include <Settings/Setting.h>
 #include <Settings/SettingEventMetadata.h>
@@ -47,7 +47,8 @@ static const std::string TAG("aace.alexa.DeviceSettingsDelegate");
 std::unique_ptr<DeviceSettingsDelegate> DeviceSettingsDelegate::createDeviceSettingsDelegate(
     const alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode& configurationRoot,
     std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
-    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager) {
+    std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     if (connectionManager == nullptr) {
         AACE_ERROR(LX("initializeFailed").d("reason", "null connectionManager"));
         return nullptr;
@@ -71,14 +72,20 @@ std::unique_ptr<DeviceSettingsDelegate> DeviceSettingsDelegate::createDeviceSett
         return nullptr;
     }
 
+    if (metricRecorder == nullptr) {
+        AACE_ERROR(LX("initializeFailed").d("reason", "null metricRecorder"));
+        return nullptr;
+    }
+
     std::unique_ptr<DeviceSettingsDelegate> ret = std::unique_ptr<DeviceSettingsDelegate>(new DeviceSettingsDelegate());
     ret->m_deviceSettingsManager = deviceSettingsManager;
     ret->m_deviceSettingStorage = std::move(deviceSettingStorage);
     ret->m_connectionManager = connectionManager;
+    ret->m_metricRecorder = metricRecorder;
     return ret;
 }
 
-const DeviceSettingsDelegate::Configurations& DeviceSettingsDelegate::getConfigurations() {
+DeviceSettingsDelegate::Configurations& DeviceSettingsDelegate::getConfigurations() {
     return m_configurations;
 }
 
@@ -94,6 +101,7 @@ std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface
 bool DeviceSettingsDelegate::configureDoNotDisturbSetting(
     const std::shared_ptr<alexaClientSDK::capabilityAgents::doNotDisturb::DoNotDisturbCapabilityAgent>& dndCA) {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::DO_NOT_DISTURB>(m_configurations).setting,
             "Do not disturb already configured");
@@ -111,6 +119,7 @@ bool DeviceSettingsDelegate::configureDoNotDisturbSetting(
 
 bool DeviceSettingsDelegate::configureWakeWordConfirmationSetting() {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::WAKEWORD_CONFIRMATION>(m_configurations).setting,
             "wake word confirmation already configured");
@@ -123,7 +132,7 @@ bool DeviceSettingsDelegate::configureWakeWordConfirmationSetting() {
         auto metaData = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::getWakeWordConfirmationMetadata();
 
         auto protocol = alexaClientSDK::settings::SharedAVSSettingProtocol::create(
-            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager);
+            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager, m_metricRecorder);
 
         ThrowIfNull(protocol, "createSharedAVSSettingProtocolFailed");
         auto setting =
@@ -143,6 +152,7 @@ bool DeviceSettingsDelegate::configureWakeWordConfirmationSetting() {
 
 bool DeviceSettingsDelegate::configureSpeechConfirmationSetting() {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::SPEECH_CONFIRMATION>(m_configurations).setting,
             "speech confirmation already configured");
@@ -155,7 +165,7 @@ bool DeviceSettingsDelegate::configureSpeechConfirmationSetting() {
         auto metaData = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::getSpeechConfirmationMetadata();
 
         auto protocol = alexaClientSDK::settings::SharedAVSSettingProtocol::create(
-            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager);
+            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager, m_metricRecorder);
         ThrowIfNull(protocol, "createSharedAVSSettingProtocolFailed");
 
         auto setting =
@@ -175,6 +185,7 @@ bool DeviceSettingsDelegate::configureSpeechConfirmationSetting() {
 
 bool DeviceSettingsDelegate::configureTimeZoneSetting(const std::string& defaultValue) {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::TIMEZONE>(m_configurations).setting, "timezone already configured");
 
@@ -184,7 +195,7 @@ bool DeviceSettingsDelegate::configureTimeZoneSetting(const std::string& default
         ThrowIfNull(eventSender, "createEventSenderFailed");
 
         auto protocol = alexaClientSDK::settings::SharedAVSSettingProtocol::create(
-            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager);
+            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager, m_metricRecorder);
         ThrowIfNull(protocol, "createSharedAVSSettingProtocolFailed");
 
         auto setting = alexaClientSDK::settings::Setting<std::string>::create(defaultValue, std::move(protocol));
@@ -203,6 +214,7 @@ bool DeviceSettingsDelegate::configureTimeZoneSetting(const std::string& default
 bool DeviceSettingsDelegate::configureLocaleAndWakeWordsSettings(
     const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface>& assetsManager) {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(std::get<DeviceSettingsIndex::LOCALE>(m_configurations).setting, "locale already configured");
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::WAKE_WORDS>(m_configurations).setting, "wake word already configured");
@@ -243,6 +255,7 @@ bool DeviceSettingsDelegate::configureLocaleAndWakeWordsSettings(
 bool DeviceSettingsDelegate::configureLocaleSetting(
     const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface>& assetsManager) {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(std::get<DeviceSettingsIndex::LOCALE>(m_configurations).setting, "locale already configured");
 
         auto dummySender = alexaClientSDK::settings::SettingEventSender::create(
@@ -269,19 +282,19 @@ bool DeviceSettingsDelegate::configureLocaleSetting(
 
 bool DeviceSettingsDelegate::configureAlarmVolumeRampSetting() {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::ALARM_VOLUME_RAMP>(m_configurations).setting,
             "Alarm volume ramp already configured");
 
         auto eventSender = alexaClientSDK::settings::SettingEventSender::create(
-            alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent::getAlarmVolumeRampMetadata(),
-            m_connectionManager);
+            alexaClientSDK::acsdkAlerts::AlertsCapabilityAgent::getAlarmVolumeRampMetadata(), m_connectionManager);
         ThrowIfNull(eventSender, "createEventSenderFailed");
 
-        auto metaData = alexaClientSDK::capabilityAgents::alerts::AlertsCapabilityAgent::getAlarmVolumeRampMetadata();
+        auto metaData = alexaClientSDK::acsdkAlerts::AlertsCapabilityAgent::getAlarmVolumeRampMetadata();
 
         auto protocol = alexaClientSDK::settings::SharedAVSSettingProtocol::create(
-            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager);
+            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager, m_metricRecorder);
 
         ThrowIfNull(protocol, "createSharedAVSSettingProtocolFailed");
 
@@ -301,6 +314,7 @@ bool DeviceSettingsDelegate::configureAlarmVolumeRampSetting() {
 
 bool DeviceSettingsDelegate::configureNetworkInfoSetting() {
     try {
+        AACE_DEBUG(LX(TAG));
         ThrowIfNotNull(
             std::get<DeviceSettingsIndex::NETWORK_INFO>(m_configurations).setting, "Network info already configured");
 
@@ -310,7 +324,7 @@ bool DeviceSettingsDelegate::configureNetworkInfoSetting() {
         ThrowIfNull(eventSender, "createEventSenderFailed");
 
         auto protocol = alexaClientSDK::settings::DeviceControlledSettingProtocol::create(
-            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager);
+            metaData, std::move(eventSender), m_deviceSettingStorage, m_connectionManager, nullptr);
         ThrowIfNull(protocol, "createDeviceControlledSettingProtocolFailed");
 
         auto setting = alexaClientSDK::settings::Setting<alexaClientSDK::settings::types::NetworkInfo>::create(

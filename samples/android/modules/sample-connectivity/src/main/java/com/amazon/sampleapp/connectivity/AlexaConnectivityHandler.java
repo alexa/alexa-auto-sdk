@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -82,6 +82,12 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
         TERMS_DECLINED("Partial Experience (Terms Declined)"),
         /**
          * This state represents when managedProvider under Connectivity API is set to MANAGED, Provider is AMAZON,
+         * Terms and Condition is deferred by user
+         * @hideinitializer
+         */
+        TERMS_DEFERRED("Partial Experience (Terms Deferred)"),
+        /**
+         * This state represents when managedProvider under Connectivity API is set to MANAGED, Provider is AMAZON,
          * DataPlanType is AMAZON_SPONSORED and TRIAL is not available since it is expired.
          * @hideinitializer
          */
@@ -115,22 +121,42 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
     private static final String sDATAPLAN_TRIAL = "TRIAL";
     private static final String sTERMS_ACCEPTED = "ACCEPTED";
     private static final String sTERMS_DECLINED = "DECLINED";
+    private static final String sTERMS_DEFERRED = "DEFERRED";
+    private static final String sTERMS_VERSION1 = "1";
     private static final DateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    public static final String PREFERENCES_FILE = "ConnectivityStatePrefs";
-    public static final String POSITION_KEY = "POSITION";
+    private static final String sPREFERENCES_FILE = "ConnectivityStatePrefs";
+    private static final String sPOSITION_KEY = "POSITION";
 
     private final Activity mActivity;
-    private int mConnectionStatePos;
+    private int mConnectionStatePosition;
     private Spinner mConnectivitySpinner;
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
-    protected String mConnectivityPayload;
+    protected String mConnectivityState;
+    protected String mIdentifier;
 
     public AlexaConnectivityHandler(SampleAppContext sampleAppContext) {
         Log.i(sTag, "Creating AlexaConnectivityHandler");
         mActivity = sampleAppContext.getActivity();
-        mConnectivityPayload =
+
+        // Default payload.
+        mConnectivityState =
                 "{\"managedProvider\":{\"type\":\"NOT_MANAGED\"},\"dataPlan\":{\"type\":\"AMAZON_SPONSORED\"}}";
+
+        // To facilitate testing, we check the "aace.json" configuration file located in the root
+        // of the SD card for a `connectivity/identifier` string value.
+        // The JSON format is as follows:
+        // {
+        //     "connectivity": {
+        //         "identifier": "SAMPLE123"
+        //     }
+        // }
+        JSONObject extraConfig = sampleAppContext.getConfigFromFile("aace.json", "connectivity");
+        if (extraConfig != null) {
+            Log.i(sTag, "Reading connectivity identifier from the extra config file.");
+            mIdentifier = extraConfig.optString("identifier", "");
+        }
+
         // The value provided by SimpleDateFormat Z doesn't include the colon separator specified in
         // RFC 3339 (https://tools.ietf.org/html/rfc3339#section-5.6). We either need to split the
         // [+-] hours from the minutes and rejoin with colon, or set UTC TimeZone and literal Z.
@@ -140,8 +166,21 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
     @Override
     public String getConnectivityState() {
-        Log.i(sTag, "Getting ConnectivityState Overrided in Connectivity Handler");
-        return mConnectivityPayload;
+        Log.i(sTag, "Getting the ConnectivityState overridden in AlexaConnectivityHandler");
+        return mConnectivityState;
+    }
+
+    @Override
+    public String getIdentifier() {
+        Log.i(sTag, "Getting the Identifier overridden in AlexaConnectivityHandler");
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                                                                                           //
+        //  FOR SECURITY REASONS, GET THE IDENTIFIER FROM THE SYSTEM ONLY WHEN NEEDED, DO NOT STORE THE IDENTIFIER.  //
+        //                                                                                                           //
+        //  NOTE: RETURN AN EMPTY STRING TO AUTOMATICALLY USE VEHICLE_IDENTIFIER FROM ENGINE CONFIGURATION INSTEAD.  //
+        //                                                                                                           //
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        return mIdentifier;
     }
 
     public void onConnectivityStateItemSelected(ConnectivityState state) {
@@ -177,9 +216,10 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                     managedProvider.put("type", sMANAGED_PROVIDER);
                     managedProvider.put("id", sMANAGED_PROVIDER_ID);
                     dataPlan.put("type", sDATAPLAN_PAID);
-                    payload.put("termsStatus", sTERMS_ACCEPTED);
                     payload.put("managedProvider", managedProvider);
                     payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_ACCEPTED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag, "Error setting payload to paid full experience: " + e.getMessage());
@@ -195,11 +235,12 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                     dataPlan.put("endDate", sDateFormat.format(calendar.getTime()));
                     managedProvider.put("type", sMANAGED_PROVIDER);
                     managedProvider.put("id", sMANAGED_PROVIDER_ID);
-                    payload.put("termsStatus", sTERMS_ACCEPTED);
                     String[] dataplanList = {sDATAPLAN_PAID, sDATAPLAN_SPONSORED};
                     payload.put("dataPlansAvailable", new JSONArray(dataplanList));
                     payload.put("managedProvider", managedProvider);
                     payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_ACCEPTED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag, "Error setting payload to trial full experience: " + e.getMessage());
@@ -211,11 +252,12 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                     dataPlan.put("type", sDATAPLAN_SPONSORED);
                     managedProvider.put("type", sMANAGED_PROVIDER);
                     managedProvider.put("id", sMANAGED_PROVIDER_ID);
-                    payload.put("termsStatus", sTERMS_ACCEPTED);
                     String[] dataplanList = {sDATAPLAN_PAID, sDATAPLAN_TRIAL};
                     payload.put("dataPlansAvailable", new JSONArray(dataplanList));
                     payload.put("managedProvider", managedProvider);
                     payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_ACCEPTED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag, "Error setting payload to partial experience mode: " + e.getMessage());
@@ -227,13 +269,30 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                     dataPlan.put("type", sDATAPLAN_SPONSORED);
                     managedProvider.put("type", sMANAGED_PROVIDER);
                     managedProvider.put("id", sMANAGED_PROVIDER_ID);
-                    payload.put("termsStatus", sTERMS_DECLINED);
                     payload.put("managedProvider", managedProvider);
                     payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_DECLINED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag,
                             "Error setting payload to partial experience mode with terms declined: " + e.getMessage());
+                }
+                break;
+
+            case TERMS_DEFERRED:
+                try {
+                    dataPlan.put("type", sDATAPLAN_SPONSORED);
+                    managedProvider.put("type", sMANAGED_PROVIDER);
+                    managedProvider.put("id", sMANAGED_PROVIDER_ID);
+                    payload.put("managedProvider", managedProvider);
+                    payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_DEFERRED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
+                } catch (JSONException e) {
+                    payload = new JSONObject();
+                    Log.e(sTag,
+                            "Error setting payload to partial experience mode with terms deferred: " + e.getMessage());
                 }
                 break;
 
@@ -243,11 +302,12 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                     dataPlan.put("type", sDATAPLAN_SPONSORED);
                     managedProvider.put("type", sMANAGED_PROVIDER);
                     managedProvider.put("id", sMANAGED_PROVIDER_ID);
-                    payload.put("termsStatus", sTERMS_ACCEPTED);
                     String[] dataplanList = {sDATAPLAN_PAID};
                     payload.put("dataPlansAvailable", new JSONArray(dataplanList));
                     payload.put("managedProvider", managedProvider);
                     payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_ACCEPTED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag,
@@ -264,11 +324,12 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                     dataPlan.put("endDate", sDateFormat.format(calendar.getTime()));
                     managedProvider.put("type", sMANAGED_PROVIDER);
                     managedProvider.put("id", sMANAGED_PROVIDER_ID);
-                    payload.put("termsStatus", sTERMS_ACCEPTED);
                     String[] dataplanList = {sDATAPLAN_PAID, sDATAPLAN_SPONSORED};
                     payload.put("dataPlansAvailable", new JSONArray(dataplanList));
                     payload.put("managedProvider", managedProvider);
                     payload.put("dataPlan", dataPlan);
+                    payload.put("termsStatus", sTERMS_ACCEPTED);
+                    payload.put("termsVersion", sTERMS_VERSION1);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag, "Error setting payload to trial mode with trial expiring in 5 days: " + e.getMessage());
@@ -277,7 +338,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
             default:
                 try {
-                    payload = new JSONObject(mConnectivityPayload);
+                    payload = new JSONObject(mConnectivityState);
                 } catch (JSONException e) {
                     payload = new JSONObject();
                     Log.e(sTag,
@@ -285,8 +346,8 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
                 }
                 break;
         }
-        mConnectivityPayload = payload.toString();
-        return mConnectivityPayload;
+        mConnectivityState = payload.toString();
+        return mConnectivityState;
     }
 
     public void setupGUI() {
@@ -303,14 +364,14 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
         mConnectivitySpinner.setAdapter(adapter);
 
         if (readInstanceState(mActivity)) {
-            mConnectivitySpinner.setSelection(mConnectionStatePos);
+            mConnectivitySpinner.setSelection(mConnectionStatePosition);
         }
 
         mConnectivitySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 AlexaConnectivityHandler.ConnectivityState state =
                         (AlexaConnectivityHandler.ConnectivityState) parent.getItemAtPosition(position);
-                mConnectionStatePos = position;
+                mConnectionStatePosition = position;
                 if (!writeInstanceState(mActivity)) {
                     Toast.makeText(mActivity, "Failed to write state!", Toast.LENGTH_LONG).show();
                 }
@@ -326,11 +387,11 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
      */
     public boolean readInstanceState(Activity activity) {
         // Get the SharedPreferences object for sample from local storage
-        SharedPreferences perf = activity.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+        SharedPreferences perf = activity.getSharedPreferences(sPREFERENCES_FILE, Context.MODE_PRIVATE);
 
         // Get the position and value dropdown from local storage, or a default value as 0 if no menu option selected
-        this.mConnectionStatePos = perf.getInt(POSITION_KEY, 1);
-        return (perf.contains(POSITION_KEY));
+        this.mConnectionStatePosition = perf.getInt(sPOSITION_KEY, 1);
+        return (perf.contains(sPOSITION_KEY));
     }
 
     /**
@@ -339,11 +400,11 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
      */
     public boolean writeInstanceState(Activity activity) {
         // Get the SharedPreferences object for Sample App
-        SharedPreferences perf = activity.getSharedPreferences(this.PREFERENCES_FILE, Context.MODE_PRIVATE);
+        SharedPreferences perf = activity.getSharedPreferences(this.sPREFERENCES_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = perf.edit();
 
         // Use SharedPreferences editor to write dropdown menu position with its key value
-        editor.putInt(POSITION_KEY, this.mConnectionStatePos);
+        editor.putInt(sPOSITION_KEY, this.mConnectionStatePosition);
 
         // Commit the editor change to local storage
         return (editor.commit());

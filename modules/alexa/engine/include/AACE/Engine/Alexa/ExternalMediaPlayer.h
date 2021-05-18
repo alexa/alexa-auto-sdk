@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,19 +24,16 @@
 #include <utility>
 #include <unordered_map>
 
+#include <acsdkAudioPlayerInterfaces/AudioPlayerObserverInterface.h>
 #include <AVSCommon/AVS/CapabilityAgent.h>
 #include <AVSCommon/AVS/DirectiveHandlerConfiguration.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
-
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
-
-#include <AVSCommon/SDKInterfaces/AudioPlayerObserverInterface.h>
-
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/AVS/NamespaceAndName.h>
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
@@ -100,7 +97,7 @@ class ExternalMediaPlayer
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface
         , public ExternalMediaPlayerInterface
-        , public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface
+        , public alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::MediaPropertiesInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface

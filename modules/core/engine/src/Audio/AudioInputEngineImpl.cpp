@@ -15,13 +15,24 @@
 
 #include <AACE/Engine/Audio/AudioInputEngineImpl.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.audio.AudioInputEngineImpl");
 
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioInputEngineImpl";
+
+/// Counter metrics fpr AudioInput Platform APIs
+static const std::string METRIC_AUDIO_INPUT_WRITE = "Write";
+static const std::string METRIC_AUDIO_INPUT_START_AUDIO_INPUT = "StartAudioInput";
+static const std::string METRIC_AUDIO_INPUT_STOP_AUDIO_INPUT = "StopAudioInput";
+
 namespace aace {
 namespace engine {
 namespace audio {
+
+using namespace aace::engine::utils::metrics;
 
 AudioInputEngineImpl::AudioInputEngineImpl(std::shared_ptr<aace::audio::AudioInput> platformAudioInput) :
         m_platformAudioInput(platformAudioInput) {
@@ -58,6 +69,7 @@ AudioInputChannelInterface::ChannelId AudioInputEngineImpl::start(AudioWriteCall
         if (m_callbackMap.empty()) {
             // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
             callbackLock.unlock();
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "start", {METRIC_AUDIO_INPUT_START_AUDIO_INPUT});
             ThrowIfNot(m_platformAudioInput->startAudioInput(), "startPlatformAudioInputFailed");
             callbackLock.lock();
         }
@@ -88,6 +100,7 @@ bool AudioInputEngineImpl::stop(ChannelId id) {
         if (m_callbackMap.size() == 1) {
             // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
             callbackLock.unlock();
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "stop", {METRIC_AUDIO_INPUT_STOP_AUDIO_INPUT});
             ThrowIfNot(m_platformAudioInput->stopAudioInput(), "stopPlatformAudioInputFailed");
             callbackLock.lock();
         }

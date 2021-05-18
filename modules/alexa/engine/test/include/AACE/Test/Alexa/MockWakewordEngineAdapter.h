@@ -24,9 +24,10 @@ namespace alexa {
 
 class MockWakewordEngineAdapter : public aace::engine::alexa::WakewordEngineAdapter {
 public:
-    MOCK_METHOD2(
+    MOCK_METHOD3(
         initialize,
         bool(
+            const std::string& defaultLocale,
             std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream>& audioInputStream,
             alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat));
     MOCK_METHOD0(enable, bool());

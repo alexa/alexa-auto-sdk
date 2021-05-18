@@ -30,6 +30,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockMessageRouter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockMessageStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockSpeakerManager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/AVS/MockMetricRecorder.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/AlexaTestHelper.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/AlexaMockComponentFactory.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAlerts.h
@@ -43,9 +44,10 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAuthProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockAlexaClient.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockWakewordEngineAdapter.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockWakewordVerifier.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockInitiatorVerifier.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/MockDeviceSettingStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockDeviceSettingsDelegate.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockDeviceSetup.h
 
 )
 source_group("Header Files" FILES ${HEADERS})
@@ -81,6 +83,7 @@ set(UNIT_TEST_SRCS
     SpeechSynthesizerEngineImplTest.cpp
     SpeechRecognizerEngineImplTest.cpp
     AlexaEngineClientObserverTest.cpp
+    DeviceSetupEngineImplTest.cpp
     DoNotDisturbEngineImplTest.cpp
     AuthorizationManagerTest.cpp
     AlexaAuthorizationProviderTest.cpp
@@ -130,6 +133,7 @@ add_executable(AACEAlexaTests
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizerEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechRecognizerEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaEngineClientObserverTest.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceSetupEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DoNotDisturbEngineImplTest.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/StubMiscStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AuthorizationManagerTest.cpp

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            Go to <font color=\'#33B5E5\'>amazon.com/code</font> and sign in. Then enter this code:
+        ]]>
+    </string>
+    <string name="login_action_button">GET STARTED</string>
+    <string name="auth_provider_login_action_button">ENABLE ALEXA</string>
+    <string name="privacy_notice_button">Privacy Notice</string>
+    <string name="terms_of_use_button">Terms of Use</string>
+    <string name="login_action_retry_button">Try Again</string>
+    <string name="sign_in_action_button">SIGN IN</string>
+    <string name="login_later_action_button">SIGN IN LATER</string>
+    <string name="login_connect_to_aacs">Please wait for connecting to AACS…</string>
+    <string name="login_message">Use voice to make the most of your drive. Alexa can help with directions, music, calls, and much more.</string>
+    <string name="login_error_message">There was an issue setting up Alexa. Please try again.</string>
+    <string name="preview_mode_message">Amazon processes Alexa interactions in the cloud. By selecting \"Enable\", you accept the Amazon Alexa terms of use.</string>
+    <string name="login_method_or_text">Or scan this code:</string>
+    <string name="login_finish_heading_text">You\'re all set!</string>
+    <string name="login_finish_try_text">Try:</string>
+    <string name="login_network_settings">NETWORK SETTINGS</string>
+    <string name="login_network_error_heading_text">Network Error</string>
+    <string name="login_network_error_body_text">Alexa needs access to the internet to complete setup. \n Please check your network connection and try again.</string>
+    <string name="cbl_login_title">Sign in to your Amazon account</string>
+    <string name="cbl_login_alexa_hint1">\"Alexa, set the temperature to 72\"</string>
+    <string name="cbl_login_alexa_hint2">\"Alexa, find a coffee shop\"</string>
+    <string name="cbl_login_alexa_hint3">\"Alexa, play music\"</string>
+    <string name="auth_provider_login_alexa_hint1">\"Alexa, set the temperature to 72\"</string>
+    <string name="auth_provider_login_alexa_hint2">\"Alexa, take me to the airport\"</string>
+    <string name="auth_provider_login_alexa_hint3">\"Alexa, tune to 88.5 FM\"</string>
+    <string name="auth_provider_sign_in_hint">For music, weather, smart home, and more, sign in.</string>
+    <string name="login_all_done_btn_text">Done</string>
+    <string name="select_language_action_button">SELECT LANGUAGE</string>
+    <string name="select_language_body">Alexa isn\'t available in %1$s. Select a language for Alexa.</string>
+    <string name="select_language_continue_button">CONTINUE</string>
+</resources>

@@ -15,22 +15,55 @@
 
 #include "SampleApp/LocalNavigation/LocalSearchProviderHandler.h"
 
-#include <nlohmann/json.hpp>
-
 namespace sampleApp {
 namespace localNavigation {
+
+REGISTER_EXTENSION("LocalNavigation", LocalSearchProviderExtension);
 
 using json = nlohmann::json;
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("LocalSearchProviderHandler");
 
-std::shared_ptr<LocalSearchProviderHandler> LocalSearchProviderHandler::create(
-    std::shared_ptr<logger::LoggerHandler> loggerHandler) {
-    return std::shared_ptr<LocalSearchProviderHandler>(new LocalSearchProviderHandler(loggerHandler));
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  LocalSearchProviderExtension
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool LocalSearchProviderExtension::initialize(
+    std::weak_ptr<Activity> activity,
+    std::weak_ptr<logger::LoggerHandler> loggerHandler,
+    std::weak_ptr<aace::propertyManager::PropertyManager> propertyManager) {
+    m_localSearchProviderHandler = LocalSearchProviderHandler::create(loggerHandler);
+    return true;
 }
 
-LocalSearchProviderHandler::LocalSearchProviderHandler(std::shared_ptr<logger::LoggerHandler> loggerHandler) :
+bool LocalSearchProviderExtension::validate(const std::vector<nlohmann::json>& configs) {
+    // LVC Configuration must be passed
+    for (auto const& j : configs) {
+        try {
+            if (j.contains("aace.localVoiceControl") && j.contains("aace.localSkillService") &&
+                j.contains("aace.localNavigation")) {
+                return true;
+            }
+        } catch (nlohmann::json::exception& e) {
+        }
+    }
+    return false;
+}
+
+std::shared_ptr<aace::core::PlatformInterface> LocalSearchProviderExtension::getPlatformInterfaceHandler() {
+    return m_localSearchProviderHandler;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//  LocalSearchProviderHandler
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+LocalSearchProviderHandler::LocalSearchProviderHandler(std::weak_ptr<logger::LoggerHandler> loggerHandler) :
         m_loggerHandler{std::move(loggerHandler)} {
 }
 

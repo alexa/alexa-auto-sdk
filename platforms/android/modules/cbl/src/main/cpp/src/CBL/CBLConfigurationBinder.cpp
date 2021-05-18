@@ -20,12 +20,18 @@
 // String to identify log entries originating from this file.
 static const char TAG[] = "aace.jni.cbl.config.CBLConfigurationBinder";
 
+/// Default HTTP request timeout.
+static const int DEFAULT_HTTP_REQUEST_TIMEOUT = 60;
+
 // JNI
 extern "C" {
-JNIEXPORT jlong JNICALL
-Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLConfigBinder(JNIEnv* env, jobject obj, jint seconds) {
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_cbl_config_CBLConfiguration_createCBLConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jint seconds,
+    jboolean enableUserProfile) {
     try {
-        auto config = aace::cbl::config::CBLConfiguration::createCBLConfig(seconds);
+        auto config = aace::cbl::config::CBLConfiguration::createCBLConfig(seconds, enableUserProfile);
         ThrowIfNull(config, "createCBLConfigFailed");
 
         return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
@@ -40,7 +46,8 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_cbl_config_CBLConfiguration_createC
     jobject obj,
     jboolean enableUserProfile) {
     try {
-        auto config = aace::cbl::config::CBLConfiguration::createCBLUserProfileConfig(enableUserProfile);
+        auto config =
+            aace::cbl::config::CBLConfiguration::createCBLConfig(DEFAULT_HTTP_REQUEST_TIMEOUT, enableUserProfile);
         ThrowIfNull(config, "createCBLUserProfileConfig");
 
         return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ struct MediaErrorMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.1";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -67,7 +67,7 @@ struct MediaErrorMessage {
 
         std::string token;
         MediaError error;
-        std::string description;
+        std::string description = "";
     };
     static const std::string& topic() {
         static std::string topic = "AudioOutput";
@@ -78,7 +78,7 @@ struct MediaErrorMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.1";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {
@@ -101,7 +101,9 @@ inline void to_json(nlohmann::json& j, const MediaErrorMessage::Payload& c) {
 inline void from_json(const nlohmann::json& j, MediaErrorMessage::Payload& c) {
     j.at("token").get_to(c.token);
     j.at("error").get_to(c.error);
-    j.at("description").get_to(c.description);
+    if (j.contains("description")) {
+        j.at("description").get_to(c.description);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const MediaErrorMessage::Header::MessageDescription& c) {

@@ -45,7 +45,7 @@ public class SpeechRecognizerMessages {
      * Send start audio capture message to AACS.
      *
      * @param initiatorType Type of initiator such as tap to talk, push to
-     *                      talk etc.
+     *                      talk, wakeword etc.
      * @param keyword Wakeword.
      * @param keywordBeginIndex Starting index of wakeword in audio stream.
      * @param keywordEndIndex End index of wakeword in audio stream.
@@ -57,7 +57,7 @@ public class SpeechRecognizerMessages {
             String payload = new JSONStringer()
                                      .object()
                                      .key(AASBConstants.SpeechRecognizer.SPEECH_INITIATOR)
-                                     .value(AASBConstants.SpeechRecognizer.SPEECH_INITIATOR_TAP_TO_TALK)
+                                     .value(initiatorType)
                                      .key(AASBConstants.SpeechRecognizer.KEYWORD)
                                      .value(keyword == null ? "" : keyword)
                                      .key(AASBConstants.SpeechRecognizer.KEYWORD_BEGIN)

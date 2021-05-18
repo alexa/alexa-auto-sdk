@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ struct LocalResetBandsMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.0";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -65,7 +65,7 @@ struct LocalResetBandsMessage {
     struct Payload {
         using EqualizerBand = ::aasb::message::alexa::EqualizerBand;
 
-        std::vector<EqualizerBand> bands;
+        std::vector<EqualizerBand> bands = {};
     };
     static const std::string& topic() {
         static std::string topic = "EqualizerController";
@@ -76,7 +76,7 @@ struct LocalResetBandsMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.0";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {
@@ -95,7 +95,9 @@ inline void to_json(nlohmann::json& j, const LocalResetBandsMessage::Payload& c)
     };
 }
 inline void from_json(const nlohmann::json& j, LocalResetBandsMessage::Payload& c) {
-    j.at("bands").get_to(c.bands);
+    if (j.contains("bands")) {
+        j.at("bands").get_to(c.bands);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const LocalResetBandsMessage::Header::MessageDescription& c) {

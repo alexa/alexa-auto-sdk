@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 
 #include "AACE/Engine/CBL/CBLEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace cbl {
 
+using namespace aace::engine::utils::metrics;
 using namespace aace::cbl;
 using json = nlohmann::json;
 
@@ -33,6 +35,19 @@ static const std::string SERVICE_NAME = "alexa:cblEngineImpl";
 
 /// Timeout to wait for the callbacks from authorization provider.
 static const std::chrono::seconds TIMEOUT(2);
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "CBLEngineImpl";
+
+/// Counter metrics for CBL Platform APIs
+static const std::string METRIC_CBL_CBL_STATE_CHANGED = "CblStateChanged";
+static const std::string METRIC_CBL_CLEAR_REFRESH_TOKEN = "ClearRefreshToken";
+static const std::string METRIC_CBL_SET_REFRESH_TOKEN = "SetRefreshToken";
+static const std::string METRIC_CBL_GET_REFRESH_TOKEN = "GetRefreshToken";
+static const std::string METRIC_CBL_SET_USER_PROFILE = "SetUserProfile";
+static const std::string METRIC_CBL_START = "Start";
+static const std::string METRIC_CBL_CANCEL = "Cancel";
+static const std::string METRIC_CBL_RESET = "Reset";
 
 CBLEngineImpl::CBLEngineImpl(std::shared_ptr<CBL> cblPlatformInterface) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
@@ -97,7 +112,12 @@ bool CBLEngineImpl::initialize(
         ThrowIfNull(configuration, "nullCBLAuthDelegateConfiguration");
 
         m_cblAuthorizationProvider = CBLAuthorizationProvider::create(
-            SERVICE_NAME, authorizationManagerInterface, configuration, propertyManager, enableUserProfile);
+            SERVICE_NAME,
+            authorizationManagerInterface,
+            configuration,
+            propertyManager,
+            enableUserProfile,
+            shared_from_this());
         ThrowIfNull(m_cblAuthorizationProvider, "createCBLAuthorizationProviderFailed");
         m_cblAuthorizationProvider->setListener(shared_from_this());
 
@@ -121,6 +141,7 @@ void CBLEngineImpl::doShutdown() {
 
 void CBLEngineImpl::enable() {
     AACE_DEBUG(LX(TAG));
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "enable", {METRIC_CBL_GET_REFRESH_TOKEN});
     auto refreshToken = m_cblPlatformInterface->getRefreshToken();
     if (!refreshToken.empty()) {
         json refreshTokenJson;
@@ -136,18 +157,21 @@ void CBLEngineImpl::disable() {
 
 void CBLEngineImpl::onStart() {
     AACE_DEBUG(LX(TAG));
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStart", {METRIC_CBL_START});
     // Explict start, pass empty data.
     m_cblAuthorizationProvider->startAuthorizationLegacy("", true);
 }
 
 void CBLEngineImpl::onCancel() {
     AACE_DEBUG(LX(TAG));
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onCancel", {METRIC_CBL_CANCEL});
     m_cblAuthorizationProvider->cancelAuthorization();
 }
 
 void CBLEngineImpl::onReset() {
     AACE_DEBUG(LX(TAG));
     try {
+        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onReset", {METRIC_CBL_RESET});
         // Keeping the backward compatiblity by synchronizing the logout process.
         if (!m_cblAuthorizationProvider->logout()) {
             Throw("logoutFailed");
@@ -174,19 +198,13 @@ void CBLEngineImpl::onAuthorizationStateChanged(
         std::lock_guard<std::mutex> lock(m_mutex);
         if (state == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING) {
             m_state = CBLEngineState::AUTHORIZING;
-            m_cblPlatformInterface->cblStateChanged(CBL::CBLState::STARTING, CBL::CBLStateChangedReason::NONE, "", "");
         } else if (state == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZED) {
             m_state = CBLEngineState::AUTHORIZED;
-            m_cblPlatformInterface->cblStateChanged(
-                CBL::CBLState::REFRESHING_TOKEN, CBL::CBLStateChangedReason::NONE, "", "");
         } else if (state == AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED) {
             m_state = CBLEngineState::UNAUTHORIZED;
-            m_cblPlatformInterface->cblStateChanged(
-                CBL::CBLState::STOPPING, CBL::CBLStateChangedReason::SUCCESS, "", "");
         } else {
             AACE_WARN(LX(TAG).m("unexpectedState").d("service", service).d("state", state));
         }
-
         m_cv.notify_one();
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("service", service));
@@ -198,20 +216,11 @@ void CBLEngineImpl::onAuthorizationError(
     const std::string& error,
     const std::string& message) {
     AACE_DEBUG(LX(TAG));
+    std::stringstream cblState;
+    std::stringstream reason;
     try {
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
-        if (error == "UNKNOWN_ERROR") {
-            m_cblPlatformInterface->cblStateChanged(CBL::CBLState::STOPPING, CBL::CBLStateChangedReason::ERROR, "", "");
-        } else if (error == "TIMEOUT") {
-            m_cblPlatformInterface->cblStateChanged(
-                CBL::CBLState::STOPPING, CBL::CBLStateChangedReason::TIMEOUT, "", "");
-        } else if (error == "CODE_PAIR_EXPIRED") {
-            m_cblPlatformInterface->cblStateChanged(
-                CBL::CBLState::STOPPING, CBL::CBLStateChangedReason::CODE_PAIR_EXPIRED, "", "");
-        } else if (error == "AUTHORIZATION_EXPIRED") {
-            m_cblPlatformInterface->cblStateChanged(
-                CBL::CBLState::STOPPING, CBL::CBLStateChangedReason::AUTHORIZATION_EXPIRED, "", "");
-        } else if (error == "LOGOUT_FAILED") {
+        if (error == "LOGOUT_FAILED") {
             AACE_ERROR(LX(TAG).d("service", service).d("error", error));
             std::lock_guard<std::mutex> lock(m_mutex);
             m_state = CBLEngineState::ERROR;
@@ -228,6 +237,8 @@ void CBLEngineImpl::onEventReceived(const std::string& service, const std::strin
     try {
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
         auto requestPayload = json::parse(request);
+        std::stringstream cblState;
+        std::stringstream reason;
         if (requestPayload.find("type") != requestPayload.end() && requestPayload["type"].is_string()) {
             auto type = requestPayload["type"];
             if (type == "cbl-code") {
@@ -235,15 +246,14 @@ void CBLEngineImpl::onEventReceived(const std::string& service, const std::strin
                     auto payload = requestPayload["payload"];
                     if (payload.find("code") != payload.end() && payload["code"].is_string() &&
                         payload.find("url") != payload.end() && payload["url"].is_string()) {
-                        m_cblPlatformInterface->cblStateChanged(
-                            CBL::CBLState::REQUESTING_CODE_PAIR, CBL::CBLStateChangedReason::SUCCESS, "", "");
-                        m_cblPlatformInterface->cblStateChanged(
-                            CBL::CBLState::CODE_PAIR_RECEIVED,
-                            CBL::CBLStateChangedReason::SUCCESS,
-                            payload["url"],
-                            payload["code"]);
-                        m_cblPlatformInterface->cblStateChanged(
-                            CBL::CBLState::REQUESTING_TOKEN, CBL::CBLStateChangedReason::NONE, "", "");
+                        std::unique_lock<std::mutex> lock(m_mutex);
+                        auto eventListeners = m_eventListeners;
+                        lock.unlock();
+                        for (const auto& eventListener : eventListeners) {
+                            if (auto listener = eventListener.lock()) {
+                                listener->onCBLCode(payload["url"], payload["code"]);
+                            }
+                        }
                     } else {
                         Throw("invalidCodeOrUrl");
                     }
@@ -255,6 +265,8 @@ void CBLEngineImpl::onEventReceived(const std::string& service, const std::strin
                     auto payload = requestPayload["payload"];
                     if (payload.find("name") != payload.end() && payload["name"].is_string() &&
                         payload.find("email") != payload.end() && payload["email"].is_string()) {
+                        emitCounterMetrics(
+                            METRIC_PROGRAM_NAME_SUFFIX, "onEventReceived", {METRIC_CBL_SET_USER_PROFILE});
                         m_cblPlatformInterface->setUserProfile(payload["name"], payload["email"]);
                     } else {
                         Throw("invalidNameOrEmail");
@@ -279,6 +291,7 @@ std::string CBLEngineImpl::onGetAuthorizationData(const std::string& service, co
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
         if (key == "refreshToken") {
             json refreshTokenJson;
+            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetAuthorizationData", {METRIC_CBL_GET_REFRESH_TOKEN});
             refreshTokenJson["refreshToken"] = m_cblPlatformInterface->getRefreshToken();
             return refreshTokenJson.dump();
         }
@@ -302,11 +315,15 @@ void CBLEngineImpl::onSetAuthorizationData(
             if (!data.empty()) {
                 auto refreshTokenJson = json::parse(data);
                 if (refreshTokenJson.contains("refreshToken") && refreshTokenJson["refreshToken"].is_string()) {
+                    emitCounterMetrics(
+                        METRIC_PROGRAM_NAME_SUFFIX, "onSetAuthorizationData", {METRIC_CBL_SET_REFRESH_TOKEN});
                     m_cblPlatformInterface->setRefreshToken(refreshTokenJson["refreshToken"]);
                 } else {
                     Throw("invalidrefreshToken");
                 }
             } else {
+                emitCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX, "onSetAuthorizationData", {METRIC_CBL_CLEAR_REFRESH_TOKEN});
                 m_cblPlatformInterface->clearRefreshToken();
             }
             return;
@@ -314,6 +331,44 @@ void CBLEngineImpl::onSetAuthorizationData(
         Throw("keyNotSupported");
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("key", key));
+    }
+}
+
+void CBLEngineImpl::addEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_eventListeners.push_back(eventListener);
+}
+
+void CBLEngineImpl::removeEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener) {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    for (auto it = m_eventListeners.begin(); it != m_eventListeners.end(); ++it) {
+        if (it->lock() == eventListener) {
+            m_eventListeners.erase(it);
+            return;
+        }
+    }
+}
+
+void CBLEngineImpl::cblStateChanged(
+    aace::cbl::CBL::CBLState state,
+    aace::cbl::CBL::CBLStateChangedReason reason,
+    const std::string& url,
+    const std::string& code) {
+    if (m_cblPlatformInterface) {
+        std::stringstream ssCblState;
+        ssCblState << state;
+        if (state == CBL::CBLState::STOPPING) {
+            std::stringstream ssReason;
+            ssReason << reason;
+            emitCounterMetrics(
+                METRIC_PROGRAM_NAME_SUFFIX,
+                "cblStateChanged",
+                {METRIC_CBL_CBL_STATE_CHANGED, ssCblState.str(), ssReason.str()});
+        } else {
+            emitCounterMetrics(
+                METRIC_PROGRAM_NAME_SUFFIX, "cblStateChanged", {METRIC_CBL_CBL_STATE_CHANGED, ssCblState.str()});
+        }
+        m_cblPlatformInterface->cblStateChanged(state, reason, url, code);
     }
 }
 

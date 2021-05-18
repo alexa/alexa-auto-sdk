@@ -1,0 +1,75 @@
+{
+  "workflow": [
+    {
+      "event": "Start_Login",
+      "next": {
+        "type": "action",
+        "resource": "CheckNetworkStatusCommand"
+      }
+    },
+    {
+      "event": "Network_Connected",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_login"
+      }
+    },
+    {
+      "event": "Network_Disconnected",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_network"
+      }
+    },
+    {
+      "event": "Auth_Provider_Auth_Finished",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_authProviderAuthenticatedFinish"
+      }
+    },
+    {
+      "event": "CBL_Auth_Finished",
+      "next": {
+        "type": "action",
+        "resource": "CheckContactsConsentStatusCommand"
+      }
+    },
+    {
+      "event": "Contacts_Consent_Setup_Not_Finished",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_communication"
+      }
+    },
+    {
+      "event": "Contacts_Consent_Setup_Finished",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_cblLoginFinish"
+      }
+    },
+    {
+      "event": "Contacts_Consent_Setup_Skipped",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_cblLoginFinish"
+      }
+    },
+    {
+      "event": "CBL_Auth_Restarted",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_login"
+      }
+    },
+    {
+      "event": "CBL_Start",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_cblStart"
+      }
+    }
+  ],
+  "startStep": "Start_Login"
+}

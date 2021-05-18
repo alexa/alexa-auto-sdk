@@ -14,6 +14,7 @@
  */
 
 #include "SampleApp/Application.h"
+#include "SampleApp/Extension.h"
 
 // Sample Text To Speech Platform Interfaces
 #include "SampleApp/TextToSpeech/TextToSpeechHandler.h"
@@ -373,17 +374,8 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         configurationFiles.push_back(configurationFile);
     }
 
-    // Create user configuration file
-    if (applicationContext->hasUserConfigFilePath()) {
-        auto configFilePath = applicationContext->getUserConfigFilePath();
-        auto configurationFile = aace::core::config::ConfigurationFile::create(configFilePath);
-        Ensures(configurationFile != nullptr);
-        configurationFiles.push_back(configurationFile);
-    }
-
     // Validate that configuration files are passed in
     std::vector<json> jsonConfigs;
-    bool configError = false;
     parseConfigurations(configFilePaths, jsonConfigs);
     // ------------------------------------------------------------------------
     // In a production environment we recommend that the application builds
@@ -391,8 +383,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // can also be passed in to the application. This example builds a
     // configuration programatically if one is not passed in to the application.
     // ------------------------------------------------------------------------
-    if (!carControl::CarControlHandler::checkConfiguration(
-            jsonConfigs, carControl::CarControlHandler::ConfigType::CAR)) {
+    if (!carControl::CarControlHandler::checkConfiguration(jsonConfigs)) {
         console->printRuler();
         console->printLine("Car control configuration was created");
         console->printRuler();
@@ -406,43 +397,20 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Initialize values for car control configuration controllers
     carControl::CarControlDataProvider::initialize(configurationFiles);
 
-    if (applicationContext->isAlexaCommsSupported() || applicationContext->isLocalVoiceControlSupported() ||
-        applicationContext->isDcmSupported()) {
-#ifdef ALEXACOMMS
-        // Config file must be specified
-        if (!communication::CommunicationHandler::checkConfiguration(jsonConfigs)) {
-            console->printRuler();
-            console->printLine("Alexa Communications is enabled but no configuration was found.");
-            console->printRuler();
-            configError = true;
-        }
-#endif
-#ifdef LOCALVOICECONTROL
-        // Config file must be specified
-        if (!carControl::CarControlHandler::checkConfiguration(
-                jsonConfigs, carControl::CarControlHandler::ConfigType::LVC)) {
-            console->printRuler();
-            console->printLine("Local Voice Control is enabled but no configuration was found.");
-            console->printRuler();
-            configError = true;
-        }
-#endif
-#ifdef DCM
-        if (!applicationContext->checkDcmConfiguration(jsonConfigs)) {
-            console->printRuler();
-            console->printLine("DCM is enabled but no configuration was found.");
-            console->printRuler();
-            configError = true;
-        }
-#endif
+    // Validate extensions
+    if (!extension::Manager::validateExtensions(jsonConfigs, console)) {
+        console->printRuler();
+        console->printLine("Auto SDK extensions failed validation");
+        console->printRuler();
 
-        if (configError) {
-            if (!engine->shutdown()) {
-                console->printLine("Error: Engine could not be shutdown");
-            }
-
-            return Status::Failure;
+        // Shutdown
+        if (!engine->shutdown()) {
+            console->printRuler();
+            console->printLine("Error: Engine could not be shutdown");
+            console->printRuler();
         }
+
+        return Status::Failure;
     }
 
     // Configure the engine
@@ -524,26 +492,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(doNotDisturbHandler != nullptr);
     Ensures(engine->registerPlatformInterface(doNotDisturbHandler));
 
-#ifdef ALEXACOMMS
-    // Communications
-    auto communicationHandler = communication::CommunicationHandler::create(activity, loggerHandler);
-    Ensures(communicationHandler != nullptr);
-    if (!engine->registerPlatformInterface(communicationHandler)) {
-        loggerHandler->log(Level::INFO, "Application:Engine", "failed to register communication handler");
-        console->printLine("Error: could not register communication handler (check config)");
-        if (!engine->shutdown()) {
-            console->printLine("Error: could not be shutdown");
-        }
-        return Status::Failure;
-    }
-#endif  // ALEXACOMMS
-
-#ifdef LOCALVOICECONTROL
-    // Local Search Provider
-    auto localSearchProvider = localNavigation::LocalSearchProviderHandler::create(loggerHandler);
-    Ensures(localSearchProvider != nullptr);
-    Ensures(engine->registerPlatformInterface(localSearchProvider));
-#endif  // LOCALVOICECONTROL
+    //Device Setup Handler
+    auto deviceSetupHandler = alexa::DeviceSetupHandler::create(activity, loggerHandler);
+    Ensures(deviceSetupHandler != nullptr);
+    Ensures(engine->registerPlatformInterface(deviceSetupHandler));
 
 #ifdef TEXT_TO_SPEECH
     // Text To Speech Handler
@@ -667,6 +619,35 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
         return Status::Failure;
     }
 
+    bool extensionError = false;
+    std::string extensionErrorMsg;
+
+    // Initialize extension handlers
+    if (!extension::Manager::initializeExtensions(activity, loggerHandler, propertyManagerHandler)) {
+        extensionError = true;
+        extensionErrorMsg = "Auto SDK extensions failed to initialize\n";
+    }
+
+    // Register platform interfaces for extensions
+    if (!extension::Manager::registerPlatformInterfaces(engine)) {
+        extensionError = true;
+        extensionErrorMsg += "Auto SDK extensions failed platform interface registration";
+    }
+
+    // Exit on error
+    if (extensionError) {
+        console->printRuler();
+        console->printLine(extensionErrorMsg);
+        console->printRuler();
+        // Shutdown
+        if (!engine->shutdown()) {
+            console->printRuler();
+            console->printLine("Error: Engine could not be shutdown");
+            console->printRuler();
+        }
+        return Status::Failure;
+    }
+
     // Start the engine
     if (engine->start()) {
         loggerHandler->log(Level::INFO, "Application:Engine", "started successfully");
@@ -708,6 +689,12 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     console->printLine("Alexa Auto SDK", 'v' + VERSION);
     printMenuText(applicationContext, console, "main", "banner", variables);
 
+    // Start the authorization if we were successfully authorized previously.
+    // This can be disabled by supplying `disable-auto-authorization` command to sample app
+    if (!applicationContext->isAutoAuthorizationDisabled()) {
+        authorizationHandler->startAuth();
+    }
+
     // Run the program
     auto status = Status::Success;
     if (applicationContext->isTestAutomation()) {
@@ -716,10 +703,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     } else {
         // Run the main loop (i.e. interactive text based menu system)
         auto id = std::string("main");
-        if (applicationContext->hasUserConfigFilePath()) {
-            // For user configurations, automatically authenticate with CBL
-            activity->notify(Event::onStartCBLAuthorization);
-        } else if (applicationContext->hasMenu("user")) {
+        if (applicationContext->hasMenu("user")) {
             // If not logged in, and user menu is available, run it instead of main
             id = std::string("user");
         }
@@ -911,26 +895,6 @@ Status Application::runMenu(
                     } else if (action == "Help") {
                         c = HELP;  // print help
                         break;
-                    } else if (action == "Login") {
-                        Ensures(item.count("name") == 1);  // required item.name
-                        auto name = item.at("name").get<std::string>();
-                        Ensures(item.count("value") == 1);  // required item.value
-                        auto value = item.at("value").get<std::string>();
-                        console->printLine(name);
-                        auto userConfigFilePath = menuDirPath + '/' + value;
-                        applicationContext->setUserConfigFilePath(userConfigFilePath);
-                        status = Status::Restart;
-                        break;
-                    } else if (action == "Logout") {
-                        console->printLine("Are you sure you want to logout Y/n?");
-                        if ('Y' == static_cast<unsigned char>(fgetc(stdin))) {
-                            activity->notify(Event::onLogoutCBLAuthorization);
-                            applicationContext->clearUserConfigFilePath();
-                            status = Status::Restart;
-                        } else {
-                            console->printLine("Aborted the logout");
-                        }
-                        break;
                     } else if (action == "Quit") {
                         c = QUIT;  // quit app
                         break;
@@ -951,6 +915,9 @@ Status Application::runMenu(
                         propertyManagerHandler->setProperty("aace.alexa.setting.locale", value);
                         console->printLine("aace.alexa.setting.locale =", value);
                         c = ESC;  // go back
+                        break;
+                    } else if (action == "SetupCompleted") {
+                        activity->notify(Event::onDeviceSetupCompleted);
                         break;
                     } else if (action == "SetTimeZone") {
                         auto value = item.at("value").get<std::string>();  // required item.value

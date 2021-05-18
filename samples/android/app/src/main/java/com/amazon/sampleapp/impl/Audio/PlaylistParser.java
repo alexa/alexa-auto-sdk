@@ -16,7 +16,8 @@
 package com.amazon.sampleapp.impl.Audio;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;

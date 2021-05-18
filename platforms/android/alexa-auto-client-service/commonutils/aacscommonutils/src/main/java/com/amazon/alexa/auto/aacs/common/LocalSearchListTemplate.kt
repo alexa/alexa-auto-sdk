@@ -12,9 +12,9 @@ data class PointOfInterest (
     val provider : String,
     val url : String,
     val rating : Rating,
-    val travelDistance : String,
-    val phoneNumber : String,
-    val travelTime : String,
+    val travelDistance : String?,
+    val phoneNumber : String?,
+    val travelTime : String?,
     val title : Title,
     val currentStatus : String?,
     val image : POIImage

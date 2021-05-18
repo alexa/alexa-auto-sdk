@@ -7,6 +7,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBAlexaSpeaker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBAudioPlayer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBAuthProvider.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBDeviceSetup.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBDoNotDisturb.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBEqualizerController.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Alexa/AASBExternalMediaAdapter.h
@@ -52,6 +53,9 @@ set(AASB_ALEXA_MESSAGES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/AuthProvider/GetAuthStateMessageReply.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/AuthProvider/GetAuthTokenMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/AuthProvider/GetAuthTokenMessageReply.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/DeviceSetup/SetupCompletedMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/DeviceSetup/SetupCompletedResponseMessage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/DeviceSetup/StatusCode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/DoNotDisturb/DoNotDisturbChangedMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/DoNotDisturb/SetDoNotDisturbMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/EqualizerController/EqualizerBand.h
@@ -103,7 +107,6 @@ set(AASB_ALEXA_MESSAGES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/ExternalMediaAdapter/VolumeChangedMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/LocalMediaSource/AdjustSeekMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/LocalMediaSource/ContentSelector.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/LocalMediaSource/GetSourceMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/LocalMediaSource/GetStateMessage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/LocalMediaSource/GetStateMessageReply.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/Alexa/LocalMediaSource/LocalMediaSourceState.h
@@ -149,6 +152,7 @@ add_library(AASBAlexaEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBAlexaSpeaker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBAudioPlayer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBAuthProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBDeviceSetup.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBDoNotDisturb.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBEqualizerController.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AASBExternalMediaAdapter.cpp

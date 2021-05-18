@@ -16,6 +16,7 @@
 #ifndef AACE_PHONECALLCONTROLLER_PHONECALLCONTROLLER_H
 #define AACE_PHONECALLCONTROLLER_PHONECALLCONTROLLER_H
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -251,6 +252,75 @@ public:
 private:
     std::shared_ptr<PhoneCallControllerEngineInterface> m_phoneCallControllerEngineInterface;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const PhoneCallController::ConnectionState& connectionState) {
+    switch (connectionState) {
+        case PhoneCallControllerEngineInterface::ConnectionState::CONNECTED:
+            stream << "CONNECTED";
+            break;
+        case PhoneCallControllerEngineInterface::ConnectionState::DISCONNECTED:
+            stream << "DISCONNECTED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const PhoneCallController::CallState& callState) {
+    switch (callState) {
+        case PhoneCallControllerEngineInterface::CallState::IDLE:
+            stream << "IDLE";
+            break;
+        case PhoneCallControllerEngineInterface::CallState::DIALING:
+            stream << "DIALING";
+            break;
+        case PhoneCallControllerEngineInterface::CallState::OUTBOUND_RINGING:
+            stream << "OUTBOUND_RINGING";
+            break;
+        case PhoneCallControllerEngineInterface::CallState::ACTIVE:
+            stream << "ACTIVE";
+            break;
+        case PhoneCallControllerEngineInterface::CallState::CALL_RECEIVED:
+            stream << "CALL_RECEIVED";
+            break;
+        case PhoneCallControllerEngineInterface::CallState::INBOUND_RINGING:
+            stream << "INBOUND_RINGING";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const PhoneCallController::CallError& callError) {
+    switch (callError) {
+        case PhoneCallControllerEngineInterface::CallError::NO_CARRIER:
+            stream << "NO_CARRIER";
+            break;
+        case PhoneCallControllerEngineInterface::CallError::BUSY:
+            stream << "BUSY";
+            break;
+        case PhoneCallControllerEngineInterface::CallError::NO_ANSWER:
+            stream << "NO_ANSWER";
+            break;
+        case PhoneCallControllerEngineInterface::CallError::NO_NUMBER_FOR_REDIAL:
+            stream << "NO_NUMBER_FOR_REDIAL";
+            break;
+        case PhoneCallControllerEngineInterface::CallError::OTHER:
+            stream << "OTHER";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const PhoneCallController::DTMFError& dtmfError) {
+    switch (dtmfError) {
+        case PhoneCallControllerEngineInterface::DTMFError::CALL_NOT_IN_PROGRESS:
+            stream << "CALL_NOT_IN_PROGRESS";
+            break;
+        case PhoneCallControllerEngineInterface::DTMFError::DTMF_FAILED:
+            stream << "DTMF_FAILED";
+            break;
+    }
+    return stream;
+}
 
 }  // namespace phoneCallController
 }  // namespace aace

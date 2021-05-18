@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -49,6 +49,12 @@ ApplicationContext::ApplicationContext(const std::string& path) {
         m_applicationDirPath = m_applicationPath.substr(0, pos);
     }
 
+    auto input = std::ifstream(m_applicationDirPath + "/activeAuthorization", std::ifstream::in);
+    if (input.good()) {
+        input >> m_activeAuthorization;
+        input.close();
+    }
+
     m_menuRegister = json::object();
 }
 
@@ -65,25 +71,8 @@ void ApplicationContext::addMenuFilePath(const std::string& menuFilePath) {
     m_menuFilePaths.push_back(menuFilePath);
 }
 
-bool ApplicationContext::checkDcmConfiguration(const std::vector<json>& configs) {
-    for (auto const& j : configs) {
-        try {
-            auto obj = j.at("aace.dcm");
-            if (obj.is_object()) {
-                return true;
-            }
-        } catch (json::exception& e) {
-        }
-    }
-    return false;
-}
-
 void ApplicationContext::clearLevel() {
     m_logEnabled = false;
-}
-
-void ApplicationContext::clearUserConfigFilePath() {
-    m_userConfigFilePath.clear();
 }
 
 std::string ApplicationContext::executeCommand(const char* command) {
@@ -202,12 +191,12 @@ int ApplicationContext::getMinimumAVSVolume() {
     return 0;
 };
 
-std::string ApplicationContext::getPayloadScriptCommand() {
-    return m_payloadScriptCommand;
+std::string ApplicationContext::getNetworkIdentifier() {
+    return m_networkIdentifier;
 }
 
-std::string ApplicationContext::getUserConfigFilePath() {
-    return m_userConfigFilePath;
+std::string ApplicationContext::getPayloadScriptCommand() {
+    return m_payloadScriptCommand;
 }
 
 bool ApplicationContext::hasMenu(const std::string& id) {
@@ -218,16 +207,12 @@ bool ApplicationContext::hasRefreshToken(const std::string& service) {
     if (!m_authorizationData[service]["refreshToken"].empty()) {
         return true;
     }
-    auto input = std::ifstream(m_applicationDirPath + "/token-" + service, std::ifstream::in);
+    std::ifstream input(m_applicationDirPath + "/token-" + service, std::ifstream::in);
     if (input.good()) {
         input >> m_authorizationData[service]["refreshToken"];
         input.close();
     }
     return !m_authorizationData[service]["refreshToken"].empty();
-}
-
-bool ApplicationContext::hasUserConfigFilePath() {
-    return !m_userConfigFilePath.empty();
 }
 
 bool ApplicationContext::isAlexaCommsSupported() {
@@ -240,6 +225,10 @@ bool ApplicationContext::isAlexaCommsSupported() {
 
 bool ApplicationContext::isAudioFileSupported() {
     return m_audioFileSupported;
+}
+
+bool ApplicationContext::isAutoAuthorizationDisabled() {
+    return m_disableAutoAuthorization;
 }
 
 bool ApplicationContext::isConnectivitySupported() {
@@ -361,6 +350,19 @@ bool ApplicationContext::saveContent(const std::string& path, const std::string&
 void ApplicationContext::setActiveAuthorization(const std::string& service) {
     m_activeAuthorization = service;
     m_authorizationInProgress = "";
+
+    // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING ANY RELATED AUTHORIZATION DATA SECURELY.
+    // VISIT THIS PAGE (https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/avs-security-reqs.html)
+    // FOR MORE INFORMATION ON SECURITY REQUIREMENTS.
+
+    // JUST TO FACILITATE EASY TESTING AND VERIFICATION, THIS SAMPLE APP SHALL STORE AND RETRIVE ACTIVE
+    // AUTHORIZATION FROM THE FILE SYSTEM.
+    auto path = m_applicationDirPath + "/activeAuthorization";
+    if (service.empty()) {
+        std::remove(path.c_str());
+    } else {
+        saveContent(path, service);
+    }
 }
 
 void ApplicationContext::setAudioFileSupported(bool audioFileSupported) {
@@ -383,6 +385,14 @@ void ApplicationContext::setBrowserCommand(const std::string& browserCommand) {
     m_browserCommand = browserCommand;
 }
 
+void ApplicationContext::setDisableAutoAuthorizationCommand(bool disable) {
+    m_disableAutoAuthorization = disable;
+    if (m_disableAutoAuthorization == true) {
+        // Reset the active authorization state that is read from the file system
+        m_activeAuthorization = "";
+    }
+}
+
 void ApplicationContext::setLevel(const logger::LoggerHandler::Level level) {
     m_logEnabled = true;
     m_level = level;
@@ -392,16 +402,16 @@ void ApplicationContext::setMediaPlayerCommand(const std::string& mediaPlayerCom
     m_mediaPlayerCommand = mediaPlayerCommand;
 }
 
+void ApplicationContext::setNetworkIdentifier(const std::string& networkIdentifier) {
+    m_networkIdentifier = networkIdentifier;
+}
+
 void ApplicationContext::setPayloadScriptCommand(const std::string& payloadScriptCommand) {
     m_payloadScriptCommand = payloadScriptCommand;
 }
 
 void ApplicationContext::setSingleThreadedUI(bool singleThreadedUI) {
     m_singleThreadedUI = singleThreadedUI;
-}
-
-void ApplicationContext::setUserConfigFilePath(const std::string& userConfigFilePath) {
-    m_userConfigFilePath = userConfigFilePath;
 }
 
 void ApplicationContext::setMessagingResponses(bool messagingResponses) {
@@ -418,9 +428,9 @@ void ApplicationContext::setAuthorizationData(
     const std::string& service,
     const std::string& key,
     const std::string& data) {
-    // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING THE AUTHORIZATION DATA SECURELY.
+    // IMPORTANT: YOUR PRODUCT IS RESPONSIBLE FOR STORING ANY AUTHORIZATION DATA SECURELY.
     // VISIT THIS PAGE (https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/avs-security-reqs.html)
-    // FOR MORE INFORMATION SECURITY REQUIREMENTS.
+    // FOR MORE INFORMATION ON SECURITY REQUIREMENTS.
 
     // JUST TO FACILITATE TESTING AND VERIFICATION, THIS SAMPLE APP SHALL STORE TOKEN ON THE FILE SYSTEM.
     m_authorizationData[service][key] = data;
@@ -465,7 +475,6 @@ bool ApplicationContext::testValue(const std::string& value) {
         // has
         {"AuthProviderAuthorizationInProgress", std::bind(&ApplicationContext::isAuthProviderAuthorizationInProgress, this)},
         {"CBLAuthorizationInProgress", std::bind(&ApplicationContext::isCBLAuthorizationInProgress, this)},
-        {"UserConfigFilePath", std::bind(&ApplicationContext::hasUserConfigFilePath, this)},
         // is
         {"AlexaCommsSupported", std::bind(&ApplicationContext::isAlexaCommsSupported, this)},
         {"AudioFileSupported", std::bind(&ApplicationContext::isAudioFileSupported, this)},

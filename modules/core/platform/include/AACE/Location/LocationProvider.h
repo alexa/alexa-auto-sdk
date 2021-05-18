@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <chrono>
 
 #include "AACE/Core/PlatformInterface.h"
+#include "LocationProviderEngineInterface.h"
 
 #include "Location.h"
 
@@ -36,6 +37,8 @@ protected:
     LocationProvider() = default;
 
 public:
+    using LocationServiceAccess = aace::location::LocationProviderEngineInterface::LocationServiceAccess;
+
     virtual ~LocationProvider();
 
     /**
@@ -52,6 +55,26 @@ public:
      * @return The current country
      */
     virtual std::string getCountry();
+
+    /**
+     * Notifies the Engine of a change in location service access. Use this function when the device's
+     * access to location service provider changes. E.g., system location access is not granted to the
+     * application.
+     *
+     * @param [in] access Access to the location service
+     */
+    void locationServiceAccessChanged(LocationServiceAccess access);
+
+    /**
+     * @internal
+     * Sets the Engine interface delegate.
+     *
+     * Should *never* be called by the platform implementation.
+     */
+    void setEngineInterface(std::shared_ptr<LocationProviderEngineInterface> locationProviderEngineInterface);
+
+private:
+    std::shared_ptr<LocationProviderEngineInterface> m_locationProviderEngineInterface;
 };
 
 }  // namespace location

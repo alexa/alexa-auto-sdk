@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -58,6 +58,9 @@ static const std::string INTERNAL_ENDPOINT_ID = "_AutoSDKInternalRoot";
 // Register the car control service with the Engine
 REGISTER_SERVICE(CarControlEngineService);
 
+using RegistrationResult =
+    alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface::RegistrationResult;
+
 CarControlEngineService::CarControlEngineService(const aace::engine::core::ServiceDescription& description) :
         aace::engine::core::EngineService(description) {
 }
@@ -84,25 +87,27 @@ bool CarControlEngineService::configure(std::shared_ptr<std::istream> configurat
         json jconfiguration;
         jconfiguration = json::parse(*configuration);
 
-        // Ingest assets from the file path(s) specified in configuration, else use the hardcoded default assets, and
-        // store them in an @c AssetStore. This facilitates retrieval of friendly name/locale pairs for an Endpoint
-        // during its construction.
+        // Ingest assets from the file path(s) specified in configuration. Store custom assets in an @c AssetStore to
+        // facilitate retrieval of friendly name/locale pairs for asset expansion during @c Endpoint construction.
+        // Note: Default assets may be overridden for legacy backward compatibility, but this results in friendly name/
+        // locale pair expansion rather than using asset definitions stored in the cloud.
+
         if (jconfiguration.contains(CONFIG_KEY_ASSETS) && jconfiguration[CONFIG_KEY_ASSETS].is_object()) {
             auto& assets = jconfiguration.at(CONFIG_KEY_ASSETS);
             if (assets.contains(CONFIG_KEY_DEFAULT_ASSETS_PATH) && assets[CONFIG_KEY_DEFAULT_ASSETS_PATH].is_string()) {
                 std::string path = assets.at(CONFIG_KEY_DEFAULT_ASSETS_PATH);
-                AACE_DEBUG(LX(TAG).m("addingDefaultAssetsFromPath").sensitive("path", path));
+                AACE_WARN(LX(TAG)
+                              .m("addingDefaultAssetsFromPath")
+                              .sensitive("path", path)
+                              .m("Assets in file override cloud definitions for matching IDs!"));
                 ThrowIfNot(m_assetStore.addAssets(path), "addDefaultAssetsFromPathFailed");
-            } else {
-                ThrowIfNot(m_assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
             }
+
             if (assets.contains(CONFIG_KEY_CUSTOM_ASSETS_PATH) && assets[CONFIG_KEY_CUSTOM_ASSETS_PATH].is_string()) {
                 std::string path = assets.at(CONFIG_KEY_CUSTOM_ASSETS_PATH);
                 AACE_DEBUG(LX(TAG).m("addingCustomAssetsFromPath").sensitive("path", path));
                 ThrowIfNot(m_assetStore.addAssets(path), "addCustomAssetsFromPathFailed");
             }
-        } else {
-            ThrowIfNot(m_assetStore.addDefaultAssets(), "addDefaultAssetsFailed");
         }
 
         // Translate <v2.2 zones config format (top level "zones" array) to v2.3+ (ZoneDefinitions capability)
@@ -144,6 +149,10 @@ bool CarControlEngineService::setup() {
             auto endpointBuilderFactory = alexaComponents->getEndpointBuilderFactory();
             ThrowIfNull(endpointBuilderFactory, "nullEndpointBuilderFactory");
 
+            // EndpointRegistrationManager is used to register each endpoint for inclusion in discovery
+            auto endpointRegistrationManager = alexaComponents->getEndpointRegistrationManager();
+            ThrowIfNull(endpointRegistrationManager, "nullEndpointRegistrationManager");
+
             // Car control endpoints use the same "manufacturerName" and "description" as the configured DeviceInfo for
             // the default endpoint since "aace.carControl" config currently does not expect these values to be provided
             std::string manufacturerName = "";
@@ -159,7 +168,12 @@ bool CarControlEngineService::setup() {
 
             for (auto& endpoint : m_endpoints) {
                 endpoint.second->build(
-                    m_carControlEngineImpl, endpointBuilderFactory, m_assetStore, manufacturerName, description);
+                    m_carControlEngineImpl,
+                    endpointBuilderFactory,
+                    endpointRegistrationManager,
+                    m_assetStore,
+                    manufacturerName,
+                    description);
                 endpointIdMappings.insert({endpoint.second->getId(), endpoint.second->getDiscoveryId()});
             }
 
@@ -178,9 +192,16 @@ bool CarControlEngineService::setup() {
                 endpointBuilder->withManufacturerName(deviceInfo->getManufacturerName());
                 endpointBuilder->withDisplayCategory({"VEHICLE"});
                 endpointBuilder->withCookies({{"createdBy", "AutoSDK"}});
-                auto endpointId = endpointBuilder->build();
-                ThrowIfNot(endpointId.hasValue(), "couldNotBuildInternalReferenceEndpoint");
+
+                auto endpoint = endpointBuilder->build();
                 endpointBuilder.reset();
+                ThrowIfNull(endpoint, "couldNotBuildInternalReferenceEndpoint");
+                auto resultFuture = endpointRegistrationManager->registerEndpoint(std::move(endpoint));
+                // Only wait for immediate errors.
+                if ((resultFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)) {
+                    auto result = resultFuture.get();
+                    ThrowIfNot((result == RegistrationResult::SUCCEEDED), "couldNotRegisterInternalReferenceEndpoint");
+                }
             }
 
             // The contents of the AssetStore won't be used again, so we can release the memory

@@ -8,7 +8,8 @@ import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.app.dependencies.AndroidAppModule;
 import com.amazon.alexa.auto.app.dependencies.AppComponent;
 import com.amazon.alexa.auto.app.dependencies.DaggerAppComponent;
-import com.amazon.alexa.auto.apps.common.aacs.AACSServiceController;
+
+import javax.inject.Inject;
 
 /**
  * Application class which also provides component registry to constituent
@@ -18,6 +19,8 @@ public class AutoApplication extends Application implements AlexaApp {
     private static final String TAG = AutoApplication.class.getSimpleName();
 
     private AppComponent mDaggerAppComponent;
+    @Inject
+    AlexaAppRootComponent mAppRootComponent;
 
     @Override
     public void onCreate() {
@@ -25,6 +28,8 @@ public class AutoApplication extends Application implements AlexaApp {
 
         mDaggerAppComponent =
                 DaggerAppComponent.builder().androidAppModule(new AndroidAppModule(getApplicationContext())).build();
+
+        mDaggerAppComponent.inject(this);
 
         Log.i(TAG, "Alexa Auto App initialized");
     }
@@ -44,6 +49,6 @@ public class AutoApplication extends Application implements AlexaApp {
         // This method will mostly be used by external projects which
         // would like to get their dependencies from the returned
         // component.
-        return mDaggerAppComponent;
+        return mAppRootComponent;
     }
 }

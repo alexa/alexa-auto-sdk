@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 
 #include "CBLAuthorizationProvider.h"
 #include "CBLConfiguration.h"
+#include "CBLEventListenerInterface.h"
+#include "CBLLegacyEventNotificationInterface.h"
 
 namespace aace {
 namespace engine {
@@ -42,6 +44,7 @@ namespace cbl {
 class CBLEngineImpl
         : public aace::cbl::CBLEngineInterface
         , public authorization::AuthorizationProviderListenerInterface
+        , public CBLLegacyEventNotificationInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<CBLEngineImpl> {
 private:
@@ -87,6 +90,18 @@ public:
     void onCancel() override;
     void onReset() override;
 
+    void addEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener);
+    void removeEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener);
+
+    /// @name CBLLegacyEventNotificationInterface
+    /// @{
+    void cblStateChanged(
+        CBLLegacyEventNotificationInterface::CBLState state,
+        CBLLegacyEventNotificationInterface::CBLStateChangedReason reason,
+        const std::string& url,
+        const std::string& code) override;
+    /// @}
+
 protected:
     virtual void doShutdown() override;
 
@@ -120,6 +135,9 @@ private:
 
     /// To serialize access to @c m_state
     std::mutex m_mutex;
+
+    /// The list of registered CBL event listeners
+    std::vector<std::weak_ptr<CBLEventListenerInterface>> m_eventListeners;
 };
 
 }  // namespace cbl

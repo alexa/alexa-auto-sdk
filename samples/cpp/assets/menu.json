@@ -147,6 +147,12 @@
                     {
                         "do": "notify/onConnectivityConnectivityStateChange",
                         "key": "7",
+                        "name": "Partial Experience (Terms Deferred)",
+                        "value": "TERMS_DEFERRED"
+                    },
+                    {
+                        "do": "notify/onConnectivityConnectivityStateChange",
+                        "key": "8",
                         "name": "Partial Experience (Trial Expired)",
                         "value": "TRIAL_EXPIRED"
                     },
@@ -632,6 +638,16 @@
                         }
                     },
                     {
+                        "do": "notify/onLocationProviderLocationServiceAccessEnabled",
+                        "key": "1",
+                        "name": "Simulate GPS on"
+                    },
+                    {
+                        "do": "notify/onLocationProviderLocationServiceAccessDisabled",
+                        "key": "2",
+                        "name": "Simulate GPS off"
+                    },
+                    {
                         "do": "GoBack",
                         "key": "esc",
                         "name": "Go back"
@@ -947,6 +963,11 @@
             "do": "notify/onDoNotDisturbOff",
             "key": "2",
             "name": "Set DoNotDisturb Off"
+        },
+        {
+            "do": "SetupCompleted",
+            "key": "3",
+            "name": "Setup Completed"
         },
         {
             "do": "Help",

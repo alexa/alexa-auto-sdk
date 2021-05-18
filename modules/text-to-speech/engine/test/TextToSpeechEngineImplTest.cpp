@@ -203,24 +203,6 @@ TEST_F(TextToSpeechEngineImplTest, prepareSpeechWithInvalidOptions) {
 }
 
 /**
- * @test prepareSpeechWithValidParameters
- */
-TEST_F(TextToSpeechEngineImplTest, prepareSpeechWithValidParameters) {
-    std::shared_ptr<aace::engine::textToSpeech::TextToSpeechEngineImpl> testTextToSpeechEngineImpl;
-    testTextToSpeechEngineImpl = engine::textToSpeech::TextToSpeechEngineImpl::create(
-        m_mockTextToSpeechPlatformInterface, m_mockTextToSpeechServiceInterface);
-    const std::string speechId = "TEXT_TO_SPEECH-1";
-    const std::string text = "TEST";
-    const std::string provider = "text-to-speech-provider";
-    const std::string options = "";
-    EXPECT_CALL(*m_mockTextToSpeechServiceInterface, getTextToSpeechProvider(provider))
-        .Times(1)
-        .WillOnce(testing::Return(m_mockTextToSpeechSynthesizerInterface));
-    EXPECT_TRUE(testTextToSpeechEngineImpl->onPrepareSpeech(speechId, text, provider, options))
-        << "Call to onPreapreSpeech() expected to pass!";
-}
-
-/**
  * @test getCapabilitiesWithEmptyRequestId
  */
 TEST_F(TextToSpeechEngineImplTest, getCapabilitiesWithEmptyRequestId) {

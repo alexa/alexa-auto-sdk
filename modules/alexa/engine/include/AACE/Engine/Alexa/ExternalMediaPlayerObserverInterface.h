@@ -100,7 +100,7 @@ inline ObservablePlaybackStateProperties::ObservablePlaybackStateProperties(
     const std::string& state,
     const std::string& trackName,
     const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) :
-        state{state}, trackName{trackName}, playRequestor{playRequestor} {};
+        state{state}, trackName{trackName}, playRequestor(playRequestor){};
 
 inline bool operator==(
     const ObservablePlaybackStateProperties& observableA,

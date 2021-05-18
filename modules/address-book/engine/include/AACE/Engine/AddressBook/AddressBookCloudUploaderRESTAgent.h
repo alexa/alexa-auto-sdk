@@ -17,10 +17,6 @@
 #ifndef AACE_ENGINE_ADDRESS_BOOK_ADDRESSBOOK_CLOUD_UPLOADER_REST_AGENT_H
 #define AACE_ENGINE_ADDRESS_BOOK_ADDRESSBOOK_CLOUD_UPLOADER_REST_AGENT_H
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
 #include <queue>
 
 #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
@@ -33,6 +29,7 @@
 #include <AVSCommon/Utils/DeviceInfo.h>
 
 #include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
+#include "AACE/Engine/Utils/JSON/JSON.h"
 
 namespace aace {
 namespace engine {
@@ -128,7 +125,6 @@ private:
     std::string buildCreateAddressBookDataJson(
         const std::string& addressBookSourceId,
         const std::string& addressBookType);
-    std::string buildEntriesJsonString(std::shared_ptr<rapidjson::Document> document);
 
 private:
     std::string m_pceId;

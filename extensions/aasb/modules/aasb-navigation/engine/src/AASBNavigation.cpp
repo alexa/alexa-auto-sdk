@@ -227,7 +227,7 @@ std::string AASBNavigation::getNavigationState() {
 
         aasb::message::navigation::navigation::GetNavigationStateMessage message;
 
-        auto result = m_messageBroker_lock->publish(message.toString()).timeout(std::chrono::milliseconds(500)).get();
+        auto result = m_messageBroker_lock->publish(message.toString()).get();
 
         if (result.valid()) {
             std::string payload = result.payload();

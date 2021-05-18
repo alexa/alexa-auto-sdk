@@ -1,8 +1,11 @@
 package com.amazon.alexa.auto.apis.app;
 
+import androidx.annotation.NonNull;
+
 import com.amazon.alexa.auto.apis.auth.AuthController;
-import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
+
+import java.util.Optional;
 
 /**
  * Application wide Component Registry interface that is shared among
@@ -12,6 +15,14 @@ import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
  * The registry enables library components such as alexa-auto-login,
  * alexa-auto-media-player etc. to fetch common App Scope dependencies
  * from main app.
+ *
+ * All app scoped components are queried using direct methods such as
+ * {@link AlexaAppRootComponent#getAuthController()}. The components
+ * with scope different than app scope can be deposited, removed and
+ * queried using following generic methods:
+ * {@link AlexaAppRootComponent#activateScope(ScopedComponent)} ()},
+ * {@link AlexaAppRootComponent#deactivateScope(Class)} ()} &
+ * {@link AlexaAppRootComponent#getComponent(Class)}.
  */
 public interface AlexaAppRootComponent {
     /**
@@ -29,17 +40,24 @@ public interface AlexaAppRootComponent {
     AuthController getAuthController();
 
     /**
-     * Provides the {@link AlexaAppScopedComponents}
+     * Activate the scoped component and bring it in scope.
      *
-     * @return Scoped Components.
+     * @param scopedComponent Scoped component to activate.
      */
-    AlexaAppScopedComponents getScopedComponents();
+    <T extends ScopedComponent> void activateScope(@NonNull T scopedComponent);
 
     /**
-     * Provides the {@link AlexaAppScopedComponentsActivator}.
+     * Deactivate the scoped component and take it out of scope.
      *
-     * @return {@link AlexaAppScopedComponentsActivator} to activate/deactivate
-     * various scoped components.
+     * @param scopedComponentClass Scoped component to de-activate.
      */
-    AlexaAppScopedComponentsActivator getScopedComponentsActivator();
+    <T extends ScopedComponent> void deactivateScope(@NonNull Class<T> scopedComponentClass);
+
+    /**
+     * Query the scoped component, which was deposited earlier with {@link AlexaAppRootComponent#activateScope}.
+     *
+     * @param componentClass Class of the component being queried.
+     * @return Return component if component scope is active.
+     */
+    <T extends ScopedComponent> Optional<T> getComponent(@NonNull Class<T> componentClass);
 }

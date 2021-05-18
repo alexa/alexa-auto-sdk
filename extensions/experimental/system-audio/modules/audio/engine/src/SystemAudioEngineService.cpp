@@ -249,7 +249,7 @@ std::shared_ptr<AudioOutput> AudioOutputProviderImpl::openChannel(const std::str
 
         auto moduleId = service->prepareModule(config->module);
         auto impl = AudioOutputImpl::create(moduleId, config->card, name);
-        return impl;
+        return std::move(impl);
     } catch (std::exception& ex) {
         AACE_WARN(LX(TAG).d("reason", ex.what()));
         return nullptr;

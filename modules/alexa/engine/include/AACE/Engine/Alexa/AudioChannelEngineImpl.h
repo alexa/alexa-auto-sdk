@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -87,7 +87,8 @@ public:
         const std::string& url,
         std::chrono::milliseconds offset,
         const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config,
-        bool repeat) override;
+        bool repeat,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::PlaybackContext& playbackContext) override;
     bool play(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) override;
     bool stop(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) override;
     bool pause(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) override;

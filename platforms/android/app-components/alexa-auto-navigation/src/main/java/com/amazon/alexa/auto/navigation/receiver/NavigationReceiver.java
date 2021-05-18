@@ -37,7 +37,8 @@ public class NavigationReceiver extends BroadcastReceiver {
             AACSMessageBuilder.parseEmbeddedIntent(intent).ifPresent(message -> {
                 if (Topic.NAVIGATION.equals(message.topic)) {
                     if (Action.Navigation.START_NAVIGATION.equals(message.action)
-                            || Action.Navigation.CANCEL_NAVIGATION.equals(message.action)) {
+                            || Action.Navigation.CANCEL_NAVIGATION.equals(message.action)
+                            || Action.Navigation.GET_NAVIGATION_STATE.equals(message.action)) {
                         mNavigationDirectiveHandler.handleNavigationCommand(message);
                     }
                 }

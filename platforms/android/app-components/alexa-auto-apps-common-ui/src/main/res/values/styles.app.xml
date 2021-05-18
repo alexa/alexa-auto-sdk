@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file contains styles which are not part of Theme and instead
+     referred directly using @style/<name> -->
+<resources>
+    <style name="Alexa.DialogStyle" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowMinWidthMajor">60%</item>
+        <item name="android:windowMinWidthMinor">60%</item>
+    </style>
+
+    <style name="Alexa.LightButtonRound" parent="Theme.AppCompat.Light">
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@drawable/light_button_background</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:textColor">@color/Black</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="Alexa.LightButtonRoundSmall" parent="Alexa.LightButtonRound">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="Alexa.DarkButtonRound" parent="Theme.AppCompat.Light">
+        <item name="android:paddingStart">15dp</item>
+        <item name="android:paddingEnd">15dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@drawable/transparent_button_background</item>
+        <item name="android:textStyle">italic</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="Alexa.DarkButtonRoundSmall" parent="Alexa.DarkButtonRound">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+</resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 #include <utility>
 
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
-#include <Endpoints/EndpointBuilder.h>
 #include <nlohmann/json.hpp>
 
 #include "AACE/Connectivity/AlexaConnectivity.h"
@@ -54,9 +54,10 @@ private:
      * Initialize the @c AlexaConnectivityEngineImpl and @c ConnectivityCapabilityAgent.
      */
     bool initialize(
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        const std::string& networkIdentifier);
+        const std::string& vehicleIdentifier);
 
 public:
     /**
@@ -65,9 +66,10 @@ public:
      */
     static std::shared_ptr<AlexaConnectivityEngineImpl> create(
         std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivityPlatformInterface,
-        std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+            capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        const std::string& networkIdentifier);
+        const std::string& vehicleIdentifier);
 
     /// @name AlexaConnectivityEngineInterface Function
     /// @{
@@ -80,7 +82,7 @@ public:
     AlexaConnectivityInterface::DataPlansAvailable getDataPlansAvailable() const override;
     AlexaConnectivityInterface::ManagedProvider getManagedProvider() const override;
     AlexaConnectivityInterface::NetworkIdentifier getNetworkIdentifier() const override;
-    AlexaConnectivityInterface::TermsStatus getTermsStatus() const override;
+    AlexaConnectivityInterface::Terms getTerms() const override;
     /// @}
 
 protected:
@@ -112,11 +114,11 @@ private:
     AlexaConnectivityInterface::ManagedProvider parseManagedProvider(const nlohmann::json& document) const;
 
     /**
-     * Helper method for @ updateConnectivityState to parse the terms status JSON string.
+     * Helper method for @ updateConnectivityState to parse the terms JSON object.
      *
      * Note: @ updateConnectivityState will catch any exceptions.
      */
-    AlexaConnectivityInterface::TermsStatus parseTermsStatus(const nlohmann::json& document) const;
+    AlexaConnectivityInterface::Terms parseTerms(const nlohmann::json& document) const;
 
     /**
      * Get the connectivity state JSON payload from the platform implementation on initialization
@@ -132,17 +134,17 @@ private:
     /// Auto SDK Connectivity capability agent instance.
     std::shared_ptr<ConnectivityCapabilityAgent> m_connectivityCapabilityAgent;
 
+    /// Auto SDK Vehicle Identifier Property.
+    std::string m_vehicleIdentifier;
+
     /// Mutex for properties.
     mutable std::mutex m_mutex;
-
-    /// Configuration properties.
-    AlexaConnectivityInterface::NetworkIdentifier m_networkIdentifier;
 
     /// Supported properties.
     AlexaConnectivityInterface::DataPlan m_dataPlan;
     AlexaConnectivityInterface::DataPlansAvailable m_dataPlansAvailable;
     AlexaConnectivityInterface::ManagedProvider m_managedProvider;
-    AlexaConnectivityInterface::TermsStatus m_termsStatus;
+    AlexaConnectivityInterface::Terms m_terms;
 };
 
 }  // namespace connectivity

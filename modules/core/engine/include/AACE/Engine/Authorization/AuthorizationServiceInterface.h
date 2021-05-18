@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <mutex>
 
 #include "AuthorizationProvider.h"
+#include "AuthorizationEventListenerInterface.h"
 
 namespace aace {
 namespace engine {
@@ -28,6 +29,8 @@ namespace authorization {
 
 class AuthorizationServiceInterface {
 public:
+    virtual ~AuthorizationServiceInterface() = default;
+
     /**
      * To register the authorization provider
      * 
@@ -47,6 +50,19 @@ public:
      * @c nullptr.
      */
     virtual std::shared_ptr<AuthorizationProvider> getProvider(const std::string& service) = 0;
+
+    /**
+     * Adds an authorization event listener.
+     *
+     * @param eventListener listener to add
+     */
+    virtual void addEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener) = 0;
+
+    /**
+     * Removes an authorization event listener.
+     * @param eventListener listener to remove
+     */
+    virtual void removeEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener) = 0;
 };
 
 }  // namespace authorization

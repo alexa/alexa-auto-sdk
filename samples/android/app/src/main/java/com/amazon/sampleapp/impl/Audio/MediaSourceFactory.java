@@ -18,7 +18,8 @@ package com.amazon.sampleapp.impl.Audio;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.google.android.exoplayer2.C;

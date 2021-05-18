@@ -2,7 +2,7 @@ package com.amazon.alexa.auto.apis.session;
 
 import android.view.ViewGroup;
 
-import com.amazon.alexa.auto.apis.app.AlexaAppScopedComponent;
+import com.amazon.alexa.auto.apis.app.ScopedComponent;
 
 import java.util.Optional;
 
@@ -12,7 +12,7 @@ import io.reactivex.rxjava3.core.Observable;
  * Component that handles getting the session view and vending
  * it out to components that want to inflate onto that view.
  */
-public interface SessionViewController extends AlexaAppScopedComponent {
+public interface SessionViewController extends ScopedComponent {
     /**
      * Returns whether there is a current voice interaction session active.
      * @return is there is a voice interaction session active.

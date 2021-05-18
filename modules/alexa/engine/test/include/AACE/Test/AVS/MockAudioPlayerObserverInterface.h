@@ -16,13 +16,14 @@
 #ifndef AACE_TEST_UNIT_MOCK_AUDIOPLAYER_OBSERVER_INTERFACE_H_
 #define AACE_TEST_UNIT_MOCK_AUDIOPLAYER_OBSERVER_INTERFACE_H_
 
-#include <AVSCommon/SDKInterfaces/AudioPlayerObserverInterface.h>
+#include <acsdkAudioPlayerInterfaces/AudioPlayerObserverInterface.h>
 
 namespace aace {
 namespace test {
 namespace avs {
 
-class MockAudioPlayerObserverInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AudioPlayerObserverInterface {
+class MockAudioPlayerObserverInterface
+        : public alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface {
 public:
     MOCK_METHOD2(
         onPlayerActivityChanged,

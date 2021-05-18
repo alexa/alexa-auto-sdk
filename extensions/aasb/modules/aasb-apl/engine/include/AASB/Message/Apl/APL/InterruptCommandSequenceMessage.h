@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ struct InterruptCommandSequenceMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.1";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -61,7 +61,9 @@ struct InterruptCommandSequenceMessage {
         std::string id = aace::engine::utils::uuid::generateUUID();
         MessageDescription messageDescription;
     };
-    struct Payload {};
+    struct Payload {
+        std::string token;
+    };
     static const std::string& topic() {
         static std::string topic = "APL";
         return topic;
@@ -71,7 +73,7 @@ struct InterruptCommandSequenceMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.1";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {
@@ -85,9 +87,12 @@ struct InterruptCommandSequenceMessage {
 
 //JSON Serialization
 inline void to_json(nlohmann::json& j, const InterruptCommandSequenceMessage::Payload& c) {
-    j = nlohmann::json{};
+    j = nlohmann::json{
+        {"token", c.token},
+    };
 }
 inline void from_json(const nlohmann::json& j, InterruptCommandSequenceMessage::Payload& c) {
+    j.at("token").get_to(c.token);
 }
 
 inline void to_json(nlohmann::json& j, const InterruptCommandSequenceMessage::Header::MessageDescription& c) {

@@ -42,6 +42,7 @@ public class AutoVoiceInteractionSessionTest {
         voiceInteractionSession.onCreate();
         mockAutoVoiceChromeController = Mockito.mock(AutoVoiceChromeController.class);
         mockSpeechRecognizerMessages = Mockito.mock(SpeechRecognizerMessages.class);
+
         mockEarconController = Mockito.mock(EarconController.class);
         voiceInteractionSession.mAutoVoiceChromeController = mockAutoVoiceChromeController;
         voiceInteractionSession.mSpeechRecognizerMessages = mockSpeechRecognizerMessages;
@@ -77,28 +78,32 @@ public class AutoVoiceInteractionSessionTest {
 
     @Test
     public void test_show_listening_voice_chrome() {
-        EventBus.getDefault().post(new AutoVoiceInteractionMessage(Constants.TOPIC_VOICE_CHROME, "LISTENING", ""));
+        EventBus.getDefault().post(new AutoVoiceInteractionMessage(
+                Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED, "LISTENING"));
         verify(voiceInteractionSession.mAutoVoiceChromeController, times(1))
                 .onStateChanged(AutoVoiceChromeState.LISTENING);
     }
 
     @Test
     public void test_show_thinking_voice_chrome() {
-        EventBus.getDefault().post(new AutoVoiceInteractionMessage(Constants.TOPIC_VOICE_CHROME, "THINKING", ""));
+        EventBus.getDefault().post(new AutoVoiceInteractionMessage(
+                Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED, "THINKING"));
         verify(voiceInteractionSession.mAutoVoiceChromeController, times(1))
                 .onStateChanged(AutoVoiceChromeState.THINKING);
     }
 
     @Test
     public void test_show_speaking_voice_chrome() {
-        EventBus.getDefault().post(new AutoVoiceInteractionMessage(Constants.TOPIC_VOICE_CHROME, "SPEAKING", ""));
+        EventBus.getDefault().post(new AutoVoiceInteractionMessage(
+                Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED, "SPEAKING"));
         verify(voiceInteractionSession.mAutoVoiceChromeController, times(1))
                 .onStateChanged(AutoVoiceChromeState.SPEAKING);
     }
 
     @Test
     public void test_show_idle_voice_chrome() {
-        EventBus.getDefault().post(new AutoVoiceInteractionMessage(Constants.TOPIC_VOICE_CHROME, "IDLE", ""));
+        EventBus.getDefault().post(new AutoVoiceInteractionMessage(
+                Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED, "IDLE"));
         verify(voiceInteractionSession.mAutoVoiceChromeController, times(1)).onStateChanged(AutoVoiceChromeState.IDLE);
     }
 

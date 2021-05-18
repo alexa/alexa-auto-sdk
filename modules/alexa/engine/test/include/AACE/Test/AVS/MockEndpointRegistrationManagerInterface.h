@@ -30,6 +30,10 @@ public:
         std::future<RegistrationResult>(
             std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointInterface> endpoint));
     MOCK_METHOD1(
+        deregisterEndpoint,
+        std::future<DeregistrationResult>(
+            const alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointIdentifier& endpointId));
+    MOCK_METHOD1(
         addObserver,
         void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationObserverInterface>
                  observer));

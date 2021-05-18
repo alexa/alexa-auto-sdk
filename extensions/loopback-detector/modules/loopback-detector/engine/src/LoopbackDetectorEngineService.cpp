@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: LicenseRef-.amazon.com.-ASL-1.0
  *
@@ -20,7 +20,10 @@
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
 #include <AACE/Engine/Utils/JSON/JSON.h>
 #include <AACE/Engine/Alexa/WakewordEngineManager.h>
+#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
 #include <AVSCommon/Utils/AudioFormat.h>
+#include "AACE/Alexa/AlexaProperties.h"
+
 #include "LoopbackDetectorEngineService.h"
 #include "LoopbackDetector.h"
 
@@ -65,15 +68,15 @@ bool LoopbackDetectorEngineService::preRegister() {
         auto alexaEngineService = getContext()->getService<alexa::AlexaEngineService>();
         ThrowIfNull(alexaEngineService, "AlexaEngineService is not available");
 
-        auto wakewordVerifierFactory = [this]() {
-            if (!m_wakewordVerifier) {
+        auto initiatorVerifierFactory = [this]() {
+            if (!m_initiatorVerifier) {
                 prepareVerifier();
             }
-            return m_wakewordVerifier;
+            return m_initiatorVerifier;
         };
 
         ThrowIfNot(
-            alexaEngineService->registerServiceFactory<alexa::WakewordVerifier>(wakewordVerifierFactory),
+            alexaEngineService->registerServiceFactory<alexa::InitiatorVerifier>(initiatorVerifierFactory),
             "Failed to register factory");
 
         return true;
@@ -103,9 +106,14 @@ bool LoopbackDetectorEngineService::prepareVerifier() {
         audioFormat.layout = AudioFormat::Layout::INTERLEAVED;
 
         auto audioManager = getContext()->getServiceInterface<audio::AudioManagerInterface>("aace.audio");
+        auto propertyManager =
+            getContext()->getServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>(
+                "aace.propertyManager");
+        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
+        auto locale = propertyManager->getProperty(aace::alexa::property::LOCALE);
 
-        m_wakewordVerifier = LoopbackDetector::create(audioFormat, audioManager, secondaryAdapter);
-        ThrowIfNull(m_wakewordVerifier, "Failed to create LoopbackDetector");
+        m_initiatorVerifier = LoopbackDetector::create(locale, audioFormat, audioManager, secondaryAdapter);
+        ThrowIfNull(m_initiatorVerifier, "Failed to create LoopbackDetector");
 
         return true;
     } catch (std::exception& ex) {

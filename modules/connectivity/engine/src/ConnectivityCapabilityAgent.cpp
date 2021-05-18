@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ static const std::string INTERNETDATAPLAN_NAMESPACE{"Alexa.Networking.InternetDa
 static const std::string CONNECTIVITY_INTERFACE_VERSION{"1.0"};
 
 /// The supported internet data plan version.
-static const std::string INTERNETDATAPLAN_INTERFACE_VERSION{"1.0"};
+static const std::string INTERNETDATAPLAN_INTERFACE_VERSION{"2.0"};
 
 /// The name of data plan property.
 static const std::string DATAPLAN_PROPERTY_NAME{DATAPLAN_KEY};
@@ -52,8 +52,8 @@ static const std::string DATAPLANSAVAILABLE_PROPERTY_NAME{DATAPLANSAVAILABLE_KEY
 /// The name of managed provider property.
 static const std::string MANAGEDPROVIDER_PROPERTY_NAME{MANAGEDPROVIDER_KEY};
 
-/// The name of terms status property.
-static const std::string TERMSSTATUS_PROPERTY_NAME{TERMSSTATUS_KEY};
+/// The name of terms property.
+static const std::string TERMS_PROPERTY_NAME{TERMS_KEY};
 
 /// The capability configuration key.
 static const std::string CAPABILITY_CONFIGURATION_KEY{CONFIGURATION_KEY};
@@ -78,6 +78,12 @@ static const std::string CAPABILITY_MANAGEDPROVIDER_ID_KEY{ID_KEY};
 
 /// The capability network identifier key.
 static const std::string CAPABILITY_NETWORKIDENTIFIER_KEY{NETWORKIDENTIFIER_KEY};
+
+/// The capability terms status key.
+static const std::string CAPABILITY_TERMS_STATUS_KEY{STATUS_KEY};
+
+/// The capability terms version key.
+static const std::string CAPABILITY_TERMS_VERSION_KEY{VERSION_KEY};
 
 /// The capability value key.
 static const std::string CAPABILITY_VALUE_KEY{VALUE_KEY};
@@ -125,7 +131,7 @@ bool ConnectivityCapabilityAgent::initialize() {
     m_contextManager->addStateProvider({INTERNETDATAPLAN_NAMESPACE, DATAPLAN_PROPERTY_NAME, ""}, shared_from_this());
     m_contextManager->addStateProvider(
         {INTERNETDATAPLAN_NAMESPACE, DATAPLANSAVAILABLE_PROPERTY_NAME, ""}, shared_from_this());
-    m_contextManager->addStateProvider({INTERNETDATAPLAN_NAMESPACE, TERMSSTATUS_PROPERTY_NAME, ""}, shared_from_this());
+    m_contextManager->addStateProvider({INTERNETDATAPLAN_NAMESPACE, TERMS_PROPERTY_NAME, ""}, shared_from_this());
     return true;
 }
 
@@ -157,7 +163,7 @@ CapabilityConfiguration ConnectivityCapabilityAgent::getInternetDataPlanCapabili
                                                        {
                                                            DATAPLAN_PROPERTY_NAME,
                                                            DATAPLANSAVAILABLE_PROPERTY_NAME,
-                                                           TERMSSTATUS_PROPERTY_NAME,
+                                                           TERMS_PROPERTY_NAME,
                                                        }}),
         additionalConfigurations};
     return configuration;
@@ -225,16 +231,16 @@ void ConnectivityCapabilityAgent::onManagedProviderStateChanged(
     });
 }
 
-void ConnectivityCapabilityAgent::onTermsStatusStateChanged(
-    const TermsStatusState& termsStatusState,
+void ConnectivityCapabilityAgent::onTermsStateChanged(
+    const TermsState& termsState,
     alexaClientSDK::avsCommon::sdkInterfaces::AlexaStateChangeCauseType cause) {
     AACE_DEBUG(LX(TAG));
 
-    m_executor.submit([this, termsStatusState, cause] {
-        AACE_DEBUG(LX(TAG).m("onTermsStatusStateChangedInExecutor"));
+    m_executor.submit([this, termsState, cause] {
+        AACE_DEBUG(LX(TAG).m("onTermsStateChangedInExecutor"));
         m_contextManager->reportStateChange(
-            CapabilityTag(INTERNETDATAPLAN_NAMESPACE, TERMSSTATUS_PROPERTY_NAME, ""),
-            buildCapabilityState(termsStatusState),
+            CapabilityTag(INTERNETDATAPLAN_NAMESPACE, TERMS_PROPERTY_NAME, ""),
+            buildCapabilityState(termsState),
             cause);
     });
 }
@@ -245,7 +251,7 @@ void ConnectivityCapabilityAgent::doShutdown() {
     m_contextManager->removeStateProvider({CONNECTIVITY_NAMESPACE, MANAGEDPROVIDER_PROPERTY_NAME, ""});
     m_contextManager->removeStateProvider({INTERNETDATAPLAN_NAMESPACE, DATAPLAN_PROPERTY_NAME, ""});
     m_contextManager->removeStateProvider({INTERNETDATAPLAN_NAMESPACE, DATAPLANSAVAILABLE_PROPERTY_NAME, ""});
-    m_contextManager->removeStateProvider({INTERNETDATAPLAN_NAMESPACE, TERMSSTATUS_PROPERTY_NAME, ""});
+    m_contextManager->removeStateProvider({INTERNETDATAPLAN_NAMESPACE, TERMS_PROPERTY_NAME, ""});
     m_contextManager.reset();
 }
 
@@ -272,11 +278,11 @@ void ConnectivityCapabilityAgent::executeProvideState(
             AlexaConnectivityInterface::ManagedProviderState(m_connectivity->getManagedProvider(), timeOfSample);
         m_contextManager->provideStateResponse(
             stateProviderName, buildCapabilityState(managedProviderState), contextRequestToken);
-    } else if (stateProviderName.name == TERMSSTATUS_PROPERTY_NAME) {
-        AlexaConnectivityInterface::TermsStatusState termsStatusState =
-            AlexaConnectivityInterface::TermsStatusState(m_connectivity->getTermsStatus(), timeOfSample);
+    } else if (stateProviderName.name == TERMS_PROPERTY_NAME) {
+        AlexaConnectivityInterface::TermsState termsState =
+            AlexaConnectivityInterface::TermsState(m_connectivity->getTerms(), timeOfSample);
         m_contextManager->provideStateResponse(
-            stateProviderName, buildCapabilityState(termsStatusState), contextRequestToken);
+            stateProviderName, buildCapabilityState(termsState), contextRequestToken);
     } else {
         AACE_ERROR(LX(TAG).d("reason", "unknownStateProviderName"));
     }
@@ -338,13 +344,18 @@ CapabilityState ConnectivityCapabilityAgent::buildCapabilityState(const ManagedP
         value, managedProviderState.timeOfSample, managedProviderState.uncertaintyInMilliseconds.count());
 }
 
-CapabilityState ConnectivityCapabilityAgent::buildCapabilityState(const TermsStatusState& termsStatusState) {
-    AACE_DEBUG(LX(TAG).d("termsStatus", termsStatusToString(termsStatusState.termsStatus)));
+CapabilityState ConnectivityCapabilityAgent::buildCapabilityState(const TermsState& termsState) {
+    AACE_DEBUG(LX(TAG)
+                   .sensitive("status", termsStatusToString(termsState.terms.status))
+                   .sensitive("version", termsState.terms.version));
     std::string value;
-    if (termsStatusState.termsStatus != TermsStatus::UNKNOWN) {
-        value = R"(")" + termsStatusToString(termsStatusState.termsStatus) + R"(")";
+    if (termsState.terms.status != TermsStatus::UNKNOWN) {
+        JsonGenerator generator;
+        generator.addMember(CAPABILITY_TERMS_STATUS_KEY, termsStatusToString(termsState.terms.status));
+        generator.addMember(CAPABILITY_TERMS_VERSION_KEY, termsState.terms.version);
+        value = generator.toString();
     }
-    return CapabilityState(value, termsStatusState.timeOfSample, termsStatusState.uncertaintyInMilliseconds.count());
+    return CapabilityState(value, termsState.timeOfSample, termsState.uncertaintyInMilliseconds.count());
 }
 
 }  // namespace connectivity

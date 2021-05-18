@@ -1,0 +1,63 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.amazon.aacstelephony" >
+
+    <permission android:name="com.amazon.aacstelephony"
+        android:protectionLevel= "signature|privileged"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.CONTROL_INCALL_EXPERIENCE" />
+    <uses-permission android:name="android.permission.INTERACT_ACROSS_USERS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" />
+
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+
+    <application
+    android:allowBackup="true"
+    android:supportsRtl="true"
+    android:extractNativeLibs="true">
+
+        <service
+            android:name=".AACSTelephonyService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.amazon.aacstelephony"
+            >
+            <intent-filter>
+                <action android:name="com.amazon.aacs.aasb.Answer"/>
+                <action android:name="com.amazon.aacs.aasb.Dial"/>
+                <action android:name="com.amazon.aacs.aasb.Redial"/>
+                <action android:name="com.amazon.aacs.aasb.SendDTMF"/>
+                <action android:name="com.amazon.aacs.aasb.Stop"/>
+                <action android:name="com.amazon.aacs.aasb.CreateCallId"/>
+                <category android:name="com.amazon.aacs.aasb.PhoneCallController"/>
+            </intent-filter>
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AASB" />
+                <action android:name="com.amazon.aacs.aasb.StartService" />
+                <action android:name="com.amazon.aacs.aasb.StopService" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.amazon.aacstelephony.phoneAccount.reply" />
+                <action android:name="com.amazon.aacstelephony.updateDeviceConfiguration" />
+                <category android:name="com.amazon.aacstelephony" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".PhoneCallController"
+            android:permission="android.permission.BIND_INCALL_SERVICE"
+            android:exported="true"
+            android:enabled="true"
+            >
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_UI"
+                android:value="false"
+                />
+            <intent-filter>
+                <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

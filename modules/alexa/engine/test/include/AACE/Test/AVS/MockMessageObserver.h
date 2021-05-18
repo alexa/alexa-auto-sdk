@@ -16,8 +16,6 @@
 #ifndef AACE_TEST_AVS_MOCK_MESSAGE_OBSERVER_H
 #define AACE_TEST_AVS_MOCK_MESSAGE_OBSERVER_H
 
-#include <AVSCommon/SDKInterfaces/AudioPlayerInterface.h>
-
 namespace aace {
 namespace test {
 namespace avs {

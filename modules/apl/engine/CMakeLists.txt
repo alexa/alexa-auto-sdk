@@ -8,8 +8,13 @@ find_path(AVSCOMMON_INCLUDE_DIRS AVSCommon)
 find_library(AVSCOMMON_LIBRARY AVSCommon)
 find_library(ENDPOINTS_LIBRARY Endpoints)
 
+find_path(NLOHMANN_INCLUDE_DIR nlohmann/json.hpp
+    CMAKE_FIND_ROOT_PATH_BOTH
+)
+
 # Find SmartScreenSDK
 find_library(ALEXAPRESENTATION_LIBRARY AlexaPresentation)
+find_library(VISUALCHARACTERISTICS_LIBRARY VisualCharacteristics)
 find_path(ALEXAPRESENTATION_INCLUDE_DIRS AlexaPresentation)
 find_path(SMARTSCREENSDKINTERFACES_INCLUDE_DIRS SmartScreenSDKInterfaces)
 
@@ -39,6 +44,7 @@ target_include_directories(AACEAPLEngine
         ${AVSCOMMON_INCLUDE_DIRS}
         ${AVSCOMMON_INCLUDE_DIRS}/../avs_shared
         ${RAPIDJSON_INCLUDE_DIR}
+        ${NLOHMANN_INCLUDE_DIR}
 )
 
 target_link_libraries(AACEAPLEngine
@@ -48,6 +54,7 @@ target_link_libraries(AACEAPLEngine
         AACECoreEngine
     PRIVATE
         ${ALEXAPRESENTATION_LIBRARY}
+        ${VISUALCHARACTERISTICS_LIBRARY}
         ${AVSCOMMON_LIBRARY}
         ${ENDPOINTS_LIBRARY}
 )

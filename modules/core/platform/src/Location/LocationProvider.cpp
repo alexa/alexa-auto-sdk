@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,6 +22,17 @@ LocationProvider::~LocationProvider() = default;  // key function
 
 std::string LocationProvider::getCountry() {
     return "";
+}
+
+void LocationProvider::locationServiceAccessChanged(LocationServiceAccess access) {
+    if (m_locationProviderEngineInterface != nullptr) {
+        m_locationProviderEngineInterface->onLocationServiceAccessChanged(access);
+    }
+}
+
+void LocationProvider::setEngineInterface(
+    std::shared_ptr<LocationProviderEngineInterface> locationProviderEngineInterface) {
+    m_locationProviderEngineInterface = locationProviderEngineInterface;
 }
 
 }  // namespace location

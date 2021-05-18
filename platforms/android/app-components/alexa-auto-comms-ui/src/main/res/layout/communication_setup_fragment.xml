@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/communication_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:theme="@style/Theme.Alexa.Standard">
+
+    <ImageView
+        android:id="@+id/alexa_img_view"
+        android:layout_width="@dimen/contacts_permission_alexa_image_width"
+        android:layout_height="@dimen/contacts_permission_alexa_image_height"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/contacts_permission_item_margin_start"
+        android:layout_marginEnd="@dimen/contacts_permission_item_margin_end"
+        android:layout_marginTop="@dimen/contacts_permission_item_margin_start"
+        android:src="@drawable/amazon_alexa_placeholder_logo"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/contacts_permission_consent_heading"
+        style="@style/Alexa.Heading2Text"
+        android:text="@string/contacts_permission_consent_title"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/contacts_permission_margin_start"
+        android:layout_marginEnd="@dimen/contacts_permission_margin_start"
+        android:layout_marginTop="@dimen/contacts_permission_margin_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"/>
+
+    <TextView
+        android:id="@+id/contacts_permission_consent_body"
+        style="@style/Alexa.BodyText"
+        android:text="@string/contacts_permission_consent_body"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/contacts_permission_margin_start"
+        android:layout_marginEnd="@dimen/contacts_permission_margin_start"
+        android:layout_marginTop="@dimen/contacts_permission_item_margin_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contacts_permission_consent_heading"/>
+
+    <TextView
+        android:id="@+id/yes_action_button"
+        style="@style/Alexa.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/contacts_permission_action_item_margin_top"
+        android:layout_marginBottom="@dimen/contacts_permission_item_margin_bottom"
+        android:text="@string/contacts_consent_yes"
+        app:layout_constraintTop_toBottomOf="@+id/contacts_permission_consent_body"
+        app:layout_constraintStart_toEndOf="@+id/skip_action_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/skip_action_button"
+        style="@style/Alexa.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/contacts_permission_action_item_margin_top"
+        android:layout_marginBottom="@dimen/contacts_permission_item_margin_bottom"
+        android:text="@string/contacts_consent_skip"
+        app:layout_constraintTop_toBottomOf="@+id/contacts_permission_consent_body"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/yes_action_button"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

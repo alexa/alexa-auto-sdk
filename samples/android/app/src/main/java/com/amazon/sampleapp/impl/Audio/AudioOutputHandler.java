@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,14 +21,9 @@ import android.media.audiofx.Equalizer;
 import android.net.Uri;
 import android.os.Handler;
 
-import com.amazon.aace.alexa.AlexaClient.AuthError;
-import com.amazon.aace.alexa.AlexaClient.AuthState;
-import com.amazon.aace.alexa.EqualizerController;
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.aace.audio.AudioStream;
-import com.amazon.sampleapp.impl.AlexaClient.AuthStateObserver;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
-import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler.EqualizerProvider;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -44,10 +39,9 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
 
-public class AudioOutputHandler
-        extends AudioOutput implements Releasable, EqualizerControllerHandler.EqualizerProvider {
+public class AudioOutputHandler extends AudioOutput
+        implements Releasable, EqualizerControllerHandler.EqualizerProvider, AudioFocusController.PlaybackController {
     private static final String sTag = AudioOutputHandler.class.getSimpleName();
     private static final String sFileName = "alexa_media"; // Note: not thread safe
     private static final long sSkipThresholdInMS = 1500; // 1500 ms
@@ -56,6 +50,7 @@ public class AudioOutputHandler
     private final LoggerHandler mLogger;
     private final String mName;
     private final MediaSourceFactory mMediaSourceFactory;
+    private final AudioFocusController mAudioFocusController;
     private SimpleExoPlayer mPlayer;
     private boolean mRepeating;
 
@@ -82,6 +77,10 @@ public class AudioOutputHandler
         mPaused = false;
         mPeriod = new Timeline.Period();
         mWindow = new Timeline.Window();
+
+        AudioManager audioManager =
+                (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        mAudioFocusController = new AudioFocusController(audioManager, this, mName);
 
         initializePlayer();
     }
@@ -160,6 +159,11 @@ public class AudioOutputHandler
 
     @Override
     public boolean play() {
+        mAudioFocusController.startPlaybackAfterAcquiringFocus();
+        return true;
+    }
+
+    private boolean playWithFocus() {
         mLogger.postVerbose(sTag, String.format("(%s) Handling play()", mName));
         mPlayer.setPlayWhenReady(true);
         return true;
@@ -167,6 +171,7 @@ public class AudioOutputHandler
 
     @Override
     public boolean stop() {
+        mAudioFocusController.relinquishAudioFocusIfCurrentlyAcquired();
         mLogger.postVerbose(sTag, String.format("(%s) Handling stop()", mName));
         mPaused = false;
         if (!mPlayer.getPlayWhenReady()) {
@@ -284,9 +289,10 @@ public class AudioOutputHandler
             mPlayer.setRepeatMode(Player.REPEAT_MODE_ONE);
         } else {
             mPlayer.setRepeatMode(Player.REPEAT_MODE_OFF);
-            mLogger.postVerbose(sTag, String.format("(%s) Media State Changed. STATE: STOPPED", mName));
+            mLogger.postVerbose(sTag, String.format("(%s) Media State Changed. STATE: FINISHED", mName));
             mPlaying = false;
             mediaStateChanged(MediaState.STOPPED);
+            mAudioFocusController.relinquishAudioFocusIfCurrentlyAcquired();
         }
     }
 
@@ -373,5 +379,45 @@ public class AudioOutputHandler
 
         @Override
         public void onAudioDisabled(DecoderCounters counters) {}
+    }
+
+    //
+    // AudioFocusController.PlaybackController
+    //
+
+    @Override
+    public void startPlaybackNow() {
+        mLogger.postVerbose(sTag, String.format("(%s) startPlaybackNow", mName));
+        playWithFocus();
+    }
+
+    @Override
+    public void requestResumingPlayback() {
+        mLogger.postVerbose(sTag, String.format("(%s) requestResumingPlayback", mName));
+        playWithFocus();
+    }
+
+    @Override
+    public void requestPausePlayback() {
+        mLogger.postVerbose(sTag, String.format("(%s) requestPausePlayback", mName));
+        pause();
+    }
+
+    @Override
+    public void requestStopPlayback() {
+        mLogger.postVerbose(sTag, String.format("(%s) requestStopPlayback", mName));
+    }
+
+    @Override
+    public void adjustPlaybackVolume(float volumeMultiplier) {
+        mLogger.postVerbose(sTag, String.format("(%s) adjustPlaybackVolume (%f)", mName, volumeMultiplier));
+        mPlayer.setVolume(mVolume * volumeMultiplier);
+    }
+
+    @Override
+    public void failedToAcquireFocus() {
+        mLogger.postError(sTag, String.format("(%s) failedToAcquireFocus (%f)", mName));
+        // Play even if focus was not acquired
+        playWithFocus();
     }
 }

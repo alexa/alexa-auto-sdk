@@ -33,6 +33,10 @@ exit_with_usage() {
 	echo ""
 	echo " --force-docker             = Force builds to happen inside an Ubuntu docker container."
 	echo " --use-mbedtls              = Force using mbedTLS for libcurl."
+	echo " --aacs-android             = Enable AACS Android service build"
+	echo " --include-aacs-contacts    = Include contacts in AACS Android service build. This option must be used only with option --aacs-android"
+	echo " --include-aacs-telephony   = Include telephony in  AACS Android service build. This option must be used only with option --aacs-android"
+	echo " --aacs-aar                 = Build AACS service as Android Library. This option must be used only with option --aacs-android"
 	echo ""
 	echo " --default-logger-enabled <enabled> = Enable/disable the default engine logger: On, Off. (Default: On)"
 	echo "                                      If enabled, there must be logger level and sink, either explicitly set or default."
@@ -148,6 +152,18 @@ while [[ $# -gt 0 ]]; do
 		AACS_ANDROID="1"
 		shift
 		;;
+		--include-aacs-contacts)
+		AACS_CONTACTS="1"
+		shift
+		;;
+		--include-aacs-telephony)
+		AACS_TELEPHONY="1"
+		shift
+		;;
+		--aacs-aar)
+		AACS_AAR="1"
+		shift
+		;;
 		-D*=*)
 		DEFINES+=("$1")
 		shift
@@ -177,12 +193,22 @@ ENABLE_TESTS=${ENABLE_TESTS:-0}
 FORCE_DOCKER=${FORCE_DOCKER:-0}
 USE_MBEDTLS=${USE_MBEDTLS:-0}
 AACS_ANDROID=${AACS_ANDROID:-0}
+AACS_AAR=${AACS_AAR:-"0"}
+AACS_CONTACTS=${AACS_CONTACTS:-0}
+AACS_TELEPHONY=${AACS_TELEPHONY:-0}
 COMMS=${COMMS:-0}
 LVC=${LVC:-0}
 AASB=${AASB:-0}
 
 SCRIPT_OPTIONS=""
 EXTRA_MODULES=$@
+
+#AACS CONTACTS and TELEPHONY 
+if [ ${AACS_CONTACTS} = "1" ] || [ ${AACS_TELEPHONY} = "1" ] || [ ${AACS_AAR} = "1" ]; then
+	if [ ${AACS_ANDROID} != "1" ]; then
+		exit_with_usage 
+	fi
+fi
 
 # Clean deploy dir
 DEPLOY_DIR="${BUILDER_HOME}/deploy"
@@ -369,11 +395,25 @@ build_sdk ${PLATFORM}
 if [ ${PLATFORM} = "android" ]; then
 	# Run Gradle build for Android platform
 	gradle_options=""
+	aacs_script_options=""
 	if [ ${DEBUG_BUILD} = 1 ]; then
 		gradle_options="${gradle_options} -g"
 	fi
 	${THISDIR}/run-gradle.sh ${gradle_options} ${EXTRA_MODULES} ${extensions}
-        if [ ${AACS_ANDROID} = "1" ]; then
-		${THISDIR}/run-aacs-android.sh ${gradle_options} ${EXTRA_MODULES} 
+
+	if [ ${AACS_CONTACTS} = "1" ]; then
+		aacs_script_options="${aacs_script_options} --include-contacts"
+	fi
+
+	if [ ${AACS_TELEPHONY} = "1" ]; then
+		aacs_script_options="${aacs_script_options} --include-telephony"
+	fi
+
+	if [ ${AACS_AAR} = "1" ]; then
+		aacs_script_options="${aacs_script_options} --aacs-aar"
+	fi
+		
+	if [ ${AACS_ANDROID} = "1" ]; then
+		${THISDIR}/run-aacs-android.sh ${gradle_options} ${aacs_script_options} ${EXTRA_MODULES}
 	fi
 fi

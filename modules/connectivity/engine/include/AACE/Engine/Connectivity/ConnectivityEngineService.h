@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -47,9 +47,6 @@ private:
     }
 
     bool registerPlatformInterfaceType(std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivity);
-
-    /// The network identifier.
-    std::string m_networkIdentifier;
 
     /// Engine implementation object references.
     std::shared_ptr<aace::engine::connectivity::AlexaConnectivityEngineImpl> m_alexaConnectivityEngineImpl;

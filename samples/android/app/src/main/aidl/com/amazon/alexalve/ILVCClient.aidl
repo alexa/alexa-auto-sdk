@@ -129,7 +129,7 @@ interface ILVCClient {
 
     /**
      * Provides Local Voice Control configuration details, which are an aggregation of individual
-     * configurations of LVC components including the Alexa Hybrid Engine, skills, services, and
+     * configurations of LVC components including the Alexa engine, skills, services, and
      * the Auto SDK client. The Auto SDK client application may retrieve the relevant pieces of
      * this configuration to configure the Auto SDK Engine.
      *

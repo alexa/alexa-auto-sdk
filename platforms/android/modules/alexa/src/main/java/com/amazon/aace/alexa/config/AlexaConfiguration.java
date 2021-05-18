@@ -321,17 +321,12 @@ public class AlexaConfiguration {
      *        The database will be created on initialization if it does not already exist.
      */
     public static EngineConfiguration createDeviceSettingsConfig(final String databaseFilePath) {
-        return new EngineConfiguration() {
-            @Override
-            protected long createNativeRef() {
-                return createDeviceSettingsConfigBinder(databaseFilePath,
-                        new String[] {"en-US", "en-GB", "de-DE", "en-IN", "en-CA", "ja-JP", "en-AU", "fr-FR", "it-IT",
-                                "es-ES", "es-MX", "fr-CA", "es-US", "hi-IN", "pt-BR"},
-                        "en-US", "America/Vancouver",
-                        new String[][] {{"en-CA", "fr-CA"}, {"fr-CA", "en-CA"}, {"en-US", "es-US"}, {"es-US", "en-US"},
-                                {"en-IN", "hi-IN"}, {"hi-IN", "en-IN"}});
-            }
-        };
+        return createDeviceSettingsConfig(databaseFilePath,
+                new String[] {"en-US", "en-GB", "de-DE", "en-IN", "en-CA", "ja-JP", "en-AU", "fr-FR", "it-IT", "es-ES",
+                        "es-MX", "fr-CA", "es-US", "hi-IN", "pt-BR"},
+                "en-US", "America/Vancouver",
+                new String[][] {{"en-CA", "fr-CA"}, {"fr-CA", "en-CA"}, {"en-US", "es-US"}, {"es-US", "en-US"},
+                        {"en-IN", "hi-IN"}, {"hi-IN", "en-IN"}});
     }
 
     /**
@@ -361,19 +356,12 @@ public class AlexaConfiguration {
      */
     public static EngineConfiguration createDeviceSettingsConfig(final String databaseFilePath, final String[] locales,
             final String defaultLocale, final String defaultTimezone) {
-        return new EngineConfiguration() {
-            @Override
-            protected long createNativeRef() {
-                return createDeviceSettingsConfigBinder(databaseFilePath, locales, defaultLocale, defaultTimezone);
-            }
-        };
+        return createDeviceSettingsConfig(databaseFilePath, locales, defaultLocale, defaultTimezone, new String[][] {});
     }
 
     // Native Engine JNI methods
     static private native long createDeviceSettingsConfigBinder(String databaseFilePath, String[] locales,
             String defaultLocale, String defaultTimezone, String[][] localeCombinations);
-    static private native long createDeviceSettingsConfigBinder(
-            String databaseFilePath, String[] locales, String defaultLocale, String defaultTimezone);
 
     /**
      * @deprecated

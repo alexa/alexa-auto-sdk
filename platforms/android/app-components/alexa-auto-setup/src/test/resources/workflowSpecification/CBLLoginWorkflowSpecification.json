@@ -1,0 +1,33 @@
+{
+  "workflow": [
+    {
+      "event": "Start_Login",
+      "next": {
+        "type": "action",
+        "resource": "CheckNetworkStatusCommand"
+      }
+    },
+    {
+      "event": "Network_Connected",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_login"
+      }
+    },
+    {
+      "event": "Network_Disconnected",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_network"
+      }
+    },
+    {
+      "event": "CBL_Auth_Finished",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_setupFinish"
+      }
+    }
+  ],
+  "startStep": "Start_Login"
+}

@@ -64,6 +64,9 @@ public:
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
     auto saveDeviceInfo(const std::vector<json>& jsons) -> void;
 
+    // Function to start the authorization if we were successfully authorized before
+    auto startAuth() -> void;
+
     // aace::authorization::Authorization interface
     auto eventReceived(const std::string& service, const std::string& event) -> void override;
     auto authorizationStateChanged(const std::string& service, AuthorizationState state) -> void override;

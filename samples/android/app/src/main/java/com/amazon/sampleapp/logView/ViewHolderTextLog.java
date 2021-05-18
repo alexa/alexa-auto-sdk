@@ -16,9 +16,10 @@
 package com.amazon.sampleapp.logView;
 
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.amazon.sampleapp.R;
 

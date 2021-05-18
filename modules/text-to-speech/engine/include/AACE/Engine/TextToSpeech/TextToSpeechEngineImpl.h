@@ -59,6 +59,7 @@ private:
     bool executeOnGetCapabilities(
         const std::string& requestId,
         std::shared_ptr<TextToSpeechSynthesizerInterface> textToSpeechProvider);
+
     std::shared_ptr<aace::textToSpeech::TextToSpeech> m_textToSpeechPlatformInterface;
     std::weak_ptr<TextToSpeechServiceInterface> m_textToSpeechServiceInterface;
 

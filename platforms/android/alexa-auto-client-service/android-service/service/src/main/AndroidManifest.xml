@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.amazon.alexaauto.lvc" />
+    <uses-permission android:name="com.amazon.aacscontacts" />
+    <uses-permission android:name="com.amazon.aacstelephony" />
 
     <permission android:name="com.amazon.alexaautoclientservice"
         android:protectionLevel= "signature|privileged"/>
@@ -16,6 +18,10 @@
     <permission android:name="com.amazon.alexaautoclientservice.ping"
         android:protectionLevel= "signature"/>
     <uses-permission android:name="com.amazon.alexaautoclientservice.ping" />
+
+    <permission android:name="com.amazon.alexaautoclientservice.getservicemetadata"
+        android:protectionLevel= "signature"/>
+    <uses-permission android:name="com.amazon.alexaautoclientservice.getservicemetadata" />
 
     <application
         android:allowBackup="true"

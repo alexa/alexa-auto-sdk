@@ -13,10 +13,11 @@ if [ -z "$(which docker)" ]; then
 fi
 
 VM_HOME="/home/builder"
-IMAGE_REVISION="20200922"
+IMAGE_REVISION="20210505"
 IMAGE_NAME="aac/ubuntu-base:${IMAGE_REVISION}"
 VOLUME_NAME="buildervolume"
 VOLUME_MOUNT_POINT="/workdir"
+AAC_OPENSSL_VERSION=${AAC_OPENSSL_VERSION:-"1.1.1k"}
 
 EXTRA_OPTIONS=""
 if [ ! -z ${QNX_BASE} ] && [ -d ${QNX_BASE} ]; then
@@ -41,7 +42,7 @@ execute_command() {
 
 if [[ "$(docker images -q ${IMAGE_NAME} 2> /dev/null)" == "" ]] || [ ! -z ${FORCE_DOCKER_IMAGE_REBUILD} ]; then
 	note "Building Docker image..."
-	docker build --tag ${IMAGE_NAME} ${BUILDER_HOME}/scripts
+	docker build --tag ${IMAGE_NAME} --build-arg AAC_OPENSSL_VERSION=${AAC_OPENSSL_VERSION} ${BUILDER_HOME}/scripts
 fi
 
 if [[ "$(docker volume ls | grep ${VOLUME_NAME} 2> /dev/null)" == "" ]]; then

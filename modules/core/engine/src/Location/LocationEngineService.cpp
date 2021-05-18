@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,17 +44,31 @@ bool LocationEngineService::registerPlatformInterface(
 }
 
 bool LocationEngineService::registerPlatformInterfaceType(
-    std::shared_ptr<aace::location::LocationProvider> locationProvider) {
+    std::shared_ptr<aace::location::LocationProvider> locationProviderPlatformInterface) {
     try {
-        ThrowIfNotNull(m_locationProvider, "platformInterfaceAlreadyRegistered");
-        m_locationProvider = locationProvider;
-        registerServiceInterface<aace::location::LocationProvider>(m_locationProvider);
+        ThrowIfNotNull(m_locationProviderEngineImpl, "platformInterfaceAlreadyRegistered");
 
+        m_locationProviderEngineImpl = LocationProviderEngineImpl::create(locationProviderPlatformInterface);
+        ThrowIfNull(m_locationProviderEngineImpl, "createLocationProviderEngineImplFailed");
+
+        ThrowIfNot(
+            registerServiceInterface<LocationServiceInterface>(m_locationProviderEngineImpl),
+            "registerLocationServiceInterfaceFailed");
+
+        locationProviderPlatformInterface->setEngineInterface(m_locationProviderEngineImpl);
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<LocationProvider>").d("reason", ex.what()));
         return false;
     }
+}
+
+bool LocationEngineService::shutdown() {
+    if (m_locationProviderEngineImpl != nullptr) {
+        m_locationProviderEngineImpl->shutdown();
+        m_locationProviderEngineImpl.reset();
+    }
+    return true;
 }
 
 }  // namespace location

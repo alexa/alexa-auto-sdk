@@ -14,6 +14,7 @@ The Code-Based Linking (CBL) module implements the CBL mechanism of acquiring Lo
   - [Canceling Authorization](#canceling-authorization)
   - [Logging Out](#logging-out)
   - [Handling Errors](#handling-errors)
+- [Enabling User Profile](#enabling-user-profile)
 - [Sequence Diagrams for CBL](#sequence-diagrams-for-cbl)
 - [(Deprecated) Implementing the CBL Platform Interface](#deprecated-implementing-the-cbl-platform-interface)
   - [CBL States and State Change Reasons](#cbl-states-and-state-change-reasons)
@@ -22,7 +23,7 @@ The Code-Based Linking (CBL) module implements the CBL mechanism of acquiring Lo
 
 ## Overview
 
-Every request to Alexa Voice Service (AVS) requires a Login with Amazon (LWA) access token. The Alexa Auto SDK CBL module implements the [CBL mechanism](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/code-based-linking-other-platforms.html) of acquiring such tokens.
+Every request to Alexa Voice Service (AVS) requires a Login with Amazon (LWA) access token. The Alexa Auto SDK CBL module implements the [CBL mechanism](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-cbl.html) of acquiring such tokens.
 Starting with Auto SDK v3.1.0, use the `Authorization` platform interface to start, cancel, and log out of CBL authorization. The Auto SDK continues to support the CBL platform interface, but it is on the deprecation path. For more information about how the Engine manages authorization, see the Core module [README](../core/README.md). 
 
 >**Note**: CBL and other authorization methods, such as [Auth Provider](../alexa/README.md#handling-authentication), are mutually exclusive. For example, if the device is already registered with Auth Provider, starting CBL authorization logs out the device from the previous authorization.
@@ -161,6 +162,33 @@ The Engine notifies the application about any error during authorization. The fo
 ~~~
 authorizationError( "alexa:cbl", "CODE_PAIR_EXPIRED", "" )
 ~~~
+
+## Enabling User Profile
+If you want the Engine to pass information about logged-in users to the application, include the following code in the Engine configuration:
+
+```
+{
+    "aace.cbl": {
+        "enableUserProfile": true
+    }
+}
+```
+
+You can also generate the configuration programmatically by using the following method:
+
+```java
+{
+    EngineConfiguration cblConfig = cblConfiguration.createCBLUserProfileConfig( true );
+    mEngine.configure( new EngineConfiguration[]{
+	// other config objects,
+	cblConfig,
+	...
+	
+    });
+}
+```
+
+The user profile is passed via the `eventReceived` API as described in [this section](#receiving-events-from-engine).
 
 ## Sequence Diagrams for CBL
 The following diagram illustrates the flow when authorization starts.

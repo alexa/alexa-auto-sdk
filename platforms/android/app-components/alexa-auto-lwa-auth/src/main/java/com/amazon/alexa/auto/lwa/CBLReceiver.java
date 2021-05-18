@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
@@ -15,8 +16,8 @@ import com.amazon.aacsipc.IPCConstants;
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
-import com.amazon.alexa.auto.apis.auth.CBLAuthState;
-import com.amazon.alexa.auto.apis.auth.CBLAuthWorkflowData;
+import com.amazon.alexa.auto.apis.auth.AuthState;
+import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
 import com.amazon.alexa.auto.apis.auth.CodePair;
 
 import org.greenrobot.eventbus.EventBus;
@@ -25,11 +26,9 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.Optional;
-import java.util.UUID;
 
 public class CBLReceiver extends BroadcastReceiver {
     private static final String TAG = CBLReceiver.class.getSimpleName();
-    private static final String REFRESH_TOKEN_KEY = "com.amazon.alexa.lwa.key";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -88,15 +87,15 @@ public class CBLReceiver extends BroadcastReceiver {
             case "CODE_PAIR_RECEIVED":
                 Log.d(TAG, "CODE_PAIR_RECEIVED");
                 EventBus.getDefault().post(
-                        new CBLAuthWorkflowData(CBLAuthState.CBL_Auth_CodePair_Received, new CodePair(url, code)));
+                        new AuthWorkflowData(AuthState.CBL_Auth_CodePair_Received, new CodePair(url, code), null));
                 break;
             case "STARTING":
                 Log.d(TAG, "CBLStateChanged: Starting");
-                EventBus.getDefault().post(new CBLAuthWorkflowData(CBLAuthState.CBL_Auth_Started, null));
+                EventBus.getDefault().post(new AuthWorkflowData(AuthState.CBL_Auth_Started, null, null));
                 break;
             case "STOPPING":
                 Log.d(TAG, "CBLStateChanged: Stopping");
-                EventBus.getDefault().post(new CBLAuthWorkflowData(CBLAuthState.CBL_Auth_Not_Started, null));
+                EventBus.getDefault().post(new AuthWorkflowData(AuthState.CBL_Auth_Not_Started, null, null));
                 break;
             default:
                 break;
@@ -104,7 +103,7 @@ public class CBLReceiver extends BroadcastReceiver {
     }
 
     private void handleSetRefreshToken(Context context, AACSMessage message) {
-        Log.d(TAG, "handleSetRefreshToken " + message.payload);
+        Log.d(TAG, "handleSetRefreshToken");
         String refreshToken = "";
         try {
             JSONObject obj = new JSONObject(message.payload);
@@ -124,7 +123,7 @@ public class CBLReceiver extends BroadcastReceiver {
 
         TokenStore.saveRefreshToken(context, refreshToken);
 
-        EventBus.getDefault().post(new CBLAuthWorkflowData(CBLAuthState.CBL_Auth_Finished, null));
+        EventBus.getDefault().post(new AuthWorkflowData(AuthState.CBL_Auth_Finished, null, null));
     }
 
     private void handleGetRefreshToken(Context context, AACSMessage message) {
@@ -144,14 +143,14 @@ public class CBLReceiver extends BroadcastReceiver {
     }
 
     private void handleClearRefreshToken(Context context, AACSMessage message) {
-        Log.d(TAG, "handleClearRefreshToken " + message.payload);
+        Log.d(TAG, "handleClearRefreshToken");
         TokenStore.resetRefreshToken(context);
     }
 
     public static void sendMessage(Context context, String topic, String action, String message) {
         Intent intent = new Intent();
         intent.setComponent(new ComponentName(
-                "com.amazon.alexaautoclientservice", "com.amazon.alexaautoclientservice.AlexaAutoClientService"));
+                AACSConstants.getAACSPackageName(new WeakReference<Context>(context)), AACSConstants.AACS_CLASS_NAME));
         intent.setAction(action);
         intent.addCategory(topic);
 

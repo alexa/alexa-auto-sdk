@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -68,7 +68,8 @@ TextToSpeechProviderEngine::TextToSpeechProviderEngine() : alexaClientSDK::avsCo
 }
 
 bool TextToSpeechProviderEngine::initialize(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
@@ -83,7 +84,7 @@ bool TextToSpeechProviderEngine::initialize(
         ThrowIfNull(m_textToSpeechProviderCapabilityAgent, "nullTextToSpeechProviderCapabilityAgent");
 
         connectionManager->addConnectionStatusObserver(shared_from_this());
-        defaultEndpointBuilder->withCapability(
+        capabilitiesRegistrar->withCapability(
             m_textToSpeechProviderCapabilityAgent, m_textToSpeechProviderCapabilityAgent);
 
         m_propertyManager =
@@ -106,7 +107,8 @@ bool TextToSpeechProviderEngine::initialize(
 }
 
 std::shared_ptr<TextToSpeechProviderEngine> TextToSpeechProviderEngine::create(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
@@ -117,7 +119,7 @@ std::shared_ptr<TextToSpeechProviderEngine> TextToSpeechProviderEngine::create(
 
         ThrowIfNot(
             textToSpeechProviderEngine->initialize(
-                defaultEndpointBuilder,
+                capabilitiesRegistrar,
                 exceptionSender,
                 messageSender,
                 connectionManager,
@@ -287,6 +289,14 @@ void TextToSpeechProviderEngine::propertyChanged(const std::string& key, const s
 void TextToSpeechProviderEngine::onConnectionStatusChanged(
     const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
     const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason) {
+    // no-op
+}
+
+void TextToSpeechProviderEngine::onConnectionStatusChanged(
+    const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
+    const std::vector<
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
+        engineStatuses) {
     std::lock_guard<std::mutex> lock(m_connectionMutex);
     m_connectionStatus = status;
 }

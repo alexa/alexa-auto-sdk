@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.1.0</span>
+   &#160;<span id="projectnumber">3.2.0</span>
    </div>
   </td>
  </tr>
@@ -92,7 +92,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae41d2954a60f8ec802e8784d1963f3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html">AuthProvider</a> should be extended to manage access tokens for AVS authorization and report client authorization state to the Engine. </p>
+<div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html">AuthProvider</a> should be extended to manage access tokens for AVS authorization and report client authorization state to the Engine.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000007">Deprecated:</a></b></dt><dd>This platform interface is being deprecated. Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html">com.amazon.aace.authorization.Authorization</a></code> instead. </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="aeedf509b073beea5fd1bf29a170e1c57"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeedf509b073beea5fd1bf29a170e1c57">&#9670;&nbsp;</a></span>getAuthToken()</h2>
@@ -109,6 +110,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Returns the token used by the platform implementation for authorization with AVS. The platform implementation should retrieve an auth token if it does not have one.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000008">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The token used to authorize with AVS </dd></dl>
 
 </div>
@@ -128,6 +130,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Returns the AVS authorization state of the platform implementation</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000009">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The AVS authorization state </dd></dl>
 
 </div>
@@ -148,6 +151,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation that the specified access token was used in an unauthorized request to AVS. AVS responded to this request with a 403 code indicating the token was not valid.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000010">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">token</td><td>The access token used in an unauthorized request to AVS </td></tr>
@@ -183,9 +187,10 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the Engine of a change in AVS authorization state in the platform implementation</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000011">Deprecated:</a></b></dt><dd>This method is being deprecated as this platform interface is being deprecated.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">authState</td><td>The new authorization state</td></tr>
+    <tr><td class="paramname">authState</td><td>The new authorization state </td></tr>
     <tr><td class="paramname">authError</td><td>The error state of the authorization attempt </td></tr>
   </table>
   </dd>
@@ -198,7 +203,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.1.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.2.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

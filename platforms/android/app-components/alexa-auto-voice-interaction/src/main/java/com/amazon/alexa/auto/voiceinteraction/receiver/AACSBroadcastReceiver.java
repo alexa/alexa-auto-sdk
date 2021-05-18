@@ -14,13 +14,14 @@ import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.ConnectionStatusChangedMessages;
 import com.amazon.alexa.auto.aacs.common.DialogStateChangedMessages;
+import com.amazon.alexa.auto.aacs.common.WakewordDetectedMessages;
 import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
 import com.amazon.alexa.auto.voiceinteraction.common.Constants;
 
 import org.greenrobot.eventbus.EventBus;
 
 public class AACSBroadcastReceiver extends BroadcastReceiver {
-    private static final String TAG = AACSBroadcastReceiver.class.getSimpleName();
+    private static final String TAG = AACSBroadcastReceiver.class.getCanonicalName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,6 +31,8 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
         }
 
         AACSMessageBuilder.parseEmbeddedIntent(intent).ifPresent(message -> {
+            Log.d(TAG, message.messageId + " | " + message.topic + " | " + message.action + " | " + message.payload);
+
             switch (message.action) {
                 case Action.AlexaClient.CONNECTION_STATUS_CHANGED:
                     handleConnectionStatusChanged(message);
@@ -38,8 +41,7 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
                     handleDialogStateChanged(message);
                     break;
                 case Action.SpeechRecognizer.WAKEWORD_DETECTED:
-                    sendAutoVoiceInteractionMessage(
-                            Topic.SPEECH_RECOGNIZER, Action.SpeechRecognizer.WAKEWORD_DETECTED, "");
+                    handleWakewordDetected(message);
                     break;
                 case Action.SpeechRecognizer.END_OF_SPEECH_DETECTED:
                     sendAutoVoiceInteractionMessage(
@@ -52,8 +54,9 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
     @VisibleForTesting
     void handleDialogStateChanged(@NonNull AACSMessage aacsMessage) {
         if (aacsMessage.payload != null) {
-            DialogStateChangedMessages.parseDialogState(aacsMessage.payload).ifPresent(message -> {
-                sendAutoVoiceInteractionMessage(Constants.TOPIC_VOICE_CHROME, message, "");
+            DialogStateChangedMessages.parseDialogState(aacsMessage.payload).ifPresent(payload -> {
+                sendAutoVoiceInteractionMessage(
+                        Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED, payload);
             });
         }
     }
@@ -63,6 +66,16 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
         if (aacsMessage.payload != null) {
             ConnectionStatusChangedMessages.parseConnectionStatus(aacsMessage.payload).ifPresent(message -> {
                 sendAutoVoiceInteractionMessage(Constants.TOPIC_ALEXA_CONNECTION, message, "");
+            });
+        }
+    }
+
+    @VisibleForTesting
+    void handleWakewordDetected(@NonNull AACSMessage aacsMessage) {
+        if (aacsMessage.payload != null) {
+            WakewordDetectedMessages.parseWakeword(aacsMessage.payload).ifPresent(payload -> {
+                sendAutoVoiceInteractionMessage(
+                        Constants.TOPIC_VOICE_ANIMATION, Action.SpeechRecognizer.WAKEWORD_DETECTED, payload);
             });
         }
     }

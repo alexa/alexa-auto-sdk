@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -70,6 +70,22 @@ std::string AlexaConnectivityHandler::getConnectivityState() {
     return m_connectivityState;
 }
 
+std::string AlexaConnectivityHandler::getIdentifier() {
+    auto activity = m_activity.lock();
+    if (!activity) {
+        log(logger::LoggerHandler::Level::ERROR, "getNetworkIdentifierFailed");
+        return std::string();
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                                                                                           //
+    //  FOR SECURITY REASONS, GET THE IDENTIFIER FROM THE SYSTEM ONLY WHEN NEEDED, DO NOT STORE THE IDENTIFIER.  //
+    //                                                                                                           //
+    //  NOTE: RETURN AN EMPTY STRING TO AUTOMATICALLY USE VEHICLE_IDENTIFIER FROM ENGINE CONFIGURATION INSTEAD.  //
+    //                                                                                                           //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return activity->getApplicationContext()->getNetworkIdentifier();
+}
+
 // private
 
 void AlexaConnectivityHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
@@ -128,7 +144,8 @@ void AlexaConnectivityHandler::setupUI() {
                     {"dataPlan",{
                         {"type","PAID"}
                     }},
-                    {"termsStatus","ACCEPTED"}
+                    {"termsStatus","ACCEPTED"},
+                    {"termsVersion","1"}
                 }},
                 // Full Experience (Trial)
                 {"TRIAL",{
@@ -143,7 +160,8 @@ void AlexaConnectivityHandler::setupUI() {
                     {"dataPlansAvailable",{
                         "PAID","AMAZON_SPONSORED"
                     }},
-                    {"termsStatus","ACCEPTED"}
+                    {"termsStatus","ACCEPTED"},
+                    {"termsVersion","1"}
                 }},
                 // Full Experience (Trial Expiring in 5 days)
                 {"TRIAL_EXPIRING",{
@@ -158,7 +176,8 @@ void AlexaConnectivityHandler::setupUI() {
                     {"dataPlansAvailable",{
                         "PAID","AMAZON_SPONSORED"
                     }},
-                    {"termsStatus","ACCEPTED"}
+                    {"termsStatus","ACCEPTED"},
+                    {"termsVersion","1"}
                 }},
                 // Partial Experience (Amazon Sponsored)
                 {"AMAZON_SPONSORED",{
@@ -172,7 +191,8 @@ void AlexaConnectivityHandler::setupUI() {
                     {"dataPlansAvailable",{
                         "PAID","TRIAL"
                     }},
-                    {"termsStatus","ACCEPTED"}
+                    {"termsStatus","ACCEPTED"},
+                    {"termsVersion","1"}
                 }},
                 // Partial Experience (Terms Declined)
                 {"TERMS_DECLINED",{
@@ -183,7 +203,20 @@ void AlexaConnectivityHandler::setupUI() {
                     {"dataPlan",{
                         {"type","AMAZON_SPONSORED"}
                     }},
-                    {"termsStatus","DECLINED"}
+                    {"termsStatus","DECLINED"},
+                    {"termsVersion","1"}
+                }},
+                // Partial Experience (Terms Deferred)
+                {"TERMS_DEFERRED",{
+                    {"managedProvider",{
+                        {"type","MANAGED"},
+                        {"id","AMAZON"}
+                    }},
+                    {"dataPlan",{
+                        {"type","AMAZON_SPONSORED"}
+                    }},
+                    {"termsStatus","DEFERRED"},
+                    {"termsVersion","1"}
                 }},
                 // Partial Experience (Trial Expired)
                 {"TRIAL_EXPIRED",{
@@ -197,7 +230,8 @@ void AlexaConnectivityHandler::setupUI() {
                     {"dataPlansAvailable",{
                         "PAID"
                     }},
-                    {"termsStatus","ACCEPTED"}
+                    {"termsStatus","ACCEPTED"},
+                    {"termsVersion","1"}
                 }}
             };
             // clang-format on

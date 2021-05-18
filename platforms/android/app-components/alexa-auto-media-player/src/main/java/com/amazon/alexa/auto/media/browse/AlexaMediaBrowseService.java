@@ -259,7 +259,8 @@ public class AlexaMediaBrowseService extends MediaBrowserServiceCompat {
                     mVASelectionSubscription = null;
                 }
 
-                Intent loginIntent = setupController.createIntentForLaunchingLoginUI();
+                // We want to make sure Alexa has been selected as default voice assist
+                Intent loginIntent = setupController.createIntentForLaunchingVoiceAssistantSwitchUI();
                 PendingIntent pendingIntent =
                         PendingIntent.getActivity(this, 0, loginIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 mMediaSessionManager.setMediaSessionError(PlaybackStateCompat.ERROR_CODE_AUTHENTICATION_EXPIRED,

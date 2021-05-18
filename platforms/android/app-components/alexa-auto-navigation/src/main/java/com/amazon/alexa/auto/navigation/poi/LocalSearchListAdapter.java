@@ -26,6 +26,9 @@ import java.util.List;
  */
 public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchListAdapter.ViewHolder> {
     private static final String TAG = LocalSearchListAdapter.class.getSimpleName();
+
+    public static final String POI_PROVIDER_YELP = "Yelp";
+
     private final NavigationProvider mNavigationProvider;
     private final List<PointOfInterest> mPOIs = new ArrayList<>();
     private final WeakReference<LocalSearchDirectiveHandler> mDirectiveHandlerWeakReference;
@@ -77,7 +80,7 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
             }
         });
 
-        if (poi.getProvider().equals("Yelp") && poi.getRating().getImage().getSources().size() >= 1) {
+        if (POI_PROVIDER_YELP.equals(poi.getProvider()) && poi.getRating().getImage().getSources().size() >= 1) {
             String yelpImageUrl = poi.getRating().getImage().getSources().get(0).getUrl();
             Glide.with(mContext).load(yelpImageUrl).into(holder.mYelpImage);
             holder.mYelpRatingCount.setText(String.format("(%s)", poi.getRating().getReviewCount()));

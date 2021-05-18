@@ -1,0 +1,24 @@
+@startuml
+
+skinparam roundcorner 10
+
+participant Application                 <<Application>> order 10
+participant Connectivity                <<Platform>>    order 20
+participant ConnectivityEngineImpl      <<Engine>>      order 30
+participant ConnectivityCapabilityAgent <<AVS>>         order 40
+participant EndpointBuilder             <<AVS>>         order 50
+participant CapabilitiesDelegate        <<AVS>>         order 60
+participant InternetDataPlanAPI         <<AlexaCloud>>  order 70
+
+Application                 -> ConnectivityEngineImpl      : registerPlatformInterface()
+ConnectivityEngineImpl      -> ConnectivityCapabilityAgent : create()
+Connectivity                <- ConnectivityCapabilityAgent : getIdentifier()
+Connectivity               --> ConnectivityCapabilityAgent : Identifier "string"
+ConnectivityCapabilityAgent -> EndpointBuilder             : withCapabilityConfiguration()
+EndpointBuilder             -> CapabilitiesDelegate        : addDiscoveryEventSender()
+
+... __**Application is connected to AlexaCloud**__ ...
+
+CapabilitiesDelegate        -> InternetDataPlanAPI         : sendDiscoveryEvents()
+
+@enduml

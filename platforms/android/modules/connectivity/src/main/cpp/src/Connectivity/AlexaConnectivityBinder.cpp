@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,6 +38,18 @@ std::string AlexaConnectivityHandler::getConnectivityState() {
     }
     catch_with_ex {
         AACE_JNI_ERROR(TAG, "getConnectivityState", ex.what());
+        return std::string();
+    }
+}
+
+std::string AlexaConnectivityHandler::getIdentifier() {
+    try_with_context {
+        jstring result;
+        ThrowIfNot(m_obj.invoke("getIdentifier", "()Ljava/lang/String;", &result), "invokeMethodFailed");
+        return JString(result).toStdStr();
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "getIdentifier", ex.what());
         return std::string();
     }
 }

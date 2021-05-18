@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 
 #include "AACE/Engine/CarControl/RangeController.h"
 
-#include <AVSCommon/AVS/CapabilitySemantics.h>
+#include <AVSCommon/AVS/CapabilitySemantics/CapabilitySemantics.h>
 #include <RangeController/RangeControllerAttributeBuilder.h>
 
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -44,37 +44,25 @@ std::shared_ptr<RangeController> RangeController::create(
         std::string instance = controllerConfig.at("instance");
         ThrowIf(instance.empty(), "missingInstance");
 
+        ThrowIfNot(controllerConfig.contains("capabilityResources"), "missingCapabilityResources");
+        alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilityResources>
+            capabilityResources = getResources(controllerConfig.at("capabilityResources"), assetStore);
+        ThrowIfNot(capabilityResources.hasValue(), "failedToParseCapabilityResourcesConfig");
         auto attributeBuilder =
             alexaClientSDK::capabilityAgents::rangeController::RangeControllerAttributeBuilder::create();
-        alexaClientSDK::avsCommon::avs::CapabilityResources capabilityResources;
+        attributeBuilder->withCapabilityResources(capabilityResources.value());
 
-        auto& friendlyNames = controllerConfig.at("capabilityResources").at("friendlyNames");
-        for (auto& item : friendlyNames.items()) {
-            auto& value = item.value().at("value");
-            std::string assetId = value.at("assetId");
-            const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
-            for (auto name = names.begin(); name != names.end(); ++name) {
-                capabilityResources.addFriendlyNameWithText(name->first, name->second);
-            }
-        }
-        attributeBuilder->withCapabilityResources(capabilityResources);
         auto& configuration = controllerConfig.at("configuration");
         if (configuration.contains("presets")) {
             auto& presets = configuration.at("presets");
             for (auto& preset : presets.items()) {
-                alexaClientSDK::avsCommon::sdkInterfaces::rangeController::PresetResources presetResources;
                 double rangeValue = preset.value().at("rangeValue");
-                auto& friendlyNames = preset.value().at("presetResources").at("friendlyNames");
-                std::vector<std::string> assetIds;
-                for (auto& item : friendlyNames.items()) {
-                    auto& value = item.value().at("value");
-                    std::string assetId = value.at("assetId");
-                    const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(assetId);
-                    for (auto name = names.begin(); name != names.end(); ++name) {
-                        presetResources.addFriendlyNameWithText(name->first, name->second);
-                    }
-                }
-                attributeBuilder->addPreset({rangeValue, presetResources});
+                ThrowIfNot(preset.value().contains("presetResources"), "missingPresetResources");
+                // Note: PresetResources is a type alias for CapabilityResources
+                alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilityResources>
+                    presetResources = getResources(preset.value().at("presetResources"), assetStore);
+                ThrowIfNot(presetResources.hasValue(), "failedToParsePresetResourcesConfig");
+                attributeBuilder->addPreset({rangeValue, presetResources.value()});
             }
         }
         if (configuration.contains("unitOfMeasure")) {
@@ -84,8 +72,9 @@ std::shared_ptr<RangeController> RangeController::create(
 
         if (controllerConfig.contains("semantics")) {
             auto& semanticsJson = controllerConfig.at("semantics");
-            alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::avs::CapabilitySemantics> semantics =
-                getSemantics(semanticsJson);
+            alexaClientSDK::avsCommon::utils::Optional<
+                alexaClientSDK::avsCommon::avs::capabilitySemantics::CapabilitySemantics>
+                semantics = getSemantics(semanticsJson);
             ThrowIfNot(semantics.hasValue(), "failedToParseSemanticsConfig");
             attributeBuilder->withSemantics(semantics.value());
         }
@@ -126,7 +115,7 @@ RangeController::RangeController(
 
 void RangeController::build(
     std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
-    std::unique_ptr<EndpointBuilder>& builder) {
+    std::unique_ptr<EndpointBuilderInterface>& builder) {
     m_carControlServiceInterface = carControlServiceInterface;
     builder->withRangeController(shared_from_this(), getInstance(), m_attributes, false, false, false);
 }

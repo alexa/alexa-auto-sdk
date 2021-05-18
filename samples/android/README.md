@@ -70,21 +70,21 @@ You must populate the [`app_config.json`](./app/src/main/assets/app_config.json)
 
 Choose one of the following two options to include the Alexa Auto SDK build dependencies. These options correspond to two build flavors: remote and local.
 
-> **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android), you must choose option 2 and build the platform AARs and the core-sample AAR using the Auto SDK Builder. The prebuilt AARs available in JCenter are for the default Auto SDK modules only.
+> **Note:** If you want to implement any optional modules (such as wake word support, Alexa Communications, Local Voice Control (LVC), Device Client Metrics (DCM), or Voice Chrome for Android), you must choose option 2 and build the platform AARs and the core-sample AAR using the Auto SDK Builder. The prebuilt AARs available in the Maven central repository are for the default Auto SDK modules only.
 
 > **Note:** The Auto SDK requires Gradle version 4.10.1 - 5.6.2 (5.1.1 - 5.6.2 if you are using Android Studio).
 
 #### Option 1: Use the pre-built platform AARs (remote build flavor)
 
-The pre-built platform AARs for the default Auto SDK modules and the core-sample AAR required to run the Android Sample App are available in the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/).
+The pre-built platform AARs for the default Auto SDK modules and the core-sample AAR required to run the Android Sample App are available in the [Maven central repository](https://repo.maven.apache.org/maven2/com/amazon/alexa/aace/).
 
-The Sample App builder scripts are configured to use JCenter to always pull the latest release artifacts during compilation. To run the builder scripts, issue the following command:
+The Sample App builder scripts are configured to use the Maven central repository to always pull the latest release artifacts during compilation. To run the builder scripts, issue the following command:
 
 ```
 $ ./gradlew assembleRemoteRelease
 ```
 
-Alternatively, you can manually download the platform AARs and core-sample AAR from the [JCenter repo](https://jcenter.bintray.com/com/amazon/alexa/aace/) to
+Alternatively, you can manually download the platform AARs and core-sample AAR from the [Maven central repository](https://repo.maven.apache.org/maven2/com/amazon/alexa/aace/) to
 
  `${AAC_SDK_HOME}/samples/android/app/src/main/libs` 
 
@@ -149,7 +149,7 @@ The Sample App provides an example of how to create and configure an instance of
     >**Note:** The Android Sample App includes a simulated local phone that leverages the Phone Call Controller module. However, it cannot currently use cellular voice connections paired with or installed in the host device. You can use this simulator as an example of how to implement the Phone Control interface on the host platform to perform actions such as dialing, hanging up, etc.
  * [Code-based Linking (CBL) module README](../../platforms/android/modules/cbl/README.md)
  * [Alexa Presentation (APL) module README](../../platforms/android/modules/apl/README.md)
-    >**Note:** APL rendering on the Android Sample App requires a component that is available by [request from your Amazon Solutions Architect (SA) or Partner Manager](../../NEED_HELP.md#requesting-additional-functionality).
+    >**Note:** Use the APL Render module to enable the APL rendering capabilities in the Android Sample App. For information about the APL Render module, see this [README](../../platforms/android/modules/apl-render/README.md).
 
 The Sample App GUI consists of a menu bar and a log console. The expandable menu icon in the menu bar opens an options menu to the right of the screen that contains GUI elements relevant to the Platform Interface implementations as well as the authentication UI. Interacting with Alexa and the Engine requires successful authentication with AVS. You can log out using the **Log Out** button in the options menu, which will clear the saved refresh token.
 
@@ -265,7 +265,6 @@ aac-module-core/0.99.0-r0/src/engine/src/ ${AAC_SDK_HOME}/modules/core/engine/sr
 * A generic error TTS is returned when the user initiates offline contact calling before uploading contacts to the cloud on the sample app with the optional Local Voice Control extension.
 * Particular sections of the Flash Briefing do not resume properly from a paused state. Attempting to play after pause in some cases may restart the media playback.
 * Display card rendering is not adaptable to a variety of screen sizes.
-* The sample app does not implement managing inter-app audio focus. As a result, other apps do not recognize its audio playback appropriately.
 * Alexa dialog playback may stop abruptly when switching between Wi-Fi and mobile data.
 * The sample app disconnects from AVS after remaining idle for some time and takes a while to reconnect.
 * Music service provider logos in the SVG format are not rendered during the music playback.

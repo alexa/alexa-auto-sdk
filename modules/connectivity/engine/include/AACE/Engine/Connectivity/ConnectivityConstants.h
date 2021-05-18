@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -45,14 +45,32 @@ static const std::string MANAGEDPROVIDER_KEY{"managedProvider"};
 /// The network identifier key.
 static const std::string NETWORKIDENTIFIER_KEY{"networkIdentifier"};
 
-/// The terms status key.
+/// The terms key.
+static const std::string TERMS_KEY{"terms"};
+
+/// The terms status key for capability agent.
+static const std::string STATUS_KEY{"status"};
+
+/// The terms version key for capability agent.
+static const std::string VERSION_KEY{"version"};
+
+/// The terms status key for JSON parsing.
 static const std::string TERMSSTATUS_KEY{"termsStatus"};
+
+/// The terms version key for JSON parsing.
+static const std::string TERMSVERSION_KEY{"termsVersion"};
 
 /// The type key.
 static const std::string TYPE_KEY{"type"};
 
 /// The value key.
 static const std::string VALUE_KEY{"value"};
+
+/// UNKNOWN_VERSION terms version.
+static const std::string UNKNOWN_VERSION{"UNKNOWN"};
+
+/// Max length restriction for terms version.
+static const int VERSION_SIZE_MAX_LIMIT{250};
 
 }  // namespace connectivity
 }  // namespace engine

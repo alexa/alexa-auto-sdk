@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -111,6 +111,19 @@ std::shared_ptr<AuthorizationProvider> AuthorizationEngineService::getProvider(c
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("service", service));
         return nullptr;
+    }
+}
+
+void AuthorizationEngineService::addEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener) {
+    if (m_authorizationEngineImpl) {
+        m_authorizationEngineImpl->addEventListener(eventListener);
+    }
+}
+
+void AuthorizationEngineService::removeEventListener(
+    std::shared_ptr<AuthorizationEventListenerInterface> eventListener) {
+    if (m_authorizationEngineImpl) {
+        m_authorizationEngineImpl->removeEventListener(eventListener);
     }
 }
 

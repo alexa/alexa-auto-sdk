@@ -36,6 +36,10 @@ ThreadMoniker::ThreadMoniker() : m_moniker{} {
     std::strncpy(m_moniker, moniker.c_str(), sizeof(m_moniker) - 1);
 }
 
+const char* ThreadMoniker::getThisThreadMoniker() {
+    return m_threadMoniker.m_moniker;
+}
+
 }  // namespace logger
 }  // namespace engine
 }  // namespace aace

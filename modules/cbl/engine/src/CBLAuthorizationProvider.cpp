@@ -35,6 +35,7 @@
 #include <AACE/Alexa/AlexaProperties.h>
 #include "AACE/Engine/CBL/CBLAuthorizationProvider.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
@@ -42,6 +43,7 @@ namespace cbl {
 
 using namespace aace::engine::authorization;
 using namespace aace::engine::alexa;
+using namespace aace::engine::utils::metrics;
 using namespace alexaClientSDK::avsCommon::sdkInterfaces;
 using namespace alexaClientSDK::avsCommon::utils::libcurlUtils;
 using namespace rapidjson;
@@ -122,27 +124,6 @@ static const std::string HEADER_LINE_LANGUAGE_PREFIX = "Accept-Language: ";
 /// The Accept-Language header value to use if this class was not initialized with a locale.
 static const std::string DEFAULT_ACCEPT_LANGUAGE_VALUE = "en-US";
 
-/**
- * Map of Alexa-supported locales to closest match header "Accept-Language" value for LWA.
- * Accept-Language values are available here:
- * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/code-based-linking-other-platforms.html#request
- */
-static const std::unordered_map<std::string, std::string> g_localeHeaderLanguageMap = {{"de-DE", "de-DE"},
-                                                                                       {"en-AU", "en-US"},
-                                                                                       {"en-CA", "en-US"},
-                                                                                       {"en-GB", "en-GB"},
-                                                                                       {"en-IN", "en-US"},
-                                                                                       {"en-US", "en-US"},
-                                                                                       {"es-ES", "es-ES"},
-                                                                                       {"es-MX", "es-ES"},
-                                                                                       {"es-US", "es-ES"},
-                                                                                       {"fr-CA", "fr-FR"},
-                                                                                       {"fr-FR", "fr-FR"},
-                                                                                       {"hi-IN", "en-US"},
-                                                                                       {"it-IT", "it-IT"},
-                                                                                       {"ja-JP", "ja-JP"},
-                                                                                       {"pt-BR", "pt-BR"}};
-
 /// Min time to wait between attempt to poll for a token while authentication is pending.
 static const std::chrono::seconds MIN_TOKEN_REQUEST_INTERVAL = std::chrono::seconds(5);
 
@@ -188,6 +169,33 @@ static const std::string AUTHORIZATION_REQUEST_TYPE_USER_PROFILE = "user-profile
 /// Authorization request type cbl code
 static const std::string AUTHORIZATION_REQUEST_TYPE_CBL_CODE = "cbl-code";
 
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "CBLAuthorizationProvider";
+
+/// Metric for CBL timeout
+static const std::string METRIC_CODEPAIRREQUEST_TIMEOUT = "CodePairRequestTimeOut";
+
+/// Metric for failed code pair request
+static const std::string METRIC_CODEPAIRREQUEST_FAILED = "CodePairRequestFailed";
+
+/// Metric for successful code pair request
+static const std::string METRIC_CODEPAIRREQUEST_SUCCESS = "CodePairRequestSuccess";
+
+/// Metric for expired code pair
+static const std::string METRIC_CODEPAIR_EXPIRED = "CodePairExpired";
+
+/// Metric for failed request for token
+static const std::string METRIC_REQUESTTOKEN_FAILED = "RequestTokenFailed";
+
+/// Metric for successful request for token
+static const std::string METRIC_REQUESTTOKEN_SUCCESS = "RequestTokenSuccess";
+
+/// Metric for failed refresh of token
+static const std::string METRIC_REFRESHTOKEN_FAILED = "RefreshTokenFailed";
+
+/// Metric for successful refresh of token
+static const std::string METRIC_REFRESHTOKEN_SUCCESS = "RefreshTokenSuccess";
+
 /// Map error names from @c LWA to @c AuthObserverInterface::Error values.
 static const std::unordered_map<std::string, AuthObserverInterface::Error> g_nameToErrorMap = {
     {"authorization_pending", AuthObserverInterface::Error::AUTHORIZATION_PENDING},
@@ -217,10 +225,10 @@ static AuthObserverInterface::Error getErrorCode(const std::string& error) {
             if (it != g_nameToErrorMap.end()) {
                 return it->second;
             }
-            Throw("unknowError");
+            Throw("unknownError");
         }
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("error", error));
         return AuthObserverInterface::Error::UNKNOWN_ERROR;
     }
 }
@@ -334,15 +342,17 @@ std::shared_ptr<CBLAuthorizationProvider> CBLAuthorizationProvider::create(
     std::shared_ptr<AuthorizationManagerInterface> authorizationManagerInterface,
     std::shared_ptr<CBLConfigurationInterface> configuration,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
-    bool enableUserProfile) {
+    bool enableUserProfile,
+    std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier) {
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIf(service.empty(), "invalidService");
         ThrowIfNull(authorizationManagerInterface, "invalidAuthorizationManagerInterface");
         ThrowIfNull(configuration, "nullCBLAuthDelegateConfiguration");
+        ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
 
-        auto cblAuthorizationProvider = std::shared_ptr<CBLAuthorizationProvider>(
-            new CBLAuthorizationProvider(service, authorizationManagerInterface, configuration, enableUserProfile));
+        auto cblAuthorizationProvider = std::shared_ptr<CBLAuthorizationProvider>(new CBLAuthorizationProvider(
+            service, authorizationManagerInterface, configuration, enableUserProfile, legacyEventNotifier));
         ThrowIfNull(cblAuthorizationProvider, "createFailed");
 
         ThrowIfNot(cblAuthorizationProvider->initialize(propertyManager), "initializeFailed");
@@ -358,7 +368,8 @@ CBLAuthorizationProvider::CBLAuthorizationProvider(
     const std::string& service,
     std::shared_ptr<AuthorizationManagerInterface> authorizationManagerInterface,
     std::shared_ptr<CBLConfigurationInterface> configuration,
-    bool enableUserProfile) :
+    bool enableUserProfile,
+    std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
         m_configuration{configuration},
         m_isStopping{false},
@@ -375,7 +386,8 @@ CBLAuthorizationProvider::CBLAuthorizationProvider(
         m_enableUserProfile{enableUserProfile},
         m_service(service),
         m_currentAuthState(AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED),
-        m_authorizationManager(authorizationManagerInterface) {
+        m_authorizationManager(authorizationManagerInterface),
+        m_legacyEventNotifier(legacyEventNotifier) {
 }
 
 bool CBLAuthorizationProvider::initialize(
@@ -391,11 +403,11 @@ bool CBLAuthorizationProvider::initialize(
             m_scope = POST_VALUE_ALEXA_ALL;
         }
 
-        if (propertyManager != nullptr) {
-            std::lock_guard<std::mutex> lock(m_localeMutex);
-            m_locale = propertyManager->getProperty(aace::alexa::property::LOCALE);
-            propertyManager->addListener(aace::alexa::property::LOCALE, shared_from_this());
-        }
+        std::unique_lock<std::mutex> lock(m_mutex);
+        m_locale = propertyManager->getProperty(aace::alexa::property::LOCALE);
+        propertyManager->addListener(aace::alexa::property::LOCALE, shared_from_this());
+        lock.unlock();
+
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -464,10 +476,15 @@ bool CBLAuthorizationProvider::startAuthorization(const std::string& data) {
         auto result = authorizationManager_lock->startAuthorization(m_service);
         if (result == AuthorizationManagerInterface::StartAuthorizationResult::FAILED) {
             m_currentAuthState = AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED;
-            auto listener = getAuthorizationProviderListener();
-            ThrowIfNull(listener, "invalidListenerReference");
-            listener->onAuthorizationError(m_service, "START_AUTHORIZATION_FAILED");
-
+            m_executor.submit([this]() {
+                try {
+                    auto listener = getAuthorizationProviderListener();
+                    ThrowIfNull(listener, "invalidListenerReference");
+                    listener->onAuthorizationError(m_service, "START_AUTHORIZATION_FAILED");
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "startAuthorizationInsideExecutor").d("reason", ex.what()));
+                }
+            });
             // Although start of authorization failed, we consider this
             // as successful call from the perspective of AuthorizationProvider API.
             return true;
@@ -502,10 +519,14 @@ bool CBLAuthorizationProvider::cancelAuthorization() {
             // Reset to UNAUTHORIZED if current state is AUTHORIZING, this allows to start  authorization again.
             m_currentAuthState = AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED;
             m_executor.submit([this]() {
-                auto listener = getAuthorizationProviderListener();
-                ThrowIfNull(listener, "invalidListenerReference");
-                listener->onAuthorizationStateChanged(
-                    m_service, AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED);
+                try {
+                    auto listener = getAuthorizationProviderListener();
+                    ThrowIfNull(listener, "invalidListenerReference");
+                    listener->onAuthorizationStateChanged(
+                        m_service, AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED);
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "cancelAuthorizationInsideExecutor").d("reason", ex.what()));
+                }
             });
         }
         return true;
@@ -523,15 +544,19 @@ bool CBLAuthorizationProvider::logout() {
             "notAllowedDuringAuthorizing");
         stopAuthFlowThread(false);
         m_executor.submit([this]() {
-            AACE_DEBUG(LX("logoutInsideExecutor"));
-            auto authorizationManager_lock = m_authorizationManager.lock();
-            ThrowIfNull(authorizationManager_lock, "invalidAuthorizationManagerReference");
-            auto result = authorizationManager_lock->logout(m_service);
-            if (!result) {
-                auto listener = getAuthorizationProviderListener();
-                ThrowIfNull(listener, "invalidListenerReference");
-                listener->onAuthorizationError(m_service, "LOGOUT_FAILED");
-                Throw("logoutFailed");
+            try {
+                AACE_DEBUG(LX(TAG, "logoutInsideExecutor"));
+                auto authorizationManager_lock = m_authorizationManager.lock();
+                ThrowIfNull(authorizationManager_lock, "invalidAuthorizationManagerReference");
+                auto result = authorizationManager_lock->logout(m_service);
+                if (!result) {
+                    auto listener = getAuthorizationProviderListener();
+                    ThrowIfNull(listener, "invalidListenerReference");
+                    listener->onAuthorizationError(m_service, "LOGOUT_FAILED");
+                    Throw("logoutFailed");
+                }
+            } catch (std::exception& ex) {
+                AACE_ERROR(LX(TAG, "logoutInsideExecutor").d("reason", ex.what()));
             }
         });
         return true;
@@ -605,6 +630,11 @@ alexaClientSDK::avsCommon::utils::libcurlUtils::HTTPResponse CBLAuthorizationPro
 CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleStarting() {
     try {
         AACE_DEBUG(LX(TAG));
+        if (m_legacyEventNotifier) {
+            m_legacyEventNotifier->cblStateChanged(
+                CBLLegacyEventNotificationInterface::CBLState::STARTING,
+                CBLLegacyEventNotificationInterface::CBLStateChangedReason::NONE);
+        }
 
         auto listener = getAuthorizationProviderListener();
         ThrowIfNull(listener, "invalidListenerReference");
@@ -642,16 +672,35 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleStarting() {
 CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingCodePair() {
     try {
         AACE_DEBUG(LX(TAG));
+        if (m_legacyEventNotifier) {
+            m_legacyEventNotifier->cblStateChanged(
+                CBLLegacyEventNotificationInterface::CBLState::REQUESTING_CODE_PAIR,
+                CBLLegacyEventNotificationInterface::CBLStateChangedReason::SUCCESS);
+        }
+
         m_retryCount = 0;
         std::chrono::steady_clock::time_point codePairRequestTimeout =
             std::chrono::steady_clock::now() + m_configuration->getCodePairRequestTimeout();
         while (!isStopping()) {
             if (std::chrono::steady_clock::now() >= codePairRequestTimeout) {
+                emitUniqueCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingCodePair", METRIC_CODEPAIRREQUEST_TIMEOUT, 1);
                 m_stateChangeReason = AUTHORIZATION_ERROR_REASON_TIMEOUT;
                 return FlowState::STOPPING;
             }
 
             auto result = receiveCodePairResponse(requestCodePair());
+            std::stringstream codePairResult;
+            codePairResult << result;
+            if (result == AuthObserverInterface::Error::SUCCESS) {
+                emitUniqueCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingCodePair", METRIC_CODEPAIRREQUEST_SUCCESS, 1);
+            } else {
+                emitUniqueCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX,
+                    "handleRequestingCodePair",
+                    {METRIC_CODEPAIRREQUEST_FAILED, codePairResult.str()});
+            }
             switch (result) {
                 case AuthObserverInterface::Error::SUCCESS:
                     return FlowState::REQUESTING_TOKEN;
@@ -690,15 +739,34 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingCo
 CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingToken() {
     try {
         AACE_DEBUG(LX(TAG));
+        if (m_legacyEventNotifier) {
+            m_legacyEventNotifier->cblStateChanged(
+                CBLLegacyEventNotificationInterface::CBLState::REQUESTING_TOKEN,
+                CBLLegacyEventNotificationInterface::CBLStateChangedReason::NONE);
+        }
+
         auto interval = MIN_TOKEN_REQUEST_INTERVAL;
         while (!isStopping()) {
             // If the code pair expired, stop
             if (std::chrono::steady_clock::now() >= m_codePairExpirationTime) {
+                emitUniqueCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingToken", METRIC_CODEPAIR_EXPIRED, 1);
                 m_stateChangeReason = AUTHORIZATION_ERROR_REASON_CODE_PAIR_EXPIRED;
                 return FlowState::STOPPING;
             }
 
             auto result = receiveTokenResponse(requestToken(), true);
+            std::stringstream requestTokenResult;
+            requestTokenResult << result;
+            if (result == AuthObserverInterface::Error::SUCCESS) {
+                emitUniqueCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingToken", METRIC_REQUESTTOKEN_SUCCESS, 1);
+            } else {
+                emitUniqueCounterMetrics(
+                    METRIC_PROGRAM_NAME_SUFFIX,
+                    "handleRequestingToken",
+                    {METRIC_REQUESTTOKEN_FAILED, requestTokenResult.str()});
+            }
             switch (result) {
                 case AuthObserverInterface::Error::SUCCESS:
                     if (m_enableUserProfile) {
@@ -755,6 +823,12 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingTo
 CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingToken() {
     try {
         AACE_DEBUG(LX(TAG));
+        if (m_legacyEventNotifier) {
+            m_legacyEventNotifier->cblStateChanged(
+                CBLLegacyEventNotificationInterface::CBLState::REFRESHING_TOKEN,
+                CBLLegacyEventNotificationInterface::CBLStateChangedReason::NONE);
+        }
+
         m_retryCount = 0;
         while (!isStopping()) {
             std::unique_lock<std::mutex> lock(m_mutex);
@@ -795,6 +869,17 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
 
                 auto result = receiveTokenResponse(requestRefresh(), false);
                 m_refreshToken.clear();
+                std::stringstream refreshTokenResult;
+                refreshTokenResult << result;
+                if (result == AuthObserverInterface::Error::SUCCESS) {
+                    emitUniqueCounterMetrics(
+                        METRIC_PROGRAM_NAME_SUFFIX, "handleRefreshingToken", METRIC_REQUESTTOKEN_SUCCESS, 1);
+                } else {
+                    emitUniqueCounterMetrics(
+                        METRIC_PROGRAM_NAME_SUFFIX,
+                        "handleRefreshingToken",
+                        {METRIC_REQUESTTOKEN_FAILED, refreshTokenResult.str()});
+                }
                 switch (result) {
                     case AuthObserverInterface::Error::SUCCESS:
                         m_retryCount = 0;
@@ -852,6 +937,22 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
 
 CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleStopping() {
     AACE_DEBUG(LX(TAG));
+    if (m_legacyEventNotifier) {
+        auto stateChangeReason = CBLLegacyEventNotificationInterface::CBLStateChangedReason::SUCCESS;
+        if (m_stateChangeReason == AUTHORIZATION_ERROR_REASON_UNKNOWN_ERROR) {
+            stateChangeReason = CBLLegacyEventNotificationInterface::CBLStateChangedReason::ERROR;
+        } else if (m_stateChangeReason == AUTHORIZATION_ERROR_REASON_TIMEOUT) {
+            stateChangeReason = CBLLegacyEventNotificationInterface::CBLStateChangedReason::TIMEOUT;
+        } else if (m_stateChangeReason == AUTHORIZATION_ERROR_REASON_CODE_PAIR_EXPIRED) {
+            stateChangeReason = CBLLegacyEventNotificationInterface::CBLStateChangedReason::CODE_PAIR_EXPIRED;
+        } else if (m_stateChangeReason == AUTHORIZATION_ERROR_REASON_AUTHORIZATION_EXPIRED) {
+            stateChangeReason = CBLLegacyEventNotificationInterface::CBLStateChangedReason::AUTHORIZATION_EXPIRED;
+        } else if (m_stateChangeReason == AUTHORIZATION_ERROR_REASON_SUCCESS) {
+            stateChangeReason = CBLLegacyEventNotificationInterface::CBLStateChangedReason::SUCCESS;
+        }
+        m_legacyEventNotifier->cblStateChanged(
+            CBLLegacyEventNotificationInterface::CBLState::STOPPING, stateChangeReason);
+    }
 
     if (m_stateChangeReason != AUTHORIZATION_ERROR_REASON_SUCCESS) {
         auto listener = getAuthorizationProviderListener();
@@ -929,22 +1030,20 @@ HTTPResponse CBLAuthorizationProvider::requestCodePair() {
         {POST_KEY_SCOPE_DATA, m_configuration->getScopeData()},
     };
     std::unique_lock<std::mutex> lock(m_localeMutex);
-    std::string acceptLanguage;
-    if (m_locale.empty()) {
+    std::string acceptLanguage = m_locale;
+    lock.unlock();
+
+    if (acceptLanguage.empty()) {
         AACE_WARN(LX(TAG).m("No locale setting available. Using default").d("default", DEFAULT_ACCEPT_LANGUAGE_VALUE));
         acceptLanguage = DEFAULT_ACCEPT_LANGUAGE_VALUE;
     } else {
-        auto it = g_localeHeaderLanguageMap.find(m_locale);
-        if (it != g_localeHeaderLanguageMap.end()) {
-            acceptLanguage = it->second;
-        } else {
-            AACE_WARN(LX(TAG)
-                          .m("Current locale is not in header language map. Using default")
-                          .d("default", DEFAULT_ACCEPT_LANGUAGE_VALUE));
-            acceptLanguage = DEFAULT_ACCEPT_LANGUAGE_VALUE;
+        // When locale is set to dual use the primary one. Dual locale have the `/` as delimiter.
+        size_t position = acceptLanguage.find("/");
+        if (position != std::string::npos) {
+            acceptLanguage = acceptLanguage.substr(0, position);
         }
     }
-    lock.unlock();
+
     const std::vector<std::string> headerLines = {HEADER_LINE_URLENCODED, HEADER_LINE_LANGUAGE_PREFIX + acceptLanguage};
 
     return doPost(
@@ -1045,6 +1144,14 @@ AuthObserverInterface::Error CBLAuthorizationProvider::receiveCodePairResponse(c
         }
 
         m_codePairExpirationTime = std::chrono::steady_clock::now() + std::chrono::seconds(expiresInSeconds);
+
+        if (m_legacyEventNotifier) {
+            m_legacyEventNotifier->cblStateChanged(
+                CBLLegacyEventNotificationInterface::CBLState::CODE_PAIR_RECEIVED,
+                CBLLegacyEventNotificationInterface::CBLStateChangedReason::SUCCESS,
+                verificationUri,
+                m_userCode);
+        }
 
         // clang-format off
         json requestJson = {

@@ -26,17 +26,13 @@ class ThreadMoniker {
 public:
     ThreadMoniker();
 
-    static inline const char* getThisThreadMoniker();
+    static const char* getThisThreadMoniker();
 
 private:
     char m_moniker[16];
 
     static thread_local ThreadMoniker m_threadMoniker;
 };
-
-const char* ThreadMoniker::getThisThreadMoniker() {
-    return m_threadMoniker.m_moniker;
-}
 
 }  // namespace logger
 }  // namespace engine

@@ -37,6 +37,9 @@ public:
     static const std::string NORMAL_PRIORITY;
     static const std::string HIGH_PRIORITY;
 
+    static const std::string UNIQUE;
+    static const std::string BUFFER;
+
     static std::shared_ptr<MetricsUploaderEngineImpl> create(
         std::shared_ptr<aace::metrics::MetricsUploader> platformMetricsUploaderInterface);
 

@@ -25,13 +25,13 @@ import android.content.pm.ResolveInfo;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.amazon.alexalve.ILVCClient;
 import com.amazon.alexalve.ILVCService;
-import com.amazon.sampleapp.FileUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

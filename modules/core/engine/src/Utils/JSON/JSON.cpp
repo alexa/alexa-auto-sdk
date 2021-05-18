@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -109,11 +109,6 @@ std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::
 }
 
 std::string toString(const rapidjson::Document& document, bool prettyPrint) {
-    auto stream = toStream(document, prettyPrint);
-    return stream != nullptr ? stream->str().c_str() : "";
-}
-
-std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint) {
     rapidjson::StringBuffer buffer;
 
     if (prettyPrint) {
@@ -124,7 +119,11 @@ std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document,
         document.Accept(writer);
     }
 
-    return std::make_shared<std::stringstream>(buffer.GetString());
+    return buffer.GetString();
+}
+
+std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint) {
+    return std::make_shared<std::stringstream>(toString(document, prettyPrint));
 }
 
 }  // namespace json

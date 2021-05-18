@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: LicenseRef-.amazon.com.-ASL-1.0
  *
@@ -39,6 +39,7 @@ LoopbackDetector::LoopbackDetector(const alexaClientSDK::avsCommon::utils::Audio
 }
 
 bool LoopbackDetector::initialize(
+    const std::string& defaultLocale,
     std::shared_ptr<audio::AudioManagerInterface> audioManager,
     std::shared_ptr<alexa::WakewordEngineAdapter> wakewordEngineAdapter) {
     try {
@@ -54,7 +55,9 @@ bool LoopbackDetector::initialize(
         m_wakewordEngineAdapter = wakewordEngineAdapter;
         ThrowIfNull(m_wakewordEngineAdapter, "invalidWakewordEngineAdapter");
 
-        ThrowIfNot(m_wakewordEngineAdapter->initialize(m_audioInputStream, m_audioFormat), "wakewordInitializeFailed");
+        ThrowIfNot(
+            m_wakewordEngineAdapter->initialize(defaultLocale, m_audioInputStream, m_audioFormat),
+            "wakewordInitializeFailed");
         m_wakewordEngineAdapter->addKeyWordObserver(shared_from_this());
 
         // Enable WW
@@ -71,6 +74,7 @@ bool LoopbackDetector::initialize(
 }
 
 std::shared_ptr<LoopbackDetector> LoopbackDetector::create(
+    const std::string& defaultLocale,
     const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat,
     std::shared_ptr<audio::AudioManagerInterface> audioManager,
     std::shared_ptr<alexa::WakewordEngineAdapter> wakewordEngineAdapter) {
@@ -80,7 +84,8 @@ std::shared_ptr<LoopbackDetector> LoopbackDetector::create(
         loopbackDetector = std::shared_ptr<LoopbackDetector>(new LoopbackDetector(audioFormat));
 
         ThrowIfNot(
-            loopbackDetector->initialize(audioManager, wakewordEngineAdapter), "initializeLoopbackDetectorFailed");
+            loopbackDetector->initialize(defaultLocale, audioManager, wakewordEngineAdapter),
+            "initializeLoopbackDetectorFailed");
 
         return loopbackDetector;
     } catch (std::exception& ex) {
@@ -183,10 +188,10 @@ ssize_t LoopbackDetector::write(const int16_t* data, const size_t size) {
     }
 }
 
-bool LoopbackDetector::verify(const std::string& wakeword, const std::chrono::milliseconds& timeout) {
+bool LoopbackDetector::shouldBlock(const std::string& wakeword, const std::chrono::milliseconds& timeout) {
     std::unique_lock<std::mutex> lock(m_detectionMutex);
 
-    AACE_DEBUG(LX(TAG, "verify").d("wakeword", wakeword));
+    AACE_DEBUG(LX(TAG, "shouldBlock").d("wakeword", wakeword));
 
     // Does wake-word is already detected by secondary WW engine within past N ms?
     if ((std::chrono::system_clock::now() - m_lastDetection) < timeout) {

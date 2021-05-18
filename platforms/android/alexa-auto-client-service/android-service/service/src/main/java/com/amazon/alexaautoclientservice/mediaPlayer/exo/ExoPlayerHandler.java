@@ -122,7 +122,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
     }
 
     private void initializePlayer() {
-        mPlayer = ExoPlayerFactory.newSimpleInstance(mContext, new DefaultTrackSelector());
+        mPlayer = new SimpleExoPlayer.Builder(mContext).build();
         mPlayer.addListener(new PlayerEventListener());
         mPlayer.setPlayWhenReady(false);
     }
@@ -355,8 +355,10 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
 
     @Override
     public void cleanUp() {
-        mPlayer.release();
-        mPlayer = null;
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     private class PlayerEventListener extends Player.DefaultEventListener {
@@ -488,7 +490,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         Format audioFormat = mPlayer.getAudioFormat();
         if (audioFormat != null && audioFormat.bitrate == Format.NO_VALUE) {
             bufferedBytes = 0;
-        } else {
+        } else if (audioFormat != null)  {
             long bufferMs = mPlayer.getBufferedPosition() - mPlayer.getCurrentPosition();
             if (bufferMs >= 0) {
                 bufferedBytes = bufferMs * audioFormat.bitrate / 1000 / 8;

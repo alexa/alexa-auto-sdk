@@ -9,7 +9,7 @@ android {
         applicationId "com.amazon.alexa.auto.app"
         minSdkVersion 28
         versionCode 1
-        versionName "1.0"
+        versionName "3.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -62,10 +62,17 @@ dependencies {
     implementation project(":alexa-auto-apps-common-ui")
     implementation project(':alexa-auto-apps-common-util')
     implementation project(':alexa-auto-lwa-auth')
-    implementation project(':alexa-auto-login')
+    implementation project(':alexa-auto-setup')
     implementation project(':alexa-auto-media-player')
     implementation project(':alexa-auto-voice-interaction')
     implementation project(':alexa-auto-navigation')
+    implementation project(':alexa-auto-settings')
+    implementation project(':alexa-auto-comms-ui')
+
+    // Extra modules for AACS Sample App Projects.
+    for (extra_module_project_name in gradle.ext.extra_module_project_names) {
+        implementation project(':' + extra_module_project_name)
+    }
 
     // AndroidX dependencies
     implementation deps.androidx_annotation

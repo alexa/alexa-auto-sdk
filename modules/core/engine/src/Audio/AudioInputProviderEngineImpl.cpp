@@ -16,13 +16,22 @@
 #include <AACE/Engine/Audio/AudioInputProviderEngineImpl.h>
 #include <AACE/Engine/Audio/AudioInputEngineImpl.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
-// String to identify log entries originating from this file.
+/// String to identify log entries originating from this file.
 static const std::string TAG("aace.audio.AudioInputProviderEngineImpl");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioInputProviderEngineImpl";
+
+/// Counter metric for AudioInputProvider Platform API
+static const std::string METRIC_AUDIO_INPUT_PROVIDER_OPEN_CHANNEL = "OpenChannel";
 
 namespace aace {
 namespace engine {
 namespace audio {
+
+using namespace aace::engine::utils::metrics;
 
 AudioInputProviderEngineImpl::AudioInputProviderEngineImpl(
     std::shared_ptr<aace::audio::AudioInputProvider> platformAudioInputProviderInterface) :
@@ -44,6 +53,7 @@ std::shared_ptr<AudioInputProviderEngineImpl> AudioInputProviderEngineImpl::crea
 std::shared_ptr<AudioInputChannelInterface> AudioInputProviderEngineImpl::openChannel(
     const std::string& name,
     aace::audio::AudioInputProvider::AudioInputType audioInputType) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "openChannel", {METRIC_AUDIO_INPUT_PROVIDER_OPEN_CHANNEL});
     try {
         std::lock_guard<std::mutex> lock(m_mutex);
 

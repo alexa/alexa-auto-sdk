@@ -21,8 +21,8 @@ include ':alexa-auto-apis'
 project(':alexa-auto-apis').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apis')
 include ':alexa-auto-lwa-auth'
 project(':alexa-auto-lwa-auth').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-lwa-auth')
-include ':alexa-auto-login'
-project(':alexa-auto-login').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-login')
+include ':alexa-auto-setup'
+project(':alexa-auto-setup').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-setup')
 include ':alexa-auto-media-player'
 project(':alexa-auto-media-player').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-media-player')
 include ':alexa-auto-app'
@@ -35,3 +35,37 @@ include ':alexa-auto-apps-common-ui'
 project(':alexa-auto-apps-common-ui').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apps-common-ui')
 include ':alexa-auto-navigation'
 project(':alexa-auto-navigation').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-navigation')
+include ':alexa-auto-settings'
+project(':alexa-auto-settings').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-settings')
+include ':alexa-auto-comms-ui'
+project(':alexa-auto-comms-ui').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-comms-ui')
+
+gradle.ext.previewmodecomponent =  new File(rootProject.projectDir, "../../platforms/android/app-components/alexa-auto-preview-mode-util").getAbsolutePath()
+if (!gradle.ext.previewmodecomponent.isEmpty()) {
+    include ':alexa-auto-preview-mode-util'
+    project(':alexa-auto-preview-mode-util').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-preview-mode-util')
+}
+
+// Extra modules for AACS Sample App Projects.
+def extra_modules = []
+def extra_modules_folder = new File('../../extensions/extras')
+extra_modules_folder.eachDir {
+    extra_modules << it.name
+}
+
+gradle.ext.extra_module_project_names = []
+for (extra_module in extra_modules) {
+    gradle.ext.extramodulecomponent = new File(rootProject.projectDir, "../../extensions/extras/${extra_module}/samples/android-aacs-sample-app/modules")
+    if (gradle.ext.extramodulecomponent.exists()) {
+        def extram_module_project_name = ''
+        def folder = new File(gradle.ext.extramodulecomponent.getAbsolutePath())
+        folder.eachDir {
+            if (it.name.startsWith('alexa-auto')) {
+                extram_module_project_name = it.name
+            }
+        }
+        include ':' + extram_module_project_name
+        project(':' + extram_module_project_name).projectDir = new File(gradle.ext.extramodulecomponent, '/' + extram_module_project_name)
+        gradle.ext.extra_module_project_names << extram_module_project_name
+    }
+}

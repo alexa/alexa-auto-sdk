@@ -55,8 +55,6 @@ public:
     auto getActivity() -> std::weak_ptr<Activity>;
     auto getLoggerHandler() -> std::weak_ptr<logger::LoggerHandler>;
 
-    enum class ConfigType { LVC, CAR };
-
     // Car Control Platform Interface
 public:
     // PowerController
@@ -86,7 +84,7 @@ public:
         override;
 
 public:
-    static bool checkConfiguration(const std::vector<json>& jsons, ConfigType type);
+    static bool checkConfiguration(const std::vector<json>& jsons);
 
 private:
     std::weak_ptr<View> m_console{};

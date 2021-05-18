@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,6 +38,8 @@ class EngineImpl;
 class EngineContext;
 class ServiceDescription;
 
+static const std::string DEFAULT_SERVICE_FACTORY_ID = "__default__";
+
 class EngineService {
 protected:
     EngineService(const aace::engine::core::ServiceDescription& description);
@@ -53,14 +55,21 @@ public:
     const ServiceDescription& getDescription();
 
     template <class T>
-    bool registerServiceFactory(ServiceFactory fn) {
+    bool registerServiceFactory(ServiceFactory fn, const std::string& id = DEFAULT_SERVICE_FACTORY_ID) {
         auto key = typeid(T).name();
-        if (m_serviceFactoryMap.find(key) == m_serviceFactoryMap.end()) {
-            m_serviceFactoryMap[key] = fn;
+        auto outer_iterator = m_serviceFactoryMap.find(key);
+        if (outer_iterator == m_serviceFactoryMap.end()) {
+            std::unordered_map<std::string, ServiceFactory> innerMap({{id, fn}});
+            m_serviceFactoryMap[key] = innerMap;
             return true;
         } else {
-            return false;
+            auto inner_iterator = m_serviceFactoryMap[key].find(id);
+            if (inner_iterator == m_serviceFactoryMap[key].end()) {
+                m_serviceFactoryMap[key][id] = fn;
+                return true;
+            }
         }
+        return false;
     }
 
     template <class T>
@@ -85,14 +94,30 @@ protected:
     std::shared_ptr<aace::engine::core::EngineContext> getContext();
 
     template <class T>
-    std::shared_ptr<T> newFactoryInstance(ServiceFactory defaultFactory) {
+    std::shared_ptr<T> newFactoryInstance(
+        ServiceFactory defaultFactory,
+        const std::string& id = DEFAULT_SERVICE_FACTORY_ID) {
         auto key = typeid(T).name();
-        auto it = m_serviceFactoryMap.find(key);
-        if (it != m_serviceFactoryMap.end()) {
-            return std::static_pointer_cast<T>(it->second());
-        } else {
-            return std::static_pointer_cast<T>(defaultFactory());
+        auto outer_iterator = m_serviceFactoryMap.find(key);
+        if (outer_iterator != m_serviceFactoryMap.end()) {
+            auto inner_iterator = m_serviceFactoryMap[key].find(id);
+            if (inner_iterator != m_serviceFactoryMap[key].end()) {
+                return std::static_pointer_cast<T>(inner_iterator->second());
+            }
         }
+        return std::static_pointer_cast<T>(defaultFactory());
+    }
+
+    template <class T>
+    std::vector<std::shared_ptr<T>> getFactoryType() {
+        std::vector<std::shared_ptr<T>> factoryList;
+        auto key = typeid(T).name();
+        if (m_serviceFactoryMap.find(key) != m_serviceFactoryMap.end()) {
+            for (auto it = m_serviceFactoryMap[key].begin(); it != m_serviceFactoryMap[key].end(); it++) {
+                factoryList.push_back(std::static_pointer_cast<T>(it->second()));
+            }
+        }
+        return factoryList;
     }
 
     template <class T>
@@ -126,7 +151,7 @@ private:
     bool m_running;
 
     // service factory map
-    std::unordered_map<std::string, ServiceFactory> m_serviceFactoryMap;
+    std::unordered_map<std::string, std::unordered_map<std::string, ServiceFactory>> m_serviceFactoryMap;
 
     // service interface map
     std::unordered_map<std::string, std::weak_ptr<void>> m_serviceInterfaceMap;
@@ -144,8 +169,8 @@ public:
     EngineServiceContext(std::shared_ptr<EngineService> service) : m_service(service){};
 
     template <class T>
-    bool registerServiceFactory(EngineService::ServiceFactory fn) {
-        return m_service->registerServiceFactory<T>(fn);
+    bool registerServiceFactory(EngineService::ServiceFactory fn, const std::string& id = DEFAULT_SERVICE_FACTORY_ID) {
+        return m_service->registerServiceFactory<T>(fn, id);
     }
 
     template <class T>

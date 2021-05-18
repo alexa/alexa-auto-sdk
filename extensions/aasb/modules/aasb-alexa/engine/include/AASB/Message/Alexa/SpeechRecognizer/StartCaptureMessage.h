@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ struct StartCaptureMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.0";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -66,9 +66,9 @@ struct StartCaptureMessage {
         using Initiator = ::aasb::message::alexa::Initiator;
 
         Initiator initiator;
-        int keywordBegin;
-        int keywordEnd;
-        std::string keyword;
+        int keywordBegin = -1;
+        int keywordEnd = -1;
+        std::string keyword = "";
     };
     static const std::string& topic() {
         static std::string topic = "SpeechRecognizer";
@@ -79,7 +79,7 @@ struct StartCaptureMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.0";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {
@@ -102,9 +102,15 @@ inline void to_json(nlohmann::json& j, const StartCaptureMessage::Payload& c) {
 }
 inline void from_json(const nlohmann::json& j, StartCaptureMessage::Payload& c) {
     j.at("initiator").get_to(c.initiator);
-    j.at("keywordBegin").get_to(c.keywordBegin);
-    j.at("keywordEnd").get_to(c.keywordEnd);
-    j.at("keyword").get_to(c.keyword);
+    if (j.contains("keywordBegin")) {
+        j.at("keywordBegin").get_to(c.keywordBegin);
+    }
+    if (j.contains("keywordEnd")) {
+        j.at("keywordEnd").get_to(c.keywordEnd);
+    }
+    if (j.contains("keyword")) {
+        j.at("keyword").get_to(c.keyword);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const StartCaptureMessage::Header::MessageDescription& c) {

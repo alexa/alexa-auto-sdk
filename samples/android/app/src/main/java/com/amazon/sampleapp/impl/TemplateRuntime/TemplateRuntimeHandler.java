@@ -17,10 +17,10 @@ package com.amazon.sampleapp.impl.TemplateRuntime;
 
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.amazon.aace.alexa.ExternalMediaAdapter;
+import androidx.annotation.Nullable;
+
 import com.amazon.aace.alexa.TemplateRuntime;
 // import com.amazon.aace.alexa.AudioPlayer;
 import com.amazon.aace.audio.AudioOutput;

@@ -27,11 +27,10 @@ namespace engine {
 namespace carControl {
 
 /**
- * The AssetStore is responsible for ingesting assets from a file
- * (or ingesting the predetermined defaults @c AssetsDefault.h) and storing the 
- * friendly names and locales associated with each asset ID. Literal friendly 
- * names of assets may be retrieved by asset ID when constructing a discovery 
- * message with assets translated to text.
+ * The AssetStore ingests assets from a file and stores the friendly name /
+ * locale pairs associated with each asset definition in the file.
+ * Friendly name / locale pairs of assets may be retrieved by asset ID when
+ * constructing a discovery message with assets expanded to text.
  */
 class AssetStore {
 public:
@@ -51,17 +50,6 @@ public:
      * there was an issue such as malformed or missing values
      */
     bool addAssets(const std::string& path);
-
-    /**
-     * Ingest the default set of 1P assets from @c AssetsDefault.h. This is an
-     * alternative to calling @c addAssets with a path to the default assets and
-     * should be used if no 1P assets path is provided in 'aace.carControl' 
-     * configuration.
-     *
-     * @return @c true if the assets were ingested successfully; @c false if 
-     * there was an issue such as malformed or missing values
-     */
-    bool addDefaultAssets();
 
     /**
      * Get the literal friendly names and locales associated with the given 

@@ -63,7 +63,7 @@ public:
         m_avsConnectionManager = std::make_shared<NiceMock<MockAVSConnectionManager>>();
         m_dataManager = std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
         m_registrationManager = std::make_shared<alexaClientSDK::registrationManager::RegistrationManager>(
-            m_directiveSequencer, m_avsConnectionManager, m_dataManager);
+            m_directiveSequencer, m_avsConnectionManager, m_dataManager, nullptr);
         auto authorizationManagerStorage = AuthorizationManagerStorage::create(m_miscStorage);
         m_authorizationManager = AuthorizationManager::create(authorizationManagerStorage, m_dataManager);
     }

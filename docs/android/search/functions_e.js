@@ -1,10 +1,14 @@
 var searchData=
 [
   ['seek',['seek',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a6c511f6d0967158f9512d5359e4a4a10',1,'com.amazon.aace.alexa.ExternalMediaAdapter.seek()'],['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a0f65d94b6aa9a24a7d896939adc8d4a4',1,'com.amazon.aace.alexa.LocalMediaSource.seek()']]],
+  ['senddatasourcefetchrequestevent',['sendDataSourceFetchRequestEvent',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a4886bca519163b2d2648ee09fd519bde',1,'com::amazon::aace::apl::APL']]],
+  ['senddevicewindowstate',['sendDeviceWindowState',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a846222db2e1244525bedcc935274a582',1,'com::amazon::aace::apl::APL']]],
+  ['senddocumentstate',['sendDocumentState',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a02696580fc976b4ab7596512a5613c1c',1,'com::amazon::aace::apl::APL']]],
   ['senddtmf',['sendDTMF',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a84929af8429fa585444691eb965da31a',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
   ['senddtmffailed',['sendDTMFFailed',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#aaa339310c1f1f0c29b99308677572a47',1,'com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFFailed(String callId, DTMFError code)'],['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a6deac75764abd61feefcff05756ed367',1,'com.amazon.aace.phonecontrol.PhoneCallController.sendDTMFFailed(String callId, DTMFError code, String message)']]],
   ['senddtmfsucceeded',['sendDTMFSucceeded',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#abbef49449a17271bc67e885054c50416',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
   ['sendevent',['sendEvent',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a642481290c6676c77421712813cbc9fd',1,'com::amazon::aace::authorization::Authorization']]],
+  ['sendruntimeerrorevent',['sendRuntimeErrorEvent',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#ae3debd3e0ca999b04ec313d50a8bae69',1,'com::amazon::aace::apl::APL']]],
   ['senduserevent',['sendUserEvent',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a596b08f65e81293660be6b9b0b1e13b9',1,'com::amazon::aace::apl::APL']]],
   ['setaplmaxversion',['setAPLMaxVersion',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a52b6f421255ee73cfef5b3c5e73073fc',1,'com::amazon::aace::apl::APL']]],
   ['setauthorizationdata',['setAuthorizationData',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#a5d7a33dce5adbb4ab084eb0b3b6de90e',1,'com::amazon::aace::authorization::Authorization']]],
@@ -19,6 +23,8 @@ var searchData=
   ['setproperty',['setProperty',['../classcom_1_1amazon_1_1aace_1_1property_manager_1_1_property_manager.html#a6a6b6d34ba96850c38f1aa3d40786c7d',1,'com::amazon::aace::propertyManager::PropertyManager']]],
   ['setrangecontrollervalue',['setRangeControllerValue',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control.html#afe04323771ca2cbbc44de5ecb93c38ce',1,'com::amazon::aace::carControl::CarControl']]],
   ['setrefreshtoken',['setRefreshToken',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#ad320c677bafca842107daa2419bbc675',1,'com::amazon::aace::cbl::CBL']]],
+  ['setupcompleted',['setupCompleted',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_device_setup.html#aa49898f6ff85c74ff11ca8fae4ae6374',1,'com::amazon::aace::alexa::DeviceSetup']]],
+  ['setupcompletedresponse',['setupCompletedResponse',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_device_setup.html#a16219851bbc1eb9ffde835f7580da4f0',1,'com::amazon::aace::alexa::DeviceSetup']]],
   ['setuserprofile',['setUserProfile',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a18753a6d6d002bc4188de1a00beba9e5',1,'com::amazon::aace::cbl::CBL']]],
   ['showalternativeroutessucceeded',['showAlternativeRoutesSucceeded',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#a17039d639541a43a786cd5057f9f27ae',1,'com::amazon::aace::navigation::Navigation']]],
   ['speakersettingschanged',['speakerSettingsChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_speaker.html#a96ea668a0bd4f4f8f266b1a84e2f3e2d',1,'com::amazon::aace::alexa::AlexaSpeaker']]],

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. and its affiliates. All Rights Reserved.
  *
  * SPDX-License-Identifier: LicenseRef-.amazon.com.-ASL-1.0
  *
@@ -25,7 +25,7 @@
 #include <AVSCommon/Utils/AudioFormat.h>
 #include <AVSCommon/SDKInterfaces/KeyWordObserverInterface.h>
 #include <AACE/Engine/Audio/AudioManagerInterface.h>
-#include <AACE/Engine/Alexa/WakewordVerifier.h>
+#include <AACE/Engine/Alexa/InitiatorVerifier.h>
 #include <AACE/Engine/Alexa/WakewordEngineAdapter.h>
 
 namespace aace {
@@ -36,21 +36,23 @@ class LoopbackDetector
         : public alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<LoopbackDetector>
-        , public alexa::WakewordVerifier {
+        , public alexa::InitiatorVerifier {
 private:
     LoopbackDetector(const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat);
 
     bool initialize(
+        const std::string& defaultLocale,
         std::shared_ptr<audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexa::WakewordEngineAdapter> wakewordEngineAdapter);
 
 public:
     static std::shared_ptr<LoopbackDetector> create(
+        const std::string& defaultLocale,
         const alexaClientSDK::avsCommon::utils::AudioFormat& audioFormat,
         std::shared_ptr<audio::AudioManagerInterface> audioManager,
         std::shared_ptr<alexa::WakewordEngineAdapter> wakewordEngineAdapter = nullptr);
 
-    bool verify(const std::string& wakeword, const std::chrono::milliseconds& timeout) override;
+    bool shouldBlock(const std::string& wakeword, const std::chrono::milliseconds& timeout) override;
 
     // KeyWordObserverInterface
     void onKeyWordDetected(

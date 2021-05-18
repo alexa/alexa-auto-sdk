@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,24 +17,18 @@ package com.amazon.sampleapp.apl;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
 
-import com.amazon.aace.logger.Logger;
-import com.amazon.apl.android.APLController;
-import com.amazon.sampleapp.apl.R;
+import androidx.fragment.app.Fragment;
 
+import com.amazon.apl.android.render.APLPresenter;
+
+/**
+ * This fragment represent the UI element where APL will be rendered
+ * in the sample app.
+ */
 public class APLFragment extends Fragment {
     Activity mActivity;
 
@@ -44,9 +38,17 @@ public class APLFragment extends Fragment {
         this.mActivity = activity;
     }
 
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        APLController.initializeAPL(mActivity);
+        //---------------------------------------------------------------------
+        // Initialize the APL Runtime. This must be called during
+        // Activity.onCreate() or prior to APLLayout inflation.
+        //---------------------------------------------------------------------
+        APLPresenter.initialize(mActivity);
+
+        // Inflate the APLLayout view in this fragment
         View view = inflater.inflate(R.layout.apl_view, container, false);
+
         return view;
     }
 }

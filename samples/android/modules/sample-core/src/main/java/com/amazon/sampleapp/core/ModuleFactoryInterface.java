@@ -1,6 +1,6 @@
 package com.amazon.sampleapp.core;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.core.config.EngineConfiguration;

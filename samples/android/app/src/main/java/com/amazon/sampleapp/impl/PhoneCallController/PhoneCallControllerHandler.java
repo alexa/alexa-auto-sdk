@@ -18,12 +18,13 @@ package com.amazon.sampleapp.impl.PhoneCallController;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.amazon.aace.phonecontrol.PhoneCallController;
 import com.amazon.sampleapp.R;

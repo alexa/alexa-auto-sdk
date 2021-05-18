@@ -16,10 +16,11 @@
 package com.amazon.sampleapp.impl.SpeechRecognizer;
 
 import android.app.Activity;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.amazon.aace.alexa.AlexaProperties;
 import com.amazon.aace.alexa.SpeechRecognizer;

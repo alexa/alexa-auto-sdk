@@ -1,5 +1,5 @@
 /*
-  * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+  * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
   *
   * Licensed under the Apache License, Version 2.0 (the "License").
   * You may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 
 #include <memory>
 
-#include <AVSCommon/SDKInterfaces/LocaleAssetsManagerInterface.h>
 #include <ACL/AVSConnectionManager.h>
-
+#include <acsdkDoNotDisturb/DoNotDisturbCapabilityAgent.h>
+#include <AVSCommon/SDKInterfaces/LocaleAssetsManagerInterface.h>
+#include <AVSCommon/Utils/Metrics/MetricRecorderInterface.h>
 #include <Settings/DeviceSettingsManager.h>
 #include <Settings/SettingsManagerBuilderBase.h>
 #include <Settings/Storage/DeviceSettingStorageInterface.h>
 #include <Settings/Types/LocaleWakeWordsSetting.h>
-
-#include <DoNotDisturbCA/DoNotDisturbCapabilityAgent.h>
 
 namespace aace {
 namespace engine {
@@ -47,7 +46,8 @@ public:
     static std::unique_ptr<DeviceSettingsDelegate> createDeviceSettingsDelegate(
         const alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode& configurationRoot,
         std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
-        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager);
+        std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder);
 
     using Configurations = decltype(mapConfigurationsType(static_cast<DeviceSettingsManager*>(nullptr)));
 
@@ -100,7 +100,7 @@ public:
         return std::get<index>(m_configurations);
     }
 
-    virtual const Configurations& getConfigurations();
+    virtual Configurations& getConfigurations();
     virtual std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> getDeviceSettingsManager();
     virtual std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> getDeviceSettingStorage();
 
@@ -109,6 +109,7 @@ private:
     std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> m_deviceSettingsManager;
     std::shared_ptr<alexaClientSDK::settings::storage::DeviceSettingStorageInterface> m_deviceSettingStorage;
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_connectionManager;
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> m_metricRecorder;
 };
 
 }  // namespace alexa

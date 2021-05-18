@@ -69,8 +69,8 @@ bool MessagingEngineService::registerPlatformInterfaceType(std::shared_ptr<aace:
             getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
         ThrowIfNull(alexaComponents, "invalidAlexaComponentInterface");
 
-        auto defaultEndpointBuilder = alexaComponents->getDefaultEndpointBuilder();
-        ThrowIfNull(defaultEndpointBuilder, "defaultEndpointBuilderInvalid");
+        auto defaultCapabilitiesRegistrar = alexaComponents->getDefaultEndpointCapabilitiesRegistrar();
+        ThrowIfNull(defaultCapabilitiesRegistrar, "defaultCapabilitiesRegistrarInvalid");
 
         auto exceptionSender = alexaComponents->getExceptionEncounteredSender();
         ThrowIfNull(exceptionSender, "exceptionSenderInvalid");
@@ -82,7 +82,7 @@ bool MessagingEngineService::registerPlatformInterfaceType(std::shared_ptr<aace:
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
         m_messagingEngineImpl = aace::engine::messaging::MessagingEngineImpl::create(
-            messaging, defaultEndpointBuilder, exceptionSender, contextManager, messageSender);
+            messaging, defaultCapabilitiesRegistrar, exceptionSender, contextManager, messageSender);
         ThrowIfNull(m_messagingEngineImpl, "createMessagingEngineImplFailed");
 
         return true;

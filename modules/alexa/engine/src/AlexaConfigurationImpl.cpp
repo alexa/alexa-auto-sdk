@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace alexa {
 namespace config {
 
 // String to identify log entries originating from this file.
-static const std::string TAG("aace.alexa.config.AlexaConfiguationImpl");
+static const std::string TAG("aace.alexa.config.AlexaConfigurationImpl");
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceInfoConfig(
     const std::string& deviceSerialNumber,
@@ -59,7 +59,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAlertsConfig(
@@ -77,7 +77,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createNotificationsConfig(
@@ -95,7 +95,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCertifiedSenderConfig(
@@ -114,7 +114,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCapabilitiesDelegateConfig(
@@ -133,7 +133,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCurlConfig(
@@ -156,7 +156,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSettingsConfig(
@@ -221,7 +221,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     document.Accept(writer);
     AACE_DEBUG(LX(TAG).m(buffer.GetString()));
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSpeakerManagerConfig(bool enabled) {
@@ -234,7 +234,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSystemConfig(
@@ -249,7 +249,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createMiscStorageConfig(
@@ -270,7 +270,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createSpeechRecognizerConfig(
@@ -289,7 +289,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createTemplateRuntimeTimeoutConfig(
@@ -330,7 +330,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createExternalMediaPlayerConfig(
@@ -345,7 +345,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createEqualizerControllerConfig(
@@ -402,7 +402,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAuthProviderConfig(
@@ -422,7 +422,7 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document));
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
 }  // namespace config

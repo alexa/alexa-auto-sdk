@@ -15,6 +15,7 @@
 
 #include "AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -24,6 +25,8 @@
 namespace aace {
 namespace engine {
 namespace alexa {
+
+using namespace aace::engine::utils::metrics;
 
 static const uint8_t MAX_SPEAKER_VOLUME = 100;
 
@@ -38,6 +41,20 @@ static const std::string DEFAULT_PLAYERCOOKIE_PAYLOAD = R"(
         "capabilities": {}
     }
 )";
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "LocalMediaSourceEngineImpl";
+
+/// Counter metrics for LocalMediaSource Platform APIs
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAY = "Play";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAY_CONTROL = "PlayControl";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_SEEK = "Seek";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_ADJUST_SEEK = "AdjustSeek";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_VOLUME_CHANGED = "VolumeChanged";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_MUTED_STATE_CHANGED = "MutedStateChanged";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAYER_EVENT = "PlayerEvent";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAYER_ERROR = "PlayerError";
+static const std::string METRIC_LOCAL_MEDIA_SOURCE_SET_FOCUS = "SetFocus";
 
 LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl(
     std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
@@ -191,7 +208,7 @@ bool LocalMediaSourceEngineImpl::handlePlay(
         ContentSelector contentSelector = foundIt->second;
 
         std::string selectionPayload = playContextToken.substr(separatorIndex + 1);  //  i.e."98.7"
-
+        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlay", {METRIC_LOCAL_MEDIA_SOURCE_PLAY});
         ThrowIfNot(
             m_platformLocalMediaSource->play(contentSelector, selectionPayload), "platformMediaAdapterPlayFailed");
         // set focus on successful play
@@ -212,6 +229,7 @@ bool LocalMediaSourceEngineImpl::handlePlay(
 bool LocalMediaSourceEngineImpl::handlePlayControl(
     const std::string& localPlayerId,
     aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlayControl", {METRIC_LOCAL_MEDIA_SOURCE_PLAY_CONTROL});
     try {
         AACE_VERBOSE(LX(TAG));
 
@@ -238,6 +256,7 @@ bool LocalMediaSourceEngineImpl::handlePlayControl(
 }
 
 bool LocalMediaSourceEngineImpl::handleSeek(const std::string& localPlayerId, std::chrono::milliseconds offset) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSeek", {METRIC_LOCAL_MEDIA_SOURCE_SEEK});
     try {
         AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId));
 
@@ -253,6 +272,7 @@ bool LocalMediaSourceEngineImpl::handleSeek(const std::string& localPlayerId, st
 bool LocalMediaSourceEngineImpl::handleAdjustSeek(
     const std::string& localPlayerId,
     std::chrono::milliseconds deltaOffset) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleAdjustSeek", {METRIC_LOCAL_MEDIA_SOURCE_ADJUST_SEEK});
     try {
         AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId));
 
@@ -449,6 +469,7 @@ std::string LocalMediaSourceEngineImpl::getPlayerId(Source source) {
 }
 
 bool LocalMediaSourceEngineImpl::handleSetVolume(int8_t volume) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSetVolume", {METRIC_LOCAL_MEDIA_SOURCE_VOLUME_CHANGED});
     try {
         ThrowIfNot(
             m_platformLocalMediaSource->volumeChanged((float)volume / MAX_SPEAKER_VOLUME),
@@ -461,6 +482,12 @@ bool LocalMediaSourceEngineImpl::handleSetVolume(int8_t volume) {
 }
 
 bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
+    std::stringstream ss;
+    ss
+        << (mute ? aace::alexa::ExternalMediaAdapter::MutedState::MUTED
+                 : aace::alexa::ExternalMediaAdapter::MutedState::UNMUTED);
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "handleSetMute", {METRIC_LOCAL_MEDIA_SOURCE_MUTED_STATE_CHANGED, ss.str()});
     try {
         ThrowIfNot(
             m_platformLocalMediaSource->mutedStateChanged(
@@ -480,6 +507,8 @@ bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
 //
 
 void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_EVENT, eventName});
     try {
         AACE_VERBOSE(LX(TAG).d("eventName", eventName));
 
@@ -507,6 +536,10 @@ void LocalMediaSourceEngineImpl::onPlayerError(
     long code,
     const std::string& description,
     bool fatal) {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX,
+        "onPlayerError",
+        {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_ERROR, errorName, std::to_string(code)});
     try {
         AACE_VERBOSE(LX(TAG).d("errorName", errorName).d("code", code).d("description", description).d("fatal", fatal));
 
@@ -540,6 +573,7 @@ void LocalMediaSourceEngineImpl::onPlayerError(
 }
 
 void LocalMediaSourceEngineImpl::onSetFocus(bool focusAcquire) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSetFocus", {METRIC_LOCAL_MEDIA_SOURCE_SET_FOCUS});
     try {
         ThrowIfNot(setFocus(m_localPlayerId, focusAcquire), "setFocusFailed");
     } catch (std::exception& ex) {

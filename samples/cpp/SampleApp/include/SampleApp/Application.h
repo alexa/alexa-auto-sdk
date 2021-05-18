@@ -39,6 +39,7 @@
 #include "SampleApp/Alexa/AlexaSpeakerHandler.h"
 #include "SampleApp/Alexa/GlobalPresetHandler.h"
 #include "SampleApp/Alexa/DoNotDisturbHandler.h"
+#include "SampleApp/Alexa/DeviceSetupHandler.h"
 
 // Default Audio Interfaces (File based audio support)
 #include "SampleApp/Audio/AudioInputProviderHandler.h"

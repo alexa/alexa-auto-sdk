@@ -287,6 +287,7 @@ public class AACSReceiver {
         String messageTransferId = bundle.getString(IPCConstants.AACS_IPC_MESSAGE_TRANSFER_ID);
         final String streamId = bundle.getString(IPCConstants.AACS_IPC_STREAM_ID);
 
+        final boolean closeReadPipe = !bundle.getBoolean(IPCConstants.AACS_IPC_PACKAGE_NAME_MATCHES);
         Messenger messenger = new Messenger(bundle.getBinder(IPCConstants.AACS_IPC_MESSENGER));
 
         ParcelFileDescriptor[] pipe;
@@ -319,10 +320,12 @@ public class AACSReceiver {
         Log.d(TAG, "IPC: receiver handleFetch initiating callback to provide data to stream");
         mHandler.post(() -> {
             if (!mIsShutdown) {
-                try {
-                    readPipe.close();
-                } catch (Exception e) {
-                    Log.i(TAG, "IPC: Error while closing read pipe " + e.toString());
+                if (closeReadPipe) {
+                    try {
+                        readPipe.close();
+                    } catch (Exception e) {
+                        Log.e(TAG, "IPC: Error while closing read pipe " + e.toString());
+                    }
                 }
                 mFetchStreamCallback.onStreamRequested(streamId, writePipe);
             }
@@ -347,7 +350,7 @@ public class AACSReceiver {
 
         String messageTransferId = bundle.getString(IPCConstants.AACS_IPC_MESSAGE_TRANSFER_ID);
         final String streamId = bundle.getString(IPCConstants.AACS_IPC_STREAM_ID);
-
+        final boolean closeWritePipe = !bundle.getBoolean(IPCConstants.AACS_IPC_PACKAGE_NAME_MATCHES);
         Messenger messenger = new Messenger(bundle.getBinder(IPCConstants.AACS_IPC_MESSENGER));
 
         ParcelFileDescriptor[] pipe;
@@ -381,10 +384,12 @@ public class AACSReceiver {
 
         mHandler.post(() -> {
             if (!mIsShutdown) {
-                try {
-                    writePipe.close();
-                } catch (Exception e) {
-                    Log.i(TAG, "IPC: Error while closing write pipe " + e.toString());
+                if (closeWritePipe) {
+                    try {
+                        writePipe.close();
+                    } catch (Exception e) {
+                        Log.e(TAG, "IPC: Error while closing write pipe " + e.toString());
+                    }
                 }
                 mStreamPushedFromSenderCallback.onStreamPushedFromSenderCallback(streamId, readPipe);
             }

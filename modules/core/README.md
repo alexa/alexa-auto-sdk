@@ -1,6 +1,5 @@
 # Core Module
 
-
 The Auto SDK Core module contains the Engine base classes and the abstract platform interfaces that the platform or other modules can use.
 
 <!-- omit in toc -->
@@ -46,7 +45,7 @@ To create an instance of the Engine, call the static function `aace::core::Engin
 
 Before you can start the Engine, you must configure it using the required `aace::core::config::EngineConfiguration` object(s) for the services you will be using:
 
-1. Generate the `EngineConfiguration` object(s). You can do this [using a JSON configuration file](#specifying-configuration-data-using-a-json-file), [programmatically (using factory methods)](#specifying-configuration-data-programmatically), or using a combination of both approaches.
+1. Generate the `EngineConfiguration` object(s). You can do this [using a JSON configuration file](#specifying-configuration-data-using-a-json-file), [programmatically (using factory functions)](#specifying-configuration-data-programmatically), or using a combination of both approaches.
 
     >**Note:** You can generate a single `EngineConfiguration` object that includes all configuration data for the services you will be using, or you can break the configuration data into logical sections and generate multiple `EngineConfiguration` objects. For example, you might generate one `EngineConfiguration` object for each module.
     
@@ -62,7 +61,7 @@ Before you can start the Engine, you must configure it using the required `aace:
       
       replacing `xConfig, yConfig, zConfig` with logical names to identify the `EngineConfiguration` objects you generated; for example: `coreConfig, alexaConfig, navigationConfig`
 
-> **Note**: You can call the Engine's `configure()` method only once, and you must call it before you register any platform interfaces or start the Engine.
+> **Note**: You can call the Engine's `configure()` function only once, and you must call it before you register any platform interfaces or start the Engine.
 
 ### Configuration Database Files
 
@@ -92,18 +91,18 @@ The [config.json.in](../../samples/cpp/assets/config.json.in) file provides an e
 
 ### Specifying Configuration Data Programmatically
 
-You can also specify the configuration data programmatically by using the configuration factory methods provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating an `EngineConfiguration` object with the following method:
+You can also specify the configuration data programmatically by using the configuration factory functions provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating an `EngineConfiguration` object with the following function:
 
 ```cpp
 auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig
     ("<SQLITE_DATABASE_FILE_PATH>" );
 ```
 
-See the API reference documentation for the [`AlexaConfiguration` class](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html) for details about the configurable methods used to generate the `EngineConfiguration` object.
+See the API reference documentation for the [`AlexaConfiguration` class](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html) for details about the configurable functions used to generate the `EngineConfiguration` object.
 
 ### Vehicle Information Requirements
 
-You must configure vehicle information in the Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically through the `VehicleConfiguration::createVehicleInfoConfig()` factory method.
+You must configure vehicle information in the Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically through the `VehicleConfiguration::createVehicleInfoConfig()` factory function.
 
 ```cpp
 {
@@ -134,7 +133,7 @@ For details about the vehicle properties included in the `VehicleConfiguration` 
 To extend each Auto SDK interface you will use in your platform implementation:
 
 1. Create a handler for the interface by overriding the various classes in the library that, when registered with the Engine, allow your application to interact with Amazon services.
-2. Register the handler with the Engine. The Engine class provides two methods for registering platform interface handlers, which allows you to register one or more interfaces at a time for convenience:
+2. Register the handler with the Engine. The Engine class provides two functions for registering platform interface handlers, which allows you to register one or more interfaces at a time for convenience:
 
     ```
     class MyInterface : public SpeechRecognizer {
@@ -159,8 +158,21 @@ The sections below provide information about and examples for creating and regis
 
 ### Implementing a Location Provider
 
-The Engine provides a callback for implementing location requests from Alexa and other modules and a Location type definition. This is optional and dependent on the platform implementation.
+The Engine provides a platform interface for implementing location requests from Alexa and other modules and a Location type definition. For some features, the platform interface is optional and dependent on the platform implementation. For other features, such as navigation and local search, the platform interface is required.
 
+The following sections describe the `LocationProvider` APIs.
+
+#### `getLocation()` and `getCountry()` 
+These virtual functions allow the Engine to retrieve the device's geographic coordinates and country code (based on the coordinates).
+
+The Engine calls `getLocation()` for each voice request to Alexa. Your application needs to construct a `Location` object with geographic coordinates obtained from the location service provider on the device. If the platform cannot retrieve the device location, your application must return the `Location` object with its fields set to `UNDEFINED`.
+
+#### `locationServiceAccessChanged(LocationServiceAccess access)`
+This function notifies the Engine of any change in the state of the location service access. 
+
+If the location provider on the device is disabled, for example, when GPS or network service is down, call `locationServiceAccessChanged(LocationServiceAccess::DISABLED)` to inform the Engine. This API allows the Engine to avoid querying the device location unnecessarily each time a voice request to Alexa is received. If the location provider is enabled again, for example, when the GPS or network service is restored, call `locationServiceAccessChanged(LocationServiceAccess::ENABLED)`. The Engine then resumes calling `getLocation()` to query the device location.
+
+#### Implementing `LocationProvider` Handler
 To implement a custom `LocationProvider` handler to provide location using the default Engine `LocationProvider` class, extend the `LocationProvider` class:
 
 ```cpp
@@ -183,9 +195,11 @@ engine->registerPlatformInterface( std::make_shared<MyLocationProvider>());
 
 ### Implementing a Network Information Provider
 
-The `NetworkInfoProvider` platform interface provides methods that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events whenever the network status changes. Methods such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` method informs the Engine about network status changes.
+>**Note:** The `NetworkInfoProvider` platform interface is mandatory if you use the Local Voice Control (LVC) extension.
 
-The `NetworkInfoProvider` methods are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the methods provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
+The `NetworkInfoProvider` platform interface provides functions that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events to the Engine. Functions such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` function informs the Engine about network status changes.
+
+The `NetworkInfoProvider` functions are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the functions provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
 
 > **Important!** Network connectivity monitoring is the responsibility of the platform. The Auto SDK doesn't monitor network connectivity.
 
@@ -243,12 +257,78 @@ class MyLogger : public aace::logger::Logger {
 // Register the platform interface with the Engine
 engine->registerPlatformInterface( std::make_shared<MyLogger>());
 ```        
-    
+
+#### Configuring Logger to Use a File Sink
+By default, the Engine writes logs to the console. You can configure the Engine to save logs to a file with an *"aace.logger"* JSON object:
+
+```jsonc
+{
+  "aace.logger": {
+    "sinks": [
+        {
+            "id": "{STRING}",
+            "type": "aace.logger.sink.file",
+            "config": {
+                "path": "{STRING}",
+                "prefix": "{STRING}",
+                "maxSize": {INTEGER},
+                "maxFiles": {INTEGER},
+                "append": {BOOLEAN}
+            },
+            "rules": [
+                {
+                    "level": "{STRING}"
+                }
+            ]
+        }
+    ]
+}
+```
+
+| Property | Type | Required | Description | Example
+|-|-|-|-|-|
+| aace.logger.<br>sinks[i].<br>id | string | Yes | A unique identifier for the log sink. | "debug-logs"
+| aace.logger.<br>sinks[i].<br>type | string | Yes | The type of the log sink. Use "aace.logger.sink.file" to write logs to a file. | "aace.logger.sink.file"
+| aace.logger.<br>sinks[i].<br>config.<br>path | string | Yes | An absolute path where the Engine creates the log file. | "/opt/AAC/data"
+| aace.logger.<br>sinks[i].<br>config.<br>prefix | string | Yes | The prefix for the log file. | "auto-sdk"
+| aace.logger.<br>sinks[i].<br>config.<br>maxSize | integer | Yes | The maximum size of the log file in bytes. | 5242880
+| aace.logger.<br>sinks[i].<br>config.<br>maxFiles | integer | Yes | The maximum number of logs files. | 5
+| aace.logger.<br>sinks[i].<br>config.<br>append | boolean | Yes | Use true to append logs to the existing file. Use false to overwrite the log files.  | false
+| aace.logger.<br>sinks[i].<br>rules[j].<br>level | enum (log level) | Yes | The log level used to filter logs written to the sink. <br><br>**Accepted values:**<ul><li>`"VERBOSE"`</li><li>`"INFO"`</li><li>`"WARN"`</li><li>`"ERROR"`</li><li>`"CRITICAL"`</li><li>`"METRIC"`</li></ul> | "VERBOSE"
+
+
+You can either define this JSON in a file and construct an `EngineConfiguration` from that file, or you can use the provided configuration factory function [`aace::logger::config::LoggerConfiguration::createFileSinkConfig()`](./platform/include/AACE/Logger/LoggerConfiguration.h) to programmatically construct the `EngineConfiguration` in the proper format.
+
+```c++
+#include "AACE/Logger/Logger.h"
+#include "AACE/Logger/LoggerConfiguration.h"
+
+// ...
+
+auto fileSinkConfig = aace::logger::config::LoggerConfiguration::createFileSinkConfig(
+    "debug-logs",
+    aace::logger::LoggerEngineInterface::Level::VERBOSE,
+    "opt/AAC/data",
+    "auto-sdk",
+    5242880,
+    5,
+    false);
+m_engine->configure(
+    {
+        // other config objects...,
+        fileSinkConfig
+        // ...
+    }
+);
+
+...
+```
+
 ### Implementing Audio
 
 The platform should implement audio input and audio output handling. Other Auto SDK components can then make use of the provided implementation to provision audio input and output channels. 
   
-The `AudioInputProvider` should provide a platform-specific implementation of the `AudioInput` interface, for the type of input specified by the `AudioInputType` parameter when its `openChannel()` method is called, with only one instance of `AudioInput` per `AudioInputType`. For example, the `SpeechRecognizer` engine implementation requests an audio channel for type `VOICE`, while AlexaComms requests a channel for type `COMMUNICATION` - the implementation determines if these are shared or separate input channels. If it is a shared input channel, then whenever the platform implementation writes data to the interface, any instance in the Engine that has opened that channel will receive a callback with the audio data.
+The `AudioInputProvider` should provide a platform-specific implementation of the `AudioInput` interface, for the type of input specified by the `AudioInputType` parameter when its `openChannel()` function is called, with only one instance of `AudioInput` per `AudioInputType`. For example, the `SpeechRecognizer` engine implementation requests an audio channel for type `VOICE`, while AlexaComms requests a channel for type `COMMUNICATION` - the implementation determines if these are shared or separate input channels. If it is a shared input channel, then whenever the platform implementation writes data to the interface, any instance in the Engine that has opened that channel will receive a callback with the audio data.
   
 ```cpp
 #include <AACE/Audio/AudioInputProvider.h>
@@ -281,9 +361,9 @@ public:
 };
 ```
 
-The `AudioInput` interface is required to implement platform-specific support for providing audio data from a specific input channel when requested by the Auto SDK. When a request for audio input is made (for example tap-to-talk from `SpeechRecognizer`), the `AudioInput`'s `startAudioInput()` method is called and the implementation must start writing audio data until `stopAudioInput()` is called. 
+The `AudioInput` interface is required to implement platform-specific support for providing audio data from a specific input channel when requested by the Auto SDK. When a request for audio input is made (for example tap-to-talk from `SpeechRecognizer`), the `AudioInput`'s `startAudioInput()` function is called and the implementation must start writing audio data until `stopAudioInput()` is called. 
 
-In the case where two components in the Auto SDK both request audio from the same channel, `startAudioInput()` will only be called when the first component requests the audio. All of the components that have requested audio from the input channel will receive a callback when audio data is written to the interface, until they explicitly cancel the request. The `stopAudioInput()` method will only be called after the last component has canceled its request to receive audio from the channel.
+In the case where two components in the Auto SDK both request audio from the same channel, `startAudioInput()` will only be called when the first component requests the audio. All of the components that have requested audio from the input channel will receive a callback when audio data is written to the interface, until they explicitly cancel the request. The `stopAudioInput()` function will only be called after the last component has canceled its request to receive audio from the channel.
 
 The audio input format for all input types should be encoded as:
 
@@ -305,7 +385,7 @@ public:
         // start receiving audio data from the platform specific input device
         m_device.start( [this](const int16_t* data, const size_t size) {
             // provide the audio data to engine by calling the
-            // AudioInput write() method...
+            // AudioInput write() function...
             write( data, size );
         });
     }
@@ -318,7 +398,7 @@ public:
 };
 ```
 
-The `AudioOutputProvider` provides a platform-specific implementation of the `AudioOutput` interface, for the type of input specified by the `AudioOutputType` parameter, when its `openChannel()` method is called. The `AudioOutputProvider` should create a new instance of `AudioOutput` each time `openChannel()` is called. The `openChannel()` method will be called from components in the Auto SDK that require support for playing back audio. The characteristics of the audio that will be played on the channel are specified by the `AudioOutputType` parameter. The following types are currently defined by `AudioOutputType`:
+The `AudioOutputProvider` provides a platform-specific implementation of the `AudioOutput` interface, for the type of input specified by the `AudioOutputType` parameter, when its `openChannel()` function is called. The `AudioOutputProvider` should create a new instance of `AudioOutput` each time `openChannel()` is called. The `openChannel()` function will be called from components in the Auto SDK that require support for playing back audio. The characteristics of the audio that will be played on the channel are specified by the `AudioOutputType` parameter. The following types are currently defined by `AudioOutputType`:
 
  * TTS
  * MUSIC
@@ -346,7 +426,7 @@ public:
 };
 ```
 
-The `AudioOutput` describes a platform-specific implementation of an audio output channel. The platform should have one or more implementations of `AudioOutput`, depending on on the desired behavior. In addition to implementing the callback methods, each `AudioOutput` channel implementation should report the state of its media, when appropriate. 
+The `AudioOutput` describes a platform-specific implementation of an audio output channel. The platform should have one or more implementations of `AudioOutput`, depending on on the desired behavior. In addition to implementing the callback functions, each `AudioOutput` channel implementation should report the state of its media, when appropriate. 
 
 The full `AudioOutput` API is described below. 
 
@@ -422,14 +502,14 @@ class AudioOutputHandler :
 ```
 ## Starting the Engine
 
-After creating and registering handlers for all required platform interfaces, you can start the Engine by calling the Engine's `start()` method. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
+After creating and registering handlers for all required platform interfaces, you can start the Engine by calling the Engine's `start()` function. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
 
 ```
 engine->start();
 ```
 
 ## Stopping the Engine
-If you need to stop the engine for any reason except for logging out the user, use the Engine's `stop()` method. You can then restart the Engine by calling `start()` again.
+If you need to stop the engine for any reason except for logging out the user, use the Engine's `stop()` function. You can then restart the Engine by calling `start()` again.
 
 ```
 engine->stop();
@@ -444,7 +524,7 @@ engine->shutdown();
 
 Certain modules in the Auto SDK define constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set the values of runtime properties in the Engine. Changes to property values may also be initiated from the Alexa Voice Service (AVS). For example, the `TIMEZONE` property may be changed through AVS when the user changes the timezone setting in the Alexa Companion App.
 
-The Auto SDK Property Manager maintains the runtime properties by storing properties and listeners to the properties and delegating the `setProperty()` and `getProperty()` calls from your application to the respective Engine services. It also calls `propertyChanged()` to notify your application about property value changes originating in the Engine. The Property Manager includes a `PropertyManager` platform interface that provides the following methods:
+The Auto SDK Property Manager maintains the runtime properties by storing properties and listeners to the properties and delegating the `setProperty()` and `getProperty()` calls from your application to the respective Engine services. It also calls `propertyChanged()` to notify your application about property value changes originating in the Engine. The Property Manager includes a `PropertyManager` platform interface that provides the following functions:
 
 * `setProperty()` - called by your application to set a property value in the Engine.
 * `getProperty()` - called by your application to retrieve a property value from the Engine.
@@ -495,7 +575,7 @@ auto m_propertyManagerHandler = std::make_shared<MyPropertyManagerHandler>();
 engine->registerPlatformInterface( m_propertyManagerHandler );
 
 // You can also set and retrieve properties in the Engine by calling the inherited
-// setProperty() and getProperty() methods.
+// setProperty() and getProperty() functions.
 
 // For example, to set the LOCALE property to English-Canada:
 m_propertyManagerHandler->setProperty(aace::alexa::property::LOCALE, "en-CA");
@@ -505,7 +585,7 @@ auto locale  = m_propertyManagerHandler->getProperty(aace::alexa::property::LOCA
 
 ```
 ### Property Definitions
-The definitions of the properties used with the `PropertyManager::setProperty()` and `PropertyManager::getProperty()` methods are included in the [AlexaProperties.h](../alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [CoreProperties.h](./platform/include/AACE/Core/CoreProperties.h) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
+The definitions of the properties used with the `PropertyManager::setProperty()` and `PropertyManager::getProperty()` functions are included in the [AlexaProperties.h](../alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [CoreProperties.h](./platform/include/AACE/Core/CoreProperties.h) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
 
 
 ## Managing Authorization

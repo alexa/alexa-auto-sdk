@@ -17,16 +17,16 @@ package com.amazon.sampleapp.impl.Navigation;
 
 import android.app.Activity;
 import android.os.Environment;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SwitchCompat;
 
 import com.amazon.aace.navigation.Navigation;
 import com.amazon.sampleapp.R;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 import com.amazon.sampleapp.logView.LogRecyclerViewAdapter;
-import com.google.android.gms.common.util.JsonUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,11 +38,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.*;
-import java.text.*;
-import java.time.*;
 import java.util.*;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class NavigationHandler extends Navigation {
     private static String sTag = "Navigation";
@@ -117,9 +114,8 @@ public class NavigationHandler extends Navigation {
      */
     private boolean loadNavigationState() {
         synchronized (m_currentNavigationState) {
-            String navigationStateRootFileName =
-                    Environment.getExternalStorageDirectory().getAbsolutePath() + "/NavigationState.json";
-            File rootNavigationStateFile = new File(navigationStateRootFileName);
+            File rootNavigationStateFile =
+                    new File(Environment.getExternalStorageDirectory(), sNavigationStateFilename);
             StringBuilder text = new StringBuilder();
             if (rootNavigationStateFile.exists()) {
                 try {

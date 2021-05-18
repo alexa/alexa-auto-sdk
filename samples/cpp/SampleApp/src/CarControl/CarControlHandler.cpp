@@ -316,21 +316,12 @@ bool CarControlHandler::getModeControllerValue(
     return true;
 }
 
-bool CarControlHandler::checkConfiguration(const std::vector<json>& jsons, CarControlHandler::ConfigType type) {
+bool CarControlHandler::checkConfiguration(const std::vector<json>& jsons) {
     // Look for car control config
     for (auto const& j : jsons) {
         try {
-            switch (type) {
-                case ConfigType::LVC:
-                    if (j.find("aace.localVoiceControl") != j.end() && j.find("aace.localSkillService") != j.end()) {
-                        return true;
-                    }
-                    break;
-                case ConfigType::CAR:
-                    if (j.find("aace.carControl") != j.end()) {
-                        return true;
-                    }
-                    break;
+            if (j.find("aace.carControl") != j.end()) {
+                return true;
             }
         } catch (json::exception& e) {
         }

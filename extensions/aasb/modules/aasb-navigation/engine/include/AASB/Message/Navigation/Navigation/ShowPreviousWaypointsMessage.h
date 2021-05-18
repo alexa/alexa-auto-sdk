@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ struct ShowPreviousWaypointsMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.1";
+            static std::string version = "3.2";
             return version;
         }
         static const std::string& messageType() {
@@ -71,7 +71,7 @@ struct ShowPreviousWaypointsMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.1";
+        static std::string version = "3.2";
         return version;
     }
     static const std::string& messageType() {

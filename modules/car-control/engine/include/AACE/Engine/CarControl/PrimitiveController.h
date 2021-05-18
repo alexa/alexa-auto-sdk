@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 #ifndef AACE_ENGINE_CAR_CONTROL_PRIMITIVE_CONTROLLER_H
 #define AACE_ENGINE_CAR_CONTROL_PRIMITIVE_CONTROLLER_H
 
+#include "AACE/Engine/CarControl/AssetStore.h"
 #include <AACE/Engine/CarControl/CapabilityController.h>
-#include <AVSCommon/AVS/CapabilitySemantics.h>
+#include <AVSCommon/AVS/CapabilityResources.h>
+#include <AVSCommon/AVS/CapabilitySemantics/CapabilitySemantics.h>
 #include <AVSCommon/Utils/Optional.h>
 
 #include <nlohmann/json.hpp>
@@ -27,7 +29,8 @@ namespace aace {
 namespace engine {
 namespace carControl {
 
-using CapabilitySemantics = alexaClientSDK::avsCommon::avs::CapabilitySemantics;
+using CapabilityResources = alexaClientSDK::avsCommon::avs::CapabilityResources;
+using CapabilitySemantics = alexaClientSDK::avsCommon::avs::capabilitySemantics::CapabilitySemantics;
 using json = nlohmann::json;
 
 /**
@@ -54,8 +57,19 @@ public:
     std::string getInstance();
 
     /**
-     * Utility method to create a @c CapabilitySemantics from a 'semantics' node of a capability definition JSON
-     * 
+     * Utility function to create a @c CapabilityResources from a 'capabilityResources' node of a capability definition JSON
+     *
+     * @param resources The 'capabilityResources' node of the capability definition JSON
+     * @param assetStore The AssetStore containing asset definitions to expand
+     * @return An @c Optional @c CapabilityResources with an empty value if the object cannot be constructed due to parsing error
+     */
+    static alexaClientSDK::avsCommon::utils::Optional<CapabilityResources> getResources(
+        const json& resources,
+        const AssetStore& assetStore);
+
+    /**
+     * Utility function to create a @c CapabilitySemantics from a 'semantics' node of a capability definition JSON
+     *
      * @param semantics The 'semantics' node of the capability definition JSON
      * @return An @c Optional @c CapabilitySemantics with an empty value if the object cannot be constructed due to parsing error
      */

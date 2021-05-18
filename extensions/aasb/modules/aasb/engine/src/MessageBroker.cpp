@@ -80,7 +80,7 @@ PublishMessage MessageBroker::publish(const std::string& message, Message::Direc
     // create a wp reference
     std::weak_ptr<MessageBroker> wp = shared_from_this();
 
-    return PublishMessage(direction, message, [wp](const PublishMessage& pm, bool sync) {
+    return PublishMessage(direction, message, m_timeout, [wp](const PublishMessage& pm, bool sync) {
         try {
             auto sp = wp.lock();
             ThrowIfNull(sp, "invalidWeakPtrReference");
@@ -218,14 +218,13 @@ Message MessageBroker::publishSync(const PublishMessage& pm, aace::engine::utils
 
 void MessageBroker::reply(const PublishMessage& pm) {
     try {
+        AACE_VERBOSE(LX(TAG).sensitive("message", pm.msg()));
         auto message = pm.message();
-        AACE_VERBOSE(LX(TAG).sensitive("message", message));
-
         auto promise = getSyncMessagePromise(message.replyTo());
 
         if (promise == nullptr) {
             AACE_VERBOSE(
-                LX(TAG).m("Publishing reply message because no promise is registered").sensitive("message", message));
+                LX(TAG).m("Publishing reply message because no promise is registered"));
             publishAsync(
                 pm,
                 pm.direction() == Message::Direction::INCOMING ? m_incomingMessageExecutor : m_outgoingMessageExecutor);
@@ -238,7 +237,7 @@ void MessageBroker::reply(const PublishMessage& pm) {
 }
 
 void MessageBroker::notifySubscribers(const std::string& type, const Message& message) {
-    AACE_DEBUG(LX(TAG).d("type", type).sensitive("message", message));
+    AACE_DEBUG(LX(TAG).d("type", type));
 
     //std::lock_guard<std::mutex> pub_sub_lock( m_pub_sub_mutex );
     auto it = m_subscriberMap.find(type);
@@ -291,6 +290,10 @@ std::shared_ptr<MessageBroker::SyncPromiseType> MessageBroker::getSyncMessagePro
 
         return nullptr;
     }
+}
+
+void MessageBroker::setMessageTimeout(const std::chrono::milliseconds& value) {
+    m_timeout = value;
 }
 
 }  // namespace aasb

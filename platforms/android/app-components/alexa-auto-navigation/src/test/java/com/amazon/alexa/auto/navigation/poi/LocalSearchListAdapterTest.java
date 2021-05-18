@@ -1,10 +1,15 @@
 package com.amazon.alexa.auto.navigation.poi;
 
+import static org.mockito.Mockito.when;
+
 import android.app.Activity;
 import android.content.Context;
 import android.widget.LinearLayout;
 
+import com.amazon.alexa.auto.aacs.common.Image;
+import com.amazon.alexa.auto.aacs.common.POIImage;
 import com.amazon.alexa.auto.aacs.common.PointOfInterest;
+import com.amazon.alexa.auto.aacs.common.Rating;
 import com.amazon.alexa.auto.aacs.common.Title;
 import com.amazon.alexa.auto.navigation.handlers.LocalSearchDirectiveHandler;
 import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
@@ -14,11 +19,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 @RunWith(RobolectricTestRunner.class)
 public class LocalSearchListAdapterTest {
@@ -29,28 +38,44 @@ public class LocalSearchListAdapterTest {
     private Activity mActivity;
     private Context mContext;
     private LocalSearchListAdapter mLocalSearchListAdapter;
+
+    @Mock
     private NavigationProvider mNavigationProvider;
+    @Mock
     private PointOfInterest mPointOfInterest;
+    @Mock
     private LocalSearchDirectiveHandler mLocalSearchDirectiveHandler;
+    @Mock
+    private Rating mRating;
+    @Mock
+    private POIImage mPOIImage;
+    @Mock
+    private Image mImage;
 
     @Before
     public void setup() {
-        mActivity = Robolectric.buildActivity(Activity.class).create().resume().get();
+        MockitoAnnotations.openMocks(this);
 
+        mActivity = Robolectric.buildActivity(Activity.class).create().resume().get();
         mContext = mActivity.getApplicationContext();
-        mNavigationProvider = Mockito.mock(NavigationProvider.class);
-        mLocalSearchDirectiveHandler = Mockito.mock(LocalSearchDirectiveHandler.class);
-        mLocalSearchListAdapter =
-                new LocalSearchListAdapter(mNavigationProvider, new WeakReference<>(mLocalSearchDirectiveHandler));
+        mLocalSearchListAdapter = new LocalSearchListAdapter(
+                mNavigationProvider, new WeakReference<>(mLocalSearchDirectiveHandler), mContext);
 
         setupTestPOI();
     }
 
     private void setupTestPOI() {
-        mPointOfInterest = Mockito.mock(PointOfInterest.class);
-        Mockito.when(mPointOfInterest.getTitle()).thenReturn(new Title(TEST_SUBTITLE, TEST_TITLE));
-        Mockito.when(mPointOfInterest.getTravelDistance()).thenReturn(TEST_DISTANCE);
-        Mockito.when(mPointOfInterest.getAddress()).thenReturn(TEST_ADDRESS);
+        ArrayList<Image> images = new ArrayList<>();
+        images.add(mImage);
+
+        when(mPointOfInterest.getProvider()).thenReturn(LocalSearchListAdapter.POI_PROVIDER_YELP);
+        when(mPointOfInterest.getTitle()).thenReturn(new Title(TEST_SUBTITLE, TEST_TITLE));
+        when(mPointOfInterest.getTravelDistance()).thenReturn(TEST_DISTANCE);
+        when(mPointOfInterest.getAddress()).thenReturn(TEST_ADDRESS);
+        when(mPointOfInterest.getRating()).thenReturn(mRating);
+        when(mRating.getImage()).thenReturn(mPOIImage);
+        when(mImage.getUrl()).thenReturn("http://image-url");
+        when(mPOIImage.getSources()).thenReturn(images);
     }
 
     @Test

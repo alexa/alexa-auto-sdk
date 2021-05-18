@@ -16,6 +16,7 @@
 #ifndef AACE_NAVIGATION_NAVIGATION_H
 #define AACE_NAVIGATION_NAVIGATION_H
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include "AACE/Core/PlatformInterface.h"
@@ -401,6 +402,294 @@ public:
 private:
     std::shared_ptr<NavigationEngineInterface> m_navigationEngineInterface;
 };
+
+inline std::ostream& operator<<(std::ostream& stream, const Navigation::EventName& eventName) {
+    switch (eventName) {
+        case NavigationEngineInterface::EventName::NAVIGATION_STARTED:
+            stream << "NAVIGATION_STARTED";
+            break;
+        case NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN:
+            stream << "PREVIOUS_WAYPOINTS_SHOWN";
+            break;
+        case NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED:
+            stream << "PREVIOUS_NAVIGATION_STARTED";
+            break;
+        case NavigationEngineInterface::EventName::ROUTE_OVERVIEW_SHOWN:
+            stream << "ROUTE_OVERVIEW_SHOWN";
+            break;
+        case NavigationEngineInterface::EventName::DIRECTIONS_LIST_SHOWN:
+            stream << "DIRECTIONS_LIST_SHOWN";
+            break;
+        case NavigationEngineInterface::EventName::ZOOMED_IN:
+            stream << "ZOOMED_IN";
+            break;
+        case NavigationEngineInterface::EventName::ZOOMED_OUT:
+            stream << "ZOOMED_OUT";
+            break;
+        case NavigationEngineInterface::EventName::MAP_CENTERED:
+            stream << "MAP_CENTERED";
+            break;
+        case NavigationEngineInterface::EventName::ORIENTED_NORTH:
+            stream << "ORIENTED_NORTH";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_NORTH:
+            stream << "SCROLLED_NORTH";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_UP:
+            stream << "SCROLLED_UP";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_EAST:
+            stream << "SCROLLED_EAST";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_RIGHT:
+            stream << "SCROLLED_RIGHT";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_SOUTH:
+            stream << "SCROLLED_SOUTH";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_DOWN:
+            stream << "SCROLLED_DOWN";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_WEST:
+            stream << "SCROLLED_WEST";
+            break;
+        case NavigationEngineInterface::EventName::SCROLLED_LEFT:
+            stream << "SCROLLED_LEFT";
+            break;
+        case NavigationEngineInterface::EventName::ROUTE_GUIDANCE_MUTED:
+            stream << "ROUTE_GUIDANCE_MUTED";
+            break;
+        case NavigationEngineInterface::EventName::ROUTE_GUIDANCE_UNMUTED:
+            stream << "ROUTE_GUIDANCE_UNMUTED";
+            break;
+        case NavigationEngineInterface::EventName::DEFAULT_ALTERNATE_ROUTES_SHOWN:
+            stream << "DEFAULT_ALTERNATE_ROUTES_SHOWN";
+            break;
+        case NavigationEngineInterface::EventName::SHORTER_TIME_ROUTES_SHOWN:
+            stream << "SHORTER_TIME_ROUTES_SHOWN";
+            break;
+        case NavigationEngineInterface::EventName::SHORTER_DISTANCE_ROUTES_SHOWN:
+            stream << "SHORTER_TIME_ROUTES_SHOWN";
+            break;
+        case NavigationEngineInterface::EventName::TURN_GUIDANCE_ANNOUNCED:
+            stream << "TURN_GUIDANCE_ANNOUNCED";
+            break;
+        case NavigationEngineInterface::EventName::EXIT_GUIDANCE_ANNOUNCED:
+            stream << "EXIT_GUIDANCE_ANNOUNCED";
+            break;
+        case NavigationEngineInterface::EventName::ENTER_GUIDANCE_ANNOUNCED:
+            stream << "ENTER_GUIDANCE_ANNOUNCED";
+            break;
+        case NavigationEngineInterface::EventName::MERGE_GUIDANCE_ANNOUNCED:
+            stream << "MERGE_GUIDANCE_ANNOUNCED";
+            break;
+        case NavigationEngineInterface::EventName::LANE_GUIDANCE_ANNOUNCED:
+            stream << "LANE_GUIDANCE_ANNOUNCED";
+            break;
+        case NavigationEngineInterface::EventName::SPEED_LIMIT_REGULATION_ANNOUNCED:
+            stream << "SPEED_LIMIT_REGULATION_ANNOUNCED";
+            break;
+        case NavigationEngineInterface::EventName::CARPOOL_RULES_REGULATION_ANNOUNCED:
+            stream << "CARPOOL_RULES_REGULATION_ANNOUNCED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const Navigation::ErrorType& errorType) {
+    switch (errorType) {
+        case NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED:
+            stream << "NAVIGATION_START_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED:
+            stream << "SHOW_PREVIOUS_WAYPOINTS_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::PREVIOUS_NAVIGATION_START_FAILED:
+            stream << "PREVIOUS_NAVIGATION_START_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::ROUTE_OVERVIEW_FAILED:
+            stream << "ROUTE_OVERVIEW_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::DIRECTIONS_LIST_FAILED:
+            stream << "DIRECTIONS_LIST_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::ZOOM_IN_FAILED:
+            stream << "ZOOM_IN_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::ZOOM_OUT_FAILED:
+            stream << "ZOOM_OUT_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::CENTER_FAILED:
+            stream << "CENTER_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::ORIENT_NORTH_FAILED:
+            stream << "ORIENT_NORTH_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_NORTH_FAILED:
+            stream << "SCROLL_NORTH_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_UP_FAILED:
+            stream << "SCROLL_UP_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_EAST_FAILED:
+            stream << "SCROLL_EAST_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_RIGHT_FAILED:
+            stream << "SCROLL_RIGHT_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_SOUTH_FAILED:
+            stream << "SCROLL_SOUTH_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_DOWN_FAILED:
+            stream << "SCROLL_DOWN_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_WEST_FAILED:
+            stream << "SCROLL_WEST_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_LEFT_FAILED:
+            stream << "SCROLL_LEFT_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::MUTED_ROUTE_GUIDANCE_FAILED:
+            stream << "MUTED_ROUTE_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::UNMUTED_ROUTE_GUIDANCE_FAILED:
+            stream << "UNMUTED_ROUTE_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::DEFAULT_ALTERNATE_ROUTES_FAILED:
+            stream << "DEFAULT_ALTERNATE_ROUTES_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SHORTER_TIME_ROUTES_FAILED:
+            stream << "DEFAULT_ALTERNATE_ROUTES_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SHORTER_DISTANCE_ROUTES_FAILED:
+            stream << "SHORTER_DISTANCE_ROUTES_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::TURN_GUIDANCE_FAILED:
+            stream << "TURN_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::EXIT_GUIDANCE_FAILED:
+            stream << "TURN_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::ENTER_GUIDANCE_FAILED:
+            stream << "ENTER_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::MERGE_GUIDANCE_FAILED:
+            stream << "MERGE_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::LANE_GUIDANCE_FAILED:
+            stream << "LANE_GUIDANCE_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::SPEED_LIMIT_REGULATION_FAILED:
+            stream << "SPEED_LIMIT_REGULATION_FAILED";
+            break;
+        case NavigationEngineInterface::ErrorType::CARPOOL_RULES_REGULATION_FAILED:
+            stream << "CARPOOL_RULES_REGULATION_FAILED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const Navigation::ErrorCode& errorCode) {
+    switch (errorCode) {
+        case NavigationEngineInterface::ErrorCode::INTERNAL_SERVICE_ERROR:
+            stream << "INTERNAL_SERVICE_ERROR";
+            break;
+        case NavigationEngineInterface::ErrorCode::ROUTE_NOT_FOUND:
+            stream << "ROUTE_NOT_FOUND";
+            break;
+        case NavigationEngineInterface::ErrorCode::NO_PREVIOUS_WAYPOINTS:
+            stream << "NO_PREVIOUS_WAYPOINTS";
+            break;
+        case NavigationEngineInterface::ErrorCode::NOT_SUPPORTED:
+            stream << "NOT_SUPPORTED";
+            break;
+        case NavigationEngineInterface::ErrorCode::NOT_ALLOWED:
+            stream << "NOT_ALLOWED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const Navigation::AlternateRouteType& alternateRouteType) {
+    switch (alternateRouteType) {
+        case NavigationEngineInterface::AlternateRouteType::DEFAULT:
+            stream << "DEFAULT";
+            break;
+        case NavigationEngineInterface::AlternateRouteType::SHORTER_TIME:
+            stream << "SHORTER_TIME";
+            break;
+        case NavigationEngineInterface::AlternateRouteType::SHORTER_DISTANCE:
+            stream << "SHORTER_DISTANCE";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const Navigation::RoadRegulation& roadRegulation) {
+    switch (roadRegulation) {
+        case Navigation::RoadRegulation::SPEED_LIMIT:
+            stream << "SPEED_LIMIT";
+            break;
+        case Navigation::RoadRegulation::CARPOOL_RULES:
+            stream << "CARPOOL_RULES";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const Navigation::ControlDisplay& controlDisplay) {
+    switch (controlDisplay) {
+        case Navigation::ControlDisplay::SHOW_ROUTE_OVERVIEW:
+            stream << "SHOW_ROUTE_OVERVIEW";
+            break;
+        case Navigation::ControlDisplay::SHOW_DIRECTIONS_LIST:
+            stream << "SHOW_DIRECTIONS_LIST";
+            break;
+        case Navigation::ControlDisplay::ZOOM_IN:
+            stream << "ZOOM_IN";
+            break;
+        case Navigation::ControlDisplay::ZOOM_OUT:
+            stream << "ZOOM_OUT";
+            break;
+        case Navigation::ControlDisplay::CENTER_MAP_ON_CURRENT_LOCATION:
+            stream << "CENTER_MAP_ON_CURRENT_LOCATION";
+            break;
+        case Navigation::ControlDisplay::ORIENT_NORTH:
+            stream << "ORIENT_NORTH";
+            break;
+        case Navigation::ControlDisplay::SCROLL_NORTH:
+            stream << "SCROLL_NORTH";
+            break;
+        case Navigation::ControlDisplay::SCROLL_UP:
+            stream << "SCROLL_UP";
+            break;
+        case Navigation::ControlDisplay::SCROLL_EAST:
+            stream << "SCROLL_EAST";
+            break;
+        case Navigation::ControlDisplay::SCROLL_RIGHT:
+            stream << "SCROLL_RIGHT";
+            break;
+        case Navigation::ControlDisplay::SCROLL_SOUTH:
+            stream << "SCROLL_SOUTH";
+            break;
+        case Navigation::ControlDisplay::SCROLL_DOWN:
+            stream << "SCROLL_DOWN";
+            break;
+        case Navigation::ControlDisplay::SCROLL_WEST:
+            stream << "SCROLL_WEST";
+            break;
+        case Navigation::ControlDisplay::SCROLL_LEFT:
+            stream << "SCROLL_LEFT";
+            break;
+        case Navigation::ControlDisplay::MUTE_ROUTE_GUIDANCE:
+            stream << "MUTE_ROUTE_GUIDANCE";
+            break;
+        case Navigation::ControlDisplay::UNMUTE_ROUTE_GUIDANCE:
+            stream << "UNMUTE_ROUTE_GUIDANCE";
+            break;
+    }
+    return stream;
+}
 
 }  // namespace navigation
 }  // namespace aace

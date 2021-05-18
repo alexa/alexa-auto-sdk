@@ -37,6 +37,7 @@
 #include <AACE/Engine/Utils/Threading/Executor.h>
 
 #include "CBLConfigurationInterface.h"
+#include "CBLLegacyEventNotificationInterface.h"
 
 namespace aace {
 namespace engine {
@@ -56,7 +57,8 @@ private:
         const std::string& service,
         std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface,
         std::shared_ptr<CBLConfigurationInterface> configuration,
-        bool enableUserProfile);
+        bool enableUserProfile,
+        std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier);
 
     /**
      * Initializes the object.
@@ -68,8 +70,9 @@ public:
         const std::string& service,
         std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface,
         std::shared_ptr<CBLConfigurationInterface> configuration,
-        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager = nullptr,
-        bool enableUserProfile = false);
+        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        bool enableUserProfile = false,
+        std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier = nullptr);
 
     /// @name AuthorizationProvider
     /// @{
@@ -199,6 +202,9 @@ private:
 
     /// Reference to access the authorization manager interface
     std::weak_ptr<aace::engine::alexa::AuthorizationManagerInterface> m_authorizationManager;
+
+    /// Reference to the @c CBLLegacyEventNotificationInterface to notify the (legacy) CBL states.
+    std::shared_ptr<CBLLegacyEventNotificationInterface> m_legacyEventNotifier;
 
     /// To serialize the access to this module API
     std::mutex m_mutex;

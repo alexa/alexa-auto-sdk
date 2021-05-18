@@ -119,7 +119,7 @@ public class AudioInputMessageHandler {
     }
 
     private void handleStartAudioInput(String audioType, String streamId) {
-        if (FileUtil.isAudioSourceExternal(mContext, audioType)) {
+        if (FileUtil.isAudioSourceExternal(audioType)) {
             Log.d(TAG, "handleStartAudioInput: use external audio source.");
             AudioReader reader = setupStreamsAndReader(audioType, streamId, AudioSourceType.EXTERNAL);
             fetchExternalAudioSource(audioType, streamId, reader);
@@ -184,7 +184,7 @@ public class AudioInputMessageHandler {
         Log.d(TAG, "createAudioInput");
         AudioRecord audioRecord = null;
         try {
-            audioRecord = new AudioRecord(getAudioSourceForAudioType(mContext, audioType), SAMPLE_RATE_HZ,
+            audioRecord = new AudioRecord(getAudioSourceForAudioType(audioType), SAMPLE_RATE_HZ,
                     AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, AUDIO_RECORD_BUFFER_SIZE);
 
         } catch (IllegalArgumentException e) {
@@ -209,7 +209,7 @@ public class AudioInputMessageHandler {
     }
 
     private void createTargetComponentForExternalSource(String audioType) {
-        JSONObject externalSourceTarget = getAudioExternalSourceForAudioType(mContext, audioType);
+        JSONObject externalSourceTarget = getAudioExternalSourceForAudioType(audioType);
         if (externalSourceTarget == null) {
             Log.e(TAG,
                     String.format(

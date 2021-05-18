@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,6 +22,42 @@ import com.amazon.aace.core.PlatformInterface;
  */
 abstract public class LocationProvider extends PlatformInterface {
     /**
+     * Describes the access to the geolocation service on the device.
+     */
+    public enum LocationServiceAccess {
+        /**
+         * The location service on the device is disabled (e.g., GPS is turned off).
+         * @hideinitializer
+         */
+        DISABLED("DISABLED"),
+        /**
+         * The location service on the device is enabled (e.g., GPS is turned on).
+         * @hideinitializer
+         */
+        ENABLED("ENABLED");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private LocationServiceAccess(String name) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
+    }
+    ;
+
+    /**
      * Returns the current geolocation of the device
      *
      * @return The current location
@@ -38,6 +74,17 @@ abstract public class LocationProvider extends PlatformInterface {
         return "";
     }
 
+    /**
+     * Notifies the Engine of a change in location service access. Use this method when the device's
+     * access to location service provider changes. E.g., system location access is not granted to the
+     * application.
+     *
+     * @param access Access to the location service
+     */
+    public void locationServiceAccessChanged(LocationServiceAccess access) {
+        locationServiceAccessChanged(getNativeRef(), access);
+    }
+
     final protected long createNativeRef() {
         return createBinder();
     }
@@ -49,4 +96,5 @@ abstract public class LocationProvider extends PlatformInterface {
     // Native Engine JNI methods
     private native long createBinder();
     private native void disposeBinder(long nativeRef);
+    private native void locationServiceAccessChanged(long nativeRef, LocationServiceAccess access);
 }

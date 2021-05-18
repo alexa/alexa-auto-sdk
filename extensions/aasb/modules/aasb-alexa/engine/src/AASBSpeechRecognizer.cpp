@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -71,8 +71,10 @@ bool AASBSpeechRecognizer::initialize(std::shared_ptr<aace::engine::aasb::Messag
 
                     sp->startCapture(
                         static_cast<Initiator>(payload.initiator),
-                        payload.keywordBegin,
-                        payload.keywordEnd,
+                        payload.keywordBegin < 0 ? aace::alexa::SpeechRecognizerEngineInterface::UNSPECIFIED_INDEX
+                                                 : payload.keywordBegin,
+                        payload.keywordEnd < 0 ? aace::alexa::SpeechRecognizerEngineInterface::UNSPECIFIED_INDEX
+                                               : payload.keywordEnd,
                         payload.keyword);
                 } catch (std::exception& ex) {
                     AACE_ERROR(LX(TAG, "StartCaptureMessage").d("reason", ex.what()));

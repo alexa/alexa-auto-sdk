@@ -17,11 +17,12 @@ package com.amazon.sampleapp.impl.EqualizerController;
 
 import android.app.Activity;
 import android.media.audiofx.Equalizer;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.amazon.aace.alexa.EqualizerController;
 import com.amazon.sampleapp.R;

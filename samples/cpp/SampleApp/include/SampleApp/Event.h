@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -90,6 +90,10 @@ enum class Event {
     // Logger
     onLoggerLog,
 
+    // LocationProvider
+    onLocationProviderLocationServiceAccessEnabled,
+    onLocationProviderLocationServiceAccessDisabled,
+
     // NetworkInfoProvider
     onNetworkInfoProviderNetworkStatusChanged,
 
@@ -129,9 +133,12 @@ enum class Event {
     onCancelAuthProviderAuthorization,
     onLogoutAuthProviderAuthorization,
 
+    //Devide Setup Completed
+    onDeviceSetupCompleted,
+
     // Text-To-Speech
     onPrepareSpeech,
-    onGetCapabilities,
+    onGetCapabilities
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -195,6 +202,10 @@ static const std::map<std::string, Event> EventEnumerator{
 
     // Logger
     {"onLoggerLog", Event::onLoggerLog},
+
+    // LocationProvider
+    {"onLocationProviderLocationServiceAccessEnabled", Event::onLocationProviderLocationServiceAccessEnabled},
+    {"onLocationProviderLocationServiceAccessDisabled", Event::onLocationProviderLocationServiceAccessDisabled},
 
     // NetworkInfoProvider
     {"onNetworkInfoProviderNetworkStatusChanged", Event::onNetworkInfoProviderNetworkStatusChanged},

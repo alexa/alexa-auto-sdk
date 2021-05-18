@@ -13,6 +13,9 @@
  * permissions and limitations under the License.
  */
 
+// JSON for Modern C++
+#include <nlohmann/json.hpp>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -31,6 +34,8 @@ static std::chrono::seconds TIMEOUT(10);
 
 /// Mock token to be returned by @c getAuthToken
 static const std::string AUTH_TOKEN = "MockAuthToken";
+
+using json = nlohmann::json;
 
 class MockAuthDelegateInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface {
 public:
@@ -92,6 +97,101 @@ static const std::string CAPABILITIES_CONFIG_JSON =
     "    }"
     " }";
 // clang-format on
+
+struct PhoneNumber {
+    std::string label;
+    std::string number;
+};
+
+struct PostalAddress {
+    std::string label;
+    std::string addressLine1;
+    std::string addressLine2;
+    std::string addressLine3;
+    std::string city;
+    std::string stateOrRegion;
+    std::string districtOrCounty;
+    std::string postalCode;
+    std::string country;
+    float latitudeInDegrees;
+    float longitudeInDegrees;
+    float accuracyInMeters;
+};
+
+static std::string buildEntryPayloadJustName(
+    const std::string& entryId,
+    const std::string& firstName,
+    const std::string& lastName,
+    const std::string& nickName) {
+    // clang-format off
+        json payload = {
+               {"entryId",entryId},
+               {"name",{
+                    {"firstName",firstName},
+                    {"lastName",lastName},
+                    {"nickName",nickName}
+               }}
+        };
+    // clang-format on
+    return payload.dump();
+}
+
+static std::string buildEntryPayloadWithNameAndPhoneNumbers(
+    const std::string& entryId,
+    const std::string& firstName,
+    const std::string& lastName,
+    const std::string& nickName,
+    const std::vector<PhoneNumber> phoneNumbers) {
+    // clang-format off
+        json payload = {
+               {"entryId",entryId},
+               {"name",{
+                    {"firstName",firstName},
+                    {"lastName",lastName},
+                    {"nickName",nickName}
+               }},
+               {"phoneNumbers", json::array()}
+        };
+    // clang-format on
+    for (auto& phoneNumber : phoneNumbers) {
+        payload["phoneNumbers"].push_back({{"label", phoneNumber.label}, {"number", phoneNumber.number}});
+    }
+    return payload.dump();
+}
+
+static std::string buildEntryPayloadWithNameAndPostalAddresses(
+    const std::string& entryId,
+    const std::string& firstName,
+    const std::string& lastName,
+    const std::string& nickName,
+    const std::vector<PostalAddress> postalAddresses) {
+    // clang-format off
+        json payload = {
+               {"entryId",entryId},
+               {"name",{
+                    {"firstName",firstName},
+                    {"lastName",lastName},
+                    {"nickName",nickName}
+               }},
+               {"postalAddresses", json::array()}
+        };
+    // clang-format on
+    for (auto& postalAddres : postalAddresses) {
+        payload["postalAddresses"].push_back({{"label", postalAddres.label},
+                                              {"addressLine1", postalAddres.addressLine1},
+                                              {"addressLine2", postalAddres.addressLine2},
+                                              {"addressLine3", postalAddres.addressLine3},
+                                              {"city", postalAddres.city},
+                                              {"stateOrRegion", postalAddres.stateOrRegion},
+                                              {"districtOrCounty", postalAddres.districtOrCounty},
+                                              {"postalCode", postalAddres.postalCode},
+                                              {"country", postalAddres.country},
+                                              {"latitudeInDegrees", postalAddres.latitudeInDegrees},
+                                              {"longitudeInDegrees", postalAddres.longitudeInDegrees},
+                                              {"accuracyInMeters", postalAddres.accuracyInMeters}});
+    }
+    return payload.dump();
+}
 
 class AddressBookCloudUploaderTest : public ::testing::Test {
 public:
@@ -417,7 +517,7 @@ TEST_F(AddressBookCloudUploaderTest, CheckForSequneceCallWhenAddingAndRemovingTw
     std::this_thread::sleep_for(std::chrono::seconds(3));
 }
 
-TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddContactAddressBookTestAddingNameTwiceShouldFail) {
+TEST_F(AddressBookCloudUploaderTest, AddingEntryWithSameEntryIdShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
         .Times(testing::AtLeast(1))
@@ -446,7 +546,36 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddContactAddres
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddContactAddressBookTestAddingTwoPhoneTwicePass) {
+TEST_F(AddressBookCloudUploaderTest, AddingEntryWithSameEntryIdShouldFail) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    EXPECT_TRUE(sharedRef->addEntry(buildEntryPayloadJustName("001", "Alice", "Smith", "U")));
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadJustName("001", "Dummy", "Dummy", "U")));
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockContactAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingTwoPhoneNumbersShouldPass_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
         .Times(testing::AtLeast(1))
@@ -474,9 +603,157 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddContactAddres
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(
-    AddressBookCloudUploaderTest,
-    WithNetworkAndAuthRefreshedTestAddingPostalAddressForContactAddressBookShouldFail) {
+TEST_F(AddressBookCloudUploaderTest, AddingTwoPhoneNumberShouldPass) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_TRUE(sharedRef->addEntry(buildEntryPayloadWithNameAndPhoneNumbers("001", "firstName", "lastName", "",
+                        {
+                            {"HOME", "123456789"}, 
+                            {"WORK", "123456789"}
+                        }
+                    )));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockContactAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, VerifyPhoneNumberInputSanity) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_TRUE(sharedRef->addEntry(buildEntryPayloadWithNameAndPhoneNumbers("001", "firstName", "lastName", "",
+                        {
+                            {"HOME", "123456789"}, 
+                            {"HOME", "123456789"}, // Adding HOME label again
+                            {"RANDOM_LABEL1", "123456789"}, // Some radom label name
+                            {"12345678", "123456789"}, // Label as numbers
+                            {"WORK", "STRING"}, // Phone number as string.
+                            {"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV","1234"}, // Label has 100 characters
+                            {"MAIL","1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"} // Number has 100 characters
+                        }
+                    )));
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPhoneNumbers("002", "firstName", "lastName", "",
+                        {
+                            {"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV\
+                              1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\
+                              ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV\
+                              1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\
+                              ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV",
+                              "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\
+                              ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV\
+                              1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\
+                              ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV\
+                              12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901"}  // Phone Exceeds (Max) 1000 + 1
+                        }
+                    )));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockContactAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, VerifyPostalAddressInputSanity) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_TRUE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("001", "firstName", "lastName", "",
+                        {
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // Adding HOME label again
+                            {"RANDOM_LABEL1", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // Adding HOME label again
+                            {"12345678", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // // Label as numbers
+                            {"LABEL", "ADDRESS_LINE_1_ADDRESS_LINE_1_ADDRESS_LINE_1_ADDRESS_LINE_1_",  // 60
+                                      "ADDRESS_LINE_2_ADDRESS_LINE_2_ADDRESS_LINE_1_ADDRESS_LINE_2_",  // 60
+                                      "ADDRESS_LINE_3_ADDRESS_LINE_3_ADDRESS_LINE_3_ADDRESS_LINE_3_",  // 60
+                                      "CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_",  // 100
+                                      "STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_ST",  // 100
+                                      "DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNT",  // 100
+                                      "POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_P",  // 100
+                                      "COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUN",  // 100
+                                      90, 100, 5 } // Address fields each having 100 chars
+                        }
+                    )));
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("002", "firstName", "lastName", "",
+                        {
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // Adding HOME label again
+                            {"RANDOM_LABEL1", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // Adding HOME label again
+                            {"12345678", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // // Label as numbers
+                            {"LABEL", "ADDRESS_LINE_1_ADDRESS_LINE_1_ADDRESS_LINE_1_ADDRESS_LINE_1_A",     // 60 + 1
+                                      "ADDRESS_LINE_2_ADDRESS_LINE_2_ADDRESS_LINE_1_ADDRESS_LINE_2_A",     // 60 + 1
+                                      "ADDRESS_LINE_3_ADDRESS_LINE_3_ADDRESS_LINE_3_ADDRESS_LINE_3_A",     // 60 + 1
+                                      "CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_CITY_",  // 100
+                                      "STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_STATEORREGION_ST",  // 100
+                                      "DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNTY_DISTRICTORCOUNT",  // 100
+                                      "POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_POSTALCODE_P",  // 100
+                                      "COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUNTRY_COUN",  // 100
+                                      90, 100, 5 } // Address fields each having 100 chars
+                        }
+                    )));
+
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockNavigationAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
@@ -490,7 +767,7 @@ TEST_F(
                 std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
                 if (auto sharedRef = factory.lock()) {
                     // clang-format off
-                    EXPECT_FALSE( sharedRef->addPostalAddress("001", "Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5));
+                    EXPECT_FALSE(sharedRef->addPostalAddress("001", "Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5));
                     // clang-format on
                 }
                 waitEvent.wakeUp();
@@ -506,7 +783,41 @@ TEST_F(
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedTestAddingPhoneForNavigationAddressBookShouldFail) {
+TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldFail) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("001", "firstName", "lastName", "",
+                        { 
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}
+                        }
+                    )));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockContactAddressBook);
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingPhoneForNavigationAddressBookShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
         .Times(testing::AtLeast(1))
@@ -533,9 +844,40 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedTestAddingPhoneF
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(
-    AddressBookCloudUploaderTest,
-    WithNetworkAndAuthRefreshedAddContactAddressBookTestAddingTwoPostalAddressTwicePass) {
+TEST_F(AddressBookCloudUploaderTest, AddingPhoneForNavigationAddressBookShouldFail) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPhoneNumbers("001", "firstName", "lastName", "",
+                        {
+                            {"HOME", "123456789"}
+                        }
+                    )));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockNavigationAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingTwoPostalAddressShouldPass_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
         .Times(testing::AtLeast(1))
@@ -567,7 +909,43 @@ TEST_F(
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedTestAddingMaxAllowedPhonesForSameEntryIdShouldFail) {
+TEST_F(AddressBookCloudUploaderTest, AddingTwoPostalAddressShouldPass) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_TRUE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("001", "firstName", "lastName", "",
+                        {
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}
+                        }  
+                    )));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockNavigationAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingMaxAllowedPhonesForSameEntryIdShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
         .Times(testing::AtLeast(1))
@@ -629,9 +1007,71 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedTestAddingMaxAll
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(
-    AddressBookCloudUploaderTest,
-    WithNetworkAndAuthRefreshedTestAddingMaxAllowedPostalAddressForSameEntryIdShouldFail) {
+TEST_F(AddressBookCloudUploaderTest, AddingMaxAllowedPhonesForSameEntryIdShouldFail) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPhoneNumbers("001", "firstName", "lastName", "",
+                        {
+                            {"HOME", "123456789"}, // 1
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"}, // 11
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"}, //21
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"},
+                            {"WORK", "123456789"},
+                            {"HOME", "123456789"} //31
+                        }
+                    )));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockContactAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingMaxAllowedPostalAddressForSameEntryIdShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
         .Times(testing::AtLeast(1))
@@ -679,6 +1119,70 @@ TEST_F(
                     EXPECT_TRUE( sharedRef->addPostalAddress("001", "Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5));
                     //31
                     EXPECT_FALSE( sharedRef->addPostalAddress("001", "Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5));
+                    // clang-format on
+                }
+                waitEvent.wakeUp();
+                return true;
+            }));
+
+    m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    m_addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    m_addressBookCloudUploader->addressBookAdded(m_mockNavigationAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+}
+
+TEST_F(AddressBookCloudUploaderTest, AddingMaxAllowedPostalAddressForSameEntryIdShouldFail) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
+        .Times(testing::AtLeast(1))
+        .WillRepeatedly(testing::Invoke(
+            [&waitEvent](
+                const std::string& id,
+                std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
+                if (auto sharedRef = factory.lock()) {
+                    // clang-format off
+                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("001", "firstName", "lastName", "",
+                        {
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // 1
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // 11
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // 21
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, 
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5},
+                            {"Work", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}, // 31
+                        }  
+                    )));
                     // clang-format on
                 }
                 waitEvent.wakeUp();

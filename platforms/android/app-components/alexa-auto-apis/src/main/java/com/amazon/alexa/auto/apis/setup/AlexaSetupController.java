@@ -48,4 +48,20 @@ public interface AlexaSetupController {
      * @return Intent for starting the login UI.
      */
     Intent createIntentForLaunchingLoginUI();
+
+    /**
+     * Tells if Alexa setup is completed and should exit setup workflow.
+     *
+     * @return true, if Alexa setup is completed
+     */
+    boolean isSetupCompleted();
+
+    /**
+     * Set Alexa setup complete status. When Alexa setup is completed,
+     * the complete status will be set to be true then the step workflow will be exited.
+     * If user logout from the app, the Alexa setup complete status will be set to be false.
+     *
+     * @param isSetupCompleted, is Alexa setup completed.
+     */
+    void setSetupCompleteStatus(boolean isSetupCompleted);
 }

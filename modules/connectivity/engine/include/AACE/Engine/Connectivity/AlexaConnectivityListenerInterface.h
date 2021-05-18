@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -215,32 +215,57 @@ public:
         /// Indicates the customer has declined the terms and conditions of the OEM and network provider.
         DECLINED,
 
+        /// Indicates the customer has deferred acceptance of the terms and conditions of the OEM and network provider.
+        DEFERRED,
+
         /// @internal
         UNKNOWN
     };
 
     /**
-     * Struct that represents the terms status state of the endpoint.
+     * Provides details about the terms and conditions provided to the customer.
      */
-    struct TermsStatusState {
+    struct Terms {
+        /**
+         * Constructor. Initializes the property to default.
+         */
+        Terms() : status{TermsStatus::UNKNOWN}, version{""} {};
+
         /**
          * Constructor for initializing with specified values.
          *
-         * @param termsStatus 
+         * @param status
+         * @param version
+         */
+        Terms(const TermsStatus& status, const std::string& version = "") : status{status}, version{version} {};
+
+        /// The TermsStatus enum.
+        TermsStatus status;
+
+        /// The version of the terms & conditions put forward to the user.
+        std::string version;
+    };
+
+    /**
+     * Struct that represents the terms state of the endpoint.
+     */
+    struct TermsState {
+        /**
+         * Constructor for initializing with specified values.
+         *
+         * @param Terms
          * @param timeOfSample
          * @param uncertaintyInMilliseconds
          */
-        TermsStatusState(
-            const TermsStatus& termsStatus,
+        TermsState(
+            const Terms& terms,
             const alexaClientSDK::avsCommon::utils::timing::TimePoint& timeOfSample =
                 alexaClientSDK::avsCommon::utils::timing::TimePoint::now(),
             const std::chrono::milliseconds uncertaintyInMilliseconds = std::chrono::milliseconds(0)) :
-                termsStatus{termsStatus},
-                timeOfSample{timeOfSample},
-                uncertaintyInMilliseconds{uncertaintyInMilliseconds} {};
+                terms{terms}, timeOfSample{timeOfSample}, uncertaintyInMilliseconds{uncertaintyInMilliseconds} {};
 
-        /// The TermsStatus enum.
-        TermsStatus termsStatus;
+        /// The Terms object.
+        Terms terms;
 
         /// Represents time at which the state value was recorded.
         alexaClientSDK::avsCommon::utils::timing::TimePoint timeOfSample;
@@ -287,11 +312,11 @@ public:
     /**
      * Notifies the change in properties of the endpoint.
      *
-     * @param termsStatusState The changed TermsStatusState object.
+     * @param termsState The changed TermsState object.
      * @param cause The cause for this change specified using @c AlexaStateChangeCauseType.
      */
-    virtual void onTermsStatusStateChanged(
-        const TermsStatusState& termsStatusState,
+    virtual void onTermsStateChanged(
+        const TermsState& termsState,
         alexaClientSDK::avsCommon::sdkInterfaces::AlexaStateChangeCauseType cause) = 0;
 };
 
@@ -390,7 +415,8 @@ inline std::pair<bool, AlexaConnectivityListenerInterface::TermsStatus> termsSta
     // clang-format off
     static const std::map<std::string, AlexaConnectivityListenerInterface::TermsStatus> TermsStatusEnumerator{
         {"ACCEPTED", AlexaConnectivityListenerInterface::TermsStatus::ACCEPTED},
-        {"DECLINED", AlexaConnectivityListenerInterface::TermsStatus::DECLINED}
+        {"DECLINED", AlexaConnectivityListenerInterface::TermsStatus::DECLINED},
+        {"DEFERRED", AlexaConnectivityListenerInterface::TermsStatus::DEFERRED}
         // UNKNOWN is special and must not be added here.
     };
     // clang-format on
@@ -412,6 +438,8 @@ inline std::string termsStatusToString(AlexaConnectivityListenerInterface::Terms
             return "ACCEPTED";
         case AlexaConnectivityListenerInterface::TermsStatus::DECLINED:
             return "DECLINED";
+        case AlexaConnectivityListenerInterface::TermsStatus::DEFERRED:
+            return "DEFERRED";
         case AlexaConnectivityListenerInterface::TermsStatus::UNKNOWN:
             return "UNKNOWN";
     }
@@ -464,6 +492,30 @@ inline bool operator==(
 inline bool operator!=(
     const AlexaConnectivityListenerInterface::ManagedProvider& lhs,
     const AlexaConnectivityListenerInterface::ManagedProvider& rhs) {
+    return !(lhs == rhs);
+}
+
+/**
+ * Operator == for @c AlexaConnectivityListenerInterface::Terms.
+ * @param lhs The left hand side of the == operation.
+ * @param rhs The right hand side of the == operation.
+ * @return Whether or not this instance and @c rhs are equivalent.
+ */
+inline bool operator==(
+    const AlexaConnectivityListenerInterface::Terms& lhs,
+    const AlexaConnectivityListenerInterface::Terms& rhs) {
+    return ((lhs.status == rhs.status) && (lhs.version == rhs.version));
+}
+
+/**
+ * Operator != for @c AlexaConnectivityListenerInterface::Terms.
+ * @param lhs The left hand side of the != operation.
+ * @param rhs The right hand side of the != operation.
+ * @return Whether or not this instance and @c rhs are not equivalent.
+ */
+inline bool operator!=(
+    const AlexaConnectivityListenerInterface::Terms& lhs,
+    const AlexaConnectivityListenerInterface::Terms& rhs) {
     return !(lhs == rhs);
 }
 

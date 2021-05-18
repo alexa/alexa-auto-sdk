@@ -70,6 +70,7 @@ bool AlexaAuthorizationProvider::initialize(
 }
 
 void AlexaAuthorizationProvider::doShutdown() {
+    m_executor.waitForSubmittedTasks();
     m_executor.shutdown();
     m_authorizationManager.reset();
 }
@@ -89,11 +90,15 @@ bool AlexaAuthorizationProvider::startAuthorization(const std::string& data) {
         auto result = m_authorizationManager_lock->startAuthorization(m_service);
         if (result == AuthorizationManagerInterface::StartAuthorizationResult::FAILED) {
             m_currentAuthState = AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED;
-
-            auto listener = getAuthorizationProviderListener();
-            ThrowIfNull(listener, "invalidListenerReference");
-            listener->onAuthorizationError(m_service, "START_AUTHORIZATION_FAILED");
-
+            m_executor.submit([this]() {
+                try {
+                    auto listener = getAuthorizationProviderListener();
+                    ThrowIfNull(listener, "invalidListenerReference");
+                    listener->onAuthorizationError(m_service, "START_AUTHORIZATION_FAILED");
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "startAuthorizationInsideExecutor").d("reason", ex.what()));
+                }
+            });
             // Although start of authorization resulted in failure, we consider this
             // as successful call from the perspective of AuthorizationProvider API
             return true;
@@ -102,17 +107,21 @@ bool AlexaAuthorizationProvider::startAuthorization(const std::string& data) {
         m_currentAuthState = AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING;
 
         m_executor.submit([this]() {
-            AACE_DEBUG(LX("startAuthorizationInsideExecutor"));
-            auto listener = getAuthorizationProviderListener();
-            ThrowIfNull(listener, "invalidListenerReference");
-            listener->onAuthorizationStateChanged(
-                m_service, AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING);
-            // clang-format off
-            json requestPayload = {
-                {"type","requestAuthorization"}
-            };
-            // clang-format on
-            listener->onEventReceived(m_service, requestPayload.dump());
+            try {
+                AACE_DEBUG(LX(TAG, "startAuthorizationInsideExecutor"));
+                auto listener = getAuthorizationProviderListener();
+                ThrowIfNull(listener, "invalidListenerReference");
+                listener->onAuthorizationStateChanged(
+                    m_service, AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING);
+                // clang-format off
+                json requestPayload = {
+                    {"type","requestAuthorization"}
+                };
+                // clang-format on
+                listener->onEventReceived(m_service, requestPayload.dump());
+            } catch (std::exception& ex) {
+                AACE_ERROR(LX(TAG, "startAuthorizationInsideExecutor").d("reason", ex.what()));
+            }
         });
         return true;
     } catch (std::exception& ex) {
@@ -133,10 +142,14 @@ bool AlexaAuthorizationProvider::cancelAuthorization() {
             // Reset to UNAUTHORIZED if current state is AUTHORIZING, this allows to start  authorization again.
             m_currentAuthState = AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED;
             m_executor.submit([this]() {
-                auto listener = getAuthorizationProviderListener();
-                ThrowIfNull(listener, "invalidListenerReference");
-                listener->onAuthorizationStateChanged(
-                    m_service, AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED);
+                try {
+                    auto listener = getAuthorizationProviderListener();
+                    ThrowIfNull(listener, "invalidListenerReference");
+                    listener->onAuthorizationStateChanged(
+                        m_service, AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED);
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "cancelAuthorizationInsideExecutor").d("reason", ex.what()));
+                }
             });
         }
         return true;
@@ -154,15 +167,19 @@ bool AlexaAuthorizationProvider::logout() {
             m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING,
             "notAllowedDuringAuthorizing");
         m_executor.submit([this]() {
-            AACE_DEBUG(LX("logoutInsideExecutor"));
-            auto m_authorizationManager_lock = m_authorizationManager.lock();
-            ThrowIfNull(m_authorizationManager_lock, "invalidAuthorizationManagerReference");
-            auto result = m_authorizationManager_lock->logout(m_service);
-            if (!result) {
-                AACE_ERROR(LX(TAG).d("reason", "logoutFailed"));
-                auto listener = getAuthorizationProviderListener();
-                ThrowIfNull(listener, "invalidListenerReference");
-                listener->onAuthorizationError(m_service, "LOGOUT_FAILED");
+            try {
+                AACE_DEBUG(LX(TAG, "logoutInsideExecutor"));
+                auto m_authorizationManager_lock = m_authorizationManager.lock();
+                ThrowIfNull(m_authorizationManager_lock, "invalidAuthorizationManagerReference");
+                auto result = m_authorizationManager_lock->logout(m_service);
+                if (!result) {
+                    AACE_ERROR(LX(TAG).d("reason", "logoutFailed"));
+                    auto listener = getAuthorizationProviderListener();
+                    ThrowIfNull(listener, "invalidListenerReference");
+                    listener->onAuthorizationError(m_service, "LOGOUT_FAILED");
+                }
+            } catch (std::exception& ex) {
+                AACE_ERROR(LX(TAG, "logoutInsideExecutor").d("reason", ex.what()));
             }
         });
         return true;

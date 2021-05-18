@@ -20,9 +20,7 @@ namespace engine {
 namespace carControl {
 
 CapabilityController::CapabilityController(const std::string& endpointId, const std::string& interface) :
-        // alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG), //TODO
-        m_endpointId(endpointId),
-        m_interface(interface) {
+        m_endpointId(endpointId), m_interface(interface) {
 }
 
 CapabilityController::~CapabilityController() {

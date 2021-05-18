@@ -20,14 +20,26 @@
 #include "AACE/CBL/CBL.h"
 
 #include "CBLEngineImpl.h"
+#include "CBLServiceInterface.h"
 
 namespace aace {
 namespace engine {
 namespace cbl {
 
-class CBLEngineService : public aace::engine::core::EngineService {
+class CBLEngineService
+        : public aace::engine::core::EngineService
+        , public CBLServiceInterface
+        , public std::enable_shared_from_this<CBLEngineService> {
 public:
     DESCRIBE("aace.cbl", VERSION("1.0"), DEPENDS(aace::engine::alexa::AlexaEngineService))
+
+    /// @name CBLServiceInterface
+    /// @{
+    void startCBL() override;
+    void cancelCBL() override;
+    void addEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener) override;
+    void removeEventListener(std::shared_ptr<CBLEventListenerInterface> eventListener) override;
+    /// @}
 
 private:
     CBLEngineService(const aace::engine::core::ServiceDescription& description);

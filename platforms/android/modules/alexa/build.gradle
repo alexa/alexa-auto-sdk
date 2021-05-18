@@ -29,7 +29,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 23
         versionCode 1
-        versionName '3.1'
+        versionName '3.2'
         ndk {
             abiFilters = generateAbiFiltersDeploy()
         }

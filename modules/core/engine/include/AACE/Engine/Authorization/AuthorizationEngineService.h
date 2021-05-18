@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ public:
     /// @{
     bool registerProvider(std::shared_ptr<AuthorizationProvider> provider, const std::string& service) override;
     std::shared_ptr<AuthorizationProvider> getProvider(const std::string& service) override;
+    void addEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener) override;
+    void removeEventListener(std::shared_ptr<AuthorizationEventListenerInterface> eventListener) override;
     /// @}
 
 protected:

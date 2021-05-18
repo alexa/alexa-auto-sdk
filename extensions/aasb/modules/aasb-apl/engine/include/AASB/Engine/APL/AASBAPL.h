@@ -35,11 +35,12 @@ public:
     static std::shared_ptr<AASBAPL> create(std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker);
 
     // aace::apl
-    std::string getVisualContext() override;
     void renderDocument(const std::string& payload, const std::string& token, const std::string& windowId) override;
-    void clearDocument() override;
+    void clearDocument(const std::string& token) override;
     void executeCommands(const std::string& payload, const std::string& token) override;
-    void interruptCommandSequence() override;
+    void interruptCommandSequence(const std::string& token) override;
+    void dataSourceUpdate(const std::string& sourceType, const std::string& jsonPayload, const std::string& token)
+        override;
 
 private:
     std::weak_ptr<aace::engine::aasb::MessageBrokerInterface> m_messageBroker;

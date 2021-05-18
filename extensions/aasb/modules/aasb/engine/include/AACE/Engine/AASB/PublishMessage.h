@@ -34,7 +34,11 @@ public:
     using ErrorHandler = std::function<void()>;
     using InvokeHandler = std::function<Message(const PublishMessage& pm, bool sync)>;
 
-    PublishMessage(Message::Direction direction, const std::string& message, InvokeHandler invokeHandler);
+    PublishMessage(
+        Message::Direction direction,
+        const std::string& message,
+        const std::chrono::milliseconds& timeout,
+        InvokeHandler invokeHandler);
     PublishMessage(const PublishMessage& pm);
 
     PublishMessage& timeout(const std::chrono::milliseconds& duration);

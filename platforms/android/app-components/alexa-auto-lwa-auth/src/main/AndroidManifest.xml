@@ -32,5 +32,17 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="com.amazon.alexa.auto.lwa.AuthReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.Authorization" />
+
+                <action android:name="com.amazon.aacs.aasb.EventReceived" />
+                <action android:name="com.amazon.aacs.aasb.GetAuthorizationData" />
+                <action android:name="com.amazon.aacs.aasb.AuthorizationStateChanged" />
+                <action android:name="com.amazon.aacs.aasb.AuthorizationError" />
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>

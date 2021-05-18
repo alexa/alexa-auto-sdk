@@ -41,4 +41,10 @@ public interface NavigationProvider {
      * @param poi point of interest.
      */
     void zoomToPOI(PointOfInterest poi);
+
+    /**
+     * Provide navigation state context.
+     * @param messageId MessageId to reply GetNavigationState request.
+     */
+    void provideNavigationState(String messageId);
 }

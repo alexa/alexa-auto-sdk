@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,13 +17,26 @@
 
 #include "AACE/Engine/Alexa/TemplateRuntimeEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
+using namespace aace::engine::utils::metrics;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.TemplateRuntimeEngineImpl");
+
+/// Program Name for Metrics
+static const std::string METRIC_PROGRAM_NAME_SUFFIX = "TemplateRuntimeEngineImpl";
+
+/// Counter metrics for TemplateRuntime Platform APIs
+static const std::string METRIC_TEMPLATERUNTIME_RENDER_TEMPLATE = "RenderTemplate";
+static const std::string METRIC_TEMPLATERUNTIME_CLEAR_TEMPLATE = "ClearTemplate";
+static const std::string METRIC_TEMPLATERUNTIME_RENDER_PLAYER_INFO = "RenderPlayerInfo";
+static const std::string METRIC_TEMPLATERUNTIME_CLEAR_PLAYER_INFO = "ClearPlayerInfo";
+static const std::string METRIC_TEMPLATERUNTIME_DISPLAY_CARD_CLEARED = "DisplayCardCleared";
 
 // Convert AVS FocusState type to an AACE FocusState type for use in the platform interface.
 static aace::alexa::FocusState convertFocusState(alexaClientSDK::avsCommon::avs::FocusState focusState) {
@@ -65,12 +78,12 @@ TemplateRuntimeEngineImpl::TemplateRuntimeEngineImpl(
 }
 
 bool TemplateRuntimeEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::unordered_set<
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>
         renderPlayerInfoCardsProviderInterfaces,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) {
     try {
@@ -94,7 +107,7 @@ bool TemplateRuntimeEngineImpl::initialize(
         dialogUXStateAggregator->addObserver(m_templateRuntimeCapabilityAgent);
 
         // register capability with the default endpoint
-        defaultEndpointBuilder->withCapability(m_templateRuntimeCapabilityAgent, m_templateRuntimeCapabilityAgent);
+        capabilitiesRegistrar->withCapability(m_templateRuntimeCapabilityAgent, m_templateRuntimeCapabilityAgent);
 
         return true;
     } catch (std::exception& ex) {
@@ -105,21 +118,20 @@ bool TemplateRuntimeEngineImpl::initialize(
 
 std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
     std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntimePlatformInterface,
-    std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> defaultEndpointBuilder,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
+        capabilitiesRegistrar,
     std::unordered_set<
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>
         renderPlayerInfoCardsProviderInterfaces,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesDelegateInterface> capabilitiesDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) {
     std::shared_ptr<TemplateRuntimeEngineImpl> templateRuntimeEngineImpl = nullptr;
 
     try {
         ThrowIfNull(templateRuntimePlatformInterface, "invalidTemplateRuntimePlatformInterface");
-        ThrowIfNull(defaultEndpointBuilder, "invalidDefaultEndpointBuilder");
+        ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(focusManager, "invalidFocusManager");
-        ThrowIfNull(capabilitiesDelegate, "invalidCapabilitiesDelegate");
         ThrowIfNull(dialogUXStateAggregator, "invalidDialogUXStateAggregator");
         ThrowIfNull(exceptionSender, "invalidExceptionEncounteredSenderInterface");
 
@@ -128,10 +140,9 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
 
         ThrowIfNot(
             templateRuntimeEngineImpl->initialize(
-                defaultEndpointBuilder,
+                capabilitiesRegistrar,
                 renderPlayerInfoCardsProviderInterfaces,
                 focusManager,
-                capabilitiesDelegate,
                 dialogUXStateAggregator,
                 exceptionSender),
             "initializeTemplateRuntimeEngineImplFailed");
@@ -165,10 +176,12 @@ void TemplateRuntimeEngineImpl::doShutdown() {
 void TemplateRuntimeEngineImpl::renderTemplateCard(
     const std::string& jsonPayload,
     alexaClientSDK::avsCommon::avs::FocusState focusState) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderTemplateCard", {METRIC_TEMPLATERUNTIME_RENDER_TEMPLATE});
     m_templateRuntimePlatformInterface->renderTemplate(jsonPayload, convertFocusState(focusState));
 }
 
 void TemplateRuntimeEngineImpl::clearTemplateCard() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearTemplateCard", {METRIC_TEMPLATERUNTIME_CLEAR_TEMPLATE});
     m_templateRuntimePlatformInterface->clearTemplate();
 }
 
@@ -176,6 +189,7 @@ void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
     const std::string& jsonPayload,
     alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo,
     alexaClientSDK::avsCommon::avs::FocusState focusState) {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderPlayerInfoCard", {METRIC_TEMPLATERUNTIME_RENDER_PLAYER_INFO});
     m_templateRuntimePlatformInterface->renderPlayerInfo(
         jsonPayload,
         convertPlayerActivity(audioPlayerInfo.audioPlayerState),
@@ -184,6 +198,7 @@ void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
 }
 
 void TemplateRuntimeEngineImpl::clearPlayerInfoCard() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearPlayerInfoCard", {METRIC_TEMPLATERUNTIME_CLEAR_PLAYER_INFO});
     m_templateRuntimePlatformInterface->clearPlayerInfo();
 }
 
@@ -212,6 +227,8 @@ void TemplateRuntimeEngineImpl::setRenderPlayerInfoCardsProviderInterface(
 // TemplateRuntimeEngineInterface
 //
 void TemplateRuntimeEngineImpl::onDisplayCardCleared() {
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onDisplayCardCleared", {METRIC_TEMPLATERUNTIME_DISPLAY_CARD_CLEARED});
     if (m_templateRuntimeCapabilityAgent != nullptr) {
         m_templateRuntimeCapabilityAgent->displayCardCleared();
     }

@@ -177,6 +177,13 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
         if (mMediaAppsConnectionListener != null) {
             mMediaAppsConnectionListener.onConnectionFailure(CapabilityAgentError.PLAYER_CONNECTION_REJECTED);
         }
+        if (mMediaBrowser != null) {
+            try {
+                mMediaBrowser.disconnect();
+            } catch (Exception e) {
+                Log.w(TAG, "disconnect call of failed media browser object failed");
+            }
+        }
         mMediaBrowser = null;
     }
 
@@ -192,6 +199,9 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
             public void run() {
                 if (mMediaAppsConnectionListener != null) {
                     mMediaAppsConnectionListener.onConnectionFailure(CapabilityAgentError.PLAYER_CONNECTION_TIMEOUT);
+                }
+                if (mMediaController != null && mMediaControllerCallback != null) {
+                    mMediaController.unregisterCallback(mMediaControllerCallback);
                 }
                 mMediaController = null;
             }
@@ -216,6 +226,9 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
     }
 
     public void registerCallback() {
+        if (mMediaController != null && mMediaControllerCallback != null) {
+            mMediaController.unregisterCallback(mMediaControllerCallback);
+        }
         mMediaControllerCallback = new MediaControllerCallback(getLocalPlayerId(), this);
         mMediaController.registerCallback(mMediaControllerCallback);
     }

@@ -102,7 +102,6 @@ void TextToSpeechHandler::prepareSpeechCompleted(
         }
 
         output->close();
-        log(logger::LoggerHandler::Level::VERBOSE, "complete size" + size);
     } catch (std::exception& ex) {
         log(logger::LoggerHandler::Level::ERROR, ex.what());
     }

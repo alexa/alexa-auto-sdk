@@ -13,6 +13,10 @@
  * permissions and limitations under the License.
  */
 
+#include <AVSCommon/AVS/EndpointResources.h>
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointRegistrationManagerInterface.h>
+#include <Endpoints/EndpointBuilder.h>
+
 #include <AACE/Engine/CarControl/AssetStore.h>
 #include <AACE/Engine/CarControl/CapabilityController.h>
 #include <AACE/Engine/CarControl/Endpoint.h>
@@ -21,8 +25,6 @@
 #include <AACE/Engine/CarControl/RangeController.h>
 #include <AACE/Engine/CarControl/ToggleController.h>
 #include <AACE/Engine/Core/EngineMacros.h>
-#include <AVSCommon/AVS/EndpointResources.h>
-#include <Endpoints/EndpointBuilder.h>
 
 namespace aace {
 namespace engine {
@@ -63,6 +65,9 @@ static const std::string CONFIG_KEY_INTERFACE = "interface";
 /// The display category for the endpoint in the companion app
 static const std::string DISPLAY_CATEGORY = "VEHICLE";
 
+using RegistrationResult =
+    alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface::RegistrationResult;
+
 std::shared_ptr<Endpoint> Endpoint::create(const json& endpointConfig, const AssetStore& assetStore) {
     try {
         ThrowIfNot(endpointConfig.contains(CONFIG_KEY_ENDPOINT_ID), "noEndpointId");
@@ -77,9 +82,8 @@ std::shared_ptr<Endpoint> Endpoint::create(const json& endpointConfig, const Ass
         std::vector<std::string> assetIds;
         for (auto& item : friendlyNames.items()) {
             auto& type = item.value().at(CONFIG_KEY_TYPE);
-            // For now, "text" labels
+            // aace.carControl config only allows "asset" type labels.
             // (https://developer.amazon.com/en-US/docs/alexa/device-apis/resources-and-assets.html#label-object) are
-            // not allowed, since aace.carControl config has always expected assets
             ThrowIfNot(type == CONFIG_TYPE_ASSET, "expectedAssetTypeResource");
             auto& value = item.value().at(CONFIG_KEY_VALUE);
             std::string assetId = value.at(CONFIG_KEY_ASSET_ID);
@@ -148,18 +152,27 @@ std::string Endpoint::getDiscoveryId() {
 bool Endpoint::build(
     std::shared_ptr<CarControlServiceInterface> carControlServiceInterface,
     std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> endpointBuilderFactory,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>
+        endpointRegistrationManager,
     const AssetStore& assetStore,
     const std::string& manufacturer,
     const std::string& description) {
     try {
+        ThrowIfNull(endpointRegistrationManager, "nullEndpointRegistrationManager");
         auto endpointBuilder = endpointBuilderFactory->createEndpointBuilder();
         ThrowIfNull(endpointBuilder, "couldNotCreateEndpointBuilder");
 
         alexaClientSDK::avsCommon::avs::EndpointResources endpointResources;
         for (auto asset = m_assetIds.begin(); asset != m_assetIds.end(); ++asset) {
+            // Expand assets present in the AssetStore. Use the asset ID for assets that are absent
             const std::vector<AssetStore::NameLocalePair>& names = assetStore.getFriendlyNames(*asset);
-            for (auto name = names.begin(); name != names.end(); ++name) {
-                endpointResources.addFriendlyNameWithText(name->first, name->second);
+            if (names.empty()) {
+                endpointResources.addFriendlyNameWithAssetId(*asset);
+            } else {
+                AACE_DEBUG(LX(TAG).m("expanding asset to text").d("assetID", *asset));
+                for (auto name = names.begin(); name != names.end(); ++name) {
+                    endpointResources.addFriendlyNameWithText(name->first, name->second);
+                }
             }
         }
         // Note: "aace.carControl" config currently does not use manufacturer name, so we fill in a default
@@ -174,10 +187,16 @@ bool Endpoint::build(
             auto controller = item.second;
             controller->build(carControlServiceInterface, endpointBuilder);
         }
-        auto endpointId = endpointBuilder->build();
-        ThrowIfNot(endpointId.hasValue(), "couldNotBuildEndpoint");
-        m_discoveryEndpointId = endpointId.value();
+        auto endpoint = endpointBuilder->build();
         endpointBuilder.reset();
+        ThrowIfNull(endpoint, "couldNotBuildEndpoint");
+        m_discoveryEndpointId = endpoint->getEndpointId();
+        auto resultFuture = endpointRegistrationManager->registerEndpoint(std::move(endpoint));
+        // Only wait for immediate errors.
+        if ((resultFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)) {
+            auto result = resultFuture.get();
+            ThrowIfNot((result == RegistrationResult::SUCCEEDED), "couldNotRegisterEndpoint");
+        }
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));

@@ -36,6 +36,16 @@ public:
     enum class MetricPriority { NR, HI };
 
     /**
+     * An enum class to indicate if the metric event should be buffered: One of BF (buffer) or NB (No-buffer). Default is NB.
+     */
+    enum class MetricBufferType { BF, NB };
+
+    /**
+     * An enum class to indicate if the metric event should be tagged with a unique identifier: One of UNIQ (unique) or NUNI (Non-unique). Default is NUNI.
+     */
+    enum class MetricIdentityType { UNIQ, NUNI };
+
+    /**
      * Constructor.
      *
      * @param program The name that indicates where the event came from / who reported.
@@ -48,8 +58,44 @@ public:
      *
      * @param program The name that indicates where the event came from / who reported.
      * @param source The name that provides additional contextual information about how the event happened.
+     * @param priority The priority of the metric.
      */
     MetricEvent(const std::string& program, const std::string& source, MetricPriority priority);
+
+    /**
+     * Constructor.
+     *
+     * @param program The name that indicates where the event came from / who reported.
+     * @param source The name that provides additional contextual information about how the event happened.
+     * @param bufferType Enum to indicate if the metric needs to be buffered
+     */
+    MetricEvent(const std::string& program, const std::string& source, MetricBufferType bufferType);
+
+    /**
+     * Constructor.
+     *
+     * @param program The name that indicates where the event came from / who reported.
+     * @param source The name that provides additional contextual information about how the event happened.
+     * @param identityType Enum to indicate metric identity type.
+     */
+    MetricEvent(
+        const std::string& program,
+        const std::string& source,
+        MetricBufferType bufferType,
+        MetricIdentityType identityType);
+
+    /**
+     * Constructor.
+     *
+     * @param program The name that indicates where the event came from / who reported.
+     * @param source The name that provides additional contextual information about how the event happened.
+     */
+    MetricEvent(
+        const std::string& program,
+        const std::string& source,
+        MetricPriority priority,
+        MetricBufferType bufferType,
+        MetricIdentityType identityType);
 
     /**
      * Add timer data to the metric event.
@@ -96,6 +142,20 @@ private:
     static std::string dataTypeToString(MetricDataType dataPoint);
 
     /**
+     * Convert MetricDataType enum to String representation.
+     *
+     * @param type The buffer type enum to convert.
+     */
+    static std::string bufferTypeToString(MetricBufferType type);
+
+    /**
+     * Convert MetricIdentityType enum to String representation.
+     *
+     * @param type The metric identity type enum to convert.
+     */
+    static std::string identityTypeToString(MetricIdentityType type);
+
+    /**
      * Helper method to append data to the string log that is being built. 
      *
      * @param name The name describing the datapoint being captured.
@@ -116,6 +176,12 @@ private:
 
     /// Priority of the metric (High or Normal).
     MetricPriority m_priority;
+
+    /// Buffer type of the metric (Buffer or No-Buffer).
+    MetricBufferType m_bufferType;
+
+    /// Identity type of the metric (Unique or Non-unique).
+    MetricIdentityType m_identityType;
 };
 
 }  // namespace metrics

@@ -53,7 +53,7 @@ ___
 
 * Enhancements for car control:
   
-  * Added prompt improvements. Alexa can provide a recommendation or ask for clarification after receiving an invalid or ambiguous user request. Suppose a user request targets the wrong mode, setting, or value for an appliance, such as "Alexa, set fan speed to 100", Alexa responds, "Sorry, you can only set the fan between 1 and 10". When the target in a user request is ambiguous, Alexa prompts for more information to determine the exact meaning of the request. For example, when a user says, "Turn on fan" (when the fan's default zone is not set), Alexa responds, "For the driver, the passenger, or the rear?" This feature is supported online and offline.
+  * Added prompt improvements. Alexa can provide a recommendation after receiving an invalid or ambiguous user request. Suppose a user request targets the wrong mode, setting, or value for an appliance, such as "Alexa, set fan speed to 100", Alexa responds, "Sorry, you can only set the fan between 1 and 10." When the target in a user request is ambiguous, Alexa provides recommendations for disambiguation so the user can retry the request. For example, when a user says, "Turn on fan" (when the fan's default zone is not set), Alexa responds, "Sorry, I'm not sure whether you meant the driver, the passenger, or the rear. Please try again." This feature is supported offline.
   
   * Improved asset management for car control, which enables Alexa to accept utterances only a few seconds after the user logs in. Previously, the user had to wait up to 20 seconds for Alexa to accept utterances.
 

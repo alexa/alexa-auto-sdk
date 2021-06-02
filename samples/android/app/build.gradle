@@ -32,11 +32,6 @@ android {
         pickFirst 'lib/x86_64/libc++_shared.so'
         doNotStrip '**/*'
     }
-    // Enable desugaring (dependency contains Java 8 bytecode)
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
 }
 
 ext {

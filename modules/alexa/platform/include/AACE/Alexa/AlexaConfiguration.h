@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -161,8 +161,9 @@ public:
      * @code{.json}
      * {
      *     "libcurlUtils" : {
-     *         "CURLOPT_CAPATH" : "<CA_CERTIFICATES_FILE_PATH>"
-     *         "CURLOPT_INTERFACE" : "<NETWORK_INTERFACE_NAME>"
+     *         "CURLOPT_CAPATH" : "<CA_CERTIFICATES_FILE_PATH>",
+     *         "CURLOPT_INTERFACE" : "<NETWORK_INTERFACE_NAME>",
+     *         "CURLOPT_PROXY" : "<PROXY_ADDRESS>"
      *     }
      * }
      * @endcode
@@ -170,10 +171,12 @@ public:
      * @param [in] certsPath The file path to the directory holding CA certificates
      * @param [in] iface The specific network interface to use. This can be a network interface name, an IP address or a
      * host name. Default to the system's primary network interface.
+     * @param [in] proxy The proxy used for outgoing requests.
      */
     static std::shared_ptr<aace::core::config::EngineConfiguration> createCurlConfig(
         const std::string& certsPath,
-        const std::string& iface = "");
+        const std::string& iface = "",
+        const std::string& proxy = "");
 
     /**
      * @deprecated
@@ -225,7 +228,7 @@ public:
      *             "en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"].
      * @param [in] defaultLocale The default locale setting on the device. The default is "en-US".
      * @param [in] defaultTimezone The default timezone setting on the device. The default is "America/Vancouver".
-     *             For accepted values, refer to the accepted timezones here: 
+     *             For accepted values, refer to the accepted timezones here:
      *             https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#timezonechanged
      * @param [in] localeCombinations A list of locale combinations supported by the device for dual-locale mode.
      *             The permitted combinations are [["en-CA","fr-CA"],["fr-CA","en-CA"],["en-US","es-US"],

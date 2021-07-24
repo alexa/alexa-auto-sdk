@@ -39,7 +39,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "2.3+"
+    remoteLibVersion = "2.3.1+"
 }
 
 dependencies {

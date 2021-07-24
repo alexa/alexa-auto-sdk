@@ -53,10 +53,22 @@ bool NetworkEngineService::registerProperties() {
                 "aace.propertyManager");
         ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
 
+        // For NETWORK_INTERFACE
         propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
             aace::network::property::NETWORK_INTERFACE,
             std::bind(
                 &NetworkEngineService::setProperty_networkInterface,
+                this,
+                std::placeholders::_1,
+                std::placeholders::_2,
+                std::placeholders::_3,
+                std::placeholders::_4),
+            nullptr));
+        // For NETWORK_HTTP_PROXY_HEADERS
+        propertyManager->registerProperty(aace::engine::propertyManager::PropertyDescription(
+            aace::network::property::NETWORK_HTTP_PROXY_HEADERS,
+            std::bind(
+                &NetworkEngineService::setProperty_httpProxyHeaders,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2,
@@ -115,6 +127,22 @@ bool NetworkEngineService::setProperty_networkInterface(
     try {
         AACE_INFO(LX(TAG).sensitive("value", value));
         ThrowIfNot(m_networkInfoProviderEngineImpl->setNetworkInterface(value), "setNetworkInterfaceFailed");
+        changed = true;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("value", value));
+        return false;
+    }
+}
+
+bool NetworkEngineService::setProperty_httpProxyHeaders(
+    const std::string& value,
+    bool& changed,
+    bool& async,
+    const SetPropertyResultCallback& callbackFunction) {
+    try {
+        AACE_INFO(LX(TAG).sensitive("value", value));
+        ThrowIfNot(m_networkInfoProviderEngineImpl->setNetworkHttpProxyHeader(value), "setNetworkHttpProxyHeaderFailed");
         changed = true;
         return true;
     } catch (std::exception& ex) {

@@ -24,4 +24,18 @@ public class NetworkProperties {
      * @hideinitializer
      */
     public static final String NETWORK_INTERFACE = "aace.network.networkInterface";
+
+
+    /**
+     * This property is used with aace::propertyManager::PropertyManager::setProperty()
+     * to set the custom HTTP header to pass in the HTTP request sent to a proxy. The headers
+     * should be `\n` separated.
+     *
+     * For example:
+     * `"Proxy-Authorization: Bearer 1234"` (should not be CRLF-terminated)
+     *
+     * @note To apply the custom headers you are required to specify the CURLOPT_PROXY` in the config.
+     * The specified headers will be applied to all subsequent requests sent to a proxy.
+     */
+    public static final String NETWORK_HTTP_PROXY_HEADERS = "aace.network.httpProxyHeaders";
 }

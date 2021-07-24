@@ -123,6 +123,22 @@ For details about the vehicle properties included in the `VehicleConfiguration` 
 
 >**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN).
 
+### Configuring cURL
+
+The Auto SDK uses cURL for various network connections. Use the factory method, as shown in the following example, to generate cURL configuration, which specifies the CA certificates path, network interface, and HTTP proxy address:
+
+```java
+AlexaConfiguration.createCurlConfig("/path/to/certs", "wlan0", "http://127.0.0.1:8888");
+```
+
+In this example, "/path/to/certs" is the path to the directory holding CA certificates. "wlan0" is the interface used as the outgoing network interface, which can be a network interface name, an IP address, or a host name. "http://127.0.0.1:8888" is the web address of the HTTP proxy.
+
+If the HTTP proxy requires credentials in HTTP headers to authenticate a user agent, you can specify the header with the Property Manager API, as in the following example:
+
+```java
+mPropertyManager.setProperty(NetworkProperties.NETWORK_HTTP_PROXY_HEADERS, "Proxy-Authorization: Basic YWxhZGRpbjpvcGVuc2VzYW1l");
+```
+
 ## Extending the Default Platform Implementation <a id="extending-the-default-platform-implementation"></a>
 
 To extend each Auto SDK interface you will use in your platform implementation:

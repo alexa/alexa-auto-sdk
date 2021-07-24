@@ -1,9 +1,9 @@
-From 5c1da1022b448302b17ba380b56ecccdfe7ce1c3 Mon Sep 17 00:00:00 2001
+From b62b8eaf9b6f265774fff0d708cbab34639c8f81 Mon Sep 17 00:00:00 2001
 From: Muni Sakkuru <muni.sakkuru@gmail.com>
-Date: Tue, 7 Jul 2020 10:16:03 -0700
-Subject: [PATCH 1/1] Alexa Auto changes for v1.19.1 AVS Device SDK
+Date: Thu, 8 Jul 2021 15:16:40 -0700
+Subject: [PATCH] Alexa Auto changes for v1.19.1 AVS Device SDK
 
-For internal reference: 3f093bdd
+For internal reference: 001bf67a
 ---
  ACL/src/AVSConnectionManager.cpp              |   4 +-
  ADSL/include/ADSL/DirectiveProcessor.h        |  15 +-
@@ -37,15 +37,17 @@ For internal reference: 3f093bdd
  .../ToggleControllerAttributes.h              |  51 +-
  .../SDKInterfaces/MockDirectiveSequencer.h    |   4 +
  .../SDKInterfaces/MockFocusManager.h          |   1 +
- .../LibcurlUtils/CurlEasyHandleWrapper.h      |  35 +-
+ .../LibcurlUtils/CurlEasyHandleWrapper.h      |  61 +-
  .../AVSCommon/Utils/LibcurlUtils/HttpDelete.h |  83 +++
  .../Utils/LibcurlUtils/HttpDeleteInterface.h  |  56 ++
  .../AVSCommon/Utils/LibcurlUtils/HttpGet.h    |  83 +++
  .../Utils/LibcurlUtils/HttpGetInterface.h     |  56 ++
+ .../Utils/LibcurlUtils/LibcurlUtils.h         |  22 +
  .../include/AVSCommon/Utils/Timing/Timer.h    |   7 +-
- .../LibcurlUtils/CurlEasyHandleWrapper.cpp    |  56 +-
+ .../LibcurlUtils/CurlEasyHandleWrapper.cpp    |  98 ++-
  .../Utils/src/LibcurlUtils/HttpDelete.cpp     | 129 ++++
  AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp  | 129 ++++
+ .../Utils/src/LibcurlUtils/LibcurlUtils.cpp   |  29 +
  AVSCommon/Utils/src/Timer.cpp                 |   6 +-
  .../DefaultClient/src/DefaultClient.cpp       |   1 +
  .../CapabilitiesDelegate.h                    |   3 +
@@ -99,7 +101,8 @@ For internal reference: 3f093bdd
  SampleApp/src/InteractionManager.cpp          |   2 +-
  .../DoNotDisturbCapabilityAgent.h             |  46 +-
  .../src/DoNotDisturbCapabilityAgent.cpp       |   9 +-
- 94 files changed, 3963 insertions(+), 167 deletions(-)
+ tools/Install/android.sh                      |   1 -
+ 97 files changed, 4077 insertions(+), 173 deletions(-)
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/ActionsToDirectiveMapping.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/CapabilitySemantics.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/EndpointResources.h
@@ -2062,7 +2065,7 @@ index 1308fc50..a1e89356 100644
          addObserver,
          void(const std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerObserverInterface>& observer));
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
-index 8458bd82..843edbba 100644
+index 8458bd82..e9830b06 100644
 --- a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
 +++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
 @@ -73,7 +73,9 @@ public:
@@ -2076,7 +2079,7 @@ index 8458bd82..843edbba 100644
      };
  
      /**
-@@ -254,6 +256,27 @@ public:
+@@ -254,6 +256,46 @@ public:
       */
      CURLcode pause(int mask);
  
@@ -2085,9 +2088,9 @@ index 8458bd82..843edbba 100644
 +     * connection.
 +     *
 +     * Network interface provided will be used in preference over the value
-+     * in provided in config. Set emtpy string to reset to default.
++     * in provided in config. Set empty string to reset to default.
 +     *
-+     * @note The network interace set shall applied only to newly instantiated
++     * @note The network interface set shall applied only to newly instantiated
 +     * @c CurlEasyHandleWrapper objects.
 +     *
 +     * @param value The interface name as defined in CURLOPT_INTERFACE.
@@ -2101,10 +2104,29 @@ index 8458bd82..843edbba 100644
 +     */
 +    static std::string getInterfaceName();
 +
++    /**
++     * Static function to set custom HTTP headers to pass in the HTTP request sent to a proxy, for example:
++     *
++     * "Proxy-Authorization: Bearer 1234" (should not be CRLF-terminated)
++     *
++     * The specified headers will be applied to all subsequent requests sent to a proxy. They will not be applied
++     * if there is no proxy specified by `CURLOPT_PROXY` in the config.
++     *
++     * @param headers the list of headers. See https://curl.se/libcurl/c/CURLOPT_HTTPHEADER.html for detailed rules about the header.
++     */
++    static void setProxyHeaders(const std::vector<std::string>& headers);
++
++    /**
++     * Static function to get custom HTTP headers to pass in the HTTP request sent to a proxy.
++     *
++     * @returns the list of headers.
++     */
++    static std::vector<std::string> getProxyHeaders();
++
  private:
      /**
       * Frees and sets the following attributes to NULL:
-@@ -300,6 +323,9 @@ private:
+@@ -300,6 +342,9 @@ private:
      avsCommon::utils::logger::LogStringFormatter m_logFormatter;
  #endif
  
@@ -2114,20 +2136,28 @@ index 8458bd82..843edbba 100644
      /// The associated libcurl easy handle
      CURL* m_handle;
      /// A list of headers needed to be added at the HTTP level
-@@ -312,7 +338,12 @@ private:
+@@ -312,9 +357,19 @@ private:
      curl_httppost* m_lastPost;
      /// Name for this handle.
      std::string m_id;
 -
-+    /// Synchronizes access to the @c m_interfaceName
-+    static std::mutex m_interfaceNameMutex;
++    /// Synchronizes access to the settings e.g. @c s_interfaceName or @c s_proxyHeaders
++    static std::mutex s_settingsMutex;
 +    /// Indicates the initialization of @c m_interfaceName
-+    static bool m_isInterfaceNameInitialized;
++    static bool s_isInterfaceNameInitialized;
 +    /// Interface name to be used for curl
-+    static std::string m_interfaceName;
++    static std::string s_interfaceName;
      /// If no id is provided by the user, we will generate it from this counter.
-     static std::atomic<uint64_t> m_idGenerator;
+-    static std::atomic<uint64_t> m_idGenerator;
++    static std::atomic<uint64_t> s_idGenerator;
++
++    /// Custom HTTP headers provided by setProxyHeaders call.
++    static std::vector<std::string> s_proxyHeaders;
++    /// A list of headers needed to be added to a proxy request
++    curl_slist* m_proxyHeaders;
  };
+ 
+ template <typename ParamType>
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
 new file mode 100644
 index 00000000..bff624b6
@@ -2430,6 +2460,39 @@ index 00000000..68573f06
 +}  // namespace alexaClientSDK
 +
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
+diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/LibcurlUtils.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/LibcurlUtils.h
+index 73ec4d04..7c792d5a 100644
+--- a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/LibcurlUtils.h
++++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/LibcurlUtils.h
+@@ -44,6 +44,28 @@ namespace libcurlUtils {
+  */
+ bool prepareForTLS(CURL* handle);
+ 
++/**
++ * Prepare a CURL handle to set the proxy to use for the upcoming requests.
++ *
++ * The 'libCurlUtils' sub-component of the global configuration supports the following options:
++ * - CURLOPT_PROXY If present, specifies a value for the libcurl property CURLOPT_PROXY.
++ *
++ * Here is an example configuration:
++ * @code
++ * {
++ *     "libcurlUtils" : {
++ *         "CURLOPT_PROXY" : "http://proxy:1080"
++ *     }
++ *     // Other configuration nodes
++ * }
++ * @endcode
++ *
++ * @param handle The libcurl handle to prepare.
++ * @param headers Additional headers for proxy request.
++ * @return Whether the operation was successful.
++ */
++bool prepareForProxy(CURL* handle, curl_slist* headers = NULL);
++
+ }  // namespace libcurlUtils
+ }  // namespace utils
+ }  // namespace avsCommon
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/Timing/Timer.h b/AVSCommon/Utils/include/AVSCommon/Utils/Timing/Timer.h
 index 8f5c05e4..a936eadd 100644
 --- a/AVSCommon/Utils/include/AVSCommon/Utils/Timing/Timer.h
@@ -2453,23 +2516,52 @@ index 8f5c05e4..a936eadd 100644
      /**
       * Reports whether the @c Timer is active.  A timer is considered active if it is waiting to start a call to the
 diff --git a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
-index fdfb346b..e1e0bda4 100644
+index fdfb346b..3e057fd1 100644
 --- a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
 +++ b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
-@@ -54,6 +54,12 @@ static const std::string LIBCURLUTILS_CONFIG_KEY = "libcurlUtils";
+@@ -53,7 +53,15 @@ static const std::string LIBCURLUTILS_CONFIG_KEY = "libcurlUtils";
+ /// Key for looking up a configuration value for @c CURLOPT_INTERFACE
  static const std::string INTERFACE_CONFIG_KEY = "CURLOPT_INTERFACE";
  /// Counter used to geneate unique IDs.
- std::atomic<uint64_t> CurlEasyHandleWrapper::m_idGenerator{1};
+-std::atomic<uint64_t> CurlEasyHandleWrapper::m_idGenerator{1};
++std::atomic<uint64_t> CurlEasyHandleWrapper::s_idGenerator{1};
 +///  Interface used for the curl connection.
-+std::string CurlEasyHandleWrapper::m_interfaceName{""};
-+/// Indicates the initialization of @c m_interfaceName
-+bool CurlEasyHandleWrapper::m_isInterfaceNameInitialized = false;
-+/// Synchronizes access to the @c m_interfaceName
-+std::mutex CurlEasyHandleWrapper::m_interfaceNameMutex;
++std::string CurlEasyHandleWrapper::s_interfaceName{""};
++/// Indicates the initialization of @c s_interfaceName
++bool CurlEasyHandleWrapper::s_isInterfaceNameInitialized = false;
++/// Synchronizes access to the settings e.g. @c s_interfaceName or @c s_proxyHeaders
++std::mutex CurlEasyHandleWrapper::s_settingsMutex;
++/// HTTP headers for proxy request
++std::vector<std::string> CurlEasyHandleWrapper::s_proxyHeaders{};
  
  #ifdef ACSDK_EMIT_CURL_LOGS
  /// Key under 'acl' configuration node for path/prefix of per-stream log file names.
-@@ -242,6 +248,9 @@ bool CurlEasyHandleWrapper::setTransferType(TransferType type) {
+@@ -128,12 +136,13 @@ CurlEasyHandleWrapper::CurlEasyHandleWrapper(std::string id) :
+         m_requestHeaders{nullptr},
+         m_postHeaders{nullptr},
+         m_post{nullptr},
+-        m_lastPost{nullptr} {
++        m_lastPost{nullptr},
++        m_proxyHeaders{nullptr} {
+     if (m_handle == nullptr) {
+         ACSDK_ERROR(LX("CurlEasyHandleWrapperFailed").d("reason", "curl_easy_init failed"));
+     } else {
+         if (id.empty()) {
+-            m_id = std::to_string(m_idGenerator++);
++            m_id = std::to_string(s_idGenerator++);
+         } else {
+             m_id = std::move(id);
+         }
+@@ -150,7 +159,7 @@ CurlEasyHandleWrapper::~CurlEasyHandleWrapper() {
+ 
+ bool CurlEasyHandleWrapper::reset(std::string id) {
+     if (id.empty()) {
+-        m_id = std::to_string(m_idGenerator++);
++        m_id = std::to_string(s_idGenerator++);
+     } else {
+         m_id = std::move(id);
+     }
+@@ -242,6 +251,9 @@ bool CurlEasyHandleWrapper::setTransferType(TransferType type) {
          case TransferType::kPUT:
              ret = setopt(CURLOPT_UPLOAD, 1L);
              break;
@@ -2479,7 +2571,19 @@ index fdfb346b..e1e0bda4 100644
      }
      return ret;
  }
-@@ -322,10 +331,14 @@ bool CurlEasyHandleWrapper::setDefaultOptions() {
+@@ -296,6 +308,11 @@ void CurlEasyHandleWrapper::cleanupResources() {
+         m_post = nullptr;
+         m_lastPost = nullptr;
+     }
++
++    if (m_proxyHeaders) {
++        curl_slist_free_all(m_proxyHeaders);
++        m_proxyHeaders = nullptr;
++    }
+ }
+ 
+ bool CurlEasyHandleWrapper::setDefaultOptions() {
+@@ -322,10 +339,25 @@ bool CurlEasyHandleWrapper::setDefaultOptions() {
              break;
          }
  
@@ -2488,39 +2592,65 @@ index fdfb346b..e1e0bda4 100644
 -        if (config.getString(INTERFACE_CONFIG_KEY, &interfaceName) &&
 -            !setopt(CURLOPT_INTERFACE, interfaceName.c_str())) {
 +        {
-+            std::lock_guard<std::mutex> lock(m_interfaceNameMutex);
-+            if (!m_isInterfaceNameInitialized) {
++            std::lock_guard<std::mutex> lock(s_settingsMutex);
++            if (!s_isInterfaceNameInitialized) {
 +                initializeNetworkInterfaceName();
++            }
++
++            curl_slist_free_all(m_proxyHeaders);
++            m_proxyHeaders = nullptr;
++            for (auto& header : s_proxyHeaders) {
++                m_proxyHeaders = curl_slist_append(m_proxyHeaders, header.c_str());
++            }
++
++            if (!prepareForProxy(m_handle, m_proxyHeaders)) {
++                ACSDK_ERROR(LX("setDefaultOptions").d("reason", "prepareForProxy failed"));
++                break;
 +            }
 +        }
 +
-+        if (!m_interfaceName.empty() && !setopt(CURLOPT_INTERFACE, m_interfaceName.c_str())) {
++        if (!s_interfaceName.empty() && !setopt(CURLOPT_INTERFACE, s_interfaceName.c_str())) {
              break;
          }
  
-@@ -372,6 +385,41 @@ CURLcode CurlEasyHandleWrapper::pause(int mask) {
+@@ -372,6 +404,56 @@ CURLcode CurlEasyHandleWrapper::pause(int mask) {
      return CURLcode::CURLE_FAILED_INIT;
  }
  
++void CurlEasyHandleWrapper::setProxyHeaders(const std::vector<std::string>& headers) {
++    std::lock_guard<std::mutex> lock(s_settingsMutex);
++
++    std::ostringstream ss;
++    std::copy(headers.begin(), headers.end(), std::ostream_iterator<std::string>(ss, ";"));
++    ACSDK_DEBUG(LX("setProxyHeaders").d("headers", ss.str()));
++
++    s_proxyHeaders = headers;
++}
++
++std::vector<std::string> CurlEasyHandleWrapper::getProxyHeaders() {
++    std::lock_guard<std::mutex> lock(s_settingsMutex);
++    return s_proxyHeaders;
++}
++
 +void CurlEasyHandleWrapper::setInterfaceName(const std::string& interfaceName) {
-+    std::lock_guard<std::mutex> lock(m_interfaceNameMutex);
++    std::lock_guard<std::mutex> lock(s_settingsMutex);
 +    ACSDK_DEBUG(LX("setInterfaceName").d("interfaceName", interfaceName));
 +
 +    if (interfaceName.empty()) {
-+        m_interfaceName = interfaceName;
++        s_interfaceName = interfaceName;
 +        // Reset to default value from config, if provided.
 +        initializeNetworkInterfaceName();
 +        return;
 +    }
-+    m_interfaceName = interfaceName;
++    s_interfaceName = interfaceName;
 +}
 +
 +std::string CurlEasyHandleWrapper::getInterfaceName() {
-+    std::lock_guard<std::mutex> lock(m_interfaceNameMutex);
-+    if (!m_isInterfaceNameInitialized) {
++    std::lock_guard<std::mutex> lock(s_settingsMutex);
++    if (!s_isInterfaceNameInitialized) {
 +        initializeNetworkInterfaceName();
 +    }
-+    return m_interfaceName;
++    return s_interfaceName;
 +}
 +
 +void CurlEasyHandleWrapper::initializeNetworkInterfaceName() {
@@ -2528,13 +2658,13 @@ index fdfb346b..e1e0bda4 100644
 +    std::string interfaceNameFromConfig;
 +    config.getString(INTERFACE_CONFIG_KEY, &interfaceNameFromConfig, "");
 +
-+    if (m_interfaceName.empty() && !interfaceNameFromConfig.empty()) {
++    if (s_interfaceName.empty() && !interfaceNameFromConfig.empty()) {
 +        // Update the value from config, so that getInterfaceName always
 +        // return the current value.
-+        m_interfaceName = interfaceNameFromConfig;
++        s_interfaceName = interfaceNameFromConfig;
 +    }
-+    m_isInterfaceNameInitialized = true;
-+    ACSDK_DEBUG(LX("initializeNetworkInterfaceName").d("m_interfaceName", m_interfaceName));
++    s_isInterfaceNameInitialized = true;
++    ACSDK_DEBUG(LX("initializeNetworkInterfaceName").d("s_interfaceName", s_interfaceName));
 +}
 +
  #ifdef ACSDK_EMIT_CURL_LOGS
@@ -2810,6 +2940,53 @@ index 00000000..10e6836a
 +}  // namespace utils
 +}  // namespace avsCommon
 +}  // namespace alexaClientSDK
+diff --git a/AVSCommon/Utils/src/LibcurlUtils/LibcurlUtils.cpp b/AVSCommon/Utils/src/LibcurlUtils/LibcurlUtils.cpp
+index eb0a46ca..ff2a3f64 100644
+--- a/AVSCommon/Utils/src/LibcurlUtils/LibcurlUtils.cpp
++++ b/AVSCommon/Utils/src/LibcurlUtils/LibcurlUtils.cpp
+@@ -46,6 +46,9 @@ static const std::string CAPATH_CONFIG_KEY = "CURLOPT_CAPATH";
+ /// Key for looking up a configuration value for @c CURLOPT_CAINFO
+ static const std::string CAINFO_CONFIG_KEY = "CURLOPT_CAINFO";
+ 
++/// Key for looking up a configuration value for @c CURLOPT_PROXY
++static const std::string PROXY_CONFIG_KEY = "CURLOPT_PROXY";
++
+ /// Key for looking up a configuration value for verifying hosts and peers.
+ static const std::string VERIFY_HOSTS_AND_PEERS_CONFIG_KEY = "verifyHostsAndPeers";
+ 
+@@ -128,6 +131,32 @@ bool prepareForTLS(CURL* handle) {
+     return true;
+ }
+ 
++bool prepareForProxy(CURL* handle, curl_slist* headers) {
++    if (!handle) {
++        ACSDK_ERROR(LX("prepareForProxyFailed").d("reason", "nullHandle"));
++        return false;
++    }
++
++    auto config = configuration::ConfigurationNode::getRoot()[LIBCURLUTILS_CONFIG_KEY];
++
++    std::string proxy;
++    if (config.getString(PROXY_CONFIG_KEY, &proxy)) {
++        if (!setopt(handle, CURLOPT_PROXY, proxy.c_str(), "CURLOPT_PROXY", proxy.c_str())) {
++            ACSDK_ERROR(LX("prepareForProxyFailed").d("reason", "CURLOPT_PROXY setopt Failed"));
++            return false;
++        }
++
++        if (headers) {
++            if (!setopt(handle, CURLOPT_PROXYHEADER, headers, "CURLOPT_PROXYHEADER", "...")) {
++                ACSDK_ERROR(LX("prepareForProxyFailed").d("reason", "CURLOPT_PROXYHEADER setopt Failed"));
++                return false;
++            }
++        }
++    }
++
++    return true;
++}
++
+ }  // namespace libcurlUtils
+ }  // namespace utils
+ }  // namespace avsCommon
 diff --git a/AVSCommon/Utils/src/Timer.cpp b/AVSCommon/Utils/src/Timer.cpp
 index bab3a556..58ab7a3c 100644
 --- a/AVSCommon/Utils/src/Timer.cpp
@@ -6301,6 +6478,18 @@ index 9e897c5e..f7244c80 100644
          }
      });
      promise.set_value(true);
+diff --git a/tools/Install/android.sh b/tools/Install/android.sh
+index 329bd8a0..b50d0cb5 100644
+--- a/tools/Install/android.sh
++++ b/tools/Install/android.sh
+@@ -544,7 +544,6 @@ install_dependencies() {
+                   --disable-file \
+                   --disable-ldap \
+                   --disable-rtsp \
+-                  --disable-proxy \
+                   --disable-dict \
+                   --disable-telnet \
+                   --disable-tftp \
 -- 
 2.25.0
 

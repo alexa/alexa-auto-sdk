@@ -1679,6 +1679,18 @@ void AlexaEngineService::onNetworkInterfaceChangeStatusChanged(
     }
 }
 
+void AlexaEngineService::onNetworkProxyHeadersAvailable(const std::vector<std::string>& headers) {
+    try {
+        ThrowIfNot(m_configured, "alexaServiceNotConfigured");
+
+        if (isRunning()) {
+            alexaClientSDK::avsCommon::utils::libcurlUtils::CurlEasyHandleWrapper::setProxyHeaders(headers);
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
 bool AlexaEngineService::registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     try {
         ThrowIfNot(m_configured, "alexaServiceNotConfigured");

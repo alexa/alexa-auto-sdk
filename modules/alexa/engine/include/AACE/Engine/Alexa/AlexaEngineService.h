@@ -172,6 +172,7 @@ public:
     void onNetworkInfoChanged(NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength) override;
     void onNetworkInterfaceChangeStatusChanged(const std::string& networkInterface, NetworkInterfaceChangeStatus status)
         override;
+    void onNetworkProxyHeadersAvailable(const std::vector<std::string>& headers) override;
     /// @}
 
     /// AlexaComponentInterface

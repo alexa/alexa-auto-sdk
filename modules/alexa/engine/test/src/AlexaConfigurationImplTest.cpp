@@ -189,6 +189,27 @@ TEST_F(AlexaConfigurationImplTest, createCurlConfigWithEmptyStringNetworkInterfa
     EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
+TEST_F(AlexaConfigurationImplTest, createCurlConfigWithProxy) {
+    std::string expectedConfigStr =
+        "{\n"
+        "    \"aace.alexa\": {\n"
+        "        \"avsDeviceSDK\": {\n"
+        "            \"libcurlUtils\": {\n"
+        "                \"CURLOPT_CAPATH\": \"CAPATH\",\n"
+        "                \"CURLOPT_PROXY\": \"PROXY\"\n"
+        "            }\n"
+        "        }\n"
+        "    }\n"
+        "}";
+
+    auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig("CAPATH", "", "PROXY");
+
+    //Convert to ostringstream for comparing the istream
+    std::ostringstream configStr;
+    configStr << config->getStream()->rdbuf();
+    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
+}
+
 TEST_F(AlexaConfigurationImplTest, createSettingsConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"

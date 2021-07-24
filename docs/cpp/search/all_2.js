@@ -56,7 +56,7 @@ var searchData=
   ['createcertifiedsenderconfig',['createCertifiedSenderConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5d38a056525d20aad2114677d8d461ae',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createconsolesinkconfig',['createConsoleSinkConfig',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#ae6aa1d5ddd52e173073d501861e6835a',1,'aace::logger::config::LoggerConfiguration']]],
   ['createcontrol',['createControl',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a0a9236ba93a3b3c0c1e85900f40af697',1,'aace::carControl::config::CarControlConfiguration']]],
-  ['createcurlconfig',['createCurlConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a2012a3f45f54d16f5d8f260bb16c49c1',1,'aace::alexa::config::AlexaConfiguration']]],
+  ['createcurlconfig',['createCurlConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a221fd921e3b5f297a99520a6e09c283d',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createdeviceinfoconfig',['createDeviceInfoConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aceaa112768e13cd30722766cc9d1a2c6',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createdevicesettingsconfig',['createDeviceSettingsConfig',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8e556b5044008752d356c6e72b095df5',1,'aace::alexa::config::AlexaConfiguration']]],
   ['createendpoint',['createEndpoint',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ad5854625364fa4390d96712dc4eff550',1,'aace::carControl::config::CarControlConfiguration']]],

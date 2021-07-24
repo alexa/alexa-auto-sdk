@@ -65,6 +65,7 @@ import com.amazon.aace.core.config.ConfigurationFile;
 import com.amazon.aace.core.config.EngineConfiguration;
 import com.amazon.aace.logger.Logger;
 import com.amazon.aace.navigation.Navigation;
+import com.amazon.aace.network.NetworkProperties;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aace.vehicle.config.VehicleConfiguration;
 import com.amazon.sampleapp.core.ModuleFactoryInterface;
@@ -726,6 +727,26 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             throw new RuntimeException("Could not start engine");
         mEngineStarted = true;
 
+        // To facilitate testing, we check the "aace.json" configuration file located in the root
+        // of the SD card for a network proxy config.
+        // The JSON format is as follows:
+        // {
+        //     "proxyconfig": {
+        //         "proxyServer": "proxy-address",
+        //         "proxyHeader": "Bearer 1234"
+        //     }
+        // }
+        JSONObject proxyConfig = FileUtils.getOptionalConfigFromSDCard("aace.json", "proxyconfig");
+        if (proxyConfig != null && proxyConfig.has("proxyHeader")) {
+            try {
+                String value = proxyConfig.getString("proxyHeader");
+                String proxyHeader = "Proxy-Authorization: " + value;
+                mPropertyManager.setProperty(NetworkProperties.NETWORK_HTTP_PROXY_HEADERS, proxyHeader);
+            } catch (JSONException e) {
+                Log.w(TAG, "proxyHeader not provided in proxyconfig, proceeding without it");
+            }
+        }
+
         // Check if Amazonlite is supported
         if (mPropertyManager.getProperty(AlexaProperties.WAKEWORD_SUPPORTED).equals("true")) {
             mSpeechRecognizer.enableWakeWordUI();
@@ -782,6 +803,15 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         String productDsn = mPreferences.getString(getString(R.string.preference_product_dsn), "");
         String clientId = mPreferences.getString(getString(R.string.preference_client_id), "");
         String productId = mPreferences.getString(getString(R.string.preference_product_id), "");
+        String proxyServer = "";
+        JSONObject proxyConfig = FileUtils.getOptionalConfigFromSDCard("aace.json", "proxyconfig");
+        if (proxyConfig != null && proxyConfig.has("proxyServer")) {
+            try {
+                proxyServer = proxyConfig.getString("proxyServer");
+            } catch (JSONException e) {
+                Log.w(TAG, "proxyServer not provided in proxyconfig, proceeding without it");
+            }
+        }
 
         AlexaConfiguration.TemplateRuntimeTimeout[] timeoutList = new AlexaConfiguration.TemplateRuntimeTimeout[] {
                 new AlexaConfiguration.TemplateRuntimeTimeout(
@@ -798,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration>(Arrays.asList(
                 // AlexaConfiguration.createCurlConfig( certsDir.getPath(), "wlan0" ), Uncomment this line to specify
                 // the interface name to use by AVS.
-                AlexaConfiguration.createCurlConfig(certsDir.getPath()),
+                AlexaConfiguration.createCurlConfig(certsDir.getPath(), "", proxyServer),
                 AlexaConfiguration.createDeviceInfoConfig(
                         productDsn, clientId, productId, "Alexa Auto SDK", "Android Sample App"),
                 AlexaConfiguration.createMiscStorageConfig(appDataDir.getPath() + "/miscStorage.sqlite"),

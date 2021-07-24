@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">2.3.0</span>
+   &#160;<span id="projectnumber">2.3.1</span>
    </div>
   </td>
  </tr>
@@ -103,8 +103,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:a5d38a056525d20aad2114677d8d461ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85784965a44345df2874caa93af74cfb"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a85784965a44345df2874caa93af74cfb">createCapabilitiesDelegateConfig</a> (const std::string &amp;databaseFilePath)</td></tr>
 <tr class="separator:a85784965a44345df2874caa93af74cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2012a3f45f54d16f5d8f260bb16c49c1"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a2012a3f45f54d16f5d8f260bb16c49c1">createCurlConfig</a> (const std::string &amp;certsPath, const std::string &amp;iface=&quot;&quot;)</td></tr>
-<tr class="separator:a2012a3f45f54d16f5d8f260bb16c49c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a221fd921e3b5f297a99520a6e09c283d"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a221fd921e3b5f297a99520a6e09c283d">createCurlConfig</a> (const std::string &amp;certsPath, const std::string &amp;iface=&quot;&quot;, const std::string &amp;proxy=&quot;&quot;)</td></tr>
+<tr class="separator:a221fd921e3b5f297a99520a6e09c283d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08aee7c879ef040c17d32bd9a781a940"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a08aee7c879ef040c17d32bd9a781a940">createSettingsConfig</a> (const std::string &amp;databaseFilePath, const std::string &amp;locale=&quot;en-US&quot;)</td></tr>
 <tr class="separator:a08aee7c879ef040c17d32bd9a781a940"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e556b5044008752d356c6e72b095df5"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8e556b5044008752d356c6e72b095df5">createDeviceSettingsConfig</a> (const std::string &amp;databaseFilePath, const std::vector&lt; std::string &gt; &amp;locales={&quot;en-US&quot;, &quot;en-GB&quot;, &quot;de-DE&quot;, &quot;en-IN&quot;, &quot;en-CA&quot;, &quot;ja-JP&quot;, &quot;en-AU&quot;, &quot;fr-FR&quot;, &quot;it-IT&quot;, &quot;es-ES&quot;, &quot;es-MX&quot;, &quot;fr-CA&quot;, &quot;es-US&quot;, &quot;hi-IN&quot;, &quot;pt-BR&quot;}, const std::string &amp;defaultLocale=&quot;en-US&quot;, const std::string &amp;defaultTimezone=&quot;America/Vancouver&quot;, const std::vector&lt; std::vector&lt; std::string &gt;&gt; &amp;localeCombinations={})</td></tr>
@@ -404,8 +404,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a2012a3f45f54d16f5d8f260bb16c49c1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2012a3f45f54d16f5d8f260bb16c49c1">&#9670;&nbsp;</a></span>createCurlConfig()</h2>
+<a id="a221fd921e3b5f297a99520a6e09c283d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a221fd921e3b5f297a99520a6e09c283d">&#9670;&nbsp;</a></span>createCurlConfig()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -423,7 +423,13 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>iface</em> = <code>&quot;&quot;</code>&#160;</td>
+          <td class="paramname"><em>iface</em> = <code>&quot;&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>proxy</em> = <code>&quot;&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -443,10 +449,11 @@ Static Public Member Functions</h2></td></tr>
 <li>CURLOPT_INTERFACE if present, specifies a value for the libcurl property CURLOPT_INTERFACE.</li>
 </ul>
 <p>The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">    &quot;libcurlUtils&quot; : {</div><div class="line">        &quot;CURLOPT_CAPATH&quot; : &quot;&lt;CA_CERTIFICATES_FILE_PATH&gt;&quot;</div><div class="line">        &quot;CURLOPT_INTERFACE&quot; : &quot;&lt;NETWORK_INTERFACE_NAME&gt;&quot;</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">    &quot;libcurlUtils&quot; : {</div><div class="line">        &quot;CURLOPT_CAPATH&quot; : &quot;&lt;CA_CERTIFICATES_FILE_PATH&gt;&quot;,</div><div class="line">        &quot;CURLOPT_INTERFACE&quot; : &quot;&lt;NETWORK_INTERFACE_NAME&gt;&quot;,</div><div class="line">        &quot;CURLOPT_PROXY&quot; : &quot;&lt;PROXY_ADDRESS&gt;&quot;</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">certsPath</td><td>The file path to the directory holding CA certificates </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">iface</td><td>The specific network interface to use. This can be a network interface name, an IP address or a host name. Default to the system's primary network interface. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">proxy</td><td>The proxy used for outgoing requests. </td></tr>
   </table>
   </dd>
 </dl>
@@ -839,7 +846,7 @@ Static Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 2.3.0 - Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 2.3.1 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

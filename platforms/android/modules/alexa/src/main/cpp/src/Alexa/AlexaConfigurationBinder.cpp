@@ -177,12 +177,13 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
     JNIEnv* env,
     jobject obj,
     jstring certsPath,
-    jstring iface) {
+    jstring iface,
+    jstring proxy) {
     try {
-        auto config = iface != nullptr
-                          ? aace::alexa::config::AlexaConfiguration::createCurlConfig(
-                                JString(certsPath).toStdStr(), JString(iface).toStdStr())
-                          : aace::alexa::config::AlexaConfiguration::createCurlConfig(JString(certsPath).toStdStr());
+        auto config = aace::alexa::config::AlexaConfiguration::createCurlConfig(
+                            JString(certsPath).toStdStr(),
+                            iface ? JString(iface).toStdStr() : "",
+                            proxy ? JString(proxy).toStdStr() : "");
 
         ThrowIfNull(config, "createCurlConfigFailed");
 

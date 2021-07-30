@@ -1,6 +1,29 @@
 # Change Log
 
 ___
+## v2.1.1 released on 2021-07-29:
+>**Note:** For Android targets, the remote build flavor is not supported because the pre-built default platform AARs for the default Auto SDK modules and the sample-core AAR are not available from the JCenter repo. The information about the remote build flavor in the [Android Sample App README](./samples/android/README.md) is not applicable.
+
+>**Note:** All Auto SDK 2.1 extensions are compatible with 2.1.1.
+### Resolved Issues
+This version resolved a race condition during music playback that could cause the `PlaybackStarted` event to be delayed for eight seconds.
+
+### Known Issues
+* The Alexa cloud currently returns an `INVALID_REQUEST_EXCEPTION` or `INTERNAL_SERVICE_EXCEPTION` in response to any navigation event sent by the Auto SDK. You may see a harmless error/exception in the logs.
+* The CBL module uses a backoff when refreshing the access token after expiry. If internet is disconnected when the refresh is attempted, it could take up to a minute for the token to refresh when the internet connection is restored.
+* If the user deregisters from the companion app, Alexa does not prompt or notify the clients and does not reject the ping packet.
+* If you log out and log in, the Do Not Disturb (DND) state is not synchronized with Alexa.
+* When you cancel login with `CBL::cancel()`, the CBL state does not change to stopped.
+* Calling numbers such as 1800xxxxxxx using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, calling numbers using utterances that include "triple", "hundred" and "thousand" and pressing special characters such as # or* using utterances such as "Alexa press *#" may return unexpected results. Therefore we recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+* The Engine may sometimes stop abruptly on shutdown due to a race condition. However, since shutdown is triggered when the car ignition is turned off, no direct customer impact is expected.
+* The Engine may hang during shutdown if it is shut down while TTS is being played or read. Therefore, you should avoid calling the shutdown method while loading or playing SpeechSynthesizer audio.
+* When online, Alexa does not recognize the utterance “Switch to line In.”
+* A user playing Jeopardy or Skyrim cannot accept or reject incoming Alexa-to-Alexa calls using voice.
+* If the local timezone of your device differs from the timezone that was configured through the Alexa companion app, the user may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past".
+* When pausing and resuming music, volume adjustments are lost.
+* A user playing notifications while music is playing will hear the music for a split second between the end of one notification and the start of the next.
+* The External Media Player (EMP) Engine implementation does not wait for a dialog channel focus change to complete, such as after TTS, before executing an EMP directive, such as playing the CD player. As a result, you may see an unexpected sequence of Local Media Source playControl() method invocations such as play, then pause, followed by play again in quick succession.
+
 ## v2.1.0 released on 2019-12-19:
 
 ### Enhancements

@@ -1,9 +1,9 @@
-From 4cb17a9d3b672b5eaeb90b66d42fa2f1c3d4f36d Mon Sep 17 00:00:00 2001
-From: Prajwal Shimpi <shimpips@amazon.com>
-Date: Wed, 18 Dec 2019 10:11:37 -0800
+From ad40220820b4f28419d0acd8d12bb3fb2db8b7fa Mon Sep 17 00:00:00 2001
+From: Muni Sakkuru <muni.sakkuru@gmail.com>
+Date: Wed, 23 Jun 2021 11:47:55 -0700
 Subject: [PATCH] Alexa Auto changes for v1.17 AVS Device SDK
 
-For internal reference: 0f74be58 (1.17+aac)
+For internal reference: 0f74be58+8d039eff (1.17+aac)
 ---
  ACL/src/AVSConnectionManager.cpp              |   4 +-
  ADSL/include/ADSL/DirectiveProcessor.h        |  15 +-
@@ -13,9 +13,12 @@ For internal reference: 0f74be58 (1.17+aac)
  ADSL/test/ADSL/MockDirectiveSequencer.h       |   4 +
  AFML/include/AFML/FocusManager.h              |   2 +
  AFML/src/FocusManager.cpp                     |  27 +
+ .../AVSCommon/AVS/DialogUXStateAggregator.h   |  12 +
  .../AVS/ExternalMediaPlayer/AdapterUtils.h    |  25 +-
  .../ExternalMediaAdapterConstants.h           |   9 +
+ AVSCommon/AVS/src/DialogUXStateAggregator.cpp |  17 +-
  .../src/ExternalMediaPlayer/AdapterUtils.cpp  |  15 +-
+ .../AVS/test/DialogUXStateAggregatorTest.cpp  |  17 +
  AVSCommon/CMakeLists.txt                      |   2 +
  .../CallStateObserverInterface.h              |  17 +-
  .../DirectiveSequencerInterface.h             |   4 +
@@ -59,7 +62,7 @@ For internal reference: 0f74be58 (1.17+aac)
  .../test/AudioPlayerIntegrationTest.cpp       |  19 +
  .../include/SampleApp/InteractionManager.h    |   2 +-
  SampleApp/src/InteractionManager.cpp          |   2 +-
- 54 files changed, 2246 insertions(+), 107 deletions(-)
+ 57 files changed, 2285 insertions(+), 114 deletions(-)
  create mode 100644 AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
  create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
  create mode 100644 AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
@@ -69,7 +72,7 @@ For internal reference: 0f74be58 (1.17+aac)
  create mode 100644 AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
 
 diff --git a/ACL/src/AVSConnectionManager.cpp b/ACL/src/AVSConnectionManager.cpp
-index c9d16f3..b2fe711 100644
+index c9d16f3d..b2fe7111 100644
 --- a/ACL/src/AVSConnectionManager.cpp
 +++ b/ACL/src/AVSConnectionManager.cpp
 @@ -138,7 +138,9 @@ void AVSConnectionManager::reconnect() {
@@ -84,7 +87,7 @@ index c9d16f3..b2fe711 100644
  
  bool AVSConnectionManager::isConnected() const {
 diff --git a/ADSL/include/ADSL/DirectiveProcessor.h b/ADSL/include/ADSL/DirectiveProcessor.h
-index 174aac6..424b698 100644
+index 174aac62..424b698f 100644
 --- a/ADSL/include/ADSL/DirectiveProcessor.h
 +++ b/ADSL/include/ADSL/DirectiveProcessor.h
 @@ -81,7 +81,7 @@ public:
@@ -131,7 +134,7 @@ index 174aac6..424b698 100644
      std::string m_dialogRequestId;
  
 diff --git a/ADSL/include/ADSL/DirectiveSequencer.h b/ADSL/include/ADSL/DirectiveSequencer.h
-index d381118..77e0334 100644
+index d381118b..77e03340 100644
 --- a/ADSL/include/ADSL/DirectiveSequencer.h
 +++ b/ADSL/include/ADSL/DirectiveSequencer.h
 @@ -54,6 +54,10 @@ public:
@@ -146,7 +149,7 @@ index d381118..77e0334 100644
  
      void disable() override;
 diff --git a/ADSL/src/DirectiveProcessor.cpp b/ADSL/src/DirectiveProcessor.cpp
-index fc5b484..85acfce 100644
+index fc5b484e..85acfce7 100644
 --- a/ADSL/src/DirectiveProcessor.cpp
 +++ b/ADSL/src/DirectiveProcessor.cpp
 @@ -47,7 +47,8 @@ std::unordered_map<DirectiveProcessor::ProcessorHandle, DirectiveProcessor*> Dir
@@ -196,7 +199,7 @@ index fc5b484..85acfce 100644
      {
          std::lock_guard<std::mutex> lock(m_handleMapMutex);
 diff --git a/ADSL/src/DirectiveSequencer.cpp b/ADSL/src/DirectiveSequencer.cpp
-index d8c361c..2240f09 100644
+index d8c361c8..2240f09e 100644
 --- a/ADSL/src/DirectiveSequencer.cpp
 +++ b/ADSL/src/DirectiveSequencer.cpp
 @@ -66,6 +66,14 @@ std::string DirectiveSequencer::getDialogRequestId() {
@@ -215,7 +218,7 @@ index d8c361c..2240f09 100644
      if (!directive) {
          ACSDK_ERROR(LX("onDirectiveFailed").d("action", "ignored").d("reason", "nullptrDirective"));
 diff --git a/ADSL/test/ADSL/MockDirectiveSequencer.h b/ADSL/test/ADSL/MockDirectiveSequencer.h
-index 3cff6cc..0562444 100644
+index 3cff6cc7..05624443 100644
 --- a/ADSL/test/ADSL/MockDirectiveSequencer.h
 +++ b/ADSL/test/ADSL/MockDirectiveSequencer.h
 @@ -51,6 +51,10 @@ public:
@@ -230,7 +233,7 @@ index 3cff6cc..0562444 100644
  
      MOCK_METHOD0(disable, void());
 diff --git a/AFML/include/AFML/FocusManager.h b/AFML/include/AFML/FocusManager.h
-index 4d0cdbf..9f01309 100644
+index 4d0cdbfe..9f013092 100644
 --- a/AFML/include/AFML/FocusManager.h
 +++ b/AFML/include/AFML/FocusManager.h
 @@ -107,6 +107,8 @@ public:
@@ -243,7 +246,7 @@ index 4d0cdbf..9f01309 100644
  
      void stopAllActivities() override;
 diff --git a/AFML/src/FocusManager.cpp b/AFML/src/FocusManager.cpp
-index 4b42532..7bdec45 100644
+index 4b425327..7bdec456 100644
 --- a/AFML/src/FocusManager.cpp
 +++ b/AFML/src/FocusManager.cpp
 @@ -91,6 +91,33 @@ std::future<bool> FocusManager::releaseChannel(
@@ -280,8 +283,38 @@ index 4b42532..7bdec45 100644
  void FocusManager::stopForegroundActivity() {
      // We lock these variables so that we can correctly capture the currently foregrounded channel and activity.
      std::unique_lock<std::mutex> lock(m_mutex);
+diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h b/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h
+index abdd5eb5..a649a0c0 100644
+--- a/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h
++++ b/AVSCommon/AVS/include/AVSCommon/AVS/DialogUXStateAggregator.h
+@@ -110,6 +110,12 @@ private:
+      */
+     void tryEnterIdleState();
+ 
++    /**
++     * An event has occurred which may transition @c DialogUXStateAggregator out of THINKING mode. This function
++     * evaluates if the transition is valid and performs the necessary logic to prepare for the transition.
++     */
++    void tryExitThinkingState();
++
+     /**
+      * Transitions the internal state from THINKING to IDLE.
+      */
+@@ -152,6 +158,12 @@ private:
+     /// The timeout to be used for transitioning away from the THINKING state in case no messages are received.
+     const std::chrono::milliseconds m_timeoutForThinkingToIdle;
+ 
++    /**
++     * This timeout will be used to avoid going to the IDLE state immediately after receiving a message from AVS so
++     * that other UX states (such as speech starting) may be processed and propagated.
++     */
++    const std::chrono::milliseconds m_shortTimeoutForThinkingToIdle;
++
+     /// A timer to transition out of the THINKING state.
+     avsCommon::utils::timing::Timer m_thinkingTimeoutTimer;
+ 
 diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
-index d16c2c9..b47bd07 100644
+index d16c2c95..b47bd07c 100644
 --- a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
 +++ b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/AdapterUtils.h
 @@ -33,7 +33,7 @@ namespace externalMediaPlayer {
@@ -335,7 +368,7 @@ index d16c2c9..b47bd07 100644
  /**
   * Method to iterate over a collection of supported operation in playback state and convert to JSON.
 diff --git a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
-index 5532018..5e427cb 100644
+index 55320182..5e427cb1 100644
 --- a/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
 +++ b/AVSCommon/AVS/include/AVSCommon/AVS/ExternalMediaPlayer/ExternalMediaAdapterConstants.h
 @@ -31,6 +31,15 @@ const char USERNAME[] = "username";
@@ -354,8 +387,53 @@ index 5532018..5e427cb 100644
  
  // The key values used in the context payload from External Media Player to AVS.
  const char STATE[] = "state";
+diff --git a/AVSCommon/AVS/src/DialogUXStateAggregator.cpp b/AVSCommon/AVS/src/DialogUXStateAggregator.cpp
+index 54d564eb..81b6a8f7 100644
+--- a/AVSCommon/AVS/src/DialogUXStateAggregator.cpp
++++ b/AVSCommon/AVS/src/DialogUXStateAggregator.cpp
+@@ -41,6 +41,7 @@ DialogUXStateAggregator::DialogUXStateAggregator(
+     std::chrono::milliseconds timeoutForListeningToIdle) :
+         m_currentState{DialogUXStateObserverInterface::DialogUXState::IDLE},
+         m_timeoutForThinkingToIdle{timeoutForThinkingToIdle},
++        m_shortTimeoutForThinkingToIdle{std::chrono::milliseconds{200}},
+         m_timeoutForListeningToIdle{timeoutForListeningToIdle},
+         m_speechSynthesizerState{SpeechSynthesizerObserverInterface::SpeechSynthesizerState::FINISHED},
+         m_audioInputProcessorState{AudioInputProcessorObserverInterface::State::IDLE} {
+@@ -120,9 +121,15 @@ void DialogUXStateAggregator::onStateChanged(SpeechSynthesizerObserverInterface:
+ }
+ 
+ void DialogUXStateAggregator::receive(const std::string& contextId, const std::string& message) {
++    tryExitThinkingState();
++}
++
++void DialogUXStateAggregator::tryExitThinkingState() {
+     m_executor.submit([this]() {
+         if (DialogUXStateObserverInterface::DialogUXState::THINKING == m_currentState &&
+             SpeechSynthesizerObserverInterface::SpeechSynthesizerState::GAINING_FOCUS != m_speechSynthesizerState) {
++            ACSDK_DEBUG5(
++                LX("Kicking off short timer").d("shortTimeout in ms", m_shortTimeoutForThinkingToIdle.count()));
+             /*
+              * Stop the long timer and start a short timer so that either the state will change (i.e. Speech begins)
+              * or we automatically go to idle after the short timeout (i.e. the directive received isn't related to
+@@ -179,13 +186,9 @@ void DialogUXStateAggregator::onRequestProcessingStarted() {
+ }
+ 
+ void DialogUXStateAggregator::onRequestProcessingCompleted() {
+-    // No-op
+-    /*
+-     * No particular processing is needed for this directive. The RequestProcessCompleted directive exists in the
+-     * Interaction Model 1.1 to let AVS activate a logic that stops the thinking mode without any other semantic. But
+-     * the specification is such that any directive will interrupt the thinking mode. So here we are simply confirming
+-     * that this directive is supported.
+-     */
++    // If receive() calls occur before onRequestProcessStarted() happens, we need to use this method as a fallback to
++    // exit THINKING mode.
++    tryExitThinkingState();
+ }
+ 
+ void DialogUXStateAggregator::notifyObserversOfState() {
 diff --git a/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp b/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
-index 25a6366..e58d937 100644
+index 25a63664..e58d937a 100644
 --- a/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
 +++ b/AVSCommon/AVS/src/ExternalMediaPlayer/AdapterUtils.cpp
 @@ -45,12 +45,17 @@ const std::vector<int> SESSION_RETRY_TABLE = {
@@ -391,8 +469,36 @@ index 25a6366..e58d937 100644
  
      return playerJson;
  }
+diff --git a/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp b/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp
+index 4c5e4396..d0f1a997 100644
+--- a/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp
++++ b/AVSCommon/AVS/test/DialogUXStateAggregatorTest.cpp
+@@ -437,6 +437,23 @@ TEST_F(DialogUXAggregatorTest, test_validStatesForRPSToThinking) {
+     assertNoStateChange(m_testObserver);
+ }
+ 
++/// Test that if receive() happens before RequestProcessingCompleted directive is handled, we exit THINKING mode.
++TEST_F(DialogUXAggregatorTest, test_receiveThenRPCTransitionsOutOfThinking) {
++    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE);
++
++    m_aggregator->onStateChanged(AudioInputProcessorObserverInterface::State::BUSY);
++    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::LISTENING);
++
++    m_aggregator->receive("", "");
++    m_aggregator->receive("", "");
++
++    m_aggregator->onRequestProcessingStarted();
++    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::THINKING);
++    m_aggregator->onRequestProcessingCompleted();
++
++    assertStateChange(m_testObserver, DialogUXStateObserverInterface::DialogUXState::IDLE);
++}
++
+ }  // namespace test
+ }  // namespace avsCommon
+ }  // namespace alexaClientSDK
 diff --git a/AVSCommon/CMakeLists.txt b/AVSCommon/CMakeLists.txt
-index d10b8cc..20698fc 100644
+index d10b8ccd..20698fcb 100644
 --- a/AVSCommon/CMakeLists.txt
 +++ b/AVSCommon/CMakeLists.txt
 @@ -54,6 +54,8 @@ add_library(AVSCommon SHARED
@@ -405,7 +511,7 @@ index d10b8cc..20698fc 100644
      Utils/src/LibcurlUtils/LibCurlHttpContentFetcher.cpp
      Utils/src/LibcurlUtils/LibcurlHTTP2Connection.cpp
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/CallStateObserverInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/CallStateObserverInterface.h
-index fc8e7cd..118e5f1 100644
+index fc8e7cd8..118e5f17 100644
 --- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/CallStateObserverInterface.h
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/CallStateObserverInterface.h
 @@ -41,17 +41,30 @@ public:
@@ -442,7 +548,7 @@ index fc8e7cd..118e5f1 100644
  
  /**
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h
-index cd12ece..5e48299 100644
+index cd12ecef..5e482991 100644
 --- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h
 @@ -97,6 +97,10 @@ public:
@@ -458,7 +564,7 @@ index cd12ece..5e48299 100644
       * is associated with the most specific routing rule.
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
 new file mode 100644
-index 0000000..20d26e3
+index 00000000..20d26e33
 --- /dev/null
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterHandlerInterface.h
 @@ -0,0 +1,126 @@
@@ -589,7 +695,7 @@ index 0000000..20d26e3
 +
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_SDKINTERFACES_INCLUDE_AVSCOMMON_SDKINTERFACES_EXTERNALMEDIAADAPTERHANDLERINTERFACE_H_
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
-index d100866..dc378e4 100644
+index d100866c..dc378e40 100644
 --- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaAdapterInterface.h
 @@ -267,6 +267,21 @@ struct AdapterSessionState {
@@ -650,7 +756,7 @@ index d100866..dc378e4 100644
      /**
       * Method to initiate the different types of play control like PLAY/PAUSE/RESUME/NEXT/...
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h
-index 862df74..728ca2b 100644
+index 862df746..728ca2bc 100644
 --- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/ExternalMediaPlayerInterface.h
 @@ -16,6 +16,9 @@
@@ -699,7 +805,7 @@ index 862df74..728ca2b 100644
       * Method to set the player in focus after an adapter has acquired the channel.
       *
 diff --git a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/FocusManagerInterface.h b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/FocusManagerInterface.h
-index fc550eb..b92aba5 100644
+index fc550ebc..b92aba53 100644
 --- a/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/FocusManagerInterface.h
 +++ b/AVSCommon/SDKInterfaces/include/AVSCommon/SDKInterfaces/FocusManagerInterface.h
 @@ -114,6 +114,17 @@ public:
@@ -721,7 +827,7 @@ index fc550eb..b92aba5 100644
       * This method will request that the currently foregrounded Channel activity be stopped, if there is one. This will
       * be performed asynchronously, and so, if at the time of processing, the activity has stopped for any reason, then
 diff --git a/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockDirectiveSequencer.h b/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockDirectiveSequencer.h
-index 263e025..680d6e1 100644
+index 263e0252..680d6e11 100644
 --- a/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockDirectiveSequencer.h
 +++ b/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockDirectiveSequencer.h
 @@ -37,6 +37,10 @@ public:
@@ -736,7 +842,7 @@ index 263e025..680d6e1 100644
      MOCK_METHOD0(doShutdown, void());
      MOCK_METHOD0(disable, void());
 diff --git a/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockFocusManager.h b/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockFocusManager.h
-index c2404fe..507c613 100644
+index c2404fe9..507c6136 100644
 --- a/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockFocusManager.h
 +++ b/AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces/MockFocusManager.h
 @@ -39,6 +39,7 @@ public:
@@ -748,7 +854,7 @@ index c2404fe..507c613 100644
          addObserver,
          void(const std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerObserverInterface>& observer));
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
-index 72a7834..beb9cd7 100644
+index 72a78344..beb9cd7d 100644
 --- a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
 +++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/CurlEasyHandleWrapper.h
 @@ -73,7 +73,9 @@ public:
@@ -798,7 +904,7 @@ index 72a7834..beb9cd7 100644
  };
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
 new file mode 100644
-index 0000000..0bfbaa1
+index 00000000..0bfbaa19
 --- /dev/null
 +++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDelete.h
 @@ -0,0 +1,83 @@
@@ -887,7 +993,7 @@ index 0000000..0bfbaa1
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETE_H_
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
 new file mode 100644
-index 0000000..1a948d8
+index 00000000..1a948d8b
 --- /dev/null
 +++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpDeleteInterface.h
 @@ -0,0 +1,53 @@
@@ -946,7 +1052,7 @@ index 0000000..1a948d8
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPDELETEINTERFACE_H_
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
 new file mode 100644
-index 0000000..5068502
+index 00000000..50685028
 --- /dev/null
 +++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGet.h
 @@ -0,0 +1,83 @@
@@ -1035,7 +1141,7 @@ index 0000000..5068502
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGET_H_
 diff --git a/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
 new file mode 100644
-index 0000000..770b206
+index 00000000..770b206b
 --- /dev/null
 +++ b/AVSCommon/Utils/include/AVSCommon/Utils/LibcurlUtils/HttpGetInterface.h
 @@ -0,0 +1,53 @@
@@ -1093,7 +1199,7 @@ index 0000000..770b206
 +
 +#endif  // ALEXA_CLIENT_SDK_AVSCOMMON_UTILS_INCLUDE_AVSCOMMON_UTILS_LIBCURLUTILS_HTTPGETINTERFACE_H_
 diff --git a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
-index c3bda8f..df104c0 100644
+index c3bda8f8..df104c01 100644
 --- a/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
 +++ b/AVSCommon/Utils/src/LibcurlUtils/CurlEasyHandleWrapper.cpp
 @@ -54,7 +54,8 @@ static const std::string LIBCURLUTILS_CONFIG_KEY = "libcurlUtils";
@@ -1149,7 +1255,7 @@ index c3bda8f..df104c0 100644
      std::string streamLogPrefix;
 diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
 new file mode 100644
-index 0000000..b41bace
+index 00000000..b41bace0
 --- /dev/null
 +++ b/AVSCommon/Utils/src/LibcurlUtils/HttpDelete.cpp
 @@ -0,0 +1,124 @@
@@ -1279,7 +1385,7 @@ index 0000000..b41bace
 +}  // namespace alexaClientSDK
 diff --git a/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp b/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
 new file mode 100644
-index 0000000..ee45dfd
+index 00000000..ee45dfd6
 --- /dev/null
 +++ b/AVSCommon/Utils/src/LibcurlUtils/HttpGet.cpp
 @@ -0,0 +1,124 @@
@@ -1408,7 +1514,7 @@ index 0000000..ee45dfd
 +}  // namespace avsCommon
 +}  // namespace alexaClientSDK
 diff --git a/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp b/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
-index 1b29073..7295d86 100644
+index 1b29073a..7295d86b 100644
 --- a/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
 +++ b/ApplicationUtilities/DefaultClient/src/DefaultClient.cpp
 @@ -694,6 +694,7 @@ bool DefaultClient::initialize(
@@ -1428,7 +1534,7 @@ index 1b29073..7295d86 100644
  #endif
      if (!m_audioPlayer) {
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7b2de61..a431dcd 100644
+index 7b2de617..a431dcd2 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -6,6 +6,10 @@ set(PROJECT_BRIEF "A cross-platform, modular SDK for interacting with the Alexa
@@ -1443,7 +1549,7 @@ index 7b2de61..a431dcd 100644
  include(build/BuildDefaults.cmake)
  include(tools/Testing.cmake)
 diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
-index af0ff6a..780ffce 100644
+index af0ff6ac..780ffce2 100644
 --- a/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
 +++ b/CapabilityAgents/Alerts/include/Alerts/AlertObserverInterface.h
 @@ -74,6 +74,29 @@ public:
@@ -1477,7 +1583,7 @@ index af0ff6a..780ffce 100644
       * Convert a @c State to a @c std::string.
       *
 diff --git a/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h b/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
-index 8c7b9cf..74de4ca 100644
+index 8c7b9cf4..74de4cab 100644
 --- a/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
 +++ b/CapabilityAgents/Alerts/include/Alerts/AlertsCapabilityAgent.h
 @@ -288,6 +288,32 @@ private:
@@ -1536,7 +1642,7 @@ index 8c7b9cf..74de4ca 100644
       * A handler function which will be called by our internal executor to remove all alerts currently being managed.
       */
 diff --git a/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp b/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
-index 37f3535..34fa86f 100644
+index 37f35357..34fa86f7 100644
 --- a/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
 +++ b/CapabilityAgents/Alerts/src/AlertsCapabilityAgent.cpp
 @@ -66,6 +66,9 @@ static const std::string ALERTS_CAPABILITY_INTERFACE_VERSION = "1.4";
@@ -1636,7 +1742,7 @@ index 37f3535..34fa86f 100644
      ACSDK_DEBUG1(LX("executeRemoveAllAlerts"));
      m_alertScheduler.clearData();
 diff --git a/CapabilityAgents/AudioPlayer/include/AudioPlayer/AudioPlayer.h b/CapabilityAgents/AudioPlayer/include/AudioPlayer/AudioPlayer.h
-index 49df3c9..feb7d9e 100644
+index 49df3c9e..feb7d9e8 100644
 --- a/CapabilityAgents/AudioPlayer/include/AudioPlayer/AudioPlayer.h
 +++ b/CapabilityAgents/AudioPlayer/include/AudioPlayer/AudioPlayer.h
 @@ -42,6 +42,7 @@
@@ -1675,7 +1781,7 @@ index 49df3c9..feb7d9e 100644
  
  }  // namespace audioPlayer
 diff --git a/CapabilityAgents/AudioPlayer/src/AudioPlayer.cpp b/CapabilityAgents/AudioPlayer/src/AudioPlayer.cpp
-index 340abe3..191a1a5 100644
+index 340abe32..191a1a50 100644
 --- a/CapabilityAgents/AudioPlayer/src/AudioPlayer.cpp
 +++ b/CapabilityAgents/AudioPlayer/src/AudioPlayer.cpp
 @@ -38,6 +38,7 @@ using namespace avsCommon::utils;
@@ -1771,7 +1877,7 @@ index 340abe3..191a1a5 100644
      m_messageSender->sendMessage(request);
  }
 diff --git a/CapabilityAgents/AudioPlayer/src/CMakeLists.txt b/CapabilityAgents/AudioPlayer/src/CMakeLists.txt
-index 1d650e6..23362e8 100644
+index 1d650e62..23362e80 100644
 --- a/CapabilityAgents/AudioPlayer/src/CMakeLists.txt
 +++ b/CapabilityAgents/AudioPlayer/src/CMakeLists.txt
 @@ -4,10 +4,15 @@ add_library(AudioPlayer SHARED
@@ -1792,7 +1898,7 @@ index 1d650e6..23362e8 100644
  # install target
  asdk_install()
 diff --git a/CapabilityAgents/AudioPlayer/test/AudioPlayerTest.cpp b/CapabilityAgents/AudioPlayer/test/AudioPlayerTest.cpp
-index 4a2d1f4..1ffe920 100644
+index 4a2d1f4b..1ffe9205 100644
 --- a/CapabilityAgents/AudioPlayer/test/AudioPlayerTest.cpp
 +++ b/CapabilityAgents/AudioPlayer/test/AudioPlayerTest.cpp
 @@ -37,6 +37,7 @@
@@ -1964,7 +2070,7 @@ index 4a2d1f4..1ffe920 100644
          m_mockCaptionManager);
      EXPECT_EQ(testAudioPlayer, nullptr);
 diff --git a/CapabilityAgents/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h b/CapabilityAgents/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h
-index ba38ff3..0a80190 100644
+index ba38ff31..0a80190a 100644
 --- a/CapabilityAgents/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h
 +++ b/CapabilityAgents/DoNotDisturb/include/DoNotDisturbCA/DoNotDisturbCapabilityAgent.h
 @@ -50,11 +50,11 @@ namespace doNotDisturb {
@@ -2077,7 +2183,7 @@ index ba38ff3..0a80190 100644
      /**
       * Flag indicating latest reported connection status. True if SDK is connected to the AVS and ready,
 diff --git a/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h b/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
-index b859abb..1dfc800 100644
+index b859abb3..1dfc8000 100644
 --- a/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
 +++ b/CapabilityAgents/ExternalMediaPlayer/include/ExternalMediaPlayer/ExternalMediaPlayer.h
 @@ -21,6 +21,11 @@
@@ -2243,7 +2349,7 @@ index b859abb..1dfc800 100644
       * @c Executor which queues up operations from asynchronous API calls.
       *
 diff --git a/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp b/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
-index cf77ebc..6c19f45 100644
+index cf77ebc2..6c19f45a 100644
 --- a/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
 +++ b/CapabilityAgents/ExternalMediaPlayer/src/ExternalMediaPlayer.cpp
 @@ -14,9 +14,6 @@
@@ -3050,7 +3156,7 @@ index cf77ebc..6c19f45 100644
      state.AddMember(PLAYERS, players, stateAlloc);
  
 diff --git a/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp b/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
-index 5096569..1d2ce4d 100644
+index 5096569e..1d2ce4d3 100644
 --- a/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
 +++ b/CapabilityAgents/ExternalMediaPlayer/test/ExternalMediaPlayerTest.cpp
 @@ -96,6 +96,9 @@ static const std::string PLAYER_STATE = "IDLE";
@@ -3446,7 +3552,7 @@ index 5096569..1d2ce4d 100644
   * Test successful logout.
   */
 diff --git a/CapabilityAgents/MRM/include/MRM/MRMCapabilityAgent.h b/CapabilityAgents/MRM/include/MRM/MRMCapabilityAgent.h
-index 8775551..ffc28d2 100644
+index 8775551f..ffc28d27 100644
 --- a/CapabilityAgents/MRM/include/MRM/MRMCapabilityAgent.h
 +++ b/CapabilityAgents/MRM/include/MRM/MRMCapabilityAgent.h
 @@ -107,7 +107,7 @@ public:
@@ -3475,7 +3581,7 @@ index 8775551..ffc28d2 100644
 \ No newline at end of file
 +#endif  // ALEXA_CLIENT_SDK_CAPABILITYAGENTS_MRM_INCLUDE_MRM_MRMCAPABILITYAGENT_H_
 diff --git a/CapabilityAgents/MRM/src/MRMCapabilityAgent.cpp b/CapabilityAgents/MRM/src/MRMCapabilityAgent.cpp
-index 03b9700..8dadc58 100644
+index 03b97001..8dadc589 100644
 --- a/CapabilityAgents/MRM/src/MRMCapabilityAgent.cpp
 +++ b/CapabilityAgents/MRM/src/MRMCapabilityAgent.cpp
 @@ -153,9 +153,9 @@ void MRMCapabilityAgent::onSpeakerSettingsChanged(
@@ -3500,7 +3606,7 @@ index 03b9700..8dadc58 100644
      bool active =
          (CallStateObserverInterface::CallState::CONNECTING == callState ||
 diff --git a/CapabilityAgents/PlaybackController/include/PlaybackController/PlaybackController.h b/CapabilityAgents/PlaybackController/include/PlaybackController/PlaybackController.h
-index 078dc4c..c02d9f5 100644
+index 078dc4ca..c02d9f57 100644
 --- a/CapabilityAgents/PlaybackController/include/PlaybackController/PlaybackController.h
 +++ b/CapabilityAgents/PlaybackController/include/PlaybackController/PlaybackController.h
 @@ -25,6 +25,7 @@
@@ -3553,7 +3659,7 @@ index 078dc4c..c02d9f5 100644
      std::queue<const PlaybackCommand*> m_commands;
      /// @}
 diff --git a/CapabilityAgents/PlaybackController/src/PlaybackController.cpp b/CapabilityAgents/PlaybackController/src/PlaybackController.cpp
-index f29ae74..8a99117 100644
+index f29ae74b..8a99117d 100644
 --- a/CapabilityAgents/PlaybackController/src/PlaybackController.cpp
 +++ b/CapabilityAgents/PlaybackController/src/PlaybackController.cpp
 @@ -50,6 +50,12 @@ static const std::string TAG("PlaybackController");
@@ -3633,7 +3739,7 @@ index f29ae74..8a99117 100644
  }
  
 diff --git a/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp b/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp
-index ec148c0..7592c35 100644
+index ec148c0e..7592c357 100644
 --- a/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp
 +++ b/CapabilityAgents/SpeechSynthesizer/src/SpeechSynthesizer.cpp
 @@ -230,8 +230,12 @@ void SpeechSynthesizer::handleDirective(std::shared_ptr<DirectiveInfo> info) {
@@ -3685,7 +3791,7 @@ index ec148c0..7592c35 100644
          m_currentInfo = speakInfo;
      }
 diff --git a/CapabilityAgents/SpeechSynthesizer/test/SpeechSynthesizerTest.cpp b/CapabilityAgents/SpeechSynthesizer/test/SpeechSynthesizerTest.cpp
-index 21f7e69..25a03f3 100644
+index 21f7e693..25a03f3d 100644
 --- a/CapabilityAgents/SpeechSynthesizer/test/SpeechSynthesizerTest.cpp
 +++ b/CapabilityAgents/SpeechSynthesizer/test/SpeechSynthesizerTest.cpp
 @@ -903,6 +903,143 @@ TEST_F(SpeechSynthesizerTest, testTimer_notCallStopTwice) {
@@ -3833,7 +3939,7 @@ index 21f7e69..25a03f3 100644
   * Testing executeCancel() completes execution before onFocusChanged() is called.
   *
 diff --git a/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp b/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
-index 16dacdd..764e773 100644
+index 16dacdd2..764e7734 100644
 --- a/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
 +++ b/CapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
 @@ -39,7 +39,7 @@ static const std::string TEMPLATERUNTIME_CAPABILITY_INTERFACE_TYPE = "AlexaInter
@@ -3862,7 +3968,7 @@ index 16dacdd..764e773 100644
  /**
   * Creates the TemplateRuntime capability configuration.
 diff --git a/Captions/Implementation/src/SystemClockDelay.cpp b/Captions/Implementation/src/SystemClockDelay.cpp
-index 77e3037..0c3cf4a 100644
+index 77e30376..0c3cf4a9 100644
 --- a/Captions/Implementation/src/SystemClockDelay.cpp
 +++ b/Captions/Implementation/src/SystemClockDelay.cpp
 @@ -23,7 +23,7 @@ namespace captions {
@@ -3875,7 +3981,7 @@ index 77e3037..0c3cf4a 100644
  }
  
 diff --git a/CertifiedSender/src/CertifiedSender.cpp b/CertifiedSender/src/CertifiedSender.cpp
-index e923707..fc27a61 100644
+index e9237071..fc27a611 100644
 --- a/CertifiedSender/src/CertifiedSender.cpp
 +++ b/CertifiedSender/src/CertifiedSender.cpp
 @@ -184,10 +184,10 @@ inline bool shouldRetryTransmission(MessageRequestObserverInterface::Status stat
@@ -3900,7 +4006,7 @@ index e923707..fc27a61 100644
  
      int queueSize = static_cast<int>(m_messagesToSend.size());
 diff --git a/Endpoints/src/EndpointBuilder.cpp b/Endpoints/src/EndpointBuilder.cpp
-index ad299fa..4788a24 100644
+index ad299fa1..4788a247 100644
 --- a/Endpoints/src/EndpointBuilder.cpp
 +++ b/Endpoints/src/EndpointBuilder.cpp
 @@ -51,8 +51,8 @@ static const std::string TAG("EndpointBuilder");
@@ -3915,7 +4021,7 @@ index ad299fa..4788a24 100644
  std::unique_ptr<EndpointBuilder> EndpointBuilder::create(
      const avsCommon::utils::DeviceInfo& deviceInfo,
 diff --git a/Integration/test/AudioPlayerIntegrationTest.cpp b/Integration/test/AudioPlayerIntegrationTest.cpp
-index 3ad3232..1b98ac3 100644
+index 3ad32327..1b98ac33 100644
 --- a/Integration/test/AudioPlayerIntegrationTest.cpp
 +++ b/Integration/test/AudioPlayerIntegrationTest.cpp
 @@ -45,6 +45,9 @@
@@ -3987,7 +4093,7 @@ index 3ad3232..1b98ac3 100644
      FocusState m_focusState;
      std::mutex m_mutex;
 diff --git a/SampleApp/include/SampleApp/InteractionManager.h b/SampleApp/include/SampleApp/InteractionManager.h
-index 522b713..0bb0a33 100644
+index 522b7136..0bb0a331 100644
 --- a/SampleApp/include/SampleApp/InteractionManager.h
 +++ b/SampleApp/include/SampleApp/InteractionManager.h
 @@ -361,7 +361,7 @@ public:
@@ -4000,7 +4106,7 @@ index 522b713..0bb0a33 100644
  #ifdef ENABLE_PCC
      /**
 diff --git a/SampleApp/src/InteractionManager.cpp b/SampleApp/src/InteractionManager.cpp
-index 7005b40..d3c3bd1 100644
+index 7005b403..d3c3bd1f 100644
 --- a/SampleApp/src/InteractionManager.cpp
 +++ b/SampleApp/src/InteractionManager.cpp
 @@ -410,7 +410,7 @@ void InteractionManager::onDialogUXStateChanged(DialogUXState state) {
@@ -4013,5 +4119,5 @@ index 7005b40..d3c3bd1 100644
          if (CallState::CALL_CONNECTED == state) {
              if (!m_micWrapper->isStreaming()) {
 -- 
-2.22.0
+2.32.0
 

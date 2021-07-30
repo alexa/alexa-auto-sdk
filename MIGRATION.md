@@ -1,6 +1,6 @@
 # Alexa Auto SDK Migration Guide
 
-This guide outlines the changes you will need to make to migrate from Auto SDK v2.0 to Auto SDK v2.1. 
+This guide outlines the changes you will need to make to migrate from Auto SDK v2.0 to Auto SDK v2.1 or v2.1.1.
 
 **Table of Contents**
 

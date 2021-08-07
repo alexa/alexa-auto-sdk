@@ -157,6 +157,18 @@
                         "value": "TRIAL_EXPIRED"
                     },
                     {
+                        "do": "notify/onConnectivityEvent",
+                        "key": "9",
+                        "name": "Activate Trial",
+                        "value": "TRIAL"
+                    },
+                    {
+                        "do": "notify/onConnectivityEvent",
+                        "key": "A",
+                        "name": "Activate Paid Plan",
+                        "value": "PAID_PLAN"
+                    },
+                    {
                         "do": "GoBack",
                         "key": "esc",
                         "name": "Go back"
@@ -869,6 +881,11 @@
                         "do": "notify/onRemoveAddressBookAuto",
                         "key": "4",
                         "name": "Remove Navigation(Labelled Address) Book"
+                    },
+                    {
+                        "do": "notify/onRemoveAllAddressBooks",
+                        "key": "5",
+                        "name": "Remove All Address Books"
                     },
                     {
                         "do": "GoBack",

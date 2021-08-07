@@ -21,6 +21,7 @@ set(ADDRESSBOOK_CPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp)
 set(ADDRESSBOOK_SOURCE
     ${ADDRESSBOOK_CPP_DIR}/src/AddressBook/AddressBookBinder.cpp
     ${ADDRESSBOOK_CPP_DIR}/src/AddressBook/IAddressBookEntriesFactoryBinder.cpp
+    ${ADDRESSBOOK_CPP_DIR}/src/AddressBook/AddressBookConfigurationBinder.cpp
 )
 set(ADDRESSBOOK_DEPENDENCIES
     AACEAddressBookPlatform

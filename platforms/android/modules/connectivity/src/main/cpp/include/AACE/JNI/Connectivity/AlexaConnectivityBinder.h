@@ -30,6 +30,7 @@ public:
     // aace::connectivity::AlexaConnectivity interface
     std::string getConnectivityState() override;
     std::string getIdentifier() override;
+    void connectivityEventResponse(const std::string& token, StatusCode statusCode) override;
 
 private:
     JObject m_obj;
@@ -50,6 +51,24 @@ public:
 private:
     std::shared_ptr<AlexaConnectivityHandler> m_alexaConnectivity;
 };
+
+//
+// JStatusCode
+//
+class JAlexaConnectivityHandlerStatusCodeConfig : public EnumConfiguration<AlexaConnectivityHandler::StatusCode> {
+public:
+    using T = AlexaConnectivityHandler::StatusCode;
+
+    const char* getClassName() override {
+        return "com/amazon/aace/connectivity/AlexaConnectivity$StatusCode";
+    }
+
+    std::vector<std::pair<T, std::string>> getConfiguration() override {
+        return {{T::SUCCESS, "SUCCESS"}, {T::FAIL, "FAIL"}};
+    }
+};
+
+using JStatusCode = JEnum<AlexaConnectivityHandler::StatusCode, JAlexaConnectivityHandlerStatusCodeConfig>;
 
 }  // namespace connectivity
 }  // namespace jni

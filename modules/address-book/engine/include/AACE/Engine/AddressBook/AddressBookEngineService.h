@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ public:
 
 protected:
     // EngineService
+    bool configure(std::shared_ptr<std::istream> configuration) override;
     bool shutdown() override;
     AddressBookEngineService(const aace::engine::core::ServiceDescription& description);
 
@@ -52,6 +53,7 @@ private:
 
     std::shared_ptr<AddressBookEngineImpl> m_addressBookEngineImpl;
     std::shared_ptr<AddressBookCloudUploader> m_addressBookCloudUploader;
+    bool m_cleanAllAddressBooksAtStart;
 };
 
 }  // namespace addressBook

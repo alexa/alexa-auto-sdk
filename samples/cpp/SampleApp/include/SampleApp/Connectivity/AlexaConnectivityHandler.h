@@ -50,6 +50,7 @@ public:
     // aace::connectivity::AlexaConnectivity interface
     auto getConnectivityState() -> std::string override;
     auto getIdentifier() -> std::string override;
+    auto connectivityEventResponse(const std::string& token, StatusCode statusCode) -> void override;
 
 private:
     std::weak_ptr<View> m_console{};

@@ -1,0 +1,31 @@
+@startuml
+
+skinparam roundcorner 10
+
+participant Application                     <<Application>> order 10
+participant AlexaConnectivityHandler        <<Platform>>    order 20
+participant AudioOutputProviderHandler      <<Platform>>    order 30
+participant "Auto SDK Engine" as AutoSDK    <<Engine>>      order 40
+participant "Alexa" as AVS                  <<AlexaCloud>>  order 50
+
+alt Activating Trial
+    Application                 -> AlexaConnectivityHandler         : Customer clicks `ACTIVATE_TRIAL`\nbutton on screen to activate trial up-sell.
+    AlexaConnectivityHandler    -> AutoSDK                          : sendConnectivityEvent({"type":"ACTIVATE_TRIAL"}, "token")
+else Activiting Paid Plan
+    Application                 -> AlexaConnectivityHandler         : Customer clicks `ACTIVATE_PAID_PLAN`\nbutton on screen to activate paid plan up-sell.
+    AlexaConnectivityHandler    -> AutoSDK                          : sendConnectivityEvent({"type":"ACTIVATE_PAID_PLAN"}, "token")
+end
+...
+AutoSDK         -> AVS                                              : sends InitiateDataPlanSubscription event to AVS
+alt successful in sending event to Alexa
+    AutoSDK -> AlexaConnectivityHandler                             : connectivityEventResponse("token", StatusCode::SUCCESS)
+    ...
+    AVS -> AutoSDK: Voice interaction using SpeechSynthesizer directive.
+    AutoSDK -> AudioOutputProviderHandler: Audio Stream (TTS)
+    AudioOutputProviderHandler -> Application: Audio Output
+else on failure
+    AutoSDK -> AlexaConnectivityHandler                             : connectivityEventResponse("token", StatusCode::FAIL)
+end
+...
+
+@enduml

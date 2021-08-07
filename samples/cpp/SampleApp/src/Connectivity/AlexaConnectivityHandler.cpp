@@ -86,6 +86,14 @@ std::string AlexaConnectivityHandler::getIdentifier() {
     return activity->getApplicationContext()->getNetworkIdentifier();
 }
 
+void AlexaConnectivityHandler::connectivityEventResponse(const std::string& id, StatusCode statusCode) {
+    if (statusCode == StatusCode::SUCCESS) {
+        log(logger::LoggerHandler::Level::INFO, "sendConnectivityEvent Success token=" + id);
+    } else {
+        log(logger::LoggerHandler::Level::ERROR, "sendConnectivityEvent Failed token=" + id);
+    }
+}
+
 // private
 
 void AlexaConnectivityHandler::log(logger::LoggerHandler::Level level, const std::string& message) {
@@ -244,6 +252,29 @@ void AlexaConnectivityHandler::setupUI() {
             applicationContext->saveContent(path, m_connectivityState);
         }
         connectivityStateChange();
+        return true;
+    });
+    activity->registerObserver(Event::onConnectivityEvent, [=](const std::string& value) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onConnectivityEvent:" + value);
+        if (!value.empty()) {
+            // clang-format off
+            static const std::map<std::string, json> TestEnumerator{
+                // Activate Trial Event
+                {"TRIAL",{
+                    {"type","ACTIVATE_TRIAL"}
+                }},
+                // Activate Paid Plan Event
+                {"PAID_PLAN",{
+                    {"type","ACTIVATE_PAID_PLAN"}
+                }},
+            };
+            // clang-format on
+            if (TestEnumerator.count(value) != 0) {
+                sendConnectivityEvent(TestEnumerator.at(value).dump());
+            } else {
+                log(logger::LoggerHandler::Level::ERROR, "invalidConnectivityEvent.value=" + value);
+            }
+        }
         return true;
     });
 }

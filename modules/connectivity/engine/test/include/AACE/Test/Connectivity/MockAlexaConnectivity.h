@@ -27,6 +27,7 @@ class MockAlexaConnectivity : public aace::connectivity::AlexaConnectivity {
 public:
     MOCK_METHOD0(getConnectivityState, std::string());
     MOCK_METHOD0(getIdentifier, std::string());
+    MOCK_METHOD2(connectivityEventResponse, void(const std::string& token, StatusCode statusCode));
 };
 
 }  // namespace connectivity

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -107,7 +107,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         NetworkInfoObserver::NetworkStatus networkStatus,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
-        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        bool cleanAllAddressBooksAtStart);
 
 public:
     static std::shared_ptr<AddressBookCloudUploader> create(
@@ -116,7 +117,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
         NetworkInfoObserver::NetworkStatus networkStatus,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
-        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints);
+        std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        bool cleanAllAddressBooksAtStart);
 
     // AddressBookObserver
     bool addressBookAdded(std::shared_ptr<AddressBookEntity> addressBookEntity) override;
@@ -140,7 +142,7 @@ protected:
 private:
     using HTTPResponse = AddressBookCloudUploaderRESTAgent::HTTPResponse;
 
-    void eventLoop();  // Infinite loop
+    void eventLoop(bool cleanAllAddressBooksAtStart);  // Infinite loop
     const Event popNextEventFromQ();
 
     bool handleUpload(std::shared_ptr<AddressBookEntity> addressBookEntity);

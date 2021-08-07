@@ -14,10 +14,8 @@
  */
 
 #include <typeinfo>
-#include <rapidjson/error/en.h>
-#include <rapidjson/pointer.h>
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/writer.h>
+
+#include <nlohmann/json.hpp>
 
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/Alexa/AlexaEngineService.h>
@@ -42,7 +40,8 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AddressBookEngineService"
 REGISTER_SERVICE(AddressBookEngineService);
 
 AddressBookEngineService::AddressBookEngineService(const aace::engine::core::ServiceDescription& description) :
-        aace::engine::core::EngineService(description) {
+        aace::engine::core::EngineService(description),
+        m_cleanAllAddressBooksAtStart(true) {
 }
 
 AddressBookEngineService::~AddressBookEngineService() = default;
@@ -69,6 +68,17 @@ bool AddressBookEngineService::registerPlatformInterface(
         AACE_ERROR(LX(TAG, "registerPlatformInterface").d("reason", ex.what()));
         return false;
     }
+}
+
+bool AddressBookEngineService::configure(std::shared_ptr<std::istream> configuration) {
+    try {
+        auto config = nlohmann::json::parse(*configuration);
+        m_cleanAllAddressBooksAtStart = config.value("cleanAllAddressBooksAtStart", m_cleanAllAddressBooksAtStart);
+    } catch (nlohmann::json::parse_error& ex) {
+        AACE_ERROR(LX(TAG).m("configuration is not valid JSON").d("exception", ex.what()));
+        return false;
+    }
+    return true;
 }
 
 bool AddressBookEngineService::registerPlatformInterfaceType(
@@ -114,7 +124,13 @@ bool AddressBookEngineService::registerPlatformInterfaceType(
         ThrowIfNull(alexaEndpoints, "alexaEndpointsInvalid");
 
         m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create(
-            m_addressBookEngineImpl, authDelegate, deviceInfo, networkStatus, networkObserver, alexaEndpoints);
+            m_addressBookEngineImpl,
+            authDelegate,
+            deviceInfo,
+            networkStatus,
+            networkObserver,
+            alexaEndpoints,
+            m_cleanAllAddressBooksAtStart);
         ThrowIfNull(m_addressBookCloudUploader, "createAddressBookCloudUploaderFailed");
 
         // set the engine interface reference

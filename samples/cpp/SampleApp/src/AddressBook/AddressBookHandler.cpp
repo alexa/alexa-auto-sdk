@@ -144,6 +144,11 @@ void AddressBookHandler::setupUI() {
         log(logger::LoggerHandler::Level::VERBOSE, "onRemoveAddressBookAuto");
         return removeAddressBook(NAVIGATION_FAVORITES_ID);
     });
+
+    activity->registerObserver(Event::onRemoveAllAddressBooks, [=](const std::string&) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onRemoveAllAddressBooks");
+        return removeAddressBook("");
+    });
 }
 
 bool AddressBookHandler::LoadContactData(const std::string& filepath) {

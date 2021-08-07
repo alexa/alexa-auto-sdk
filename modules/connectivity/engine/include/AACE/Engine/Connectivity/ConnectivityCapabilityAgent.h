@@ -20,11 +20,14 @@
 #include <AVSCommon/AVS/CapabilityState.h>
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+#include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/StateProviderInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+#include <AVSCommon/Utils/Timing/TimePoint.h>
 #include <AVSCommon/Utils/Timing/Timer.h>
 
+#include "AACE/Connectivity/AlexaConnectivityEngineInterface.h"
 #include "AACE/Engine/Connectivity/AlexaConnectivityInterface.h"
 #include "AACE/Engine/Connectivity/AlexaConnectivityListenerInterface.h"
 
@@ -46,6 +49,17 @@ class ConnectivityCapabilityAgent
         , public std::enable_shared_from_this<ConnectivityCapabilityAgent> {
 public:
     /**
+     * An enum representing Initiate Data Plan Subscription types
+     */
+    enum class InitiateDataPlanSubscriptionType {
+        /// Activates the trial data plan activation process
+        TRIAL,
+
+        /// Activates the pain data plan activation process
+        PAID
+    };
+
+    /**
      * Create an instance of @c ConnectivityCapabilityAgent.
      *
      * @param connectivity An interface that this object will use to perform the internet data plan operations.
@@ -54,6 +68,7 @@ public:
      */
     static std::shared_ptr<ConnectivityCapabilityAgent> create(
         std::shared_ptr<AlexaConnectivityInterface> connectivity,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
 
     /**
@@ -100,6 +115,14 @@ public:
         alexaClientSDK::avsCommon::sdkInterfaces::AlexaStateChangeCauseType cause) override;
     /// @}
 
+    /**
+     * Sends @c InitiateDataPlanSubscription event to the AVS
+     *
+     * @param subscriptionType Represents the data plan to activate.
+     * @return A future indicating @c true if the event was sent successfully, @c false otherwise.
+     */
+    std::future<bool> initiateDataPlanSubscription(const InitiateDataPlanSubscriptionType subscriptionType);
+
 private:
     /**
      * Constructor.
@@ -109,6 +132,7 @@ private:
      */
     ConnectivityCapabilityAgent(
         std::shared_ptr<AlexaConnectivityInterface> connectivity,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
 
     // @name RequiresShutdown Function
@@ -163,6 +187,8 @@ private:
 
     /// Reference to @c AlexaConnectivityInterface.
     std::shared_ptr<AlexaConnectivityInterface> m_connectivity;
+
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
     /// The @c ContextManager used to generate system context for events.
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;

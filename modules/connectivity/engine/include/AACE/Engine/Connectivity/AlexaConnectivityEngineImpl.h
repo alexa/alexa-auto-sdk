@@ -21,7 +21,9 @@
 
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
+#include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
+#include <AVSCommon/Utils/Threading/Executor.h>
 #include <nlohmann/json.hpp>
 
 #include "AACE/Connectivity/AlexaConnectivity.h"
@@ -56,6 +58,7 @@ private:
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
             capabilitiesRegistrar,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         const std::string& vehicleIdentifier);
 
@@ -68,12 +71,14 @@ public:
         std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivityPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
             capabilitiesRegistrar,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         const std::string& vehicleIdentifier);
 
     /// @name AlexaConnectivityEngineInterface Function
     /// @{
     bool onConnectivityStateChange() override;
+    void onSendConnectivityEvent(const std::string& event, const std::string& token) override;
     /// @}
 
     /// @name AlexaConnectivityInterface Functions
@@ -145,6 +150,9 @@ private:
     AlexaConnectivityInterface::DataPlansAvailable m_dataPlansAvailable;
     AlexaConnectivityInterface::ManagedProvider m_managedProvider;
     AlexaConnectivityInterface::Terms m_terms;
+
+    /// This is the worker thread for the @c AlexaConnectivityEngineImpl.
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 };
 
 }  // namespace connectivity

@@ -23,6 +23,7 @@ add_library(AACEAddressBookEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AddressBookCloudUploaderRESTAgent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AddressBookEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AddressBookEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/AddressBookConfiguration.cpp
 )
 
 target_include_directories(AACEAddressBookEngine

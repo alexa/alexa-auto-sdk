@@ -20,13 +20,17 @@
 #include <string>
 #include <utility>
 
-#include <AACE/Engine/Connectivity/AlexaConnectivityEngineImpl.h>
-#include <AACE/Test/Alexa/AlexaMockComponentFactory.h>
-#include <AACE/Test/Alexa/AlexaTestHelper.h>
-#include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
+
+#include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
+#include <AVSCommon/Utils/WaitEvent.h>
+#include <AVSCommon/Utils/PromiseFuturePair.h>
+
+#include <AACE/Engine/Connectivity/AlexaConnectivityEngineImpl.h>
+#include <AACE/Test/Alexa/AlexaMockComponentFactory.h>
+#include <AACE/Test/Alexa/AlexaTestHelper.h>
 
 #include "AACE/Test/Connectivity/MockAlexaConnectivity.h"
 
@@ -34,7 +38,21 @@ namespace aace {
 namespace test {
 namespace connectivity {
 
-std::string RFC3339(int offsetInHours = 0) {
+using namespace ::testing;
+using ::testing::MatchesRegex;
+
+/// Plenty of timeout to wait for async task to run
+static std::chrono::seconds TIMEOUT(2);
+
+// clang-format off
+static const std::string EXPECTED_TRIAL_EVENT = R"(\{"event":\{"header":\{"namespace":"Alexa.Networking.InternetDataPlan","name":"InitiateDataPlanSubscription","messageId":".*-.*-.*-.*-.*"\},"payload":\{"subscriptionType":"TRIAL"\}\}\})";
+// clang-format on
+
+// clang-format off
+static const std::string EXPECTED_PAID_EVENT = R"(\{"event":\{"header":\{"namespace":"Alexa.Networking.InternetDataPlan","name":"InitiateDataPlanSubscription","messageId":".*-.*-.*-.*-.*"\},"payload":\{"subscriptionType":"PAID"\}\}\})";
+// clang-format on
+
+static std::string RFC3339(int offsetInHours = 0) {
     auto now = std::chrono::system_clock::now();
     auto t_c = std::chrono::system_clock::to_time_t(now + std::chrono::hours(offsetInHours));
     std::stringstream ss;
@@ -80,6 +98,9 @@ public:
         // Mock the ConnectivityHandler and NetworkIdentifier.
         m_mockConnectivityHandler = std::make_shared<StrictMock<MockAlexaConnectivity>>();
 
+        // Mock MessageSenderInterface
+        m_mockMessageSender = m_alexaMockComponentFactory->getMessageSenderInterfaceMock();
+
         // Mock the vehicle identifier.
         m_mockVehicleIdentifier = "SAMPLE123";
 
@@ -111,7 +132,11 @@ protected:
         }
 
         auto alexaConnectivityEngineImpl = aace::engine::connectivity::AlexaConnectivityEngineImpl::create(
-            mockConnectivityHandler, m_mockEndpointBuilder, m_mockContextManager, m_mockVehicleIdentifier);
+            mockConnectivityHandler,
+            m_mockEndpointBuilder,
+            m_mockMessageSender,
+            m_mockContextManager,
+            m_mockVehicleIdentifier);
 
         return alexaConnectivityEngineImpl;
     }
@@ -120,6 +145,7 @@ protected:
     std::shared_ptr<aace::test::alexa::AlexaMockComponentFactory> m_alexaMockComponentFactory;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> m_mockContextManager;
     std::shared_ptr<alexaClientSDK::endpoints::EndpointBuilder> m_mockEndpointBuilder;  // std::unique_ptr
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockMessageSender> m_mockMessageSender;
     std::shared_ptr<StrictMock<MockAlexaConnectivity>> m_mockConnectivityHandler;
     std::string m_mockVehicleIdentifier;
 
@@ -255,6 +281,151 @@ TEST_F(AlexaConnectivityEngineImplTest, connectivityStateChangeAfterShutdown) {
 TEST_F(AlexaConnectivityEngineImplTest, connectivityStateChangeBeforeInitialization) {
     EXPECT_FALSE(m_mockConnectivityHandler->connectivityStateChange())
         << "Call to connectivityStateChange() expected to fail!";
+}
+
+/**
+ * @test sendConnectivityEventInvalidJSONEvent
+ */
+TEST_F(AlexaConnectivityEngineImplTest, sendConnectivityEventInvalidJSONEvent) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+
+    EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(std::string()));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
+
+    auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
+    ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
+
+    EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(0);  // Expect no sendMessage call
+
+    m_mockConnectivityHandler->sendConnectivityEvent("", "dummyToken1");
+    EXPECT_CALL(
+        *m_mockConnectivityHandler,
+        connectivityEventResponse("dummyToken1", MockAlexaConnectivity::AlexaConnectivity::StatusCode::FAIL))
+        .Times(1)
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> void { waitEvent.wakeUp(); }));
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+
+    waitEvent.reset();
+    m_mockConnectivityHandler->sendConnectivityEvent("{}", "dummyToken2");
+    EXPECT_CALL(
+        *m_mockConnectivityHandler,
+        connectivityEventResponse("dummyToken2", MockAlexaConnectivity::AlexaConnectivity::StatusCode::FAIL))
+        .Times(1)
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> void { waitEvent.wakeUp(); }));
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+
+    waitEvent.reset();
+    m_mockConnectivityHandler->sendConnectivityEvent(R"({"TEST"})", "dummyToken3");
+    EXPECT_CALL(
+        *m_mockConnectivityHandler,
+        connectivityEventResponse("dummyToken3", MockAlexaConnectivity::AlexaConnectivity::StatusCode::FAIL))
+        .Times(1)
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> void { waitEvent.wakeUp(); }));
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+
+    waitEvent.reset();
+    m_mockConnectivityHandler->sendConnectivityEvent(R"({"type":1234})", "dummyToken4");
+    EXPECT_CALL(
+        *m_mockConnectivityHandler,
+        connectivityEventResponse("dummyToken4", MockAlexaConnectivity::AlexaConnectivity::StatusCode::FAIL))
+        .Times(1)
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> void { waitEvent.wakeUp(); }));
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+
+    alexaConnectivityEngineImpl->shutdown();
+}
+
+/**
+ * @test sendConnectivityEventAfterShutdown
+ */
+TEST_F(AlexaConnectivityEngineImplTest, sendConnectivityEventAfterShutdown) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+
+    EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(std::string()));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
+
+    auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
+    ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
+
+    EXPECT_CALL(*m_mockMessageSender, sendMessage(testing::_)).Times(0);  // Expect no sendMessage call
+
+    alexaConnectivityEngineImpl->shutdown();  // intentional shutdown here
+
+    m_mockConnectivityHandler->sendConnectivityEvent(R"({"type":"ACTIVATE_TRIAL"})", "dummyToken1");
+    EXPECT_CALL(*m_mockConnectivityHandler, connectivityEventResponse("dummyToken1", _)).Times(0);
+
+    sleep(2);  //Allow engine to run
+}
+
+/**
+ * @test sendConnectivityEventWithValidJSON
+ */
+TEST_F(AlexaConnectivityEngineImplTest, sendConnectivityEventWithValidJSON) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+
+    EXPECT_CALL(*m_mockConnectivityHandler, getConnectivityState()).WillOnce(Return(std::string()));
+    EXPECT_CALL(*m_mockConnectivityHandler, getIdentifier()).WillOnce(Return(std::string()));
+
+    auto alexaConnectivityEngineImpl = createAlexaConnectivityEngineImpl(m_mockConnectivityHandler);
+    ASSERT_NE(alexaConnectivityEngineImpl, nullptr) << "AlexaConnectivityEngineImpl pointer expected to be not null!";
+
+    // Trial
+    alexaClientSDK::avsCommon::utils::PromiseFuturePair<std::string> setValuePromise;
+    EXPECT_CALL(*m_mockMessageSender, sendMessage(_))
+        .Times(1)
+        .WillOnce(Invoke([&setValuePromise](std::shared_ptr<alexaClientSDK::avsCommon::avs::MessageRequest> request) {
+            setValuePromise.setValue(request->getJsonContent());
+            request->sendCompleted(
+                alexaClientSDK::avsCommon::sdkInterfaces::MessageRequestObserverInterface::Status::SUCCESS);
+        }));
+
+    m_mockConnectivityHandler->sendConnectivityEvent(R"({"type":"ACTIVATE_TRIAL"})", "dummyToken1");
+    EXPECT_CALL(
+        *m_mockConnectivityHandler,
+        connectivityEventResponse("dummyToken1", MockAlexaConnectivity::AlexaConnectivity::StatusCode::SUCCESS))
+        .Times(1)
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> void { waitEvent.wakeUp(); }));
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+    EXPECT_THAT(setValuePromise.getValue(), MatchesRegex(EXPECTED_TRIAL_EVENT));
+
+    // Paid plan
+    waitEvent.reset();
+    alexaClientSDK::avsCommon::utils::PromiseFuturePair<std::string> setValuePromise1;
+    EXPECT_CALL(*m_mockMessageSender, sendMessage(_))
+        .Times(1)
+        .WillOnce(Invoke([&setValuePromise1](std::shared_ptr<alexaClientSDK::avsCommon::avs::MessageRequest> request) {
+            setValuePromise1.setValue(request->getJsonContent());
+            request->sendCompleted(
+                alexaClientSDK::avsCommon::sdkInterfaces::MessageRequestObserverInterface::Status::SUCCESS);
+        }));
+
+    m_mockConnectivityHandler->sendConnectivityEvent(R"({"type":"ACTIVATE_PAID_PLAN"})", "dummyToken2");
+    EXPECT_CALL(
+        *m_mockConnectivityHandler,
+        connectivityEventResponse("dummyToken2", MockAlexaConnectivity::AlexaConnectivity::StatusCode::SUCCESS))
+        .Times(1)
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> void { waitEvent.wakeUp(); }));
+    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
+    EXPECT_THAT(setValuePromise1.getValue(), MatchesRegex(EXPECTED_PAID_EVENT));
+
+    // Verify that connectivityEventResponse not called when token is empty.
+    alexaClientSDK::avsCommon::utils::PromiseFuturePair<std::string> setValuePromise2;
+    EXPECT_CALL(*m_mockMessageSender, sendMessage(_))
+        .Times(1)
+        .WillOnce(Invoke([&setValuePromise2](std::shared_ptr<alexaClientSDK::avsCommon::avs::MessageRequest> request) {
+            setValuePromise2.setValue(request->getJsonContent());
+            request->sendCompleted(
+                alexaClientSDK::avsCommon::sdkInterfaces::MessageRequestObserverInterface::Status::SUCCESS);
+        }));
+
+    m_mockConnectivityHandler->sendConnectivityEvent(R"({"type":"ACTIVATE_PAID_PLAN"})");
+    EXPECT_CALL(*m_mockConnectivityHandler, connectivityEventResponse(_, _)).Times(0);
+
+    sleep(5);  // Allow engine to run
+
+    EXPECT_THAT(setValuePromise2.getValue(), MatchesRegex(EXPECTED_PAID_EVENT));
+
+    alexaConnectivityEngineImpl->shutdown();
 }
 
 /**
@@ -497,7 +668,7 @@ INSTANTIATE_TEST_CASE_P(
         /**
          * @test connectivityStateChange/10
          *
-         * Optional termsVersion element 
+         * Optional termsVersion element
          * Expecting return true.
          */
         std::make_pair(

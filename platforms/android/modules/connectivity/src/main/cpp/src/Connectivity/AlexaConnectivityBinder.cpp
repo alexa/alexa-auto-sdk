@@ -54,6 +54,24 @@ std::string AlexaConnectivityHandler::getIdentifier() {
     }
 }
 
+void AlexaConnectivityHandler::connectivityEventResponse(const std::string& id, StatusCode statusCode) {
+    try_with_context {
+        jobject checkedStatusCode;
+        ThrowIfNot(JStatusCode::checkType(statusCode, &checkedStatusCode), "invalidStatusCode");
+        ThrowIfNot(
+            m_obj.invoke<void>(
+                "connectivityEventResponse",
+                "(Ljava/lang/String;Lcom/amazon/aace/connectivity/AlexaConnectivity$StatusCode;)V",
+                nullptr,
+                JString(id).get(),
+                checkedStatusCode),
+            "invokeMethodFailed");
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "connectivityEventResponse", ex.what());
+    }
+}
+
 }  // namespace connectivity
 }  // namespace jni
 }  // namespace aace
@@ -93,6 +111,24 @@ JNIEXPORT jboolean JNICALL Java_com_amazon_aace_connectivity_AlexaConnectivity_c
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_connectivity_AlexaConnectivity_connectivityStateChange", ex.what());
         return false;
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_amazon_aace_connectivity_AlexaConnectivity_sendConnectivityEvent(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring event,
+    jstring token) {
+    try {
+        auto alexaConnectivityBinder = ALEXA_CONNECTIVITY_BINDER(ref);
+        ThrowIfNull(alexaConnectivityBinder, "invalidAlexaConnectivityBinder");
+
+        alexaConnectivityBinder->getAlexaConnectivity()->sendConnectivityEvent(
+            JString(event).toStdStr(), JString(token).toStdStr());
+
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_connectivity_AlexaConnectivity_sendConnectivityEvent", ex.what());
     }
 }
 }

@@ -50,8 +50,11 @@ static const std::string METRIC_SPEECHRECOGNIZER_START_CAPTURE = "StartCapture";
 static const std::string METRIC_SPEECHRECOGNIZER_STOP_CAPTURE = "StopCapture";
 static const std::string METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED = "WakewordDetected";
 
+/// For metric calculation we want to detect an invalid wakeword duration (20 seconds max based on 16Khz voice rate)
+static const ssize_t MAX_WAKEWORD_SAMPLE_DURATION = 320000;
+
 // Evaluates the correct startOfSpeechTimestamp by subtracting how long ago the wakeword started from steady clock now.
-static bool computeStartOfSpeechTimestamp(
+static void computeStartOfSpeechTimestamp(
     const alexaClientSDK::avsCommon::avs::AudioInputStream::Index wakewordBeginIndex,
     const alexaClientSDK::avsCommon::avs::AudioInputStream::Index wakewordEndIndex,
     const unsigned int sampleRateHz,
@@ -60,25 +63,48 @@ static bool computeStartOfSpeechTimestamp(
     // Create a reader to get the current index position
     static const auto startWithNewData = true;
     if (not stream) {
-        return false;
+        AACE_WARN(LX(TAG).d(
+            "computeStartOfSpeechTimestamp",
+            "Streams could not be obtained, skipping startOfSpeech timestamp calculation"));
+        return;
     }
 
     auto reader = stream->createReader(
         alexaClientSDK::avsCommon::avs::AudioInputStream::Reader::Policy::NONBLOCKING, startWithNewData);
     if (not reader) {
-        return false;
+        AACE_WARN(LX(TAG).d(
+            "computeStartOfSpeechTimestamp",
+            "Stream reader could not be obtained, skipping startOfSpeech timestamp calculation"));
+        return;
     }
 
     // Get the current index position
-    const auto currentIndex = reader->tell();
+    ssize_t currentIndex = reader->tell();
+    reader->close();
+
+    /* This block will be entered if bytes have not yet started/resumed streaming to the audioInput stream. This is
+     * normal when using an implementation using an external wakeword engine. For instance, the currentIndex starts
+     * out at 0 upon engine start for external wakeword until after startCapture returns, which triggers
+     * startAudioInput. In the external wakeword setup, we are entering this method at a point in time where the
+     * wakeword has just been detected and audio samples are not yet ingested. Therefore, in this case, we need to
+     * use wakeword end index as the basis for the startOfSpeech timestamp calculation.
+     */
+    if (currentIndex <= (ssize_t)wakewordBeginIndex) {
+        // Set current index depending on whether the indexes supplied are valid
+        if (wakewordEndIndex > wakewordBeginIndex &&
+            (wakewordEndIndex - wakewordBeginIndex) < MAX_WAKEWORD_SAMPLE_DURATION) {
+            currentIndex = wakewordEndIndex;
+        } else {
+            AACE_WARN(LX(TAG).d(
+                "computeStartOfSpeechTimestamp",
+                "Wakeword indexes appear to be invalid, defaulting to wakewordBeginIndex for startOfSpeech timestamp "
+                "calculation"));
+            currentIndex = wakewordBeginIndex;
+        }
+    }
 
     // Start with the current time in the startOfSpeechTimestamp corresponding with the currentIndex from the reader.
     startOfSpeechTimestamp = std::chrono::steady_clock::now();
-
-    if (currentIndex <= wakewordBeginIndex) {
-        // Note: this should never happen, since it should not be possible for millions of years w/ 64-bit indexes.
-        return false;
-    }
 
     // Translate the currentIndex position to a time duration elapsed since the end of wakeword.
     const auto sampleRatePerMillisec = sampleRateHz / 1000;
@@ -88,10 +114,11 @@ static bool computeStartOfSpeechTimestamp(
 
     // Adjust the start of speech timestamp to be the start of the WW.
     startOfSpeechTimestamp -= timeSinceStartOfWW;
-
-    AACE_DEBUG(LX(TAG).d("timeSinceStartOfWW", timeSinceStartOfWW.count()));
-
-    return true;
+    AACE_DEBUG(LX(TAG)
+                   .d("timeSinceStartOfWW", timeSinceStartOfWW.count())
+                   .d("startOfSpeechTimestampWithoutPreRollMS",
+                      std::chrono::duration_cast<std::chrono::milliseconds>(startOfSpeechTimestamp.time_since_epoch())
+                          .count()));
 }
 
 SpeechRecognizerEngineImpl::SpeechRecognizerEngineImpl(
@@ -580,21 +607,14 @@ bool SpeechRecognizerEngineImpl::startCapture(
         // ask the aip to start recognizing input
         auto startOfSpeechTimestamp = std::chrono::steady_clock::now();
         if (alexaClientSDK::capabilityAgents::aip::Initiator::WAKEWORD == initiator) {
-            ThrowIfNot(
-                computeStartOfSpeechTimestamp(
-                    begin,
-                    keywordEnd,
-                    audioProvider->format.sampleRateHz,
-                    audioProvider->stream,
-                    startOfSpeechTimestamp),
-                "computeStartOfSpeechTimestampFailed");
+            computeStartOfSpeechTimestamp(
+                begin, keywordEnd, audioProvider->format.sampleRateHz, audioProvider->stream, startOfSpeechTimestamp);
         }
         ThrowIfNot(
             m_audioInputProcessor
                 ->recognize(*audioProvider, initiator, startOfSpeechTimestamp, begin, keywordEnd, keyword)
                 .get(),
             "recognizeFailed");
-
         // notify the platform that we are expecting audio... if the platform returns
         // and error then we reset the expecting audio state and throw an exception
         if (isExpectingAudio() == false) {

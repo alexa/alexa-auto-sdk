@@ -7,7 +7,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "3.2"
+        versionName "3.2.1"
     }
     buildTypes {
         release {
@@ -40,7 +40,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "3.2+"
+    remoteLibVersion = "3.2.1+"
 }
 
 dependencies {

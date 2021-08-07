@@ -67,6 +67,9 @@ bool ConnectivityEngineService::registerPlatformInterfaceType(
         auto defaultCapabilitiesRegistrar = alexaComponents->getDefaultEndpointCapabilitiesRegistrar();
         ThrowIfNull(defaultCapabilitiesRegistrar, "defaultCapabilitiesRegistrarInvalid");
 
+        auto messageSender = alexaComponents->getMessageSender();
+        ThrowIfNull(messageSender, "messageSenderInvalid");
+
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
@@ -77,7 +80,7 @@ bool ConnectivityEngineService::registerPlatformInterfaceType(
             vehicleProperties->getVehicleProperty(vehicle::VehiclePropertyType::VEHICLE_IDENTIFIER);
 
         m_alexaConnectivityEngineImpl = aace::engine::connectivity::AlexaConnectivityEngineImpl::create(
-            alexaConnectivity, defaultCapabilitiesRegistrar, contextManager, vehicleIdentifier);
+            alexaConnectivity, defaultCapabilitiesRegistrar, messageSender, contextManager, vehicleIdentifier);
         ThrowIfNull(m_alexaConnectivityEngineImpl, "createAlexaConnectivityEngineImplFailed");
 
         return true;

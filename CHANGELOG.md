@@ -1,5 +1,66 @@
 # Change Log
 ___
+## v3.2.1 released on 2021-08-06
+
+### Enhancements
+* The Connectivity module supports additional APIs, which enable the voice up-sell conversation between the user and Alexa to activate either a trial data plan or a paid subscription plan. Your implementation should call `sendConnectivityEvent` to notify the Engine of the data plan type. To respond, the Engine calls `connectivityEventResponse`.
+
+* You can customize the Address Book module with the `cleanAllAddressBooksAtStart` field in the Engine configuration, which specifies whether address books are removed each time the Engine starts.
+
+>**Note:** All Auto SDK 3.2 extensions are compatible with 3.2.1.
+
+### Resolved Issues
+In v3.2.0, if you use the `startCapture` API with an external wake word engine, wake words cannot be detected correctly. In v3.2.1, wake word detection works properly with external wake word engines.  
+
+### Known Issues
+* General
+    * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
+        ["en-US", "es-US"],
+        ["es-US", "en-US"],
+        ["en-IN", "hi-IN"],
+        ["hi-IN", "en-IN"],
+        ["fr-CA", "en-CA"],
+        ["en-CA", "fr-CA"].
+    
+      The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
+
+    * The `wakewordEnabled` property is not persistent across device reboots. If you use AACS, however, this issue does not occur. 
+    
+    * For Linux platforms, if your hardware does not use AVX2 instructions, the wake word library initialization causes an illegal instruction error.
+
+* Car Control   
+    * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+
+* Communications
+  
+    * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+  
+    * Calling numbers such as 1-800-xxx-xxxx by using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, when you call numbers by using utterances that include "triple," "hundred," and "thousand," or press special characters such as # or * by saying "Alexa press *#", you may experience unexpected results. We recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+  
+    * A user playing any skill with extended multi-turn dialogs (such as Jeopardy or Skyrim) cannot use voice to accept or reject incoming Alexa-to-Alexa calls.
+
+* Entertainment
+    * A user playing notifications while music is playing hears the music for a split second between the end of one notification and the start of the next.
+  
+    * The word, "line-in," in an utterance is sometimes misinterpreted as "line" or other words. For example, if the user says, "Switch to line-in," the misinterpretation of "line-in" might cause an incorrect response.
+  
+    * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
+
+    * If your Android app displays the NowPlaying Display Card whenever Alexa plays media, the card might be erroneously dismissed. For example, during music playback, if a user invokes Alexa, putting Alexa in LISTENING, THINKING, or SPEAKING state, and then cancels the Alexa session by tapping the Cancel button, the NowPlaying card is dismissed. A media Display Card should not be automatically dismissed in this scenario.
+
+* Authentication
+    * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
+
+* AACS
+  
+    * For some platform interface APIs in the Core module, when an application fails to handle a directive, there is no way to report the failure to the Engine. This is because AASB assumes that the application always handles messages correctly. When AASB incorrectly reports how the application handles the message, the Engine state might become inconsistent with the application state. For example, suppose the Engine sends a directive to the application to set the audio volume but the application fails to make the change. AASB does not report the failure to the Engine. As a result, the Engine's and the application's settings become out of sync. The following list shows the affected APIs:
+        * `AudioInput`: 
+            * `startAudioInput()`
+        * `AudioOutput`: 
+            * `setPosition(int64_t position)`
+            * `volumeChanged(float volume)`
+            * `mutedStateChanged(MutedState state)`  
+
 ## v3.2.0 released on 2021-05-19
 
 ### Enhancements
@@ -53,7 +114,7 @@ ___
 
 * Enhancements for car control:
   
-  * Added prompt improvements. Alexa can provide a recommendation after receiving an invalid or ambiguous user request. Suppose a user request targets the wrong mode, setting, or value for an appliance, such as "Alexa, set fan speed to 100", Alexa responds, "Sorry, you can only set the fan between 1 and 10." When the target in a user request is ambiguous, Alexa provides recommendations for disambiguation so the user can retry the request. For example, when a user says, "Turn on fan" (when the fan's default zone is not set), Alexa responds, "Sorry, I'm not sure whether you meant the driver, the passenger, or the rear. Please try again." This feature is supported offline.
+  * Added prompt improvements. Alexa can provide a recommendation or ask for clarification after receiving an invalid or ambiguous user request. Suppose a user request targets the wrong mode, setting, or value for an appliance, such as "Alexa, set fan speed to 100", Alexa responds, "Sorry, you can only set the fan between 1 and 10". When the target in a user request is ambiguous, Alexa prompts for more information to determine the exact meaning of the request. For example, when a user says, "Turn on fan" (when the fan's default zone is not set), Alexa responds, "For the driver, the passenger, or the rear?" This feature is supported online and offline.
   
   * Improved asset management for car control, which enables Alexa to accept utterances only a few seconds after the user logs in. Previously, the user had to wait up to 20 seconds for Alexa to accept utterances.
 

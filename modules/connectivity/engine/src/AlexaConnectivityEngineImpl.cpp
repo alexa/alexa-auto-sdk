@@ -16,6 +16,7 @@
 #include <regex>
 
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/UUID/UUID.h>
 
 #include "AACE/Engine/Connectivity/AlexaConnectivityEngineImpl.h"
 #include "AACE/Engine/Connectivity/ConnectivityConstants.h"
@@ -26,6 +27,7 @@ namespace engine {
 namespace connectivity {
 
 using namespace aace::engine::utils::metrics;
+using namespace aace::connectivity;
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.connectivity.AlexaConnectivityEngineImpl");
@@ -37,6 +39,8 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaConnectivityEngineIm
 static const std::string METRIC_CONNECTIVITY_GET_CONNECTIVITY_STATE = "GetConnectivityState";
 static const std::string METRIC_CONNECTIVITY_GET_IDENTIFIER = "GetIdentifier";
 static const std::string METRIC_CONNECTIVITY_CONNECTIVITY_STATE_CHANGE = "ConnectivityStateChange";
+static const std::string METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT = "SendConnectivityEvent";
+static const std::string METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT_FAILED = "SendConnectivityEventFailed";
 
 AlexaConnectivityEngineImpl::AlexaConnectivityEngineImpl(
     std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivityPlatformInterface) :
@@ -47,6 +51,7 @@ AlexaConnectivityEngineImpl::AlexaConnectivityEngineImpl(
 bool AlexaConnectivityEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     const std::string& vehicleIdentifier) {
     AACE_INFO(LX(TAG));
@@ -59,7 +64,8 @@ bool AlexaConnectivityEngineImpl::initialize(
         m_vehicleIdentifier = vehicleIdentifier;
 
         // Create instance of capability agent.
-        m_connectivityCapabilityAgent = ConnectivityCapabilityAgent::create(shared_from_this(), contextManager);
+        m_connectivityCapabilityAgent =
+            ConnectivityCapabilityAgent::create(shared_from_this(), messageSender, contextManager);
         ThrowIfNull(m_connectivityCapabilityAgent, "createConnectivityCapabilityAgentFailed");
         capabilitiesRegistrar->withCapabilityConfiguration(m_connectivityCapabilityAgent);
 
@@ -74,6 +80,7 @@ std::shared_ptr<AlexaConnectivityEngineImpl> AlexaConnectivityEngineImpl::create
     std::shared_ptr<aace::connectivity::AlexaConnectivity> alexaConnectivityPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     const std::string& vehicleIdentifier) {
     AACE_INFO(LX(TAG));
@@ -86,7 +93,8 @@ std::shared_ptr<AlexaConnectivityEngineImpl> AlexaConnectivityEngineImpl::create
             new AlexaConnectivityEngineImpl(alexaConnectivityPlatformInterface));
 
         ThrowIfNot(
-            alexaConnectivityEngineImpl->initialize(capabilitiesRegistrar, contextManager, vehicleIdentifier),
+            alexaConnectivityEngineImpl->initialize(
+                capabilitiesRegistrar, messageSender, contextManager, vehicleIdentifier),
             "initializeAlexaConnectivityEngineImplFailed");
 
         // Set the platform engine interface reference.
@@ -150,6 +158,60 @@ bool AlexaConnectivityEngineImpl::onConnectivityStateChange() {
     }
 }
 
+void AlexaConnectivityEngineImpl::onSendConnectivityEvent(const std::string& event, const std::string& token) {
+    AACE_DEBUG(LX(TAG).sensitive("token", token));
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onSendConnectivityEvent", METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT, 1);
+
+    m_executor.submit([this, event, token]() {
+        AACE_DEBUG(LX(TAG).m("onSendConnectivityEventExecutor"));
+        try {
+            ThrowIfNull(m_alexaConnectivityPlatformInterface, "invalidPlatformInterface");
+
+            if (event.empty()) {
+                Throw("emptyEvent");
+            }
+
+            nlohmann::json eventJson;
+            eventJson = nlohmann::json::parse(event);
+            ThrowIf(!eventJson.contains("type") || !eventJson["type"].is_string(), "invalidEvent");
+
+            auto type = eventJson["type"];
+            ConnectivityCapabilityAgent::InitiateDataPlanSubscriptionType planType;
+            if (type == ACTIVATE_TRIAL_KEY) {
+                planType = ConnectivityCapabilityAgent::InitiateDataPlanSubscriptionType::TRIAL;
+            } else if (type == ACTIVATE_PAID_PLAN_KEY) {
+                planType = ConnectivityCapabilityAgent::InitiateDataPlanSubscriptionType::PAID;
+            } else {
+                Throw("invalidEventType");
+            }
+            auto resultFuture = m_connectivityCapabilityAgent->initiateDataPlanSubscription(planType);
+            resultFuture.wait();
+
+            auto result = resultFuture.get();
+
+            ThrowIf(!result, "initiateDataPlanSubscriptionFailed");
+
+            if (!token.empty()) {
+                // Notify only when token is not empty
+                m_alexaConnectivityPlatformInterface->connectivityEventResponse(token, StatusCode::SUCCESS);
+            }
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG, "onSendConnectivityEventExecutor").d("reason", ex.what()));
+
+            if (!token.empty()) {
+                // Notify only when token is not empty
+                m_alexaConnectivityPlatformInterface->connectivityEventResponse(token, StatusCode::FAIL);
+            }
+            emitCounterMetrics(
+                METRIC_PROGRAM_NAME_SUFFIX,
+                "onSendConnectivityEvent",
+                METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT_FAILED,
+                1);
+        }
+    });
+}
+
 AlexaConnectivityInterface::DataPlan AlexaConnectivityEngineImpl::getDataPlan() const {
     std::lock_guard<std::mutex> guard{m_mutex};
     return m_dataPlan;
@@ -196,6 +258,7 @@ AlexaConnectivityInterface::Terms AlexaConnectivityEngineImpl::getTerms() const 
 
 void AlexaConnectivityEngineImpl::doShutdown() {
     AACE_INFO(LX(TAG));
+    m_executor.shutdown();
     if (m_connectivityCapabilityAgent != nullptr) {
         m_connectivityCapabilityAgent->shutdown();
         m_connectivityCapabilityAgent.reset();

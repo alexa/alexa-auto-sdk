@@ -31,6 +31,12 @@ bool AlexaConnectivity::connectivityStateChange() {
     return false;
 }
 
+void AlexaConnectivity::sendConnectivityEvent(const std::string& event, const std::string& token) {
+    if (auto m_alexaConnectivityEngineInterface_lock = m_alexaConnectivityEngineInterface.lock()) {
+        m_alexaConnectivityEngineInterface_lock->onSendConnectivityEvent(event, token);
+    }
+}
+
 void AlexaConnectivity::setEngineInterface(
     std::shared_ptr<AlexaConnectivityEngineInterface> alexaConnectivityEngineInterface) {
     m_alexaConnectivityEngineInterface = alexaConnectivityEngineInterface;

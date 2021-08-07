@@ -26,7 +26,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.amazon.aace.connectivity.AlexaConnectivity;
-import com.amazon.sampleapp.connectivity.R;
 import com.amazon.sampleapp.core.SampleAppContext;
 
 import org.json.JSONArray;
@@ -38,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -112,6 +112,42 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
             return m_name;
         }
     }
+
+    public enum Events {
+        INIT("Please Select a Event"),
+        /**
+         * This state represents when managedProvider under Connectivity API is set to NOT_MANAGED
+         * @hideinitializer
+         */
+        ACTIVATE_TRIAL("Activate Trial"),
+        /**
+         * This state represents when managedProvider under Connectivity API is set to MANAGED, Provider is AMAZON,
+         * DataPlanType is PAID
+         *
+         * @hideinitializer
+         */
+        ACTIVATE_PAID_PLAN("Activate Paid Plan");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        Events(String name) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
+    }
+
     private static final String sTag = "AlexaConnectivityHandler";
     private static final String sNOT_MANAGED_PROVIDER = "NOT_MANAGED";
     private static final String sMANAGED_PROVIDER = "MANAGED";
@@ -130,6 +166,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
     private final Activity mActivity;
     private int mConnectionStatePosition;
     private Spinner mConnectivitySpinner;
+    private Spinner mEventSpinner;
 
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     protected String mConnectivityState;
@@ -183,6 +220,17 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
         return mIdentifier;
     }
 
+    @Override
+    public void connectivityEventResponse(final String token, final StatusCode statusCode) {
+        Log.i(sTag, "connectivityEventResponse " + statusCode.toString() + " token=" + token);
+        mActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(mActivity, "SendConnnectivityEvent " + statusCode.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public void onConnectivityStateItemSelected(ConnectivityState state) {
         if (state == ConnectivityState.INIT)
             return;
@@ -190,6 +238,16 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
         String payload = connectivityPayloadGenerator(state);
         Log.i(sTag, "Connectivity Connectivity Payload: \n" + payload);
         connectivityStateChange();
+    }
+
+    public void onEventItemSelected(Events event) {
+        String id;
+        if (event == Events.INIT)
+            return;
+        Log.d(sTag, "Event dropdown changed");
+        String payload = sendConnectivityPayloadGenerator(event);
+        Log.i(sTag, "Connectivity Event Payload: \n" + payload);
+        sendConnectivityEvent(payload, UUID.randomUUID().toString());
     }
 
     public String connectivityPayloadGenerator(ConnectivityState state) {
@@ -350,8 +408,37 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
         return mConnectivityState;
     }
 
+    public String sendConnectivityPayloadGenerator(Events event) {
+        JSONObject payload = new JSONObject();
+
+        switch (event) {
+            case ACTIVATE_TRIAL:
+                try {
+                    payload.put("type", "ACTIVATE_TRIAL");
+                } catch (JSONException e) {
+                    payload = new JSONObject();
+                    Log.e(sTag, "Error setting event payload: " + e.getMessage());
+                }
+                break;
+            case ACTIVATE_PAID_PLAN:
+                try {
+                    payload.put("type", "ACTIVATE_PAID_PLAN");
+                } catch (JSONException e) {
+                    payload = new JSONObject();
+                    Log.e(sTag, "Error setting event payload: " + e.getMessage());
+                }
+                break;
+            default:
+                Log.e(sTag, "Invalid event" + event);
+        }
+        return payload.toString();
+    }
+
     public void setupGUI() {
         mConnectivitySpinner = mActivity.findViewById(R.id.connectivitySpinner);
+        mEventSpinner = mActivity.findViewById(R.id.eventSpinner);
+
+        // Connectivity Spinner
         ArrayAdapter<AlexaConnectivityHandler.ConnectivityState> adapter =
                 new ArrayAdapter<AlexaConnectivityHandler.ConnectivityState>(
                         mActivity, android.R.layout.simple_spinner_item);
@@ -379,6 +466,27 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
             }
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+        // Events Spinner
+        ArrayAdapter<Events> eventAdapter = new ArrayAdapter<Events>(mActivity, android.R.layout.simple_spinner_item);
+        eventAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        for (Events event : Events.values()) {
+            eventAdapter.add(event);
+        }
+
+        mEventSpinner.setAdapter(eventAdapter);
+
+        mEventSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Events event = (Events) parent.getItemAtPosition(position);
+                if (!writeInstanceState(mActivity)) {
+                    Toast.makeText(mActivity, "Failed to write state!", Toast.LENGTH_LONG).show();
+                }
+                onEventItemSelected(event);
+            }
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
     }
 
     /**
@@ -391,6 +499,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
         // Get the position and value dropdown from local storage, or a default value as 0 if no menu option selected
         this.mConnectionStatePosition = perf.getInt(sPOSITION_KEY, 1);
+
         return (perf.contains(sPOSITION_KEY));
     }
 

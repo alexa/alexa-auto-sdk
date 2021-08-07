@@ -16,12 +16,30 @@
 #ifndef AACE_CONNECTIVITY_ALEXA_CONNECTIVITY_ENGINE_INTERFACE_H
 #define AACE_CONNECTIVITY_ALEXA_CONNECTIVITY_ENGINE_INTERFACE_H
 
+#include <string>
+
 namespace aace {
 namespace connectivity {
 
 class AlexaConnectivityEngineInterface {
 public:
+    /**
+     * Indicates the delivery status of @c sendConnectivityEvent.
+     */
+    enum class StatusCode {
+        /**
+         * The @c sendConnectivityEvent event was sent to AVS successfully.
+         */
+        SUCCESS,
+
+        /**
+         * The @c sendConnectivityEvent event was not sent to AVS successfully.
+         */
+        FAIL
+    };
+
     virtual bool onConnectivityStateChange() = 0;
+    virtual void onSendConnectivityEvent(const std::string& event, const std::string& token) = 0;
 };
 
 }  // namespace connectivity

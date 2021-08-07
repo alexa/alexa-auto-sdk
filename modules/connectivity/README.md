@@ -1,6 +1,6 @@
 # Connectivity Module
 
-The Connectivity module for the Alexa Auto SDK creates a lower data consumption mode for Alexa, allowing automakers to offer tiered functionality based on the status of their connectivity plans. By using this module, you can send the customer's connectivity status from the vehicle to Alexa, which determines whether the customer can enjoy a full or partial set of Alexa features. This module allows the automaker to create tiered access to Alexa for customers and offer upsell opportunities to subscribe to a full connectivity plan.  
+The Connectivity module for the Alexa Auto SDK creates a lower data consumption mode for Alexa, allowing automakers to offer tiered functionality based on the status of their connectivity plans. By using this module, you can send the customer's connectivity status from the vehicle to Alexa, which determines whether the customer can enjoy a full or partial set of Alexa features. This module allows the automaker to create tiered access to Alexa for customers and offer up-sell opportunities to subscribe to a full connectivity plan.  
  
 <!-- omit in toc -->
 ## Table of Contents
@@ -76,6 +76,28 @@ The following table describes the objects in the JSON payload:
 | `managedProvider.type` | String | **Accepted Values:**<br><ul><li>`MANAGED` means the device's internet connectivity is managed by a provider. The only possible provider that manages connectivity is Amazon. The Alexa experience is affected by the current connectivity state in the following ways:<ul><li>If the customer is on a paid or trial data plan, `MANAGED` has no effect on the customer's Alexa experience. <li>If the customer does not have a paid or trial data plan, the customer, through the AlexaConnectivity platform interface, can access a limited number of Alexa features.</ul><li>`NOT_MANAGED` means the device's internet connectivity is not managed by a provider. For example, assign this value if the customer accesses the internet via a WiFi network or mobile hotspot. The customer can access all Alexa features, regardless of the current connectivity state.</ul> | Yes
 | `managedProvider.id` | String | It specifies the name of the provider that manages connectivity. The only accepted value is `AMAZON`. | Yes (only when `managedProvider.type` is `MANAGED`)
 
+### Activating Voice Up-Sell Conversation
+To activate the voice up-sell conversation with Alexa, for example, to activate the trial or paid plan subscription, call `sendConnectivityEvent` with the event represented in the JSON schema:
+
+```jsonc
+  {
+    "type": "{{STRING}}"
+  }
+```
+
+>**Note:** Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before starting the voice conversation.
+
+The following table describes the objects in the JSON payload:
+
+| Property | Type | Description | Required
+|-|-|-|-|
+| `type` | String | Represents the type of the connectivity event to Alexa. <br>**Accepted Values**:<br><ul><li>`ACTIVATE_TRIAL` for Alexa to begin the trial data plan activation (if available). Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation. <br> **Note:** If the platform implementation cannot determine the data plan type, use this event type. Alexa would first check the trial eligibility. If the customer is not eligible, Alexa begins the paid plan voice conversation. <li> `ACTIVATE_PAID_PLAN` for Alexa to begin the paid data plan activation. Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation.| Yes 
+
+The Engine calls `connectivityEventResponse` to notify the platform implementation of the status of `sendConnectivityEvent`. The parameters in `connectivityEventResponse` are used as follows:
+
+  * `token` is the unique identifier sent by the Engine when replying to `sendConnectivityEvent`.
+  * `statusCode` is set to "SUCCESS" if the event is successfully sent to Alexa. Otherwise, it is set to "FAIL".
+
 ## Auto SDK Connectivity Sequence Diagrams
 The sequence diagram below shows the major information flows from the Connectivity module to Alexa.
 
@@ -93,6 +115,11 @@ The following sequence diagram illustrates the flow when the platform implementa
 The following sequence diagram illustrates the flow when Alexa requests that the Connectivity module report its current connectivity state.
 
 ![picture](./assets/Connectivity-Sequence-CloudAskReport.png)
+
+### When Customer Activates Up-sell Conversation
+The following sequence diagram illustrates the flow when the customer starts an up-sell conversation, which results in activating either a trial subscription or a paid data plan subscription.
+
+![picture](./assets/Connectivity-Sequence-sendConnectivityEvent.png)
 
 ## Implementing the Auto SDK with the Connectivity Module
 To implement the Auto SDK with Connectivity, extend the `AlexaConnectivity` class. For more information about this class, see [Connectivity Interface](./platform/include/AACE/Connectivity/AlexaConnectivity.h).

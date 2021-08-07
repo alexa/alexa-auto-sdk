@@ -109,18 +109,36 @@ bool AddressBookEngineImpl::onAddAddressBook(
 bool AddressBookEngineImpl::onRemoveAddressBook(const std::string& addressBookSourceId) {
     try {
         emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onRemoveAddressBook", METRIC_REMOVE_ADDRESS_BOOK, 1);
-        ThrowIf(addressBookSourceId.empty(), "addressBookSourceIdInvalid");
 
         std::lock_guard<std::mutex> guard(m_mutex);
 
-        auto it = m_addressBookEntities.find(addressBookSourceId);
-        ThrowIf(it == m_addressBookEntities.end(), "addressBookSourceIdNotFound");
+        if (!addressBookSourceId.empty()) {
+            auto it = m_addressBookEntities.find(addressBookSourceId);
+            ThrowIf(it == m_addressBookEntities.end(), "addressBookSourceIdNotFound");
 
-        auto addressBookEntity = m_addressBookEntities[addressBookSourceId];
-        m_addressBookEntities.erase(it);
+            auto addressBookEntity = m_addressBookEntities[addressBookSourceId];
+            m_addressBookEntities.erase(it);
 
-        for (auto observer : m_observers) {
-            ThrowIfNot(observer->addressBookRemoved(addressBookEntity), "addressBookRemovedFailed");
+            for (auto observer : m_observers) {
+                ThrowIfNot(observer->addressBookRemoved(addressBookEntity), "addressBookRemovedFailed");
+            }
+        } else {
+            m_addressBookEntities.clear();
+
+            // Remove the uploaded phone book by constructing a dummy address book entity with CONTACT type
+            // and notifying all observers. Since AddressBookCloudUploader is one of the observers and allows
+            // only one address book of each type, it will ignore the empty client-side source ID and delete
+            // the corresponding address book on the cloud by specified address book type.
+            auto phoneBookEntity = std::make_shared<AddressBookEntity>("", "", AddressBookType::CONTACT);
+            for (auto observer : m_observers) {
+                ThrowIfNot(observer->addressBookRemoved(phoneBookEntity), "addressBookRemovedFailed");
+            }
+
+            // Do the same for the uploaded navigation books
+            auto navigationBookEntity = std::make_shared<AddressBookEntity>("", "", AddressBookType::NAVIGATION);
+            for (auto observer : m_observers) {
+                ThrowIfNot(observer->addressBookRemoved(navigationBookEntity), "addressBookRemovedFailed");
+            }
         }
 
         return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -100,12 +100,13 @@ std::shared_ptr<AddressBookCloudUploader> AddressBookCloudUploader::create(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     NetworkInfoObserver::NetworkStatus networkStatus,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
-    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    bool cleanAllAddressBooksAtStart) {
     try {
         auto addressBookCloudUploader = std::shared_ptr<AddressBookCloudUploader>(new AddressBookCloudUploader());
         ThrowIfNot(
             addressBookCloudUploader->initialize(
-                addressBookService, authDelegate, deviceInfo, networkStatus, networkObserver, alexaEndpoints),
+                addressBookService, authDelegate, deviceInfo, networkStatus, networkObserver, alexaEndpoints, cleanAllAddressBooksAtStart),
             "initializeAddressBookCloudUploaderFailed");
 
         return addressBookCloudUploader;
@@ -121,7 +122,8 @@ bool AddressBookCloudUploader::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo,
     NetworkInfoObserver::NetworkStatus networkStatus,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
-    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
+    std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    bool cleanAllAddressBooksAtStart) {
     try {
         m_addressBookService = addressBookService;
         m_authDelegate = authDelegate;
@@ -142,7 +144,7 @@ bool AddressBookCloudUploader::initialize(
         m_addressBookService->addObserver(shared_from_this());
 
         // Infinite event loop
-        m_eventThread = std::thread{&AddressBookCloudUploader::eventLoop, this};
+        m_eventThread = std::thread{&AddressBookCloudUploader::eventLoop, this, cleanAllAddressBooksAtStart};
 
         return true;
     } catch (std::exception& ex) {
@@ -924,27 +926,35 @@ bool AddressBookCloudUploader::handleUpload(std::shared_ptr<AddressBookEntity> a
 bool AddressBookCloudUploader::handleRemove(std::shared_ptr<AddressBookEntity> addressBookEntity) {
     std::string addressBookSourceId = INVALID_ADDRESS_BOOK_SOURCE_ID;
     try {
+        ThrowIfNot(m_addressBookCloudUploaderRESTAgent->isAccountProvisioned(), "accountNotProvisioned");
+
         addressBookSourceId = addressBookEntity->getSourceId();
 
         ThrowIfNot(deleteAddressBook(addressBookEntity), "addressBookDeleteFailed");
 
-        AACE_INFO(LX(TAG, "handleRemove").m("Removed Successfully").d("addressBookSourceId", addressBookSourceId));
+        AACE_INFO(LX(TAG, "handleRemove")
+                      .m("Removed Successfully")
+                      .d("addressBookType", addressBookEntity->getType())
+                      .d("addressBookSourceId", addressBookSourceId));
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "handleRemove").d("addressBookSourceId", addressBookSourceId).d("reason", ex.what()));
+        AACE_ERROR(LX(TAG, "handleRemove")
+                       .d("addressBookType", addressBookEntity->getType())
+                       .d("addressBookSourceId", addressBookSourceId)
+                       .d("reason", ex.what()));
         return false;
     }
 }
 
-void AddressBookCloudUploader::eventLoop() {
+void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
     AACE_INFO(LX(TAG));
-    bool cleanAllAddressBookAtStart = true;  // Delete all address books in Cloud at start.
+    bool cleanAllAddressBooks = cleanAllAddressBooksAtStart;
     while (!m_isShuttingDown) {
         // Clean up previous address books in cloud.
-        if (cleanAllAddressBookAtStart) {
+        if (cleanAllAddressBooks) {
             if (cleanAllCloudAddressBooks()) {
-                cleanAllAddressBookAtStart = false;
+                cleanAllAddressBooks = false;
             } else {
                 continue;
             }

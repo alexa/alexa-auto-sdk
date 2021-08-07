@@ -226,7 +226,8 @@ public:
             std::move(deviceInfo),
             aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED,
             m_mockNetworkObservableInterface,
-            m_alexaEndpointInterface);
+            m_alexaEndpointInterface,
+            true);
     }
 
     void TearDown() override {

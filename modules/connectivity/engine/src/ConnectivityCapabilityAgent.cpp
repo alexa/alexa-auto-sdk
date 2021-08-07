@@ -13,11 +13,14 @@
  * permissions and limitations under the License.
  */
 
+#include <AVSCommon/AVS/EventBuilder.h>
+
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AVSCommon/Utils/JSON/JSONGenerator.h>
 
 #include "AACE/Engine/Connectivity/ConnectivityCapabilityAgent.h"
 #include "AACE/Engine/Connectivity/ConnectivityConstants.h"
+#include "AACE/Engine/Connectivity/ConnectivityMessageRequest.h"
 
 namespace aace {
 namespace engine {
@@ -41,7 +44,7 @@ static const std::string INTERNETDATAPLAN_NAMESPACE{"Alexa.Networking.InternetDa
 static const std::string CONNECTIVITY_INTERFACE_VERSION{"1.0"};
 
 /// The supported internet data plan version.
-static const std::string INTERNETDATAPLAN_INTERFACE_VERSION{"2.0"};
+static const std::string INTERNETDATAPLAN_INTERFACE_VERSION{"3.0"};
 
 /// The name of data plan property.
 static const std::string DATAPLAN_PROPERTY_NAME{DATAPLAN_KEY};
@@ -88,11 +91,34 @@ static const std::string CAPABILITY_TERMS_VERSION_KEY{VERSION_KEY};
 /// The capability value key.
 static const std::string CAPABILITY_VALUE_KEY{VALUE_KEY};
 
+/// The @c InitiateDataPlanSubscription event identifier.
+static const std::string INTERNETDATAPLAN_INITIATE_DATA_PLAN_SUBSCRIPTION_EVENT{"InitiateDataPlanSubscription"};
+
+/// The @c TermsChanged event identifier.
+static const std::string INTERNETDATAPLAN_TERMS_CHANGED_EVENT{"TermsChanged"};
+
+static std::string subscriptionTypeToString(
+    ConnectivityCapabilityAgent::InitiateDataPlanSubscriptionType subscriptionType) {
+    switch (subscriptionType) {
+        case ConnectivityCapabilityAgent::InitiateDataPlanSubscriptionType::TRIAL:
+            return "TRIAL";
+        case ConnectivityCapabilityAgent::InitiateDataPlanSubscriptionType::PAID:
+            return "PAID";
+    }
+
+    return "UNKNOWN";
+}
+
 std::shared_ptr<ConnectivityCapabilityAgent> ConnectivityCapabilityAgent::create(
     std::shared_ptr<AlexaConnectivityInterface> connectivity,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) {
     if (!connectivity) {
         AACE_ERROR(LX(TAG).m("createFailed").d("reason", "invalidConnectivity"));
+        return nullptr;
+    }
+    if (!messageSender) {
+        AACE_ERROR(LX(TAG).m("createFailed").d("reason", "invalidMessageSender"));
         return nullptr;
     }
     if (!contextManager) {
@@ -100,8 +126,8 @@ std::shared_ptr<ConnectivityCapabilityAgent> ConnectivityCapabilityAgent::create
         return nullptr;
     }
 
-    auto connectivityCapabilityAgent =
-        std::shared_ptr<ConnectivityCapabilityAgent>(new ConnectivityCapabilityAgent(connectivity, contextManager));
+    auto connectivityCapabilityAgent = std::shared_ptr<ConnectivityCapabilityAgent>(
+        new ConnectivityCapabilityAgent(connectivity, messageSender, contextManager));
 
     if (!connectivityCapabilityAgent) {
         AACE_ERROR(LX(TAG).m("createFailed").d("reason", "instantiationFailed"));
@@ -118,8 +144,12 @@ std::shared_ptr<ConnectivityCapabilityAgent> ConnectivityCapabilityAgent::create
 
 ConnectivityCapabilityAgent::ConnectivityCapabilityAgent(
     std::shared_ptr<AlexaConnectivityInterface> connectivity,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) :
-        RequiresShutdown{TAG}, m_connectivity{connectivity}, m_contextManager{contextManager} {
+        RequiresShutdown{TAG},
+        m_connectivity{connectivity},
+        m_messageSender{messageSender},
+        m_contextManager{contextManager} {
     m_capabilityConfigurations.insert(
         std::make_shared<CapabilityConfiguration>(getConnectivityCapabilityConfiguration()));
     m_capabilityConfigurations.insert(
@@ -242,7 +272,37 @@ void ConnectivityCapabilityAgent::onTermsStateChanged(
             CapabilityTag(INTERNETDATAPLAN_NAMESPACE, TERMS_PROPERTY_NAME, ""),
             buildCapabilityState(termsState),
             cause);
+
+        // Along with ChagneReport, we need to notify the cloud with explict TermsChanged event.
+        alexaClientSDK::avsCommon::utils::json::JsonGenerator jsonGenerator;
+        jsonGenerator.addMember("timeOfSample", termsState.timeOfSample.getTime_ISO_8601());
+        auto event = buildJsonEventString(
+            INTERNETDATAPLAN_NAMESPACE, INTERNETDATAPLAN_TERMS_CHANGED_EVENT, "", jsonGenerator.toString());
+        auto request = std::make_shared<MessageRequest>(event.second);
+
+        m_messageSender->sendMessage(request);
     });
+}
+
+std::future<bool> ConnectivityCapabilityAgent::initiateDataPlanSubscription(
+    const InitiateDataPlanSubscriptionType subscriptionType) {
+    AACE_DEBUG(LX(TAG));
+
+    std::promise<bool> sendMessagePromise;
+    std::future<bool> sendMessageFuture = sendMessagePromise.get_future();
+
+    alexaClientSDK::avsCommon::utils::json::JsonGenerator jsonGenerator;
+    jsonGenerator.addMember("subscriptionType", subscriptionTypeToString(subscriptionType));
+    auto event = buildJsonEventString(
+        INTERNETDATAPLAN_NAMESPACE,
+        INTERNETDATAPLAN_INITIATE_DATA_PLAN_SUBSCRIPTION_EVENT,
+        "",
+        jsonGenerator.toString());
+    auto request = std::make_shared<ConnectivityMessageRequest>(event.second, std::move(sendMessagePromise));
+
+    m_messageSender->sendMessage(request);
+
+    return sendMessageFuture;
 }
 
 void ConnectivityCapabilityAgent::doShutdown() {

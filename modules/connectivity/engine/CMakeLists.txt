@@ -21,12 +21,14 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Connectivity/ConnectivityCapabilityAgent.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Connectivity/ConnectivityConstants.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Connectivity/ConnectivityEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Connectivity/ConnectivityMessageRequest.h
 )
 
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaConnectivityEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ConnectivityCapabilityAgent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ConnectivityEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ConnectivityMessageRequest.cpp
 )
 
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)

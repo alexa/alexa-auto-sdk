@@ -37,6 +37,9 @@ protected:
 public:
     virtual ~AlexaConnectivity();
 
+    /// Represents the delivery status of @c sendConnectivityEvent.
+    using StatusCode = aace::connectivity::AlexaConnectivityEngineInterface::StatusCode;
+
     /**
      * Retrieve the connectivity state from the platform implementation.
      *
@@ -133,6 +136,63 @@ public:
      * @return @c true if connectivity state was processed successfully, @c false otherwise.
      */
     bool connectivityStateChange();
+
+    /**
+     * Notifies the Engine of an event in connectivity.
+     * 
+     * @param [in] event The stringified JSON containing the event.
+     * @code{.json}
+     * {
+     *   "type": "{{STRING}}"
+     * }
+     * @endcode
+     * @li type (required) : Indicates the connectivity event type.
+     * 
+     * **Activating Trial**
+     * 
+     * Set event @c type to `"ACTIVATE_TRIAL"` for Alexa to begin the trial data plan activation (if available) via voice conversation with the
+     * customer. Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation.
+     * 
+     * @note Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before starting the
+     * voice conversation for activating the trial data plan. 
+     * 
+     * @note If the platform implementation cannot determine the data plan type, then send this event. Alexa would first check the 
+     * trial eligibility. If customer is not eligible, Alexa begins the paid plan voice conversation.
+     * 
+     * Example:
+     * @code{.json}
+     * {
+     *   "type": "ACTIVATE_TRIAL"
+     * }
+     * @endcode
+     * 
+     * **Starting Paid Plan**
+     * 
+     * Set event @c type to `"ACTIVATE_PAID_PLAN"` for Alexa to begin the paid data plan activation via voice conversation with the customer.
+     * Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation.
+     * 
+     * @note Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before starting the 
+     * voice conversation for activating the paid data plan.
+     * 
+     * Example:
+     * @code{.json}
+     * {
+     *   "type": "ACTIVATE_PAID_PLAN"
+     * }
+     * @endcode
+     * @param token An identifier to correlate @c connectivityEventResponse to @c sendConnectivityEvent. Default value is empty, but override this
+     * to a unique non-empty value for engine to call @c connectivityEventResponse. If it is empty, engine will not call @c connectivityEventResponse.
+     */
+    void sendConnectivityEvent(const std::string& event, const std::string& token = "");
+
+    /**
+     * Notifies the platform implementation of the delivery status of @c sendConnectivityEvent. This is only
+     * called if a non-empty token was provided in the @c sendConnectivityEvent.
+     * 
+     * @param [in] token The identifier that was provided in @c sendConnectivityEvent call.
+     * @param [in] statusCode Represents the delivery status of event sent using @c sendConnectivityEvent.
+     */
+    virtual void connectivityEventResponse(const std::string& token, StatusCode statusCode){};
 
     /**
      * @internal

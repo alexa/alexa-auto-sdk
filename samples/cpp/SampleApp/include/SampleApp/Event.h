@@ -61,6 +61,7 @@ enum class Event {
 
     // Connectivity
     onConnectivityConnectivityStateChange,
+    onConnectivityEvent,
 
     // MediaPlayer
     onMediaPlayerMediaStateChanged,
@@ -112,6 +113,7 @@ enum class Event {
     onRemoveAddressBookPhone,
     onAddAddressBookAuto,
     onRemoveAddressBookAuto,
+    onRemoveAllAddressBooks,
 
     // Messaging
     onMessagingEndpointConnection,
@@ -174,6 +176,7 @@ static const std::map<std::string, Event> EventEnumerator{
 
     // Connectivity
     {"onConnectivityConnectivityStateChange", Event::onConnectivityConnectivityStateChange},
+    {"onConnectivityEvent", Event::onConnectivityEvent},
 
     // MediaPlayer
     {"onMediaPlayerMediaStateChanged", Event::onMediaPlayerMediaStateChanged},
@@ -225,6 +228,7 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onRemoveAddressBookPhone", Event::onRemoveAddressBookPhone},
     {"onAddAddressBookAuto", Event::onAddAddressBookAuto},
     {"onRemoveAddressBookAuto", Event::onRemoveAddressBookAuto},
+    {"onRemoveAllAddressBooks", Event::onRemoveAllAddressBooks},
 
     // Messaging
     {"onMessagingEndpointConnection", Event::onMessagingEndpointConnection},

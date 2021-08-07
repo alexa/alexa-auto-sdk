@@ -2,6 +2,7 @@
 
 set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/AddressBook/AddressBook.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/AddressBook/AddressBookConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/AddressBook/AddressBookEngineInterface.h
 )
 

@@ -2,6 +2,7 @@ var searchData=
 [
   ['action',['Action',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control_configuration_1_1_action.html',1,'com::amazon::aace::carControl::CarControlConfiguration']]],
   ['activityevent',['ActivityEvent',['../enumcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l_1_1_activity_event.html',1,'com::amazon::aace::apl::APL']]],
+  ['addressbookconfiguration',['AddressBookConfiguration',['../classcom_1_1amazon_1_1aace_1_1address_book_1_1config_1_1_address_book_configuration.html',1,'com::amazon::aace::addressBook::config']]],
   ['addressbooktype',['AddressBookType',['../enumcom_1_1amazon_1_1aace_1_1addressbook_1_1_address_book_1_1_address_book_type.html',1,'com::amazon::aace::addressbook::AddressBook']]],
   ['alerts',['Alerts',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html',1,'com::amazon::aace::alexa']]],
   ['alertstate',['AlertState',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html',1,'com::amazon::aace::alexa::Alerts']]],
@@ -16,7 +17,7 @@ var searchData=
   ['audiooutputprovider',['AudioOutputProvider',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output_provider.html',1,'com::amazon::aace::audio']]],
   ['audiooutputtype',['AudioOutputType',['../enumcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output_provider_1_1_audio_output_type.html',1,'com::amazon::aace::audio::AudioOutputProvider']]],
   ['audioplayer',['AudioPlayer',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_audio_player.html',1,'com::amazon::aace::alexa']]],
-  ['autherror',['AuthError',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html',1,'com.amazon.aace.alexa.AlexaClient.AuthError'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html',1,'com.amazon.aace.alexa.AuthProvider.AuthError']]],
+  ['autherror',['AuthError',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider_1_1_auth_error.html',1,'com.amazon.aace.alexa.AuthProvider.AuthError'],['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_auth_error.html',1,'com.amazon.aace.alexa.AlexaClient.AuthError']]],
   ['authorization',['Authorization',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html',1,'com::amazon::aace::authorization']]],
   ['authorizationstate',['AuthorizationState',['../enumcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization_1_1_authorization_state.html',1,'com::amazon::aace::authorization::Authorization']]],
   ['authprovider',['AuthProvider',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html',1,'com::amazon::aace::alexa']]],

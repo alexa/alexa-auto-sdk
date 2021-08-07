@@ -442,6 +442,7 @@ The **notify/*** action exercises the application platform interfaces with event
 | onCommunicationShowState                    | -
 | **Connectivity**                            |
 | onConnectivityConnectivityStateChange       | `json`
+| onConnectivityEvent                         | `json`
 | **DoNotDisturb**                            |
 | onDoNotDisturbChanged                       | -
 | **Logger**                                  |

@@ -25,6 +25,42 @@ abstract public class AlexaConnectivity extends PlatformInterface {
     public AlexaConnectivity() {}
 
     /**
+     * Indicates the delivery status of the {@link #sendConnectivityEvent() sendConnectivityEvent()} call.
+     */
+    public enum StatusCode {
+        /**
+         * The {@link #sendConnectivityEvent() sendConnectivityEvent()} event was sent to AVS successfully.
+         * @hideinitializer
+         */
+        SUCCESS("SUCCESS"),
+
+        /**
+         * The {@link #sendConnectivityEvent() sendConnectivityEvent()} event was not sent to AVS successfully.
+         * @hideinitializer
+         */
+        FAIL("FAIL");
+
+        /**
+         * @internal
+         */
+        private String m_name;
+
+        /**
+         * @internal
+         */
+        private StatusCode(String name) {
+            m_name = name;
+        }
+
+        /**
+         * @internal
+         */
+        public String toString() {
+            return m_name;
+        }
+    }
+
+    /**
      * Retrieve the connectivity state from the platform implementation.
      *
      * **ConnectivityState**
@@ -130,6 +166,121 @@ abstract public class AlexaConnectivity extends PlatformInterface {
         return connectivityStateChange(getNativeRef());
     }
 
+    /**
+     * Notifies the Engine of an event in connectivity.
+     *
+     * @param [in] event The stringified JSON containing the event.
+     * @code{.json}
+     * {
+     *   "type": "{{STRING}}"
+     * }
+     * @endcode
+     * @li type (required) : Indicates the connectivity event type.
+     *
+     * **Activating Trial**
+     *
+     * Set event @c type to `"ACTIVATE_TRIAL"` for Alexa to begin the trial data plan activation (if available) via
+     * voice conversation with the customer. Alexa, upon receiving this event, may perform some validations and
+     * eligibility checks before starting the voice conversation.
+     *
+     * @note Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before
+     * starting the voice conversation for activating the trial data plan.
+     *
+     * @note If the platform implementation cannot determine the data plan type, then send this event. Alexa would first
+     * check the trial eligibility. If customer is not eligible, Alexa begins the paid plan voice conversation.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "type": "ACTIVATE_TRIAL"
+     * }
+     * @endcode
+     *
+     * **Starting Paid Plan**
+     *
+     * Set event @c type to `"ACTIVATE_PAID_PLAN"` for Alexa to begin the paid data plan activation via voice
+     * conversation with the customer. Alexa, upon receiving this event, may perform some validations and eligibility
+     * checks before starting the voice conversation.
+     *
+     * @note Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before
+     * starting the voice conversation for activating the paid data plan.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "type": "ACTIVATE_PAID_PLAN"
+     * }
+     * @endcode
+     *
+     */
+    final public void sendConnectivityEvent(String event) {
+        sendConnectivityEvent(getNativeRef(), event, "");
+    }
+
+    /**
+     * Notifies the Engine of an event in connectivity.
+     *
+     * @param [in] event The stringified JSON containing the event.
+     * @code{.json}
+     * {
+     *   "type": "{{STRING}}"
+     * }
+     * @endcode
+     * @li type (required) : Indicates the connectivity event type.
+     *
+     * **Activating Trial**
+     *
+     * Set event @c type to `"ACTIVATE_TRIAL"` for Alexa to begin the trial data plan activation (if available) via
+     * voice conversation with the customer. Alexa, upon receiving this event, may perform some validations and
+     * eligibility checks before starting the voice conversation.
+     *
+     * @note Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before
+     * starting the voice conversation for activating the trial data plan.
+     *
+     * @note If the platform implementation cannot determine the data plan type, then send this event. Alexa would first
+     * check the trial eligibility. If customer is not eligible, Alexa begins the paid plan voice conversation.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "type": "ACTIVATE_TRIAL"
+     * }
+     * @endcode
+     *
+     * **Starting Paid Plan**
+     *
+     * Set event @c type to `"ACTIVATE_PAID_PLAN"` for Alexa to begin the paid data plan activation via voice
+     * conversation with the customer. Alexa, upon receiving this event, may perform some validations and eligibility
+     * checks before starting the voice conversation.
+     *
+     * @note Alexa requires the customer to have accepted the OEM and network provider's terms and conditions before
+     * starting the voice conversation for activating the paid data plan.
+     *
+     * Example:
+     * @code{.json}
+     * {
+     *   "type": "ACTIVATE_PAID_PLAN"
+     * }
+     * @endcode
+     *
+     * @param [in] token An identifier to correlate @c connectivityEventResponse to @c sendConnectivityEvent. Set this
+     * to a unique non-empty value for engine to call @c connectivityEventResponse. If it is empty, engine will not
+     * call @c connectivityEventResponse.
+     */
+    final public void sendConnectivityEvent(String event, String token) {
+        sendConnectivityEvent(getNativeRef(), event, token);
+    }
+
+    /**
+     * Notifies the platform implementation of the delivery status of @c {@link #sendConnectivityEvent()
+     * sendConnectivityEvent()} call. This is only called if a non-empty token was provided in the @c {@link
+     * #sendConnectivityEvent() sendConnectivityEvent()}.
+     *
+     * @param [in] token The identifier that was provided in @c sendConnectivityEvent call.
+     * @param [in] statusCode Represents the delivery status of event sent using @c sendConnectivityEvent.
+     */
+    public void connectivityEventResponse(String token, StatusCode statusCode) {}
+
     // NativeRef implementation
     final protected long createNativeRef() {
         return createBinder();
@@ -143,4 +294,5 @@ abstract public class AlexaConnectivity extends PlatformInterface {
     private native long createBinder();
     private native void disposeBinder(long nativeRef);
     private native boolean connectivityStateChange(long nativeObject);
+    private native void sendConnectivityEvent(long nativeObject, String event, String token);
 }

@@ -244,7 +244,7 @@ public:
     /**
      * Notifies the engine on a non-availability of an already available address book.
      *
-     * @param [in] addressBookSourceId A unique identifier for an address book. 
+     * @param [in] addressBookSourceId A unique identifier for an address book. Set this to empty string for engine to remove all uploaded address books.
      * @return @c false if address book does not already added or some internal error otherwise @c true on successful.
      */
     bool removeAddressBook(const std::string& addressBookSourceId);

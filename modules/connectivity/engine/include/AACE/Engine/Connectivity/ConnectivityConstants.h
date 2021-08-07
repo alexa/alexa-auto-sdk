@@ -25,7 +25,7 @@ namespace engine {
 namespace connectivity {
 
 /// The configuration key.
-static const std::string CONFIGURATION_KEY{"configuration"};
+static const std::string CONFIGURATION_KEY{"configurations"};
 
 /// The data plan key.
 static const std::string DATAPLAN_KEY{"dataPlan"};
@@ -71,6 +71,12 @@ static const std::string UNKNOWN_VERSION{"UNKNOWN"};
 
 /// Max length restriction for terms version.
 static const int VERSION_SIZE_MAX_LIMIT{250};
+
+/// The ACTIVATE_TRIAL event key.
+static const std::string ACTIVATE_TRIAL_KEY{"ACTIVATE_TRIAL"};
+
+/// The ACTIVATE_PAID_PLAN event key.
+static const std::string ACTIVATE_PAID_PLAN_KEY{"ACTIVATE_PAID_PLAN"};
 
 }  // namespace connectivity
 }  // namespace engine

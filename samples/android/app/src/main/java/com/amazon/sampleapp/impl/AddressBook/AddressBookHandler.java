@@ -293,8 +293,6 @@ public class AddressBookHandler extends AddressBook {
     }
 
     public void removeAllAddressBooks() {
-        for (String id : sSourceIds) {
-            removeAddressBook(id);
-        }
+        removeAddressBook("");
     }
 }

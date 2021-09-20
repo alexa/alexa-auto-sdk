@@ -974,6 +974,11 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleStopping() {
 
     std::lock_guard<std::mutex> lock(m_mutex);
     m_isStopping = true;
+
+    // Reset token related variables for a possible re-authentication
+    m_timeToRefresh = std::chrono::steady_clock::now();
+    m_tokenExpirationTime = std::chrono::steady_clock::time_point::max();
+
     return FlowState::STOPPING;
 }
 

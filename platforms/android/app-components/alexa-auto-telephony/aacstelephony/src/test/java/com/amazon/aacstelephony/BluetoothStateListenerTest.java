@@ -44,7 +44,7 @@ public class BluetoothStateListenerTest {
 
     @Before
     public void setUp() {
-        mBluetoothStateListener = new BluetoothStateListener(mAACSMessageSender, 0, 0);
+        mBluetoothStateListener = new BluetoothStateListener(mAACSMessageSender);
         PowerMockito.mockStatic(BluetoothAdapter.class);
         PowerMockito.when(BluetoothAdapter.getDefaultAdapter()).thenReturn(mBluetoothAdapter);
     }

@@ -23,6 +23,9 @@
 #include "AASB/Message/Connectivity/AlexaConnectivity/GetConnectivityStateMessageReply.h"
 #include "AASB/Message/Connectivity/AlexaConnectivity/GetIdentifierMessage.h"
 #include "AASB/Message/Connectivity/AlexaConnectivity/GetIdentifierMessageReply.h"
+#include "AASB/Message/Connectivity/AlexaConnectivity/SendConnectivityEventMessage.h"
+#include "AASB/Message/Connectivity/AlexaConnectivity/SendConnectivityEventMessageReply.h"
+#include "AASB/Message/Connectivity/AlexaConnectivity/StatusCode.h"
 
 namespace aasb {
 namespace engine {
@@ -79,6 +82,27 @@ bool AASBAlexaConnectivity::initialize(std::shared_ptr<aace::engine::aasb::Messa
                 }
             });
 
+        messageBroker->subscribe(
+            aasb::message::connectivity::alexaConnectivity::SendConnectivityEventMessage::topic(),
+            aasb::message::connectivity::alexaConnectivity::SendConnectivityEventMessage::action(),
+            [wp](const aace::engine::aasb::Message& message) {
+                try {
+                    auto sp = wp.lock();
+                    ThrowIfNull(sp, "invalidWeakPtrReference");
+
+                    aasb::message::connectivity::alexaConnectivity::SendConnectivityEventMessage::Payload payload =
+                        nlohmann::json::parse(message.payload());
+
+                    // Use the messageId as token
+                    sp->sendConnectivityEvent(payload.event, message.messageId());
+
+                    auto m_messageBroker_sp = sp->m_messageBroker.lock();
+                    ThrowIfNull(m_messageBroker_sp, "invalidMessageBrokerReference");
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG).d("reason", ex.what()));
+                }
+            });
+
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -131,6 +155,27 @@ std::string AASBAlexaConnectivity::getIdentifier() {
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return "";
+    }
+}
+
+void AASBAlexaConnectivity::connectivityEventResponse(
+    const std::string& token,
+    AlexaConnectivity::StatusCode statusCode) {
+    try {
+        AACE_VERBOSE(LX(TAG));
+
+        auto m_messageBroker_sp = m_messageBroker.lock();
+        ThrowIfNull(m_messageBroker_sp, "invalidMessageBrokerReference");
+
+        aasb::message::connectivity::alexaConnectivity::SendConnectivityEventMessageReply message;
+
+        message.header.messageDescription.replyToId = token;
+        message.payload.statusCode =
+            static_cast<aasb::message::connectivity::alexaConnectivity::StatusCode>(statusCode);
+
+        m_messageBroker_sp->publish(message.toString()).send();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 

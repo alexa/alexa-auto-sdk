@@ -74,13 +74,24 @@ LocalMediaSource::Source LocalMediaSource::getSource() {
     return m_source;
 }
 
+bool LocalMediaSource::play(ContentSelector contentSelectorType, const std::string& payload) {
+    return false;
+}
+
+bool LocalMediaSource::play(
+    ContentSelector contentSelectorType,
+    const std::string& payload,
+    const std::string& sessionId) {
+    return false;
+}
+
 //
 // Engine interface methods
 //
 
-void LocalMediaSource::playerEvent(const std::string& eventName) {
+void LocalMediaSource::playerEvent(const std::string& eventName, const std::string& sessionId) {
     if (auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock()) {
-        m_localMediaSourceEngineInterface_lock->onPlayerEvent(eventName);
+        m_localMediaSourceEngineInterface_lock->onPlayerEvent(eventName, sessionId);
     }
 }
 
@@ -88,9 +99,10 @@ void LocalMediaSource::playerError(
     const std::string& errorName,
     long code,
     const std::string& description,
-    bool fatal) {
+    bool fatal,
+    const std::string& sessionId) {
     if (auto m_localMediaSourceEngineInterface_lock = m_localMediaSourceEngineInterface.lock()) {
-        m_localMediaSourceEngineInterface_lock->onPlayerError(errorName, code, description, fatal);
+        m_localMediaSourceEngineInterface_lock->onPlayerError(errorName, code, description, fatal, sessionId);
     }
 }
 

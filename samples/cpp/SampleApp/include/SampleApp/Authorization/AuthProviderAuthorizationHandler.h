@@ -79,7 +79,7 @@ public:
     auto logout() -> void;
 
     /** 
-     * Retrives the access token.
+     * Retrieves the access token.
      * 
      * @return If available returns the token, otherwise empty string. 
      */

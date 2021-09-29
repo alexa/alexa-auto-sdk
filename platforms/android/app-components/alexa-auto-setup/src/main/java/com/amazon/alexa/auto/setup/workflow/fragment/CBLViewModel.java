@@ -10,15 +10,24 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.amazon.aacsconstants.AACSPropertyConstants;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthState;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
 import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
+import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
+import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
+
+import javax.inject.Inject;
 
 import io.reactivex.rxjava3.disposables.Disposable;
+
+import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.DISABLED;
 
 /**
  * ViewModel for @{link CBLFragment}
@@ -30,6 +39,8 @@ public class CBLViewModel extends AndroidViewModel {
 
     private final @NonNull AuthController mAuthController;
     private final @Nullable LoginUIEventListener mUIEventListener;
+    @Inject
+    AlexaPropertyManager mAlexaPropertyManager;
 
     private MutableLiveData<AuthWorkflowData> mAuthWorkflowState = new MutableLiveData<>();
     private Disposable mLoginWorkflowSubscription;
@@ -50,6 +61,7 @@ public class CBLViewModel extends AndroidViewModel {
 
         mAuthController = app.getRootComponent().getAuthController();
         mUIEventListener = app.getRootComponent().getComponent(LoginUIEventListener.class).orElse(null);
+        DaggerSetupComponent.builder().androidModule(new AndroidModule(application)).build().injectCBLViewModel(this);
 
         mWaitForStartLogin = new WaitForStartLoginRunnable();
     }
@@ -80,6 +92,9 @@ public class CBLViewModel extends AndroidViewModel {
     public void startLogin() {
         Log.d(TAG, "CBL Workflow starting");
 
+        // Resetting location consent to DISABLED to clear out existing state (e.g. it's possible
+        // that previously the user had enabled preview mode and enabled location consent)
+        resetLocationConsent();
         // Make sure to cancel the login with auth provider, before we start CBL login flow.
         mAuthController.cancelLogin(AuthMode.AUTH_PROVIDER_AUTHORIZATION);
 
@@ -95,6 +110,28 @@ public class CBLViewModel extends AndroidViewModel {
             }
         });
     }
+
+    /**
+     * Reset location consent to default value: DISABLED when the user logs out
+     */
+    public void resetLocationConsent() {
+        String extraModules = ModuleProvider.getModules(getApplication().getApplicationContext());
+        if (extraModules.contains(ModuleProvider.ModuleName.GEOLOCATION.name())) {
+            mAlexaPropertyManager.updateAlexaProperty(AACSPropertyConstants.GEOLOCATION_ENABLED, DISABLED.getValue())
+                    .doOnSuccess((succeeded) -> {
+                        if (succeeded) {
+                            Log.d(TAG, "Successfully reset geolocation value to: " + DISABLED.getValue());
+                        } else {
+                            Log.e(TAG, "Failed to reset geolocation value to: " + DISABLED.getValue());
+                        }
+                    })
+                    .doOnError(throwable -> {
+                        Log.e(TAG, "Failed to reset geolocation to: " + DISABLED.getValue());
+                    })
+                    .subscribe();
+        }
+    }
+
 
     /**
      * Create a runnable to wait for login workflow get started within the timeout,

@@ -150,7 +150,7 @@ public:
          */
         ENABLE_REPEAT_ONE,
         /**
-         * Disbale Repeat is supported
+         * Disable Repeat is supported
          */
         DISABLE_REPEAT,
         /**
@@ -427,7 +427,7 @@ public:
      *
      * @param [in] accessToken The handshake token between AVS, and the external media player app session
      *
-     * @param [in] userName The username proided by the external media player app, if available
+     * @param [in] userName The username provided by the external media player app, if available
      *
      * @param [in] forceLogin True if no handshake is needed, and login is simply assumed
      *

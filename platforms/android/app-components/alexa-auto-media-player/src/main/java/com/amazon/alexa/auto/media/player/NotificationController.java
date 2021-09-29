@@ -54,7 +54,7 @@ public class NotificationController {
     private static void initializeNotificationChannel(
             @NonNull Context context, @NonNull NotificationManager notificationManager) {
         NotificationChannel channel = new NotificationChannel(ALEXA_MEDIA_CHANNEL_ID,
-                context.getString(R.string.notification_channel), NotificationManager.IMPORTANCE_DEFAULT);
+                context.getString(R.string.notification_channel), NotificationManager.IMPORTANCE_NONE);
 
         channel.setDescription(context.getString(R.string.notification_channel_description));
 

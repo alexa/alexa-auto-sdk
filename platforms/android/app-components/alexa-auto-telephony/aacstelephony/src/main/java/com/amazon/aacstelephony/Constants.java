@@ -33,6 +33,11 @@ public class Constants {
     public static final String HEADSET_CLIENT = "HEADSET_CLIENT";
     public static final String PBAP_CLIENT = "PBAP_CLIENT";
 
+    // Bluetooth Profile IDs that are marked as @SystemApi in Android 30
+    // ID source: https://cs.android.com/android/platform/superproject/+/android-11.0.0_r2:frameworks/base/core/java/android/bluetooth/BluetoothProfile.java
+    public static final int HEADSET_CLIENT_PROFILE_ID = 16;
+    public static final int PBAP_CLIENT_PROFILE_ID = 17;
+
     public static class CallState {
         public static final String IDLE = "IDLE";
         public static final String DIALING = "DIALING";

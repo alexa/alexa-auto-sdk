@@ -13,11 +13,13 @@ if [ -z "$(which docker)" ]; then
 fi
 
 VM_HOME="/home/builder"
-IMAGE_REVISION="20210505"
-IMAGE_NAME="aac/ubuntu-base:${IMAGE_REVISION}"
-VOLUME_NAME="buildervolume"
+IMAGE_REVISION="20210804"
 VOLUME_MOUNT_POINT="/workdir"
 AAC_OPENSSL_VERSION=${AAC_OPENSSL_VERSION:-"1.1.1k"}
+source ${THISDIR}/version
+VOLUME_NAME="buildervolume${AAC_VERSION}_openssl${AAC_OPENSSL_VERSION}"
+IMAGE_NAME="aac/ubuntu-base:${IMAGE_REVISION}_openssl${AAC_OPENSSL_VERSION}"
+
 
 EXTRA_OPTIONS=""
 if [ ! -z ${QNX_BASE} ] && [ -d ${QNX_BASE} ]; then
@@ -42,15 +44,16 @@ execute_command() {
 
 if [[ "$(docker images -q ${IMAGE_NAME} 2> /dev/null)" == "" ]] || [ ! -z ${FORCE_DOCKER_IMAGE_REBUILD} ]; then
 	note "Building Docker image..."
-	docker build --tag ${IMAGE_NAME} --build-arg AAC_OPENSSL_VERSION=${AAC_OPENSSL_VERSION} ${BUILDER_HOME}/scripts
+	docker build --tag ${IMAGE_NAME} --build-arg AAC_OPENSSL_VERSION=${AAC_OPENSSL_VERSION} --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) ${BUILDER_HOME}/scripts
 fi
 
 if [[ "$(docker volume ls | grep ${VOLUME_NAME} 2> /dev/null)" == "" ]]; then
 	note "Creating Docker volume \"${VOLUME_NAME}\"..."
 	docker volume create --name ${VOLUME_NAME}
-	note "Changing permissions for volume..."
-	execute_command sudo chown -R builder:builder ${VOLUME_MOUNT_POINT}
 fi
+
+note "Changing permissions for volume..."
+execute_command "sudo chown -R $(id -u):$(id -g) ${VOLUME_MOUNT_POINT}" &> /dev/null || note "Non-zero exit code when adjusting volume permissions. Proceeding..."
 
 note "Run Docker image..."
 echo ""

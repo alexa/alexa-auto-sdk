@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+
 public class LocalSearchDirectiveHandler {
     private static final String TAG = LocalSearchDirectiveHandler.class.getSimpleName();
     private final WeakReference<Context> mContext;
@@ -54,6 +55,7 @@ public class LocalSearchDirectiveHandler {
                         .ifPresent(localSearchListTemplate -> {
                             try {
                                 renderLocalSearchListView(viewGroup, localSearchListTemplate);
+                                sessionViewController.setTemplateDisplayed();
                             } catch (Exception e) {
                                 Log.e(TAG, "Issue inflating template: " + e);
                             }
@@ -74,6 +76,7 @@ public class LocalSearchDirectiveHandler {
                         .ifPresent(localSearchDetailTemplate -> {
                             try {
                                 renderLocalSearchDetailView(viewGroup, localSearchDetailTemplate);
+                                sessionViewController.setTemplateDisplayed();
                             } catch (Exception e) {
                                 Log.e(TAG, "Issue inflating template: " + e);
                             }
@@ -83,11 +86,31 @@ public class LocalSearchDirectiveHandler {
     }
 
     /**
-     * Clears any existing template.
-     *
+     * Clears the local search template if exists. This is so we can clear the right template, since
+     * the clear template directive from aacs doesn't say which template needs to be cleared.
+     * e.g. in the case where the user tries to invoke Weather template before the clear
+     * template is received for the Local Search template. We don't want to clear weather template
+     * with the clear template directive that was actually meant for local search
+     */
+    public void clearLocalSearchTemplate() {
+        AlexaApp.from(mContext.get())
+                .getRootComponent()
+                .getComponent(SessionViewController.class)
+                .ifPresent(sessionViewController -> {
+                    sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
+                        if (viewGroup.findViewById(R.id.template_local_search_list_view) != null ||
+                                viewGroup.findViewById(R.id.template_local_search_detail_view) != null) {
+                            Log.i(TAG, "clearLocalSearchTemplate");
+                            sessionViewController.clearTemplate();
+                        }
+                    });
+                });
+    }
+
+    /**
+     * Clears existing template, if any.
      */
     public void clearTemplate() {
-        Log.i(TAG, "clearTemplate");
         AlexaApp.from(mContext.get())
                 .getRootComponent()
                 .getComponent(SessionViewController.class)
@@ -100,16 +123,14 @@ public class LocalSearchDirectiveHandler {
                 (LayoutInflater) mContext.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View inflatedView = layoutInflater.inflate(R.layout.local_search_list, null);
+        inflatedView.setId(R.id.template_local_search_list_view);
         viewContainer.addView(
                 inflatedView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-
         LocalSearchListAdapter adapter =
                 new LocalSearchListAdapter(mNavigationProvider, new WeakReference<>(this), mContext.get());
         String title = localSearchListTemplate.getTitle();
         TextView titleText = inflatedView.findViewById(R.id.poi_card_title_text);
         titleText.setText(title.toUpperCase());
-
-        inflatedView.findViewById(R.id.close_button).setOnClickListener(view -> clearTemplate());
 
         localSearchListTemplate.getPointOfInterests().forEach(adapter::addPOI);
 
@@ -127,6 +148,7 @@ public class LocalSearchDirectiveHandler {
                 (LayoutInflater) mContext.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View inflatedView = layoutInflater.inflate(R.layout.local_search_detail, null);
+        inflatedView.setId(R.id.template_local_search_detail_view);
         viewGroup.addView(inflatedView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         String title = localSearchDetailTemplate.getTitle().getMainTitle();

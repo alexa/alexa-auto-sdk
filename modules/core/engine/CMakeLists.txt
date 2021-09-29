@@ -124,7 +124,6 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Vehicle/VehicleEngineService.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Vehicle/VehiclePropertyInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/StorageEngineService.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/JSONStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/SQLiteStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Storage/LocalStorageInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Metrics/MetricsEngineService.h
@@ -156,6 +155,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationProvider.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationProviderListenerInterface.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/Authorization/AuthorizationServiceInterface.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/DeviceUsage/DeviceUsageEngineImpl.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Engine/DeviceUsage/DeviceUsageEngineService.h
 )
  
 source_group("Header Files" FILES ${HEADERS})
@@ -189,7 +190,6 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vehicle/VehicleConfigurationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Vehicle/VehiclePropertyInterface.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/StorageEngineService.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/JSONStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/SQLiteStorage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/StorageConfigurationImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Storage/LocalStorageInterface.cpp
@@ -215,6 +215,12 @@ add_library(AACECoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationEngineImpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AuthorizationProvider.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceUsage/DeviceUsageEngineImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceUsage/DeviceUsageEngineService.cpp
+)
+
+find_path(NLOHMANN_INCLUDE_DIR nlohmann/json.hpp
+    CMAKE_FIND_ROOT_PATH_BOTH
 )
 
 find_path(RAPIDJSON_INCLUDE_DIR rapidjson/rapidjson.h
@@ -228,6 +234,7 @@ target_include_directories(AACECoreEngine
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
+        ${NLOHMANN_INCLUDE_DIR}
         ${RAPIDJSON_INCLUDE_DIR}
         ${SQLITE3_INCLUDE_DIRS}
 )

@@ -251,7 +251,7 @@ public:
     void removeObserver(const std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerObserverInterface> observer);
 
     /**
-     * Iniitalize the ExternalMediaAdapter.
+     * Initialize the ExternalMediaAdapter.
      *
      * @param mediaPlayers The map of <PlayerId, MediaPlayer> to be used to find the mediaPlayer to use for this
      * adapter.
@@ -274,7 +274,7 @@ private:
      *
      * @param agentString agent identifier for this device type's implementation.
      * @param speakerManager A @c SpeakerManagerInterface to perform volume changes requested by adapters.
-     * @param messageSender The messager sender of the adapter.
+     * @param messageSender The message sender of the adapter.
      * @param certifiedMessageSender Used to send messages that must be guaranteed.
      * @param contextManager The AVS Context manager used to generate system context for events.
      * @param exceptionSender The object to use for sending AVS Exception messages.
@@ -349,7 +349,7 @@ private:
      * @param speakers The map of <PlayerId, SpeakerInterface> to be used to find the speaker to use for this
      * adapter.
      * @param adapterCreationMap The map of <PlayerId, AdapterCreateFunction> to be used to create the adapters.
-     * @param messageSender The messager sender of the adapter.
+     * @param messageSender The message sender of the adapter.
      * @param focusManager The focus manager to be used by the adapter to acquire/release channel.
      * @param contextManager The context manager of the ExternalMediaPlayer and adapters.
      */

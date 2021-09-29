@@ -67,6 +67,28 @@ bool LocalMediaSourceHandler::play(ContentSelector selector, const std::string& 
     }
 }
 
+bool LocalMediaSourceHandler::play(ContentSelector selector, const std::string& payload, const std::string& sessionId) {
+    try_with_context {
+        jboolean result;
+        jobject selectorTypeObj;
+        ThrowIfNot(JContentSelector::checkType(selector, &selectorTypeObj), "invalidContentSelectorType");
+        ThrowIfNot(
+            m_obj.invoke(
+                "play",
+                "(Lcom/amazon/aace/alexa/LocalMediaSource$ContentSelector;Ljava/lang/String;Ljava/lang/String;)Z",
+                &result,
+                selectorTypeObj,
+                JString(payload).get(),
+                JString(sessionId).get()),
+            "invokeMethodFailed");
+        return result;
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "play", ex.what());
+        return false;
+    }
+}
+
 bool LocalMediaSourceHandler::playControl(PlayControlType controlType) {
     try_with_context {
         jboolean result;
@@ -295,13 +317,18 @@ Java_com_amazon_aace_alexa_LocalMediaSource_disposeBinder(JNIEnv* env, jobject /
     }
 }
 
-JNIEXPORT void JNICALL
-Java_com_amazon_aace_alexa_LocalMediaSource_playerEvent(JNIEnv* env, jobject /* this */, jlong ref, jstring eventName) {
+JNIEXPORT void JNICALL Java_com_amazon_aace_alexa_LocalMediaSource_playerEvent(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring eventName,
+    jstring sessionId) {
     try {
         auto localMediaSourceBinder = LOCAL_MEDIA_SOURCE_BINDER(ref);
         ThrowIfNull(localMediaSourceBinder, "invalidLocalMediaSourceBinder");
 
-        localMediaSourceBinder->getLocalMediaSource()->playerEvent(JString(eventName).toStdStr());
+        localMediaSourceBinder->getLocalMediaSource()->playerEvent(
+            JString(eventName).toStdStr(), JString(sessionId).toStdStr());
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_LocalMediaSource_playerEvent", ex.what());
     }
@@ -314,13 +341,14 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_alexa_LocalMediaSource_playerError(
     jstring errorName,
     jlong code,
     jstring description,
-    jboolean fatal) {
+    jboolean fatal,
+    jstring sessionId) {
     try {
         auto localMediaSourceBinder = LOCAL_MEDIA_SOURCE_BINDER(ref);
         ThrowIfNull(localMediaSourceBinder, "invalidLocalMediaSourceBinder");
 
         localMediaSourceBinder->getLocalMediaSource()->playerError(
-            JString(errorName).toStdStr(), code, JString(description).toStdStr(), fatal);
+            JString(errorName).toStdStr(), code, JString(description).toStdStr(), fatal, JString(sessionId).toStdStr());
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_LocalMediaSource_playerError", ex.what());
     }

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cbl_login_error"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/alexa_img_view"
+        android:layout_width="@dimen/login_alexa_image_width"
+        android:layout_height="@dimen/login_alexa_image_height"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:src="@drawable/amazon_alexa_placeholder_logo"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/cbl_error_header"
+        android:textAppearance="@style/Alexa.Heading1TextNormal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:text="@string/setup_not_complete_header"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@+id/cbl_error_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view" />
+
+    <TextView
+        android:id="@+id/cbl_error_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:text="@string/cbl_login_error_message"
+        android:textAlignment="center"
+        android:textAppearance="@style/Alexa.Heading2Text"
+        app:layout_constraintBottom_toTopOf="@+id/cbl_retry_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cbl_error_header" />
+
+
+    <TextView
+        android:id="@+id/cbl_retry_button"
+        style="@style/Alexa.Button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/action_button_margin_bottom"
+        android:text="@string/setup_not_complete_retry_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

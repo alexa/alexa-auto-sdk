@@ -18,11 +18,18 @@ public class PreferenceKeys {
 
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_NONALEXA = "voice-assistance-nonalexa";
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_ALEXA = "voice-assistance-alexa";
+    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_DISABLE_NONALEXA = "voice-assistance-disable-nonalexa";
+    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_ENABLE_NONALEXA = "voice-assistance-enable-nonalexa";
+    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_ENABLE_ALEXA = "voice-assistance-enable-alexa";
+    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK = "voice-assistance-push-to-talk";
+    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK_SELECTION = "voice-assistance-push-to-talk-selection";
     public static final String ALEXA_SETTINGS_HANDS_FREE = "alexa-hands-free-settings";
+    public static final String ALEXA_SETTINGS_LOCATION_CONSENT = "alexa-location-consent-setting";
     public static final String ALEXA_SETTINGS_LANGUAGES = "alexa-languages-settings";
     public static final String ALEXA_SETTINGS_SIGNIN = "alexa-signin";
     public static final String ALEXA_SETTINGS_SIGNOUT = "alexa-signout";
     public static final String ALEXA_SETTINGS_DISABLE = "alexa-disable";
+    public static final String ALEXA_SETTINGS_DISABLE_NON_ALEXA = "non-alexa-disable";
     public static final String ALEXA_SETTINGS_AACS = "alexa-auto-client-service-settings";
     public static final String ALEXA_SETTINGS_DO_NOT_DISTURB = "alexa-dnd-settings";
     public static final String ALEXA_SETTINGS_COMMUNICATION = "alexa-communication";

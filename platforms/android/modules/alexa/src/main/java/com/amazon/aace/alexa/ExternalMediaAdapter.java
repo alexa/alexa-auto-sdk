@@ -166,7 +166,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface {
          */
         ENABLE_REPEAT_ONE("ENABLE_REPEAT_ONE"),
         /*
-         * Disbale Repeat is supported
+         * Disable Repeat is supported
          */
         DISABLE_REPEAT("DISABLE_REPEAT"),
         /*
@@ -356,7 +356,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface {
          * Validation data :
          *  1. Device platform issued app signing certificate. A list of certificates may be
          *  attached.
-         *  2. In some cases validation is performed locally. The certificate is trasmitted as
+         *  2. In some cases validation is performed locally. The certificate is transmitted as
          *  validationData during discovery to announce the activated app's identity in order to
          *  allow app activation to be revoked.
          *  3. empty
@@ -519,7 +519,7 @@ abstract public class ExternalMediaAdapter extends PlatformInterface {
      *
      * @param  accessToken The handshake token between AVS, and the external media player app session
      *
-     * @param  userName The username proided by the external media player app, if available
+     * @param  userName The username provided by the external media player app, if available
      *
      * @param  forceLogin True if no handshake is needed, and login is simply assumed
      *

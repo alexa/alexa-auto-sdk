@@ -23,6 +23,7 @@ public class PlaybackControlButtonActionProvider implements CustomActionProvider
     private final String mButtonName;
     private boolean mIsToggleAction;
     private boolean mIsToggleSelected;
+    private boolean mIsDisabled;
 
     private final PlaybackStateCompat.CustomAction mPlaybackAction;
 
@@ -42,7 +43,7 @@ public class PlaybackControlButtonActionProvider implements CustomActionProvider
      */
     public PlaybackControlButtonActionProvider(@NonNull PlaybackControlMessages aacsSender, int buttonResourceId,
             @NonNull String buttonDisplayName, @NonNull String buttonName, boolean toggleAction,
-            boolean toggleSelected) {
+            boolean toggleSelected, boolean isDisabled) {
         this.mMessageSender = aacsSender;
 
         this.mButtonResourceId = buttonResourceId;
@@ -50,6 +51,7 @@ public class PlaybackControlButtonActionProvider implements CustomActionProvider
         this.mButtonName = buttonName;
         this.mIsToggleAction = toggleAction;
         this.mIsToggleSelected = toggleSelected;
+        this.mIsDisabled = isDisabled;
 
         mPlaybackAction =
                 new PlaybackStateCompat.CustomAction.Builder(mButtonName, mButtonDisplayName, mButtonResourceId)
@@ -58,6 +60,8 @@ public class PlaybackControlButtonActionProvider implements CustomActionProvider
 
     @Override
     public void onCustomAction(String action, @Nullable Bundle extras) {
+        if (mIsDisabled) return;
+
         if (mIsToggleAction) {
             mMessageSender.sendToggleCommandToAACS(this.mButtonName, this.mIsToggleSelected);
         } else {

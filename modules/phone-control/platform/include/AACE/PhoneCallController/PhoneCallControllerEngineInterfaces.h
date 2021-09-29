@@ -71,7 +71,7 @@ public:
         /**
          * The call is active, and media is being transmitted between the caller and remote party.
          * The following are possible transitions to ACTIVE state:
-         * @li While in DIALING or OUTBOUND_RINGING, outbound call setup is sucessfully completed.
+         * @li While in DIALING or OUTBOUND_RINGING, outbound call setup is successfully completed.
          * @li While in INBOUND_RINGING, the user accepted the call, and setup is completed.
          * @li When transitioning from DISCONNECTED to CONNECTED, and the calling device is already in an active call.
          */

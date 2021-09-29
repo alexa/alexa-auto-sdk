@@ -55,9 +55,13 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
             Preference signOutPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_SIGNOUT);
             if (signOutPref != null)
                 screen.removePreference(signOutPref);
-            Preference commsPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_COMMUNICATION);
-            if (commsPref != null)
-                screen.removePreference(commsPref);
+
+            if (!ModuleProvider.isAlexaCustomAssistantEnabled(screen.getContext())) {
+                Preference commsPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_COMMUNICATION);
+                if (commsPref != null)
+                    screen.removePreference(commsPref);
+            }
+
             Preference dndPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_DO_NOT_DISTURB);
             if (dndPref != null)
                 screen.removePreference(dndPref);
@@ -173,13 +177,6 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
             Log.i(TAG, "Logging user out");
             mAuthController.logOut();
             mAlexaSetupController.setSetupCompleteStatus(false);
-
-            if (ModuleProvider.getModules(mContext).contains(ModuleProvider.ModuleName.PREVIEW_MODE.name())) {
-                // Temporary solution of Restarting AACS for a new preview mode login. After user logout from preview
-                // mode, without resetting engine, the same workflow of enabling preview mode cannot be established.
-                AACSServiceController.stopAACS(mContext);
-                AACSServiceController.startAACS(mContext, false);
-            }
         }
     }
 

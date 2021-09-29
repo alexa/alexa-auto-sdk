@@ -13,6 +13,9 @@ public abstract class Command {
     public static final String CHECK_NETWORK_STATUS_COMMAND = "CheckNetworkStatusCommand";
     public static final String CHECK_LANGUAGE_COMMAND = "CheckLanguageCommand";
     public static final String CHECK_CONTACTS_CONSENT_STATUS_COMMAND = "CheckContactsConsentStatusCommand";
+    public static final String CHECK_LOCATION_CONSENT_COMMAND = "CheckLocationConsentCommand";
+    public static final String CHECK_LOGIN_REQUIRED_COMMAND = "CheckLoginRequiredCommand";
+    public static final String SETUP_COMPLETE_COMMAND = "SetupCompleteCommand";
 
     private final Context mConext;
 

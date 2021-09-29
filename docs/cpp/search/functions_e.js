@@ -18,6 +18,7 @@ var searchData=
   ['setdocumentidletimeout',['setDocumentIdleTimeout',['../classaace_1_1apl_1_1_a_p_l.html#ad6270378b772440b1d4679b844d4d928',1,'aace::apl::APL']]],
   ['setdonotdisturb',['setDoNotDisturb',['../classaace_1_1alexa_1_1_do_not_disturb.html#adf4a853a8f3366e416127d1f1767ccab',1,'aace::alexa::DoNotDisturb']]],
   ['setfocus',['setFocus',['../classaace_1_1alexa_1_1_local_media_source.html#ad1217e4c192da618ae846ba57c8611ac',1,'aace::alexa::LocalMediaSource']]],
+  ['setglobalpreset',['setGlobalPreset',['../classaace_1_1alexa_1_1_global_preset.html#a9cecca4284cee3de1215a53bb3b763ea',1,'aace::alexa::GlobalPreset']]],
   ['setindicator',['setIndicator',['../classaace_1_1alexa_1_1_notifications.html#ac88ce22736f266b4ef6d703b7e2fbc58',1,'aace::alexa::Notifications']]],
   ['setmodecontrollervalue',['setModeControllerValue',['../classaace_1_1car_control_1_1_car_control.html#a68e0a7b00fa0024f83240e273817390a',1,'aace::carControl::CarControl']]],
   ['setposition',['setPosition',['../classaace_1_1audio_1_1_audio_output.html#a2d621811ac53c6128ad435546ba964e7',1,'aace::audio::AudioOutput']]],

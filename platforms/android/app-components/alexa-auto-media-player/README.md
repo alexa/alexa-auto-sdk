@@ -20,6 +20,10 @@ This version of the Alexa Auto Media Player doesn’t meet all the Alexa Music C
 
 The Media Player doesn’t pass Music Service Provider (MSP) logo attribution GUI validation for Amazon Music, TuneIn Radio Live, TuneIn Radio Custom, Music Skills (Deezer & SiriusXM), iHeart Radio Live, iHeart Radio Custom, and Pandora. Audible and Kindle don't have a GUI validation requirement. The Android Automotive OS doesn't have placeholder for showing MSP logo which is required for passing GUI validation. The Media Player provides text based MSP attribution. 
 
+The Android Automotive OS displays album art as the background image in media player screen, which doesn't pass GUI validation of not altering album art in any way.
+
+Due to the missing media controls in TemplateRuntime RenderPlayerInfo payload, the Media Player fails to display all the required media controls, which doesn't pass media controls GUI validation.
+
 The standard certification process is required and simplified by the Alexa Auto Media Player because the above mentioned API validation has been completed. Contact your Solutions Architect (SA) or Partner Manager for information about how to obtain certification.
 
 ## Known Issues

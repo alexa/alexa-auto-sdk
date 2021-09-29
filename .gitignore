@@ -1,11 +1,15 @@
+# XDG cache folder where clangd index resides
+.cache
+# gradle external native build
+.cxx
 .DS_Store
 /*native-dependencies
-/.clangd
 /.idea
 /.repo
 /.vscode
 /build
-/cmake-build-debug
+# CLion build folder
+/cmake-build-*
 /extras
 compile_commands.json
 tools/builder

@@ -307,6 +307,7 @@ protected:
     bool stop() override;
     bool shutdown() override;
     bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
+    bool engineStarted() override;
 
 private:
     bool configureDeviceSDK(std::shared_ptr<std::istream> configuration);
@@ -461,7 +462,7 @@ private:
     // Endpoint builder factory
     std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> m_endpointBuilderFactory;
 
-    // executer
+    // executor
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 
     // determine if alexa engine service was shut down in async callback methods

@@ -140,10 +140,10 @@ public class AudioInputHandler implements AudioIOServiceWorker, AACSReceiver.Fet
     }
 
     /**
-     * Remove error'd streams from the map so that we don't try to write
+     * Remove errored streams from the map so that we don't try to write
      * into them in next run.
      *
-     * @param erroredStreams Streams which have error'd.
+     * @param erroredStreams Streams which have errored.
      */
     private void removeErroredStreams(@NonNull List<String> erroredStreams) {
         Log.w(TAG, "Removing failed streams");

@@ -135,7 +135,7 @@ enum class Event {
     onCancelAuthProviderAuthorization,
     onLogoutAuthProviderAuthorization,
 
-    //Devide Setup Completed
+    //Device Setup Completed
     onDeviceSetupCompleted,
 
     // Text-To-Speech

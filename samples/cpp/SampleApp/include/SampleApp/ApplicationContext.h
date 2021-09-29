@@ -22,6 +22,7 @@
 // C++ Standard Library
 #include <deque>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -50,6 +51,7 @@ private:
     bool m_testAutomation{false};
     json m_menuRegister{};
     logger::LoggerHandler::Level m_level{};
+    std::mutex m_mutex;
     std::string m_activeAuthorization{};
     std::string m_applicationDirPath{};
     std::string m_applicationPath{};
@@ -91,7 +93,6 @@ public:
     auto getMenuFilePaths() -> std::vector<std::string>;
     auto getMenuItemValue(const std::string& id, json defaultValue = nullptr) -> json;
     auto getMenuPtr(const std::string& id) -> json*;
-    auto getMenuValue(const std::string& id, json defaultValue = nullptr) -> json;
     auto getMinimumAVSVolume() -> int;
     auto getNetworkIdentifier() -> std::string;
     auto getPayloadScriptCommand() -> std::string;
@@ -142,6 +143,8 @@ private:
 
     auto getAuthorizationData(const std::string& service, const std::string& key) -> std::string;
     auto setAuthorizationData(const std::string& service, const std::string& key, const std::string& data) -> void;
+
+    auto getMenuValueLocked(const std::string& id, json defaultValue = nullptr) -> json;
 };
 
 }  // namespace sampleApp

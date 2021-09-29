@@ -74,7 +74,10 @@ bool AASBLocalMediaSource::initialize(std::shared_ptr<aace::engine::aasb::Messag
 }
 
 //aace::alexa::LocalMediaSource
-bool AASBLocalMediaSource::play(ContentSelector contentSelectorType, const std::string& payload) {
+bool AASBLocalMediaSource::play(
+    ContentSelector contentSelectorType,
+    const std::string& payload,
+    const std::string& sessionId) {
     try {
         AACE_VERBOSE(LX(TAG));
 
@@ -87,6 +90,7 @@ bool AASBLocalMediaSource::play(ContentSelector contentSelectorType, const std::
         message.payload.contentSelectorType =
             static_cast<aasb::message::alexa::localMediaSource::ContentSelector>(contentSelectorType);
         message.payload.payload = payload;
+        message.payload.sessionId = sessionId;
 
         m_messageBroker_lock->publish(message.toString()).send();
 

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.amazon.aacsconstants.AACSPropertyConstants;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
 import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 import com.amazon.alexa.auto.settings.config.PreferenceKeys;
@@ -83,37 +84,63 @@ public class AlexaSettingsLanguagesFragment extends Fragment {
         languageList = new HashMap<>();
         languageCheckerList = new HashMap<>();
 
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_US, view.findViewById(R.id.enUS));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_US, view.findViewById(R.id.esUS));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_DE_DE, view.findViewById(R.id.deDE));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_AU, view.findViewById(R.id.enAU));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_CA, view.findViewById(R.id.enCA));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_GB, view.findViewById(R.id.enGB));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_IN, view.findViewById(R.id.enIN));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_ES, view.findViewById(R.id.esES));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_MX, view.findViewById(R.id.esMX));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_CA, view.findViewById(R.id.frCA));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_FR, view.findViewById(R.id.frFR));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_HI_IN, view.findViewById(R.id.hiIN));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_IT_IT, view.findViewById(R.id.itIT));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_JA_JP, view.findViewById(R.id.jaJP));
-        languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_PT_BR, view.findViewById(R.id.ptBR));
+        if (ModuleProvider.isAlexaCustomAssistantEnabled(view.getContext())) {
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_US, view.findViewById(R.id.enUS));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_DE_DE, view.findViewById(R.id.deDE));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_CA, view.findViewById(R.id.enCA));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_GB, view.findViewById(R.id.enGB));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_MX, view.findViewById(R.id.esMX));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_CA, view.findViewById(R.id.frCA));
 
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_US, view.findViewById(R.id.enUSImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_US, view.findViewById(R.id.esUSImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_DE_DE, view.findViewById(R.id.deDEImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_AU, view.findViewById(R.id.enAUImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_CA, view.findViewById(R.id.enCAImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_GB, view.findViewById(R.id.enGBImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_IN, view.findViewById(R.id.enINImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_ES, view.findViewById(R.id.esESImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_MX, view.findViewById(R.id.esMXImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_CA, view.findViewById(R.id.frCAImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_FR, view.findViewById(R.id.frFRImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_HI_IN, view.findViewById(R.id.hiINImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_IT_IT, view.findViewById(R.id.itITImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_JA_JP, view.findViewById(R.id.jaJPImage));
-        languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_PT_BR, view.findViewById(R.id.ptBRImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_US, view.findViewById(R.id.enUSImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_DE_DE, view.findViewById(R.id.deDEImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_CA, view.findViewById(R.id.enCAImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_GB, view.findViewById(R.id.enGBImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_MX, view.findViewById(R.id.esMXImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_CA, view.findViewById(R.id.frCAImage));
+
+            view.findViewById(R.id.esUSLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.enAULayout).setVisibility(View.GONE);
+            view.findViewById(R.id.enINLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.esESLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.frFRLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.hiINLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.itITLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.jaJPLayout).setVisibility(View.GONE);
+            view.findViewById(R.id.ptBRLayout).setVisibility(View.GONE);
+        } else {
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_US, view.findViewById(R.id.enUS));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_US, view.findViewById(R.id.esUS));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_DE_DE, view.findViewById(R.id.deDE));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_AU, view.findViewById(R.id.enAU));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_CA, view.findViewById(R.id.enCA));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_GB, view.findViewById(R.id.enGB));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_IN, view.findViewById(R.id.enIN));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_ES, view.findViewById(R.id.esES));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_MX, view.findViewById(R.id.esMX));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_CA, view.findViewById(R.id.frCA));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_FR, view.findViewById(R.id.frFR));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_HI_IN, view.findViewById(R.id.hiIN));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_IT_IT, view.findViewById(R.id.itIT));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_JA_JP, view.findViewById(R.id.jaJP));
+            languageList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_PT_BR, view.findViewById(R.id.ptBR));
+
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_US, view.findViewById(R.id.enUSImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_US, view.findViewById(R.id.esUSImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_DE_DE, view.findViewById(R.id.deDEImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_AU, view.findViewById(R.id.enAUImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_CA, view.findViewById(R.id.enCAImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_GB, view.findViewById(R.id.enGBImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_EN_IN, view.findViewById(R.id.enINImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_ES, view.findViewById(R.id.esESImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_ES_MX, view.findViewById(R.id.esMXImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_CA, view.findViewById(R.id.frCAImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_FR_FR, view.findViewById(R.id.frFRImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_HI_IN, view.findViewById(R.id.hiINImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_IT_IT, view.findViewById(R.id.itITImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_JA_JP, view.findViewById(R.id.jaJPImage));
+            languageCheckerList.put(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES_PT_BR, view.findViewById(R.id.ptBRImage));
+        }
 
         mInFlightOperations.add(
                 mAlexaPropertyManager.getAlexaProperty(AACSPropertyConstants.LOCALE)

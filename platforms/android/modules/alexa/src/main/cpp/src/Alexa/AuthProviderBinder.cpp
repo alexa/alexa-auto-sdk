@@ -16,7 +16,7 @@
 #include <AACE/JNI/Alexa/AuthProviderBinder.h>
 
 // String to identify log entries originating from this file.
-static const char TAG[] = "aace.jni.alexa.AuthProvicerBinder";
+static const char TAG[] = "aace.jni.alexa.AuthProviderBinder";
 
 // type aliases
 using AuthState = aace::jni::alexa::AuthProviderHandler::AuthState;

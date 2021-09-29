@@ -64,7 +64,7 @@ enum class RequestType {
     /// Previous
     PREVIOUS,
 
-    /// Starover from the beginning
+    /// Start over from the beginning
     START_OVER,
 
     /// Fast-forward
@@ -141,7 +141,7 @@ enum class SupportedPlaybackOperation {
     /// Previous
     PREVIOUS,
 
-    /// Starover a track from the beginning
+    /// Start over a track from the beginning
     START_OVER,
 
     /// Fast-forward
@@ -195,7 +195,7 @@ enum class ChangeCauseType {
     /// Change was triggered by a rule.
     RULE_TRIGGER,
 
-    /// Change was triggerd by periodic polling.
+    /// Change was triggered by periodic polling.
     PERIODIC_POLL
 };
 
@@ -414,9 +414,9 @@ public:
     /**
      * ExternalMediaAdapterInterface constructor.
      *
-     * @param adapaterName The name of the adapter.
+     * @param adapterName The name of the adapter.
      */
-    ExternalMediaAdapterInterface(const std::string& adapaterName);
+    ExternalMediaAdapterInterface(const std::string& adapterName);
 
     /**
      * Destructor.

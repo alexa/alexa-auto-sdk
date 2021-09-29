@@ -57,7 +57,7 @@ public:
      * 
      * @param service The name to be used for registering with the @c AuthorizationManager.
      * @param authorizationManagerInterface To carry out the required authorization flow with @c AuthorizationManager.
-     * @return On successfull returns the valid reference otherwise @c nullptr.
+     * @return On successful returns the valid reference otherwise @c nullptr.
      */
     static std::shared_ptr<AlexaAuthorizationProvider> create(
         const std::string& service,

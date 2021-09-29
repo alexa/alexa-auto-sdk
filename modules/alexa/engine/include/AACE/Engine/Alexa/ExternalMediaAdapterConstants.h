@@ -61,7 +61,7 @@ const char UNPLAYABLE_BY_SUBSCRIPTION[] = "UNPLAYABLE_BY_SUBSCRIPTION";
 const char OPERATION_REJECTED_SKIP_LIMIT[] = "OPERATION_REJECTED_SKIP_LIMIT";
 const char UNKNOWN_ERROR[] = "UNKNOWN_ERROR";
 
-// plaback state strings
+// playback state strings
 const char IDLE[] = "IDLE";
 const char PLAYING[] = "PLAYING";
 const char PAUSED[] = "PAUSED";

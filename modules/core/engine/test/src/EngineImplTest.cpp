@@ -105,7 +105,7 @@ TEST_F(EngineImplTest, stop) {
 }
 
 TEST_F(EngineImplTest, shutdown) {
-    // conifgure and start the engine
+    // configure and start the engine
     ASSERT_TRUE(m_engine->configure(CoreTestHelper::createDefaultConfiguration())) << "Configure engine failed!";
     ASSERT_TRUE(m_engine->start()) << "Start engine failed!";
 

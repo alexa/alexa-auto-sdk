@@ -1,13 +1,7 @@
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
-import static com.amazon.alexa.auto.apps.common.Constants.CBL_LOGIN_ALEXA_HINT_TEXT;
-import static com.amazon.alexa.auto.apps.common.Constants.CBL_LOGIN_NONALEXA_HINT_TEXT;
-import static com.amazon.alexa.auto.apps.common.Constants.LOGIN_FINISH_HEADING_TEXT;
-import static com.amazon.alexa.auto.apps.common.Constants.LOGIN_TRY_TEXT;
-
 import android.app.Application;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +13,14 @@ import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.amazon.alexa.auto.apis.alexaCustomAssistant.AlexaSetupProvider;
+import com.amazon.aacsconstants.Action;
+import com.amazon.aacsconstants.Topic;
+import com.amazon.aacsipc.AACSSender;
+import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
-import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.setup.R;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Fragment for displaying CBL login finish screen.
@@ -80,39 +78,34 @@ public class CBLLoginFinishFragment extends Fragment {
 
         View fragmentView = requireView();
 
-        if (getArguments() != null) {
-            String supportedFeature = getArguments().getString(ModuleProvider.MODULES);
-            if (supportedFeature != null) {
-                if (supportedFeature.contains(ModuleProvider.ModuleName.ALEXA_CUSTOM_ASSISTANT.name())) {
-                    updateUIForAlexaCustomAssistant();
-                }
-            }
+        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_heading);
+        String format = getResources().getString(R.string.login_finish_heading_text);
+
+        String headingString = "";
+        String userFirstNameName = mViewModel.getUserFirstName();
+        if (userFirstNameName != null) {
+            // Make sure user first name's first letter is always capital.
+            userFirstNameName =
+                    userFirstNameName.substring(0, 1).toUpperCase() + userFirstNameName.substring(1).toLowerCase();
+            headingString = String.format(format, ", " + userFirstNameName);
+        } else {
+            headingString = String.format(format, "");
         }
+        loginFinishHeadingText.setText(headingString);
 
-        TextView getStartedButtonText = fragmentView.findViewById(R.id.cbl_login_finished_btn);
-        getStartedButtonText.setOnClickListener(view -> { mViewModel.userFinishedLogin(); });
+        TextView loginCompletedButton = fragmentView.findViewById(R.id.cbl_login_finished_btn);
+        loginCompletedButton.setOnClickListener(view -> { mViewModel.userFinishedLogin(); });
 
-        // Setup steps are completed and showing the finish screen.
+        // Setup steps are completed and sending setup complete event.
         mViewModel.setupCompleted();
+        sendSetupCompleteEvent();
     }
 
-    @VisibleForTesting
-    private void updateUIForAlexaCustomAssistant() {
-        Log.d(TAG, "Update UI components for alexa custom assistant");
-        View fragmentView = requireView();
-
-        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_heading);
-        TextView loginHintTryText = fragmentView.findViewById(R.id.login_hint_try);
-        TextView assistantHint1Text = fragmentView.findViewById(R.id.alexa_hint1);
-        TextView assistantHint2Text = fragmentView.findViewById(R.id.alexa_hint2);
-        TextView assistantHint3Text = fragmentView.findViewById(R.id.alexa_hint3);
-
-        mApp.getRootComponent().getComponent(AlexaSetupProvider.class).ifPresent(alexaSetupProvider -> {
-            loginFinishHeadingText.setText(alexaSetupProvider.getSetupResId(LOGIN_FINISH_HEADING_TEXT));
-            loginHintTryText.setText(alexaSetupProvider.getSetupResId(LOGIN_TRY_TEXT));
-            assistantHint1Text.setText(alexaSetupProvider.getSetupResId(CBL_LOGIN_ALEXA_HINT_TEXT));
-            assistantHint2Text.setText(alexaSetupProvider.getSetupResId(CBL_LOGIN_NONALEXA_HINT_TEXT));
-            assistantHint3Text.setVisibility(View.GONE);
-        });
+    /**
+     * Send setup complete event to AACS, it will trigger Alexa feature introduction VUI.
+     */
+    private void sendSetupCompleteEvent() {
+        new AACSMessageSender(new WeakReference<>(getContext()), new AACSSender())
+                .sendMessage(Topic.DEVICE_SETUP, Action.DeviceSetup.SETUP_COMPLETED, "");
     }
 }

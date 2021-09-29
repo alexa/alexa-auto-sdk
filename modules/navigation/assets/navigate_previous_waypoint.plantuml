@@ -1,0 +1,32 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant Alexa
+
+Driver->SDK: "Take me to my previous destination"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+
+Alexa->SDK : NavigateToPreviousWaypoints directive
+
+SDK->NavigationHandler : navigateToPreviousWaypoint()
+NavigationHandler->Nav : navigate to driver's previous waypoint
+
+alt Success
+	NavigationHandler<-Nav : navigation started
+    NavigationHandler->SDK: navigationEvent(PREVIOUS_NAVIGATION_STARTED)
+    SDK->Alexa : NavigateToPreviousWaypointSuccess event
+    Alexa->Driver : "OK, navigating to your previous destination" TTS
+else Error
+	NavigationHandler<-Nav : navigation failed
+    NavigationHandler->SDK: navigationError(PREVIOUS_NAVIGATION_START_FAILED, INTERNAL_SERVICE_ERROR , "")
+    SDK->Alexa : NavigateToPreviousWaypointError event
+    Alexa->Driver : "Sorry, I could not navigate to your previous destination" TTS
+end
+@enduml

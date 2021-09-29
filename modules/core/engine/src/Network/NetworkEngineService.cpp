@@ -93,11 +93,11 @@ bool NetworkEngineService::registerPlatformInterfaceType(
             registerServiceInterface<NetworkObservableInterface>(m_networkInfoProviderEngineImpl),
             "registerNetworkObservableInterfaceFailed");
 
-        // save a reference to the newtork info provider
+        // save a reference to the network info provider
         m_networkInfoProvider = networkInfoProvider;
         registerServiceInterface<aace::network::NetworkInfoProvider>(m_networkInfoProvider);
 
-        // set the network infor provider engine interface reference
+        // set the network info provider engine interface reference
         m_networkInfoProvider->setEngineInterface(m_networkInfoProviderEngineImpl);
 
         return true;

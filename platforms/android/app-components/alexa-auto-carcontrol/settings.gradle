@@ -1,0 +1,9 @@
+rootProject.name='alexa-auto-carcontrol'
+include ':aacscarcontrol'
+gradle.ext.aacsRoot = '../../alexa-auto-client-service'
+include ':aacsconstants'
+project(':aacsconstants').projectDir = new File(gradle.ext.aacsRoot, '/constants/aacsconstants')
+include ':aacsipc'
+project(':aacsipc').projectDir = new File(gradle.ext.aacsRoot, '/ipc/aacsipc')
+include ':aacscommonutils'
+project(':aacscommonutils').projectDir = new File(gradle.ext.aacsRoot, '/commonutils/aacscommonutils')

@@ -189,9 +189,12 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformMediaAdapter(
             m_registeredLocalMediaSources.find(source) != m_registeredLocalMediaSources.end(),
             "localMediaSourceAlreadyRegistered");
 
+        ThrowIf(
+            m_defaultExternalMediaAdapter != nullptr && source == aace::alexa::LocalMediaSource::Source::DEFAULT,
+            "DEFAULT localMediaSourceAlreadyRegistered");
+
         // get the local player id for the local media source type
         auto localPlayerId = getLocalPlayerIdForSource(source);
-        ThrowIf(localPlayerId.empty(), "invalidLocalPlayerId");
 
         // create the ExternalMediaAdapterEngineImpl instance
         auto localMediaSourceEngineImpl = LocalMediaSourceEngineImpl::create(
@@ -203,12 +206,15 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformMediaAdapter(
             m_speakerManager.lock());
         ThrowIfNull(localMediaSourceEngineImpl, "invalidExternalMediaAdapterEngineImpl");
 
-        // add the ExternalMediaAdapterEngineImpl to the ExternalMediaAdapterEngineImpl list
-        m_externalMediaAdapterList.push_back(localMediaSourceEngineImpl);
+        if (source == aace::alexa::LocalMediaSource::Source::DEFAULT) {
+            AACE_VERBOSE(LX(TAG).d("platformMediaAdapter", "DEFAULT"));
+            m_defaultExternalMediaAdapter = localMediaSourceEngineImpl;
+        } else {
+            // add the ExternalMediaAdapterEngineImpl to the ExternalMediaAdapterEngineImpl list
+            m_externalMediaAdapterList.push_back(localMediaSourceEngineImpl);
+        }
         m_registeredLocalMediaSources.emplace(source);
-
         return true;
-
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
@@ -231,8 +237,12 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformGlobalPresetHandler(
 
 std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface> ExternalMediaPlayerEngineImpl::getAdapter(
     const std::string& playerId) {
-    auto it = m_externalMediaAdapterMap.find(playerId);
-    return it != m_externalMediaAdapterMap.end() ? it->second : nullptr;
+    if (playerId.empty()) {
+        return m_defaultExternalMediaAdapter;
+    } else {
+        auto it = m_externalMediaAdapterMap.find(playerId);
+        return it != m_externalMediaAdapterMap.end() ? it->second : nullptr;
+    }
 }
 
 std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> ExternalMediaPlayerEngineImpl::
@@ -349,38 +359,39 @@ bool ExternalMediaPlayerEngineImpl::play(
     const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) {
     try {
         AACE_VERBOSE(LX(TAG));
-        if (playerId.empty()) {  // empty playerId == global preset case
+        if (playerId.empty()) {  // empty playerId means it can be a global preset case
             std::string token = playbackContextToken;
             size_t gpindex = token.find(GLOBAL_PRESET_KEY);
-            ThrowIfNot(gpindex != std::string::npos, "invalidPayloadWithGlobalPreset");
-            std::string presetString =
-                token.substr(gpindex + GLOBAL_PRESET_KEY.length() + 1);  //  from "preset:" to end
-            int preset = std::stoi(presetString);
-            ThrowIfNull(m_globalPresetHandler, "platformGlobalPresetHandlerNull");
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "play", {METRIC_GLOBAL_PRESET_GLOBAL_PRESET});
-            // send global preset to platform
-            m_globalPresetHandler->setGlobalPreset(preset);
-            return true;
-        } else {
-            // get the platform adapter
-            auto adapter = getAdapter(playerId);
-            ThrowIfNull(adapter, "invalidMediaPlayerAdapter");
-
-            // call the adapter method
-            ThrowIfNot(
-                adapter->play(
-                    playerId,
-                    playbackContextToken,
-                    index,
-                    offsetInMilliseconds,
-                    skillToken,
-                    playbackSessionId,
-                    navigation,
-                    preload,
-                    playRequestor),
-                "adapterPlayFailed");
-            return true;
+            if (gpindex != std::string::npos) {
+                std::string presetString =
+                    token.substr(gpindex + GLOBAL_PRESET_KEY.length() + 1);  //  from "preset:" to end
+                int preset = std::stoi(presetString);
+                if (m_globalPresetHandler) {
+                    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "play", {METRIC_GLOBAL_PRESET_GLOBAL_PRESET});
+                    // send global preset to platform
+                    m_globalPresetHandler->setGlobalPreset(preset);
+                    return true;
+                }
+            }
         }
+        // get the platform adapter
+        auto adapter = getAdapter(playerId);
+        ThrowIfNull(adapter, "invalidMediaPlayerAdapter");
+
+        // call the adapter method
+        ThrowIfNot(
+            adapter->play(
+                playerId,
+                playbackContextToken,
+                index,
+                offsetInMilliseconds,
+                skillToken,
+                playbackSessionId,
+                navigation,
+                preload,
+                playRequestor),
+            "adapterPlayFailed");
+        return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
@@ -394,7 +405,6 @@ bool ExternalMediaPlayerEngineImpl::playControl(const std::string& playerId, aac
         // get the platform adapter
         auto adapter = getAdapter(playerId);
         ThrowIfNull(adapter, "invalidMediaPlayerAdapter");
-
         // call the adapter method
         ThrowIfNot(adapter->playControl(playerId, request), "adapterPlayControlFailed");
         return true;
@@ -450,6 +460,10 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::ge
         // for the players that the adapter handles...
         for (auto next : m_externalMediaAdapterList) {
             auto adapterStates = next->getAdapterStates(all);
+            adapterStateList.insert(adapterStateList.end(), adapterStates.begin(), adapterStates.end());
+        }
+        if (m_defaultExternalMediaAdapter != nullptr) {
+            auto adapterStates = m_defaultExternalMediaAdapter->getAdapterStates(all);
             adapterStateList.insert(adapterStateList.end(), adapterStates.begin(), adapterStates.end());
         }
 
@@ -641,7 +655,10 @@ void ExternalMediaPlayerEngineImpl::removeDiscoveredPlayer(const std::string& lo
 
     m_executor.submit([this, localPlayerId]() {
         std::lock_guard<std::mutex> lock(m_playersMutex);
+        AACE_DEBUG(LX(TAG).d("Removing localPlayerId", localPlayerId));
         m_authorizationStateMap.erase(localPlayerId);
+        m_pendingDiscoveredPlayerMap.erase(localPlayerId);
+        m_allDiscoveredPlayersMap.erase(localPlayerId);
     });
 }
 
@@ -700,6 +717,9 @@ std::string ExternalMediaPlayerEngineImpl::getLocalPlayerIdForSource(aace::alexa
             case aace::alexa::LocalMediaSource::Source::DAB:
                 return "com.amazon.alexa.auto.players.DAB_RADIO";
 
+            case aace::alexa::LocalMediaSource::Source::DEFAULT:
+                return "";
+
             default:
                 throw("invalidLocalMediaSource");
         }
@@ -712,10 +732,6 @@ std::string ExternalMediaPlayerEngineImpl::getLocalPlayerIdForSource(aace::alexa
 // FocusHandlerInterface
 void ExternalMediaPlayerEngineImpl::setFocus(const std::string& playerId, bool focusAcquire) {
     AACE_VERBOSE(LX(TAG).d("playerId", playerId));
-    if (playerId.empty()) {
-        AACE_ERROR(LX(TAG, "setPlayerInFocusFailed").d("reason", "empty playerId"));
-        return;
-    }
     // TBD implement better association on localPlayerId and playerId
     for (auto& nextAdapter : m_authorizationStateMap) {
         if (nextAdapter.second.playerId.compare(playerId) == 0) {
@@ -747,6 +763,15 @@ void ExternalMediaPlayerEngineImpl::setFocus(const std::string& playerId, bool f
             } else
                 m_externalMediaPlayerCapabilityAgent->setPlayerInFocus(playerId, focusAcquire);
         }
+    }
+}
+
+void ExternalMediaPlayerEngineImpl::setDefaultPlayerFocus() {
+    try {
+        ThrowIfNull(m_externalMediaPlayerCapabilityAgent, "ExternalMediaPlayer is null");
+        m_externalMediaPlayerCapabilityAgent->setPlayerInFocus("", true);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
@@ -800,6 +825,11 @@ void ExternalMediaPlayerEngineImpl::doShutdown() {
     for (auto& adapter : m_externalMediaAdapterList) {
         adapter->shutdown();
         adapter.reset();
+    }
+    if (m_defaultExternalMediaAdapter != nullptr) {
+        m_defaultExternalMediaAdapter->shutdown();
+        m_defaultExternalMediaAdapter.reset();
+        m_defaultExternalMediaAdapter = nullptr;
     }
     // clear the external media adapter list
     m_externalMediaAdapterList.clear();

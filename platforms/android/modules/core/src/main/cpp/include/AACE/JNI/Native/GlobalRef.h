@@ -31,7 +31,7 @@ public:
 
     GlobalRef(JNIEnv* env, T obj) : m_globalRef(nullptr) {
         try {
-            ThrowIfNull(obj, "invalidReferenceObect");
+            ThrowIfNull(obj, "invalidReferenceObject");
             m_globalRef = (T)env->NewGlobalRef(obj);
             ThrowIfJavaEx(env, "newGlobalRefFailed");
         } catch (const std::exception& ex) {
@@ -41,7 +41,7 @@ public:
 
     GlobalRef(T obj) : m_globalRef(nullptr) {
         try_with_context {
-            ThrowIfNull(obj, "invalidReferenceObect");
+            ThrowIfNull(obj, "invalidReferenceObject");
             m_globalRef = (T)env->NewGlobalRef(obj);
             ThrowIfJavaEx(env, "newGlobalRefFailed");
         }
@@ -52,7 +52,7 @@ public:
 
     GlobalRef(const GlobalRef<T>& ref) : m_globalRef(nullptr) {
         try_with_context {
-            ThrowIfNull(ref.m_globalRef, "invalidReferenceObect");
+            ThrowIfNull(ref.m_globalRef, "invalidReferenceObject");
             m_globalRef = (T)env->NewGlobalRef(ref.m_globalRef);
             ThrowIfJavaEx(env, "newGlobalRefFailed");
         }
@@ -83,7 +83,7 @@ public:
         return m_globalRef;
     }
 
-    // assignment opperator
+    // assignment operator
     GlobalRef<T>& operator=(const GlobalRef<T>& ref) {
         try_with_context {
             if (ref.m_globalRef != nullptr) {

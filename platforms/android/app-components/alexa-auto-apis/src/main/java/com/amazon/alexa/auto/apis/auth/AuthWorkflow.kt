@@ -9,6 +9,8 @@ enum class AuthState {
     CBL_Auth_Not_Started,
     CBL_Auth_Started,
     CBL_Auth_CodePair_Received,
+    CBL_Auth_Token_Saved,
+    CBL_Auth_User_Identity_Saved,
     CBL_Auth_Finished,
     CBL_Auth_Start_Failed,
     Auth_Provider_Request_Authorization,
@@ -16,9 +18,12 @@ enum class AuthState {
     Auth_Provider_Authorization_Get_Data,
     Auth_Provider_Authorized,
     Auth_Provider_Not_Authorized,
+    Auth_Provider_Token_Saved,
     Auth_Provider_Authorizing,
     Auth_Provider_Auth_Started,
-    Auth_Provider_Logout
+    Auth_Provider_Logout,
+    Alexa_Client_Connected,
+    Alexa_Client_Disconnected
 }
 
 data class CodePair (

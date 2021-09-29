@@ -16,6 +16,8 @@
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/AddressBook/AddressBookCloudUploaderRESTAgent.h>
 
+#include "zlib.h"
+
 namespace aace {
 namespace engine {
 namespace addressBook {
@@ -450,6 +452,46 @@ bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId(
     }
 }
 
+/**
+ * Compress input byte stream with gzip.
+ *
+ * @param bytes the input byte stream
+ * @param gzipped the output compressed stream
+ * @return Z_OK if success. zlib error code otherwise.
+ */
+static int gzip(const std::string& bytes, std::string& gzipped) {
+    z_stream zstr;
+    zstr.zalloc = Z_NULL;
+    zstr.zfree = Z_NULL;
+    zstr.opaque = Z_NULL;
+    zstr.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(bytes.data()));
+    zstr.avail_in = bytes.length();
+
+    int ret = deflateInit2(&zstr, Z_DEFAULT_COMPRESSION, Z_DEFLATED, MAX_WBITS + 16, MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY);
+    if (ret != Z_OK) {
+        deflateEnd(&zstr);
+        return ret;
+    }
+
+    size_t maxOut = deflateBound(&zstr, bytes.length()) + 12;
+    gzipped.resize(maxOut);
+    zstr.next_out = reinterpret_cast<Bytef*>(&gzipped[0]);
+    zstr.avail_out = gzipped.capacity();
+    ret = deflate(&zstr, Z_FINISH);
+    if (Z_STREAM_END != ret) {
+        deflateEnd(&zstr);
+        return ret;
+    }
+
+    ret = deflateEnd(&zstr);
+    if (Z_OK != ret) {
+        return ret;
+    }
+
+    gzipped.resize(zstr.total_out);
+    return Z_OK;
+}
+
 AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::uploadDocumentToCloud(
     std::shared_ptr<rapidjson::Document> document,
     const std::string& cloudAddressBookId) {
@@ -458,12 +500,20 @@ AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgen
     auto httpHeaderData = buildCommonHTTPHeader();
     httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
 
-    auto entriesJson = aace::engine::utils::json::toString(*document);
+    auto content = aace::engine::utils::json::toString(*document);
+    std::string gzipped;
+    int ret = gzip(content, gzipped);
+    if (ret == Z_OK) {
+        httpHeaderData.insert(httpHeaderData.end(), "Content-Encoding: gzip");
+        content = std::move(gzipped);
+    } else {
+        AACE_ERROR(LX(TAG, "failedToCompressContent").d("error", ret));
+    }
 
     auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
                ADDRESSBOOK_PATH + FORWARD_SLASH + cloudAddressBookId + FORWARD_SLASH + ENTRIES_PATH;
     for (int retryCount = 0; retryCount < HTTP_RETRY_COUNT; retryCount++) {
-        httpResponse = doPost(url, httpHeaderData, entriesJson, DEFAULT_HTTP_TIMEOUT);
+        httpResponse = doPost(url, httpHeaderData, content, DEFAULT_HTTP_TIMEOUT);
         switch (httpResponse.code) {
             case HTTPResponseCode::SUCCESS_OK:
                 return httpResponse;

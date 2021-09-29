@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.comms.ui.Constants;
 import com.amazon.alexa.auto.comms.ui.R;
 import com.amazon.alexa.auto.comms.ui.db.BTDevice;
@@ -107,17 +109,29 @@ public class CommunicationConsentFragment extends Fragment {
                 } else {
                     View fragmentView = requireView();
                     TextView consentPermissionBody = fragmentView.findViewById(R.id.contacts_permission_consent_body);
-                    String format = getResources().getString(R.string.contacts_permission_consent_body);
+                    TextView getYesButtonText = fragmentView.findViewById(R.id.contacts_upload_yes_action_button);
+                    TextView getSkipButtonText = fragmentView.findViewById(R.id.contacts_upload_skip_action_button);
+
+                    String format = "";
+                    if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
+                        // Remove Alexa logo placeholder
+                        ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
+                        alexaImage.setVisibility(View.GONE);
+
+                        // Update text content
+                        format = getResources().getString(R.string.contacts_permission_consent_body_with_alexa_custom_assistant);
+                        getYesButtonText.setText(R.string.contacts_consent_yes_with_alexa_custom_assistant);
+                    } else {
+                        format = getResources().getString(R.string.contacts_permission_consent_body);
+                    }
                     String bodyString = String.format(format, device.getValue().getDeviceName());
                     consentPermissionBody.setText(bodyString);
                     Log.d(TAG, "Device's contacts upload permission is NO, showing contacts consent card.");
 
-                    TextView getYesButtonText = fragmentView.findViewById(R.id.yes_action_button);
                     getYesButtonText.setOnClickListener(view
                             -> mViewModel.setContactsUploadPermission(
                                     device.getValue().getDeviceAddress(), Constants.CONTACTS_PERMISSION_YES));
 
-                    TextView getSkipButtonText = fragmentView.findViewById(R.id.skip_action_button);
                     getSkipButtonText.setOnClickListener(view
                             -> mViewModel.setContactsUploadPermission(
                                     device.getValue().getDeviceAddress(), Constants.CONTACTS_PERMISSION_NO));

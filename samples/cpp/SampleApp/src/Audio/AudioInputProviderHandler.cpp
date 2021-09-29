@@ -182,7 +182,7 @@ ssize_t FileAudioStream::read(char* data, const size_t size) {
     // get the number of bytes read
     ssize_t count = m_stream.gcount();
 
-    m_stream.tellg();  // Don't remove otherwise the ReseourceStream used for Alerts/Timers won't work as expected.
+    m_stream.tellg();  // Don't remove. Otherwise, the ResourceStream used for Alerts/Timers won't work as expected.
 
     return count;
 }

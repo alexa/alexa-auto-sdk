@@ -24,7 +24,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.GeneralSecurityException;
 import java.util.Optional;
 
 public class CBLReceiver extends BroadcastReceiver {
@@ -42,14 +44,32 @@ public class CBLReceiver extends BroadcastReceiver {
                     handleCBLStateChanged(message);
                     break;
                 case Action.CBL.SET_REFRESH_TOKEN:
-                    handleSetRefreshToken(context, message);
+                    try {
+                        handleSetRefreshToken(context, message);
+                    } catch (GeneralSecurityException | IOException e) {
+                        Log.e(TAG, "Failed to set refresh token.");
+                    }
                     break;
                 case Action.CBL.GET_REFRESH_TOKEN:
-                    handleGetRefreshToken(context, message);
+                    try {
+                        handleGetRefreshToken(context, message);
+                    } catch (GeneralSecurityException | IOException e) {
+                        Log.e(TAG, "Failed to get refresh token.");
+                    }
                     break;
                 case Action.CBL.CLEAR_REFRESH_TOKEN:
-                    handleClearRefreshToken(context, message);
+                    try {
+                        handleClearRefreshToken(context, message);
+                    } catch (GeneralSecurityException | IOException e) {
+                        Log.e(TAG, "Failed to clear refresh token.");
+                    }
                     break;
+                case Action.CBL.SET_USER_PROFILE:
+                    try {
+                        handleSetUserProfile(context, message);
+                    } catch (GeneralSecurityException | IOException e) {
+                        Log.e(TAG, "Failed to set user profile.");
+                    }
             }
         });
     }
@@ -102,7 +122,8 @@ public class CBLReceiver extends BroadcastReceiver {
         }
     }
 
-    private void handleSetRefreshToken(Context context, AACSMessage message) {
+    private void handleSetRefreshToken(Context context, AACSMessage message)
+            throws GeneralSecurityException, IOException {
         Log.d(TAG, "handleSetRefreshToken");
         String refreshToken = "";
         try {
@@ -123,10 +144,11 @@ public class CBLReceiver extends BroadcastReceiver {
 
         TokenStore.saveRefreshToken(context, refreshToken);
 
-        EventBus.getDefault().post(new AuthWorkflowData(AuthState.CBL_Auth_Finished, null, null));
+        EventBus.getDefault().post(new AuthWorkflowData(AuthState.CBL_Auth_Token_Saved, null, null));
     }
 
-    private void handleGetRefreshToken(Context context, AACSMessage message) {
+    private void handleGetRefreshToken(Context context, AACSMessage message)
+            throws GeneralSecurityException, IOException {
         Log.d(TAG, "handleGetRefreshToken");
         Optional<String> refreshToken = TokenStore.getRefreshToken(context);
         JSONObject payloadJson;
@@ -142,9 +164,34 @@ public class CBLReceiver extends BroadcastReceiver {
                 .sendReplyMessage(message.messageId, Topic.CBL, Action.CBL.GET_REFRESH_TOKEN, payloadJson.toString());
     }
 
-    private void handleClearRefreshToken(Context context, AACSMessage message) {
+    private void handleClearRefreshToken(Context context, AACSMessage message)
+            throws GeneralSecurityException, IOException {
         Log.d(TAG, "handleClearRefreshToken");
         TokenStore.resetRefreshToken(context);
+    }
+
+    private void handleSetUserProfile(Context context, AACSMessage message)
+            throws GeneralSecurityException, IOException {
+        Log.d(TAG, "handleSetUserProfile");
+        String userName = "";
+        try {
+            JSONObject obj = new JSONObject(message.payload);
+
+            if (obj.has("name")) {
+                userName = obj.getString("name");
+                if (userName.isEmpty()) {
+                    Log.w(TAG, "User name is empty.");
+                } else {
+                    UserIdentityStore.saveUserIdentity(context, userName);
+                    EventBus.getDefault().post(
+                            new AuthWorkflowData(AuthState.CBL_Auth_User_Identity_Saved, null, null));
+                }
+            } else {
+                Log.w(TAG, "handleSetUserProfile: JSON is missing user name. json:" + message.payload);
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "handleSetUserProfile: JSON cannot be parsed.");
+        }
     }
 
     public static void sendMessage(Context context, String topic, String action, String message) {

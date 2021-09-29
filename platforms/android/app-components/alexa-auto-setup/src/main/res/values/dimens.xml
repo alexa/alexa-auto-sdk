@@ -18,10 +18,17 @@
     <dimen name="login_item_margin_end">100dp</dimen>
     <dimen name="login_item_regular_text_size">20sp</dimen>
     <dimen name="login_qr_code_size">150dp</dimen>
-    <dimen name="login_close_button_width">42dp</dimen>
 
     <dimen name="login_header_footer_vertical_margin">8dp</dimen>
     <dimen name="login_margin_start">50dp</dimen>
     <dimen name="login_margin_end">50dp</dimen>
     <dimen name="login_margin_start_double">32dp</dimen>
+
+    <dimen name="cbl_loading_screen_margin_top">340dp</dimen>
+
+    <dimen name="network_error_img_width">145dp</dimen>
+    <dimen name="network_error_img_height">110dp</dimen>
+
+    <dimen name="action_button_space_between">2dp</dimen>
+    <dimen name="action_button_margin_bottom">50dp</dimen>
 </resources>

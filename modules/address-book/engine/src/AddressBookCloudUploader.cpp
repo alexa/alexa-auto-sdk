@@ -37,10 +37,10 @@ using namespace aace::engine::utils::metrics;
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBook.addressBookCloudUploader");
 
-/// Upload entreis batch size
+/// Upload entries batch size
 static const int UPLOAD_BATCH_SIZE = 100;
 
-/// Max allowed phonenumbers per entry
+/// Max allowed phone numbers per entry
 static const int MAX_ALLOWED_ADDRESSES_PER_ENTRY = 30;
 
 /// Max allowed characters
@@ -106,7 +106,13 @@ std::shared_ptr<AddressBookCloudUploader> AddressBookCloudUploader::create(
         auto addressBookCloudUploader = std::shared_ptr<AddressBookCloudUploader>(new AddressBookCloudUploader());
         ThrowIfNot(
             addressBookCloudUploader->initialize(
-                addressBookService, authDelegate, deviceInfo, networkStatus, networkObserver, alexaEndpoints, cleanAllAddressBooksAtStart),
+                addressBookService,
+                authDelegate,
+                deviceInfo,
+                networkStatus,
+                networkObserver,
+                alexaEndpoints,
+                cleanAllAddressBooksAtStart),
             "initializeAddressBookCloudUploaderFailed");
 
         return addressBookCloudUploader;
@@ -437,7 +443,7 @@ public:
                 // Consider phone numbers only when the address book type is CONTACT
                 if (m_addressBookEntity->getType() == AddressBookType::CONTACT) {
                     if (!entryPayload["phoneNumbers"].is_array()) {
-                        Throw("phoneNumbersFieldIsNotAnArrary");
+                        Throw("phoneNumbersFieldIsNotAnArray");
                     }
 
                     if (!data.HasMember("addresses")) {
@@ -494,7 +500,7 @@ public:
                 // Consider postal addresses  only when the address book type is NAVIGATION
                 if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
                     if (!entryPayload["postalAddresses"].is_array()) {
-                        Throw("postalAddressesFieldIsNotAnArrary");
+                        Throw("postalAddressesFieldIsNotAnArray");
                     }
 
                     if (!data.HasMember("addresses")) {
@@ -986,7 +992,7 @@ void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
                         enqueueBackPoppedEvent = true;
                     } else {
                         AACE_INFO(LX(TAG, "eventLoop")
-                                      .m("maxRetryReachedDropingtheEvent")
+                                      .m("maxRetryReachedDroppingtheEvent")
                                       .d("addressBookSourceId", event.getAddressBookEntity()->getSourceId())
                                       .d("eventType", event.getType()));
                     }
@@ -1067,9 +1073,7 @@ bool AddressBookCloudUploader::upload(
     const std::string& cloudAddressBookId,
     std::shared_ptr<rapidjson::Document> document) {
     try {
-        auto entries = document->FindMember("entries");
-
-        AACE_DEBUG(LX(TAG, "upload").d("entries.Size()", entries->value.Size()));
+        AACE_DEBUG(LX(TAG, "upload").d("entries.Size()", document->FindMember("entries")->value.Size()));
 
         ThrowIfNot(uploadEntries(cloudAddressBookId, document), "uploadEntriesFailed");
 
@@ -1195,7 +1199,9 @@ void AddressBookCloudUploader::logNetworkMetrics(const HTTPResponse& httpRespons
 
 std::string AddressBookCloudUploader::createAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity) {
     try {
-        auto dsn = m_deviceInfo->getDeviceSerialNumber();  // Use DSN as addressBookSourceId.
+        // At the time of ER, AVS selects the address book using the DSN instead of the provided addressBookSourceId.
+        // This is because at the time of utterance, Alexa does not know about the addressBookSourceId.
+        auto dsn = m_deviceInfo->getDeviceSerialNumber();
 
         auto cloudAddressBookId = m_addressBookCloudUploaderRESTAgent->createAndGetCloudAddressBook(
             dsn, addressBookEntity->toJSONAddressBookType());
@@ -1211,7 +1217,9 @@ std::string AddressBookCloudUploader::createAddressBook(std::shared_ptr<AddressB
 
 bool AddressBookCloudUploader::deleteAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity) {
     try {
-        auto dsn = m_deviceInfo->getDeviceSerialNumber();  // Use DSN as addressBookSourceId.
+        // DSN is used to get the cloud address book Id. See above comment on
+        // why DSN is used instead of addressBookSourceId
+        auto dsn = m_deviceInfo->getDeviceSerialNumber();
 
         std::string cloudAddressBookId;
         ThrowIfNot(

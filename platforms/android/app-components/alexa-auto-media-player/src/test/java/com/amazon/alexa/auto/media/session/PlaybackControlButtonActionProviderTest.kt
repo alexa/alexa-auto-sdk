@@ -38,7 +38,7 @@ class PlaybackControlButtonActionProviderTest {
 
         mClassUnderTest = PlaybackControlButtonActionProvider(
             mMessageSender, BUTTON_RESOURCE_ID, BUTTON_DISPLAY_NAME, BUTTON_CONTROL_NAME,
-            false, false)
+            false, false, false)
     }
 
     @Test

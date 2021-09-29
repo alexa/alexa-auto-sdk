@@ -32,7 +32,7 @@ AddressBookHandler -> AutoSDK: addAddressBook (UNIQUE_ID, "FavNav",AddressBookTy
 
 AutoSDK -> AddressBookHandler: getEntries (UNIQUE_ID, factory)
 loop for each navigation favorite
-AddressBookHandler -> AutoSDK: factory.addEntry("<json-with-name-and-postaladdress>")
+AddressBookHandler -> AutoSDK: factory.addEntry("<json-with-name-and-postal-address>")
 end
 
 AddressBookHandler --> AutoSDK: getEntries call returns with "true"

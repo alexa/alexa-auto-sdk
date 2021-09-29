@@ -27,4 +27,5 @@ public class TemplateRuntimeConstants {
     public static final String TEMPLATE_TYPE_LOCAL_SEARCH_DETAIL = "LocalSearchDetailTemplate1";
     public static final String TEMPLATE_TYPE_LOCAL_SEARCH_LIST = "LocalSearchListTemplate2";
     public static final String TEMPLATE_TYPE_TRAFFIC_DETAIL = "TrafficDetailsTemplate";
+    public static final String TEMPLATE_TYPE_WEATHER = "WeatherTemplate";
 }

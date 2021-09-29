@@ -132,7 +132,7 @@ ssize_t AudioInputEngineImpl::write(const int16_t* data, const size_t size) {
             next.second(data, size);
         }
 
-        // always return a successfull write even if some of the callbacks failed to write all
+        // always return a successful write even if some of the callbacks failed to write all
         // of the data being provided... the audio input channel should handle retries or buffering
         // on its own if it is needed!
         return size;

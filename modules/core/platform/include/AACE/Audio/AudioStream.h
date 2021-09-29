@@ -51,7 +51,7 @@ public:
     virtual ~AudioStream();
 
     /**
-     * Reads audio data from the strean when available. Audio data will be
+     * Reads audio data from the stream when available. Audio data will be
      * available while @c isClosed() returns false.
      *
      * @param [out] data The buffer where audio data should be copied

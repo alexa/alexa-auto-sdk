@@ -50,7 +50,7 @@ std::shared_ptr<AlexaAuthorizationProvider> AlexaAuthorizationProvider::create(
 }
 
 AlexaAuthorizationProvider::AlexaAuthorizationProvider(const std::string& service) :
-        m_service(service), alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG) {
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG), m_service(service) {
 }
 
 bool AlexaAuthorizationProvider::initialize(
@@ -82,7 +82,7 @@ bool AlexaAuthorizationProvider::startAuthorization(const std::string& data) {
         if (m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZED ||
             m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING) {
             AACE_ERROR(LX(TAG).d("m_currentAuthState", m_currentAuthState));
-            Throw("previousStartAuthorizationyInProgressOrAuthorized");
+            Throw("previousStartAuthorizationInProgressOrAuthorized");
         }
 
         auto m_authorizationManager_lock = m_authorizationManager.lock();

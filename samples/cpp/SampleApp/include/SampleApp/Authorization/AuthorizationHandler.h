@@ -115,7 +115,7 @@ private:
     /// Chosen authorization
     std::string m_selectedAuthorization;
 
-    /// Provides the implemenation of Auth Provider Authorization
+    /// Provides the implementation of Auth Provider Authorization
     std::shared_ptr<AuthProviderAuthorizationHandler> m_authProviderHandler{};
 
     /// To wait on state change notification

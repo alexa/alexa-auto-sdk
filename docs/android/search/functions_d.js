@@ -9,6 +9,7 @@ var searchData=
   ['renderplayerinfo',['renderPlayerInfo',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a09010f2bbdf49bbd579108d7c405e040',1,'com::amazon::aace::alexa::TemplateRuntime']]],
   ['rendertemplate',['renderTemplate',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_template_runtime.html#a2b47479f51a5998559dc2d7e9b33fdbe',1,'com::amazon::aace::alexa::TemplateRuntime']]],
   ['reportdiscoveredplayers',['reportDiscoveredPlayers',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#ac35c5760ab1c2cfca05f59eb0fdfa62b',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
+  ['reportnetworkdatausage',['reportNetworkDataUsage',['../classcom_1_1amazon_1_1aace_1_1device_usage_1_1_device_usage.html#af219f67c9fea0057a7a502f495f99809',1,'com::amazon::aace::deviceUsage::DeviceUsage']]],
   ['requesttoken',['requestToken',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_external_media_adapter.html#a70408cbfd6cf421643434928d4619511',1,'com::amazon::aace::alexa::ExternalMediaAdapter']]],
   ['reset',['reset',['../classcom_1_1amazon_1_1aace_1_1cbl_1_1_c_b_l.html#a438e7b454cdfca08bf2b24795f73650b',1,'com::amazon::aace::cbl::CBL']]],
   ['resume',['resume',['../classcom_1_1amazon_1_1aace_1_1audio_1_1_audio_output.html#a860c1575b54e245352fa2c8d05baf1e9',1,'com::amazon::aace::audio::AudioOutput']]]

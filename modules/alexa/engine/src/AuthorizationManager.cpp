@@ -90,7 +90,7 @@ void AuthorizationManager::registerAuthorizationAdapter(
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIfNull(adapter, "invalidAuthorizationAdapter");
-        ThrowIf(service.empty(), "emtpyService");
+        ThrowIf(service.empty(), "emptyService");
 
         std::lock_guard<std::mutex> lock(m_callMutex);
         if (m_serviceAndAuthorizationAdapterMap.find(service) != m_serviceAndAuthorizationAdapterMap.end()) {
@@ -106,7 +106,7 @@ void AuthorizationManager::registerAuthorizationAdapter(
 AuthorizationManager::StartAuthorizationResult AuthorizationManager::startAuthorization(const std::string& service) {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIf(service.empty(), "emtpyService");
+        ThrowIf(service.empty(), "emptyService");
         ThrowIf(
             m_serviceAndAuthorizationAdapterMap.find(service) == m_serviceAndAuthorizationAdapterMap.end(),
             "serviceNotRegistered");
@@ -153,7 +153,7 @@ void AuthorizationManager::updateAuthStateAndNotifyAuthObservers(State authState
         lock.unlock();
 
         // Enable the metrics emitter module first when the auth state changes to REFRESHED, so that
-        // it could accept the mertics that could be emitted immediately by the auth delegate observers.
+        // it could accept the metrics that could be emitted immediately by the auth delegate observers.
         std::unique_lock<std::mutex> metricsLock(m_metricEmissionListenerMutex);
         if (m_authState == State::REFRESHED && m_metricsEmissionListener) {
             m_metricsEmissionListener->onMetricEmissionStateChanged(true);
@@ -228,7 +228,7 @@ bool AuthorizationManager::clearAdapterStateLocked() {
 void AuthorizationManager::authStateChanged(const std::string& service, State state, Error reason) {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIf(service.empty(), "emtpyService");
+        ThrowIf(service.empty(), "emptyService");
         ThrowIf(m_activeAdapter.first.empty(), "noActiveAuthorization");
 
         std::unique_lock<std::mutex> lock(m_callMutex);
@@ -255,7 +255,7 @@ void AuthorizationManager::authStateChanged(const std::string& service, State st
 bool AuthorizationManager::logout(const std::string& service) {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIf(service.empty(), "emtpyService");
+        ThrowIf(service.empty(), "emptyService");
         ThrowIf(
             m_serviceAndAuthorizationAdapterMap.find(service) == m_serviceAndAuthorizationAdapterMap.end(),
             "serviceNotRegistered");

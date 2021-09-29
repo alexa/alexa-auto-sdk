@@ -433,6 +433,7 @@ void CBLAuthorizationProvider::doShutdown() {
 }
 
 void CBLAuthorizationProvider::startAuthorizationLegacy(const std::string& data, bool explicitStart) {
+    AACE_DEBUG(LX(TAG));
     m_legacyCBLExplicitStart = explicitStart;
     startAuthorization(data);
 }
@@ -787,7 +788,8 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingTo
                     if (m_explicitAuthorizationRequest) {
                         // Fall back to requesting code pair state if the application provides an invalid refresh token during
                         // explicit start of CBL authorization.
-                        m_explicitAuthorizationRequest = false;  // Don't loop continuosly in code pair requesting state
+                        m_explicitAuthorizationRequest =
+                            false;  // Don't loop continuously in code pair requesting state
                         return FlowState::REQUESTING_CODE_PAIR;
                     } else {
                         setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);
@@ -900,7 +902,7 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
                         if (m_explicitAuthorizationRequest) {
                             // Fall back to requesting code pair state if the application provides an invalid refresh token during
                             // explicit start of CBL authorization.
-                            m_explicitAuthorizationRequest = false;  // Not to loop continuosly
+                            m_explicitAuthorizationRequest = false;  // Not to loop continuously
                             return FlowState::REQUESTING_CODE_PAIR;
                         } else {
                             setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);

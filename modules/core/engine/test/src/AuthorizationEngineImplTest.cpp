@@ -94,7 +94,7 @@ protected:
     }
 
     /**
-     * Settting up GMock expectations.
+     * Setting up GMock expectations.
      */
     void setupGetProviderExpectations();
 
@@ -111,7 +111,7 @@ protected:
     /// Mocked authorization providers
     std::shared_ptr<MockAuthorizationProvider> m_mockAuthorizationProvider2;
 
-    /// Obejct used in the test
+    /// Object used in the test
     std::shared_ptr<AuthorizationEngineImpl> m_authorizationEngineImpl;
 };
 
@@ -164,19 +164,19 @@ TEST_F(AuthorizationEngineImplTest, test_verifyInvalidServiceCalls) {
 
     EXPECT_CALL(*m_mockAuthorizationProvider1, startAuthorization(_)).Times(0);
     EXPECT_CALL(*m_mockAuthorizationProvider2, startAuthorization(_)).Times(0);
-    m_authorizationEngineImpl->onStartAuthorization("notRegistredService", "{\"TestData\"}");
+    m_authorizationEngineImpl->onStartAuthorization("notRegisteredService", "{\"TestData\"}");
 
     EXPECT_CALL(*m_mockAuthorizationProvider1, cancelAuthorization()).Times(0);
     EXPECT_CALL(*m_mockAuthorizationProvider2, cancelAuthorization()).Times(0);
-    m_authorizationEngineImpl->onCancelAuthorization("notRegistredService");
+    m_authorizationEngineImpl->onCancelAuthorization("notRegisteredService");
 
     EXPECT_CALL(*m_mockAuthorizationProvider1, logout()).Times(0);
     EXPECT_CALL(*m_mockAuthorizationProvider2, logout()).Times(0);
-    m_authorizationEngineImpl->onLogout("notRegistredService");
+    m_authorizationEngineImpl->onLogout("notRegisteredService");
 
     EXPECT_CALL(*m_mockAuthorizationProvider1, sendEvent(_)).Times(0);
     EXPECT_CALL(*m_mockAuthorizationProvider2, sendEvent(_)).Times(0);
-    m_authorizationEngineImpl->onSendEvent("notRegistredService", "{\"TestData\"}");
+    m_authorizationEngineImpl->onSendEvent("notRegisteredService", "{\"TestData\"}");
 }
 
 TEST_F(AuthorizationEngineImplTest, test_verifySequenceOfCalling) {
@@ -230,8 +230,8 @@ TEST_F(AuthorizationEngineImplTest, test_verifyAuthorizationProviderListenerCall
 
     EXPECT_CALL(*m_mockAuthorizationPlatformInterface, getAuthorizationData("service2", "Mock-Key"))
         .WillOnce(Return("MockGetData"));
-    auto getAurhtoizationDataResult = m_authorizationEngineImpl->onGetAuthorizationData("service2", "Mock-Key");
-    EXPECT_EQ(getAurhtoizationDataResult, "MockGetData");
+    auto getAuthorizationDataResult = m_authorizationEngineImpl->onGetAuthorizationData("service2", "Mock-Key");
+    EXPECT_EQ(getAuthorizationDataResult, "MockGetData");
 
     EXPECT_CALL(*m_mockAuthorizationPlatformInterface, setAuthorizationData("service2", "Mock-Key", "{\"Mock-Data\"}"));
     m_authorizationEngineImpl->onSetAuthorizationData("service2", "Mock-Key", "{\"Mock-Data\"}");

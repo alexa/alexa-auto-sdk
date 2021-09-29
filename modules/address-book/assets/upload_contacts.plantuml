@@ -47,8 +47,8 @@ end note
 
 Driver -> Alexa
 
-Alexa -> AutoSDK: dail directive
+Alexa -> AutoSDK: dial directive
 
-AutoSDK -> PhoneCallControllerHandler: dail(payload wtih Bob's details)
+AutoSDK -> PhoneCallControllerHandler: dial (payload with Bob's details)
 
 @enduml

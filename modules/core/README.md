@@ -25,6 +25,7 @@ The Auto SDK Core module contains the Engine base classes and the abstract platf
 - [Managing Authorization](#managing-authorization)
   - [Authorization Sequence Diagrams](#authorization-sequence-diagrams)
   - [Using the Authorization Module](#using-the-authorization-module)
+- [Providing network usage data to Auto SDK](#providing-network-usage-data-to-auto-sdk)
 
 ## Overview
 
@@ -665,5 +666,34 @@ m_authorizationHandler->logout("service-name");
 
 // To send events from the platform implementation to the authorization service.
 m_authorizationHandler->sendEvent("service-name", "event-data-as-defined-by-service");
+
+```
+
+## Providing network usage data to Auto SDK
+
+The Auto SDK exposes the `DeviceUsage` platform interface that can be used to provide network usage data of your Alexa application to Auto SDK. This data is logged as a metric and is sent to Amazon endpoints if Auto SDK is built with the `Device Client Metrics` extension.
+
+To use the `DeviceUsage` platform interface, create your custom `DeviceUsage` handler and use it as follows :
+
+```cpp
+#include <AACE/DeviceUsage/DeviceUsage.h>
+
+class MyDeviceUsageHandler : public aace::deviceUsage::DeviceUsage {  
+
+    void reportNetworkDataUsage(std::string& networkUsageData) {
+        // Reports the network usage data to Auto SDK Engine
+    }
+
+}
+
+// Register the platform interface with the Engine
+auto m_deviceUsageHandler = std::make_shared<MyDeviceUsageHandler>();
+engine->registerPlatformInterface( m_deviceUsageHandler );
+
+// Reference @c aace::deviceUsage::DeviceUsage for network usage data format
+std::string networkUsageData = R"({ ... })";
+
+// To provide the network usage data to the Engine, call the reportNetworkUsage API
+m_deviceUsageHandler->reportNetworkDataUsage(networkUsageData);
 
 ```

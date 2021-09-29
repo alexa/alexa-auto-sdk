@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ static const std::string DEFAULT_NAVIGATION_STATE_PAYLOAD = R"({
 })";
 
 //// max number of shapes allowable in context
-static const int MAXIMUM_SHAPES_IN_CONTEXT = 3000;
+static const int MAXIMUM_SHAPES_IN_CONTEXT = 100;
 
 // Navigation Event Strings
 static const std::string START_NAVIGATION_SUCCESS = "StartNavigationSuccess";
@@ -649,7 +649,7 @@ bool NavigationCapabilityAgent::isNavigationStateValid( std::string navigationSt
         }
 
         if( document[ "shapes" ].Size() > MAXIMUM_SHAPES_IN_CONTEXT ) {
-            AACE_WARN(LX(TAG, "isNavigationStateValid").d("shapes", "Too many shapes in payload. Only using first 3000."));
+            AACE_WARN(LX(TAG, "isNavigationStateValid").d("shapes", "Too many shapes in payload. Only using first 100."));
             ThrowIfNot( document[ "shapes" ].Erase(document[ "shapes" ].Begin() + MAXIMUM_SHAPES_IN_CONTEXT, document[ "shapes" ].End()), "unable to operate on shapes Array" );
         }
         rapidjson::StringBuffer buffer;

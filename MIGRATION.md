@@ -2,12 +2,15 @@
 
 This guide outlines the changes you need to make to migrate from Auto SDK v2.0 to later versions of the Auto SDK.
 
->**Note:** If you migrate from a version earlier than v2.3, be sure to read the relevant sections of this guide to understand all changes introduced between your current version and v3.2.1. The information helps you decide what changes you must include. For example, if you migrate from v2.0, include the changes described in [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21), the changes described in [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22), and so on, taking into consideration the deprecated or removed features in each version.
+>**Note:** If you migrate from a version earlier than v2.3, be sure to read the relevant sections of this guide to understand all changes introduced between your current version and v3.3. The information helps you decide what changes you must include. For example, if you migrate from v2.0, include the changes described in [Migrating from Auto SDK v2.0 to v2.1](#migrating-from-auto-sdk-v20-to-v21), the changes described in [Migrating from Auto SDK v2.1 to v2.2](#migrating-from-auto-sdk-v21-to-v22), and so on, taking into consideration the deprecated or removed features in each version.
 
 <!-- omit in toc -->
 ## Table of Contents
 
-- [Migrating from Auto SDK v3.1.0 to v3.2.0 or v3.2.1](#migrating-from-auto-sdk-v310-to-v320-or-v321)
+- [Migrating from Auto SDK v3.2.1 to v3.3.0](#migrating-from-auto-sdk-v321-to-v330)
+  - [Local Media Source and Global Preset Enhancements](#local-media-source-and-global-preset-enhancements)
+  - [Migrating the Local Navigation Module APIs](#migrating-the-local-navigation-module-apis)
+- [Migrating from Auto SDK v3.1.0 to v3.2.0](#migrating-from-auto-sdk-v310-to-v320)
   - [Using the Alexa Communication Extension](#using-the-alexa-communication-extension)
   - [Using the Device Client Metrics (DCM) Extension](#using-the-device-client-metrics-dcm-extension)
 - [Migrating from Auto SDK v3.0.0 to v3.1.0](#migrating-from-auto-sdk-v300-to-v310)
@@ -31,8 +34,86 @@ This guide outlines the changes you need to make to migrate from Auto SDK v2.0 t
   - [Car Control Source File Relocation](#car-control-source-file-relocation)
   - [Code-Based-Linking (CBL) Handler in the Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
 
-## Migrating from Auto SDK v3.1.0 to v3.2.0 or v3.2.1
-This section provides the information you need to migrate from Auto SDK v3.1.0 to Auto SDK 3.2.0 or 3.2.1. All information about 3.2.0 is also applicable to 3.2.1.
+## Migrating from Auto SDK v3.2.1 to v3.3.0
+This section provides the information you need to migrate from Auto SDK v3.2.1 to Auto SDK v3.3.0 
+
+### Local Media Source and Global Preset Enhancements
+
+#### GlobalPreset is deprecated
+The `GlobalPreset` platform interface is deprecated because its feature set is supported by the new `DEFAULT` `LocalMediaSource` type. To preserve functionality for utterances targetting generic presets like "Alexa, play preset 1", implement and register a `LocalMediaSource` handler of `Source::DEFAULT` type. The user utterances that cause the Engine to invoke `GlobalPreset::setGlobalPreset()` will cause the Engine to invoke `LocalMediaSource::play()` with `ContentSelector::PRESET` instead. The `GlobalPreset` platform interface will be removed in a future version of Auto SDK.
+
+#### Addtional LocalMediaSource playerEvent calls are needed
+Previous Auto SDK documentation stated that you must call `LocalMediaSource::playerEvent()` to report events "PlaybackStated" and "PlaybackStopped" only. Please update your implementation to call `playerEvent()` with states "PlaybackSessionStarted" and "PlaybackSessionEnded" as well. See the [Reporting Playback Events](modules/alexa/README.md#reporting-playback-events) section in the Alexa module README for information about when to report these events.
+
+#### setFocus is deprecated
+The API `LocalMediaSource::setFocus()` is deprecated because its functionality is equivalent to calling `LocalMediaSource::playerEvent()` with event name "PlaybackSessionStarted" when a player is brought into focus or "PlaybackSessionEnded" when a player is removed from focus. Please replace your calls to `setFocus(true)` and `setFocus(false)` with calls to `playerEvent("PlaybackSessionStarted")` and `playerEvent("PlaybackSessionEnded")`, respectively. `setFocus` will be removed in a future version of Auto SDK.
+
+#### Reporting playback session ID is needed
+The Alexa cloud requires `ExternalMediaPlayer` events and context for a particular player to include the playback session ID of a player's active session. To support this, the `LocalMediaSource::play()` function signature is updated to include a parameter for session ID for an Alexa-initiated session, which you must use when reporting player events for the player. The `playerEvent` and `playerError` signatures are also updated to include session ID. You must generate your own session ID when the playback is initiated by the user without Alexa. See the [Reporting Playback Events](modules/alexa/README.md#reporting-playback-events) section in the Alexa module README for more details about the `sessionId`. The versions of APIs without the session ID will be removed in a future version of Auto SDK.
+
+### Migrating the Local Navigation Module APIs
+The local search features of the Local Voice Control Extension's Local Navigation module are extended to support offline navigation to addresses, cities, and neighborhoods. To support the new feature set, the existing APIs are updated to a more general name. The changes are backward compatible, but the old APIs are deprecated and will be removed in a future version. Use the following steps to assist the migration to the new APIs:
+
+#### LocalSearchProvider Platform Interface Changes
+We have deprecated the functions `poiSearchRequest`, `poiLookupRequest`, `poiSearchResponse`, and `poiLookupResponse` in favor of `searchRequest`, `lookupRequest`, `searchResponse`, and `lookupResponse`, respectively.
+
+* Override `LocalSearchProvider::searchRequest()` instead of `LocalSearchProvider::poiSearchRequest()`.
+* Override `LocalSearchProvider::lookupRequest()` instead of `LocalSearchProvider::poiLookupRequest()`.
+* Call `LocalSearchProvider::searchResponse()` instead of `LocalSearchProvider::poiSearchResponse()`.
+* Call `LocalSearchProvider::lookupResponse()` instead of `LocalSearchProvider::poiLookupResponse()`.
+
+We have also deprecated the AASB messages `PoiSearchRequestMessage`, `PoiLookupRequestMessage`, `PoiSearchResponseMessage`, and `PoiLookupResponseMessage` in favor of `SearchRequestMessage`, `LookupRequestMessage`, `SearchResponseMessage`, and `LookupResponseMessage`, respectively.
+
+* Subscribe to `SearchRequestMessage` instead of `PoiSearchRequestMessage`.
+* Subscribe to `LookupRequestMessage` instead of `PoiLookupRequestMessage`.
+* Publish to `SearchResponseMessage` instead of `PoiSearchResponseMessage`.
+* Publish to `LookupResponseMessage` instead of `PoiLookupResponseMessage`.
+
+The JSON schemas of search and response are still the same.
+Note: Do not use/implement a mix of the old APIs and the new APIs
+
+#### Local Navigation Module Engine Configuration Changes
+The `aace.localNavigation.localSearch` configuration keys `navigationPOISocketPath` and `poiEERSocketPath` are renamed to `navigationLocalSearchSocketPath` and `localSearchEERSocketPath`, respectively. 
+For example, if your configuration was this
+
+```jsonc
+{
+   "aace.localNavigation": {
+        "localSearch": {
+            "navigationPOISocketPath": "/opt/LVC/data/poi-er-service/poi_navigation.socket",
+            "poiEERSocketPath": "/opt/LVC/data/poi-er-service/poi_eer.socket"
+        }
+    }
+}
+```
+change it to this
+
+```jsonc
+{
+   "aace.localNavigation": {
+        "localSearch": {
+            "navigationLocalSearchSocketPath": "/opt/LVC/data/local-search-er-service/local_search_navigation.socket",
+            "localSearchEERSocketPath": "/opt/LVC/data/local-search-er-service/local_search_eer.socket"
+        }
+    }
+}
+```
+
+If you are using the `LocalNavigationConfiguration::createLocalSearchConfig()` factory function to generate the configuration, your usage does not have to change because the signature is the same and implementation of this function generates the new JSON.
+
+Note: the socket paths in the Linux default sample configuration file are updated, so if you use different values, ensure you update your LVC app configuration accordingly
+
+#### LVC APK Configuration Changes
+If you use LVC on Android, update the configuration returned by your implementation of the interface `ILVCClient.getConfiguration()`.
+
+The paths `NavigationPOISocketDir` and `POIEERSocketDir` have been deprecated in favor of `NavigationLocalSearchSocketDir` and `LocalSearchEERSocketDir`, respectively.
+The socket names `NavigationPOISocketName` and `POIEERSocketName` have been deprecated in favor of `NavigationLocalSearchSocketName` and `LocalSearchEERSocketName`, respectively. 
+
+#### LVC Linux App Configuration Changes
+The LVC configuration file `lvc-config.json` installed at `/opt/LVC/config` by the installation script `LVC.sh` has no changes to its JSON configuration schema since Auto SDK 3.2. However, the socket directories and names used by default in this file are updated to use more general names.
+
+## Migrating from Auto SDK v3.1.0 to v3.2.0
+This section provides the information you need to migrate from Auto SDK v3.1.0 to Auto SDK 3.2.0. All information about 3.2.0 is also applicable to 3.2.1.
 
 ### Using the Alexa Communication Extension
 The Alexa Comms library in Auto SDK v3.2.0 uses Device Client Metrics (DCM) instead of AWS IoT for uploading metrics. Therefore, remove the `iotCertificateDirPath`, `iotHostAddress`, and `deviceTypeId` fields from the communication configuration file. For information about the configuration file format, see the Alexa Communication extension README.
@@ -364,7 +445,7 @@ The following build changes have been introduced in Auto SDK v2.1:
 
     See the [Builder README](./builder/README.md#running-builder) for details about supported platforms and targets.
 
-* For QNX targets, you must cross-compile with the QNX multimedia software for the system audio extension (which is built by default for QNX targets). This requires a QNX Multimedia Suite license. See the [System Audio extension README](./extensions/experimental/system-audio/README.md) for details.
+* For QNX targets, you must cross-compile with the QNX multimedia software for the system audio extension (which is built by default for QNX targets). This requires a QNX Multimedia Suite license. See the [System Audio extension README](./extensions/system-audio/README.md) for details.
 
 ### Engine Configuration File Updates
 

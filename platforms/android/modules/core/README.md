@@ -25,6 +25,7 @@ The Alexa Auto SDK module contains the Engine base classes and the abstract plat
 - [Managing Authorization](#managing-authorization)
   - [Authorization Sequence Diagrams](#authorization-sequence-diagrams)
 - [Using the Authorization Module](#using-the-authorization-module)
+- [Providing network usage data to Auto SDK](#providing-network-usage-data-to-auto-sdk)
 
 
 ## Overview
@@ -688,5 +689,33 @@ mAuthorizationHandler.logout("service-name");
 
 // To send events from the platform implementation to the authorization service.
 mAuthorizationHandler.sendEvent("service-name", "event-data-as-defined-by-service");
+
+```
+
+## Providing network usage data to Auto SDK
+
+The Auto SDK exposes the `DeviceUsage` platform interface that can be used to provide network usage data of your Alexa application to Auto SDK. This data is logged as a metric and is sent to Amazon endpoints if Auto SDK is built with the `Device Client Metrics` extension.
+
+To use the `DeviceUsage` platform interface, create your custom `DeviceUsage` handler and use it as follows :
+
+```java
+
+public class MyDeviceUsageHandler extends DeviceUsage {  
+
+    void reportNetworkDataUsage(String networkUsageData) {
+        // Reports the network usage data to Auto SDK Engine
+    }
+
+}
+
+// Register the platform interface with the Engine
+MyDeviceUsageHandler mDeviceUsageHandler = new MyDeviceUsageHandler();
+mEngine.registerPlatformInterface( mDeviceUsageHandler );
+
+// Reference @c DeviceUsage for network usage data format
+String networkUsageData = "{ ... }";
+
+// To provide the network usage data to the Engine, call the reportNetworkUsage API
+mDeviceUsageHandler.reportNetworkDataUsage(networkUsageData);
 
 ```

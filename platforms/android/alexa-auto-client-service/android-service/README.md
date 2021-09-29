@@ -10,6 +10,7 @@ with a few additional fields unique to AACS.
 - [General](#general)
   - [persistentSystemService](#persistentsystemservice)
   - [startServiceOnBootEnabled](#startserviceonbootenabled)
+  - [syncSystemPropertyChange](#syncsystempropertychange)
   - [intentTargets](#intenttargets)
 - [Default Platform Handlers](#default-platform-handlers)
   - [useDefaultLocationProvider](#usedefaultlocationprovider)
@@ -18,6 +19,7 @@ with a few additional fields unique to AACS.
   - [useDefaultPropertyManager](#usedefaultpropertymanager)
   - [audioInput](#audioinput)
   - [audioOutput](#audiooutput)
+  - [useDefaultLocalMediaSource](#usedefaultlocalmediasource)
 
 ## Auto SDK Modules
 You configure a module in AACS in a similar way as you configure a module in the Auto SDK. For example,  the Auto SDK specifies a module in the configuration as `aace.<module>`, and AACS specifies a module in the configuration as `aacs.<module>`. See the [Auto SDK's 
@@ -36,7 +38,7 @@ The `aacs.aasb` module requires a field `version`, as detailed in [AASB README](
 ~~~
 {
     "aacs.aasb": {
-        "version": "3.2"
+        "version": "3.3"
     }
 }
 ~~~
@@ -79,13 +81,13 @@ The following example shows  `deviceInfo` and `localMediaSource` in the configur
 ### localMediaSource
 **Type:** JSON Object
 
-Specifies which local media sources are available and handled in the application.
+Specifies which local media sources are available and handled in the application. If your application prefers AACS to handle the local media sources, use `useDefaultLocalMediaSource` instead.
 
 #### types
 **Type:** String Array
 
 Specifies the available local media sources. Possible values are `BLUETOOTH`, `USB`, `FM_RADIO`, `AM_RADIO`, `SATELLITE_RADIO`, 
-`LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, and `DAB`.
+`LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`, and `DEFAULT`
 
 ## AACS Module Enablement
 AACS allows your application to enable/disable certain modules using AACS configuration file. To enable or disable certain modules,
@@ -139,6 +141,7 @@ If your application uses the deprecated `CBL` module, disable the `Authorization
         "version": "1.0",
         "persistentSystemService": false,
         "startServiceOnBootEnabled": true,
+        "syncSystemPropertyChange": false,
         "intentTargets" : {
             "AASB" : {
                 "type": [],
@@ -315,6 +318,11 @@ the AACS notification that is displayed when the service is run in the foregroun
 
 When `startServiceOnBootEnabled` is set to `true`, AACS automatically starts running when the device is booted up. For the service to start on boot, it must have been run at least once after it was installed. When `startServiceOnBootEnabled` is set to `false`, AACS requires the application to send an intent to start the service. 
 
+### syncSystemPropertyChange
+**Type:** Boolean
+
+This field is optional. When `syncSystemPropertyChange` is set to `true`, AACS handles synchronizing the time zone and locale settings of Alexa with the device settings so your application does not need to implement this feature if it is expected in your UX. When it's not present, it's default to `false`.
+
 ### intentTargets
 **Type:** JSON Object
 
@@ -447,3 +455,119 @@ audio types are `TTS`, `ALARM`, `MUSIC`, `NOTIFICATION`, `EARCON`, and `RINGTONE
 
 Set to `true` to enable the default `AudioOutput` platform implementation for the given audio type. If `useDefault` is set to `false`, `AudioOutput` for the given audio
 type must be handled in your application.
+
+### useDefaultLocalMediaSource
+
+**Type:** Boolean
+(Followed with detailed `localMediaSourceMetadata` JSON array configuration if set `true`)
+
+Set to `true` to enable the default `LocalMediaSource` platform implementation to configure local media sources. By default `useDefaultLocalMediaSource` is treated `false` so if not included in the config file or set to `false` explicitly, please define `localMediaSource` JSON array in the `aacs.alexa` node to enable AASB LocalMediaSource messages to be delivered to your application.
+Refer the following sample configuration for the `useDefaultLocalMediaSource`.
+~~~
+    "useDefaultLocalMediaSource" : true,
+    "localMediaSourceMetadata": [
+      {
+        "sourceType":"BLUETOOTH",
+        "supported": true,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      }, {
+        "sourceType":"USB",
+        "supported": true,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      }, {
+        "sourceType":"FM_RADIO",
+        "supported": true,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>",
+        "supportsSetPreset": true,
+        "supportsSetFrequency": true
+      }, {
+        "sourceType":"AM_RADIO",
+        "supported": false,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>",
+        "supportsSetPreset": true,
+        "supportsSetFrequency": true
+      }, {
+        "sourceType":"SATELLITE_RADIO",
+        "supported": false,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      }, {
+        "sourceType":"LINE_IN",
+        "supported": false,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      }, {
+        "sourceType":"COMPACT_DISC",
+        "supported": true,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      }, {
+        "sourceType":"SIRIUS_XM",
+        "supported": false,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      }, {
+        "sourceType":"DAB",
+        "supported": false,
+        "mediaPackageName":"<Package Name>",
+        "mediaServiceClass":"<Media Browser service class name>"
+      },{
+        "sourceType":"DEFAULT",
+        "supported": true,
+        "mediaPackageName":"",
+        "mediaServiceClass":"",
+        "supportsSetPreset": true
+      }
+    ]
+~~~
+`sourceType` Specifies the available local media sources. Possible values are `BLUETOOTH`, `USB`, `FM_RADIO`, `AM_RADIO`, `SATELLITE_RADIO`, 
+`LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`, and `DEFAULT`. The `DEFAULT` source provides the facility to support all the media sources which are not listed in the given list.
+
+>**Note:** This feature uses [NotificationListenerService](https://developer.android.com/reference/android/service/notification/NotificationListenerService) to monitor active sessions, provide [BIND_NOTIFICATION_LISTENER_SERVICE permission](https://developer.android.com/reference/android/Manifest.permission#BIND_NOTIFICATION_LISTENER_SERVICE) to the AACS application (or the application which includes AACS AAR module) to support the default local media source handling. If access is not provided, AACS would ignore the `"useDefaultLocalMediaSource" : true` configuration. This access is generally given by enabling the AACS application in `Settings >> Apps >> Special Access >> Notification access`.
+
+>**Note:** If OEM wishes to make AACS app (or the app which includes AACS AAR) as a system app, they can avoid the `Notification Access` step. Please add a line `<uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />` in the [AndroidManifest.xml](service/src/main/AndroidManifest.xml) file and provide all the required permissions to the system application in the Android operating system.
+
+Refer [Local Media Source](../../../../modules/alexa/README.md#handling-local-media-sources) to know more about `DEFAULT` media source.
+`supported` configures the given Local Media Source. if `supported` is set `true`, that media source would be handled and controlled through AACS. If `supported` is set `false`, AACS would ignore the media source.
+
+`mediaPackageName` and `mediaServiceClass` are mandatory configuration keys.  `mediaPackageName` represents the package name of the media source and `mediaServiceClass` represents the The name of the class inside of package that implements the component of the media browser service. This is a requirement of the [ComponentName](https://developer.android.com/reference/android/content/ComponentName). Please ensure that right data is provided here. Since `DEFAULT` player can act on behalf of all latest the media sources except Alexa music, MACC supported players and other configured local media sources, it is not full time associated to any package name and MediaBrowserService. It always represents 0th media controller of the [onActiveSessionsChanged](https://developer.android.com/reference/android/media/session/MediaSessionManager.OnActiveSessionsChangedListener#onActiveSessionsChanged(java.util.List%3Candroid.media.session.MediaController%3E)) controller list.
+
+Besides these mandatory configuration keys, following optional keys are useful for the correct mapping of metadata.
+
+`metadataTitleKey` By default AACS uses [METADATA_KEY_TITLE](https://developer.android.com/reference/android/media/MediaMetadata#METADATA_KEY_TITLE) to extract the title data from the Local Media Source. If any of the media source provides this data through the different key, use this configuration field.
+
+For example, Consider sub title as title for some reason
+~~~
+"metadataTitleKey":"android.media.metadata.DISPLAY_SUBTITLE" 
+~~~ 
+
+`metadataTrackIdKey` By default AACS uses [METADATA_KEY_MEDIA_ID](https://developer.android.com/reference/android/media/MediaMetadata#METADATA_KEY_MEDIA_ID) to extract the trackId from the Local Media Source. If any of the media source provides this data through the different key, use this configuration field.
+
+`metadataTrackNumberKey` By default AACS uses [METADATA_KEY_TRACK_NUMBER](https://developer.android.com/reference/android/media/MediaMetadata#METADATA_KEY_TRACK_NUMBER) to extract the track number from the Local Media Source. If any of the media source provides this data through the different key, use this configuration field.
+
+`metadataArtistKey` By default AACS uses [METADATA_KEY_ARTIST](https://developer.android.com/reference/android/media/MediaMetadata#METADATA_KEY_ARTIST) to extract the artist from the Local Media Source. If any of the media source provides this data through the different key, use this configuration field.
+
+`metadataAlbumKey` By default AACS uses [METADATA_KEY_ALBUM](https://developer.android.com/reference/android/media/MediaMetadata#METADATA_KEY_ALBUM) to extract the title data from the Local Media Source. If any of the media source provides this data through the different key, use this configuration field.
+
+`metadataDurationKey` By default AACS uses [METADATA_KEY_DURATION](https://developer.android.com/reference/android/media/MediaMetadata#METADATA_KEY_DURATION) to extract the title data from the Local Media Source. If any of the media source provides this data through the different key, use this configuration field.
+
+`supportsSetFrequency` This takes a boolean value. It should be set `true` for AM or FM where Alexa can set the frequency in the AM or FM application.
+
+Local Media Player like FM or AM application should be able to handle this request. To support it, these app needs to implement [onPrepareFromSearch](https://developer.android.com/reference/kotlin/android/support/v4/media/session/MediaSessionCompat.Callback#onpreparefromsearch) and [onPlayFromSearch](https://developer.android.com/reference/kotlin/android/support/v4/media/session/MediaSessionCompat.Callback#onplayfromsearch) methods. They will receive a query string containing a json in following format.
+~~~
+{
+    "ContentSelector":"FREQUENCY",
+    "payload":"98.7 FM HD 1"
+}
+~~~ 
+>**Note** Refer [Local Media Source](../../../../modules/alexa/README.md#handling-local-media-sources) for more information of the ContentSelector and payload.
+
+`supportsSetPreset` This takes a boolean value. It should be set `true` if media source can play media by preset number.
+>**Note** `onPrepareFromSearch` and `onPlayFromSearch` related details given in the above section are applicable for content type PRESET as well.
+
+`supportsSetChannel` This takes a boolean value. It should be set `true` if media source like Sirius XM which can play media by channel name.
+>**Note** `onPrepareFromSearch` and `onPlayFromSearch` related details given in the above section are applicable for content type CHANNEL as well.

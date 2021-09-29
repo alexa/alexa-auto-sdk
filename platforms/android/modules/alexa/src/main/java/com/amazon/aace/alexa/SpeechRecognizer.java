@@ -122,17 +122,17 @@ abstract public class SpeechRecognizer extends PlatformInterface {
     /**
      * Notifies the Engine of a speech recognition event. The Engine will call @c startAudioInput() to notify
      * the platform implementation when to start writing audio samples.
-     * If the initator type is @c HOLD_TO_TALK, then the platform implementation should call @c stopCapture()
+     * If the initiator type is @c HOLD_TO_TALK, then the platform implementation should call @c stopCapture()
      * to terminate speech recognition on release of the press-and-hold action. Otherwise, the Engine will
      * terminate the recognize event when end of speech is detected.
      *
      * @param initiator The @c Initiator type for the speech recognition event
      * @param keywordBegin The sample index where the keyword begins. This is required when the
-     * initator type is @c WAKEWORD, otherwise should be set to @c UNSPECIFIED_INDEX.
+     * initiator type is @c WAKEWORD, otherwise should be set to @c UNSPECIFIED_INDEX.
      * @param keywordEnd The sample index where the keyword ends. This is required when the
-     * initator type is @c WAKEWORD, otherwise should be set to @c UNSPECIFIED_INDEX.
+     * initiator type is @c WAKEWORD, otherwise should be set to @c UNSPECIFIED_INDEX.
      * @param keyword The keyword being recognized, e.g. "alexa". This is required when the
-     * initator type is @c WAKEWORD, otherwise should be set to null.
+     * initiator type is @c WAKEWORD, otherwise should be set to null.
      * @return @c true if the Engine successfully started a recognize event, else @c false
      */
     public final boolean startCapture(Initiator initiator, long keywordBegin, long keywordEnd, String keyword) {

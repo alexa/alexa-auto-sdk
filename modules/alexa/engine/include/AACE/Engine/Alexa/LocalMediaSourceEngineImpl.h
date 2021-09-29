@@ -52,6 +52,7 @@ private:
     using Source = aace::alexa::LocalMediaSource::Source;
 
     std::string getPlayerId(Source source);
+    void setDefaultPlayerFocus();
 
 public:
     static std::shared_ptr<LocalMediaSourceEngineImpl> create(
@@ -63,8 +64,13 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
     // aace::alexa::LocalMediaSourceEngineInterface
-    void onPlayerEvent(const std::string& eventName) override;
-    void onPlayerError(const std::string& errorName, long code, const std::string& description, bool fatal) override;
+    void onPlayerEvent(const std::string& eventName, const std::string& sessionId) override;
+    void onPlayerError(
+        const std::string& errorName,
+        long code,
+        const std::string& description,
+        bool fatal,
+        const std::string& sessionId) override;
     void onSetFocus(bool focusAcquire = true) override;
 
 protected:

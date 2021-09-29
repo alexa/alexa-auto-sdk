@@ -17,16 +17,4 @@
         android:visibility="gone"
         layout="@layout/login_display_cbl_code" />
 
-    <include
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:visibility="gone"
-        layout="@layout/cbl_login_finished" />
-
-    <include
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:visibility="gone"
-        layout="@layout/auth_provider_login_finished" />
-
 </LinearLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,40 +15,34 @@
 
 #include "AACE/Storage/StorageConfiguration.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "AACE/Engine/Utils/JSON/JSON.h"
 
 namespace aace {
 namespace storage {
 namespace config {
+
+// json namespace alias
+namespace json = aace::engine::utils::json;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.storage.config.StorageConfiguationImpl");
 
 std::shared_ptr<aace::core::config::EngineConfiguration> StorageConfiguration::createLocalStorageConfig(
     const std::string& localStoragePath) {
-    rapidjson::Document document;
+    try {
+        // clang-format off
+        json::Value config = {
+            {"aace.storage",{
+                {"localStoragePath",localStoragePath}
+            }}
+        };
+        // clang-format on
 
-    document.SetObject();
-
-    rapidjson::Value aaceStorageNode(rapidjson::kObjectType);
-
-    aaceStorageNode.AddMember(
-        "localStoragePath",
-        rapidjson::Value().SetString(localStoragePath.c_str(), localStoragePath.length()),
-        document.GetAllocator());
-
-    document.AddMember("aace.storage", aaceStorageNode, document.GetAllocator());
-
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-
-    return aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(buffer.GetString()));
+        return aace::core::config::StreamConfiguration::create(json::toStream(config));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return nullptr;
+    }
 }
 
 }  // namespace config

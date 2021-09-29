@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.2.1</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -144,6 +144,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to power on the controller identified by <code>endpointId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -175,6 +176,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to power off the controller identified by <code>endpointId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -206,6 +208,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Retrieves the power state of the controller identified by <code>endpointId</code> from the platform implementation.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -248,6 +251,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to turn on the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -290,6 +294,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to turn off the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -332,6 +337,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Retrieves the power state of the controller identified by <code>endpointId</code> and <code>controllerId</code> from the platform implementation.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -381,6 +387,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to set the range setting of the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -430,6 +437,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to adjust the range setting of the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -473,6 +481,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Retrieves the range value of the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -522,6 +531,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to set the mode of the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -571,6 +581,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to adjust the mode of the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -614,6 +625,7 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Retrieves the mode of the controller identified by <code>endpointId</code> and <code>controllerId</code>.</p>
+<dl class="section note"><dt>Note</dt><dd>The platform implementation must return within 5 seconds. Failure to do so will result in a timeout.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">endpointId</td><td>The unique identifier of the endpoint. </td></tr>
@@ -636,7 +648,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.2.1 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

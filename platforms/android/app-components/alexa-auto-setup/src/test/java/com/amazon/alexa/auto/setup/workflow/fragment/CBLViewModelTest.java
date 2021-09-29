@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
@@ -41,6 +42,8 @@ public class CBLViewModelTest {
     @Mock
     Application mMockApplication;
     @Mock
+    Context mMockContext;
+    @Mock
     AlexaApp mMockAlexaApp;
     @Mock
     AlexaAppRootComponent mMockRootComponent;
@@ -61,6 +64,7 @@ public class CBLViewModelTest {
         try (MockedStatic<AlexaApp> staticMock = Mockito.mockStatic(AlexaApp.class)) {
             staticMock.when(() -> AlexaApp.from(mMockApplication)).thenReturn(mMockAlexaApp);
             when(mMockAlexaApp.getRootComponent()).thenReturn(mMockRootComponent);
+            when(mMockApplication.getApplicationContext()).thenReturn(mMockContext);
             when(mMockRootComponent.getAuthController()).thenReturn(mMockAuthController);
             when(mMockRootComponent.getComponent(LoginUIEventListener.class))
                     .thenReturn(Optional.of(mMockLoginHostBinding));

@@ -20,6 +20,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.amazon.aace.alexa.SpeechRecognizer;
 import com.amazon.aace.audio.AudioOutputProvider;
+import com.amazon.aace.core.PlatformInterface;
 import com.amazon.aace.propertyManager.PropertyManager;
 
 import org.json.JSONObject;
@@ -52,4 +53,8 @@ public interface SampleAppContext {
     void registerAuthStateObserver(AuthStateObserver observer);
 
     void addEngineStatusListener(EngineStatusListener listener);
+
+    void addPlatformInterfaceHandler(String name, PlatformInterface handler);
+
+    public PlatformInterface getPlatformInterfaceHandler(String name);
 }

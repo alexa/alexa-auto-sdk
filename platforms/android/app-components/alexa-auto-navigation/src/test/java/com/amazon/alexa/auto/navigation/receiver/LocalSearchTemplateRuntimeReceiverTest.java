@@ -21,6 +21,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.times;
+
 @RunWith(RobolectricTestRunner.class)
 public class LocalSearchTemplateRuntimeReceiverTest {
     private LocalSearchTemplateRuntimeReceiver mClassUnderTest;
@@ -39,6 +41,7 @@ public class LocalSearchTemplateRuntimeReceiverTest {
                 generateIntent("aacs/RenderTemplateLocalSearchList.json", "com.amazon.aacs.aasb.RenderTemplate");
         mClassUnderTest.onReceive(Mockito.mock(Context.class), renderTemplateIntent);
         ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
+        Mockito.verify(mLocalSearchDirectiveHandler, times(1)).clearTemplate();
         Mockito.verify(mLocalSearchDirectiveHandler, Mockito.times(1))
                 .renderLocalSearchListTemplate(aacsMessageArgumentCaptor.capture());
         AACSMessage aacsMessage = aacsMessageArgumentCaptor.getValue();
@@ -61,6 +64,7 @@ public class LocalSearchTemplateRuntimeReceiverTest {
                 generateIntent("aacs/RenderTemplateLocalSearchDetail.json", "com.amazon.aacs.aasb.RenderTemplate");
         mClassUnderTest.onReceive(Mockito.mock(Context.class), renderTemplateIntent);
         ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
+        Mockito.verify(mLocalSearchDirectiveHandler, times(1)).clearTemplate();
         Mockito.verify(mLocalSearchDirectiveHandler, Mockito.times(1))
                 .renderLocalSearchDetailTemplate(aacsMessageArgumentCaptor.capture());
         AACSMessage aacsMessage = aacsMessageArgumentCaptor.getValue();
@@ -82,7 +86,7 @@ public class LocalSearchTemplateRuntimeReceiverTest {
         Intent clearTemplateIntent = generateIntent("aacs/ClearTemplate.json", "com.amazon.aacs.aasb.ClearTemplate");
         mClassUnderTest.onReceive(Mockito.mock(Context.class), clearTemplateIntent);
         ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
-        Mockito.verify(mLocalSearchDirectiveHandler, Mockito.times(1)).clearTemplate();
+        Mockito.verify(mLocalSearchDirectiveHandler, Mockito.times(1)).clearLocalSearchTemplate();
     }
 
     private Intent generateIntent(String resPath, String action) {

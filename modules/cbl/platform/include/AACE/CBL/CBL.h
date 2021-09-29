@@ -84,7 +84,7 @@ public:
         SUCCESS,
 
         /**
-         * Error occured in the CBL process
+         * Error occurred in the CBL process
          */
         ERROR,
 
@@ -130,7 +130,7 @@ public:
     virtual void clearRefreshToken() = 0;
 
     /**
-     * Notifies the platform implemnentation to set the refresh token
+     * Notifies the platform implementation to set the refresh token
      * 
      * @deprecated This method is being deprecated as this platform interface is being deprecated.
      */
@@ -176,7 +176,7 @@ public:
 
     /**
      * @internal
-     * Sets the Engine interface delagate
+     * Sets the Engine interface delegate
      * 
      * Should *never* be called by the platform implementation
      */

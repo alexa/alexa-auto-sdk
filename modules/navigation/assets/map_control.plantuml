@@ -1,0 +1,32 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant "Alexa"
+
+Driver->SDK: "Alexa, move the map to the left"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+
+
+Alexa->SDK : ControlDisplay directive
+
+SDK->NavigationHandler : controlDisplay(MOVE_LEFT)
+
+NavigationHandler->Nav : move map to left
+
+alt Success
+	NavigationHandler<-Nav : move map left success
+	NavigationHandler->SDK: navigationEvent(MOVED_LEFT)
+    SDK->Alexa : ControlDisplaySuccess event
+else Error
+	NavigationHandler<-Nav : move map left failed
+    NavigationHandler->SDK: navigationError(MOVE_LEFT_FAILED, NOT_SUPPORTED, "")
+    SDK->Alexa : ControlDisplaySuccessFailed event
+end
+@enduml

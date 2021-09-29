@@ -1,3 +1,17 @@
+/*
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexaautoclientservice.modules.alexaClient;
 
 import android.util.Log;
@@ -17,7 +31,8 @@ public class AlexaClientMessageHandler {
     private static final String TAG = AACSConstants.AACS + "-" + AlexaClientMessageHandler.class.getSimpleName();
     private static String sCurrentConnectionState = "";
 
-    private Set<AuthStateObserver> mObservers = new HashSet<>();
+    private Set<AuthStateObserver> mAuthObservers = new HashSet<>();
+    private Set<ConnectionStateObserver> mConnectionObservers = new HashSet<>();
     private String mAuthState = AASBConstants.AlexaClient.AUTH_STATE_UNINITIALIZED;
 
     public static String getCurrentConnectionState() {
@@ -59,11 +74,20 @@ public class AlexaClientMessageHandler {
     }
 
     public void registerAuthStateObserver(AuthStateObserver observer) {
-        synchronized (mObservers) {
+        synchronized (mAuthObservers) {
             if (observer == null)
                 return;
-            mObservers.add(observer);
+            mAuthObservers.add(observer);
             observer.onAuthStateChanged(mAuthState);
+        }
+    }
+
+    public void registerConnectionStateObserver(ConnectionStateObserver observer) {
+        synchronized (mConnectionObservers) {
+            if (observer == null)
+                return;
+            mConnectionObservers.add(observer);
+            observer.onConnectionStateChanged(sCurrentConnectionState);
         }
     }
 
@@ -81,20 +105,32 @@ public class AlexaClientMessageHandler {
             Log.e(TAG, String.format("Failed to parse payload. Error=%s", e.getMessage()));
             return;
         }
+        notifyConnectionStateObservers(status);
         sCurrentConnectionState = status;
     }
 
     private void notifyAuthStateObservers(String authState) {
-        synchronized (mObservers) {
-            for (AuthStateObserver observer : mObservers) {
+        synchronized (mAuthObservers) {
+            for (AuthStateObserver observer : mAuthObservers) {
                 observer.onAuthStateChanged(authState);
             }
         }
     }
 
+    private void notifyConnectionStateObservers(String connectionState) {
+        synchronized (mConnectionObservers) {
+            for (ConnectionStateObserver observer : mConnectionObservers) {
+                observer.onConnectionStateChanged(connectionState);
+            }
+        }
+    }
+
     public void cleanUp() {
-        synchronized (mObservers) {
-            mObservers.clear();
+        synchronized (mAuthObservers) {
+            mAuthObservers.clear();
+        }
+        synchronized (mConnectionObservers) {
+            mConnectionObservers.clear();
         }
     }
 }

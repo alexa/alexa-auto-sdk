@@ -40,7 +40,7 @@ static const std::string AACE_STORAGE_SERVICE_KEY = "aace.storage";
 
 /// The name of the 'carControl' table in the database
 static const std::string CAR_CONTROL_CONFIG_TABLE = "carControl";
-/// The key for the 'configutation' in the database 'carControl' table
+/// The key for the 'configuration' in the database 'carControl' table
 static const std::string CAR_CONTROL_CONFIG_KEY = "configuration";
 
 /// The key for the 'endpoints' node of configuration

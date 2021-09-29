@@ -42,7 +42,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         } catch (IOException e) {
             String exceptionMessage = "";
             if (e.getMessage() == null) {
-                exceptionMessage = "Exception occured. Cannot display message";
+                exceptionMessage = "Exception occurred. Cannot display message";
             } else {
                 exceptionMessage = e.getMessage();
             }

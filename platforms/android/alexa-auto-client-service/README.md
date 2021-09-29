@@ -15,10 +15,12 @@ This document assumes that you understand how the Auto SDK and Alexa Auto Servic
   - [AACS Initialization and Configuration](#aacs-initialization-and-configuration)
 - [Default Platform Implementation](#default-platform-implementation)
   - [Property Content Provider Implementation (Optional)](#property-content-provider-implementation-optional)
+  - [Enabling AACS to synchronize Alexa's Time Zone and Locale with Device Settings (Optional)](#enabling-aacs-to-synchronize-alexas-time-zone-and-locale-with-device-settings-optional)
 - [Including App Components in AACS APK](#including-app-components-in-aacs-apk)
   - [Text-to-Speech Service](#text-to-speech-service)
   - [Contacts Library](#contacts-library)
   - [Telephony Library](#telephony-library)
+  - [Car Control Library](#car-control-library)
   - [Media Player Library](#media-player-library)
 - [Specifying the Intent Targets for Handling Messages](#specifying-the-intent-targets-for-handling-messages)
   - [Using Android Manifest](#using-android-manifest)
@@ -198,7 +200,7 @@ The following documents provide more information about configuration:
     "zones":[]
   },
   "aacs.aasb": {
-    "version": "3.2"
+    "version": "3.3"
   },
   "aacs.general" : {
     "version": "1.0",
@@ -544,6 +546,15 @@ if (mExecutor == null ) {
 
 * Valid property value for `aace.alexa.wakewordEnabled` is `true` or `false`. All the other Auto SDK properties will be validated by Auto SDK. Auto SDK will provide value validation for `aace.alexa.wakewordEnabled` in the future.
 
+### Enabling AACS to synchronize Alexa's Time Zone and Locale with Device Settings (Optional)
+AACS supports synchronizing Alexa's time zone and locale properties with the ones in device settings. To enable the functionality, refer to this [README](android-service/README.md#syncsystempropertychange) for proper configuration. Once enabled, AACS will synchronize the time zone and/or locale properties of Alexa with the device settings in the following conditions:
+* When Auto SDK engine is initialized, both properties will be synchronized with the device settings.
+* When Alexa Client connects, both properties will be synchronized with the device settings.
+* When AACS gets `android.intent.action.LOCALE_CHANGED` intent as a result of device locale setting change, Alexa locale property will be updated.
+* When AACS gets `android.intent.action.TIMEZONE_CHANGED` intent as a result of device time zone setting change, Alexa time zone property will be updated.
+
+If this feature is not enabled, your application can still have the full flexibility in changing the two properties by handling AASB Property Manager messages.
+
 ## Including App Components in AACS APK
 The Auto SDK provides packages (also called "app components") in the `$AAC_SDK_HOME/platforms/android/app-components` directory. App components could be included in AACS APK or in your application to speed up the Alexa integration. The app components supported in the AACS APK are listed below.
 
@@ -557,6 +568,9 @@ AACS Contacts Library provides an implementation of Android Contacts Provider th
 
 ### Telephony Library
 AACS Telephony Library handles AASB `PhoneCallController` messages, enabling Alexa Phone Call Controller functionalities by integrating with Android Telephony Framework. To build and include this library with AACS, see this [README](../app-components/alexa-auto-telephony/README.md).
+
+### Car Control Library
+AACS Car Control Library handles AASB `CarControl` messages, enabling Auto SDK's car control features via deep integration with the Android Automotive OS. To build and include this library with AACS, see the [AACS Car Control Library README](../app-components/alexa-auto-carcontrol/README.md).
 
 ### Media Player Library
 AACS Media Player enables a multi-modal media player experience with Alexa by handling AASB `AudioOutput` messages and the `TemplateRuntime.RenderPlayerInfo` message. It implements a media session so that media can be controlled with standard Android Media Session APIs. This capability also enables Alexa Media with the Android Automotive Media UI. For more information, see this [README](../app-components/alexa-auto-media-player/README.md). 

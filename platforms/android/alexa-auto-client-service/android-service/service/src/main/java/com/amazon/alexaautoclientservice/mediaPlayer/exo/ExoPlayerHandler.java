@@ -490,7 +490,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         Format audioFormat = mPlayer.getAudioFormat();
         if (audioFormat != null && audioFormat.bitrate == Format.NO_VALUE) {
             bufferedBytes = 0;
-        } else if (audioFormat != null)  {
+        } else if (audioFormat != null) {
             long bufferMs = mPlayer.getBufferedPosition() - mPlayer.getCurrentPosition();
             if (bufferMs >= 0) {
                 bufferedBytes = bufferMs * audioFormat.bitrate / 1000 / 8;

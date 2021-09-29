@@ -4,6 +4,10 @@ import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SKI
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SKIP_FORWARD;
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_THUMBS_DOWN;
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_THUMBS_UP;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_NEXT;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_PREVIOUS;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SHUFFLE;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_LOOP;
 
 import android.content.Context;
 
@@ -41,29 +45,71 @@ public class CustomActionProviders {
     @NonNull
     @VisibleForTesting
     CustomActionProvider mThumbsDownNotSelectedProvider;
+    @NonNull
+    @VisibleForTesting
+    CustomActionProvider mShuffleSelectedProvider;
+    @NonNull
+    @VisibleForTesting
+    CustomActionProvider mShuffleNotSelectedProvider;
+    @NonNull
+    @VisibleForTesting
+    CustomActionProvider mLoopSelectedProvider;
+    @NonNull
+    @VisibleForTesting
+    CustomActionProvider mLoopNotSelectedProvider;
+    @NonNull
+    @VisibleForTesting
+    CustomActionProvider mNextDisabledProvider;
+    @NonNull
+    @VisibleForTesting
+    CustomActionProvider mPreviousDisabledProvider;
 
     public CustomActionProviders(@NonNull Context context, @NonNull PlaybackControlMessages messageSender) {
         mSkipForwardProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_skip_forward_selected, context.getString(R.string.playback_control_skip_forward),
-                PlaybackConstants.PlaybackButton.SKIP_FORWARD, false, false);
+                PlaybackConstants.PlaybackButton.SKIP_FORWARD, false, false, false);
         mSkipBackwardProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_skip_backward_selected, context.getString(R.string.playback_control_skip_backward),
-                PlaybackConstants.PlaybackButton.SKIP_BACKWARD, false, false);
+                PlaybackConstants.PlaybackButton.SKIP_BACKWARD, false, false, false);
         mThumbsUpSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_like_selected, context.getString(R.string.playback_control_thumbsup),
                 PlaybackConstants.ToggleButton.THUMBS_UP, true,
-                false); // On click un-select thumbs up
+                false, false); // On click un-select thumbs up
         mThumbsUpNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender, R.drawable.media_like,
                 context.getString(R.string.playback_control_thumbsup), PlaybackConstants.ToggleButton.THUMBS_UP, true,
-                true); // On click select thumbs up
+                true, false); // On click select thumbs up
         mThumbsDownSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_dislike_selected, context.getString(R.string.playback_control_thumbsdown),
                 PlaybackConstants.ToggleButton.THUMBS_DOWN, true,
-                false); // On click un-select thumbs down
+                false, false); // On click un-select thumbs down
         mThumbsDownNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_dislike, context.getString(R.string.playback_control_thumbsdown),
                 PlaybackConstants.ToggleButton.THUMBS_DOWN, true,
-                true); // On click select thumbs down
+                true, false); // On click select thumbs down
+        mShuffleSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
+                R.drawable.media_shuffle_selected, context.getString(R.string.playback_control_shuffle),
+                PlaybackConstants.ToggleButton.SHUFFLE, true,
+                false, false); // On click un-select shuffle
+        mShuffleNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
+                R.drawable.media_shuffle, context.getString(R.string.playback_control_shuffle),
+                PlaybackConstants.ToggleButton.SHUFFLE, true,
+                true, false); // On click select shuffle
+        mLoopSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
+                R.drawable.media_repeat_selected, context.getString(R.string.playback_control_loop),
+                PlaybackConstants.ToggleButton.LOOP, true,
+                false, false); // On click un-select loop
+        mLoopNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
+                R.drawable.media_repeat, context.getString(R.string.playback_control_loop),
+                PlaybackConstants.ToggleButton.LOOP, true,
+                true, false); // On click select loop
+        mPreviousDisabledProvider = new PlaybackControlButtonActionProvider(messageSender,
+                R.drawable.media_skip_previous_disabled, context.getString(R.string.playback_control_previous),
+                PlaybackConstants.PlaybackButton.NEXT, false,
+                false, true);
+        mNextDisabledProvider = new PlaybackControlButtonActionProvider(messageSender,
+                R.drawable.media_skip_next_disabled, context.getString(R.string.playback_control_next),
+                PlaybackConstants.PlaybackButton.PREVIOUS, false,
+                false, true);
     }
 
     /**
@@ -95,6 +141,26 @@ public class CustomActionProviders {
         if (thumbsDown != null) {
             actionProviders.add(
                     thumbsDown.getSelected() ? mThumbsDownSelectedProvider : mThumbsDownNotSelectedProvider);
+        }
+
+        PlaybackControl shuffle = playerInfo.getControl(CONTROL_NAME_SHUFFLE);
+        if (shuffle != null) {
+            actionProviders.add(shuffle.getSelected() ? mShuffleSelectedProvider : mShuffleNotSelectedProvider);
+        }
+
+        PlaybackControl loop = playerInfo.getControl(CONTROL_NAME_LOOP);
+        if (loop != null) {
+            actionProviders.add(loop.getSelected() ? mLoopSelectedProvider : mLoopNotSelectedProvider);
+        }
+
+        PlaybackControl previous = playerInfo.getControl(CONTROL_NAME_PREVIOUS);
+        if (previous != null && !previous.getEnabled()) {
+            actionProviders.add(mPreviousDisabledProvider);
+        }
+
+        PlaybackControl next = playerInfo.getControl(CONTROL_NAME_NEXT);
+        if (next != null && !next.getEnabled()) {
+            actionProviders.add(mNextDisabledProvider);
         }
 
         return actionProviders;

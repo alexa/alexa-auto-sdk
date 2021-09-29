@@ -17,6 +17,7 @@ usageExit() {
 	echo " -c,--clean                 = Do clean."
 	echo " --include-contacts          = Include contacts in AACS Service build"
 	echo " --include-telephony         = Include telephony in AACS Service build"
+	echo " --include-carcontrol         = Include carcontrol in AACS Service build"
 	echo ""
 	exit 1
 }
@@ -45,6 +46,10 @@ while [[ $# -gt 0 ]]; do
 		;;
 		--include-telephony)
 		TELEPHONY="1"
+		shift
+		;;
+		--include-carcontrol)
+		CARCONTROL="1"
 		shift
 		;;
 		--aacs-aar)
@@ -81,6 +86,7 @@ UTILS_DIR="${AACS_DIR}/commonutils"
 TTS_DIR="${APP_COMPONENTS_DIR}/alexa-auto-tts"
 CONTACTS_DIR="${APP_COMPONENTS_DIR}/alexa-auto-contacts/"
 TELEPHONY_DIR="${APP_COMPONENTS_DIR}/alexa-auto-telephony/"
+CARCONTROL_DIR="${APP_COMPONENTS_DIR}/alexa-auto-carcontrol/"
 AAR_DEPLOY_DIR="${DEPLOY_DIR}/aar"
 AACS_AAR_DEPLOY_DIR="${DEPLOY_DIR}/aacs-aar"
 APK_DEPLOY_DIR="${DEPLOY_DIR}/apk"
@@ -222,6 +228,10 @@ if [ "${TELEPHONY}" = 1 ]; then
 	copy_aar ${TELEPHONY_DIR}
 fi
 
+if [ "${CARCONTROL}" = 1 ]; then
+	run_gradle ${CARCONTROL_DIR}
+	copy_aar ${CARCONTROL_DIR}
+fi
 run_aacs_gradle
 
 if [ -d ${ANDROID_SERVICE_LIBS_FOLDER} ]; then

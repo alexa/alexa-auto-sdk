@@ -73,13 +73,14 @@ You can build the Auto SDK for the following operating systems (platforms) and h
 
 During build time, the Auto SDK Builder fetches and builds the dependencies appropriate for the  platform. For license information about the dependencies, go to the following websites:
 
-* [AVS Device SDK v1.19.1](https://github.com/alexa/avs-device-sdk/)
+* [AVS Device SDK v1.22.0](https://github.com/alexa/avs-device-sdk/)
   * [cURL 7.65.3](https://curl.haxx.se/)
   * [ngHTTP2 1.39.1](https://github.com/nghttp2/nghttp2)
   * [SQLite3 3.20.0](https://www.sqlite.org/) or later
   * [OpenSSL 1.1.0](https://www.openssl.org/) or later
 * [Google Test v1.8.0](https://github.com/google/googletest)
 * [libopus 1.3.1](https://opus-codec.org/)
+* [zlib 1.2.11](https://zlib.net)
 * [OpenEmbedded-Core Rocko](https://www.openembedded.org/wiki/OpenEmbedded-Core)
 * [BitBake](https://www.yoctoproject.org/software-overview/)
 * [Android Toolchain](https://www.android.com/)

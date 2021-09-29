@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.2.1</span>
+   &#160;<span id="projectnumber">3.3.0</span>
    </div>
   </td>
  </tr>
@@ -91,31 +91,39 @@ $(function() {
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
 <dt><a class="anchor" id="_deprecated000006"></a>Member <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a08aee7c879ef040c17d32bd9a781a940">aace::alexa::config::AlexaConfiguration::createSettingsConfig</a>  (const std::string &amp;databaseFilePath, const std::string &amp;locale="en-US")</dt>
 <dd>Use <code><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8e556b5044008752d356c6e72b095df5">AlexaConfiguration::createDeviceSettingsConfig()</a></code>. </dd>
-<dt><a class="anchor" id="_deprecated000014"></a>Member <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a67b0af557aa409231020239fa7960255">aace::carControl::config::CarControlConfiguration::addDefaultAssetsPath</a>  (const std::string &amp;path)=0</dt>
+<dt><a class="anchor" id="_deprecated000014"></a>Class <a class="el" href="classaace_1_1alexa_1_1_global_preset.html">aace::alexa::GlobalPreset</a>  </dt>
+<dd>This class will be removed very soon. Use <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> class instead with ContentSelector PRESET  </dd>
+<dt><a class="anchor" id="_deprecated000015"></a>Member <a class="el" href="classaace_1_1alexa_1_1_global_preset.html#a9cecca4284cee3de1215a53bb3b763ea">aace::alexa::GlobalPreset::setGlobalPreset</a>  (int preset)=0</dt>
+<dd>Use <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> class with DEFAULT source with <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#ae2468e3779807990305dfd341ca3d19dae02d6531f660a4cb37e2e978136891f6">LocalMediaSource::ContentSelector::PRESET</a></code> instead Called after receiving a global preset play directive  </dd>
+<dt><a class="anchor" id="_deprecated000016"></a>Member <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a1a1f194d9ecc288b70fa09a04d937e8e">aace::alexa::LocalMediaSource::play</a>  (ContentSelector contentSelectorType, const std::string &amp;payload)</dt>
+<dd>This function will be removed very soon. Use the new <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#acfa5a4b31e25aad959be05d56a495fb8">LocalMediaSource::play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</a></code> instead Called when the user calls play with a content selection type </dd>
+<dt><a class="anchor" id="_deprecated000017"></a>Member <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#ad1217e4c192da618ae846ba57c8611ac">aace::alexa::LocalMediaSource::setFocus</a>  (bool focusAcquire=true)</dt>
+<dd>This function will be removed very soon. Use the <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a7227c31de96b605df8e22b83eb161a32">LocalMediaSource::playerEvent(const std::string&amp; eventName, const std::string&amp; sessionId)</a></code> instead with playbackSessionStarted and playbackSessionEnded events Should be called on local media source player events. This will switch the media focus to that context. Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method.  </dd>
+<dt><a class="anchor" id="_deprecated000018"></a>Member <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#a67b0af557aa409231020239fa7960255">aace::carControl::config::CarControlConfiguration::addDefaultAssetsPath</a>  (const std::string &amp;path)=0</dt>
 <dd></dd>
-<dt><a class="anchor" id="_deprecated000015"></a>Class <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html">aace::cbl::CBL</a>  </dt>
+<dt><a class="anchor" id="_deprecated000019"></a>Class <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html">aace::cbl::CBL</a>  </dt>
 <dd>This platform interface is being deprecated. Use <code><a class="el" href="classaace_1_1authorization_1_1_authorization.html">aace::authorization::Authorization</a></code> instead.  </dd>
-<dt><a class="anchor" id="_deprecated000024"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a08eafdc469f9d7d282878c5caa016237">aace::cbl::CBL::cancel</a>  ()</dt>
+<dt><a class="anchor" id="_deprecated000028"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a08eafdc469f9d7d282878c5caa016237">aace::cbl::CBL::cancel</a>  ()</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000016"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a9d56e447b5e1fa27a79e9c0932af2bab">aace::cbl::CBL::CBLState</a>  </dt>
+<dt><a class="anchor" id="_deprecated000020"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a9d56e447b5e1fa27a79e9c0932af2bab">aace::cbl::CBL::CBLState</a>  </dt>
 <dd>This enum is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000018"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#adf012d535ed61ac2f0df50a8dd01cac7">aace::cbl::CBL::cblStateChanged</a>  (CBLState state, CBLStateChangedReason reason, const std::string &amp;url, const std::string &amp;code)=0</dt>
+<dt><a class="anchor" id="_deprecated000022"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#adf012d535ed61ac2f0df50a8dd01cac7">aace::cbl::CBL::cblStateChanged</a>  (CBLState state, CBLStateChangedReason reason, const std::string &amp;url, const std::string &amp;code)=0</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000017"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a4a095678f1d75f972b59f09b7c3aae0a">aace::cbl::CBL::CBLStateChangedReason</a>  </dt>
+<dt><a class="anchor" id="_deprecated000021"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a4a095678f1d75f972b59f09b7c3aae0a">aace::cbl::CBL::CBLStateChangedReason</a>  </dt>
 <dd>This enum is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000019"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#aabf78f56e306cc7cfe0d46ac084fbaf1">aace::cbl::CBL::clearRefreshToken</a>  ()=0</dt>
+<dt><a class="anchor" id="_deprecated000023"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#aabf78f56e306cc7cfe0d46ac084fbaf1">aace::cbl::CBL::clearRefreshToken</a>  ()=0</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000021"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#ae957213803bd5ca4a6a19d4133160963">aace::cbl::CBL::getRefreshToken</a>  ()=0</dt>
+<dt><a class="anchor" id="_deprecated000025"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#ae957213803bd5ca4a6a19d4133160963">aace::cbl::CBL::getRefreshToken</a>  ()=0</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000025"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a6b9bf59fb1f4a358273851049b2a74b6">aace::cbl::CBL::reset</a>  ()</dt>
+<dt><a class="anchor" id="_deprecated000029"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a6b9bf59fb1f4a358273851049b2a74b6">aace::cbl::CBL::reset</a>  ()</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated. </dd>
-<dt><a class="anchor" id="_deprecated000020"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#aeb62feeb8cdaad65b1d8dea41f243d7b">aace::cbl::CBL::setRefreshToken</a>  (const std::string &amp;refreshToken)=0</dt>
+<dt><a class="anchor" id="_deprecated000024"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#aeb62feeb8cdaad65b1d8dea41f243d7b">aace::cbl::CBL::setRefreshToken</a>  (const std::string &amp;refreshToken)=0</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000022"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a5ce90c8c986bdb7afa6ce7fcfb6a4be5">aace::cbl::CBL::setUserProfile</a>  (const std::string &amp;name, const std::string &amp;email)=0</dt>
+<dt><a class="anchor" id="_deprecated000026"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a5ce90c8c986bdb7afa6ce7fcfb6a4be5">aace::cbl::CBL::setUserProfile</a>  (const std::string &amp;name, const std::string &amp;email)=0</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000023"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf">aace::cbl::CBL::start</a>  ()</dt>
+<dt><a class="anchor" id="_deprecated000027"></a>Member <a class="el" href="classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf">aace::cbl::CBL::start</a>  ()</dt>
 <dd>This method is being deprecated as this platform interface is being deprecated.  </dd>
-<dt><a class="anchor" id="_deprecated000026"></a>Member <a class="el" href="classaace_1_1cbl_1_1config_1_1_c_b_l_configuration.html#a5a70191fa2181583b169248fa94dcecb">aace::cbl::config::CBLConfiguration::createCBLUserProfileConfig</a>  (bool enableUserProfile)</dt>
+<dt><a class="anchor" id="_deprecated000030"></a>Member <a class="el" href="classaace_1_1cbl_1_1config_1_1_c_b_l_configuration.html#a5a70191fa2181583b169248fa94dcecb">aace::cbl::config::CBLConfiguration::createCBLUserProfileConfig</a>  (bool enableUserProfile)</dt>
 <dd>This method is deprecated, use <code>createCBLConfig</code> instead.</dd>
 </dl>
 </div></div><!-- contents -->
@@ -123,7 +131,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.2.1 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

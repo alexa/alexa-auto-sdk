@@ -97,7 +97,7 @@ sudo apt-get install -y gstreamer1.0-libav \
                         libgstreamer1.0-dev
 ```
 
->**Note:** The command sequence above installs the minimum set of GStreamer libraries and plugins required by the [System Audio extension](../../extensions/experimental/system-audio/README.md) for audio capture/playback on Linux and Mac. See [Recommended Media Support](https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html) for a list of codecs, containers, streaming formats, and playlists that your product should support to provide a familiar Alexa experience to your customers.
+>**Note:** The command sequence above installs the minimum set of GStreamer libraries and plugins required by the [System Audio extension](../../extensions/system-audio/README.md) for audio capture/playback on Linux and Mac. See [Recommended Media Support](https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html) for a list of codecs, containers, streaming formats, and playlists that your product should support to provide a familiar Alexa experience to your customers.
 
 ## Building the C++ Sample App
 
@@ -144,7 +144,7 @@ $ LD_LIBRARY_PATH=/opt/AAC/lib \
 
 >**Note:** The `config.json` file contains your device information and Alexa settings. The [menu file](./assets/menu.json) drives the hierarchical interactive text based menu system. Refer to the [menu documentation](./assets/MENU.md) for more information.
 >
->When you run the C++ Sample App, a `config-system-audio.json` file with default audio settings for Linux platforms is copied to `/opt/AAC/etc`. For information about how to modify these settings for QNX, see the [System Audio extension README](../../extensions/experimental/system-audio/README.md#running-the-c-sampleapp-with-the-audio-configuration).
+>When you run the C++ Sample App, a `config-system-audio.json` file with default audio settings for Linux platforms is copied to `/opt/AAC/etc`. For information about how to modify these settings for QNX, see the [System Audio extension README](../../extensions/system-audio/README.md#running-the-c-sampleapp-with-the-audio-configuration).
 
 ### Authenticating with AVS using Code-Based Linking (CBL)
 
@@ -228,11 +228,11 @@ The C++ Sample App supports the [BlackBerry QNX Multimedia Suite](https://blackb
 
 >**Note:** The SHOUTcast/lcecast streaming format is not supported.
 
-See the [System Audio extension README](../../extensions/experimental/system-audio/README.md) for details about configuring audio input and output on QNX platforms.
+See the [System Audio extension README](../../extensions/system-audio/README.md) for details about configuring audio input and output on QNX platforms.
 
 ### AudioFile Menu
 
-The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](./assets/MENU.md#audiofile) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the [System Audio](../../extensions/experimental/system-audio/README.md) configuration defined in the config-system-audio.json file.
+The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](./assets/MENU.md#audiofile) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the [System Audio](../../extensions/system-audio/README.md) configuration defined in the config-system-audio.json file.
 
 >**Note:** The AudioFile menu appears on platforms that do not provide built-in audio support (such as platforms that are under development). On platforms that provide built-in audio support, the AudioFile menu does not appear. 
 

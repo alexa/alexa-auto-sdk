@@ -201,6 +201,20 @@ std::string AASBCBL::getRefreshToken() {
 }
 
 void AASBCBL::setUserProfile(const std::string& name, const std::string& email) {
+    try {
+        AACE_VERBOSE(LX(TAG));
+
+        auto m_messageBroker_lock = m_messageBroker.lock();
+        ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
+
+        aasb::message::cbl::cbl::SetUserProfileMessage message;
+        message.payload.name = name;
+        message.payload.email = email;
+
+        m_messageBroker_lock->publish(message.toString()).send();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 }  // namespace cbl

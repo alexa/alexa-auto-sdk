@@ -36,7 +36,7 @@ private:
     /**
      * Constructor
      * 
-     * @param authProvider The reference to the platform implemenation of @c AuthProvider
+     * @param authProvider The reference to the platform implementation of @c AuthProvider
      */
     AuthProviderEngineImpl(std::shared_ptr<aace::alexa::AuthProvider> authProvider);
 
@@ -112,11 +112,14 @@ private:
     /// Synchronizes @c AuthProviderEngineInterface calls with @c AuthorizationProviderListenerInterface callbacks that update @c m_state.
     std::condition_variable m_cv;
 
+    /// Lock for conditional variable @c m_cv
+    std::mutex m_cvMutex;
+
     /// Indicates falling back to AUTHORIZING state after log out.
     bool m_resetToAuthorizingState;
 
     /// To serialize access to @c m_state
-    std::mutex m_mutex;
+    std::mutex m_stateMutex;
 };
 
 }  // namespace alexa

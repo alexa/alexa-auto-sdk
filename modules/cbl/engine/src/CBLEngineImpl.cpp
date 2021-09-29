@@ -158,7 +158,7 @@ void CBLEngineImpl::disable() {
 void CBLEngineImpl::onStart() {
     AACE_DEBUG(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStart", {METRIC_CBL_START});
-    // Explict start, pass empty data.
+    // Explicit start, pass empty data.
     m_cblAuthorizationProvider->startAuthorizationLegacy("", true);
 }
 
@@ -172,7 +172,7 @@ void CBLEngineImpl::onReset() {
     AACE_DEBUG(LX(TAG));
     try {
         emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onReset", {METRIC_CBL_RESET});
-        // Keeping the backward compatiblity by synchronizing the logout process.
+        // Keeping the backward compatibility by synchronizing the logout process.
         if (!m_cblAuthorizationProvider->logout()) {
             Throw("logoutFailed");
         }

@@ -14,8 +14,16 @@
         app:title="@string/setting_voice_assistance_nonalexa"
         app:layout="@layout/alexa_preference_layout"/>
     <Preference
+        app:key="voice-assistance-enable-nonalexa"
+        app:title="@string/setting_voice_assistance_enable_nonalexa"
+        app:layout="@layout/alexa_preference_layout"/>
+    <Preference
         app:key="voice-assistance-alexa"
         app:title="@string/setting_voice_assistance_alexa"
+        app:layout="@layout/alexa_preference_layout"/>
+    <Preference
+        app:key="voice-assistance-enable-alexa"
+        app:title="@string/setting_voice_assistance_enable_alexa"
         app:layout="@layout/alexa_preference_layout"/>
 
     <!-- General Settings -->
@@ -28,6 +36,16 @@
         app:title="@string/setting_alexa_hands_free_title"
         app:summary="@string/setting_alexa_hands_free_summary"
         app:defaultValue="true"
+        app:layout="@layout/alexa_preference_layout" />
+    <Preference
+        app:key="voice-assistance-push-to-talk"
+        app:title="@string/setting_voice_assistance_setting_push_to_talk"
+        app:layout="@layout/alexa_preference_layout"/>
+    <SwitchPreferenceCompat
+        app:key="alexa-location-consent-setting"
+        app:title="@string/setting_location_sharing_title"
+        app:summary="@string/setting_location_sharing_summary"
+        app:defaultValue="false"
         app:layout="@layout/alexa_preference_layout" />
     <Preference
         app:key="alexa-communication"

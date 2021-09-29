@@ -21,7 +21,7 @@ The Loopback Detector extension solves this issue by capturing speaker reference
 Your system must provide:
 `aace::audio::AudioInputProvider::AudioInputType::LOOPBACK` type of audio via an `aace::audio::AudioInputProvider` implementation. This audio source should be the final mix of audio output (i.e. speaker reference/monitor).
 
->**Note:** If you are using the System Audio extension, see the [System Audio extension README](../experimental/system-audio/README.md) for details about how to provide the `LOOPBACK` type of audio.
+>**Note:** If you are using the System Audio extension, see the [System Audio extension README](../system-audio/README.md) for details about how to provide the `LOOPBACK` type of audio.
 
 ### Building with the Loopback Detector Extension
 
@@ -40,7 +40,7 @@ You will need the following software running on a Linux system:
 * GStreamer
 * Advanced Linux Sound Architecture (ALSA) `snd_aloop` module
 
-If you are using the [System Audio extension](../experimental/system-audio/README.md), the Auto SDK (and all other applications on Linux) will use PulseAudio to output audio by default. PulseAudio mixes all audio then plays it through a hardware device. We need to capture this "final mix result" into the GStreamer pipeline and pass it through directly into the ALSA loopback device so the Auto SDK can capture this audio. To do this, follow these steps:
+If you are using the [System Audio extension](../system-audio/README.md), the Auto SDK (and all other applications on Linux) will use PulseAudio to output audio by default. PulseAudio mixes all audio then plays it through a hardware device. We need to capture this "final mix result" into the GStreamer pipeline and pass it through directly into the ALSA loopback device so the Auto SDK can capture this audio. To do this, follow these steps:
 
 1. Make sure the `snd_aloop` module is loaded into kernel by running `sudo modprobe snd_aloop`.
 1. Use this command to launch the GStreamer pipeline:

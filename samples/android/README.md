@@ -206,6 +206,31 @@ ArrayList<EngineConfiguration> configuration = new ArrayList<EngineConfiguration
     ...
 ));
 ```
+### Using the NetworkStatsManager in the Android Sample App
+The Android Sample App provides a sample implementation called the `NetworkStatsManagerRunner` which uses the in-built Android `NetworkStatsManager` to capture network usage data of your Alexa application. The `NetworkStatsManagerRunner` captures the network usage data every 5 minutes and reports it to Auto SDK using the `DeviceUsage` platform interface. 
+
+You can use the `NetworkStatsManagerRunner` directly with your `DeviceUsage` handler to report the network usage data. Refer to [DeviceUsage Handler](./app/src/main/java/com/amazon/sampleapp/impl/DeviceUsage/DeviceUsageHandler.java) and [NetworkStatsManager](./app/src/main/java/com/amazon/sampleapp/NetworkStatsManagerRunner.java) for more details.
+
+Few points to note while using the NetworkStatsManager with Android Sample App:
+
+* NetworkStatsManager is only supported for Android (M) (API level 23 and higher). 
+
+* If the Android version of your device is lower than 10 (Android Q): The Android Sample App needs the `android.permission.READ_PHONE_STATE` permission to access the `subscriber id` (associated to the eSIM of a user), which is required to query the network consumption over the `MOBILE` interface. Declare the `READ_PHONE_STATE` permission in your manifest and grant this permission to the Android Sample App during runtime.
+
+* If the Android version of your device is 10 (Android Q) or higher: The Android Sample App must be installed as a privileged system application and it must have the `android.permission.READ_PRIVILEGED_PHONE_STATE` privileged permission in order to be able to get the `subscriber id`.
+
+* If you install the Android Sample App as a system app, make sure your have the following `privapp-permissions-com.amazon.sampleapp.xml` file under the `/etc/permissions` directory on your device:
+
+```xml
+    <?xml version="1.0" encoding="utf-8"?>
+    <permissions>
+	    <privapp-permissions package="com.amazon.sampleapp">
+        <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+        </privapp-permissions>
+    </permissions>
+```
+
+For details about how to use NetworkStatsManager, see the [NetworkStatsManager documentation](https://developer.android.com/reference/android/app/usage/NetworkStatsManager)
 
 ## Debugging Notes
 

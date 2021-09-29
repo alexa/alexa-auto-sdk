@@ -1,0 +1,58 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant "Alexa"
+
+== Adding a waypoint ==
+
+Driver->SDK: "Add Starbucks to the route"
+SDK-> NavigationHandler : getNavigationState()
+NavigationHandler -->SDK : navigation context
+SDK -> Alexa : Recognize event with context
+
+Alexa->SDK : StartNavigation directive with updated waypoints
+
+SDK->NavigationHandler : startNavigation(payload for navigation with updated waypoints
+
+NavigationHandler->Nav : Update the route with the\nwaypoints and start/continue navigation
+NavigationHandler<-Nav : navigation started
+NavigationHandler->SDK: navigationEvent(NAVIGATION_STARTED)
+SDK->NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK->Alexa : StartNavigationSuccess event
+Alexa->Driver : "Adding Starbucks to the route" TTS
+
+== Removing a waypoint ==
+
+Driver->SDK: "Remove Starbucks from the route"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+Alexa->SDK : StartNavigation directive with updated waypoints
+SDK->NavigationHandler : startNavigation(payload for navigation with updated waypoints)
+NavigationHandler->Nav : Update the route with the\nwaypoints and start/continue navigation
+
+alt Success
+	NavigationHandler<-Nav : navigation started
+    NavigationHandler->SDK: navigationEvent(NAVIGATION_STARTED)
+    SDK->NavigationHandler : getNavigationState()
+	activate NavigationHandler
+	NavigationHandler -->SDK : navigation context
+	deactivate NavigationHandler
+    SDK->Alexa : StartNavigationSuccess event
+    Alexa->Driver : "Removing Starbucks from the route" TTS
+else Error
+	NavigationHandler<-Nav : navigation failed
+    NavigationHandler->SDK: navigationError(NAVIGATION_START_FAILED , INTERNAL_SERVICE_ERROR , "")
+    SDK->Alexa : StartNavigationError event
+    Alexa->Driver : "Sorry, cannot remove Starbucks from your route" TTS OR Other error response
+end
+
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant Alexa
+
+Driver->SDK: "Show my recent trips"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+
+Alexa->SDK : ShowPreviousWaypoints directive
+
+SDK->NavigationHandler : showPreviousWaypoints()
+NavigationHandler->Nav : show driver's previous waypoints
+
+alt Success
+	NavigationHandler<-Nav : previous waypoints shown
+    NavigationHandler->SDK: navigationEvent(PREVIOUS_WAYPOINTS_SHOWN)
+    SDK->Alexa : ShowPreviousWaypointsSuccess event
+    Alexa->Driver : "OK, here is what I found in your recent trips" TTS
+else Error
+	NavigationHandler<-Nav : no previous waypoints
+    NavigationHandler->SDK: navigationError(NO_PREVIOUS_WAYPOINTS, INTERNAL_SERVICE_ERROR , "")
+    SDK->Alexa : ShowPreviousWaypointsError event
+    Alexa->Driver : "Sorry, I could not find anything in your recent trips" TTS
+end
+@enduml

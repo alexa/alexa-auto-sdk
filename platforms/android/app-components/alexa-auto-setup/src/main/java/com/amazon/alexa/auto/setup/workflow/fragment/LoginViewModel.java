@@ -16,6 +16,7 @@ import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthState;
 import com.amazon.alexa.auto.apis.auth.AuthStatus;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
+import com.amazon.alexa.auto.apis.auth.UserIdentity;
 import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
@@ -86,11 +87,6 @@ public class LoginViewModel extends AndroidViewModel {
         return mAuthWorkflowState;
     }
 
-    public void signInLater() {
-        // When user chooses to sign in later, we will start another authorization way with auth provider.
-        EventBus.getDefault().post(new AuthWorkflowData(AuthState.Auth_Provider_Auth_Started, null, null));
-    }
-
     /**
      * Start the new Authorization Login workflow.
      *
@@ -143,12 +139,37 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     /**
+     * User expressed her/his intent to switch the login process.
+     */
+    public void userSwitchedLogin(AuthMode authMode) {
+        Log.d(TAG, "Login Workflow finished");
+
+        if (mUIEventListener != null) {
+            mUIEventListener.loginSwitched(authMode);
+        }
+    }
+
+    /**
      * Logout.
      */
     public void logout() {
         Log.d(TAG, "Logout.");
 
         mAuthController.logOut();
+    }
+
+    /**
+     * Get user's first name from user identity data.
+     */
+    public String getUserFirstName() {
+        Log.d(TAG, "Getting user's first name");
+
+        UserIdentity userIdentity = mAuthController.getUserIdentity();
+        if (userIdentity != null) {
+            return userIdentity.getUserName().split(" ")[0];
+        }
+
+        return null;
     }
 
     /**
@@ -215,7 +236,8 @@ public class LoginViewModel extends AndroidViewModel {
                         .distinctUntilChanged()
                         .subscribe(authStatus -> {
                             if (authStatus) {
-                                if (mAuthController.getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
+                                if (mAuthController.getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)
+                                        && mAuthController.isAuthenticated()) {
                                     Log.d(TAG, "CBL auth is finished, skipping the CBL login step.");
                                     mAuthWorkflowState.setValue(
                                             new AuthWorkflowData(AuthState.CBL_Auth_Finished, null, null));

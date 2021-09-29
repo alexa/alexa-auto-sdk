@@ -72,25 +72,9 @@
         android:layout_height="@dimen/login_qr_code_size"
         android:layout_gravity="center|bottom"
         android:layout_marginTop="@dimen/login_item_margin_top"
-        app:layout_constraintBottom_toTopOf="@+id/skip_cbl_action_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cbl_code" />
-
-    <TextView
-        android:id="@+id/skip_cbl_action_button"
-        style="@style/Alexa.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginStart="@dimen/login_button_margin_start"
-        android:layout_marginBottom="@dimen/login_button_margin_bottom"
-        android:text="@string/login_later_action_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/qr_code"
-        android:visibility="invisible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

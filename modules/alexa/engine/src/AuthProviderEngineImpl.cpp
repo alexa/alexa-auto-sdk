@@ -109,7 +109,7 @@ void AuthProviderEngineImpl::doShutdown() {
 void AuthProviderEngineImpl::startAuthorization() {
     AACE_DEBUG(LX(TAG));
     try {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_stateMutex);
         ThrowIf(m_state == AuthProviderEngineState::AUTHORIZING, "authorizationInProgress");
         ThrowIf(m_state == AuthProviderEngineState::AUTHORIZED, "authorizationAlreadyActive");
 
@@ -117,7 +117,8 @@ void AuthProviderEngineImpl::startAuthorization() {
             Throw("startAuthorizationFailed");
         }
         // Wait for confirmation callback from authorization provider before considering this synchronous event complete
-        if (!m_cv.wait_for(lock, START_AUTH_TIMEOUT, [this]() {
+        std::unique_lock<std::mutex> cv_lock(m_cvMutex);
+        if (!m_cv.wait_for(cv_lock, START_AUTH_TIMEOUT, [this]() {
                 return (m_state == AuthProviderEngineState::AUTHORIZING || m_state == AuthProviderEngineState::ERROR);
             })) {
             AACE_ERROR(LX("startAuthorizationFailed").d("reason", "timeout"));
@@ -130,7 +131,7 @@ void AuthProviderEngineImpl::startAuthorization() {
 void AuthProviderEngineImpl::stopAuthorization() {
     AACE_DEBUG(LX(TAG));
     try {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_stateMutex);
         ThrowIf(m_state == AuthProviderEngineState::UNAUTHORIZED, "authorizationNotActive");
 
         // Between stop and start of the Engine, the customer Id  might have changed.
@@ -147,7 +148,8 @@ void AuthProviderEngineImpl::stopAuthorization() {
             }
         }
         // Wait for confirmation callback from authorization provider before considering this synchronous event complete
-        if (!m_cv.wait_for(lock, DEFAULT_TIMEOUT, [this]() {
+        std::unique_lock<std::mutex> cv_lock(m_cvMutex);
+        if (!m_cv.wait_for(cv_lock, DEFAULT_TIMEOUT, [this]() {
                 return (m_state == AuthProviderEngineState::UNAUTHORIZED || m_state == AuthProviderEngineState::ERROR);
             })) {
             AACE_ERROR(LX("logoutOrCancelAuthorizationFailed").d("reason", "timeout"));
@@ -168,7 +170,7 @@ void AuthProviderEngineImpl::onAuthStateChanged(AuthState authState, AuthError a
         {METRIC_AUTH_PROVIDER_AUTH_STATE_CHANGED, state.str(), error.str()});
     AACE_DEBUG(LX(TAG).d("authState", authState).d("authError", authError));
     try {
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_stateMutex);
         ThrowIf(m_state == AuthProviderEngineState::UNAUTHORIZED, "authorizationNotActive");
 
         json payload;
@@ -227,7 +229,7 @@ void AuthProviderEngineImpl::onAuthorizationStateChanged(
     AACE_DEBUG(LX(TAG).d("service", service).d("state", state));
     try {
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
-        std::unique_lock<std::mutex> lock(m_mutex);
+        std::unique_lock<std::mutex> lock(m_cvMutex);
         if (state == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING) {
             m_state = AuthProviderEngineState::AUTHORIZING;
         } else if (state == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZED) {
@@ -257,7 +259,7 @@ void AuthProviderEngineImpl::onAuthorizationError(
         } else if (error == "START_AUTHORIZATION_FAILED" || error == "LOGOUT_FAILED") {
             AACE_ERROR(LX(TAG).d("service", service).d("error", error));
             m_resetToAuthorizingState = false;
-            std::unique_lock<std::mutex> lock(m_mutex);
+            std::unique_lock<std::mutex> lock(m_cvMutex);
             m_state = AuthProviderEngineState::ERROR;
             lock.unlock();
 

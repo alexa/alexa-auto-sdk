@@ -22,6 +22,7 @@ import com.amazon.alexaautoclientservice.util.FileUtil;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -127,7 +128,7 @@ public class TestFileUtil {
                 TestUtil.readConfig(mTestContext.getAssets().open(TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE));
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(!FileUtil.isPersistentSystemService(mContext));
+        Assert.assertFalse(FileUtil.isEnabledInAACSGeneralConfig("persistentSystemService"));
     }
 
     @Test
@@ -136,7 +137,7 @@ public class TestFileUtil {
                 TestUtil.readConfig(mTestContext.getAssets().open(TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE));
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(FileUtil.isStartServiceOnBootEnabled(mContext));
+        assertTrue(FileUtil.isEnabledInAACSGeneralConfig("startServiceOnBootEnabled"));
     }
 
     @Test

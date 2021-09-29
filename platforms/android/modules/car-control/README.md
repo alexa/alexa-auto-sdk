@@ -63,18 +63,6 @@ The Alexa Auto SDK provides a list of IDs for the "default assets," which form a
 
 By combining these elements, you can build a [Car Control module configuration](#configuring-the-car-control-module), which the Auto SDK Engine uses to advertise the features available in the vehicle to Alexa, and implement the corresponding [platform interface](#implementing-platform-interface) to map the directives from a user's voice request to the intended target feature.
 
-
-### Car Control Module Architecture <a id ="car-control-architecture"></a>
-
-The following diagram illustrates the high-level Car Control module architecture:
-
-<p align="center">
-<img src="./assets/carcontrol_online.png"/>
-</p>
-
-* The Auto SDK Car Control module uses the Car Control configuration and assets to build the infrastructure necessary to operate.
-* Car control directives are sent to the Car Control module from the Alexa cloud.
-
 ### Car Control Sequence Diagram
 
 The following diagram illustrates a sample car control sequence based on the utterance "Alexa, set the temperature to 70":

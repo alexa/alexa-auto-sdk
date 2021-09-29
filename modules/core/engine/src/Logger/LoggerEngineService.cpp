@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,11 +27,15 @@
 #include "AACE/Engine/Logger/Sinks/FileSink.h"
 #include "AACE/Engine/Logger/Sinks/SyslogSink.h"
 #include "AACE/Engine/Utils/JSON/JSON.h"
+#include "AACE/Engine/Utils/String/StringUtils.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
 namespace logger {
+
+// json alias
+namespace json = aace::engine::utils::json;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.logger.LoggerEngineService");
@@ -66,40 +70,34 @@ bool LoggerEngineService::initialize() {
 
 bool LoggerEngineService::configure(std::shared_ptr<std::istream> configuration) {
     try {
-        auto document = aace::engine::utils::json::parse(configuration);
-        ThrowIfNull(document, "parseConfigurationStreamFailed");
+        auto root = json::toJson(configuration);
+        ThrowIfNull(root, "parseConfigurationFailed");
 
-        auto loggerConfigRoot = document->GetObject();
-
-        if (loggerConfigRoot.HasMember("sinks") && loggerConfigRoot["sinks"].IsArray()) {
-            auto sinks = loggerConfigRoot["sinks"].GetArray();
-
-            for (unsigned int j = 0; j < sinks.Size(); j++) {
-                auto sink = createSink(sinks[j]);
-
+        auto sinkConfigList = json::get(root, "/sinks", json::Type::array);
+        if (sinkConfigList != nullptr) {
+            for (int j = 0; j < sinkConfigList.size(); j++) {
+                auto sink = createSink(sinkConfigList[j]);
+                ThrowIfNull(sink, "createSinkFailed");
                 // add the sink to the engine logger
-                if (sink != nullptr) {
-                    EngineLogger::getInstance()->addSink(sink);
+                if (!EngineLogger::getInstance()->addSink(sink)) {
+                    AACE_ERROR(LX(TAG).m("addSinkFailed"));
                 }
             }
         }
 
-        if (loggerConfigRoot.HasMember("rules") && loggerConfigRoot["rules"].IsArray()) {
-            auto rules = loggerConfigRoot["rules"].GetArray();
-
-            for (unsigned int j = 0; j < rules.Size(); j++) {
-                auto obj = rules[j].GetObject();
-
-                if (obj.HasMember("sink") && obj["sink"].IsString() && obj.HasMember("rule") &&
-                    obj["rule"].IsObject()) {
-                    auto sink = EngineLogger::getInstance()->getSink(obj["sink"].GetString());
-
-                    if (sink != nullptr) {
-                        auto rule = createRule(obj["rule"].GetObject());
-
-                        if (rule != nullptr) {
-                            sink->addRule(rule);
-                        }
+        auto rulesConfigList = json::get(root, "/rules", json::Type::array);
+        if (rulesConfigList != nullptr) {
+            for (int j = 0; j < rulesConfigList.size(); j++) {
+                auto next = rulesConfigList[j];
+                auto sinkId = json::get(next, "/sink", json::Type::string);
+                if (sinkId != nullptr) {
+                    auto sink = EngineLogger::getInstance()->getSink(sinkId);
+                    ThrowIfNull(sink, "invalidSink");
+                    auto ruleConfig = json::get(next, "/rule", json::Type::object);
+                    if (ruleConfig != nullptr) {
+                        auto rule = createRule(ruleConfig);
+                        ThrowIfNull(rule, "createRuleFailed");
+                        sink->addRule(rule);
                     }
                 }
             }
@@ -112,85 +110,62 @@ bool LoggerEngineService::configure(std::shared_ptr<std::istream> configuration)
     }
 }
 
-std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSink(const rapidjson::Value& config) {
+std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSink(
+    const aace::engine::utils::json::Value& config) {
     try {
-        auto obj = config.GetObject();
+        auto id = json::get(config, "/id", json::Type::string);
+        ThrowIfNull(id, "invalidOrMissingId");
 
-        ThrowIfNot(obj.HasMember("id") && obj["id"].IsString(), "invalidOrMissingConfigData");
-        ThrowIfNot(obj.HasMember("type") && obj["type"].IsString(), "invalidOrMissingConfigData");
-
-        std::string id = obj["id"].GetString();
-        std::string type = obj["type"].GetString();
-
-        // convert the type to lower case
-        std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c) -> unsigned char {
-            return static_cast<unsigned char>(std::tolower(c));
-        });
+        auto type = json::get(config, "/type", json::Type::string);
+        ThrowIfNull(type, "invalidOrMissingType");
 
         // create the new sink
         std::shared_ptr<aace::engine::logger::sink::Sink> sink = nullptr;
 
-        if (type == "aace.logger.sink.console") {
+        if (aace::engine::utils::string::equal(type, "aace.logger.sink.console", false)) {
             sink = aace::engine::logger::sink::ConsoleSink::create(id);
-        } else if (type == "aace.logger.sink.syslog") {
+        } else if (aace::engine::utils::string::equal(type, "aace.logger.sink.syslog", false)) {
             sink = aace::engine::logger::sink::SyslogSink::create(id);
-        } else if (type == "aace.logger.sink.file") {
-            ThrowIfNot(obj.HasMember("config") && obj["config"].IsObject(), "invalidOrMissingConfigData");
+        } else if (aace::engine::utils::string::equal(type, "aace.logger.sink.file", false)) {
+            auto path = json::get(config, "/config/path", json::Type::string);
+            ThrowIfNull(path, "invalidOrMissingConfigPath");
 
-            auto config = obj["config"].GetObject();
-
-            ThrowIfNot(config.HasMember("path") && config["path"].IsString(), "invalidOrMissingConfigData");
-
-            std::string path = config["path"].GetString();
-            std::string prefix =
-                config.HasMember("prefix") && config["prefix"].IsString() ? config["prefix"].GetString() : "aace";
-            uint32_t maxSize =
-                config.HasMember("maxSize") && config["maxSize"].IsUint() ? config["maxSize"].GetUint() : 1048576;
-            uint32_t maxFiles =
-                config.HasMember("maxFiles") && config["maxFiles"].IsUint() ? config["maxFiles"].GetUint() : 3;
-            bool append = config.HasMember("append") && config["append"].IsBool() ? config["append"].GetBool() : true;
+            std::string prefix = json::get(config, "/config/prefix", "aace");
+            uint32_t maxSize = json::get(config, "/config/maxSize", (uint64_t)1048576);
+            uint32_t maxFiles = json::get(config, "/config/maxFiles", (uint64_t)3);
+            bool append = json::get(config, "/config/append", true);
 
             sink = aace::engine::logger::sink::FileSink::create(id, path, prefix, maxSize, maxFiles, append);
         } else {
-            Throw("invalideSinkType");
+            Throw("invalidSinkType");
         }
 
         // fail if the sink could not be created
-        ThrowIfNull(sink, "couldNotCreateSink");
+        ThrowIfNull(sink, "createSinkFailed");
 
-        if (obj.HasMember("rules") && obj["rules"].IsArray()) {
-            auto rules = obj["rules"].GetArray();
-
-            for (unsigned int j = 0; j < rules.Size(); j++) {
-                auto rule = createRule(rules[j]);
-
-                if (rule != nullptr) {
-                    sink->addRule(rule);
-                }
+        auto rulesConfigList = json::get(config, "/rules", json::Type::array);
+        if (rulesConfigList != nullptr) {
+            for (int j = 0; j < rulesConfigList.size(); j++) {
+                auto rule = createRule(rulesConfigList[j]);
+                ThrowIfNull(rule, "createRuleFailed");
+                sink->addRule(rule);
             }
         }
 
         return sink;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "createSink").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return nullptr;
     }
 }
 
-std::shared_ptr<aace::engine::logger::sink::Rule> LoggerEngineService::createRule(const rapidjson::Value& config) {
+std::shared_ptr<aace::engine::logger::sink::Rule> LoggerEngineService::createRule(
+    const aace::engine::utils::json::Value& config) {
     try {
-        auto obj = config.GetObject();
-
-        std::string level = obj.HasMember("level") && obj["level"].IsString() ? obj["level"].GetString()
-                                                                              : aace::engine::logger::sink::Rule::EMPTY;
-        std::string source = obj.HasMember("source") && obj["source"].IsString()
-                                 ? obj["source"].GetString()
-                                 : aace::engine::logger::sink::Rule::EMPTY;
-        std::string tag = obj.HasMember("tag") && obj["tag"].IsString() ? obj["tag"].GetString()
-                                                                        : aace::engine::logger::sink::Rule::EMPTY;
-        std::string message = obj.HasMember("message") && obj["message"].IsString()
-                                  ? obj["message"].GetString()
-                                  : aace::engine::logger::sink::Rule::EMPTY;
+        std::string level = json::get(config, "/level", aace::engine::logger::sink::Rule::EMPTY);
+        std::string source = json::get(config, "/source", aace::engine::logger::sink::Rule::EMPTY);
+        std::string tag = json::get(config, "/tag", aace::engine::logger::sink::Rule::EMPTY);
+        std::string message = json::get(config, "/message", aace::engine::logger::sink::Rule::EMPTY);
 
         return aace::engine::logger::sink::Rule::create(level, source, tag, message);
     } catch (std::exception& ex) {

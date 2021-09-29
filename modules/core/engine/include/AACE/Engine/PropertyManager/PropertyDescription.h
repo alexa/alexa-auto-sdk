@@ -54,7 +54,7 @@ public:
      * @param [out] bool Flag set to @c true by the setter to indicate whether
      *        the setter returns asynchronously
      * @return @c true if the property value was updated or set to the current
-     *         setting, else @c false if an error occured.
+     *         setting, else @c false if an error occurred.
      */
     using Setter = std::function<bool(const std::string&, bool&, bool&, const SetterCallback&)>;
 

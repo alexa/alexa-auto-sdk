@@ -1,5 +1,8 @@
 package com.amazon.alexa.auto.settings;
 
+import android.content.Intent;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -12,13 +15,25 @@ import androidx.navigation.NavDestination;
 import androidx.navigation.NavGraph;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.amazon.alexa.auto.apis.alexaCustomAssistant.AlexaSettingsProvider;
-import com.amazon.alexa.auto.apis.alexaCustomAssistant.AlexaSetupProvider;
+import com.amazon.aacsconstants.AACSConstants;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.SettingsProvider;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.SetupProvider;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.AssistantManager;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
+import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupWorkflowController;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.settings.databinding.SettingsActivityLayoutBinding;
+import com.amazon.alexa.auto.setup.receiver.NetworkStateChangeReceiver;
 import com.amazon.alexa.auto.setup.workflow.AlexaSetupWorkflowControllerImpl;
+
+import java.util.Optional;
+
+import static com.amazon.aacsconstants.NetworkConstants.ANDROID_CONNECTIVITY_CHANGE_ACTION;
+import static com.amazon.alexa.auto.apps.common.Constants.CBL_START;
+import static com.amazon.alexa.auto.apps.common.Constants.SETUP_DONE;
+import static com.amazon.alexa.auto.apps.common.Constants.VOICE_ASSISTANCE;
 
 /**
  * Activity to Alexa Auto Settings.
@@ -35,8 +50,13 @@ public class SettingsActivity extends AppCompatActivity {
 
     private AlexaApp mApp;
 
+    private AssistantManager mAssistantManager;
+    private AlexaSetupController mAlexaSetupController;
+    private boolean isAlexaCustomAssistantEnabled;
+
     // State.
     private boolean mShouldExitAfterFinishingLogin = false;
+    private NetworkStateChangeReceiver networkStateChangeReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,15 +72,32 @@ public class SettingsActivity extends AppCompatActivity {
 
         mApp = AlexaApp.from(this);
 
+        if (ModuleProvider.isAlexaCustomAssistantEnabled(getApplicationContext())) {
+            if (mAssistantManager == null) {
+                mAssistantManager = fetchAssistantManager(this);
+            }
+
+            if (mAlexaSetupController == null) {
+                mAlexaSetupController = fetchAlexaSetupController(this);
+            }
+
+            isAlexaCustomAssistantEnabled = true;
+        }
+
         startObservingAuthEvents();
         startObservingNavigationEvents();
 
         mShouldExitAfterFinishingLogin = getIntent().getBooleanExtra(EXTRAS_SHOULD_EXIT_ACTIVITY_AFTER_LOGIN, false);
+        requestAacsExtraModules();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        IntentFilter intentFilter = new IntentFilter(ANDROID_CONNECTIVITY_CHANGE_ACTION);
+        networkStateChangeReceiver = new NetworkStateChangeReceiver();
+        this.registerReceiver(networkStateChangeReceiver, intentFilter);
 
         setupNavigationBarListener();
     }
@@ -68,6 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        this.unregisterReceiver(networkStateChangeReceiver);
     }
 
     /**
@@ -76,10 +114,14 @@ public class SettingsActivity extends AppCompatActivity {
      */
     private void startObservingAuthEvents() {
         mViewModel.getAuthState().observe(this, state -> {
+            Log.d(TAG, "auth state changed");
             boolean currentNavDestinationIsLogin = isCurrentNavigationDestinationLogin();
+            boolean isSetupCompleted = mAlexaSetupController != null && mAlexaSetupController.isSetupCompleted();
+
             Log.d(TAG,
                     "Auth State changed. state:" + state
-                            + " is-current-destination-login:" + currentNavDestinationIsLogin);
+                            + " is-current-destination-login:" + currentNavDestinationIsLogin
+                            + " is-setup-completed:" + isSetupCompleted);
 
             switch (state) {
                 case LOGGED_IN:
@@ -93,7 +135,7 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                     break;
                 case LOGGED_OUT:
-                    if (!currentNavDestinationIsLogin) {
+                    if (!isSetupCompleted && !currentNavDestinationIsLogin) {
                         resetNavigationGraphWithLoginAsInitialDestination();
                     }
                     break;
@@ -138,20 +180,45 @@ public class SettingsActivity extends AppCompatActivity {
         // TODO: the actual BACK behavior will be confirmed with UX team, current solution is a place
         // holder
         mViewBinding.navigationBar.navigateBackButton.setOnClickListener(view -> {
-            if (getNavigationController().getCurrentDestination().getId() == R.id.navigation_fragment_login
-                    || getNavigationController().getCurrentDestination().getId() == R.id.navigation_fragment_network
-                    || getNavigationController().getCurrentDestination().getId()
-                            == R.id.navigation_fragment_startLanguageSelection
-                    || getNavigationController().getCurrentDestination().getId()
-                            == R.id.navigation_fragment_communication
-                    || getNavigationController().getCurrentDestination().getId()
-                            == R.id.navigation_fragment_authProviderAuthenticatedFinish
-                    || getNavigationController().getCurrentDestination().getId()
-                            == R.id.navigation_fragment_cblLoginFinish
+            int id = getNavigationController().getCurrentDestination().getId();
+            if (id == R.id.navigation_fragment_network
+                    || id == R.id.navigation_fragment_startLanguageSelection
+                    || id == R.id.navigation_fragment_communication
+                    || id == R.id.navigation_fragment_login
                     || !getNavigationController().popBackStack()) {
                 finish();
+            } else if (id == R.id.navigation_fragment_setupNotComplete
+                    || id == R.id.navigation_fragment_enablePreviewMode
+                    || id == R.id.navigation_fragment_cblLoginError) {
+                resetSetupWorkflow();
+            } else if (id == R.id.navigation_fragment_cblStart
+                    || id == R.id.cbl_loading_layout
+                    || (isAlexaCustomAssistantEnabled &&
+                        id == mApp.getRootComponent()
+                                .getComponent(SetupProvider.class)
+                                .get()
+                                .getSetupResId(CBL_START))) {
+                // When user starts cbl login, preview mode auth gets deactivated in AACS
+                // This is a temp logic until fixed in AACS layer
+                mViewModel.transitionToLoggedOutState();
+            } else if (id == R.id.navigation_fragment_authProviderAuthenticatedFinish
+                    || id == R.id.navigation_fragment_cblLoginFinish) {
+                resetNavigationGraphToOriginalState();
             }
         });
+    }
+
+    /**
+     * Reset setup workflow to go back to the start
+     */
+    private void resetSetupWorkflow() {
+        mApp.getRootComponent()
+                .getComponent(AlexaSetupWorkflowController.class)
+                .ifPresent(alexaSetupWorkflowController -> {
+                    alexaSetupWorkflowController.stopSetupWorkflow();
+                    alexaSetupWorkflowController.startSetupWorkflow(getApplicationContext(),
+                            getNavigationController(), null);
+                });
     }
 
     /**
@@ -162,6 +229,16 @@ public class SettingsActivity extends AppCompatActivity {
     private boolean isCurrentNavigationDestinationLogin() {
         NavController navController = getNavigationController();
         NavDestination currentDestination = navController.getCurrentDestination();
+
+        if (mApp.getRootComponent().getComponent(SetupProvider.class).isPresent()) {
+            Log.d(TAG, "Checking destination provided by SetupProvider");
+            SetupProvider setupProvider =
+                    mApp.getRootComponent().getComponent(SetupProvider.class).get();
+            int setupDoneDestination = setupProvider.getSetupResId(SETUP_DONE);
+            if (currentDestination != null && currentDestination.getId() == setupDoneDestination) {
+                return true;
+            }
+        }
 
         return currentDestination != null
                 && (currentDestination.getId() == R.id.navigation_fragment_login
@@ -180,12 +257,12 @@ public class SettingsActivity extends AppCompatActivity {
         NavController controller = getNavigationController();
         NavGraph graph = controller.getNavInflater().inflate(R.navigation.setup_navigation);
 
-        if (mApp.getRootComponent().getComponent(AlexaSetupProvider.class).isPresent()) {
-            Log.d(TAG, "Using navigation graph provided by AlexaSetupProvider");
-            AlexaSetupProvider alexaSetupProvider =
-                    mApp.getRootComponent().getComponent(AlexaSetupProvider.class).get();
-            graph = controller.getNavInflater().inflate(alexaSetupProvider.getCustomSetupNavigationGraph());
-            graph.setStartDestination(alexaSetupProvider.getSetupWorkflowStartDestination());
+        if (mApp.getRootComponent().getComponent(SetupProvider.class).isPresent()) {
+            Log.d(TAG, "Using navigation graph provided by SetupProvider");
+            SetupProvider setupProvider =
+                    mApp.getRootComponent().getComponent(SetupProvider.class).get();
+            graph = controller.getNavInflater().inflate(setupProvider.getCustomSetupNavigationGraph());
+            graph.setStartDestination(setupProvider.getSetupWorkflowStartDestinationByKey(VOICE_ASSISTANCE));
         }
 
         controller.setGraph(graph);
@@ -210,11 +287,11 @@ public class SettingsActivity extends AppCompatActivity {
         NavController controller = getNavigationController();
         NavGraph graph = controller.getNavInflater().inflate(R.navigation.setup_navigation);
 
-        if (mApp.getRootComponent().getComponent(AlexaSetupProvider.class).isPresent()) {
-            Log.d(TAG, "Using navigation graph provided by AlexaSetupProvider");
-            AlexaSetupProvider alexaSetupProvider =
-                    mApp.getRootComponent().getComponent(AlexaSetupProvider.class).get();
-            graph = controller.getNavInflater().inflate(alexaSetupProvider.getCustomSetupNavigationGraph());
+        if (mApp.getRootComponent().getComponent(SetupProvider.class).isPresent()) {
+            Log.d(TAG, "Using navigation graph provided by SetupProvider");
+            SetupProvider setupProvider =
+                    mApp.getRootComponent().getComponent(SetupProvider.class).get();
+            graph = controller.getNavInflater().inflate(setupProvider.getCustomSetupNavigationGraph());
         }
 
         graph.setStartDestination(R.id.navigation_fragment_cblStart);
@@ -241,12 +318,12 @@ public class SettingsActivity extends AppCompatActivity {
         NavGraph graph = controller.getNavInflater().inflate(R.navigation.settings_navigation);
         graph.setStartDestination(R.id.navigation_fragment_alexa_settings_home);
 
-        if (mApp.getRootComponent().getComponent(AlexaSettingsProvider.class).isPresent()) {
-            Log.d(TAG, "Using navigation graph provided by AlexaSettingsProvider");
-            AlexaSettingsProvider alexaSettingsProvider =
-                    mApp.getRootComponent().getComponent(AlexaSettingsProvider.class).get();
-            graph = controller.getNavInflater().inflate(alexaSettingsProvider.getCustomSettingNavigationGraph());
-            graph.setStartDestination(alexaSettingsProvider.getSettingStartDestination());
+        if (mApp.getRootComponent().getComponent(SettingsProvider.class).isPresent()) {
+            Log.d(TAG, "Using navigation graph provided by SettingsProvider");
+            SettingsProvider settingsProvider =
+                    mApp.getRootComponent().getComponent(SettingsProvider.class).get();
+            graph = controller.getNavInflater().inflate(settingsProvider.getCustomSettingNavigationGraph());
+            graph.setStartDestination(settingsProvider.getSettingStartDestination());
         }
 
         controller.setGraph(graph);
@@ -258,5 +335,35 @@ public class SettingsActivity extends AppCompatActivity {
                     alexaSetupWorkflowController.stopSetupWorkflow();
                     mApp.getRootComponent().deactivateScope(AlexaSetupWorkflowController.class);
                 });
+    }
+
+    /**
+     * Send intent to AACS requesting Service Metadata which includes extra modules. Reply handled by
+     * @see AACSMetadataReceiver class
+     */
+    private void requestAacsExtraModules() {
+        Intent intent = new Intent();
+        intent.setAction(AACSConstants.IntentAction.GET_SERVICE_METADATA);
+        intent.addCategory(AACSConstants.IntentCategory.GET_SERVICE_METADATA);
+        intent.putExtra(AACSConstants.REPLY_TYPE, AACSConstants.REPLY_TYPE_RECEIVER);
+        intent.putExtra(AACSConstants.REPLY_TO_PACKAGE, getApplicationContext().getPackageName());
+        intent.putExtra(AACSConstants.REPLY_TO_CLASS, AACSMetadataReceiver.class.getName());
+
+        getApplicationContext().sendBroadcast(intent);
+        Log.d(TAG, "Sending broadcast to get AACS service metadata");
+    }
+
+    @VisibleForTesting
+    AlexaSetupController fetchAlexaSetupController(@NonNull Context context) {
+        AlexaApp app = AlexaApp.from(context);
+        return app.getRootComponent().getAlexaSetupController();
+    }
+
+    @VisibleForTesting
+    AssistantManager fetchAssistantManager(@NonNull Context context) {
+        AlexaApp app = AlexaApp.from(context);
+        Optional<AssistantManager> assistantManager =
+                app.getRootComponent().getComponent(AssistantManager.class);
+        return assistantManager.orElse(null);
     }
 }

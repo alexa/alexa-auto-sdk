@@ -59,19 +59,23 @@ ApplicationContext::ApplicationContext(const std::string& path) {
 }
 
 void ApplicationContext::addAudioFilePath(const std::string& audioFilePath) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_audioFilePaths.push_back(audioFilePath);
     m_testAutomation = true;
 }
 
 void ApplicationContext::addConfigFilePath(const std::string& configFilePath) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_configFilePaths.push_back(configFilePath);
 }
 
 void ApplicationContext::addMenuFilePath(const std::string& menuFilePath) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_menuFilePaths.push_back(menuFilePath);
 }
 
 void ApplicationContext::clearLevel() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_logEnabled = false;
 }
 
@@ -89,18 +93,22 @@ std::string ApplicationContext::executeCommand(const char* command) {
 }
 
 std::string ApplicationContext::getApplicationDirPath() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_applicationDirPath;
 }
 
 std::string ApplicationContext::getApplicationPath() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_applicationPath;
 }
 
 std::string ApplicationContext::getAudioInputDevice() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_audioInputDevice;
 }
 
 std::string ApplicationContext::getBrowserCommand() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_browserCommand;
 }
 
@@ -113,10 +121,12 @@ std::string ApplicationContext::getBuildIdentifier() {
 }
 
 std::string ApplicationContext::getConfigFilePath(size_t index) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_configFilePaths[index];
 }
 
 std::vector<std::string> ApplicationContext::getConfigFilePaths() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_configFilePaths;
 }
 
@@ -132,6 +142,7 @@ std::string ApplicationContext::getDirPath(const std::string& path) {
 }
 
 logger::LoggerHandler::Level ApplicationContext::getLevel() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_level;
 }
 
@@ -140,10 +151,12 @@ int ApplicationContext::getMaximumAVSVolume() {
 };
 
 std::string ApplicationContext::getMediaPlayerCommand() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_mediaPlayerCommand;
 }
 
 json ApplicationContext::getMenu(const std::string& id) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_menuRegister.count(id)) {
         return m_menuRegister.at(id);
     }
@@ -151,10 +164,12 @@ json ApplicationContext::getMenu(const std::string& id) {
 }
 
 std::vector<std::string> ApplicationContext::getMenuFilePaths() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_menuFilePaths;
 }
 
 json ApplicationContext::getMenuItemValue(const std::string& id, const json defaultValue) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_menuRegister.count(id)) {
         auto menu = m_menuRegister.at(id);
         if (menu.count("index") && menu.count("item")) {
@@ -167,24 +182,15 @@ json ApplicationContext::getMenuItemValue(const std::string& id, const json defa
             }
         }
     }
-    return getMenuValue(id, defaultValue);
+    return getMenuValueLocked(id, defaultValue);
 }
 
 json* ApplicationContext::getMenuPtr(const std::string& id) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_menuRegister.count(id)) {
         return &m_menuRegister.at(id);
     }
     return nullptr;
-}
-
-json ApplicationContext::getMenuValue(const std::string& id, const json defaultValue) {
-    if (m_menuRegister.count(id)) {
-        auto menu = m_menuRegister.at(id);
-        if (menu.count("value")) {
-            return menu.at("value");
-        }
-    }
-    return defaultValue;
 }
 
 int ApplicationContext::getMinimumAVSVolume() {
@@ -192,18 +198,22 @@ int ApplicationContext::getMinimumAVSVolume() {
 };
 
 std::string ApplicationContext::getNetworkIdentifier() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_networkIdentifier;
 }
 
 std::string ApplicationContext::getPayloadScriptCommand() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_payloadScriptCommand;
 }
 
 bool ApplicationContext::hasMenu(const std::string& id) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_menuRegister.count(id) == 1;
 }
 
 bool ApplicationContext::hasRefreshToken(const std::string& service) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_authorizationData[service]["refreshToken"].empty()) {
         return true;
     }
@@ -224,10 +234,12 @@ bool ApplicationContext::isAlexaCommsSupported() {
 }
 
 bool ApplicationContext::isAudioFileSupported() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_audioFileSupported;
 }
 
 bool ApplicationContext::isAutoAuthorizationDisabled() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_disableAutoAuthorization;
 }
 
@@ -256,14 +268,17 @@ bool ApplicationContext::isLocalVoiceControlSupported() {
 }
 
 bool ApplicationContext::isLogEnabled() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_logEnabled;
 }
 
 bool ApplicationContext::isSingleThreadedUI() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_singleThreadedUI;
 }
 
 bool ApplicationContext::isTestAutomation() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_testAutomation;
 }
 
@@ -276,10 +291,12 @@ bool ApplicationContext::isWakeWordSupported() {
 }
 
 bool ApplicationContext::isMessagingResponsesEnabled() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_messagingResponsesEnabled;
 }
 
 bool ApplicationContext::isAuthProviderAuthorizationActive() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_activeAuthorization == "alexa:auth-provider") {
         return true;
     }
@@ -287,6 +304,7 @@ bool ApplicationContext::isAuthProviderAuthorizationActive() {
 }
 
 bool ApplicationContext::isAuthProviderAuthorizationInProgress() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_authorizationInProgress == "alexa:auth-provider") {
         return true;
     }
@@ -294,10 +312,12 @@ bool ApplicationContext::isAuthProviderAuthorizationInProgress() {
 }
 
 bool ApplicationContext::isAuthProviderSupported() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_authProviderAvailable;
 }
 
 bool ApplicationContext::isCBLAuthorizationActive() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_activeAuthorization == "alexa:cbl") {
         return true;
     }
@@ -305,6 +325,7 @@ bool ApplicationContext::isCBLAuthorizationActive() {
 }
 
 bool ApplicationContext::isCBLAuthorizationInProgress() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_authorizationInProgress == "alexa:cbl") {
         return true;
     }
@@ -312,6 +333,7 @@ bool ApplicationContext::isCBLAuthorizationInProgress() {
 }
 
 std::string ApplicationContext::makeTempPath(const std::string& name, const std::string& extension) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     static std::map<std::string, unsigned> Count{};
     if (Count.count(name) == 0) {
         Count[name] = 0;
@@ -322,6 +344,7 @@ std::string ApplicationContext::makeTempPath(const std::string& name, const std:
 }
 
 std::string ApplicationContext::popAudioFilePath() {
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_audioFilePaths.empty()) {
         return {};
     }
@@ -331,6 +354,7 @@ std::string ApplicationContext::popAudioFilePath() {
 }
 
 std::size_t ApplicationContext::registerMenu(const std::string& id, const json& menu) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     std::size_t result = m_menuRegister.count(id) + 1;
     m_menuRegister[id] = menu;
     return result;
@@ -348,6 +372,7 @@ bool ApplicationContext::saveContent(const std::string& path, const std::string&
 }
 
 void ApplicationContext::setActiveAuthorization(const std::string& service) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_activeAuthorization = service;
     m_authorizationInProgress = "";
 
@@ -366,26 +391,32 @@ void ApplicationContext::setActiveAuthorization(const std::string& service) {
 }
 
 void ApplicationContext::setAudioFileSupported(bool audioFileSupported) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_audioFileSupported = audioFileSupported;
 }
 
 void ApplicationContext::setAudioInputDevice(const std::string& audioInputDevice) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_audioInputDevice = audioInputDevice;
 }
 
 void ApplicationContext::setAuthorizationInProgress(const std::string& service) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_authorizationInProgress = service;
 }
 
 void ApplicationContext::setAuthProviderAvailability(bool available) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_authProviderAvailable = available;
 }
 
 void ApplicationContext::setBrowserCommand(const std::string& browserCommand) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_browserCommand = browserCommand;
 }
 
 void ApplicationContext::setDisableAutoAuthorizationCommand(bool disable) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_disableAutoAuthorization = disable;
     if (m_disableAutoAuthorization == true) {
         // Reset the active authorization state that is read from the file system
@@ -394,34 +425,45 @@ void ApplicationContext::setDisableAutoAuthorizationCommand(bool disable) {
 }
 
 void ApplicationContext::setLevel(const logger::LoggerHandler::Level level) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_logEnabled = true;
     m_level = level;
 }
 
 void ApplicationContext::setMediaPlayerCommand(const std::string& mediaPlayerCommand) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_mediaPlayerCommand = mediaPlayerCommand;
 }
 
 void ApplicationContext::setNetworkIdentifier(const std::string& networkIdentifier) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_networkIdentifier = networkIdentifier;
 }
 
 void ApplicationContext::setPayloadScriptCommand(const std::string& payloadScriptCommand) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_payloadScriptCommand = payloadScriptCommand;
 }
 
 void ApplicationContext::setSingleThreadedUI(bool singleThreadedUI) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_singleThreadedUI = singleThreadedUI;
 }
 
 void ApplicationContext::setMessagingResponses(bool messagingResponses) {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_messagingResponsesEnabled = messagingResponses;
 }
 
 // private
 
 std::string ApplicationContext::getAuthorizationData(const std::string& service, const std::string& key) {
-    return m_authorizationData[service][key];
+    std::lock_guard<std::mutex> lock(m_mutex);
+    try {
+        return m_authorizationData.at(service).at(key);
+    } catch (std::out_of_range& ex) {
+        return "";
+    }
 }
 
 void ApplicationContext::setAuthorizationData(
@@ -433,6 +475,7 @@ void ApplicationContext::setAuthorizationData(
     // FOR MORE INFORMATION ON SECURITY REQUIREMENTS.
 
     // JUST TO FACILITATE TESTING AND VERIFICATION, THIS SAMPLE APP SHALL STORE TOKEN ON THE FILE SYSTEM.
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_authorizationData[service][key] = data;
     if (key == "refreshToken") {
         auto path = m_applicationDirPath + "/token-" + service;
@@ -442,6 +485,16 @@ void ApplicationContext::setAuthorizationData(
             saveContent(path, data);
         }
     }
+}
+
+json ApplicationContext::getMenuValueLocked(const std::string& id, const json defaultValue) {
+    if (m_menuRegister.count(id)) {
+        auto menu = m_menuRegister.at(id);
+        if (menu.count("value")) {
+            return menu.at("value");
+        }
+    }
+    return defaultValue;
 }
 
 bool ApplicationContext::testExpression(const std::string& value) {

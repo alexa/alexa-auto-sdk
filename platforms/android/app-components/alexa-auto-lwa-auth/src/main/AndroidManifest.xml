@@ -29,6 +29,7 @@
                 <action android:name="com.amazon.aacs.aasb.SetRefreshToken" />
                 <action android:name="com.amazon.aacs.aasb.ClearRefreshToken" />
                 <action android:name="com.amazon.aacs.aasb.CBLStateChanged" />
+                <action android:name="com.amazon.aacs.aasb.SetUserProfile" />
             </intent-filter>
         </receiver>
 
@@ -41,6 +42,14 @@
                 <action android:name="com.amazon.aacs.aasb.GetAuthorizationData" />
                 <action android:name="com.amazon.aacs.aasb.AuthorizationStateChanged" />
                 <action android:name="com.amazon.aacs.aasb.AuthorizationError" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="com.amazon.alexa.auto.lwa.AlexaClientReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AlexaClient" />
+                <action android:name="com.amazon.aacs.aasb.ConnectionStatusChanged"/>
             </intent-filter>
         </receiver>
 

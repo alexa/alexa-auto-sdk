@@ -30,28 +30,15 @@ import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 
 import java.util.Set;
 
+import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
+import static com.amazon.aacstelephony.Constants.PBAP_CLIENT_PROFILE_ID;
+
 public class BluetoothStateListener extends BroadcastReceiver {
     private static final String TAG = AACSConstants.AACS + "-" + BluetoothStateListener.class.getSimpleName();
-    private static int PBAP_CLIENT_PROFILE_ID;
-    private static int HEADSET_CLIENT_PROFILE_ID;
     private AACSMessageSender mAACSMessageSender;
 
     public BluetoothStateListener(@NonNull AACSMessageSender aacsMessageSender) {
         mAACSMessageSender = aacsMessageSender;
-        try {
-            PBAP_CLIENT_PROFILE_ID = (int) BluetoothProfile.class.getField(Constants.PBAP_CLIENT).get(null);
-            HEADSET_CLIENT_PROFILE_ID = (int) BluetoothProfile.class.getField(Constants.HEADSET_CLIENT).get(null);
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error occurred when looking up the profile IDs." + e.toString());
-        }
-    }
-
-    BluetoothStateListener(@NonNull AACSMessageSender aacsMessageSender, @NonNull int pbapClientProfileId,
-            @NonNull int headsetClientProfileId) {
-        mAACSMessageSender = aacsMessageSender;
-        PBAP_CLIENT_PROFILE_ID = pbapClientProfileId;
-        HEADSET_CLIENT_PROFILE_ID = headsetClientProfileId;
     }
 
     public void initialConnectionCheck(@NonNull Context context) {

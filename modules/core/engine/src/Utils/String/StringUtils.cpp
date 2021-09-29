@@ -24,7 +24,7 @@ namespace utils {
 namespace string {
 
 bool equal(const std::string& str1, const std::string& str2, bool caseSensitive) {
-    // return immedieately if the string length is different
+    // return immediately if the string length is different
     ReturnIf(str1.size() != str2.size(), false);
 
     // call std::strcmp for case sensitive comparison

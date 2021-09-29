@@ -654,7 +654,7 @@ TEST_F(AddressBookCloudUploaderTest, VerifyPhoneNumberInputSanity) {
                         {
                             {"HOME", "123456789"}, 
                             {"HOME", "123456789"}, // Adding HOME label again
-                            {"RANDOM_LABEL1", "123456789"}, // Some radom label name
+                            {"RANDOM_LABEL1", "123456789"}, // Some random label name
                             {"12345678", "123456789"}, // Label as numbers
                             {"WORK", "STRING"}, // Phone number as string.
                             {"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUV","1234"}, // Label has 100 characters

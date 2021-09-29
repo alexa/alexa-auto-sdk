@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['phonecallcontroller',['PhoneCallController',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html',1,'aace::phoneCallController']]],
-  ['phonecallcontrollerengineinterface',['PhoneCallControllerEngineInterface',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html',1,'aace::phoneCallController']]],
-  ['platforminterface',['PlatformInterface',['../classaace_1_1core_1_1_platform_interface.html',1,'aace::core']]],
-  ['playbackcontroller',['PlaybackController',['../classaace_1_1alexa_1_1_playback_controller.html',1,'aace::alexa']]],
-  ['playbackcontrollerengineinterface',['PlaybackControllerEngineInterface',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html',1,'aace::alexa']]],
-  ['playbackstate',['PlaybackState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html',1,'aace::alexa::ExternalMediaAdapter::PlaybackState'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html',1,'aace::alexa::LocalMediaSource::PlaybackState']]],
-  ['propertymanager',['PropertyManager',['../classaace_1_1property_manager_1_1_property_manager.html',1,'aace::propertyManager']]]
+  ['navigation',['Navigation',['../classaace_1_1navigation_1_1_navigation.html',1,'aace::navigation']]],
+  ['navigationconfiguration',['NavigationConfiguration',['../classaace_1_1navigation_1_1config_1_1_navigation_configuration.html',1,'aace::navigation::config']]],
+  ['networkinfoprovider',['NetworkInfoProvider',['../classaace_1_1network_1_1_network_info_provider.html',1,'aace::network']]],
+  ['networkinfoproviderengineinterface',['NetworkInfoProviderEngineInterface',['../classaace_1_1network_1_1_network_info_provider_engine_interface.html',1,'aace::network']]],
+  ['notifications',['Notifications',['../classaace_1_1alexa_1_1_notifications.html',1,'aace::alexa']]]
 ];

@@ -35,6 +35,7 @@ import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.aacsipc.TargetComponent;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AlexaClientMessageHandler;
+import com.amazon.alexaautoclientservice.modules.alexaClient.ConnectionStateObserver;
 import com.amazon.alexaautoclientservice.modules.audioInput.AudioInputMessageHandler;
 import com.amazon.alexaautoclientservice.modules.audioOutput.AudioOutputMessageHandler;
 import com.amazon.alexaautoclientservice.receiver.InstrumentationReceiver;
@@ -218,6 +219,12 @@ public class AASBHandler extends AASB {
             publish(message);
         } else {
             Log.e(TAG, "Failed to publish AASB message");
+        }
+    }
+
+    public void registerConnectionStateObserver(ConnectionStateObserver connectionStateObserver) {
+        if (connectionStateObserver != null) {
+            mAlexaClient.registerConnectionStateObserver(connectionStateObserver);
         }
     }
 

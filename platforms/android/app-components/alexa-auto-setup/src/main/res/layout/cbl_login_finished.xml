@@ -18,7 +18,6 @@
         android:layout_marginTop="@dimen/login_item_margin_top"
         android:src="@drawable/amazon_alexa_placeholder_logo"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/qr_code_title_textview"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -93,10 +92,10 @@
 
     <TextView
         android:id="@+id/cbl_login_finished_btn"
-        style="@style/Alexa.Button"
+        style="@style/Alexa.Button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/login_item_margin_top"
+        android:layout_marginBottom="@dimen/action_button_margin_bottom"
         android:text="@string/login_all_done_btn_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

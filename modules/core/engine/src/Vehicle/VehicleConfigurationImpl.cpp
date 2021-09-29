@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Vehicle/VehicleConfiguration.h"
-
-#include <rapidjson/document.h>
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "AACE/Engine/Utils/JSON/JSON.h"
 
 namespace aace {
 namespace vehicle {
 namespace config {
+
+// json namespace alias
+namespace json = aace::engine::utils::json;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.vehicle.config.VehicleConfiguationImpl");
@@ -61,57 +61,46 @@ std::string getVehiclePropertyAttribute(VehiclePropertyType property) {
 
 std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::createVehicleInfoConfig(
     const std::vector<VehicleProperty>& propertyList) {
-    rapidjson::Document document;
+    try {
+        json::Value info = {};
 
-    document.SetObject();
+        for (auto next : propertyList) {
+            std::string name = getVehiclePropertyAttribute(next.first);
+            json::Value value = next.second;
+            json::set(info, name, value);
+        }
 
-    rapidjson::Value aaceVehicleNode(rapidjson::kObjectType);
-    rapidjson::Value infoNode(rapidjson::kObjectType);
+        // clang-format off
+        json::Value config = {
+            {"aace.vehicle",{
+                {"info",info}
+            }}
+        };
+        // clang-format on
 
-    for (auto next : propertyList) {
-        std::string name = getVehiclePropertyAttribute(next.first);
-
-        infoNode.AddMember(
-            rapidjson::Value().SetString(name.c_str(), name.length(), document.GetAllocator()),
-            rapidjson::Value().SetString(next.second.c_str(), next.second.length(), document.GetAllocator()),
-            document.GetAllocator());
+        return aace::core::config::StreamConfiguration::create(json::toStream(config));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return nullptr;
     }
-
-    aaceVehicleNode.AddMember("info", infoNode, document.GetAllocator());
-
-    document.AddMember("aace.vehicle", aaceVehicleNode, document.GetAllocator());
-
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-
-    return aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(buffer.GetString()));
 }
 
 std::shared_ptr<aace::core::config::EngineConfiguration> VehicleConfiguration::createOperatingCountryConfig(
     const std::string& operatingCountry) {
-    rapidjson::Document document;
+    try {
+        // clang-format off
+        json::Value config = {
+            {"aace.vehicle",{
+                {"operatingCountry",operatingCountry}
+            }}
+        };
+        // clang-format on
 
-    document.SetObject();
-
-    rapidjson::Value aaceVehicleNode(rapidjson::kObjectType);
-
-    aaceVehicleNode.AddMember(
-        "operatingCountry",
-        rapidjson::Value().SetString(operatingCountry.c_str(), operatingCountry.length()),
-        document.GetAllocator());
-
-    document.AddMember("aace.vehicle", aaceVehicleNode, document.GetAllocator());
-
-    // create event string
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-
-    return aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(buffer.GetString()));
+        return aace::core::config::StreamConfiguration::create(json::toStream(config));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return nullptr;
+    }
 }
 
 }  // namespace config

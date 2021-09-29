@@ -89,7 +89,7 @@ public class MediaControllerCallback extends MediaControllerCompat.Callback {
             mEventsToSendQueue.add(PlayerEvents.PlayModeChanged);
         }
 
-        // if only current state is differrent from previous state or there is an error
+        // if only current state is different from previous state or there is an error
         if (mPrevState == null || mPrevState.getState() != playbackState
                 || state.getState() == PlaybackStateCompat.STATE_ERROR) {
             // State changed from STATE_NONE to anything else

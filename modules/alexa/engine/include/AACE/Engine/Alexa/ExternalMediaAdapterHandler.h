@@ -70,6 +70,7 @@ protected:
     void reportDiscoveredPlayers(
         const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers);
     bool removeDiscoveredPlayer(const std::string& localPlayerId);
+    void reportPlaybackSessionId(const std::string& localPlayerId, const std::string& sessionId);
 
     // ExternalMediaAdapterHandler interface
     virtual bool handleAuthorization(
@@ -140,9 +141,15 @@ public:
         alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings) const override;
     alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type getSpeakerType() const override;
 
+protected:
+    std::weak_ptr<FocusHandlerInterface> m_focusHandler;
+    /**
+     * Generic executor. Used for delaying focus state change.
+     */
+    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
 private:
     std::weak_ptr<DiscoveredPlayerSenderInterface> m_discoveredPlayerSender;
-    std::weak_ptr<FocusHandlerInterface> m_focusHandler;
 
     std::unordered_map<std::string, PlayerInfo> m_playerInfoMap;
     std::unordered_map<std::string, std::string> m_alexaToLocalPlayerIdMap;
@@ -154,10 +161,7 @@ private:
      * Serializes generic access. Used for delaying focus state change.
      */
     std::mutex m_mutex;
-    /**
-     * Generic executor. Used for delaying focus state change.
-     */
-    alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+
     /**
      * Serializes generic condition. Used for delaying focus state change.
      */
@@ -167,6 +171,7 @@ private:
 class FocusHandlerInterface {
 public:
     virtual void setFocus(const std::string& playerId, bool focusAcquire) = 0;
+    virtual void setDefaultPlayerFocus() = 0;
 };
 
 }  // namespace alexa

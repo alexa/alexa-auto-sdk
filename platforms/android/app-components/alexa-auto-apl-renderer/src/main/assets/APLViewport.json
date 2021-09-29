@@ -1,0 +1,113 @@
+{
+    "_comment": "AACS config for APL visual characteristics.",
+    "aacs.alexa": {
+        "gui": {
+            "visualCharacteristics": [
+                {
+                    "type": "AlexaInterface",
+                    "interface": "Alexa.InteractionMode",
+                    "version": "1.1",
+                    "configurations": {
+                        "interactionModes": [
+                            {
+                                "id": "{{STRING}}",
+                                "uiMode": ["HUB", "TV", "MOBILE", "PC", "AUTO", "HEADLESS"],
+                                "interactionDistance": {
+                                    "unit": [ "CENTIMETERS", "INCHES" ],
+                                    "value": "{INTEGER}"
+                                },
+                                "touch": [ "SUPPORTED", "UNSUPPORTED" ],
+                                "keyboard": [ "SUPPORTED", "UNSUPPORTED" ],
+                                "video": [ "SUPPORTED", "UNSUPPORTED" ],
+                                "dialog": [ "SUPPORTED", "UNSUPPORTED" ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "AlexaInterface",
+                    "interface": "Alexa.Presentation.APL.Video",
+                    "version": "1.0",
+                    "configurations": {
+                        "video": {
+                            "codecs": [
+                                "H_264_42",
+                                "H_264_41"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type": "AlexaInterface",
+                    "interface": "Alexa.Display.Window",
+                    "version": "1.0",
+                    "configurations": {
+                        "templates": [
+                            {
+                                "id": "{STRING}",
+                                "type": "STANDARD",
+                                "configuration": {
+                                    "sizes": [
+                                        {
+                                            "type": "DISCRETE",
+                                            "id": "{STRING}",
+                                            "value": {
+                                                "unit": "PIXEL",
+                                                "value": {
+                                                    "width": "{INTEGER}",
+                                                    "height": "{INTEGER}"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "interactionModes": [
+                                        "{STRING}"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "AlexaInterface",
+                    "interface": "Alexa.Display",
+                    "version": "1.0",
+                    "configurations": {
+                        "display": {
+                            "type": "PIXEL",
+                            "touch": [ "SINGLE", "UNSUPPORTED" ],
+                            "shape": [ "RECTANGLE", "ROUND" ],
+                            "dimensions": {
+                                "resolution": {
+                                    "unit": "PIXEL",
+                                    "value": {
+                                        "width": "{INTEGER}",
+                                        "height": "{INTEGER}"
+                                    }
+                                },
+                                "physicalSize": {
+                                    "unit": [ "CENTIMETERS", "INCHES" ],
+                                    "value": {
+                                        "width": "{DECIMAL}",
+                                        "height": "{DECIMAL}"
+                                    }
+                                },
+                                "pixelDensity": {
+                                    "unit": "DPI",
+                                    "value": "{INTEGER}"
+                                },
+                                "densityIndependentResolution": {
+                                    "unit": "DP",
+                                    "value": {
+                                        "width": "{INTEGER}",
+                                        "height": "{INTEGER}"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

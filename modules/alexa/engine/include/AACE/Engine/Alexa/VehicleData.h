@@ -65,7 +65,7 @@ private:
     /**
      * Creates the Alexa.Automotive.VehicleData capability configuration.
      *
-     * @return The Alexa.Automotive.VehicleData @c CapabilityConfiguration or @c nullptr if constucting the
+     * @return The Alexa.Automotive.VehicleData @c CapabilityConfiguration or @c nullptr if constructing the
      * configuration fails
      */
     static std::shared_ptr<CapabilityConfiguration> getVehicleDataCapabilityConfiguration(

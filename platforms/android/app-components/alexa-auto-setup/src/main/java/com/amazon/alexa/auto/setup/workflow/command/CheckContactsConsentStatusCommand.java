@@ -4,7 +4,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.amazon.alexa.auto.apis.app.AlexaApp;
+import com.amazon.alexa.auto.apis.auth.AuthController;
+import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.communication.ContactsController;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -16,10 +19,13 @@ public class CheckContactsConsentStatusCommand extends Command {
     private static final String TAG = CheckContactsConsentStatusCommand.class.getSimpleName();
 
     private final Context mContext;
+    private final AuthController authController;
 
     public CheckContactsConsentStatusCommand(Context context) {
         super(context);
+        AlexaApp app = AlexaApp.from(context);
         mContext = context;
+        authController = app.getRootComponent().getAuthController();
     }
 
     @Override
@@ -28,15 +34,22 @@ public class CheckContactsConsentStatusCommand extends Command {
     }
 
     private void observeContactsConsentStatus() {
+        if (!authController.getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)
+                && !ModuleProvider.isAlexaCustomAssistantEnabled(mContext)) {
+            Log.d(TAG, "Auth mode is not CBL and Alexa Custom Assistant is not enabled, skipping contacts consent step.");
+            publishEvent(new WorkflowMessage("Contacts_Consent_Setup_Skipped"));
+            return;
+        }
+
         AlexaApp app = AlexaApp.from(mContext);
         if (app.getRootComponent().getComponent(ContactsController.class).isPresent()) {
             app.getRootComponent().getComponent(ContactsController.class).ifPresent(contactsController -> {
                 contactsController.observeContactsConsent().subscribe(isContactsConsentNeeded -> {
                     if (isContactsConsentNeeded) {
                         Log.d(TAG, "Showing contacts consent screen.");
-                        EventBus.getDefault().post(new WorkflowMessage("Contacts_Consent_Setup_Not_Finished"));
+                        publishEvent(new WorkflowMessage("Contacts_Consent_Setup_Not_Finished"));
                     } else {
-                        EventBus.getDefault().post(new WorkflowMessage("Contacts_Consent_Setup_Finished"));
+                        publishEvent(new WorkflowMessage("Contacts_Consent_Setup_Finished"));
                     }
                 });
             });

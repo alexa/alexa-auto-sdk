@@ -56,6 +56,9 @@ public:
     /**
      * Notifies the platform implementation to power on the controller identified by @c endpointId.
      *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
+     *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @return @c true if successful.
      */
@@ -63,12 +66,18 @@ public:
     /**
      * Notifies the platform implementation to power off the controller identified by @c endpointId.
      *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
+     *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @return @c true if successful.
      */
     virtual bool turnPowerControllerOff(const std::string& endpointId);
     /**
      * Retrieves the power state of the controller identified by @c endpointId from the platform implementation.
+     *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
      *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [out] isOn To be set to @c true by the implementation if the controller is powered on.
@@ -80,6 +89,9 @@ public:
     /**
      * Notifies the platform implementation to turn on the controller identified by @c endpointId and @c controllerId.
      *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
+     *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
      * @return @c true if successful.
@@ -87,6 +99,9 @@ public:
     virtual bool turnToggleControllerOn(const std::string& endpointId, const std::string& controllerId);
     /**
      * Notifies the platform implementation to turn off the controller identified by @c endpointId and @c controllerId.
+     *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
      *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
@@ -96,6 +111,9 @@ public:
     /**
      * Retrieves the power state of the controller identified by @c endpointId and @c controllerId from the platform
      * implementation.
+     *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
      *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
@@ -109,6 +127,9 @@ public:
      * Notifies the platform implementation to set the range setting of the controller identified by @c endpointId and
      * @c controllerId.
      *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
+     *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
      * @param [in] value The new range setting.
@@ -118,6 +139,9 @@ public:
     /**
      * Notifies the platform implementation to adjust the range setting of the controller identified by @c endpointId and
      * @c controllerId.
+     *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
      *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
@@ -131,6 +155,9 @@ public:
     /**
      * Retrieves the range setting of the controller identified by @c endpointId and @c controllerId.
      *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
+     *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
      * @param [out] value To be set to the current range setting by the implementation.
@@ -142,6 +169,9 @@ public:
     /**
      * Notifies the platform implementation to set the mode of the controller identified by @c endpointId and
      * @c controllerId.
+     *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
      *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
@@ -156,6 +186,9 @@ public:
      * Notifies the platform implementation to adjust the mode of the controller identified by @c endpointId and
      * @c controllerId.
      *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
+     *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.
      * @param [in] delta The delta by which to adjust the mode.
@@ -164,6 +197,9 @@ public:
     virtual bool adjustModeControllerValue(const std::string& endpointId, const std::string& controllerId, int delta);
     /**
      * Retrieves the mode of the controller identified by @c endpointId and @c controllerId.
+     *
+     * @note The platform implementation must return within 5 seconds. Failure to do so will result in
+     * a timeout.
      *
      * @param [in] endpointId The unique identifier of the endpoint.
      * @param [in] controllerId The unique identifier of the controller.

@@ -64,7 +64,6 @@ bool ExternalMediaAdapterHandler::initializeAdapterHandler(
 }
 
 bool ExternalMediaAdapterHandler::validatePlayer(const std::string& localPlayerId, bool checkAuthorized) {
-    if (localPlayerId.empty()) return false;
     auto it = m_playerInfoMap.find(localPlayerId);
     return it != m_playerInfoMap.end() && (it->second.authorized || checkAuthorized == false);
 }
@@ -252,14 +251,25 @@ bool ExternalMediaAdapterHandler::play(
 bool ExternalMediaAdapterHandler::playControl(
     const std::string& playerId,
     aace::engine::alexa::RequestType requestType) {
+    std::string localPlayerId;
     try {
-        auto it = m_alexaToLocalPlayerIdMap.find(playerId);
-        ThrowIf(it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId");
-
         // convert RequestType to PlayControlType
         using RequestType = aace::engine::alexa::RequestType;
         using PlayControlType = aace::alexa::ExternalMediaAdapter::PlayControlType;
 
+        if (playerId.empty()) {
+            auto it = m_playerInfoMap.find(playerId);
+            ThrowIf(it == m_playerInfoMap.end(), "Default Player not found");
+        } else {
+            auto it = m_alexaToLocalPlayerIdMap.find(playerId);
+            ThrowIf(it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId");
+            localPlayerId = it->second;
+        }
+
+        aace::engine::alexa::AdapterState state;
+
+        ThrowIfNot(handleGetAdapterState(localPlayerId, state), "handleGetAdapterStateFailed");
+        ThrowIfNot(state.sessionState.launched, "player disabled");
         PlayControlType controlType;
 
         switch (requestType) {
@@ -316,12 +326,10 @@ bool ExternalMediaAdapterHandler::playControl(
                 Throw("unsupportedRequestType");
         }
 
-        // call the platform media adapter
-        ThrowIfNot(handlePlayControl(it->second, controlType), "handlePlayControlFailed");
-
+        ThrowIfNot(handlePlayControl(localPlayerId, controlType), "handlePlayControlFailed");
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "playControl").d("reason", ex.what()).d("playerId", playerId));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("playerId", localPlayerId));
         return false;
     }
 }
@@ -362,26 +370,22 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaAdapterHandler::getA
 
         for (const auto& next : m_playerInfoMap) {
             auto playerInfo = next.second;
+            aace::engine::alexa::AdapterState state;
 
-            if (playerInfo.authorized) {
-                aace::engine::alexa::AdapterState state;
+            // default session state
+            state.sessionState.playerId = playerInfo.playerId;
+            state.sessionState.skillToken = playerInfo.skillToken;
+            state.sessionState.playbackSessionId = playerInfo.playbackSessionId;
+            state.sessionState.spiVersion = playerInfo.spiVersion;
 
-                // default session state
-                state.sessionState.playerId = playerInfo.playerId;
-                state.sessionState.skillToken = playerInfo.skillToken;
-                state.sessionState.playbackSessionId = playerInfo.playbackSessionId;
-                state.sessionState.spiVersion = playerInfo.spiVersion;
+            // default playback state
+            state.playbackState.playerId = playerInfo.playerId;
 
-                // default playback state
-                state.playbackState.playerId = playerInfo.playerId;
-
-                if (all) {
-                    // get the player state from the adapter implementation
-                    ThrowIfNot(handleGetAdapterState(playerInfo.localPlayerId, state), "handleGetAdapterStateFailed");
-                }
-
-                adapterStateList.push_back(state);
+            if (all) {
+                // get the player state from the adapter implementation
+                ThrowIfNot(handleGetAdapterState(playerInfo.localPlayerId, state), "handleGetAdapterStateFailed");
             }
+            adapterStateList.push_back(state);
         }
 
         return adapterStateList;
@@ -548,6 +552,21 @@ bool ExternalMediaAdapterHandler::removeDiscoveredPlayer(const std::string& loca
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "removeDiscoveredPlayer").d("reason", ex.what()).d("localPlayerId", localPlayerId));
         return false;
+    }
+}
+
+void ExternalMediaAdapterHandler::reportPlaybackSessionId(
+    const std::string& localPlayerId,
+    const std::string& sessionId) {
+    try {
+        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
+        auto it = m_playerInfoMap.find(localPlayerId);
+        ThrowIf(it == m_playerInfoMap.end(), "invalidLocalPlayerId");
+
+        m_playerInfoMap[localPlayerId].playbackSessionId = sessionId;
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId).d("sessionId", sessionId));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("localPlayerId", localPlayerId).d("sessionId", sessionId));
     }
 }
 

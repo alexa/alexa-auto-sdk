@@ -88,9 +88,12 @@ public class CarControlDataProvider {
 
     /**
      * Build an example car control configuration for the Auto SDK Engine.
-     * See modules/car-control/assets/assets-1P.json for all the friendly names for each asset
+     * See modules/car-control/assets/assets-1P.json for the friendly names for each asset
+     *
+     * @param customAssetsFilePath A path to an asset definition file for custom assets used
+     *                             in this configuration.
      */
-    public static EngineConfiguration generateCarControlConfig() {
+    public static EngineConfiguration generateCarControlConfig(String customAssetsFilePath) {
         CarControlConfiguration config = CarControlConfiguration.create();
         // clang-format off
 
@@ -101,6 +104,12 @@ public class CarControlDataProvider {
         // sample configuration in the README document is the source of truth
         // for how endpoints should be configured.
         //--------------------------------------------------------------------------
+
+        //---------------------------------------------------------------------
+        // Specify the path to the file that defines additional custom assets
+        // used by this example.
+        //---------------------------------------------------------------------
+        config.addCustomAssetsPath(customAssetsFilePath);
 
         //---------------------------------------------------------------------
         // Define the zones of the vehicle.
@@ -143,7 +152,7 @@ public class CarControlDataProvider {
 
         // Since "zone.default" is set to default, utterances matching endpoints
         // in this zone take precedence
-        config.setDefaultZone("zone.all");
+        config.setDefaultZone("zone.default");
 
         //---------------------------------------------------------------------
         // Create "fan" endpoints for various zones.
@@ -608,6 +617,29 @@ public class CarControlDataProvider {
             recirculateMode.addMode("AUTO");
         m_modeControllers.put(genKey("car", "recirculatemode"), recirculateMode);
         m_boolControllers.put(genKey("car", "climate.sync"), new BoolController());
+
+        //---------------------------------------------------------------------
+        // Create a sample "custom thing" endpoint to demonstrate using a custom asset.
+        //
+        // Things to try:
+        //    "Alexa, turn [on|off] the custom thing"
+        //    "Alexa, set my custom object color to pink"
+        //---------------------------------------------------------------------
+        config.createEndpoint("customThing")
+                .addAssetId("My.CustomThing")
+                .addPowerController(false)
+                .addModeController("color", false, false)
+                    .addAssetId(CarControlAssets.Setting.COLOR)
+                    .addValue("VIOLET")
+                        .addAssetId(CarControlAssets.Color.VIOLET)
+                    .addValue("PINK")
+                        .addAssetId("My.Color.Pink");
+        // Update internal data structure (not relevant to CarControlConfiguration)
+        m_boolControllers.put(genKey("customThing"), new BoolController());
+        ModeController customThingColor = new ModeController();
+        customThingColor.addMode("VIOLET");
+        customThingColor.addMode("PINK");
+        m_modeControllers.put(genKey("customThing", "color"), customThingColor);
 
         // clang-format on
         return config;

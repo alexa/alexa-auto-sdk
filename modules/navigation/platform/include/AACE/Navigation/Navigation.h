@@ -193,7 +193,7 @@ public:
      * @endcode
      * @li state (required) : current navigation state
      * @li waypoints (required) : list of waypoints, which can be empty
-     * @li shapes (required) : list of route shapes, which can be empty or limited to 3000 entries
+     * @li shapes (required) : list of route shapes, which can be empty or limited to 100 entries
      */
 
     virtual std::string getNavigationState() = 0;
@@ -275,7 +275,7 @@ public:
      * @li address.postalCode (optional) : postal code
      * @li coordinate (required) : Contains the geolocation information of the destination
      * @li coordinate.latitudeInDegrees (required) : Latitude coordinate in degrees
-     * @li coordinate.longitudeInDegrees (required) : Longitute coordinate in degrees
+     * @li coordinate.longitudeInDegrees (required) : Longitude coordinate in degrees
      * @li name (optional) : waypoint name
      * @li pointOfInterest (optional) : POI information related to the waypoint
      * @li pointOfInterest.id (optional) : Lookup Id for the POIs vended by Alexa
@@ -292,7 +292,7 @@ public:
      * Notifies the platform implementation to give details about a maneuver to next waypoint on the route or a completely
        different waypoint off route.
      *
-     * @param [in] payload JSON data containing the manueuver information
+     * @param [in] payload JSON data containing the maneuver information
      * @code{.json})
      * "maneuverType": "{{STRING}}", // requested maneuver type
      * "queryTarget" : {
@@ -344,7 +344,6 @@ public:
      * @li controlDisplay(): ROUTE_OVERVIEW_SHOWN, DIRECTIONS_LIST_SHOWN, ZOOMED_IN, ZOOMED_OUT, MAP_CENTERED, ORIENTED_NORTH, SCROLLED_NORTH,
      *                  SCROLLED_UP, SCROLLED_EAST, SCROLLED_RIGHT, SCROLLED_SOUTH, SCROLLED_DOWN, SCROLLED_WEST, SCROLLED_LEFT, ROUTE_GUIDANCE_MUTED,
      *                  ROUTE_GUIDANCE_UNMUTED
-     * @li showAlternativeRoutes(): DEFAULT_ALTERNATE_ROUTES_SHOWN, SHORTER_TIME_ROUTES_SHOWN, SHORTER_DISTANCE_ROUTES_SHOWN
      * @li announceManeuver(): TURN_GUIDANCE_ANNOUNCED, EXIT_GUIDANCE_ANNOUNCED, ENTER_GUIDANCE_ANNOUNCED, MERGE_GUIDANCE_ANNOUNCED, LANE_GUIDANCE_ANNOUNCED
      * @li announceRoadRegulation(): SPEED_LIMIT_REGULATION_ANNOUNCED, CARPOOL_RULES_REGULATION_ANNOUNCED
      */

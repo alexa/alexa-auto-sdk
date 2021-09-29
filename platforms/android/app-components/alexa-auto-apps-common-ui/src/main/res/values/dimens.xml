@@ -13,4 +13,5 @@
     <dimen name="margin_horizontal">8dp</dimen>
     <dimen name="margin_horizontal_double">16dp</dimen>
 
+    <dimen name="dialog_close_button_width">42dp</dimen>
 </resources>

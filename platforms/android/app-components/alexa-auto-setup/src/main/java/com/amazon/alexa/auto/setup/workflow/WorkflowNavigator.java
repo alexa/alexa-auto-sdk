@@ -11,8 +11,11 @@ import androidx.navigation.NavController;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.setup.workflow.command.CheckContactsConsentStatusCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckLanguageCommand;
+import com.amazon.alexa.auto.setup.workflow.command.CheckLoginRequiredCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckNetworkStatusCommand;
+import com.amazon.alexa.auto.setup.workflow.command.CheckLocationConsentCommand;
 import com.amazon.alexa.auto.setup.workflow.command.Command;
+import com.amazon.alexa.auto.setup.workflow.command.SetupCompleteCommand;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -122,8 +125,18 @@ public class WorkflowNavigator {
             case Command.CHECK_LANGUAGE_COMMAND:
                 command = new CheckLanguageCommand(mContext.get());
                 break;
+            case Command.CHECK_LOGIN_REQUIRED_COMMAND:
+                command = new CheckLoginRequiredCommand(mContext.get());
+                break;
             case Command.CHECK_CONTACTS_CONSENT_STATUS_COMMAND:
                 command = new CheckContactsConsentStatusCommand(mContext.get());
+                break;
+            case Command.CHECK_LOCATION_CONSENT_COMMAND:
+                command = new CheckLocationConsentCommand(mContext.get());
+                break;
+            case Command.SETUP_COMPLETE_COMMAND:
+                command = new SetupCompleteCommand(mContext.get());
+                break;
             default:
                 break;
         }

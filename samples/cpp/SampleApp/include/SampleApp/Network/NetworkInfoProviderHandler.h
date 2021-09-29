@@ -60,7 +60,7 @@ private:
     /// Current network status
     aace::network::NetworkInfoProvider::NetworkStatus m_networkStatus;
 
-    /// Current WiFi signal strengh
+    /// Current WiFi signal strength
     int m_wifiSignalStrength;
 };
 

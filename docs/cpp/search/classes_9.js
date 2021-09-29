@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['sessionstate',['SessionState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html',1,'aace::alexa::ExternalMediaAdapter::SessionState'],['../classaace_1_1alexa_1_1_local_media_source_1_1_session_state.html',1,'aace::alexa::LocalMediaSource::SessionState']]],
-  ['speechrecognizer',['SpeechRecognizer',['../classaace_1_1alexa_1_1_speech_recognizer.html',1,'aace::alexa']]],
-  ['speechrecognizerengineinterface',['SpeechRecognizerEngineInterface',['../classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html',1,'aace::alexa']]],
-  ['speechsynthesizer',['SpeechSynthesizer',['../classaace_1_1alexa_1_1_speech_synthesizer.html',1,'aace::alexa']]],
-  ['storageconfiguration',['StorageConfiguration',['../classaace_1_1storage_1_1config_1_1_storage_configuration.html',1,'aace::storage::config']]],
-  ['streamconfiguration',['StreamConfiguration',['../classaace_1_1core_1_1config_1_1_stream_configuration.html',1,'aace::core::config']]]
+  ['phonecallcontroller',['PhoneCallController',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html',1,'aace::phoneCallController']]],
+  ['phonecallcontrollerengineinterface',['PhoneCallControllerEngineInterface',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html',1,'aace::phoneCallController']]],
+  ['platforminterface',['PlatformInterface',['../classaace_1_1core_1_1_platform_interface.html',1,'aace::core']]],
+  ['playbackcontroller',['PlaybackController',['../classaace_1_1alexa_1_1_playback_controller.html',1,'aace::alexa']]],
+  ['playbackcontrollerengineinterface',['PlaybackControllerEngineInterface',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html',1,'aace::alexa']]],
+  ['playbackstate',['PlaybackState',['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html',1,'aace::alexa::LocalMediaSource::PlaybackState'],['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html',1,'aace::alexa::ExternalMediaAdapter::PlaybackState']]],
+  ['propertymanager',['PropertyManager',['../classaace_1_1property_manager_1_1_property_manager.html',1,'aace::propertyManager']]]
 ];

@@ -98,7 +98,7 @@ private:
     /**
      * Constructor
      * 
-     * @param storage Stores and retrieves the active authorization from persistant storage.
+     * @param storage Stores and retrieves the active authorization from persistent storage.
      * @param customerDataManager Component to register this component as a customer data container
      */
     AuthorizationManager(
@@ -124,7 +124,7 @@ private:
     bool performLogoutLocked();
 
     /**
-     * Makes the synchronus @c deregister() on the active adapter.
+     * Makes the synchronous @c deregister() on the active adapter.
      * 
      * @note This function to be called holding @c m_activeAdapterMutex lock.
      */

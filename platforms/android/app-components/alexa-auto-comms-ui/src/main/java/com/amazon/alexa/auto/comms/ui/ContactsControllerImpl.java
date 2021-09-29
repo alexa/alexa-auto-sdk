@@ -3,6 +3,9 @@ package com.amazon.alexa.auto.comms.ui;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -23,6 +26,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
 public class ContactsControllerImpl implements ContactsController {
     private static final String TAG = ContactsControllerImpl.class.getSimpleName();
+    private static String _AACS_CONTACTS_PACKAGE_NAME = null; // This should remain private non final
 
     private final WeakReference<Context> mContextWk;
     private final BTDeviceRepository mBTDeviceRepository;
@@ -48,25 +52,35 @@ public class ContactsControllerImpl implements ContactsController {
     @Override
     public void uploadContacts(String deviceAddress) {
         Log.d(TAG, "Uploading contacts...");
-        Intent intentStartService = new Intent();
-        intentStartService.setComponent(
-                new ComponentName(AACSConstants.AACS_PACKAGE_NAME, Constants.AACS_CONTACTS_SERVICE));
-        intentStartService.setAction(Constants.AACS_ACTION_UPLOAD_CONTACTS);
-        intentStartService.putExtra(Constants.AACS_EXTRA_ADDRESSBOOK_ID, deviceAddress);
-        intentStartService.putExtra(
-                Constants.AACS_EXTRA_ADDRESSBOOK_NAME_KEY, Constants.AACS_EXTRA_ADDRESSBOOK_NAME_VALUE);
-        startAACSService(mContextWk.get(), intentStartService);
+        String aacsContactsPackageName = getAACSContactsPackageName(mContextWk);
+        if (aacsContactsPackageName != null) {
+            Intent intentStartService = new Intent();
+            intentStartService.setComponent(
+                    new ComponentName(aacsContactsPackageName, Constants.AACS_CONTACTS_SERVICE));
+            intentStartService.setAction(Constants.AACS_ACTION_UPLOAD_CONTACTS);
+            intentStartService.putExtra(Constants.AACS_EXTRA_ADDRESSBOOK_ID, deviceAddress);
+            intentStartService.putExtra(
+                    Constants.AACS_EXTRA_ADDRESSBOOK_NAME_KEY, Constants.AACS_EXTRA_ADDRESSBOOK_NAME_VALUE);
+            startAACSService(mContextWk.get(), intentStartService);
+        } else {
+            Log.e(TAG, "AACS contacts service is not available, skip to upload contacts.");
+        }
     }
 
     @Override
     public void removeContacts(String deviceAddress) {
         Log.d(TAG, "Removing contacts...");
-        Intent intentStartService = new Intent();
-        intentStartService.setComponent(
-                new ComponentName(AACSConstants.AACS_PACKAGE_NAME, Constants.AACS_CONTACTS_SERVICE));
-        intentStartService.setAction(Constants.AACS_ACTION_REMOVE_CONTACTS);
-        intentStartService.putExtra(Constants.AACS_EXTRA_ADDRESSBOOK_ID, deviceAddress);
-        startAACSService(mContextWk.get(), intentStartService);
+        String aacsContactsPackageName = getAACSContactsPackageName(mContextWk);
+        if (aacsContactsPackageName != null) {
+            Intent intentStartService = new Intent();
+            intentStartService.setComponent(
+                    new ComponentName(aacsContactsPackageName, Constants.AACS_CONTACTS_SERVICE));
+            intentStartService.setAction(Constants.AACS_ACTION_REMOVE_CONTACTS);
+            intentStartService.putExtra(Constants.AACS_EXTRA_ADDRESSBOOK_ID, deviceAddress);
+            startAACSService(mContextWk.get(), intentStartService);
+        } else {
+            Log.e(TAG, "AACS contacts service is not available, skip to remove contacts.");
+        }
     }
 
     @Override
@@ -122,5 +136,35 @@ public class ContactsControllerImpl implements ContactsController {
         } else {
             context.startService(intent);
         }
+    }
+
+    /**
+     * This method returns the package name of AACS Contacts Service dynamically.
+     * If AACS Contacts Service is running in AACS as separate application, it returns value of AACS package name.
+     * Otherwise if AACS Contacts Service is included in the client app as an AAR, it returns the client app
+     * package name.
+     * @param contextWk Weak reference of Android context for getting a package manager
+     * @return AACS Contacts Service package name
+     */
+    private String getAACSContactsPackageName(@NonNull WeakReference<Context> contextWk) {
+        if (_AACS_CONTACTS_PACKAGE_NAME == null) {
+            PackageManager packageManager = contextWk.get().getPackageManager();
+            try {
+                _AACS_CONTACTS_PACKAGE_NAME = AACSConstants.getAACSPackageName(contextWk);
+                PackageInfo packageInfo =
+                        packageManager.getPackageInfo(contextWk.get().getPackageName(), PackageManager.GET_SERVICES);
+                for (ServiceInfo serviceInfo : packageInfo.services) {
+                    if (serviceInfo.name.equals(Constants.AACS_CONTACTS_SERVICE)) {
+                        _AACS_CONTACTS_PACKAGE_NAME = contextWk.get().getPackageName();
+                        Log.d(TAG, String.format("Setting PACKAGE_NAME %s", _AACS_CONTACTS_PACKAGE_NAME));
+                        break;
+                    }
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.e(TAG, "Failed to find AACS contacts package information in package manager.");
+                return null;
+            }
+        }
+        return _AACS_CONTACTS_PACKAGE_NAME;
     }
 }

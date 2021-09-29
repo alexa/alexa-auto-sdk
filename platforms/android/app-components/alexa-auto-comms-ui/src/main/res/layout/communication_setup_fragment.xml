@@ -46,11 +46,23 @@
         android:layout_marginStart="@dimen/contacts_permission_margin_start"
         android:layout_marginEnd="@dimen/contacts_permission_margin_start"
         android:layout_marginTop="@dimen/contacts_permission_item_margin_top"
+        app:layout_constraintBottom_toTopOf="@+id/contacts_upload_yes_action_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/contacts_permission_consent_heading"/>
 
     <TextView
-        android:id="@+id/yes_action_button"
+        android:id="@+id/alexa_contacts_hint1"
+        style="@style/Alexa.Hint2Text"
+        android:text="@string/comms_sample_utterance"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/contacts_permission_item_margin_top"
+        app:layout_constraintTop_toBottomOf="@+id/contacts_permission_consent_body"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/contacts_upload_yes_action_button"
         style="@style/Alexa.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -58,12 +70,12 @@
         android:layout_marginBottom="@dimen/contacts_permission_item_margin_bottom"
         android:text="@string/contacts_consent_yes"
         app:layout_constraintTop_toBottomOf="@+id/contacts_permission_consent_body"
-        app:layout_constraintStart_toEndOf="@+id/skip_action_button"
+        app:layout_constraintStart_toEndOf="@+id/contacts_upload_skip_action_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
-        android:id="@+id/skip_action_button"
+        android:id="@+id/contacts_upload_skip_action_button"
         style="@style/Alexa.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -72,6 +84,6 @@
         android:text="@string/contacts_consent_skip"
         app:layout_constraintTop_toBottomOf="@+id/contacts_permission_consent_body"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/yes_action_button"
+        app:layout_constraintEnd_toStartOf="@+id/contacts_upload_yes_action_button"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

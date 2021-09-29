@@ -31,6 +31,8 @@ public:
 
     // aace::alexa::LocalMediaSource
     bool play(ContentSelector selector, const std::string& payload) override;
+    bool play(ContentSelector selector, const std::string& payload, const std::string& sessionId) override;
+
     bool playControl(PlayControlType controlType) override;
     bool seek(std::chrono::milliseconds offset) override;
     bool adjustSeek(std::chrono::milliseconds deltaOffset) override;
@@ -114,7 +116,8 @@ public:
                 {T::LINE_IN, "LINE_IN"},
                 {T::COMPACT_DISC, "COMPACT_DISC"},
                 {T::SIRIUS_XM, "SIRIUS_XM"},
-                {T::DAB, "DAB"}};
+                {T::DAB, "DAB"},
+                {T::DEFAULT, "DEFAULT"}};
     }
 };
 

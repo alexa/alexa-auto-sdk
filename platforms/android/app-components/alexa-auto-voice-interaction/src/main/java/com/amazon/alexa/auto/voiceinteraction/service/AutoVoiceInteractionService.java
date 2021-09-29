@@ -1,7 +1,6 @@
 package com.amazon.alexa.auto.voiceinteraction.service;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +12,6 @@ import android.util.Log;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
-import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.module.ModuleInterface;
@@ -45,7 +43,6 @@ import io.reactivex.rxjava3.core.Single;
 public class AutoVoiceInteractionService extends VoiceInteractionService {
     private static final String TAG = AutoVoiceInteractionService.class.getCanonicalName();
     private static final int FLAG_SHOW_WITH_ASSIST = 1;
-    private static final String SETUP_COMPLETE_NOTICE_KEY = "com.amazon.alexa.setup.complete.notice.key";
 
     AuthController mAuthController;
     AACSConfigurator mAACSConfigurator;
@@ -111,8 +108,6 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
         if (mAuthController.isAuthenticated()) {
             isAlexaConnected = true;
         }
-
-        observeAuthStatusChange();
     }
 
     @Override
@@ -134,25 +129,6 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
     public void onVoiceInteractionStateChange(AutoVoiceInteractionMessage message) {
         if (message.getTopic().equals(Constants.TOPIC_ALEXA_CONNECTION)) {
             isAlexaConnected = message.getAction().equals(Constants.CONNECTION_STATUS_CONNECTED);
-
-            // Temporary solution to trigger Alexa introduction VUI when user finished CBL authorization process
-            // and Alexa connection state is changed to CONNECTED. We will migrate this method under setup workflow
-            // after we refactor the setup done logic to wait until Alexa is connected, currently as long as we get
-            // the refresh token, setup workflow will be marked as done, which is not quite ready to start Alexa
-            // introduction VUI until Alexa is successfully connected.
-            if (isAlexaConnected) {
-                SharedPreferences preferences = this.getApplicationContext().getSharedPreferences(
-                        SETUP_COMPLETE_NOTICE_KEY, Context.MODE_PRIVATE);
-                boolean authCompleteNoticeSent = preferences.getBoolean(SETUP_COMPLETE_NOTICE_KEY, false);
-                if (!authCompleteNoticeSent) {
-                    Log.d(TAG, "Sending setup complete event");
-                    sendSetupCompleteEvent();
-
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean(SETUP_COMPLETE_NOTICE_KEY, true);
-                    editor.apply();
-                }
-            }
         }
 
         if (message.getAction().equals(Action.SpeechRecognizer.WAKEWORD_DETECTED)
@@ -216,26 +192,5 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
             return Optional.empty();
         }
         return Optional.of(modules);
-    }
-
-    /**
-     * Send setup complete event to AACS, it will trigger Alexa feature introduction VUI.
-     */
-    private void sendSetupCompleteEvent() {
-        new AACSMessageSender(new WeakReference<>(this.getApplicationContext()), new AACSSender())
-                .sendMessage(Topic.DEVICE_SETUP, Action.DeviceSetup.SETUP_COMPLETED, "");
-    }
-
-    private void observeAuthStatusChange() {
-        mAuthController.observeAuthChangeOrLogOut().subscribe(authStatus -> {
-            if (authStatus.getLoggedIn()) {
-                // After login is finished, toggle setup complete notice to false to trigger the setup complete event
-                SharedPreferences preferences = this.getApplicationContext().getSharedPreferences(
-                        SETUP_COMPLETE_NOTICE_KEY, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putBoolean(SETUP_COMPLETE_NOTICE_KEY, false);
-                editor.apply();
-            }
-        });
     }
 }

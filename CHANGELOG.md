@@ -1,16 +1,52 @@
 # Change Log
 ___
-## v3.2.1 released on 2021-08-06
-
+## v3.3.0 released on 2021-09-30
 ### Enhancements
-* The Connectivity module supports additional APIs, which enable the voice up-sell conversation between the user and Alexa to activate either a trial data plan or a paid subscription plan. Your implementation should call `sendConnectivityEvent` to notify the Engine of the data plan type. To respond, the Engine calls `connectivityEventResponse`.
+* Added the `DeviceUsage` platform interface to provide the Alexa application network usage data to the Auto SDK Engine. The Auto SDK Engine emits this data as a metric to Amazon if Auto SDK is built with the `Device Client Metrics` extension. For more information, see the Core module README for [C++](./modules/core/README.md#providing-network-usage-data-to-auto-sdk) or [Android](./platforms/android/modules/core/README.md#providing-network-usage-data-to-auto-sdk).
 
-* You can customize the Address Book module with the `cleanAllAddressBooksAtStart` field in the Engine configuration, which specifies whether address books are removed each time the Engine starts.
+* Extended the features of the `Local Navigation` module for the `Local Voice Control (LVC)` extension. The `LocalSearchProvider` platform interface now enables you to provide customers with offline navigation to street addresses, cities, and neighborhoods in addition to the existing support for local search and navigation to points of interest. See the Local Navigation module README for information about integrating the features.
+  >**Note:** There are updates to the `LocalSearchProvider` APIs. See the [Migration Guide](./MIGRATION.md) for details.
+  
+* Added a new generic `DEFAULT` media source to the list of sources supported by the `LocalMediaSource` platform interface. The DEFAULT source can be used for voice playback control of any arbitrary media sources on the infotainment system outside of deep-linked MACC applications using the `ExternalMediaAdapter` interface and existing sources supported by name through the `LocalMediaSource` interface. For details about integrating a default media source, see the Alexa module README for [C++](./modules/alexa/README.md) or [Android](./platforms/android/modules/alexa/README.md).
 
->**Note:** All Auto SDK 3.2 extensions are compatible with 3.2.1.
+* Added offline LVC support for tuning to station names on terrestrial radio and SiriusXM. E.g., “Play CNN on Sirius XM” and “Play KISS FM”. This feature is already available in online mode.
+
+* Enhancements for AACS:
+
+    * Added an app component called `alexa-auto-carcontrol` that deeply integrates Auto SDK car control features into the Android Automotive OS. For more information about AACS deep integration to Car Control, please refer to this [README](./platforms/android/app-components/alexa-auto-carcontrol/README.md).
+
+    * Added an enhancement in which AACS can automatically sync Alexa’s timezone and locale properties with the device system settings when you set the `syncSystemPropertyChange` field to true in your AACS configuration file. If you set the field to false or omit it, you still have flexibility to change the properties in your own implementation.
+    
+* Enhancements for AACS Sample App:
+  
+    * Added a location sharing consent screen in Alexa setup and settings wherein the user has the option to enable or disable location sharing.
+   
+    * Added support for rendering for `TemplateRuntime` display cards for the weather domain.
+    
+    * Added support for rendering `Amazon Presentation Language (APL)` documents.
+
+    * Added media player transport control improvements. For example, shuffle and loop transport controls are added, and disabled transport controls are displayed.
+
+    * Added support for setup and setting menu specific to the Alexa Custom Assistant extension.
 
 ### Resolved Issues
-In v3.2.0, if you use the `startCapture` API with an external wake word engine, wake words cannot be detected correctly. In v3.2.1, wake word detection works properly with external wake word engines.  
+* Android 11 requires the attribute `android:foregroundServiceType` to be defined in services that require permissions such as microphone and location. This is added to the AACS Android Manifest file. Also, the `compileSdkVersion` and `targetSdkVersion` to are updated to 30 in `build.gradle`.
+
+* Added a `UserIdentity` value in AACS `AuthStatus` when the user finishes CBL login.
+
+* Made the 'stateOrRegion' field optional in the AACS `StartNavigation` directive JSON parser.
+
+* Implemented the AASB `SetUserProfile` message in the CBL module to ensure the user email and username will be sent to the client application after user login when `enableUserProfile` is set to true. 
+
+* Fixed an issue that blocked a valid transition from the `THINKING` to `LISTENING` `AlexaClient` dialog states.
+
+* Updated the `PhoneCallControllerCapabilityAgent` to include context in `PhoneCallController` events per the `PhoneCallController` API specification.
+
+* Fixed a memory leak observed during Engine shutdown in the `Local Voice Control` extension.
+
+* Fixed a rare deadlock issue during Engine stop and start when using the `AuthProvider` interface.
+
+* Fixed an issue in which the Engine erroneously allowed 3,000 coordinates in the "shapes" array of navigation state queried via `Navigation::getNavigationState()`. The limit is updated to 100 coordinates.
 
 ### Known Issues
 * General
@@ -23,10 +59,14 @@ In v3.2.0, if you use the `startCapture` API with an external wake word engine, 
         ["en-CA", "fr-CA"].
     
       The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
-
+      
     * The `wakewordEnabled` property is not persistent across device reboots. If you use AACS, however, this issue does not occur. 
     
     * For Linux platforms, if your hardware does not use AVX2 instructions, the wake word library initialization causes an illegal instruction error.
+    
+    * When using LVC and calling Engine::stop(), the AlexaClient connection status remains CONNECTED because the connection to LVC is not disabled. Your implementation should not accept user utterances while the Engine is stopped despite the connection status showing CONNECTED.
+
+    * The [automotive HMI guidelines](https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards) for display cards state that actionable display cards should be dismissed automatically after 30 seconds, and non-actionable display cards should be dismissed automatically after 8 seconds. This guideline is not descriptive enough since it does not clarify what is actionable and non-actionable content. The UX team is working on correcting the guideline to specify specific template types. The current automatic dismissal time for all Template Runtime display cards is 8 seconds.
 
 * Car Control   
     * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
@@ -46,7 +86,77 @@ In v3.2.0, if you use the `startCapture` API with an external wake word engine, 
   
     * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
 
-    * If your Android app displays the NowPlaying Display Card whenever Alexa plays media, the card might be erroneously dismissed. For example, during music playback, if a user invokes Alexa, putting Alexa in LISTENING, THINKING, or SPEAKING state, and then cancels the Alexa session by tapping the Cancel button, the NowPlaying card is dismissed. A media Display Card should not be automatically dismissed in this scenario.
+    * If your application displays the NowPlaying `TemplateRuntime` display card when Alexa plays media, the card might be erroneously dismissed by the Auto SDK Engine with a call to `TemplateRuntime::clearPlayerInfo()` if your application calls `AlexaClient::stopForegroundActivity()` to cancel an Alexa interaction. For example, the user might initiate an Alexa interaction during music playback and then cancel it by pressing a cancel button while Alexa is listening, thinking, or speaking. The media display card should not be dismissed in this scenario.
+
+    * The generic `DEFAULT` `LocalMediaSource` type is not supported offline with LVC. If user gives a generic playback control request like "Alexa, play" when the Alexa application is operating in the offline mode with LVC, Alexa responds "Sorry, something went wrong". Other named players like USB work as expected in the offline mode.
+
+* Authentication
+    * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
+
+* Local Search and Navigation
+    * When using LVC in offline mode, after requesting a list of POIs (e.g., "find Starbucks nearby"), Alexa does not recognize utterances like "select the first one" and does not display or read detailed information about the requested selection.
+
+* AACS
+  
+    * For some platform interface APIs in the Core module, when an application fails to handle a directive, there is no way to report the failure to the Engine. This is because AASB assumes that the application always handles messages correctly. When AASB incorrectly reports how the application handles the message, the Engine state might become inconsistent with the application state. For example, suppose the Engine sends a directive to the application to set the audio volume but the application fails to make the change. AASB does not report the failure to the Engine. As a result, the Engine's and the application's settings become out of sync. The following list shows the affected APIs:
+        * `AudioInput`: 
+            * `startAudioInput()`
+        * `AudioOutput`: 
+            * `setPosition(int64_t position)`
+            * `volumeChanged(float volume)`
+            * `mutedStateChanged(MutedState state)`
+
+    * If you are not using the default audio output implementation (i.e. your application handles `AudioOutput` AASB messages) and even though you are playing the Alexa pushed media content, `Stop` message would not be sent from AACS when AACS shuts down. e.g. If you are playing an audio stream for AmazonMusic, if AACS is stopped, [AASB `AudioOutput.Stop` message](extensions/aasb/docs/AudioOutput/StopMessage.html) would not be received. As a result, the media playing from your application would not be stopped. This issue will be fixed in the next release. As a workaround, your application can listen to `[AASB.StopService](`extensions/aasb/docs/AASB/StopServiceMessage.html`)` message or adopt `AACSPinger` (See [README](platforms/android/alexa-auto-client-service/README.md#checking-aacs-connection-state)) to listen to the `STOPPED` state of AACS and stop the media accordingly.
+    
+## v3.2.1 released on 2021-08-06
+>**Note:** All Auto SDK 3.2 extensions are compatible with 3.2.1.
+
+### Enhancements
+
+* Added additional APIs to the `Connectivity` module, which enable the voice up-sell conversation between the user and Alexa to activate a trial data plan or a paid subscription plan. Your implementation should call `AlexaConnectivity::sendConnectivityEvent()` to notify the Engine of the data plan type. To respond, the Engine calls `AlexaConnectivity::connectivityEventResponse()`.
+
+* Added the configuration field `aace.addressBook.cleanAllAddressBooksAtStart` to Engine configuration. This field specifies whether to automatically delete address books each time the Engine starts.
+
+### Resolved Issues
+Fixed an issue in which wake words cannot be detected correctly when using the `SpeechRecognizer::startCapture()` API with an external wake word engine.  
+
+### Known Issues
+* General
+    * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
+        ["en-US", "es-US"],
+        ["es-US", "en-US"],
+        ["en-IN", "hi-IN"],
+        ["hi-IN", "en-IN"],
+        ["fr-CA", "en-CA"],
+        ["en-CA", "fr-CA"].
+    
+      The Engine does not declare support for locale combinations if the "locales" field is assigned an empty value.
+
+    * The `wakewordEnabled` property is not persistent across device reboots. If you use AACS, however, this issue does not occur. 
+    
+    * For Linux platforms, if your hardware does not use AVX2 instructions, the wake word library initialization causes an illegal instruction error.
+    
+    * When using LVC and calling Engine::stop(), the AlexaClient connection status remains CONNECTED because the connection to LVC is not disabled. Your implementation should not accept user utterances while the Engine is stopped despite the connection status showing CONNECTED.
+
+* Car Control   
+    * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+
+* Communications
+  
+    * DTMF utterances that include the letters "A", "B", "C", or "D" (for example "press A" or "dial 3*#B") are ignored.
+  
+    * Calling numbers such as 1-800-xxx-xxxx by using utterances such as “Alexa call one eight double oh...” may return unexpected results. Similarly, when you call numbers by using utterances that include "triple," "hundred," and "thousand," or press special characters such as # or * by saying "Alexa press *#", you may experience unexpected results. We recommend that your client application ignore special characters, dots, and non-numeric characters when requesting Alexa to call or press digits.
+  
+    * A user playing any skill with extended multi-turn dialogs (such as Jeopardy or Skyrim) cannot use voice to accept or reject incoming Alexa-to-Alexa calls.
+
+* Entertainment
+    * A user playing notifications while music is playing hears the music for a split second between the end of one notification and the start of the next.
+  
+    * The word, "line-in," in an utterance is sometimes misinterpreted as "line" or other words. For example, if the user says, "Switch to line-in," the misinterpretation of "line-in" might cause an incorrect response.
+  
+    * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
+
+    * If your application displays the NowPlaying `TemplateRuntime` display card when Alexa plays media, the card might be erroneously dismissed by the Auto SDK Engine with a call to `TemplateRuntime::clearPlayerInfo()` if your application calls `AlexaClient::stopForegroundActivity()` to cancel an Alexa interaction. For example, the user might initiate an Alexa interaction during music playback and then cancel it by pressing a cancel button while Alexa is listening, thinking, or speaking. The media display card should not be dismissed in this scenario.
 
 * Authentication
     * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.
@@ -60,7 +170,7 @@ In v3.2.0, if you use the `startCapture` API with an external wake word engine, 
             * `setPosition(int64_t position)`
             * `volumeChanged(float volume)`
             * `mutedStateChanged(MutedState state)`  
-
+            
 ## v3.2.0 released on 2021-05-19
 
 ### Enhancements
@@ -137,6 +247,8 @@ In v3.2.0, if you use the `startCapture` API with an external wake word engine, 
   
 * `AutoVoiceChromeController` and `StateChangeAnimationScheduler` of the Voice Chrome extension are thread-safe now, preventing the Alexa app from crashing in different scenarios (e.g. when changing to the previous music track).
 
+* Fixed a race condition in `AuthorizationManager` during the Engine shutdown.
+
 ### Known Issues
 * General
     * If the "locales" field of the "deviceSettings" node of the Alexa module configuration JSON is not specified, the Engine automatically declares support for the following locale combinations:
@@ -152,6 +264,8 @@ In v3.2.0, if you use the `startCapture` API with an external wake word engine, 
     * The `wakewordEnabled` property is not persistent across device reboots. If you use AACS, however, this issue does not occur. 
     
     * For Linux platforms, if your hardware does not use AVX2 instructions, the wake word library initialization causes an illegal instruction error.
+    
+    * When using LVC and calling Engine::stop(), the AlexaClient connection status remains CONNECTED because the connection to LVC is not disabled. Your implementation should not accept user utterances while the Engine is stopped despite the connection status showing CONNECTED.
 
 * Car Control   
     * If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in a set in the cloud. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, endpoint 1 from set A remains in the cloud and might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
@@ -173,7 +287,7 @@ In v3.2.0, if you use the `startCapture` API with an external wake word engine, 
   
     * When an external player authorization is in progress at the exact moment of shutdown, a very rare race condition might occur, causing the Engine to crash.
 
-    * If your Android app displays the NowPlaying Display Card whenever Alexa plays media, the card might be erroneously dismissed. For example, during music playback, if a user invokes Alexa, putting Alexa in LISTENING, THINKING, or SPEAKING state, and then cancels the Alexa session by tapping the Cancel button, the NowPlaying card is dismissed. A media Display Card should not be automatically dismissed in this scenario.
+    * If your application displays the NowPlaying `TemplateRuntime` display card when Alexa plays media, the card might be erroneously dismissed by the Auto SDK Engine with a call to `TemplateRuntime::clearPlayerInfo()` if your application calls `AlexaClient::stopForegroundActivity()` to cancel an Alexa interaction. For example, the user might initiate an Alexa interaction during music playback and then cancel it by pressing a cancel button while Alexa is listening, thinking, or speaking. The media display card should not be dismissed in this scenario
 
 * Authentication
     * The CBL module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the refresh is attempted, it could take up to a minute to refresh the token when the internet connection is restored.

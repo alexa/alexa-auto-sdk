@@ -48,7 +48,6 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/MockDeviceSettingStorage.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockDeviceSettingsDelegate.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Test/Alexa/MockDeviceSetup.h
-
 )
 source_group("Header Files" FILES ${HEADERS})
 
@@ -99,6 +98,7 @@ target_link_libraries(AACEAlexaTestsLib
     ${AVS_ACL_LIBRARY}
     ${AVS_CERTIFIED_SENDER_LIBRARY}
     ${AVS_REGISTRATION_MANAGER_LIBRARY}
+    ${AVS_SHUTDOWN_MANAGER_LIBRARY}
     ${AVS_AVS_COMMON_LIBRARY}
 )
 
@@ -157,6 +157,7 @@ target_link_libraries(AACEAlexaTests
     AACEAlexaTestsLib
     ${AVS_CERTIFIED_SENDER_LIBRARY}
     ${AVS_REGISTRATION_MANAGER_LIBRARY}
+    ${AVS_SHUTDOWN_MANAGER_LIBRARY}
     AACECoreTestsLib
     ${GMOCK_LIBRARY}
     ${GMOCK_MAIN_LIBRARY}

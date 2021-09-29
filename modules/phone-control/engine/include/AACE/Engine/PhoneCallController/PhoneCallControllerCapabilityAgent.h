@@ -144,9 +144,10 @@ private:
     void acquireCommunicationsChannelFocus();
     void releaseCommunicationsChannelFocus();
 
-    void updateContextManager();
+    void updateContextManager(const std::string& context);
     std::string getContextString();
     std::string getEventName(CallState state, const std::string& callId);
+    const std::pair<std::string, std::string> buildEventAndUpdateContext(const std::string& eventName, const std::string& payload);
 
     void addCall(std::string callId, CallState state);
     void setCallState(std::string callId, CallState state);

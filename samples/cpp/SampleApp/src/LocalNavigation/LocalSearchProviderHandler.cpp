@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ LocalSearchProviderHandler::LocalSearchProviderHandler(std::weak_ptr<logger::Log
         m_loggerHandler{std::move(loggerHandler)} {
 }
 
-bool LocalSearchProviderHandler::poiSearchRequest(const std::string& request) {
-    log(logger::LoggerHandler::Level::INFO, "Handling POI search request");
+bool LocalSearchProviderHandler::searchRequest(const std::string& request) {
+    log(logger::LoggerHandler::Level::INFO, "Handling search request");
     std::string id;
     bool hasId = getRequestId(request, id);
     if (!hasId) {
@@ -76,16 +76,16 @@ bool LocalSearchProviderHandler::poiSearchRequest(const std::string& request) {
         return false;
     }
     // Your implementation should delegate the request to a navigation provider, return from
-    // this method immediately, and call the poiSearchResponse() callback when the async result
+    // this method immediately, and call the searchResponse() callback when the async result
     // is available from the provider. This sample produces an error response instead.
     std::string response = createErrorResponse(id);
     log(logger::LoggerHandler::Level::INFO, "Using error response: " + response);
-    poiSearchResponse(response);
+    searchResponse(response);
     return true;
 }
 
-bool LocalSearchProviderHandler::poiLookupRequest(const std::string& request) {
-    log(logger::LoggerHandler::Level::INFO, "Handling POI lookup request");
+bool LocalSearchProviderHandler::lookupRequest(const std::string& request) {
+    log(logger::LoggerHandler::Level::INFO, "Handling lookup request");
     std::string id;
     bool hasId = getRequestId(request, id);
     if (!hasId) {
@@ -93,11 +93,11 @@ bool LocalSearchProviderHandler::poiLookupRequest(const std::string& request) {
         return false;
     }
     // Your implementation should delegate the request to a navigation provider, return from
-    // this method immediately, and call the poiLookupResponse() callback when the async result
+    // this method immediately, and call the lookupResponse() callback when the async result
     // is available from the provider. This sample produces an error response instead.
     std::string response = createErrorResponse(id);
     log(logger::LoggerHandler::Level::INFO, "Using error response: " + response);
-    poiLookupResponse(response);
+    lookupResponse(response);
     return true;
 }
 

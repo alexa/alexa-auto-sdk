@@ -39,6 +39,12 @@ include ':alexa-auto-settings'
 project(':alexa-auto-settings').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-settings')
 include ':alexa-auto-comms-ui'
 project(':alexa-auto-comms-ui').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-comms-ui')
+include ':alexa-auto-apl-renderer'
+project(':alexa-auto-apl-renderer').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apl-renderer')
+include ':alexa-auto-templateruntime-renderer'
+project(':alexa-auto-templateruntime-renderer').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-templateruntime-renderer')
+include ':alexa-auto-device-usage'
+project(':alexa-auto-device-usage').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-device-usage')
 
 gradle.ext.previewmodecomponent =  new File(rootProject.projectDir, "../../platforms/android/app-components/alexa-auto-preview-mode-util").getAbsolutePath()
 if (!gradle.ext.previewmodecomponent.isEmpty()) {

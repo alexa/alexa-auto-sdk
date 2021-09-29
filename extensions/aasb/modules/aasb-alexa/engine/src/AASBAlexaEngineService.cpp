@@ -270,7 +270,7 @@ bool AASBAlexaEngineService::registerLocalMediaSourceMessageHandlers(
 
                     ThrowIfNull(localMediaSource, "invalidLocalMediaSourceAdapter");
 
-                    localMediaSource->playerEvent(payload.eventName);
+                    localMediaSource->playerEvent(payload.eventName, payload.sessionId);
                     AACE_INFO(LX(TAG, "PlayerEventMessage").m("MessageRouted"));
                 } catch (std::exception& ex) {
                     AACE_ERROR(LX(TAG, "PlayerEventMessage").d("reason", ex.what()));
@@ -290,7 +290,8 @@ bool AASBAlexaEngineService::registerLocalMediaSourceMessageHandlers(
 
                     ThrowIfNull(localMediaSource, "invalidLocalMediaSourceAdapter");
 
-                    localMediaSource->playerError(payload.errorName, payload.code, payload.description, payload.fatal);
+                    localMediaSource->playerError(
+                        payload.errorName, payload.code, payload.description, payload.fatal, payload.sessionId);
                     AACE_INFO(LX(TAG, "PlayerErrorMessage").m("MessageRouted"));
                 } catch (std::exception& ex) {
                     AACE_ERROR(LX(TAG, "PlayerErrorMessage").d("reason", ex.what()));

@@ -20,7 +20,7 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * DeviceSetup platform interface should be extended and registered into the Alexa Engine.
  * This class is used to send an event to AVS SDK when client application setup is completed.
- * Alexa walks through the supported Alexa out of box exeperience to the first time user when
+ * Alexa walks through the supported Alexa out-of-the-box experience for the first-time user when
  * setupCompleted event is triggered.
  */
 abstract public class DeviceSetup extends PlatformInterface {

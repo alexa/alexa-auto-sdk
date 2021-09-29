@@ -68,7 +68,7 @@ public final class APIConstants {
             public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_REPEAT =
                     "Alexa.PlaylistController.EnableRepeat";
             public static final String ALEXA_PLAYLIST_CONTROLLER_ENABLE_REPEAT_ONE =
-                    "Albuilexa.PlaylistController.EnableRepeatOne";
+                    "Alexa.PlaylistController.EnableRepeatOne";
             public static final String ALEXA_PLAYLIST_CONTROLLER_DISABLE_REPEAT =
                     "Alexa.PlaylistController.DisableRepeat";
 

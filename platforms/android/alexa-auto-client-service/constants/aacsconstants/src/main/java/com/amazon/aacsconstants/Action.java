@@ -86,9 +86,7 @@ public class Action {
         public static final String SETUP_COMPLETED_RESPONSE = "SetupCompletedResponse";
     }
 
-    public static class DeviceUsage {
-        public static final String REPORT_NETWORK_DATA_USAGE = "ReportNetworkDataUsage";
-    }
+    public static class DeviceUsage { public static final String REPORT_NETWORK_DATA_USAGE = "ReportNetworkDataUsage"; }
 
     public static class DoNotDisturb {
         public static final String DO_NOT_DISTURB_CHANGED = "DoNotDisturbChanged";
@@ -291,4 +289,8 @@ public class Action {
         public static final String PREPARE_SPEECH_FAILED = "PrepareSpeechFailed";
     }
     public static class Animation { public static final String ANIMATION_SWITCH = "ANIMATION_SWITCH"; }
+
+    public static class IntentAction {
+        public static final String GET_SERVICE_METADATA_REPLY = "GetServiceMetadataReply";
+    }
 }

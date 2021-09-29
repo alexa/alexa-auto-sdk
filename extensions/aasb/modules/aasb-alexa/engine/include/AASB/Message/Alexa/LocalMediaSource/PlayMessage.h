@@ -53,7 +53,7 @@ struct PlayMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.2";
+            static std::string version = "3.3";
             return version;
         }
         static const std::string& messageType() {
@@ -70,6 +70,7 @@ struct PlayMessage {
         Source source;
         ContentSelector contentSelectorType;
         std::string payload;
+        std::string sessionId;
     };
     static const std::string& topic() {
         static std::string topic = "LocalMediaSource";
@@ -80,7 +81,7 @@ struct PlayMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.2";
+        static std::string version = "3.3";
         return version;
     }
     static const std::string& messageType() {
@@ -98,12 +99,14 @@ inline void to_json(nlohmann::json& j, const PlayMessage::Payload& c) {
         {"source", c.source},
         {"contentSelectorType", c.contentSelectorType},
         {"payload", c.payload},
+        {"sessionId", c.sessionId},
     };
 }
 inline void from_json(const nlohmann::json& j, PlayMessage::Payload& c) {
     j.at("source").get_to(c.source);
     j.at("contentSelectorType").get_to(c.contentSelectorType);
     j.at("payload").get_to(c.payload);
+    j.at("sessionId").get_to(c.sessionId);
 }
 
 inline void to_json(nlohmann::json& j, const PlayMessage::Header::MessageDescription& c) {

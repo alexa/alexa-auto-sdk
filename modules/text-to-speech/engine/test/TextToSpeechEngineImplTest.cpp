@@ -147,7 +147,7 @@ TEST_F(TextToSpeechEngineImplTest, prepareSpeechWithEmptySpeechId) {
     const std::string provider = "text-to-speech-provider";
     const std::string options = "TEST";
     EXPECT_FALSE(testTextToSpeechEngineImpl->onPrepareSpeech(speechId, text, provider, options))
-        << "Call to onPreapreSpeech() expected to fail!";
+        << "Call to onPrepareSpeech() expected to fail!";
 }
 
 /**
@@ -162,7 +162,7 @@ TEST_F(TextToSpeechEngineImplTest, prepareSpeechWithEmptyText) {
     const std::string provider = "text-to-speech-provider";
     const std::string options = "TEST";
     EXPECT_FALSE(testTextToSpeechEngineImpl->onPrepareSpeech(speechId, text, provider, options))
-        << "Call to onPreapreSpeech() expected to fail!";
+        << "Call to onPrepareSpeech() expected to fail!";
 }
 
 /**
@@ -180,7 +180,7 @@ TEST_F(TextToSpeechEngineImplTest, prepareSpeechWithInvalidProvider) {
         .Times(1)
         .WillOnce(testing::Return(nullptr));
     EXPECT_FALSE(testTextToSpeechEngineImpl->onPrepareSpeech(speechId, text, provider, options))
-        << "Call to onPreapreSpeech() expected to fail!";
+        << "Call to onPrepareSpeech() expected to fail!";
 }
 
 /**
@@ -199,7 +199,7 @@ TEST_F(TextToSpeechEngineImplTest, prepareSpeechWithInvalidOptions) {
         .Times(1)
         .WillOnce(testing::Return(m_mockTextToSpeechSynthesizerInterface));
     EXPECT_FALSE(testTextToSpeechEngineImpl->onPrepareSpeech(speechId, text, provider, options))
-        << "Call to onPreapreSpeech() expected to fail!";
+        << "Call to onPrepareSpeech() expected to fail!";
 }
 
 /**
@@ -212,7 +212,7 @@ TEST_F(TextToSpeechEngineImplTest, getCapabilitiesWithEmptyRequestId) {
     const std::string requestId = "";
     const std::string provider = "text-to-speech-provider";
     EXPECT_FALSE(testTextToSpeechEngineImpl->onGetCapabilities(requestId, provider))
-        << "Call to ononGetCapabilities() expected to fail!";
+        << "Call to onGetCapabilities() expected to fail!";
 }
 
 /**
@@ -228,7 +228,7 @@ TEST_F(TextToSpeechEngineImplTest, getCapabilitiesWithInvalidProvider) {
         .Times(1)
         .WillOnce(testing::Return(nullptr));
     EXPECT_FALSE(testTextToSpeechEngineImpl->onGetCapabilities(requestId, provider))
-        << "Call to onPreapreSpeech() expected to fail!";
+        << "Call to onPrepareSpeech() expected to fail!";
 }
 
 }  // namespace unit

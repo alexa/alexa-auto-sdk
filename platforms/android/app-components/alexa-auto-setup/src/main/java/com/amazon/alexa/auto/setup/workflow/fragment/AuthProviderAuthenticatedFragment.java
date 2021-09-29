@@ -1,13 +1,7 @@
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
-import static com.amazon.alexa.auto.apps.common.Constants.AUTH_PROVIDER_ALEXA_HINT_TEXT;
-import static com.amazon.alexa.auto.apps.common.Constants.AUTH_PROVIDER_NONALEXA_HINT_TEXT;
-import static com.amazon.alexa.auto.apps.common.Constants.LOGIN_FINISH_HEADING_TEXT;
-import static com.amazon.alexa.auto.apps.common.Constants.LOGIN_TRY_TEXT;
-
 import android.app.Application;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +15,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.amazon.alexa.auto.apis.alexaCustomAssistant.AlexaSetupProvider;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
-import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
+import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.setup.R;
 
 /**
@@ -84,14 +77,9 @@ public class AuthProviderAuthenticatedFragment extends Fragment {
 
         View fragmentView = requireView();
 
-        if (getArguments() != null) {
-            String supportedFeature = getArguments().getString(ModuleProvider.MODULES);
-            if (supportedFeature != null) {
-                if (supportedFeature.contains(ModuleProvider.ModuleName.ALEXA_CUSTOM_ASSISTANT.name())) {
-                    updateUIForAlexaCustomAssistant();
-                }
-            }
-        }
+        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_heading);
+        String format = getResources().getString(R.string.login_finish_heading_text);
+        loginFinishHeadingText.setText(String.format(format, ""));
 
         mController = findNavController(fragmentView);
 
@@ -99,7 +87,10 @@ public class AuthProviderAuthenticatedFragment extends Fragment {
         finishLoginButtonText.setOnClickListener(view -> mViewModel.userFinishedLogin());
 
         TextView signIndButtonText = fragmentView.findViewById(R.id.sign_in_action_button);
-        signIndButtonText.setOnClickListener(view -> { mController.navigate(R.id.navigation_fragment_cblStart); });
+        signIndButtonText.setOnClickListener(view -> {
+            mViewModel.userFinishedLogin();
+            mViewModel.userSwitchedLogin(AuthMode.CBL_AUTHORIZATION);
+        });
 
         // Setup steps are completed and showing the finish screen.
         mViewModel.setupCompleted();
@@ -108,25 +99,5 @@ public class AuthProviderAuthenticatedFragment extends Fragment {
     @VisibleForTesting
     NavController findNavController(@NonNull View view) {
         return Navigation.findNavController(view);
-    }
-
-    @VisibleForTesting
-    private void updateUIForAlexaCustomAssistant() {
-        Log.d(TAG, "Update UI components for alexa custom assistant");
-        View fragmentView = requireView();
-
-        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_heading);
-        TextView loginHintTryText = fragmentView.findViewById(R.id.login_hint_try);
-        TextView assistantHint1Text = fragmentView.findViewById(R.id.alexa_hint1);
-        TextView assistantHint2Text = fragmentView.findViewById(R.id.alexa_hint2);
-        TextView assistantHint3Text = fragmentView.findViewById(R.id.alexa_hint3);
-
-        mApp.getRootComponent().getComponent(AlexaSetupProvider.class).ifPresent(alexaSetupProvider -> {
-            loginFinishHeadingText.setText(alexaSetupProvider.getSetupResId(LOGIN_FINISH_HEADING_TEXT));
-            loginHintTryText.setText(alexaSetupProvider.getSetupResId(LOGIN_TRY_TEXT));
-            assistantHint1Text.setText(alexaSetupProvider.getSetupResId(AUTH_PROVIDER_ALEXA_HINT_TEXT));
-            assistantHint2Text.setText(alexaSetupProvider.getSetupResId(AUTH_PROVIDER_NONALEXA_HINT_TEXT));
-            assistantHint3Text.setVisibility(View.GONE);
-        });
     }
 }

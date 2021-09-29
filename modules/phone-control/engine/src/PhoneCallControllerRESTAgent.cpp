@@ -201,7 +201,7 @@ static std::string buildAutoAccountProvisionJson() {
  * Gets the ACMS endpoint.
  * 
  * @param alexaEndpoints Reference to @c AlexaEndpointInterface, used to get the ACMS endpoint provided in engine configuration.
- * @return Returns the ACMS endpoint if provideed in the engine configuration otherwise default value. 
+ * @return Returns the ACMS endpoint if provided in the engine configuration otherwise default value. 
  */
 static std::string getACMSEndpoint(std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints) {
     auto acmsEndpoint = alexaEndpoints->getACMSEndpoint();

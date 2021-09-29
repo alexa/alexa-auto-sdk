@@ -4,6 +4,8 @@ import com.amazon.aace.alexa.LocalMediaSource;
 import com.amazon.aace.audio.AudioOutput;
 import com.amazon.sampleapp.impl.Logger.LoggerHandler;
 
+import java.util.UUID;
+
 public abstract class LocalMediaSourceHandler extends LocalMediaSource {
     private static final String sTag = LocalMediaSourceHandler.class.getSimpleName();
 
@@ -11,17 +13,27 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource {
 
     private float mVolume = 0.5f;
     private AudioOutput.MutedState mMutedState = AudioOutput.MutedState.UNMUTED;
+    private String mSessionId;
 
     protected LocalMediaSourceHandler(LoggerHandler logger, Source type) {
         super(type);
         mLogger = logger;
+        mSessionId = new String();
     }
 
     @Override
-    public boolean play(ContentSelector selector, String payload) {
+    public boolean play(ContentSelector selector, String payload, String sessionId) {
         mLogger.postInfo(sTag,
-                String.format("play [source=%s,selector=%s,payload=%s]", getSource(), selector.toString(), payload));
+                String.format("play [source=%s,selector=%s,payload=%s,sessionId=%s]", getSource(), selector.toString(),
+                        payload, sessionId));
+        // Call playerEvent("PlaybackSessionStarted","<sessionId>") to inform Alexa the media is switched.
+        // This call gets the focus for the media source. This is very crucial step.
+        // Report PlaybackSessionStarted only when the media source becomes the active
+        // Call playerEvent("PlaybackStarted", "<sessionId>") to inform Alexa the media is playing.
+        mSessionId = sessionId;
         setPlaybackState("PLAYING");
+        playerEvent("PlaybackSessionStarted", mSessionId);
+        playerEvent("PlaybackStarted", mSessionId);
         return true;
     }
 
@@ -31,13 +43,27 @@ public abstract class LocalMediaSourceHandler extends LocalMediaSource {
                 sTag, String.format("playControl [source=%s,controlType=%s]", getSource(), controlType.toString()));
         switch (controlType) {
             case STOP:
+                // Call playerEvent("PlaybackStopped", "<sessionId>") to inform Alexa the media stopped playing
                 setPlaybackState("STOPPED");
+                playerEvent("PlaybackStopped", mSessionId);
+                playerEvent("PlaybackSessionEnded", mSessionId);
+                mSessionId = ""; // Reset the session Id
                 break;
             case PAUSE:
+                // Call playerEvent("PlaybackStopped", "<sessionId>") to inform Alexa the media stopped playing
                 setPlaybackState("PAUSED");
+                playerEvent("PlaybackStopped", mSessionId);
                 break;
             case RESUME:
+                // If Resuming a non active media, consider calling playerEvent("PlaybackSessionStarted","<sessionId>")
+                // to inform Alexa the media is switched. Call playerEvent("PlaybackStarted", "<sessionId>") to inform
+                // Alexa the media is playing
+                if (mSessionId.isEmpty()) {
+                    mSessionId = UUID.randomUUID().toString();
+                    playerEvent("PlaybackSessionStarted", mSessionId);
+                }
                 setPlaybackState("PLAYING");
+                playerEvent("PlaybackStarted", mSessionId);
                 break;
             default:
                 break;

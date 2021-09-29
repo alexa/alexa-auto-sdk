@@ -1,6 +1,6 @@
 {
   "aacs.aasb": {
-    "version": "3.2"
+    "version": "3.3"
   },
   "aacs.alexa": {
     "deviceInfo": {
@@ -31,8 +31,13 @@
     },
     "operatingCountry": "US"
   },
+  "aasb.apl": {
+    "APL": {
+      "enabled" : false
+    }
+  },
   "aacs.cbl": {
-    "enableUserProfile": false
+    "enableUserProfile": true
   },
   "aacs.general": {
     "version": "1.0",

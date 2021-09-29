@@ -88,7 +88,7 @@ private:
     void handleSetFailed(const bool& fromPlatform, const std::string& name, const std::string& value);
 
 private:
-    // Map to store property name and the ProperteryDescription object
+    // Map to store property name and the PropertyDescription object
     // associated with that property.
     std::unordered_map<std::string, PropertyDescription> m_propertyDescriptionMap;
 

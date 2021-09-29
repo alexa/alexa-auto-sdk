@@ -57,7 +57,7 @@ The Address Book module (for [C++](./modules/address-book/README.md) or [Android
 
 ### Code-Based Linking (CBL) Module
 
-The CBL module (for [C++](./modules/cbl/README.md) or [Android](./platforms/android/modules/cbl/README.md)) implements the CBL mechanism of acquiring Login with Amazon (LWA) access tokens. For information about the CBL mechanism, see the [Code-Based Linking documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/code-based-linking-other-platforms.html).
+The CBL module (for [C++](./modules/cbl/README.md) or [Android](./platforms/android/modules/cbl/README.md)) implements the CBL mechanism of acquiring Login with Amazon (LWA) access tokens. For information about the CBL mechanism, see the [Code-Based Linking documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-cbl.html).
 
 ### Alexa Presentation Language (APL) Module
 The APL module (for [C++](./modules/apl/README.md) or [Android](./platforms/android/modules/apl/README.md)) enables devices to support a visual Alexa experience.
@@ -99,9 +99,16 @@ The Geolocation extension adds geolocation consent support to the Auto SDK, enab
 
 ### Local Voice Control (LVC) Extension
 The LVC extension provides car control, communication, navigation, local search, and entertainment functionality, without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit.
-
+#### Local Voice Control Module
+The Local Voice Control module adds core functionality to Auto SDK to enable offline features. The module infrastructure bridges the Auto SDK Engine to the offline Alexa endpoint running in the head unit and is necessary for all other modules in the LVC extension.
+#### Local Skill Service Module
+The Local Skill Service module provides a multipurpose service to the Auto SDK Engine that enables components running alongside the offline Alexa endpoint to communicate with the Auto SDK Engine. The module infrastructure is necessary for other modules in the LVC extension.
 #### Local Navigation Module
-The Local Navigation module enables you to provide customers with Alexa local search and navigation without WiFi or data plan connectivity.
+The Local Navigation module enables you to provide customers with offline Alexa local search and navigation to points of interest (i.e., categories, chains, and entities) and addresses.
+#### Address Book Local Service Module
+The Address Book Local Service module works with the Address Book module and the Local Skill Service module to augment the offline communications and navigation capabilities of Alexa with user data such as phone contacts and navigation favorites.
+#### Car Control Local Service Module
+The Car Control Local Service module works with the Car Control module and the Local Skill Service module to enable users to control vehicle features offline with Alexa.
 
 ### Mobile Authorization Extension
 The Mobile Authorization extension enables applications running on the vehicle's head unit to simplify the login experience. To log in to Alexa, the user uses the Alexa mobile app on a paired smartphone instead of opening a web browser and entering a code.

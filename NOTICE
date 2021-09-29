@@ -7,7 +7,7 @@ ALEXA AUTO SDK COMPONENTS
 The following Alexa Auto SDK components are licensed under the Apache License, Version 2.0 (the "License"):
 
 builder
-extensions/experimental/system-audio
+extensions/system-audio
 extensions/loopback-detector
 modules/address-book
 modules/alexa

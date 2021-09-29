@@ -45,10 +45,10 @@ interface ILVCClient {
      *          "volumeAdjustmentStepValue": "<Device volume adjustment step value>"
      *      },
      *      "LocalSearch": {
-     *          "NavigationPOISocketDir": "/some/directory/for/sockets",
-     *          "NavigationPOISocketName": "poi_navigation.socket",
-     *          "POIEERSocketDir": "/some/directory/for/sockets",
-     *          "POIEERSocketName": "poi_eer.socket"
+     *          "NavigationLocalSearchSocketDir": "/some/directory/for/sockets",
+     *          "NavigationLocalSearchSocketName": "local_search_navigation.socket",
+     *          "LocalSearchEERSocketDir": "/some/directory/for/sockets",
+     *          "LocalSearchEERSocketName": "local_search_eer.socket"
      *      },
      *      "ExternalSkillConfigurations": {
      *          "localAlexaApiService": {
@@ -104,21 +104,29 @@ interface ILVCClient {
      *         device volume. This refers to the change notified via
      *         @c AlexaSpeaker.speakerSettingsChanged(), which uses the 0-100 range.
      * "LocalSearch" (optional, but required if the Auto SDK Local Navigation module is used):
-     *     - "NavigationPOISocketDir" (required): The absolute path to a directory where the
+     *     - "NavigationLocalSearchSocketDir" (required): The absolute path to a directory where the
      *       socket will be created for communication between the local navigation skill in
      *       an LVC APK process and local search components running in the Auto SDK Engine.
      *       Use the same directory when configuring the Auto SDK Engine's Local Navigation module.
-     *     - "NavigationPOISocketName" (required): The name of the socket used for
-     *       communication between the local navigation skill and POI local search components
+     *       Note that deprecated key "NavigationPOISocketDir" may be used instead of
+     *       "NavigationLocalSearchSocketDir", but it will be removed in a future version of LVC.
+     *     - "NavigationLocalSearchSocketName" (required): The name of the socket used for
+     *       communication between the local navigation skill and local search components
      *       in the Auto SDK Engine.
      *       Use the same name when configuring the Auto SDK Engine's Local Navigation module.
-     *     - "POIEERSocketDir" (required): The absolute path to a directory where the socket
+     *       Note that deprecated key "NavigationPOISocketName" may be used instead of
+     *       "NavigationLocalSearchSocketName", but it will be removed in a future version of LVC.
+     *     - "LocalSearchEERSocketDir" (required): The absolute path to a directory where the socket
      *       will be created for communication between the offline Alexa service in an LVC APK
-     *       process and POI local search components running in the Auto SDK Engine.
+     *       process and local search components running in the Auto SDK Engine.
      *       Use the same directory when configuring the Auto SDK Engine's Local Navigation module.
-     *     - "POIEERSocketName" (required): The name of the socket used for communication
-     *       between the offline Alexa service and the POI local search components running in the
+     *       Note that deprecated key "POIEERSocketDir" may be used instead of
+     *       "LocalSearchEERSocketDir", but it will be removed in a future version of LVC.
+     *     - "LocalSearchEERSocketName" (required): The name of the socket used for communication
+     *       between the offline Alexa service and the local search components running in the
      *       the Auto SDK Engine.
+     *       Note that deprecated key "POIEERSocketName" may be used instead of
+     *       "LocalSearchEERSocketName" , but it will be removed in a future version of LVC.
      *       Use the same name when configuring the Auto SDK Engine's Local Navigation module.
      * "ExternalSkillConfigurations" (optional): Specifies configurations for additional
      *      local-hosted skills
@@ -165,10 +173,10 @@ interface ILVCClient {
      *              "volumeAdjustmentStepValue": "<Device volume adjustment step value>"
      *          },
      *          "LocalSearch": {
-     *              "NavigationPOISocketDir": "/some/directory/for/sockets",
-     *              "NavigationPOISocketName": "poi_navigation.socket",
-     *              "POIEERSocketDir": "/some/directory/for/sockets",
-     *              "POIEERSocketName": "poi_eer.socket"
+     *              "NavigationLocalSearchSocketDir": "/some/directory/for/sockets",
+     *              "NavigationLocalSearchSocketName": "local_search_navigation.socket",
+     *              "LocalSearchEERSocketDir": "/some/directory/for/sockets",
+     *              "LocalSearchEERSocketName": "local_search_eer.socket"
      *          }
      *      }
      *  }

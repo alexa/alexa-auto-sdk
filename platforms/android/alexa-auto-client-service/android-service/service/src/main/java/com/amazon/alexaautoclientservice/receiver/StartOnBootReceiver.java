@@ -33,7 +33,8 @@ public class StartOnBootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()) && FileUtil.isStartServiceOnBootEnabled(context)) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())
+                && FileUtil.isEnabledInAACSGeneralConfig("startServiceOnBootEnabled")) {
             Log.d(TAG, "Received BOOT_COMPLETED intent.");
 
             Intent startIntent = new Intent(context, AlexaAutoClientService.class);

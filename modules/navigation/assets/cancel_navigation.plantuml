@@ -1,0 +1,29 @@
+@startuml
+skinparam roundcorner 10
+scale 600 width
+scale 600 height
+
+participant Driver
+participant "3P Nav App" as Nav
+participant NavigationHandler
+participant "Auto SDK" as SDK
+participant  Alexa
+
+Driver->SDK: "Alexa, cancel navigation"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+
+
+alt Car is navigating. Nav context contains "state" field set to "NAVIGATING"
+    Alexa->SDK : CancelNavigation directive
+    SDK->NavigationHandler : cancelNavigation()
+    NavigationHandler -> Nav : cancel any ongoing navigation
+ 
+    Alexa->Driver : "Cancelling navigation" TTS
+else Car is not navigating. Nav context contains "state" field set to "NOT_NAVIGATING"
+    Alexa->Driver : "Your vehicle is not currently navigating" TTS
+end
+@enduml

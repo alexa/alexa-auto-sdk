@@ -64,7 +64,7 @@ public:
     template <class T>
     bool getStatic(JavaFieldPtr field, T* value);
 
-    // assignment opperator
+    // assignment operator
     JavaObject& operator=(const JavaObject& jobj) {
         m_globalObjRef = jobj.m_globalObjRef;
         m_class = jobj.m_class;

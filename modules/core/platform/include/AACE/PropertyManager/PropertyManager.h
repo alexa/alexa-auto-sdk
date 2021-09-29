@@ -54,7 +54,7 @@ public:
      *        @c aace::alexa::property::AlexaProperties.h.
      * @param [in] value The property setting
      * @return @c true if the property value was updated or set to the current
-     *         setting, else @c false if an error occured.
+     *         setting, else @c false if an error occurred.
      */
     bool setProperty(const std::string& name, const std::string& value);
 
@@ -98,7 +98,7 @@ public:
 
     /**
      * @internal
-     * Sets the Engine interface delagate
+     * Sets the Engine interface delegate
      *
      * Should *never* be called by the platform implementation
      */

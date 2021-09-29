@@ -8,7 +8,7 @@ data class Address (
     val addressLine2 : String?,
     val addressLine3 : String?,
     val city : String,
-    val stateOrRegion : String,
+    val stateOrRegion : String?,
     val districtOrCounty : String?,
     val postalCode : String,
     val countryCode : String

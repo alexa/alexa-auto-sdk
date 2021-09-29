@@ -95,9 +95,6 @@ public class CBLFragment extends Fragment {
         ProgressBar spinner = fragmentView.findViewById(R.id.login_progress_spinner);
         spinner.getIndeterminateDrawable().setColorFilter(
                 ResourcesCompat.getColor(getResources(), R.color.Cyan, null), PorterDuff.Mode.MULTIPLY);
-
-        TextView getStartedButtonText = fragmentView.findViewById(R.id.try_again_action_button);
-        getStartedButtonText.setOnClickListener(view -> mNavController.popBackStack());
     }
 
     private void authWorkflowStateChanged(AuthWorkflowData loginData) {
@@ -110,14 +107,12 @@ public class CBLFragment extends Fragment {
             case CBL_Auth_CodePair_Received:
                 Preconditions.checkNotNull(loginData.getCodePair());
 
-                updateLoginErrorMessageVisibility(View.GONE);
                 updateQRCodeContainerVisibility(View.VISIBLE);
                 updateVisibilitySpinner(View.GONE);
                 updateLoginInContainerVisibility(View.GONE);
                 updateCBLCodePair(loginData.getCodePair());
                 break;
             case CBL_Auth_Finished:
-                updateLoginErrorMessageVisibility(View.GONE);
                 updateCBLLoginFinishedVisibility(View.VISIBLE);
                 updateQRCodeContainerVisibility(View.GONE);
                 updateVisibilitySpinner(View.GONE);
@@ -125,7 +120,7 @@ public class CBLFragment extends Fragment {
                 EventBus.getDefault().post(new WorkflowMessage(LoginEvent.CBL_AUTH_FINISHED));
                 break;
             case CBL_Auth_Start_Failed:
-                updateLoginErrorMessageVisibility(View.VISIBLE);
+                mNavController.navigate(R.id.navigation_fragment_cblLoginError);
                 break;
         }
     }
@@ -173,15 +168,6 @@ public class CBLFragment extends Fragment {
     private void updateCBLLoginFinishedVisibility(int visible) {
         View view = requireView();
         view.findViewById(R.id.cbl_login_finished_layout).setVisibility(visible);
-    }
-
-    private void updateLoginErrorMessageVisibility(int visible) {
-        View view = requireView();
-        view.findViewById(R.id.login_error_text_view).setVisibility(visible);
-
-        TextView getStartedButton = (TextView) view.findViewById(R.id.try_again_action_button);
-        getStartedButton.setVisibility(visible);
-        getStartedButton.setText(R.string.login_action_retry_button);
     }
 
     private void setContentForCBLViewTitle() {

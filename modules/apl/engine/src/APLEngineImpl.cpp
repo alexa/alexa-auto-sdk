@@ -30,7 +30,7 @@ using namespace alexaClientSDK;
 using namespace alexaSmartScreenSDK;
 using namespace aace::engine::utils::metrics;
 
-// String to identify log entires originating from this file.
+// String to identify log entries originating from this file.
 static const std::string TAG("aace.apl.APLEngineImpl");
 
 /// Program Name for Metrics

@@ -346,7 +346,7 @@ bool SQLiteStorage::begin() {
 bool SQLiteStorage::commit() {
     try {
         ThrowIfNull(m_db, "invalidDatabase");
-        ThrowIfNot(m_transactionInProgress, "transactionNotInProgresss");
+        ThrowIfNot(m_transactionInProgress, "transactionNotInProgress");
         ThrowIfNot(query("COMMIT TRANSACTION;"), "commitTransactionFailed");
 
         m_transactionInProgress = false;
@@ -361,7 +361,7 @@ bool SQLiteStorage::commit() {
 bool SQLiteStorage::cancel() {
     try {
         ThrowIfNull(m_db, "invalidDatabase");
-        ThrowIfNot(m_transactionInProgress, "transactionNotInProgresss");
+        ThrowIfNot(m_transactionInProgress, "transactionNotInProgress");
         ThrowIfNot(query("ROLLBACK TRANSACTION;"), "cancelTransactionFailed");
 
         m_transactionInProgress = false;

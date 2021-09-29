@@ -24,9 +24,8 @@
 #include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Vehicle/VehicleConfiguration.h"
-
-#include <rapidjson/document.h>
 
 namespace aace {
 namespace engine {
@@ -93,7 +92,7 @@ protected:
      * @param [out] propertyMap The map that will be updated if the key is present
      */
     void getVehicleConfigProperty(
-        rapidjson::Value& root,
+        aace::engine::utils::json::Value& root,
         const char* configKey,
         VehiclePropertyType propertyKey,
         std::unordered_map<VehiclePropertyType, std::string, EnumHash>& propertyMap);

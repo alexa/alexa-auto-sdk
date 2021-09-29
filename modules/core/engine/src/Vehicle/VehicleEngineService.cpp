@@ -22,13 +22,12 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Vehicle/VehicleProperties.h"
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/istreamwrapper.h>
-
 namespace aace {
 namespace engine {
 namespace vehicle {
+
+// json namespace alias
+namespace json = aace::engine::utils::json;
 
 /// String to identify log entries originating from this file
 static const std::string TAG("aace.vehicle.VehicleEngineService");
@@ -142,26 +141,27 @@ bool VehicleEngineService::setup() {
 }
 
 void VehicleEngineService::getVehicleConfigProperty(
-    rapidjson::Value& root,
+    json::Value& root,
     const char* configKey,
     VehiclePropertyType propertyKey,
     std::unordered_map<VehiclePropertyType, std::string, EnumHash>& propertyMap) {
-    ReturnIfNot(root.HasMember(configKey) && root[configKey].IsString());
-    std::string value = root[configKey].GetString();
-    AACE_DEBUG(LX(TAG, "VehicleProperty").d(configKey, value));
-    propertyMap[propertyKey] = value;
+    try {
+        ReturnIf(json::get(root, configKey, json::Type::string) == nullptr);
+        auto value = json::get(root, configKey);
+        AACE_DEBUG(LX(TAG, "VehicleProperty").d(configKey, value));
+        propertyMap[propertyKey] = value;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 bool VehicleEngineService::configure(std::shared_ptr<std::istream> configuration) {
     try {
-        auto document = aace::engine::utils::json::parse(configuration);
-        ThrowIfNull(document, "parseConfigurationStreamFailed");
+        auto root = aace::engine::utils::json::toJson(configuration);
+        ThrowIfNull(root, "parseConfigurationFailed");
 
-        auto vehicleConfigRoot = document->GetObject();
-
-        if (vehicleConfigRoot.HasMember("info") && vehicleConfigRoot["info"].IsObject()) {
-            rapidjson::Value info = vehicleConfigRoot["info"].GetObject();
-
+        auto info = json::get(root, "/info", json::Type::object);
+        if (info != nullptr) {
             getVehicleConfigProperty(info, "make", VehiclePropertyType::MAKE, m_vehiclePropertyMap);
             getVehicleConfigProperty(info, "model", VehiclePropertyType::MODEL, m_vehiclePropertyMap);
             getVehicleConfigProperty(info, "year", VehiclePropertyType::YEAR, m_vehiclePropertyMap);
@@ -177,8 +177,9 @@ bool VehicleEngineService::configure(std::shared_ptr<std::istream> configuration
             m_vehicleInfoConfigured = true;
         }
 
-        if (vehicleConfigRoot.HasMember("operatingCountry") && vehicleConfigRoot["operatingCountry"].IsString()) {
-            m_operatingCountry = vehicleConfigRoot["operatingCountry"].GetString();
+        auto operatingCountry = json::get(root, "/operatingCountry", json::Type::string);
+        if (operatingCountry != nullptr) {
+            m_operatingCountry = operatingCountry;
         }
 
         // Register the vehicle engine service

@@ -187,7 +187,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
         Preconditions.checkNotNull(mPlaybackController);
 
         Log.d(TAG,
-                "Start Playback (after acquring focus). Current audio focus state: "
+                "Start Playback (after acquiring focus). Current audio focus state: "
                         + focusStateToString(mCurrentState));
 
         switch (mCurrentState) {

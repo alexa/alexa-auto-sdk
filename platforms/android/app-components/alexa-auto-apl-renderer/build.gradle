@@ -1,0 +1,84 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 28
+        versionCode 1
+        versionName "3.3"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            def project = "alexa-auto-apl-renderer"
+            def separator = "_"
+            def buildType = variant.buildType.name
+            def apkName = project + separator + buildType + ".aar"
+            outputFileName = new File(apkName)
+        }
+    }
+}
+
+dependencies {
+    implementation(name:'aplRelease', ext:'aar')
+    implementation(name:'apl-render-release', ext:'aar')
+    implementation(name:'ttsplayerRelease', ext:'aar')
+
+    implementation project(':aacscommonutils')
+    implementation project(':aacsipc')
+    implementation project(':aacsconstants')
+
+    implementation project(":alexa-auto-apps-common-util")
+
+    implementation deps.androidx_appcompat
+    implementation deps.eventbus
+
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.mockito_inline
+    testImplementation deps.androidx_test_core
+    testImplementation deps.androidx_arch_core_testing
+    testImplementation deps.roboelectric
+
+    implementation deps.android_appcompat
+    implementation deps.android_design
+    implementation deps.android_constraint
+    implementation deps.android_cardview
+    implementation deps.android_recyclerview
+    implementation deps.okhttp
+
+    // Glide
+    implementation deps.glide
+    annotationProcessor deps.glide_compiler
+
+    // RX
+    implementation deps.rxjava3
+
+    // Dagger
+    implementation 'com.google.dagger:dagger-android:2.33'
+    implementation 'com.google.dagger:dagger-android-support:2.33'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.33'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.33'
+}

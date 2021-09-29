@@ -56,7 +56,7 @@ public class AudioDecoder {
             mDecoder = MediaCodec.createDecoderByType(mimeType);
             mDecoder.configure(format,
                     null, // surface : required only for video encoding
-                    null, // crypto : required for encryted data
+                    null, // crypto : required for encrypted data
                     0 // 0 indicates that we are configuring to use this as decoder, whereas 1 would have indicated that
                       // we want to use this as an encoder.
             );

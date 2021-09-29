@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 public class ModuleProvider {
     public static final String MODULES = "modules";
 
-    public enum ModuleName { PREVIEW_MODE, ALEXA_CUSTOM_ASSISTANT }
+    public enum ModuleName { PREVIEW_MODE, ALEXA_CUSTOM_ASSISTANT, GEOLOCATION }
 
     public static void addModule(@NonNull Context context, String module) {
         SharedPreferences.Editor editor = context.getSharedPreferences(MODULES, 0).edit();
@@ -53,5 +53,15 @@ public class ModuleProvider {
         } else {
             return "";
         }
+    }
+
+    public static boolean isPreviewModeEnabled(@NonNull Context context) {
+        String extraModules = getModules(context);
+        return extraModules.contains(ModuleName.PREVIEW_MODE.name());
+    }
+
+    public static boolean isAlexaCustomAssistantEnabled(@NonNull Context context) {
+        String extraModules = getModules(context);
+        return extraModules.contains(ModuleName.ALEXA_CUSTOM_ASSISTANT.name());
     }
 }

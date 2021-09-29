@@ -24,9 +24,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.system.ErrnoException;
+import android.system.Os;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -85,15 +88,16 @@ import com.amazon.sampleapp.impl.Authorization.CBLAuthorizationHandler;
 import com.amazon.sampleapp.impl.CarControl.CarControlDataProvider;
 import com.amazon.sampleapp.impl.CarControl.CarControlHandler;
 import com.amazon.sampleapp.impl.DeviceSetup.DeviceSetupHandler;
+import com.amazon.sampleapp.impl.DeviceUsage.DeviceUsageHandler;
 import com.amazon.sampleapp.impl.DoNotDisturb.DoNotDisturbHandler;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerConfiguration;
 import com.amazon.sampleapp.impl.EqualizerController.EqualizerControllerHandler;
 import com.amazon.sampleapp.impl.ExternalMediaPlayer.MACCPlayer;
-import com.amazon.sampleapp.impl.GlobalPreset.GlobalPresetHandler;
 import com.amazon.sampleapp.impl.LocalMediaSource.AMLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.BluetoothLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.CDLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.DABLocalMediaSource;
+import com.amazon.sampleapp.impl.LocalMediaSource.DefaultMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.FMLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.LineInLocalMediaSource;
 import com.amazon.sampleapp.impl.LocalMediaSource.SatelliteLocalMediaSource;
@@ -120,6 +124,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -135,7 +140,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     private static final int sPermissionRequestCode = 0;
     private static final String[] sRequiredPermissions = {Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE};
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE};
 
     // AVS-supported locales: https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
     private static final String[] sSupportedLocales = {"de-DE", "en-AU", "en-CA", "en-GB", "en-IN", "en-US", "es-ES",
@@ -156,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     /// Device default timezone
     private static final String sDefaultDeviceTimeZone = "America/Vancouver";
 
+    /// Platform interface handlers
+    private Map<String, PlatformInterface> mPlatformInterfaceHandlers = new HashMap<>();
     /* AACE Platform Interface Handlers */
 
     // Alexa
@@ -185,6 +193,9 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
     // Car Control
     private CarControlHandler mCarControlHandler;
+
+    // Device Usage
+    private DeviceUsageHandler mDeviceUsageHandler;
 
     // Location
     private LocationProviderHandler mLocationProvider;
@@ -238,8 +249,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     private LineInLocalMediaSource mLILocalMediaSource;
     private SatelliteLocalMediaSource mSATRADLocalMediaSource;
     private USBLocalMediaSource mUSBLocalMediaSource;
-
-    private GlobalPresetHandler mGlobalPresetHandler;
+    private DefaultMediaSource mDefaultMediaSource;
 
     private LVCConfigReceiver mLVCConfigReceiver;
 
@@ -289,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     @Override
     public void onRequestPermissionsResult(
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == sPermissionRequestCode) {
             if (grantResults.length > 0) {
                 for (int grantResult : grantResults) {
@@ -341,6 +352,11 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
     }
 
     @Override
+    public void addPlatformInterfaceHandler(String name, PlatformInterface handler) {
+        mPlatformInterfaceHandlers.put(name, handler);
+    }
+
+    @Override
     public void addEngineStatusListener(EngineStatusListener listener) {
         synchronized (mEngineStatusListeners) {
             if (listener != null) {
@@ -374,6 +390,14 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
             return config;
         }
         return FileUtils.getConfigFromFile(getAssets(), configAssetName, configRootKey);
+    }
+
+    @Override
+    public PlatformInterface getPlatformInterfaceHandler(String name) {
+        if (mPlatformInterfaceHandlers.containsKey(name)) {
+            return mPlatformInterfaceHandlers.get(name);
+        }
+        return null;
     }
 
     public static class TabFragmentAdapter extends FragmentPagerAdapter {
@@ -505,6 +529,17 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
      * @throws RuntimeException
      */
     private void startEngine(String json) throws RuntimeException {
+        JSONObject debugConfig = getConfigFromFile("app_config.json", "debug");
+        if (debugConfig != null && debugConfig.optBoolean("logSslKeys", false)) {
+            try {
+                File log = File.createTempFile("sslkey-aac", ".log");
+                Os.setenv("SSLKEYLOGFILE", log.getAbsolutePath(), true);
+                Log.i(TAG, "Log SSL keys to " + log.getAbsolutePath());
+            } catch (ErrnoException | IOException e) {
+                Log.e(TAG, "Failed to set SSLKEYLOGFILE: " + e.getMessage());
+            }
+        }
+
         // Create an "appdata" subdirectory in the cache directory for storing application data
         File cacheDir = getCacheDir();
         File appDataDir = new File(cacheDir, "appdata");
@@ -628,6 +663,35 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         if (!mEngine.registerPlatformInterface(mAuthorizationHandler = new AuthorizationHandler(this, mLogger)))
             throw new RuntimeException("Could not register Authorization platform interface");
 
+        // Device Usage
+        /**
+         * Provide a way to disable network consumption reporting for test purposes. Production devices
+         * must report network consumption.
+         *
+         * "deviceUsage" : {
+         *      "recordNetworkUsage" : true
+         *  }
+         */
+        JSONObject deviceUsageConfig = getConfigFromFile("app_config.json", "deviceUsage");
+        boolean recordNetworkUsage = false;
+        if (deviceUsageConfig != null) {
+            recordNetworkUsage = deviceUsageConfig.optBoolean("recordNetworkUsage", false);
+        }
+        if (recordNetworkUsage) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!mEngine.registerPlatformInterface(mDeviceUsageHandler = new DeviceUsageHandler(this, mLogger)))
+                    throw new RuntimeException("Could not register DeviceUsage platform interface");
+                addEngineStatusListener(mDeviceUsageHandler);
+            } else {
+                Log.w(TAG,
+                        "Could not register DeviceUsage platform interface since Android API level is lower than Android 23 (M)");
+                Toast.makeText(this, "Android API Level 23 required to register DeviceUsageHandler", Toast.LENGTH_LONG)
+                        .show();
+            }
+        } else {
+            Log.i(TAG, "Network usage consumption not enabled. Device Usage handler not registered");
+        }
+
         JSONObject deviceConfig = new JSONObject();
         try {
             deviceConfig.put("productId", mPreferences.getString(getString(R.string.preference_product_id), ""));
@@ -739,9 +803,9 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
         if (!mEngine.registerPlatformInterface(mUSBLocalMediaSource = new USBLocalMediaSource(mLogger)))
             throw new RuntimeException("Could not register Mock USB player Local Media Source platform interface");
 
-        // Mock global preset
-        if (!mEngine.registerPlatformInterface(mGlobalPresetHandler = new GlobalPresetHandler(this, mLogger)))
-            throw new RuntimeException("Could not register Mock Global Preset platform interface");
+        // Mock Default platform handler
+        if (!mEngine.registerPlatformInterface(mDefaultMediaSource = new DefaultMediaSource(mLogger)))
+            throw new RuntimeException("Could not register Mock Default player Local Media Source platform interface");
 
         // Register extra modules
         loadPlatformInterfacesAndLoadUI(mEngine, extraFactories, this);
@@ -952,27 +1016,26 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
 
         // Provide a car control configuration to the Engine.
         //
-        // We check if a car control configuration file (CarControlConfig.json) is on the SD
-        // card to override the default configuration generated by
-        // CarControlDataProvider.generateCarControlConfig(), else use the default. This logic to
-        // conditionally generate a config or use a file would not ordinarily be required in a
-        // typical application since the config that an application uses will be known and stable.
-        // However, since this sample application allows facilitating testing by overriding the
-        // default car control configuration generated by the application itself, we check if such
-        // an override is being used.
+        // This sample app facilitates feature testing by allowing the user to override the default
+        // sample "aace.carControl" configuration generated by CarControlDataProvider by specifying
+        // an alternative version in "CarControlConfig.json" on the SD card. The following
+        // code checks for such an override to ensure the right config is provided to the Engine.
+        // Note that your own application should not have this conditional SD card logic; The
+        // car control configuration will be fixed and stable in a real integration.
         String sdCardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
         String externalCarControlConfigPath = sdCardPath + "/CarControlConfig.json";
-        File carControlConfigFile = new File(externalCarControlConfigPath);
-        if (carControlConfigFile.exists()) {
+        File externalCarControlConfigFile = new File(externalCarControlConfigPath);
+        if (externalCarControlConfigFile.exists()) {
             Log.i(TAG, "Using car control config from file on SD card");
-            EngineConfiguration carControlConfig = ConfigurationFile.create(carControlConfigFile.getPath());
+            EngineConfiguration carControlConfig =
+                    ConfigurationFile.create(externalCarControlConfigFile.getAbsolutePath());
             configuration.add(carControlConfig);
 
-            // If application is using an external car control configuration file, then the CarControlDataProvider
-            // needs to generate initial values by scanning the file and building a model of the power, toggle, range
-            // and mode controllers defined.
+            // CarControlDataProvider mocks representations of the controllable vehicle features for
+            // testing purposes. The following ensures CarControlDataProvider sets up the right mock
+            // features in the case where a configuration override is used.
             try {
-                CarControlDataProvider.initialize(carControlConfigFile.getPath());
+                CarControlDataProvider.initialize(externalCarControlConfigFile.getAbsolutePath());
             } catch (Exception e) {
                 Context context = getApplicationContext();
                 int duration = Toast.LENGTH_LONG;
@@ -980,10 +1043,15 @@ public class MainActivity extends AppCompatActivity implements SampleAppContext,
                 toast.show();
             }
         } else {
-            // Use programmatic generation of car control configuration. The corresponding custom
-            // assets file that complements the default generated car control config is in the
-            // assets directory, and LVCInteractionService will take care of ensuring it is used.
-            EngineConfiguration ccConfig = CarControlDataProvider.generateCarControlConfig();
+            // Use programmatic generation of a default sample car control configuration.
+            // The default config generated by CarControlDataProvider uses a custom asset defined
+            // in "CarControlAssets.json" in this app's assets directory. We copy this file to the
+            // cache directory so CarControlDataProvider can specify a path to this file in the
+            // Engine configuration it generates.
+            File sampleCustomAssetsFile = new File(appDataDir, "CarControlAssets.json");
+            copyAsset("CarControlAssets.json", sampleCustomAssetsFile, true);
+            EngineConfiguration ccConfig =
+                    CarControlDataProvider.generateCarControlConfig(sampleCustomAssetsFile.getAbsolutePath());
             configuration.add(ccConfig);
         }
 

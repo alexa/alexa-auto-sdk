@@ -26,7 +26,7 @@ When you use the AASB extension, you implement a single custom handler (labeled 
 <img src="./assets/AASBNewArch.png"/>
 </p>
 
-The default AASB implementations register their platform interfaces with the Auto SDK Engine and serialize API calls into a standardized AASB message format by overriding the platform interface methods and converting the method parameters into the corresponding AASB message payload. For details about the AASB messages, see the [AASB protocol and message reference documentation](./docs/Introduction.html). 
+The default AASB implementations register their platform interfaces with the Auto SDK Engine and serialize API calls into a standardized AASB message format by overriding the platform interface methods and converting the method parameters into the corresponding AASB message payload. For details about the AASB messages, see the [AASB protocol and message reference documentation](./docs/MainMenu.html). 
 
 The default implementations send the messages, each with a specific message topic, to the application through the AASB Message Broker interface (`MessageBrokerInterface`). The default implementations also subscribe to message topics that are sent from the application to the Auto SDK Engine, invoking the appropriate Engine interface method in the platform interface when the messages are received.
 
@@ -99,7 +99,7 @@ If the Auto SDK is built with AASB, provide in the configuration a version strin
 ```
 {
     "aace.aasb": {
-        "version": "3.1"
+        "version": "3.3"
     }
 }
 ```
@@ -208,10 +208,10 @@ In addition to the message header, each AASB JSON message includes a `payload` s
 }
 ```
 
-Each message defines a specific schema for its payload data, so you should refer to the [AASB protocol and message reference documentation](./docs/Introduction.html) before implementing any message behavior.
+Each message defines a specific schema for its payload data, so you should refer to the [AASB protocol and message reference documentation](./docs/MainMenu.html) before implementing any message behavior.
 
 ### Publishing Messages
-Your application must notify the Auto SDK when a state has changed, or to perform an action. To do this, your application sends messages to the Engine using the `publish()` method of the AASB platform interface. The format is the same as that of the messages received from the Engine. To understand which messages to send, refer to the [AASB protocol and message reference documentation](./docs/Introduction.html).
+Your application must notify the Auto SDK when a state has changed, or to perform an action. To do this, your application sends messages to the Engine using the `publish()` method of the AASB platform interface. The format is the same as that of the messages received from the Engine. To understand which messages to send, refer to the [AASB protocol and message reference documentation](./docs/MainMenu.html).
 
 The following example shows how you would send a message to the Auto SDK to initiate a tap-to-talk interaction:
 
@@ -241,7 +241,7 @@ aasb->publish( message.dump() );
 >**Note:** The example above uses nlohmann to create the message JSON; however, you can use any JSON library or method to create the message data since the message JSON is serialized to a string before being published.
 
 ### Responding to Synchronous Messages
-All messages that are received from the Auto SDK are sent asynchronously; however, certain messages require your application to respond immediately by publishing a special `Reply` message. For these messages, the Engine blocks its execution thread and waits for the response before continuing. If your application does not send a response before the message timeout expires, the Engine will fail to execute properly. Refer to the [AASB protocol and message reference documentation](./docs/Introduction.html) for details about which messages require a `Reply` message response.
+All messages that are received from the Auto SDK are sent asynchronously; however, certain messages require your application to respond immediately by publishing a special `Reply` message. For these messages, the Engine blocks its execution thread and waits for the response before continuing. If your application does not send a response before the message timeout expires, the Engine will fail to execute properly. Refer to the [AASB protocol and message reference documentation](./docs/MainMenu.html) for details about which messages require a `Reply` message response.
 
 The `GetLocation` message is an example of a request sent by the Auto SDK that requires a `Reply` message response:
 

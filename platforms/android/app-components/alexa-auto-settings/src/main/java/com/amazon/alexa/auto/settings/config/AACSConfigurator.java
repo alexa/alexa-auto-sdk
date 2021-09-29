@@ -12,8 +12,11 @@ import androidx.annotation.Nullable;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.aacsipc.TargetComponent;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.AssistantManager;
+import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apps.common.aacs.AACSServiceController;
 import com.amazon.alexa.auto.apps.common.util.FileUtil;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 
 import org.json.JSONArray;
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 import io.reactivex.rxjava3.core.Single;
 
 import static com.amazon.aacsconstants.AACSConstants.AACS_AMAZONLITE_CONFIG;
+import static com.amazon.aacsconstants.AACSConstants.AACS_COASSISTANT;
 import static com.amazon.alexa.auto.apps.common.Constants.MODELS;
 import static com.amazon.alexa.auto.apps.common.Constants.PATH;
 
@@ -138,6 +142,25 @@ public class AACSConfigurator {
     private void sendConfigurationMessage(@NonNull String configs) {
         Context context = mContextWk.get();
         Preconditions.checkNotNull(context);
+
+        if (ModuleProvider.isAlexaCustomAssistantEnabled(context)) {
+            Log.d(TAG, "Updating aacs config for assistant settings");
+            try {
+                JSONObject configJson = new JSONObject(configs);
+                AlexaApp mApp = AlexaApp.from(context);
+                if (mApp.getRootComponent().getComponent(AssistantManager.class).isPresent()) {
+                    AssistantManager assistantManager = mApp.getRootComponent().getComponent(AssistantManager.class).get();
+                    JSONObject settings = assistantManager.getAssistantsSettings();
+                    if (settings != null && !settings.toString().isEmpty()) {
+                        Log.d(TAG, "Assistant settings from assistant manager: " + settings.toString());
+                        configJson.put(AACS_COASSISTANT, settings);
+                        configs = configJson.toString();
+                    }
+                }
+            } catch (JSONException e) {
+                Log.w(TAG, "Error occurred updating the config for assistant settings");
+            }
+        }
 
         String configMessage = "{\n"
                 + "  \"" + AACS_CONFIG_FILE_PATH + "\" : [],"

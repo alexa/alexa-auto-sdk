@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
@@ -15,6 +17,8 @@ import com.amazon.alexa.auto.apis.auth.AuthState;
 import com.amazon.alexa.auto.apis.auth.AuthStatus;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
 import com.amazon.alexa.auto.apis.auth.AuthorizationHandlerInterface;
+import com.amazon.alexa.auto.apis.auth.UserIdentity;
+import com.amazon.alexa.auto.apps.common.util.FileUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -22,8 +26,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 
@@ -50,7 +57,9 @@ public class LWAAuthController implements AuthController {
     private AuthMode mAuthMode;
     private ExecutorService mExecutorService;
     private Handler mMainThreadHandler;
-    private CBLAuthEventReceiver mCBLEventReceiver;
+    private AlexaClientEventReceiver mAlexaClientEventReceiver;
+    private boolean mIsAlexaConnected;
+    private boolean mEnableUserProfile;
 
     /**
      * Constructs the LWAAuthController.
@@ -60,8 +69,9 @@ public class LWAAuthController implements AuthController {
         authStatusColdStream = BehaviorSubject.create();
         messageSender = new AACSMessageSender(context, new AACSSender());
 
-        authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), null));
+        authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), getUserIdentity()));
         mAuthMode = AuthMode.CBL_AUTHORIZATION;
+        mIsAlexaConnected = false;
 
         mExecutorService = Executors.newSingleThreadExecutor();
         mMainThreadHandler = new Handler(Looper.getMainLooper());
@@ -75,7 +85,9 @@ public class LWAAuthController implements AuthController {
                     }
                 });
 
-        subscribeCBLAuthFinishStatus();
+        subscribeAlexaClientConnectionStatus();
+
+        FileUtil.readAACSConfigurationAsync(context.get()).subscribe(this::isCBLUserProfileEnabled);
     }
 
     @Override
@@ -95,7 +107,12 @@ public class LWAAuthController implements AuthController {
             throw new RuntimeException("Context not valid any more.");
         }
 
-        return TokenStore.getRefreshToken(contextStrong).isPresent();
+        try {
+            return TokenStore.getRefreshToken(contextStrong).isPresent();
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "Failed to get refresh token.");
+            return false;
+        }
     }
 
     @Override
@@ -117,8 +134,36 @@ public class LWAAuthController implements AuthController {
                                 emitter.onError(new Exception("Failed to start Login workflow"));
                             }
                             break;
-                        case Auth_Provider_Authorized:
-                            authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), null));
+                        case Alexa_Client_Connected:
+                            // When Alexa is connected, and the auth token has also been saved, we will send the auth
+                            // finished/authorized event to subscribers.
+                            if (isAuthenticated()) {
+                                publishAuthFinishedStatus(emitter);
+                            }
+                            break;
+                        case CBL_Auth_User_Identity_Saved:
+                        case Auth_Provider_Token_Saved:
+                            // When CBL user identity or other authorization provider's auth token is saved, we want to
+                            // make sure Alexa connection is also established with the user identity or token, then we
+                            // send the auth finished/authorized event to subscribers.
+                            if (mIsAlexaConnected) {
+                                publishAuthFinishedStatus(emitter);
+                            }
+                            break;
+                        case CBL_Auth_Token_Saved:
+                            if (mEnableUserProfile) {
+                                // If user profile is enabled, we need to make sure we have also saved user identity on
+                                // the device, so that we can get the user name and display it on the screen when
+                                // needed.
+                                Log.d(TAG,
+                                        "User profile is enabled, waiting for user identity to be saved successfully.");
+                            } else {
+                                if (mIsAlexaConnected) {
+                                    // If user profile is disabled, we can send the CBL_Auth_Finished event now.
+                                    emitter.onNext(new AuthWorkflowData(AuthState.CBL_Auth_Finished, null, null));
+                                    authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), getUserIdentity()));
+                                }
+                            }
                             break;
                     }
                 }
@@ -176,7 +221,18 @@ public class LWAAuthController implements AuthController {
             }
         }
 
-        TokenStore.resetRefreshToken(strongContext);
+        try {
+            TokenStore.resetRefreshToken(strongContext);
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "Failed to reset refresh token.");
+        }
+
+        try {
+            UserIdentityStore.resetUserIdentity(strongContext);
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "Failed to reset user identity.");
+        }
+
 
         authStatusColdStream.onNext(new AuthStatus(false, null));
     }
@@ -206,6 +262,28 @@ public class LWAAuthController implements AuthController {
                 Log.e(TAG, "Fail to generate authorization logout message.");
             }
         }
+    }
+
+    @Override
+    public UserIdentity getUserIdentity() {
+        if (mAuthMode != null) {
+            if (isAuthenticated() && mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+                try {
+                    String userName = UserIdentityStore.getUserIdentity(context.get());
+                    if (userName != null) {
+                        return new UserIdentity(userName);
+                    }
+                    return null;
+                } catch (GeneralSecurityException | IOException e) {
+                    Log.e(TAG, "Fail to get user identity data.");
+                    return null;
+                }
+            } else {
+                Log.w(TAG, "Device is not authenticated or it is not for CBL login, we cannot get user identity data.");
+                return null;
+            }
+        }
+        return null;
     }
 
     private boolean startLoginWorkflow() {
@@ -308,24 +386,47 @@ public class LWAAuthController implements AuthController {
         return Optional.of(extraAuthorizationHandlerFactories);
     }
 
-    /**
-     * Subscribe CBL Auth finish event during the app life cycle, user can choose to finish CBL login
-     * with phone and skip the CBL login steps from the head unit app. When user finishes CBL login with phone,
-     * CBL auth finish event will be sent and captured by CBLAuthEventReceiver, and the remaining setup steps
-     * will be triggered from the app.
-     */
-    public void subscribeCBLAuthFinishStatus() {
-        if (mCBLEventReceiver == null) {
-            mCBLEventReceiver = new CBLAuthEventReceiver();
-            EventBus.getDefault().register(mCBLEventReceiver);
+    private void isCBLUserProfileEnabled(@NonNull String configs) {
+        try {
+            JSONObject config = new JSONObject(configs);
+            String mUserProfileConfig = config.getJSONObject("aacs.cbl").getString("enableUserProfile");
+            mEnableUserProfile = mUserProfileConfig.equals("true");
+        } catch (JSONException e) {
+            Log.w(TAG, "Failed to parse enableUserProfile config" + e);
         }
     }
 
-    class CBLAuthEventReceiver {
+    private void publishAuthFinishedStatus(ObservableEmitter emitter) {
+        if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+            emitter.onNext(new AuthWorkflowData(AuthState.CBL_Auth_Finished, null, null));
+        } else {
+            emitter.onNext(
+                    new AuthWorkflowData(AuthState.Auth_Provider_Authorized, null, null));
+        }
+        authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), getUserIdentity()));
+    }
+
+    /**
+     * Subscribe Alexa client connection event during the app life cycle, user can choose to finish CBL login
+     * with phone and skip the CBL login steps from the head unit app. When user finishes CBL login with phone,
+     * and Alexa client connection state changes to CONNECTED, the Alexa client connected event will be sent and
+     * captured by AlexaClientEventReceiver, and the remaining setup steps will be triggered from the app.
+     */
+    public void subscribeAlexaClientConnectionStatus() {
+        if (mAlexaClientEventReceiver == null) {
+            mAlexaClientEventReceiver = new AlexaClientEventReceiver();
+            EventBus.getDefault().register(mAlexaClientEventReceiver);
+        }
+    }
+
+    class AlexaClientEventReceiver {
         @Subscribe
         public void OnReceive(AuthWorkflowData data) {
-            if (data.getAuthState().equals(AuthState.CBL_Auth_Finished)) {
-                setAuthState(new AuthStatus(isAuthenticated(), null));
+            if (data.getAuthState().equals(AuthState.Alexa_Client_Connected)) {
+                setAuthState(new AuthStatus(isAuthenticated(), getUserIdentity()));
+                mIsAlexaConnected = true;
+            } else if (data.getAuthState().equals(AuthState.Alexa_Client_Disconnected)) {
+                mIsAlexaConnected = false;
             }
         }
     }

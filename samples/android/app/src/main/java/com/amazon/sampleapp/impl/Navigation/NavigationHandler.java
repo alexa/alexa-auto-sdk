@@ -110,7 +110,7 @@ public class NavigationHandler extends Navigation {
      * Loads navigation state from the NavigationState.json file
      * Format as documented for getNavigationState() in "Navigation.h"
      * If there is no explicit request to load navigation state from NavigationState.json file,
-     * the navigation state is populated everytime startNavigation() is called.
+     * the navigation state is populated every time startNavigation() is called.
      */
     private boolean loadNavigationState() {
         synchronized (m_currentNavigationState) {

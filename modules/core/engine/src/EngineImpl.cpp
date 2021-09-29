@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,6 +35,9 @@ std::shared_ptr<aace::core::Engine> aace::core::Engine::create() {
 namespace aace {
 namespace engine {
 namespace core {
+
+// json namespace alias
+namespace json = aace::engine::utils::json;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.core.EngineImpl");
@@ -167,42 +170,34 @@ bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::Engin
         ThrowIf(m_configured, "engineAlreadyConfigured");
         ThrowIf(configurationList.empty(), "invalidConfigurationList");
 
+        // create the merged configuration data
+        json::Value mergedConfiguration = {};
+
         // iterate through configuration objects and get streams for sdk initialization and
         // merge all configuration stream together before calling service config methods
-        rapidjson::Document configuration(rapidjson::kObjectType);
-        auto root = configuration.GetObject();
-
         for (auto nextStream : configurationList) {
-            ThrowIfNull(nextStream, "invalidConfiguration");
+            ThrowIfNull(nextStream, "invalidConfigurationStream");
 
             // parse the next configuration stream
-            auto document = aace::engine::utils::json::parse(nextStream->getStream());
-            ThrowIfNull(document, "parseConfigurationStreamFailed");
+            auto nextConfig = json::toJson(nextStream->getStream());
 
             // merge the document with the main configuration
-            ThrowIfNot(document->IsObject(), "invalidConfigurationStream");
-            ThrowIfNot(
-                aace::engine::utils::json::merge(root, document->GetObject(), configuration.GetAllocator()),
-                "mergeConfigurationFailed");
+            ThrowIfNot(json::isType(nextConfig, json::Type::object), "invalidConfigurationStream");
+            ThrowIfNot(aace::engine::utils::json::merge(mergedConfiguration, nextConfig), "mergeConfigurationFailed");
         }
 
         // iterate through registered engine services and call configure() for each module
-        for (auto nextService : m_orderedServiceList) {
-            auto config = root.FindMember(nextService->getDescription().getType().c_str());
-
-            if (config != root.end()) {
-                rapidjson::Document subDocument;
-
-                subDocument.CopyFrom(config->value, subDocument.GetAllocator());
-
+        if (mergedConfiguration.is_null() == false) {
+            for (auto nextService : m_orderedServiceList) {
+                auto serviceConfig =
+                    json::get(mergedConfiguration, nextService->getDescription().getType(), json::Type::object);
                 ThrowIfNot(
-                    nextService->handleConfigureEngineEvent(aace::engine::utils::json::toStream(subDocument)),
-                    "Service failed to configure: " + nextService->getDescription().getType());
-            } else {
-                ThrowIfNot(
-                    nextService->handleConfigureEngineEvent(nullptr),
+                    nextService->handleConfigureEngineEvent(
+                        serviceConfig != nullptr ? json::toStream(serviceConfig) : nullptr),
                     "Service failed to configure: " + nextService->getDescription().getType());
             }
+        } else {
+            AACE_ERROR(LX(TAG).m("nullMergedConfiguration"));
         }
 
         m_configured = true;
@@ -230,7 +225,7 @@ bool EngineImpl::checkServices() {
             auto serviceFactory = it->second;
             auto desc = serviceFactory->getDescription();
 
-            for (auto next : desc.getDependencies()) {
+            for (auto& next : desc.getDependencies()) {
                 auto it = registeredServiceFactoryMap.find(next.getType());
 
                 if (it != registeredServiceFactoryMap.end()) {
@@ -266,7 +261,7 @@ bool EngineImpl::checkServices() {
                 auto serviceFactory = *it;
                 auto desc = serviceFactory->getDescription();
 
-                for (auto next : desc.getDependencies()) {
+                for (auto& next : desc.getDependencies()) {
                     auto it = registeredServiceFactoryMap.find(next.getType());
 
                     if (it != registeredServiceFactoryMap.end()) {
@@ -356,6 +351,11 @@ bool EngineImpl::start() {
             ThrowIfNot(next->handleStartEngineEvent(), "handleStartEngineEventFailed");
         }
 
+        // iterate through registered engine services and call handleEngineStartedEngineEvent() for each service
+        for (auto next : m_orderedServiceList) {
+            ThrowIfNot(next->handleEngineStartedEngineEvent(), "handleEngineStartedEngineEventFailed");
+        }
+
         // set the engine running flag to true
         m_running = true;
 
@@ -381,6 +381,11 @@ bool EngineImpl::stop() {
         // iterate through registered engine modules and call stop() for each module
         for (auto next : m_orderedServiceList) {
             ThrowIfNot(next->handleStopEngineEvent(), "handleStopEngineEventFailed");
+        }
+
+        // iterate through registered engine services and call engineStopped() for each service
+        for (auto next : m_orderedServiceList) {
+            ThrowIfNot(next->handleEngineStoppedEngineEvent(), "handleEngineStoppedEngineEventFailed");
         }
 
         // set the engine running and configured flag to false - the engine must be reconfigured before starting again

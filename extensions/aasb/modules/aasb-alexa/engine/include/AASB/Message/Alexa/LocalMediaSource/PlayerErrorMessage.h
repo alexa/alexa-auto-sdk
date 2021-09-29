@@ -52,7 +52,7 @@ struct PlayerErrorMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.2";
+            static std::string version = "3.3";
             return version;
         }
         static const std::string& messageType() {
@@ -70,6 +70,7 @@ struct PlayerErrorMessage {
         int code;
         std::string description;
         bool fatal;
+        std::string sessionId = "";
     };
     static const std::string& topic() {
         static std::string topic = "LocalMediaSource";
@@ -80,7 +81,7 @@ struct PlayerErrorMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.2";
+        static std::string version = "3.3";
         return version;
     }
     static const std::string& messageType() {
@@ -100,6 +101,7 @@ inline void to_json(nlohmann::json& j, const PlayerErrorMessage::Payload& c) {
         {"code", c.code},
         {"description", c.description},
         {"fatal", c.fatal},
+        {"sessionId", c.sessionId},
     };
 }
 inline void from_json(const nlohmann::json& j, PlayerErrorMessage::Payload& c) {
@@ -108,6 +110,9 @@ inline void from_json(const nlohmann::json& j, PlayerErrorMessage::Payload& c) {
     j.at("code").get_to(c.code);
     j.at("description").get_to(c.description);
     j.at("fatal").get_to(c.fatal);
+    if (j.contains("sessionId")) {
+        j.at("sessionId").get_to(c.sessionId);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const PlayerErrorMessage::Header::MessageDescription& c) {

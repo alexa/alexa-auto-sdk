@@ -234,7 +234,7 @@ public class MessagingHandler extends Messaging {
     /**
      * Update the message status locally.
      * @param conversationId Conversation id to update.
-     * @param statusJson New status for messages to be udpated.
+     * @param statusJson New status for messages to be updated.
      */
     private void updateMessages(String conversationId, JSONObject statusJson) {
         // Build map of read messages to delete

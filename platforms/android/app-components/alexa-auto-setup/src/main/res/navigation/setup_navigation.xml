@@ -22,6 +22,14 @@
         android:label="Alexa's language"/>
 
     <fragment
+        android:id="@+id/navigation_fragment_enablePreviewMode"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.EnablePreviewModeFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_locationConsent"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.LocationConsentFragment"/>
+
+    <fragment
         android:id="@+id/navigation_fragment_cblLoginFinish"
         android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLLoginFinishFragment"/>
 
@@ -36,4 +44,12 @@
     <fragment
         android:id="@+id/navigation_fragment_communication"
         android:name="com.amazon.alexa.auto.comms.ui.fragment.setup.CommunicationConsentFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_setupNotComplete"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.SetupNotCompleteFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_cblLoginError"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLLoginErrorFragment"/>
 </navigation>

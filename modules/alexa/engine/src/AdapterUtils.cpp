@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,17 +20,11 @@
 #include <rapidjson/writer.h>
 #include <rapidjson/error/en.h>
 
-// namespace alexaClientSDK {
-// namespace avsCommon {
-// namespace avs {
-// namespace externalMediaPlayer {
 namespace aace {
 namespace engine {
 namespace alexa {
 
 using namespace alexaClientSDK::avsCommon::avs;
-// using namespace alexaClientSDK::avsCommon::sdkInterfaces;
-// using namespace alexaClientSDK::avsCommon::sdkInterfaces::externalMediaPlayer;
 using namespace rapidjson;
 
 alexaClientSDK::avsCommon::utils::RetryTimer& sessionRetryTimer() {
@@ -103,25 +97,56 @@ rapidjson::Value buildPlaybackState(
     media.AddMember(TYPE, playbackState.type, allocator);
 
     rapidjson::Document value(rapidjson::kObjectType);
-    value.AddMember(PLAYBACK_SOURCE, playbackState.playbackSource, allocator);
+    if (!playbackState.playbackSource.empty()) {
+        value.AddMember(PLAYBACK_SOURCE, playbackState.playbackSource, allocator);
+    }
     value.AddMember(PLAYBACK_SOURCE_ID, playbackState.playbackSourceId, allocator);
     value.AddMember(TRACKNAME, playbackState.trackName, allocator);
     value.AddMember(TRACK_ID, playbackState.trackId, allocator);
-    value.AddMember(TRACK_NUMBER, playbackState.trackNumber, allocator);
-    value.AddMember(ARTIST, playbackState.artistName, allocator);
-    value.AddMember(ARTIST_ID, playbackState.artistId, allocator);
-    value.AddMember(ALBUM, playbackState.albumName, allocator);
-    value.AddMember(ALBUM_ID, playbackState.albumId, allocator);
+    if (!playbackState.trackNumber.empty()) {
+        value.AddMember(TRACK_NUMBER, playbackState.trackNumber, allocator);
+    }
+    if (!playbackState.artistName.empty()) {
+        value.AddMember(ARTIST, playbackState.artistName, allocator);
+    }
+    if (!playbackState.artistId.empty()) {
+        value.AddMember(ARTIST_ID, playbackState.artistId, allocator);
+    }
+    if (!playbackState.albumName.empty()) {
+        value.AddMember(ALBUM, playbackState.albumName, allocator);
+    }
+    if (!playbackState.albumId.empty()) {
+        value.AddMember(ALBUM_ID, playbackState.albumId, allocator);
+    }
 
+    bool includeCoverUrls = false;
     rapidjson::Document coverUrl(rapidjson::kObjectType);
-    coverUrl.AddMember(TINY_URL, playbackState.tinyURL, allocator);
-    coverUrl.AddMember(SMALL_URL, playbackState.smallURL, allocator);
-    coverUrl.AddMember(MEDIUM_URL, playbackState.mediumURL, allocator);
-    coverUrl.AddMember(LARGE_URL, playbackState.largeURL, allocator);
-    value.AddMember(COVER_URLS, coverUrl, allocator);
+    if (!playbackState.tinyURL.empty()) {
+        coverUrl.AddMember(TINY_URL, playbackState.tinyURL, allocator);
+        includeCoverUrls = true;
+    }
+    if (!playbackState.smallURL.empty()) {
+        coverUrl.AddMember(SMALL_URL, playbackState.smallURL, allocator);
+        includeCoverUrls = true;
+    }
+    if (!playbackState.mediumURL.empty()) {
+        coverUrl.AddMember(MEDIUM_URL, playbackState.mediumURL, allocator);
+        includeCoverUrls = true;
+    }
+    if (!playbackState.largeURL.empty()) {
+        coverUrl.AddMember(LARGE_URL, playbackState.largeURL, allocator);
+        includeCoverUrls = true;
+    }
+    if (includeCoverUrls) {
+        value.AddMember(COVER_URLS, coverUrl, allocator);
+    }
 
-    value.AddMember(COVER_ID, playbackState.coverId, allocator);
-    value.AddMember(MEDIA_PROVIDER, playbackState.mediaProvider, allocator);
+    if (!playbackState.coverId.empty()) {
+        value.AddMember(COVER_ID, playbackState.coverId, allocator);
+    }
+    if (!playbackState.mediaProvider.empty()) {
+        value.AddMember(MEDIA_PROVIDER, playbackState.mediaProvider, allocator);
+    }
     value.AddMember(MEDIA_TYPE, MediaTypeToString(playbackState.mediaType), allocator);
     value.AddMember(DURATIONINMS, static_cast<uint64_t>(playbackState.duration.count()), allocator);
 
@@ -137,14 +162,20 @@ rapidjson::Value buildSessionState(
     rapidjson::Value playerJson;
     playerJson.SetObject();
     playerJson.AddMember(PLAYER_ID, sessionState.playerId, allocator);
-    playerJson.AddMember(ENDPOINT_ID, sessionState.endpointId, allocator);
+    if (!sessionState.endpointId.empty()) {
+        playerJson.AddMember(ENDPOINT_ID, sessionState.endpointId, allocator);
+    }
     playerJson.AddMember(LOGGED_IN, sessionState.loggedIn, allocator);
-    playerJson.AddMember(USERNAME, sessionState.userName, allocator);
+    if (!sessionState.userName.empty()) {
+        playerJson.AddMember(USERNAME, sessionState.userName, allocator);
+    }
     playerJson.AddMember(IS_GUEST, sessionState.isGuest, allocator);
     playerJson.AddMember(LAUNCHED, sessionState.launched, allocator);
     playerJson.AddMember(ACTIVE, sessionState.active, allocator);
     playerJson.AddMember(SPI_VERSION, sessionState.spiVersion, allocator);
-    playerJson.AddMember(PLAYER_COOKIE, sessionState.playerCookie, allocator);
+    if (!sessionState.playerCookie.empty()) {
+        playerJson.AddMember(PLAYER_COOKIE, sessionState.playerCookie, allocator);
+    }
     playerJson.AddMember(SKILL_TOKEN, sessionState.skillToken, allocator);
     playerJson.AddMember(PLAYBACK_SESSION_ID, sessionState.playbackSessionId, allocator);
 

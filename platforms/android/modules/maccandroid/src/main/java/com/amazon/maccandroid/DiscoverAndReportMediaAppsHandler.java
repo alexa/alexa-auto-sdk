@@ -141,7 +141,7 @@ public class DiscoverAndReportMediaAppsHandler extends Handler {
 
             PackageMetadata appMetaData = getPlayerMetaData(resolveInfo);
             if (appMetaData == null) {
-                Log.e(TAG, "Something wen't wrong when parsing meta data");
+                Log.e(TAG, "Something went wrong when parsing meta data");
                 continue;
             }
             // if authorized mediaApp already exists, use it. don't create another new one

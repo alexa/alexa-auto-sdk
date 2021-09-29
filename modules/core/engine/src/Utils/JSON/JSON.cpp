@@ -18,6 +18,9 @@
 
 #include <sstream>
 
+#define JSON_POINTER(p) nlohmann::json::json_pointer(p.empty() == false && p[0] != '/' ? "/" + p : p)
+
+// rapidjson (deprecated)
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/ostreamwrapper.h>
@@ -33,12 +36,281 @@ namespace json {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.engine.utils.json.JSON");
 
+// nlohmann
+
+Value toJson(const std::string& str) {
+    try {
+        return nlohmann::json::parse(str);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return Value();
+    }
+}
+
+Value toJson(std::shared_ptr<std::istream> stream) {
+    try {
+        return nlohmann::json::parse(*stream);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return Value();
+    }
+}
+
+Value toJson(std::istream& stream) {
+    try {
+        return nlohmann::json::parse(stream);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return Value();
+    }
+}
+
+std::string toString(const Value& root, bool prettyPrint) {
+    return prettyPrint ? root.dump(3) : root.dump();
+}
+
+std::shared_ptr<std::stringstream> toStream(const Value& root, bool prettyPrint) {
+    return std::make_shared<std::stringstream>(toString(root, prettyPrint));
+}
+
+bool merge(Value& into, const Value& from) {
+    try {
+        for (auto& next : from.items()) {
+            auto key = next.key();
+
+            if (into.find(key) != into.end()) {
+                ThrowIfNot(next.value().is_object() && into[key].is_object(), "configurationAlreadySpecified:" + key);
+                ThrowIfNot(merge(into[key], next.value()), "mergeChildNodeFailed");
+            } else {
+                into[key] = next.value();
+            }
+        }
+
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool has(const Value& root, const std::string& path, Type type) {
+    try {
+        return get(root, path, type) != nullptr;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool isType(const Value& value, Type type) {
+    return value.type() == type;
+}
+
+Value get(const Value& root, const std::string& path, Type type) {
+    try {
+        auto ptr = JSON_POINTER(path);
+        if (root.contains(ptr)) {
+            auto value = root.at(ptr);
+            ThrowIf(type != Type::null && value.type() != type, "invalidType");
+            return value;
+        } else {
+            return nullptr;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return Value();
+    }
+}
+
+bool set(Value& root, const std::string& path, Value value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool push(Value& arr, Value value) {
+    try {
+        ThrowIfNot(isType(arr, Type::array), "invalidArrayType");
+        arr.push_back(value);
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::string get(const Value& root, const std::string& path, const std::string& defaultValue) {
+    try {
+        auto ptr = JSON_POINTER(path);
+        if (root.contains(ptr)) {
+            auto value = root.at(ptr);
+            if (value.is_string() == false) {
+                AACE_WARN(LX(TAG).d("reason", "invalidValueType"));
+                return defaultValue;
+            }
+            return value;
+        } else {
+            return defaultValue;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return defaultValue;
+    }
+}
+
+bool set(Value& root, const std::string& path, const std::string& value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+std::string get(const Value& root, const std::string& path, const char* defaultValue) {
+    return get(root, path, std::string(defaultValue != nullptr ? defaultValue : ""));
+}
+
+bool set(Value& root, const std::string& path, const char* value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool get(const Value& root, const std::string& path, bool defaultValue) {
+    try {
+        auto ptr = JSON_POINTER(path);
+        if (root.contains(ptr)) {
+            auto value = root.at(ptr);
+            if (value.is_boolean() == false) {
+                AACE_WARN(LX(TAG).d("reason", "invalidValueType"));
+                return defaultValue;
+            }
+            return value;
+        } else {
+            return defaultValue;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return defaultValue;
+    }
+}
+
+bool set(Value& root, const std::string& path, bool value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+uint64_t get(const Value& root, const std::string& path, uint64_t defaultValue) {
+    try {
+        auto ptr = JSON_POINTER(path);
+        if (root.contains(ptr)) {
+            auto value = root.at(ptr);
+            if (value.is_number_unsigned() == false) {
+                AACE_WARN(LX(TAG).d("reason", "invalidValueType"));
+                return defaultValue;
+            }
+            return value;
+        } else {
+            return defaultValue;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return defaultValue;
+    }
+}
+
+bool set(Value& root, const std::string& path, uint64_t value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+int64_t get(const Value& root, const std::string& path, int64_t defaultValue) {
+    try {
+        auto ptr = JSON_POINTER(path);
+        if (root.contains(ptr)) {
+            auto value = root.at(ptr);
+            if (value.is_number_integer() == false) {
+                AACE_WARN(LX(TAG).d("reason", "invalidValueType"));
+                return defaultValue;
+            }
+            return value;
+        } else {
+            return defaultValue;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return defaultValue;
+    }
+}
+
+bool set(Value& root, const std::string& path, int64_t value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+double get(const Value& root, const std::string& path, double defaultValue) {
+    try {
+        auto ptr = JSON_POINTER(path);
+        if (root.contains(ptr)) {
+            auto value = root.at(ptr);
+            if (value.is_number_float() == false) {
+                AACE_WARN(LX(TAG).d("reason", "invalidValueType"));
+                return defaultValue;
+            }
+            return value;
+        } else {
+            return defaultValue;
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return defaultValue;
+    }
+}
+
+bool set(Value& root, const std::string& path, double value) {
+    try {
+        root[JSON_POINTER(path)] = value;
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+// rapidjson (deprecated)
+
 bool merge(
     const rapidjson::Document::Object& into,
     const rapidjson::Document::Object& from,
     rapidjson::Document::AllocatorType& allocator,
     const std::string& path) {
     try {
+        AACE_WARN(LX(TAG).d("reason", "deprecated"));
         for (auto next = from.begin(); next != from.end(); next++) {
             auto intoNode = into.FindMember(next->name);
 
@@ -76,6 +348,7 @@ bool merge(
 
 std::shared_ptr<rapidjson::Document> parse(std::shared_ptr<std::istream> stream, rapidjson::Type type) {
     try {
+        AACE_WARN(LX(TAG).d("reason", "deprecated"));
         rapidjson::IStreamWrapper isw(*stream);
 
         auto document = std::make_shared<rapidjson::Document>();
@@ -94,6 +367,7 @@ std::shared_ptr<rapidjson::Document> parse(std::shared_ptr<std::istream> stream,
 
 std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::Type type) {
     try {
+        AACE_WARN(LX(TAG).d("reason", "deprecated"));
         auto document = std::make_shared<rapidjson::Document>();
 
         document->Parse(value.c_str());
@@ -110,7 +384,7 @@ std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::
 
 std::string toString(const rapidjson::Document& document, bool prettyPrint) {
     rapidjson::StringBuffer buffer;
-
+    AACE_WARN(LX(TAG).d("reason", "deprecated"));
     if (prettyPrint) {
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         document.Accept(writer);
@@ -123,6 +397,7 @@ std::string toString(const rapidjson::Document& document, bool prettyPrint) {
 }
 
 std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint) {
+    AACE_WARN(LX(TAG).d("reason", "deprecated"));
     return std::make_shared<std::stringstream>(toString(document, prettyPrint));
 }
 

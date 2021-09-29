@@ -30,7 +30,7 @@ import dagger.Provides;
 @Module
 public class MediaModule {
     /**
-     * Proivdes the Media Session Manager.
+     * Provides the Media Session Manager.
      *
      * @param messageSender AACS Message sender.
      * @return Media Session Manager.

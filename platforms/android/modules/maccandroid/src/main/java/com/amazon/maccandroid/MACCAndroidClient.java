@@ -216,6 +216,7 @@ public class MACCAndroidClient {
      * @param playbackSessionId playback session id of media app
      */
     void reportError(String errorName, int errorCode, boolean fatal, String playerId, UUID playbackSessionId) {
+        Log.i(TAG, "reportError");
         mMACCAndroidClientCallback.onError(errorName, errorCode, fatal, playerId, playbackSessionId);
     }
 

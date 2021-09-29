@@ -525,7 +525,8 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
                              {aace::alexa::LocalMediaSource::Source::LINE_IN, nullptr},
                              {aace::alexa::LocalMediaSource::Source::COMPACT_DISC, nullptr},
                              /*{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr },*/
-                             {aace::alexa::LocalMediaSource::Source::DAB, nullptr}};
+                             {aace::alexa::LocalMediaSource::Source::DAB, nullptr},
+                             {aace::alexa::LocalMediaSource::Source::DEFAULT, nullptr}};
 
     for (auto& source : LocalMediaSources) {
         source.second = alexa::LocalMediaSourceHandler::create(activity, loggerHandler, source.first);

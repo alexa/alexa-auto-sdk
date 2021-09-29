@@ -20,7 +20,7 @@
 static const char* TAG = "AddressBookConfigurationBinder";
 
 extern "C" {
-JNIEXPORT jlong JNICALL Java_com_amazon_aace_addressBook_config_AddressBookConfiguration_createAddressBookConfigBinder(
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_addressbook_config_AddressBookConfiguration_createAddressBookConfigBinder(
     JNIEnv* env,
     jobject obj,
     jboolean cleanAllAddressBooksAtStart) {

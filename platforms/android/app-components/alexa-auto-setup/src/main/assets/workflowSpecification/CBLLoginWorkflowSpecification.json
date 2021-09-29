@@ -24,6 +24,13 @@
     {
       "event": "Language_Is_Supported",
       "next": {
+        "type": "action",
+        "resource": "CheckLoginRequiredCommand"
+      }
+    },
+    {
+      "event": "Login",
+      "next": {
         "type": "view",
         "resource": "navigation_fragment_login"
       }
@@ -39,11 +46,25 @@
       "event": "Language_Selection_Is_Complete",
       "next": {
         "type": "view",
-        "resource": "navigation_fragment_login"
+        "resource": "CheckLoginRequiredCommand"
       }
     },
     {
       "event": "CBL_Auth_Finished",
+      "next": {
+        "type": "action",
+        "resource": "CheckLocationConsentCommand"
+      }
+    },
+    {
+      "event": "Location_Consent",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_locationConsent"
+      }
+    },
+    {
+      "event": "Location_Consent_Completed",
       "next": {
         "type": "action",
         "resource": "CheckContactsConsentStatusCommand"
@@ -68,6 +89,13 @@
       "next": {
         "type": "view",
         "resource": "navigation_fragment_cblLoginFinish"
+      }
+    },
+    {
+      "event": "Setup_Error",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_setupNotComplete"
       }
     }
   ],

@@ -29,8 +29,10 @@ public class MediaAppsStateReporter {
     }
 
     void reportError(String playerId, CapabilityAgentError error) {
-        if (!isInitalized())
+        if (!isInitalized()) {
+            Log.e(TAG, "not initialized: " + playerId);
             return;
+        }
         MediaApp app = MediaAppsRepository.getInstance().getAuthorizedMediaApp(playerId);
         String skillToken = null;
         UUID playbackSessionId = null;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_margin_top">60dp</dimen>
+    <dimen name="constrained_max_height">550dp</dimen>
+
+    <dimen name="weather_card_width">1000dp</dimen>
+    <dimen name="weather_card_title_marginStart">60dp</dimen>
+    <dimen name="weather_card_body_height">400dp</dimen>
+    <dimen name="weather_card_body_marginStart">70dp</dimen>
+
+    <dimen name="weather_current_icon_width">300dp</dimen>
+    <dimen name="weather_current_icon_height">300dp</dimen>
+    <dimen name="weather_current_temp_width">220dp</dimen>
+    <dimen name="weather_current_temp_height">150dp</dimen>
+    <dimen name="weather_current_temp_marginStart">50dp</dimen>
+    <dimen name="weather_current_temp_marginTop">60dp</dimen>
+    <dimen name="weather_current_temp_textSize">100sp</dimen>
+    <dimen name="weather_current_temp_highLow_marginStart">60dp</dimen>
+    <dimen name="weather_current_temp_highLow_marginTop">50dp</dimen>
+    <dimen name="weather_current_temp_highlow_icon_width">60dp</dimen>
+    <dimen name="weather_current_temp_highlow_icon_height">80dp</dimen>
+    <dimen name="weather_current_temp_highlow_temp_width">150dp</dimen>
+    <dimen name="weather_current_temp_highlow_temp_height">80dp</dimen>
+    <dimen name="weather_current_temp_low_temp_marginTop">20dp</dimen>
+    <dimen name="weather_current_temp_highlow_temp_textSize">50sp</dimen>
+
+    <dimen name="weather_forecast_layout_marginStart">30dp</dimen>
+    <dimen name="weather_forecast_layout_marginTop">35dp</dimen>
+    <dimen name="weather_forecast_day_icon_width">175dp</dimen>
+    <dimen name="weather_forecast_day_icon_height">150dp</dimen>
+    <dimen name="weather_forecast_day_text_marginStart">65dp</dimen>
+    <dimen name="weather_forecast_day_highlow_text_width">70dp</dimen>
+    <dimen name="weather_forecast_day_high_text_marginStart">30dp</dimen>
+</resources>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="template_local_search_list_view" type="id"/>
+    <item name="template_local_search_detail_view" type="id"/>
+</resources>

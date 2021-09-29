@@ -27,7 +27,7 @@ namespace engine {
 namespace alexa {
 
 /**
- * AVS Device SDK's implementaiton of an asset manager.
+ * AVS Device SDK's implementation of an asset manager.
  *
  * This manager will use the @c AlexaClientSDKConfig.json to retrieve the supported locales. For devices with wake word
  * enabled this class will support "ALEXA" only.

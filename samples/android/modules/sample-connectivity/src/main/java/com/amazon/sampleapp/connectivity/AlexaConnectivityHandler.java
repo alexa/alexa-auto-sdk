@@ -286,7 +286,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
             case TRIAL:
                 try {
-                    // Get today's date and add arbitary date within 30 day upsell notice date
+                    // Get today's date and add arbitrary date within 30 day upsell notice date
                     calendar.setTime(new Date());
                     calendar.add(Calendar.DATE, 30);
                     dataPlan.put("type", sDATAPLAN_TRIAL);
@@ -375,7 +375,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
             case TRIAL_EXPIRING:
                 try {
-                    // Get today's date and add arbitary date of 5 days to trigger trial expiring notice
+                    // Get today's date and add arbitrary date of 5 days to trigger trial expiring notice
                     calendar.setTime(new Date());
                     calendar.add(Calendar.DATE, 5);
                     dataPlan.put("type", sDATAPLAN_TRIAL);
@@ -491,7 +491,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
     /**
      * Read the previous selected item for dropdown menu of the spinner from the preferences file
-     * @param acitivity - Current Activity
+     * @param activity - Current Activity
      */
     public boolean readInstanceState(Activity activity) {
         // Get the SharedPreferences object for sample from local storage
@@ -505,7 +505,7 @@ public class AlexaConnectivityHandler extends AlexaConnectivity {
 
     /**
      * Write the current selected dropdown menu option position to local storage
-     * @param acitivity - Current Activity
+     * @param activity - Current Activity
      */
     public boolean writeInstanceState(Activity activity) {
         // Get the SharedPreferences object for Sample App

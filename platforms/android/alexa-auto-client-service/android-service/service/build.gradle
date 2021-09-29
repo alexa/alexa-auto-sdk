@@ -10,12 +10,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 27
+        targetSdkVersion 30
         versionCode 1
-        versionName "3.2.1"
+        versionName "3.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -60,7 +60,7 @@ android {
 }
 
 ext {
-    remoteLibVersion = "3.2+"
+    remoteLibVersion = "3.3+"
 }
 dependencies {
     implementation fileTree(include: ['*.aar'], dir: 'src/main/libs')

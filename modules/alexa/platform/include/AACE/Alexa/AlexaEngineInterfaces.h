@@ -435,7 +435,7 @@ public:
         std::string validationMethod;
         /** Validation data :
          *  1. Device platform issued app signing certificate. A list of certificates may be attached.
-         *  2. In some cases validation is performed locally. The certificate is trasmitted as validationData during discovery to announce the activated app's identity in order to allow app activation to be revoked.
+         *  2. In some cases validation is performed locally. The certificate is transmitted as validationData during discovery to announce the activated app's identity in order to allow app activation to be revoked.
          *  3. empty
          */
         std::vector<std::string> validationData;
@@ -461,8 +461,13 @@ public:
  */
 class LocalMediaSourceEngineInterface {
 public:
-    virtual void onPlayerEvent(const std::string& eventName) = 0;
-    virtual void onPlayerError(const std::string& errorName, long code, const std::string& description, bool fatal) = 0;
+    virtual void onPlayerEvent(const std::string& eventName, const std::string& sessionId) = 0;
+    virtual void onPlayerError(
+        const std::string& errorName,
+        long code,
+        const std::string& description,
+        bool fatal,
+        const std::string& sessionId) = 0;
     virtual void onSetFocus(bool focusAcquire = true) = 0;
 };
 

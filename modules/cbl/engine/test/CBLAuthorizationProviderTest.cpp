@@ -226,7 +226,6 @@ TEST_F(CBLAuthorizationProviderTest, subsequentStartAndStop) {
 
 TEST_F(CBLAuthorizationProviderTest, subsequentStartAndLogout) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
-    bool receivedUnauthorized = false;
     EXPECT_CALL(*m_mockAuthorizationManager, registerAuthorizationAdapter("TEST_ME", ::testing::_)).Times(1);
     EXPECT_CALL(*m_mockPropertyManagerServiceInterface, getProperty("aace.alexa.setting.locale"))
         .WillOnce(::testing::Return("en-US"));

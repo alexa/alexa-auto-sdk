@@ -14,6 +14,8 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/Audio/AASBAudioOutput.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/PropertyManager/AASBPropertyManager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/PropertyManager/AASBPropertyManagerEngineService.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/DeviceUsage/AASBDeviceUsage.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Engine/DeviceUsage/AASBDeviceUsageEngineService.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -97,12 +99,19 @@ set(AASB_PPROPERTY_MANAGER_MESSAGES
 
 source_group("PropertyManager Message Headers" FILES ${AASB_PROPERTY_MANAGER_MESSAGES})
 
+set(AASB_DEVICE_USAGE_MESSAGES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AASB/Message/DeviceUsage/DeviceUsage/ReportNetworkDataUsageMessage.h
+)
+
+source_group("DeviceUsage Message Headers" FILES ${AASB_DEVICE_USAGE_MESSAGES})
+
 add_library(AASBCoreEngine SHARED
     ${HEADERS}
     ${AASB_AUDIO_MESSAGES}
     ${AASB_LOCATION_MESSAGES}
     ${AASB_NETWORK_MESSAGES}
     ${AASB_PROPERTY_MANAGER_MESSAGES}
+    ${AASB_DEVICE_USAGE_MESSAGES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AASBAuthorizationEngineService.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Authorization/AASBAuthorization.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Location/AASBLocationEngineService.cpp
@@ -116,6 +125,8 @@ add_library(AASBCoreEngine SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Audio/AASBAudioOutput.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/AASBPropertyManager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/AASBPropertyManagerEngineService.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceUsage/AASBDeviceUsage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceUsage/AASBDeviceUsageEngineService.cpp
 )
 
 find_path(NLOHMANN_INCLUDE_DIR nlohmann/json.hpp

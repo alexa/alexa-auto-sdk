@@ -4,12 +4,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.amazon.alexa.auto.app"
         minSdkVersion 28
         versionCode 1
-        versionName "3.2.1"
+        versionName "3.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -56,6 +56,7 @@ dependencies {
     implementation project(':aacsconstants')
     implementation project(':aacsipc')
     implementation project(':aacscommonutils')
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     // AACS Sample App Projects.
     implementation project(':alexa-auto-apis')
@@ -68,6 +69,15 @@ dependencies {
     implementation project(':alexa-auto-navigation')
     implementation project(':alexa-auto-settings')
     implementation project(':alexa-auto-comms-ui')
+    implementation project(':alexa-auto-templateruntime-renderer')
+
+    if(project.hasProperty('enabledAPL')){
+        implementation project(':alexa-auto-apl-renderer')
+    }
+
+    if(project.hasProperty('enabledDeviceUsage')){
+        implementation project(':alexa-auto-device-usage')
+    }
 
     // Extra modules for AACS Sample App Projects.
     for (extra_module_project_name in gradle.ext.extra_module_project_names) {

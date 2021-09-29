@@ -1,8 +1,6 @@
 package com.amazon.alexa.auto.settings;
 
 import android.app.Application;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -19,6 +17,7 @@ import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthStatus;
 import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
 import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 import com.amazon.alexa.auto.settings.dependencies.AndroidModule;
@@ -28,13 +27,13 @@ import javax.inject.Inject;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
+import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.DISABLED;
+
 /**
  * ViewModel for {@link SettingsActivity}.
  */
 public class SettingsActivityViewModel extends AndroidViewModel implements LoginUIEventListener {
     private static final String TAG = SettingsActivityViewModel.class.getSimpleName();
-
-    private static final int START_SERVICE_DELAY_MS = 15000;
 
     public enum AuthState { LOGGED_OUT, LOGGED_IN, CBL_START }
 
@@ -49,7 +48,6 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
     @Nullable
     private Disposable mAuthStatusChangeSubscription;
 
-    private final Handler mHandler;
     private boolean isLocaleUpdateNeeded;
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
@@ -72,7 +70,6 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
         mAppRootComponent = mApp.getRootComponent();
         mAuthController = mAppRootComponent.getAuthController();
         mAlexaSetupController = mAppRootComponent.getAlexaSetupController();
-        mHandler = new Handler(Looper.getMainLooper());
 
         initialize();
     }

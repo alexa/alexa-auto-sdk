@@ -66,6 +66,26 @@ public class TemplateRuntimeMessages {
     }
 
     /**
+     * Parse Template Runtime WeatherTemplate message.
+     *
+     * @param json Json to parse.
+     * @return WeatherTemplate if available.
+     */
+    public static Optional<WeatherTemplate> parseWeatherTemplate(@NonNull String json) {
+        Moshi moshi = new Moshi.Builder().build();
+        try {
+            JSONObject messagePayload = new JSONObject(json);
+            messagePayload = new JSONObject(messagePayload.getString("payload"));
+            WeatherTemplateJsonAdapter jsonAdapter = new WeatherTemplateJsonAdapter(moshi);
+            WeatherTemplate weatherTemplatePayload = jsonAdapter.fromJson(messagePayload.toString());
+            return weatherTemplatePayload != null ? Optional.of(weatherTemplatePayload) : Optional.empty();
+        } catch (Exception exception) {
+            Log.w(TAG, "Failed to parse WeatherTemplate | error: " + exception);
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Parse Template Runtime LocalSearchDetail message.
      *
      * @param json Json to parse.

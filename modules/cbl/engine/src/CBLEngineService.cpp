@@ -117,7 +117,7 @@ bool CBLEngineService::setup() {
     }
 }
 
-bool CBLEngineService::start() {
+bool CBLEngineService::engineStarted() {
     if (m_cblEngineImpl != nullptr) {
         m_cblEngineImpl->enable();
     }

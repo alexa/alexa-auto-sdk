@@ -14,6 +14,7 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.communication.ContactsController;
+import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.comms.ui.Constants;
 import com.amazon.alexa.auto.comms.ui.PreferenceKeys;
@@ -95,6 +96,10 @@ public class CommunicationPreferenceFragment extends PreferenceFragmentCompat {
                 SwitchPreferenceCompat contactUploadConsent = findPreference(PreferenceKeys.CONTACTS_CONSENT_SETTINGS);
 
                 Preconditions.checkNotNull(contactUploadConsent);
+
+                if (ModuleProvider.isAlexaCustomAssistantEnabled(context)) {
+                    contactUploadConsent.setSummary(R.string.contacts_upload_consent_summary_with_alexa_custom_assistant);
+                }
 
                 if ((device.getValue().getContactsUploadPermission().equals(Constants.CONTACTS_PERMISSION_YES))) {
                     contactUploadConsent.setChecked(true);

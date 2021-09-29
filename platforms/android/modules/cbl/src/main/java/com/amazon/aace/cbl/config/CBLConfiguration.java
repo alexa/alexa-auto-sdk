@@ -38,7 +38,7 @@ public class CBLConfiguration {
      * @endcode
      *
      * @param  requestTimeout The timeout used for requesting code pair
-     * The default configuration of 60 seconds will be overriden with this value when configured.
+     * The default configuration of 60 seconds will be overridden with this value when configured.
      */
     public static EngineConfiguration createCBLConfig(final int seconds) {
         return new EngineConfiguration() {

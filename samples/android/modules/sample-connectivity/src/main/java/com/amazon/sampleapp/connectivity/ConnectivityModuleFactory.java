@@ -51,6 +51,7 @@ public class ConnectivityModuleFactory implements ModuleFactoryInterface {
         Activity activity = sampleAppContext.getActivity();
         AlexaConnectivityHandler connectivityHandler = new AlexaConnectivityHandler(sampleAppContext);
         List<PlatformInterface> platformInterfaceList = new ArrayList<>();
+        sampleAppContext.addPlatformInterfaceHandler("AlexaConnectivity", connectivityHandler);
         platformInterfaceList.add(connectivityHandler);
 
         return platformInterfaceList;

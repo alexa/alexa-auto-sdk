@@ -42,6 +42,7 @@ public class AACSConstants {
     public static final String AACS_GENERAL_CONFIG = "aacs.general";
     public static final String AACS_AASB_CONFIG = "aacs.aasb";
     public static final String AACS_AMAZONLITE_CONFIG = "aacs.amazonLite";
+    public static final String AACS_COASSISTANT = "aacs.coassistant";
 
     public static final String AACS_PROPERTY_URI = "com.amazon.alexaautoclientservice.AACSPropertyContentProvider";
     public static final String[] ALEXA_PROPERTIES = {AACSPropertyConstants.WAKEWORD_SUPPORTED,
@@ -53,6 +54,7 @@ public class AACSConstants {
     public static final String REPLY_TO_PACKAGE = "replyToPackage";
     public static final String REPLY_TO_CLASS = "replyToClass";
     public static final String REPLY_TYPE = "replyType";
+    public static final String REPLY_TYPE_RECEIVER = "RECEIVER";
 
     public static class IntentAction {
         public static final String GET_SERVICE_METADATA = "GetServiceMetadata";

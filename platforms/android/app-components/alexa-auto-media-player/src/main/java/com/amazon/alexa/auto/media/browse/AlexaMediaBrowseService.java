@@ -3,10 +3,12 @@ package com.amazon.alexa.auto.media.browse;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
@@ -52,6 +54,8 @@ public class AlexaMediaBrowseService extends MediaBrowserServiceCompat {
     // Idle timeout until service can remain up while idle. If service doesn't get
     // busy during this time, then service is stopped.
     public static final long SERVICE_IDLE_TIMEOUT_MS = 1000 * 60 * 30; // 30 minutes.
+    public static final String MEDIA_ID = "media-id";
+
 
     // External Dependencies.
     @Inject
@@ -169,7 +173,22 @@ public class AlexaMediaBrowseService extends MediaBrowserServiceCompat {
     @Override
     public void onLoadChildren(
             @NonNull final String parentMediaId, @NonNull final Result<List<MediaBrowserCompat.MediaItem>> result) {
-        result.sendResult(new ArrayList<>());
+        List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
+
+        MediaDescriptionCompat desc =
+                new MediaDescriptionCompat.Builder()
+                        .setMediaId(MEDIA_ID)
+                        .setTitle(getString(R.string.app_name))
+                        .setSubtitle(getString(R.string.alexa_music_hint_1))
+                        .setIconUri(Uri.parse("android.resource://" +
+                                getPackageName() + "/" + "drawable/media_item_place_holder"))
+                        .build();
+
+        MediaBrowserCompat.MediaItem songList =
+                new MediaBrowserCompat.MediaItem(desc,
+                        MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
+        mediaItems.add(songList);
+        result.sendResult(mediaItems);
     }
 
     /**

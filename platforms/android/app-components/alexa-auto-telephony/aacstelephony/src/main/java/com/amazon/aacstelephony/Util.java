@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
+
 public class Util {
     private static final String TAG = AACSConstants.AACS + "-" + Util.class.getSimpleName();
 
@@ -143,16 +145,7 @@ public class Util {
     }
 
     static boolean bluetoothNotConnected() {
-        int headsetClientProfileId;
-
-        try {
-            headsetClientProfileId = (int) BluetoothProfile.class.getField(Constants.HEADSET_CLIENT).get(null);
-        } catch (Exception e) {
-            Log.e(TAG, "Bluetooth profile Id for Headset Client not found");
-            return true;
-        }
-
-        return BluetoothAdapter.getDefaultAdapter().getProfileConnectionState(headsetClientProfileId)
+        return BluetoothAdapter.getDefaultAdapter().getProfileConnectionState(HEADSET_CLIENT_PROFILE_ID)
                 != BluetoothAdapter.STATE_CONNECTED;
     }
 

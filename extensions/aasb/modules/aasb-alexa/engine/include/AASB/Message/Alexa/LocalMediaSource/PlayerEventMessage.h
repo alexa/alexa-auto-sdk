@@ -52,7 +52,7 @@ struct PlayerEventMessage {
             }
         };
         static const std::string& version() {
-            static std::string version = "3.2";
+            static std::string version = "3.3";
             return version;
         }
         static const std::string& messageType() {
@@ -67,6 +67,7 @@ struct PlayerEventMessage {
 
         Source source;
         std::string eventName;
+        std::string sessionId = "";
     };
     static const std::string& topic() {
         static std::string topic = "LocalMediaSource";
@@ -77,7 +78,7 @@ struct PlayerEventMessage {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.2";
+        static std::string version = "3.3";
         return version;
     }
     static const std::string& messageType() {
@@ -94,11 +95,15 @@ inline void to_json(nlohmann::json& j, const PlayerEventMessage::Payload& c) {
     j = nlohmann::json{
         {"source", c.source},
         {"eventName", c.eventName},
+        {"sessionId", c.sessionId},
     };
 }
 inline void from_json(const nlohmann::json& j, PlayerEventMessage::Payload& c) {
     j.at("source").get_to(c.source);
     j.at("eventName").get_to(c.eventName);
+    if (j.contains("sessionId")) {
+        j.at("sessionId").get_to(c.sessionId);
+    }
 }
 
 inline void to_json(nlohmann::json& j, const PlayerEventMessage::Header::MessageDescription& c) {

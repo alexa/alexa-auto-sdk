@@ -101,7 +101,7 @@ void NetworkInfoProviderHandler::setupUI() {
         // Store the current network status for accessor functions
         m_networkStatus = NetworkStatusEnumerator.at(sm[1]);
         if (sm[2].matched) {
-            // Optional WiFi signal strengh
+            // Optional WiFi signal strength
             m_wifiSignalStrength = std::stoi(sm[2]);
         }
         networkStatusChanged(m_networkStatus, m_wifiSignalStrength);

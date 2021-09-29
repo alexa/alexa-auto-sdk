@@ -17,6 +17,7 @@
 #define AACE_ENGINE_LOGGER_LOGGER_ENGINE_SERVICE_H
 
 #include "AACE/Engine/Core/EngineService.h"
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "EngineLogger.h"
 #include "LoggerEngineImpl.h"
 #include "LoggerServiceInterface.h"
@@ -49,8 +50,8 @@ protected:
     bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
 
 private:
-    std::shared_ptr<aace::engine::logger::sink::Sink> createSink(const rapidjson::Value& config);
-    std::shared_ptr<aace::engine::logger::sink::Rule> createRule(const rapidjson::Value& config);
+    std::shared_ptr<aace::engine::logger::sink::Sink> createSink(const aace::engine::utils::json::Value& config);
+    std::shared_ptr<aace::engine::logger::sink::Rule> createRule(const aace::engine::utils::json::Value& config);
 
     // platform interface registration
     template <class T>

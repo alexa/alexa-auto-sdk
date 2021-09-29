@@ -25,4 +25,5 @@ public class AACSPropertyConstants {
     public static final String OPERATING_COUNTRY = "aace.vehicle.operatingCountry";
     public static final String VERSION = "aace.core.version";
     public static final String NETWORK_INTERFACE = "aace.network.networkInterface";
+    public static final String GEOLOCATION_ENABLED = "aace.geolocation.geolocationEnablement";
 }

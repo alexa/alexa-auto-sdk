@@ -1,6 +1,5 @@
 # Address Book Module
 
-
 The Alexa Auto SDK Address Book module enables a platform implementation to augment the communication and navigation capabilities of Alexa with user data such as phone contacts or navigation favorites ("home", "work", etc.). Using this module, the user can upload their contacts or navigation favorites, or both, so that these capabilities could access them.
 
 > **Note:** To use the Address Book contact and navigation favorites uploading functionality, your product must be placed on the allow list by Amazon. See [Requesting Additional Functionality](../../NEED_HELP.md#requesting-additional-functionality) for details.
@@ -9,6 +8,8 @@ The Alexa Auto SDK Address Book module enables a platform implementation to augm
 
 * [Overview](#overview)
 * [Address Book Sequence Diagrams](#sequence-diagrams)
+* [Managing Address Books](#managing-address-books)
+* [Configuring the Address Book Module](#configuring-the-address-book-module)
 * [Using the Address Book Module](#using-the-address-book-module)
 
 ## Overview<a id="overview"></a>
@@ -57,6 +58,44 @@ This diagram illustrates the sequence for uploading navigation favorites and nav
 This diagram illustrates the sequence for removing uploaded navigation favorites.
 
 ![Navigation Remove](./assets/remove_navigation_fav.png)
+
+## Managing Address Books<a id="managing-address-books"></a>
+
+>**Note:** In applications that uses Local Voice Control (LVC) Extension this feature is not supported.
+
+By default, the Auto SDK expects the platform implementation to remove uploaded address books from Alexa when the user disconnects their phone from the head unit. The Auto SDK also removes all address books at Engine start, because it might have failed to remove them previously for various reasons, such as network connection issues. Therefore, when the user connects their phone to the head unit, the platform implementation must notify the Auto SDK to re-upload the address book.
+
+Uploading an address book might consume a significant amount of data. To reduce data usage due to repeated uploads, you can disable automatic address book removal at Engine start by configuring the Address Book module. This configuration reduces the number of address book uploads because the address book need not be uploaded every time the user connects the phone to the head unit. 
+
+>**Note:** Regardless of the configuration, Alexa periodically removes uploaded address books.
+
+If you disable address book removal at Engine start, skip re-uploading address books if all of the following conditions are true:
+
+- The last successful upload is less than 24-hour ago. Amazon recommends re-uploading the address books after 24 hours because of Alexa's address book retention policy.
+- The user connects the same phone used for the last successful upload.
+- The phone contacts and navigation favorites on the phone are the same as the last successful upload.
+
+When the user revokes the permission to upload address books, you must implement the logic to remove uploaded address books immediately. Your implementation must ensure that they are removed successfully.
+
+## Configuring the Address Book Module<a id="configuring-the-address-book-module"></a>
+
+To customize the Address Book module, define the `aace.addressBook` configuration with the following field:
+
+```
+"aace.addressBook": {
+    "cleanAllAddressBooksAtStart": <true/false>
+}
+```
+
+The `cleanAllAddressBooksAtStart` field specifies whether to remove all uploaded address books from Alexa at Engine start. The default value is `true`. 
+
+You can specify configuration data by using a JSON file. Alternatively, use the `createAddressBookConfig` method to configure the Address Book module programmatically. See [`aace.addressBook.config.AddressBookConfiguration.createAddressBookConfig`](./platform/include/AACE/AddressBook/AddressBookConfiguration.h) for details.
+
+```cpp
+auto addressBookConfig = aace::addressBook::config::AddressBookConfiguration::createAddressBookConfig(false);
+```
+
+Refer to the [core module](../core/README.md) documentation for steps to specify configuration data programmatically or through a JSON file.
 
 ## Using the Address Book Module<a id="using-the-address-book-module"></a>
 

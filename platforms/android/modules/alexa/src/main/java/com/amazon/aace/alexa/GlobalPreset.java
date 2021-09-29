@@ -22,11 +22,16 @@ package com.amazon.aace.alexa;
 
 import com.amazon.aace.core.PlatformInterface;
 
+/**
+ * @deprecated Use @c LocalMediaSource class instead with ContentSelector PRESET
+ */
 abstract public class GlobalPreset extends PlatformInterface {
     public GlobalPreset() {}
+
     /**
+     * @deprecated Use @c LocalMediaSource class with DEFAULT source with @c LocalMediaSource::ContentSelector::PRESET
+     *         instead
      * Called after receiving a global preset play directive
-     *
      * @param preset The preset integer from the playbackContextToken
      */
     public void setGlobalPreset(int preset){};

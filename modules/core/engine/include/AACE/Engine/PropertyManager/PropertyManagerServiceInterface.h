@@ -40,7 +40,7 @@ public:
      * @param [in] propertyDescription
      *        The aace::engine::propertyManager::PropertyDescription object.
      * @return @c true if the property was registered, else @c false
-     *         if an error occured.
+     *         if an error occurred.
      */
     virtual bool registerProperty(const PropertyDescription& propertyDescription) = 0;
 
@@ -66,7 +66,7 @@ public:
      * @param [in] listener
      *        The @c aace:engine::propertyManager::PropertyListenerInterface
      * @return @c true if the listener value was added, else @c false
-     *         if an error occured.
+     *         if an error occurred.
      */
     virtual bool addListener(const std::string& name, std::shared_ptr<PropertyListenerInterface> listener) = 0;
 
@@ -96,7 +96,7 @@ public:
      *        originated from the platform. If @c false, notify the platform via the
      *        @c aace::propertyManager::PropertyManager::propertyChanged().
      * @return @c true if the property value was updated or set to the current
-     *         setting, else @c false if an error occured.
+     *         setting, else @c false if an error occurred.
      */
     virtual bool setProperty(const std::string& name, const std::string& value, const bool& fromPlatform = false) = 0;
 

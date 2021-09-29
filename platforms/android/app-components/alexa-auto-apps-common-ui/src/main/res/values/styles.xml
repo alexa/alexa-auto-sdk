@@ -42,7 +42,16 @@
     </style>
 
     <style name="Alexa.Button" parent="Alexa.HeadingText">
-        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:backgroundTint">@color/Abbey</item>
+        <item name="android:background">?attr/shapeAppearanceMediumComponent</item>
+        <item name="android:textSize">@dimen/heading3_font_size</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="Alexa.Button2" parent="Alexa.HeadingText">
+        <item name="android:textColor">@color/Black</item>
+        <item name="android:backgroundTint">@color/White</item>
         <item name="android:background">?attr/shapeAppearanceMediumComponent</item>
         <item name="android:textSize">@dimen/heading3_font_size</item>
         <item name="android:textStyle">normal</item>

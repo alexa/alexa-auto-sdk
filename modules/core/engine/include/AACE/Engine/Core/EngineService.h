@@ -90,6 +90,8 @@ protected:
     virtual bool stop();
     virtual bool shutdown();
     virtual bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface);
+    virtual bool engineStarted();
+    virtual bool engineStopped();
 
     std::shared_ptr<aace::engine::core::EngineContext> getContext();
 
@@ -141,6 +143,8 @@ private:
     bool handleStopEngineEvent();
     bool handleShutdownEngineEvent();
     bool handleRegisterPlatformInterfaceEngineEvent(std::shared_ptr<aace::core::PlatformInterface> platformInterface);
+    bool handleEngineStartedEngineEvent();
+    bool handleEngineStoppedEngineEvent();
 
 private:
     std::shared_ptr<aace::engine::core::EngineContext> m_context;

@@ -81,7 +81,6 @@ std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create(
 
     try {
         ThrowIfNull(platformLocalMediaSource, "invalidPlatformLocalMediaSource");
-        ThrowIf(localPlayerId.empty(), "invalidPlayerId");
         ThrowIfNull(discoveredPlayerSender, "invalidDiscoveredPlayerSender");
         ThrowIfNull(focusHandler, "invalidFocusHandler");
 
@@ -192,7 +191,7 @@ bool LocalMediaSourceEngineImpl::handlePlay(
         AACE_VERBOSE(LX(TAG));
 
         // For Local Media sources localPlayerId, index, offset, preload, and navigation are currently unused
-
+        reportPlaybackSessionId(m_localPlayerId, playbackSessionId);
         size_t separatorIndex = playContextToken.find(CONTENT_SELECTOR_SEPARATOR);  // ":"
 
         std::string contentSelectorName = playContextToken.substr(0, separatorIndex);  //  i.e."frequency"
@@ -210,7 +209,9 @@ bool LocalMediaSourceEngineImpl::handlePlay(
         std::string selectionPayload = playContextToken.substr(separatorIndex + 1);  //  i.e."98.7"
         emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlay", {METRIC_LOCAL_MEDIA_SOURCE_PLAY});
         ThrowIfNot(
-            m_platformLocalMediaSource->play(contentSelector, selectionPayload), "platformMediaAdapterPlayFailed");
+            m_platformLocalMediaSource->play(contentSelector, selectionPayload) ||
+                m_platformLocalMediaSource->play(contentSelector, selectionPayload, playbackSessionId),
+            "platformMediaAdapterPlayFailed");
         // set focus on successful play
         ThrowIfNot(setFocus(m_localPlayerId, true), "setFocusFailed");
         return true;
@@ -463,6 +464,9 @@ std::string LocalMediaSourceEngineImpl::getPlayerId(Source source) {
         case Source::DAB:
             return "DAB_RADIO";
 
+        case Source::DEFAULT:
+            return "";
+
         default:
             throw("invalidLocalMediaSource");
     }
@@ -506,12 +510,32 @@ bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
 // aace::alexa::LocalMediaSourceEngineInterface
 //
 
-void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName) {
+void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName, const std::string& sessionId) {
     emitCounterMetrics(
         METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_EVENT, eventName});
+    AACE_VERBOSE(LX(TAG).d("eventName", eventName));
+    if (m_localPlayerId.empty()) {
+        if (eventName == "PlaybackSessionStarted") {
+            setDefaultPlayerFocus();
+        }
+        AACE_VERBOSE(LX(TAG).d("onPlayerEvent", "Skipping events for the DEFAULT player"));
+        return;
+    }
+    if (eventName == "PlaybackSessionStarted") {
+        try {
+            ThrowIfNot(setFocus(m_localPlayerId, true), "setFocusFailed");
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG).d("eventName", eventName).d("reason", ex.what()));
+        }
+        reportPlaybackSessionId(m_localPlayerId, sessionId);
+    } else if (eventName == "PlaybackSessionEnded") {
+        try {
+            ThrowIfNot(setFocus(m_localPlayerId, false), "setFocusFailed");
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG).d("eventName", eventName).d("reason", ex.what()));
+        }
+    }
     try {
-        AACE_VERBOSE(LX(TAG).d("eventName", eventName));
-
         auto event = createExternalMediaPlayerEvent(
             m_localPlayerId,
             "PlayerEvent",
@@ -535,7 +559,8 @@ void LocalMediaSourceEngineImpl::onPlayerError(
     const std::string& errorName,
     long code,
     const std::string& description,
-    bool fatal) {
+    bool fatal,
+    const std::string& sessionId) {
     emitCounterMetrics(
         METRIC_PROGRAM_NAME_SUFFIX,
         "onPlayerError",
@@ -543,6 +568,10 @@ void LocalMediaSourceEngineImpl::onPlayerError(
     try {
         AACE_VERBOSE(LX(TAG).d("errorName", errorName).d("code", code).d("description", description).d("fatal", fatal));
 
+        if (m_localPlayerId.empty()) {
+            AACE_VERBOSE(LX(TAG).d("onPlayerEvent", "Skipping errors for the DEFAULT player"));
+            return;
+        }
         auto event = createExternalMediaPlayerEvent(
             m_localPlayerId,
             "PlayerError",
@@ -578,6 +607,16 @@ void LocalMediaSourceEngineImpl::onSetFocus(bool focusAcquire) {
         ThrowIfNot(setFocus(m_localPlayerId, focusAcquire), "setFocusFailed");
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "onSetFocus").d("reason", ex.what()));
+    }
+}
+
+void LocalMediaSourceEngineImpl::setDefaultPlayerFocus() {
+    try {
+        auto focusHandler_lock = m_focusHandler.lock();
+        ThrowIfNull(focusHandler_lock, "invalidFocusHandler");
+        m_executor.submit([focusHandler_lock]() { focusHandler_lock->setDefaultPlayerFocus(); });
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 

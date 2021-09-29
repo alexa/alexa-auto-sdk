@@ -1,0 +1,32 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant Alexa
+
+Driver->SDK: "Alexa, What is the speed limit here"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+
+Alexa->SDK : AnnounceRoadRegulation directive
+
+SDK->NavigationHandler : announceRoadRegulation(SPEED_LIMIT)
+NavigationHandler->Nav : announce road regulation
+
+alt Success
+	Nav->Nav : "Speed limit is 45 mph" TTS by navigation system
+    NavigationHandler<-Nav : road regulation announced
+    NavigationHandler->SDK: navigationEvent(SPEED_LIMIT_REGULATION_ANNOUNCED)
+    SDK->Alexa : AnnounceRoadRegulationSuccess event
+else Error
+	Nav->Nav : "Cannot get the speed limit" TTS by navigation system
+    NavigationHandler<-Nav : road regulation announcement failed
+    NavigationHandler->SDK: navigationError(SPEED_LIMIT_REGULATION_FAILED, INTERNAL_SERVICE_ERROR, "")
+    SDK->Alexa : AnnounceRoadRegulationFailed event
+end
+@enduml

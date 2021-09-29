@@ -44,7 +44,6 @@ public class AACSPropertyContentProvider extends ContentProvider {
     private static SharedPreferences mPreferences;
     private static Context mContext;
 
-    private static CompletableFuture<Boolean> mWaitForPropertyStateChanged;
     private static HashMap<String, CompletableFuture<Boolean>> mUpdatePropertyToFutureMap;
     private static final int REPLY_WAIT_DURATION = 1000;
 
@@ -67,18 +66,23 @@ public class AACSPropertyContentProvider extends ContentProvider {
     }
 
     public static void setPropertyManagerHandler(PropertyManagerHandler propertyManagerHandler) {
-        mPropertyManagerHandler = propertyManagerHandler;
-        initialize();
+        if (propertyManagerHandler != null) {
+            mPropertyManagerHandler = propertyManagerHandler;
+            initialize();
+        } else {
+            Log.e(TAG, "propertyManagerHandler is not defined.");
+        }
     }
 
     public static void updatePropertyAndNotifyObservers(String name, String value, boolean updated) {
         if (updated) {
             mPreferences.edit().putString(name, value).apply();
-            mContext.getContentResolver().notifyChange(
-                    Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), null);
-            if (mWaitForPropertyStateChanged != null) {
-                mWaitForPropertyStateChanged.complete(updated);
-            }
+            mContext.getContentResolver().notifyChange(Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), null);
+        }
+        if (mUpdatePropertyToFutureMap != null && mUpdatePropertyToFutureMap.containsKey(name)) {
+            mUpdatePropertyToFutureMap.get(name).complete(updated);
+        } else {
+            Log.w(TAG, "mUpdatePropertyToFutureMap is null or does not contain " + name);
         }
     }
 
@@ -106,9 +110,15 @@ public class AACSPropertyContentProvider extends ContentProvider {
             @Nullable String[] strings1, @Nullable String s1) {
         mPreferences = mContext.getSharedPreferences(AACSConstants.AACS_PROPERTY_URI, mContext.MODE_PRIVATE);
         String value;
+        MatrixCursor cursor = new MatrixCursor(new String[] {"name", "value"});
+
         if (mPreferences.contains(property)) {
             value = mPreferences.getString(property, null);
         } else {
+            if (mPropertyManagerHandler == null) {
+                Log.e(TAG, "PropertyManagerHandler not defined, returning empty cursor");
+                return cursor;
+            }
             value = mPropertyManagerHandler.getProperty(property);
             // save the property value only if it is not empty string
             if (value != null && !value.isEmpty()) {
@@ -117,7 +127,6 @@ public class AACSPropertyContentProvider extends ContentProvider {
                 value = null;
             }
         }
-        MatrixCursor cursor = new MatrixCursor(new String[] {"name", "value"});
         cursor.addRow(new String[] {property, value});
         return cursor;
     }
@@ -150,23 +159,25 @@ public class AACSPropertyContentProvider extends ContentProvider {
     public int update(@Nullable Uri uri, @Nullable ContentValues contentValues, @Nullable String property,
             @Nullable String[] strings) {
         boolean updated = false;
+        if (mPropertyManagerHandler == null) {
+            Log.e(TAG, "PropertyManagerHandler not defined");
+            return 0;
+        }
+
         if (mUpdatePropertyToFutureMap == null) {
             mUpdatePropertyToFutureMap = new HashMap<>();
         }
 
         if (contentValues.getAsString(property) != null && Looper.myLooper() != Looper.getMainLooper()) {
-            mWaitForPropertyStateChanged = new CompletableFuture<>();
-            mUpdatePropertyToFutureMap.put(property, mWaitForPropertyStateChanged);
+            CompletableFuture<Boolean> waitForPropertyStateChanged = new CompletableFuture<>();
+            mUpdatePropertyToFutureMap.put(property, waitForPropertyStateChanged);
             mPropertyManagerHandler.setProperty(property, contentValues.getAsString(property));
 
             try {
-                if (mWaitForPropertyStateChanged.get(REPLY_WAIT_DURATION, TimeUnit.MILLISECONDS)) {
+                if (waitForPropertyStateChanged.get(REPLY_WAIT_DURATION, TimeUnit.MILLISECONDS)) {
                     mUpdatePropertyToFutureMap.remove(property);
                     Log.i(TAG, "Property " + property + " update successful");
                     return 1;
-                } else {
-                    Log.i(TAG, "Property " + property + " update failed");
-                    return 0;
                 }
             } catch (ExecutionException | InterruptedException e) {
                 Log.d(TAG, "Error occurred during wait task execution: " + e.getMessage());
@@ -174,7 +185,8 @@ public class AACSPropertyContentProvider extends ContentProvider {
                 Log.d(TAG, "Stopping wait for " + property + " property state changed");
             }
         }
-        Log.i(TAG, "Property " + property + " update failed");
+        Log.e(TAG, "Property " + property + " update failed");
+        mUpdatePropertyToFutureMap.remove(property);
         return 0;
     }
 }

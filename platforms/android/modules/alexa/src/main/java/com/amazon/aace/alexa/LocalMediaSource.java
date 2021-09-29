@@ -25,7 +25,7 @@ import com.amazon.aace.core.PlatformInterface;
 
 /**
  * @c LocalMediaSource should be extended to use Alexa to switch among media sources local to the device.
- * It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources.
+ * It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, DAB and CD player sources.
  */
 abstract public class LocalMediaSource extends PlatformInterface {
     private final Source mSource;
@@ -136,7 +136,7 @@ abstract public class LocalMediaSource extends PlatformInterface {
          */
         AM_RADIO("AM_RADIO"),
         /**
-         * satelite radio source
+         * satellite radio source
          */
         SATELLITE_RADIO("SATELLITE_RADIO"),
         /**
@@ -154,7 +154,11 @@ abstract public class LocalMediaSource extends PlatformInterface {
         /**
          * DAB player source
          */
-        DAB("DAB");
+        DAB("DAB"),
+        /**
+         * DEFAULT, unnamed media source
+         */
+        DEFAULT("DEFAULT");
 
         /**
          * @internal
@@ -408,7 +412,7 @@ abstract public class LocalMediaSource extends PlatformInterface {
         /// Flag that identifies if the user currently logged in is a guest or not.
         public boolean isGuest = false;
 
-        /// Flag that identifies whether the local souce is enabled or not.
+        /// Flag that identifies whether the local source is enabled or not.
         public boolean launched = true;
 
         /**
@@ -532,6 +536,7 @@ abstract public class LocalMediaSource extends PlatformInterface {
     }
 
     /**
+     * @deprecated Use @c play(ContentSelector selector, String payload, String sessionId)  instead
      * Called when the user first calls play for the local media via voice control. ( Currently this is not used in
      * LocalMediaSource)
      *
@@ -539,6 +544,22 @@ abstract public class LocalMediaSource extends PlatformInterface {
      * else @c false
      */
     public boolean play(ContentSelector selector, String payload) {
+        return false;
+    }
+
+    /**
+     * Called when the user first calls play for the local media via voice control. ( Currently this is not used in
+     * LocalMediaSource)
+     *
+     * @param ContentSelector Content selection type
+     * @param payload Content selector payload (e.g. "1", "98.7 FM HD 1", "bbc radio four")
+     * @param sessionId A universally unique identifier (UUID) generated according to the RFC 4122 specification. Since
+     *         Alexa is starting the session here, use this session Id for further events and errors.
+     *
+     * @return @c true if the platform implementation successfully handled the call,
+     * else @c false
+     */
+    public boolean play(ContentSelector selector, String payload, String sessionId) {
         return false;
     }
 
@@ -590,43 +611,91 @@ abstract public class LocalMediaSource extends PlatformInterface {
     }
 
     /**
+     * @deprecated This method will be removed very soon. Use @c playerEvent(String eventName, String sessionId)
+     *         instead
      * Should be called on a local media source player event. This will sync the context with AVS.
      *
-     * @param [in] eventName Canonical event name. Accepted values:
-     *      @li "PlaybackStarted"
-     *      @li "PlaybackStopped"
+     * @param eventName Canonical event name. Accepted values are "PlaybackStarted", "PlaybackStopped"
+     *
      */
     public void playerEvent(String eventName) {
-        playerEvent(getNativeRef(), eventName);
+        playerEvent(getNativeRef(), eventName, "");
     }
 
     /**
+     * Should be called on a local media source player event. This will sync the context with AVS.
+     *
+     * @param eventName Canonical event name. Accepted values are "PlaybackStarted", "PlaybackStopped",
+     *         "PlaybackSessionStarted", "PlaybackSessionEnded"
+     * @param sessionId A universally unique identifier (UUID) generated according to the RFC 4122 specification. If
+     *         playback session is started because of @c play(ContentSelector contentSelectorType, String payload,
+     *         String sessionId), use the same session Id. If the session is started due to any other reason, generate
+     *         unique UUID and use it as a session ID until session is not ended.
+     *
+     * <b>
+     * Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally.
+     * Do not call the deprecated setFocus method.
+     * </b>
+     */
+    public void playerEvent(String eventName, String sessionId) {
+        playerEvent(getNativeRef(), eventName, sessionId);
+    }
+
+    /**
+     * @deprecated This method will be removed very soon. Use @c playerError(String errorName, long code, String
+     *         description, boolean fatal, String sessionId) instead
      * Should be called on a local media source player error.
      *
-     * @param [in] errorName The name of the error. Accepted values:
-     *      @li "INTERNAL_ERROR"
-     *
+     * @param errorName The name of the error. Accepted values:"INTERNAL_ERROR"
      * @param code The error code
-     *
      * @param description The detailed error description
-     *
      * @param fatal true if the error is fatal
      */
     public void playerError(String errorName, long code, String description, boolean fatal) {
-        playerError(getNativeRef(), errorName, code, description, fatal);
+        playerError(getNativeRef(), errorName, code, description, fatal, "");
     }
 
     /**
+     * * Should be called on a local media source player error.
+     *
+     * @param errorName The name of the error. Accepted values:"INTERNAL_ERROR"
+     * @param code The error code
+     * @param description The detailed error description
+     * @param fatal true if the error is fatal
+     * @param sessionId A universally unique identifier (UUID) generated according to the RFC 4122 specification. If
+     *         playback session is started because of @c play(ContentSelector contentSelectorType, String payload,
+     *         String sessionId), use the same session Id. If the session is started due to any other reason, generate
+     *         unique UUID and use it as a session ID until session is not ended.
+     */
+    public void playerError(String errorName, long code, String description, boolean fatal, String sessionId) {
+        playerError(getNativeRef(), errorName, code, description, fatal, sessionId);
+    }
+
+    /**
+     * @deprecated Use the @c playerEvent(String eventName, String
+     *         sessionId) instead with "playbackSessionStarted" and "playbackSessionEnded" events
      * Should be called on local media source player events. This will switch the media focus to that context.
      *
      * @param focusAcquire true if focus should be acquired, false if focus should be abandoned
+     *
+     * <b>
+     * Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally.
+     * Do not call the deprecated setFocus method.
+     * </b>
      */
     public void setFocus(boolean focusAcquire) {
         setFocus(getNativeRef(), focusAcquire);
     }
 
     /**
+     * @deprecated Use the @c playerEvent(String eventName, String
+     *         sessionId) instead with "playbackSessionStarted" and "playbackSessionEnded" events
      * Overload of above for backward compatibility. Always acquires focus.
+     *
+     * <b>
+     * Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally.
+     * Do not call the deprecated setFocus method.
+     * </b>
      */
     public void setFocus() {
         setFocus(getNativeRef(), true);
@@ -677,8 +746,9 @@ abstract public class LocalMediaSource extends PlatformInterface {
     // Native Engine JNI methods
     private native long createBinder(Source source);
     private native void disposeBinder(long nativeRef);
-    private native void playerEvent(long nativeRef, String eventName);
-    private native void playerError(long nativeRef, String errorName, long code, String description, boolean fatal);
+    private native void playerEvent(long nativeRef, String eventName, String sessionId);
+    private native void playerError(
+            long nativeRef, String errorName, long code, String description, boolean fatal, String sessionId);
     private native void setFocus(long nativeRef, boolean focusAcquire);
 }
 

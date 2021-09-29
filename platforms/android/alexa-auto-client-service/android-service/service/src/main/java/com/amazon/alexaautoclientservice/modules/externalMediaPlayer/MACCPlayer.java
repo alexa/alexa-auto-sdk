@@ -58,12 +58,12 @@ import com.amazon.maccandroid.model.state.MediaAppMetaData;
 import com.amazon.maccandroid.model.state.MediaAppPlaybackState;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class MACCPlayer extends ExternalMediaAdapter {
+public class MACCPlayer extends ExternalMediaAdapter implements IDiscoveredPlayerProvider {
     private static final String TAG = MACCPlayer.class.getSimpleName();
     private static final int RUN_DISCOVERY_DELAY = 100;
 
@@ -73,6 +73,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
     private AudioManager mAudioManager;
     private int mMediaVolume;
     private MutedState mMutedState = MutedState.UNMUTED;
+    private Set<String> mDiscoveredPlayers = new HashSet<>();
 
     private final MACCAndroidClientCallback mMACCAndroidClientCallback = new MACCAndroidClientCallback() {
         @Override
@@ -81,6 +82,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
             for (int i = 0; i < list.size(); i++) {
                 discoveredPlayers[i] = new DiscoveredPlayerInfo();
                 discoveredPlayers[i].localPlayerId = list.get(i).getLocalPlayerId();
+                mDiscoveredPlayers.add(list.get(i).getLocalPlayerId());
                 discoveredPlayers[i].spiVersion = "1.0";
                 discoveredPlayers[i].validationData = new String[list.get(i).getValidationData().size()];
                 discoveredPlayers[i].validationData =
@@ -125,6 +127,7 @@ public class MACCPlayer extends ExternalMediaAdapter {
         public void onRemovedPlayer(String localPlayerId) {
             Log.i(TAG, "onRemovedPlayer: " + localPlayerId);
             removeDiscoveredPlayer(localPlayerId);
+            mDiscoveredPlayers.remove(localPlayerId);
         }
     };
 
@@ -382,5 +385,13 @@ public class MACCPlayer extends ExternalMediaAdapter {
     public void cleanupMACCClient() {
         if (mClient != null)
             mClient.cleanup();
+    }
+
+    @Override
+    public boolean containsDiscoveredPlayer(String packageName) {
+        if (mDiscoveredPlayers == null || packageName == null)
+            return false;
+        else
+            return mDiscoveredPlayers.contains(packageName);
     }
 }

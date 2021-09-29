@@ -149,7 +149,8 @@ PhoneCallControllerCapabilityAgent::PhoneCallControllerCapabilityAgent(
         m_phoneCallController{phoneCallController} {
     m_capabilityConfigurations.insert(getPhoneCallControllerCapabilityConfiguration());
     m_connectionState = aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::DISCONNECTED;
-    updateContextManager();
+    std::string context = getContextString();
+    updateContextManager(context);
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>
@@ -238,7 +239,8 @@ void PhoneCallControllerCapabilityAgent::handleDialDirective(std::shared_ptr<Dir
         } else {
             removeCall(callId);
         }
-        updateContextManager();
+        std::string context = getContextString();
+        updateContextManager(context);
         setHandlingCompleted(info);
     });
 }
@@ -275,7 +277,8 @@ void PhoneCallControllerCapabilityAgent::handleRedialDirective(std::shared_ptr<D
         } else {
             removeCall(callId);
         }
-        updateContextManager();
+        std::string context = getContextString();
+        updateContextManager(context);
         setHandlingCompleted(info);
     });
 }
@@ -389,7 +392,8 @@ PhoneCallControllerCapabilityAgent::getCapabilityConfigurations() {
 void PhoneCallControllerCapabilityAgent::connectionStateChanged(
     aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState state) {
     m_connectionState = state;
-    updateContextManager();
+    std::string context = getContextString();
+    updateContextManager(context);
 }
 
 void PhoneCallControllerCapabilityAgent::callStateChanged(
@@ -447,17 +451,16 @@ void PhoneCallControllerCapabilityAgent::deviceConfigurationUpdated(
         aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty,
         bool> configurationMap) {
     m_deviceConfigurationMap = configurationMap;
-    updateContextManager();
+    std::string context = getContextString();
+    updateContextManager(context);
 }
 std::string PhoneCallControllerCapabilityAgent::createCallId() {
     return alexaClientSDK::avsCommon::utils::uuidGeneration::generateUUID();
 }
 
-void PhoneCallControllerCapabilityAgent::updateContextManager() {
-    std::string contextString = getContextString();
-
+void PhoneCallControllerCapabilityAgent::updateContextManager(const std::string& context) {
     auto setStateSuccess = m_contextManager->setState(
-        CONTEXT_MANAGER_PHONE_CONTROL_STATE, contextString, alexaClientSDK::avsCommon::avs::StateRefreshPolicy::NEVER);
+        CONTEXT_MANAGER_PHONE_CONTROL_STATE, context, alexaClientSDK::avsCommon::avs::StateRefreshPolicy::NEVER);
     if (setStateSuccess != alexaClientSDK::avsCommon::sdkInterfaces::SetStateResult::SUCCESS) {
         AACE_ERROR(LX(TAG + ".PhoneCallControllerConnectionState", "updateContextManager")
                        .d("reason", static_cast<int>(setStateSuccess)));
@@ -516,6 +519,14 @@ std::string PhoneCallControllerCapabilityAgent::getContextString() {
     return buffer.GetString();
 }
 
+const std::pair<std::string, std::string> PhoneCallControllerCapabilityAgent::buildEventAndUpdateContext(
+        const std::string& eventName,
+        const std::string& payload) {
+    std::string context = getContextString();
+    updateContextManager(context);
+    return buildJsonEventString(eventName, "", payload, context);
+}
+
 void PhoneCallControllerCapabilityAgent::executeOnFocusChanged(
     alexaClientSDK::avsCommon::avs::FocusState newState,
     alexaClientSDK::avsCommon::avs::MixingBehavior behavior) {
@@ -552,7 +563,6 @@ void PhoneCallControllerCapabilityAgent::executeCallStateChanged(
     } else {
         setCallState(callId, state);
     }
-    updateContextManager();
 
     // Focus Handling
     if (state != CallState::IDLE) {
@@ -591,7 +601,7 @@ void PhoneCallControllerCapabilityAgent::executeCallStateChanged(
     }
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildJsonEventString(eventName, "", buffer.GetString());
+    auto event = buildEventAndUpdateContext(eventName, buffer.GetString());
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
     m_messageSender->sendMessage(request);
 }
@@ -620,10 +630,9 @@ void PhoneCallControllerCapabilityAgent::executeCallFailed(
 
     removeCall(callId);
     m_callMethodMap.erase(callId);
-    updateContextManager();
     releaseCommunicationsChannelFocus();
 
-    auto event = buildJsonEventString("CallFailed", "", buffer.GetString());
+    auto event = buildEventAndUpdateContext("CallFailed", buffer.GetString());
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
     m_messageSender->sendMessage(request);
 }
@@ -648,7 +657,7 @@ void PhoneCallControllerCapabilityAgent::executeCallerIdReceived(
     payload.AddMember("receivedCall", receivedCallPayload, payload.GetAllocator());
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildJsonEventString("CallerIdReceived", "", buffer.GetString());
+    auto event = buildEventAndUpdateContext("CallerIdReceived", buffer.GetString());
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
     m_messageSender->sendMessage(request);
 }
@@ -661,7 +670,7 @@ void PhoneCallControllerCapabilityAgent::executeSendDTMFSucceeded(const std::str
     payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildJsonEventString("SendDTMFSucceeded", "", buffer.GetString());
+    auto event = buildEventAndUpdateContext("SendDTMFSucceeded", buffer.GetString());
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
     m_messageSender->sendMessage(request);
 }
@@ -683,7 +692,7 @@ void PhoneCallControllerCapabilityAgent::executeSendDTMFFailed(
     payload.AddMember("error", errorPayload, payload.GetAllocator());
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildJsonEventString("SendDTMFFailed", "", buffer.GetString());
+    auto event = buildEventAndUpdateContext("SendDTMFFailed", buffer.GetString());
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
     m_messageSender->sendMessage(request);
 }

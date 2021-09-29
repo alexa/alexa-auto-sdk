@@ -51,7 +51,7 @@ public:
     virtual void onNetworkInfoChanged(NetworkStatus status, int wifiSignalStrength) = 0;
 
     /**
-     * Notifies the observer about status of network inteface change.
+     * Notifies the observer about status of network interface change.
      */
     virtual void onNetworkInterfaceChangeStatusChanged(
         const std::string& networkInterface,

@@ -45,6 +45,7 @@ target_link_libraries(AACEAddressBookEngine
     PRIVATE
         ${AVS_AVS_COMMON_LIBRARY}
         ${CURL_LIBRARIES}
+        z
 )
 
 install(

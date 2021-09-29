@@ -40,13 +40,17 @@ public class LocalSearchTemplateRuntimeReceiver extends BroadcastReceiver {
                 if (message.action.equals(Action.TemplateRuntime.RENDER_TEMPLATE)) {
                     TemplateRuntimeMessages.getTemplateType(message.payload).ifPresent(type -> {
                         if (type.equals(TemplateRuntimeConstants.TEMPLATE_TYPE_LOCAL_SEARCH_LIST)) {
+                            // clearing template in case there is one currently rendered
+                            mLocalSearchDirectiveHandler.clearTemplate();
                             mLocalSearchDirectiveHandler.renderLocalSearchListTemplate(message);
                         } else if (type.equals(TemplateRuntimeConstants.TEMPLATE_TYPE_LOCAL_SEARCH_DETAIL)) {
+                            // clearing template in case there is one currently rendered
+                            mLocalSearchDirectiveHandler.clearTemplate();
                             mLocalSearchDirectiveHandler.renderLocalSearchDetailTemplate(message);
                         }
                     });
                 } else if (message.action.equals(Action.TemplateRuntime.CLEAR_TEMPLATE)) {
-                    mLocalSearchDirectiveHandler.clearTemplate();
+                   mLocalSearchDirectiveHandler.clearLocalSearchTemplate();
                 }
             });
         }

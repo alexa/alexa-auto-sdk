@@ -35,6 +35,8 @@
 #include <CertifiedSender/CertifiedSender.h>
 #include <Endpoints/EndpointBuilder.h>
 #include <ACL/AVSConnectionManager.h>
+#include <acsdkShutdownManager/ShutdownNotifier.h>
+#include <acsdkShutdownManagerInterfaces/ShutdownManagerInterface.h>
 
 #include <AACE/Test/AVS/MockNotificationsAudioFactoryInterface.h>
 #include <AACE/Test/AVS/MockAttachmentManager.h>
@@ -149,6 +151,7 @@ public:
     std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> getEndpointBuilderMock();
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> getAuthDelegate();
     std::shared_ptr<aace::test::avs::MockMetricRecorder> getMetricRecorder();
+    std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> getShutDownNotifierMock();
 
     // platform interface mocks
     std::shared_ptr<MockAlerts> getAlertsMock();
@@ -217,6 +220,8 @@ private:
     std::shared_ptr<aace::test::avs::MockAudioPlayerObserverInterface> m_mockAudioPlayerObserverInterface;
     std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> m_mockEndpointBuilder;
     std::shared_ptr<aace::test::avs::MockMetricRecorder> m_mockMetricRecorder;
+    std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> m_mockShutDownNotifier;
+    std::shared_ptr<alexaClientSDK::acsdkShutdownManagerInterfaces::ShutdownManagerInterface> m_mockShutDownManager;
 
     // platform interface mocks
     std::shared_ptr<MockAlerts> m_mockAlerts;

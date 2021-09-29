@@ -36,6 +36,7 @@ exit_with_usage() {
 	echo " --aacs-android             = Enable AACS Android service build"
 	echo " --include-aacs-contacts    = Include contacts in AACS Android service build. This option must be used only with option --aacs-android"
 	echo " --include-aacs-telephony   = Include telephony in  AACS Android service build. This option must be used only with option --aacs-android"
+	echo " --include-aacs-carcontrol  = Include carcontrol in  AACS Android service build. This option must be used only with option --aacs-android"
 	echo " --aacs-aar                 = Build AACS service as Android Library. This option must be used only with option --aacs-android"
 	echo ""
 	echo " --default-logger-enabled <enabled> = Enable/disable the default engine logger: On, Off. (Default: On)"
@@ -160,6 +161,10 @@ while [[ $# -gt 0 ]]; do
 		AACS_TELEPHONY="1"
 		shift
 		;;
+		--include-aacs-carcontrol)
+		AACS_CARCONTROL="1"
+		shift
+		;;
 		--aacs-aar)
 		AACS_AAR="1"
 		shift
@@ -196,15 +201,17 @@ AACS_ANDROID=${AACS_ANDROID:-0}
 AACS_AAR=${AACS_AAR:-"0"}
 AACS_CONTACTS=${AACS_CONTACTS:-0}
 AACS_TELEPHONY=${AACS_TELEPHONY:-0}
+AACS_CARCONTROL=${AACS_CARCONTROL:-0}
 COMMS=${COMMS:-0}
 LVC=${LVC:-0}
+COASSISTANT=${COASSISTANT:-0}
 AASB=${AASB:-0}
 
 SCRIPT_OPTIONS=""
 EXTRA_MODULES=$@
 
 #AACS CONTACTS and TELEPHONY 
-if [ ${AACS_CONTACTS} = "1" ] || [ ${AACS_TELEPHONY} = "1" ] || [ ${AACS_AAR} = "1" ]; then
+if [ ${AACS_CONTACTS} = "1" ] || [ ${AACS_TELEPHONY} = "1" ] || [ ${AACS_AAR} = "1" ] || [ ${AACS_CARCONTROL} = "1" ]; then
 	if [ ${AACS_ANDROID} != "1" ]; then
 		exit_with_usage 
 	fi
@@ -292,14 +299,14 @@ init_extra_local_conf() {
 
 build_sdk() {
 	local available_targets=()
-	local available_extensions=(comms lvc)
+	local available_extensions=(comms lvc coassistant)
 	local extra_local_conf="${BUILDER_HOME}/.extralocal.conf"
-	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
 	local sample_app="${SDK_HOME}/samples/cpp/aac-sample-cpp.bb"
 	local aasb_extension="${SDK_HOME}/extensions/aasb"
 	local aasb_comms_extension="${SDK_HOME}/extensions/extras/alexacomms/extensions/aasb-comms"
 	local aasb_lvc_extension="${SDK_HOME}/extensions/extras/local-voice-control/extensions/aasb-lvc"
-	local audio_extension="${SDK_HOME}/extensions/experimental/system-audio"
+	local system_audio_extension="${SDK_HOME}/extensions/system-audio"
+	local aasb_coassistant_extension="${SDK_HOME}/extensions/extras/coassistant/extensions/aasb-coassistant"
 	local platform=$1
 
 	case ${platform} in
@@ -327,12 +334,12 @@ build_sdk() {
 		;;
 	"qnx7")
 		available_targets=("qnx7arm64" "qnx7x86-64")
-		extensions="${sample_app} ${audio_extension}"
+		extensions="${sample_app}"
 		export QNX_BASE
 		;;
 	"linux")
 		available_targets=("native" "pokyarm" "pokyarm64" "linaroarmel" "linaroarmhf" "linaroarm64")
-		extensions="${sample_app} ${audio_extension}"
+		extensions="${sample_app}"
 		;;
 	*)
 		error "Unknown platform: ${platform}"
@@ -351,6 +358,14 @@ build_sdk() {
 			fi
 		done
 		[ ${invalid} = "1" ] && error_and_exit "Invalid target: ${cmd_target}"
+
+		case ${cmd_target} in
+		"qnx7arm64"|"qnx7x86-64"|"native"|"pokyarm"|"pokyarm64")
+			if [[ "${extensions}" != *"${system_audio_extension}"* ]]; then
+				extensions="${extensions} ${system_audio_extension}"
+			fi
+			;;
+		esac
 	done
 
 	[ -z "${TARGET}" ] && error_and_exit "Please specify target. Possible targets are: ${available_targets[*]}"
@@ -382,6 +397,9 @@ check_extra_module() {
         elif [ "${module_name}" = "local-voice-control" ];
         then
                 LVC=1
+        elif [ "${module_name}" = "coassistant" ];
+        then
+                COASSISTANT=1
         fi
 }
 
@@ -407,6 +425,10 @@ if [ ${PLATFORM} = "android" ]; then
 
 	if [ ${AACS_TELEPHONY} = "1" ]; then
 		aacs_script_options="${aacs_script_options} --include-telephony"
+	fi
+
+	if [ ${AACS_CARCONTROL} = "1" ]; then
+		aacs_script_options="${aacs_script_options} --include-carcontrol"
 	fi
 
 	if [ ${AACS_AAR} = "1" ]; then

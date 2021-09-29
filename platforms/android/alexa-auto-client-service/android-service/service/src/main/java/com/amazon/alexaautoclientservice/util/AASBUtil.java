@@ -42,7 +42,7 @@ public class AASBUtil {
             if (replyToId.isEmpty()) {
                 aasbMessage = "{\n"
                         + "  \"header\" : {\n"
-                        + "    \"version\" : \"3.2\",\n"
+                        + "    \"version\" : \"3.3\",\n"
                         + "    \"messageType\" : \"Publish\",\n"
                         + "    \"id\" : \"" + uniqueID + "\",\n"
                         + "    \"messageDescription\" : {\n"
@@ -54,7 +54,7 @@ public class AASBUtil {
             } else {
                 aasbMessage = "{\n"
                         + "  \"header\" : {\n"
-                        + "    \"version\" : \"3.2\",\n"
+                        + "    \"version\" : \"3.3\",\n"
                         + "    \"messageType\" : \"Reply\",\n"
                         + "    \"id\" : \"" + uniqueID + "\",\n"
                         + "    \"messageDescription\" : {\n"

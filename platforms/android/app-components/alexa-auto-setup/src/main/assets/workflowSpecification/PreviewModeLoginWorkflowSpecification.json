@@ -10,6 +10,13 @@
     {
       "event": "Network_Connected",
       "next": {
+        "type": "action",
+        "resource": "CheckLoginRequiredCommand"
+      }
+    },
+    {
+      "event": "Login",
+      "next": {
         "type": "view",
         "resource": "navigation_fragment_login"
       }
@@ -22,14 +29,28 @@
       }
     },
     {
-      "event": "Auth_Provider_Auth_Finished",
+      "event": "PreviewMode_Enabled",
       "next": {
-        "type": "view",
-        "resource": "navigation_fragment_authProviderAuthenticatedFinish"
+        "type": "action",
+        "resource": "CheckLocationConsentCommand"
       }
     },
     {
       "event": "CBL_Auth_Finished",
+      "next": {
+        "type": "action",
+        "resource": "CheckLocationConsentCommand"
+      }
+    },
+    {
+      "event": "Location_Consent",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_locationConsent"
+      }
+    },
+    {
+      "event": "Location_Consent_Completed",
       "next": {
         "type": "action",
         "resource": "CheckContactsConsentStatusCommand"
@@ -45,12 +66,26 @@
     {
       "event": "Contacts_Consent_Setup_Finished",
       "next": {
-        "type": "view",
-        "resource": "navigation_fragment_cblLoginFinish"
+        "type": "action",
+        "resource": "SetupCompleteCommand"
       }
     },
     {
       "event": "Contacts_Consent_Setup_Skipped",
+      "next": {
+        "type": "action",
+        "resource": "SetupCompleteCommand"
+      }
+    },
+    {
+      "event": "PreviewMode_Flow_Setup_Completed",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_authProviderAuthenticatedFinish"
+      }
+    },
+    {
+      "event": "CBL_Flow_Setup_Completed",
       "next": {
         "type": "view",
         "resource": "navigation_fragment_cblLoginFinish"
@@ -68,6 +103,13 @@
       "next": {
         "type": "view",
         "resource": "navigation_fragment_cblStart"
+      }
+    },
+    {
+      "event": "Setup_Error",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_setupNotComplete"
       }
     }
   ],

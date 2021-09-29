@@ -96,12 +96,24 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
     }
 
     @Override
+    public void finish() {
+        Log.d(TAG, "finish");
+        super.finish();
+
+        // Clean up visuals and eventbus in finish() callback instead of onDestroy() to prevent
+        // leaking IntentReceiver and crashing the app when session is finished.
+        mAutoVoiceChromeController.onDestroy();
+        if (mAnimationProvider != null) {
+            mAnimationProvider.uninitialize();
+        }
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
         mEarconController.uninitEarcon();
-        mAutoVoiceChromeController.onDestroy();
 
         uninitializeProviders();
 
@@ -189,6 +201,10 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
                             mMessageSender.sendMessage(
                                     Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "");
                         });
+                AlexaApp app = AlexaApp.from(getContext());
+                Optional<SessionViewController> viewController =
+                        app.getRootComponent().getComponent(SessionViewController.class);
+                viewController.ifPresent(SessionViewController::clearTemplate);
                 finish();
             }
         });
@@ -257,13 +273,13 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
                                 convertToAutoVoiceChromeDialogState(message.getPayload()));
                     }
 
-                    if (message.getAction().equals(AutoVoiceChromeState.IDLE.toString())) {
+                    if (message.getPayload().equals(AutoVoiceChromeState.IDLE.toString())) {
                         mSessionEnded = true;
                         if (!mVoiceSessionInUse) {
                             Log.d(TAG, "voice session idle, so finishing voice session.");
                             finish();
                         }
-                    } else if (message.getAction().equals(AutoVoiceChromeState.LISTENING.toString())) {
+                    } else if (message.getPayload().equals(AutoVoiceChromeState.LISTENING.toString())) {
                         mSessionEnded = false;
                     }
                     break;

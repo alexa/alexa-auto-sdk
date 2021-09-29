@@ -1,0 +1,37 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/weather_card_weather_forecast_layout"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/weather_card_body_height"
+    android:layout_marginStart="@dimen/weather_card_body_marginStart"
+    android:layout_marginTop="@dimen/weather_forecast_layout_marginTop"
+    android:orientation="horizontal">
+
+    <include
+        android:id="@+id/weather_card_forecast_day1_layout"
+        layout="@layout/weather_forecast_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/weather_card_forecast_day2_layout"
+        layout="@layout/weather_forecast_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/weather_forecast_layout_marginStart" />
+
+    <include
+        android:id="@+id/weather_card_forecast_day3_layout"
+        layout="@layout/weather_forecast_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/weather_forecast_layout_marginStart" />
+
+    <include
+        android:id="@+id/weather_card_forecast_day4_layout"
+        layout="@layout/weather_forecast_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/weather_forecast_layout_marginStart" />
+</LinearLayout>

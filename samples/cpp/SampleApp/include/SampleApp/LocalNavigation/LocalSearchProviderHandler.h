@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ private:
 /**
  * This sample implementation of LocalSearchProvider provides sample error
  * responses to search and lookup requests from the Engine. In order for offline
- * POI search and navigation features to work, your implementation must delegate
+ * local search and navigation features to work, your implementation must delegate
  * search and lookup requests to a navigation provider with offline search
  * functionality.
  */
@@ -70,8 +70,8 @@ public:
 
     /// @name @c LocalSearchProvider methods
     /// @{
-    bool poiSearchRequest(const std::string& request) override;
-    bool poiLookupRequest(const std::string& request) override;
+    bool searchRequest(const std::string& request) override;
+    bool lookupRequest(const std::string& request) override;
     /// @}
 
 private:

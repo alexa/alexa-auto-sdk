@@ -139,7 +139,7 @@ public:
 
     /**
      * @internal
-     * Sets the Engine interface delagate
+     * Sets the Engine interface delegate
      *
      * Should *never* be called by the platform implementation
      */

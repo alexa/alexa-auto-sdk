@@ -51,7 +51,8 @@ public:
 
     // aace::alexa::LocalMediaSource interface
 
-    auto play(ContentSelector contentSelectorType, const std::string& payload) -> bool override;
+    auto play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId)
+        -> bool override;
     auto playControl(PlayControlType controlType) -> bool override;
     auto seek(std::chrono::milliseconds offset) -> bool override;
     auto adjustSeek(std::chrono::milliseconds deltaOffset) -> bool override;
@@ -64,6 +65,7 @@ private:
     std::weak_ptr<View> m_console{};
 
     std::string m_sourceMediaProvider = "UNDEFINED";
+    std::string m_sessionId;
     aace::alexa::LocalMediaSource::MediaType m_sourceMediaType = aace::alexa::LocalMediaSource::MediaType::OTHER;
     aace::alexa::LocalMediaSource::Source m_source;
 
@@ -76,7 +78,8 @@ private:
         {aace::alexa::LocalMediaSource::Source::LINE_IN, "IDLE"},
         {aace::alexa::LocalMediaSource::Source::COMPACT_DISC, "IDLE"},
         {aace::alexa::LocalMediaSource::Source::SIRIUS_XM, "IDLE"},
-        {aace::alexa::LocalMediaSource::Source::DAB, "IDLE"}};
+        {aace::alexa::LocalMediaSource::Source::DAB, "IDLE"},
+        {aace::alexa::LocalMediaSource::Source::DEFAULT, "IDLE"}};
 
     auto log(logger::LoggerHandler::Level level, const std::string& message) -> void;
     auto setupUI() -> void;

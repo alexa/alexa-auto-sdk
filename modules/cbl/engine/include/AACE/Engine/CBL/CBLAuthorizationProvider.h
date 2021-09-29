@@ -100,7 +100,7 @@ public:
      * Note: To be used only by CBL legacy implementation.
      *
      * @param data The Authorization data
-     * @param explicitStart Indicates an explict call to @c CBL::start()
+     * @param explicitStart Indicates an explicit call to @c CBL::start()
      */
     void startAuthorizationLegacy(const std::string& data, bool explicitStart);
 

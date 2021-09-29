@@ -45,4 +45,6 @@ public interface SessionViewController extends ScopedComponent {
      * @return an observable that informs us whether a template runtime template is inflated.
      */
     Observable<Boolean> getTemplateDisplayedObservable();
+
+    void setTemplateDisplayed();
 }

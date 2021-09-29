@@ -40,6 +40,7 @@ public:
     // aace::connectivity
     std::string getConnectivityState() override;
     std::string getIdentifier() override;
+    void connectivityEventResponse(const std::string& token, AlexaConnectivity::StatusCode statusCode) override;
 
 private:
     std::weak_ptr<aace::engine::aasb::MessageBrokerInterface> m_messageBroker;

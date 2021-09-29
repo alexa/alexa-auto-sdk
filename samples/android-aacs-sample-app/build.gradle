@@ -10,6 +10,7 @@ buildscript {
         'androidx_preference': '1.1.1',
         'androidx_navigation': '2.3.0',
         'androidx_lifecycle': '2.2.0',
+        'androidx_recycler_view': '1.1.0',
         'androidx_media': '1.1.0',
         'dagger': '2.22',
         'exoplayer': '2.11.5',
@@ -31,6 +32,7 @@ buildscript {
         'androidx_preference': "androidx.preference:preference:${versions.androidx_preference}",
         'androidx_navigation_fragment': "androidx.navigation:navigation-fragment:${versions.androidx_navigation}",
         'androidx_navigation_ui': "androidx.navigation:navigation-ui:${versions.androidx_navigation}",
+        'androidx_recycler_view': "androidx.recyclerview:recyclerview:${versions.androidx_recycler_view}",
 
         'androidx_media': "androidx.media:media:${versions.androidx_media}",
 
@@ -42,8 +44,16 @@ buildscript {
 
         'rxjava3': "io.reactivex.rxjava3:rxjava:3.0.4",
         'glide': "com.github.bumptech.glide:glide:4.11.0",
+        'glide_compiler': "com.github.bumptech.glide:compiler:4.11.0",
         'google_zxing': 'com.google.zxing:core:3.2.0',
         'eventbus': 'org.greenrobot:eventbus:3.2.0',
+        'okhttp': 'com.squareup.okhttp3:okhttp:3.9.1',
+
+        'android_appcompat': 'com.android.support:appcompat-v7:28+',
+        'android_design': 'com.android.support:design:28+',
+        'android_constraint': 'com.android.support.constraint:constraint-layout:1.0.2',
+        'android_cardview': 'com.android.support:cardview-v7:28+',
+        'android_recyclerview': 'com.android.support:recyclerview-v7:28+',
 
         'exoplayer_core': "com.google.android.exoplayer:exoplayer-core:${versions.exoplayer}",
         'exoplayer_dash': "com.google.android.exoplayer:exoplayer-dash:${versions.exoplayer}",
@@ -59,6 +69,9 @@ buildscript {
         'androidx_arch_core_testing': 'androidx.arch.core:core-testing:2.1.0',
         'androidx_fragment_testing': 'androidx.fragment:fragment-testing:1.2.5',
         'roboelectric': 'org.robolectric:robolectric:4.3',
+
+        'androidx_security_crypto': 'androidx.security:security-crypto:1.0.0',
+        'androidx_identity_credential': 'androidx.security:security-identity-credential:1.0.0-alpha02',
     ]
 
     repositories {
@@ -81,6 +94,7 @@ allprojects {
         flatDir {
             dirs 'libs'
             dirs project(':alexa-auto-voice-interaction').file('libs')
+            dirs project(':alexa-auto-apl-renderer').file('libs')
         }
     }
 }

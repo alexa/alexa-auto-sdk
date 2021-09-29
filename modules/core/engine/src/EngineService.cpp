@@ -48,7 +48,7 @@ bool EngineService::handleInitializeEngineEvent(std::shared_ptr<aace::engine::co
         // set the service engine context
         m_context = context;
 
-        // delegate the intialize request to the service handler
+        // delegate the initialize request to the service handler
         ThrowIfNot(initialize(), "initializeServiceFailed");
 
         // set the service initialized flag to true
@@ -153,6 +153,18 @@ bool EngineService::handleStartEngineEvent() {
     }
 }
 
+bool EngineService::handleEngineStartedEngineEvent() {
+    try {
+        ThrowIfNot(m_initialized, "serviceNotInitialized");
+        ThrowIfNot(engineStarted(), "engineStartedServiceFailed");
+
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
 bool EngineService::handleStopEngineEvent() {
     try {
         ThrowIfNot(m_initialized, "serviceNotInitialized");
@@ -171,6 +183,18 @@ bool EngineService::handleStopEngineEvent() {
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "handleStopEngineEvent").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool EngineService::handleEngineStoppedEngineEvent() {
+    try {
+        ThrowIfNot(m_initialized, "serviceNotInitialized");
+        ThrowIfNot(engineStopped(), "engineStoppedServiceFailed");
+
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -222,6 +246,14 @@ bool EngineService::shutdown() {
 
 bool EngineService::registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     return false;
+}
+
+bool EngineService::engineStarted() {
+    return true;
+}
+
+bool EngineService::engineStopped() {
+    return true;
 }
 
 std::shared_ptr<aace::engine::core::EngineContext> EngineService::getContext() {

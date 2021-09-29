@@ -163,7 +163,7 @@ private:
     void handleUnknownDirective(std::shared_ptr<DirectiveInfo> info);
 
     /**
-     * Exectuor function for provideState
+     * Executor function for provideState
      */
     void executeProvideState(
         const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,

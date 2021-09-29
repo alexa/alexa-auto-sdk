@@ -40,8 +40,6 @@ target_include_directories(AACECoreTestsLib
 target_link_libraries(AACECoreTestsLib
     AACECorePlatform
     AACECoreEngine
-    ${AVS_AVS_COMMON_LIBRARY}
-
 )
 
 install(
@@ -82,7 +80,6 @@ target_link_libraries(AACECoreTests
     AACECorePlatform
     AACECoreEngine
     AACECoreTestsLib
-    ${AVS_AVS_COMMON_LIBRARY}
     GTest::GTest
     GTest::Main
     ${GMOCK_LIBRARY}

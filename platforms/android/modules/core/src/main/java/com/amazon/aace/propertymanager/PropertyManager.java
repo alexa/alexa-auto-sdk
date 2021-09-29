@@ -74,7 +74,7 @@ abstract public class PropertyManager extends PlatformInterface {
      *        @c com.amazon.aace.alexa.AlexaProperties.java
      * @param value The property setting
      * @return @c true if the property value was updated or set to the current
-     *         setting, else @c false if an error occured.
+     *         setting, else @c false if an error occurred.
      */
     public final boolean setProperty(String name, String value) {
         return setProperty(getNativeRef(), name, value);

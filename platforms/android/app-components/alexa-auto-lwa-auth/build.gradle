@@ -6,7 +6,7 @@ android {
     defaultConfig {
         minSdkVersion 25
         versionCode 1
-        versionName "3.2.1"
+        versionName "3.3"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -47,6 +47,7 @@ dependencies {
     implementation project(':aacscommonutils')
 
     implementation project(":alexa-auto-apis")
+    implementation project(':alexa-auto-apps-common-util')
 
     if(project.hasProperty('enabledPreviewMode')){
         implementation project(':alexa-auto-preview-mode-util')
@@ -55,4 +56,7 @@ dependencies {
     implementation deps.androidx_annotation
     implementation deps.rxjava3
     implementation deps.eventbus
+
+    implementation deps.androidx_security_crypto
+    implementation deps.androidx_identity_credential
 }

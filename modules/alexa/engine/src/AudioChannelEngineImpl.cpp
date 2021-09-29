@@ -713,9 +713,6 @@ bool AudioChannelEngineImpl::stop(alexaClientSDK::avsCommon::utils::mediaPlayer:
         // return false if audio is already stopped
         ReturnIf(m_mediaStateChangeInitiator == MediaStateChangeInitiator::STOP, false);
 
-        // send the pending event
-        sendPendingEvent();
-
         // invoke the platform interface stop method
         auto outputChannel = m_audioOutputChannel;
         if (outputChannel != nullptr) {
@@ -854,8 +851,7 @@ void AudioChannelEngineImpl::addObserver(
 void AudioChannelEngineImpl::removeObserver(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) {
     std::unique_lock<std::mutex> lock(m_mediaPlayerObserverMutex);
-    auto numberErased = m_mediaPlayerObservers.erase(observer);
-    AACE_DEBUG(LXT.d("removed observers", numberErased));
+    m_mediaPlayerObservers.erase(observer);
 }
 
 bool AudioChannelEngineImpl::validateSource(
@@ -1072,7 +1068,7 @@ ssize_t IStreamAudioStream::read(char* data, const size_t size) {
         // get the number of bytes read
         ssize_t count = m_stream->gcount();
 
-        m_stream->tellg();  // Don't remove otherwise the ReseourceStream used for Alerts/Timers won't work as expected.
+        m_stream->tellg();  // Don't remove. Otherwise, the ResourceStream used for Alerts/Timers won't work as expected.
 
         return count;
     } catch (std::exception& ex) {

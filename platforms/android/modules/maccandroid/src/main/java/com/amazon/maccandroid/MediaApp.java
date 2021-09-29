@@ -90,7 +90,7 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
             }
             validationMethod = VALIDATION_METHOD_SIGNING;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            Log.e(TAG, "failed init data validation", e);
         }
     }
 
@@ -140,11 +140,6 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
                 Log.e(TAG, "MediaControllerCompat extras is null");
 
             mSessionReady = true; // mMediaController.isSessionReady();
-
-            if (mSessionReady && !doesControllerSupportsRequiredActions(mMediaController)) {
-                Log.i(TAG, "Controller for App " + mLocalPlayerId + " does not support required actions");
-                MediaAppsRepository.getInstance().removeMediaApp(mLocalPlayerId);
-            }
 
             if (mMediaAppsConnectionListener != null) {
                 mMediaAppsConnectionListener.onConnectionSuccessful();
@@ -206,23 +201,6 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
                 mMediaController = null;
             }
         }, MEDIA_SESSION_CONNECTION_TIMEOUT);
-    }
-
-    /**
-     * Check if the controller supports both required actions ACTION_PLAY_FROM_URI and ACTION_PREPARE_FROM_URI
-     *
-     * @param controller
-     * @return
-     */
-    private boolean doesControllerSupportsRequiredActions(MediaControllerCompat controller) {
-        PlaybackStateCompat playbackState = controller.getPlaybackState();
-        if (playbackState == null) {
-            Log.e(TAG, "doesControllerSupportsRequiredActions playbackState is null");
-            return false;
-        }
-        long actions = playbackState.getActions();
-        return ((actions & PlaybackStateCompat.ACTION_PLAY_FROM_URI) > 0)
-                && ((actions & PlaybackStateCompat.ACTION_PREPARE_FROM_URI) > 0);
     }
 
     public void registerCallback() {

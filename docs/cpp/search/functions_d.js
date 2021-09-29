@@ -8,6 +8,7 @@ var searchData=
   ['renderdocumentresult',['renderDocumentResult',['../classaace_1_1apl_1_1_a_p_l.html#a42ad9effa8cb1ae3ca95fa65c3378993',1,'aace::apl::APL']]],
   ['renderplayerinfo',['renderPlayerInfo',['../classaace_1_1alexa_1_1_template_runtime.html#a216ae3f6aa681cd2b5abead91eb17e49',1,'aace::alexa::TemplateRuntime']]],
   ['rendertemplate',['renderTemplate',['../classaace_1_1alexa_1_1_template_runtime.html#aa3d04935b3c41e98610a0e427bf4f3f1',1,'aace::alexa::TemplateRuntime']]],
+  ['reportnetworkdatausage',['reportNetworkDataUsage',['../classaace_1_1device_usage_1_1_device_usage.html#aa9003acec174eae323c0ed3e7acbdaef',1,'aace::deviceUsage::DeviceUsage']]],
   ['reset',['reset',['../classaace_1_1cbl_1_1_c_b_l.html#a6b9bf59fb1f4a358273851049b2a74b6',1,'aace::cbl::CBL']]],
   ['resume',['resume',['../classaace_1_1audio_1_1_audio_output.html#a16da42e4ec758e6635ab01c01bd435e5',1,'aace::audio::AudioOutput']]]
 ];

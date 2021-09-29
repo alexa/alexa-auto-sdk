@@ -96,7 +96,7 @@ abstract public class CBL extends PlatformInterface {
         SUCCESS("SUCCESS"),
 
         /**
-         * Error occured in the CBL process
+         * Error occurred in the CBL process
          * @hideinitializer
          */
         ERROR("ERROR"),

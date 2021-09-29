@@ -1,0 +1,13 @@
+{
+  "header" : {
+    "version" : "3.0",
+    "messageType" : "Publish",
+    "id" : "testIdForConnected",
+    "messageDescription" : {
+      "topic" : "TemplateRuntime",
+      "action" : "ClearTemplate"
+    }
+  },
+  "payload" : {
+  }
+}

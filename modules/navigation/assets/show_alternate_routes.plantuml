@@ -1,0 +1,32 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant Alexa
+
+Driver->SDK: "Alexa, show me faster route"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+Alexa->SDK : ShowAlternativeRoutes directive
+
+SDK->NavigationHandler : showAlternateRoutes(payload for alternate route)
+
+NavigationHandler->Nav : display faster route
+
+alt Success
+    NavigationHandler<-Nav :  faster route displayed
+	NavigationHandler->SDK: showAlternativeRoutesSucceeded(payload for alternate route success)
+    SDK->Alexa : ShowAlternativeRoutesSuccess event
+    Alexa->Driver : "I found a faster route that will save you 12 mins taking US-101 N and CA-237 E" TTS
+else Error
+    NavigationHandler<-Nav :  faster route display failed
+    NavigationHandler->SDK: navigationError( SHORTER_TIME_ROUTES_FAILED, NOT_SUPPORTED, "")
+    SDK->Alexa : ShowAlternativeRoutesFailed event
+        Alexa->Driver : "Sorry, I could not find a faster route" TTS
+end
+@enduml

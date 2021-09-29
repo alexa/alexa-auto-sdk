@@ -381,7 +381,7 @@ public class APLPresenter implements IPresenter, ISendEventCallback, IDataSource
             payload.put("presentationToken", getToken());
 
             Log.v(TAG, "onDataSourceError: " + payload.toString());
-            // Notify that an error occured
+            // Notify that an error occurred
             mAplEventSender.sendRuntimeErrorEventRequest(payload.toString());
         } catch (JSONException e) {
             Log.e(TAG, "Exception occurred while preparing RuntimeError Event payload", e);

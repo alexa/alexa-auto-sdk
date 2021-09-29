@@ -30,7 +30,11 @@ The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features.
 - [Handling Display Card Templates](#handling-display-card-templates)
 - [Handling External Media Apps](#handling-external-media-apps)
 - [Handling Local Media Sources](#handling-local-media-sources)
-- [Handling Global Presets](#handling-global-presets)
+    - [Starting Playback with Content Selection by Voice](#starting-playback-with-content-selection-by-voice)
+    - [Controlling Playback by Voice](#controlling-playback-by-voice) 
+    - [Reporting Playback Events](#reporting-playback-events)
+    - [Reporting Playback State](#reporting-playback-state)
+    - [Example Sequence Diagrams](#example-sequence-diagrams)
 - [Handling Notifications](#handling-notifications)
 - [Handling Alerts](#handling-alerts)
 - [Handling Do Not Disturb](#handling-do-not-disturb)
@@ -194,10 +198,10 @@ class MySpeechRecognizer : public aace::alexa::SpeechRecognizer {
         
         // Notify the engine that the wake word engine has detected the wake word. 
         // Currently the only keyword value supported is "ALEXA".
-        startCapture( Initiator::WAKEWORD, 0, 1000, "ALEXA" );
+        startCapture( Initiator::WAKEWORD, 54500, 162000, "ALEXA" );
         ...
         
-        // Notify the Engine to stop the speech recognition. 
+        // Notify the Engine to stop speech recognition. 
         // For example, when hold-to-talk was used and is now being ended by the button release action
         stopCapture();
         ...
@@ -207,6 +211,8 @@ class MySpeechRecognizer : public aace::alexa::SpeechRecognizer {
 // Register the platform interface with the Engine
 engine->registerPlatformInterface( std::make_shared<MySpeechRecognizer>() );
 ```
+
+>**Note:** In the example for `startCapture()` above, 54500 is the value for `keywordBegin`, and 162000 is the value for `keywordEnd`. These parameters correspond to the wake word indexes in the audio input stream. You must increment `keywordBegin` for each subsequent wake word to match the index at which the wake word begins (for example, at 200000), making sure that there are 8000 samples preceding the wake word as pre-roll. Otherwise, Alexa would respond incorrectly. For more information about wake word indexes, see [this section on the developer portal](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/implement-ww-verification.html#indices).
 
 ## Handling Speech Output
 
@@ -545,7 +551,7 @@ This does not impact the range used in the directives to the device. You must co
 
 ## Handling Alexa Speaker
 
-The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `ALERTS_VOLUME`. The `aace::alexa::AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI as applicable. 
+The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `ALERTS_VOLUME`. The `aace::alexa::AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI if applicable. 
 
 ### SpeakerManager Configuration
 
@@ -690,7 +696,7 @@ engine->configure( { //other config objects..., eqConfig, ... } );
 ...
 ```
 
-To implement a custom handler for Equalizer Controller extend the `EqualizerController` class:
+To implement a custom handler for Equalizer Controller, extend the `EqualizerController` class:
 
 ```
 #include <AACE/Alexa/EqualizerController.h>
@@ -783,7 +789,7 @@ The External Media Player (EMP) Adapter allows you to declare and use external m
 * A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. Use the MACC client to interface with the Spotify app running on Android. For details about the MACC client, see the Android version of the [Alexa module README](../../platforms/android/modules/alexa#handling-external-media-adapter-with-maccandroidclient).
 * An embedded media app. For information about external embedded media app solutions, contact your SA or Partner Manager.
 
-***NOTE: If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement.*** 
+>**Note:** If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement. 
 
 When advised by your SA or Partner Manager, configure the External Media Player Adapter to the device's capabilities. See `aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig` for details on configuring the supported agent, or provide the equivalent JSON values in a configuration file.
 
@@ -920,7 +926,9 @@ SupportedPlaybackOperation.START_OVER
 
 ## Handling Local Media Sources
 
-The `LocalMediaSource` interface allows the platform to register a local media source by type (`BLUETOOTH`, `USB`, `AM_RADIO`, `FM_RADIO`, `SATELLITE_RADIO`, `LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`). Registering a local media source allows playback control of that source via Alexa (e.g. "Alexa, play the CD player"). It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
+The `LocalMediaSource` interface allows the platform to register a local media source by type (`BLUETOOTH`, `USB`, `AM_RADIO`, `FM_RADIO`, `SATELLITE_RADIO`, `LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`, and `DEFAULT`). Registering a local media source allows playback control of that source via Alexa (e.g. "Alexa, play the CD player"). It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
+
+`DEFAULT` media source is a generic media source that can be used for controlling any local media source on the OEM infotainment system. It is recommended to use `DEFAULT` media source for all local media except Alexa music, MACC-supported deep linked media players, and other registered Local Media Sources. `DEFAULT` media player can not be launched by name like "Alexa, Play CD player" but it can be used to control playback actions reported in the [`supportedOperations`](#reporting-playback-state). For example, "Alexa, play" resumes the default player playback as long a the DEFAULT source is in [focus](#reporting-playback-events).
 
 The following is an example of registering a CD player local media source using type `Source.COMPACT_DISC`:
 
@@ -944,30 +952,38 @@ class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
 ... 
 ```
 
+### Starting Playback with Content Selection by Voice
+
 The `play()` method is called when Alexa invokes play by `ContentSelector` type (`FREQUENCY`, `CHANNEL`, `PRESET`) for a radio local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`, `DAB`). The `payload` is a string that depends on the `ContentSelector` type and local media `Source` type (e.g., "1", "98.7 FM HD 1").
 
 ```	
-bool play( ContentSelector type, std::string payload ) override {
+bool play( ContentSelector type, std::string payload, const std::string& sessionId ) override {
     // play initiation for frequency, channel, or presets
     ...
 }
 ``` 
+
 The table below provides details about the supported `ContentSelector` types based on `Source` type:
 
 | Source type | Supported content selector(s) |
 |:------|:---------|
-| FM | FREQUENCY, PRESET | 
+| FM | FREQUENCY, PRESET |
 | AM | FREQUENCY, PRESET | 
 | SXM | CHANNEL, PRESET | 
 | DAB | CHANNEL |
+| DEFAULT | PRESET |
 
-The support, ranges and increments for valid frequency, preset, and channel may vary, depending on the region you are in. Contact your partner manager for more detailed information. 
+The supported ranges and increments for valid frequency, preset, and channel may vary depending on the region you are in. Contact your partner manager for more detailed information.
 
 >**Note:** The `DAB` channel payload is the radio station name string. If supported, then the name string must be handled by the client's DAB implementation.
 
 The `play()` method will not be invoked if a source cannot handle the specified `ContentSelector` type.
 
->**Note:** Cases in which a preset is requested but the source is unknown are handled by the `GlobalPreset` interface. See [Handling Global Presets](#handling-global-presets) for details.
+The `DEFAULT` `Local Media Source` handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`) actually corresponds to the preset. The meaning of the preset in the `payload` parameter of `play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId)`is determined by the `DEFAULT` platform implementation and should suit the needs of the vehicle's infotainment system, i.e. when the `play()` method is called, your implementation should map the preset to a preset that makes sense for the current context.
+
+>**Note:** The `GlobalPreset` platform interface is deprecated. Use `DEFAULT` `LocalMediaSource` instead.
+
+### Controlling Playback by Voice 
 
 The `playControl()` method is called with a `PlayControlType`(`RESUME`, `PAUSE`, `STOP`, `NEXT`, `PREVIOUS`, `START_OVER`, `FAST_FORWARD`, `REWIND`, `ENABLE_REPEAT_ONE`, `ENABLE_REPEAT`, `DISABLE_REPEAT`, `ENABLE_SHUFFLE`, `DISABLE_SHUFFLE`, `FAVORITE`, `UNFAVORITE`) when Alexa invokes a playback control on the local media source.
 
@@ -978,9 +994,9 @@ bool playControl( PlayControlType controlType ) override {
 }
 ```
 
->**Note:** The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume the source that is already in focus.
+>**Note:** The `play()` method is used to initiate playback with specified content selection, whereas `playControl(RESUME)` is used to play or resume the source when content is not specified or not supported. E.g. FM receives `play()` when the user requests FM with a specific frequency ("Alexa, play 98.7 FM radio"), and USB receives `playControl(RESUME)` when the user requests playback with just the source name ("Alexa, play USB").
 
-The `seek()` and `adjustSeek()` methods are invoked to seek the currently focused `LocalMediaSource`. These methods are only used by sources that are capable of seeking. `seek()` is for specifying an absolute offset, whereas `adjustSeek()` if for specifying a relative offset. 
+The `seek()` and `adjustSeek()` methods are invoked to seek the currently focused `LocalMediaSource`. These methods are only used by sources that are capable of seeking. `seek()` is for specifying an absolute offset, whereas `adjustSeek()` is for specifying a relative offset. 
 
 ```	
 bool seek( long offset ) override {
@@ -1009,28 +1025,9 @@ public boolean mutedStateChanged( MutedState state ) {
 ...
 ```
 
-Use the `setFocus()` method to tell the Engine that the `LocalMediaSource` instance has become focused or un-focused on the system. The Engine already considers a source active when the user requests Alexa to play the source by name, so this should only be used when the state of the source is changed by a user GUI interaction.
+### Reporting Playback Events
 
-Call `setFocus(true)` to tell the Engine that the user brought the `LocalMediaSource` to the foreground with a GUI interaction. The Engine considers the source to have an active playback session, although it may or may not be playing yet. If no other Alexa media source is playing, utterances such as “Alexa, play” target this source.
-
-Call `setFocus(false)` to tell the Engine that the `LocalMediaSource` is no longer in the foreground, typically as a result of a GUI interaction from the user after the player is stopped. The Engine considers the source inactive, and starting a new playback session for the source requires a further GUI interaction or user voice request to Alexa that targets the source by name.
-
-```	
-class MyFMRadioLocalMediaSource : public aace::alexa::LocalMediaSource {
-...
-    // public method in source handler	
-    void setAlexaFocusForFMRadio( bool isFocused ) {  
-    ...  
-    	// FM Radio begins playback independently of Alexa
-       	setFocus( true ); // or setFocus();
-    ...    
-     	// Notify Alexa that FM Radio is no longer the active media source on the device as a result of platform driven change
-       	setFocus( false );
-...    
-```
->**Note:** Only one `LocalMediaSource` type can have Alexa focus at a time.
-
-The `LocalMediaSource` interface provides methods `playerEvent()` and `playerError()` for your implementation to report events regarding the state of the playback session managed by your local source. Even though your local source manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the  `playerEvent()` and `playerError()` calls in conjunction with `setFocus()` provide important information to the Engine:
+The `LocalMediaSource` interface provides methods `playerEvent()` and `playerError()` for your implementation to report events regarding the state of the playback session managed by your local source. Even though your local source manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the  `playerEvent()` and `playerError()` calls provide important information to the Engine:
     
 1. The Engine may use calls to these methods to synchronize the state of your local source's playback session with Alexa.
 
@@ -1039,14 +1036,61 @@ The `LocalMediaSource` interface provides methods `playerEvent()` and `playerErr
 
 | playerEvent() event name | Description |
 |:--|:--|
-| "PlaybackStarted" |  During an active session, the local source has started to play or resumed from a paused state. The Engine considers the source active and in focus. |
+| "PlaybackSessionStarted" |  The local media source is switched from the inactive to active media state or a new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing).|
+| "PlaybackSessionEnded" |  The local media source is switched from the active to inactive media state or an active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus.|
+| "PlaybackStarted" |  During an active session, the local source has started to play or resumed from a paused state. |
 | "PlaybackStopped" | During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa. |
 
 | playerError() event name | Description |
 |:--|:--|
 | "INTERNAL\_ERROR" | During an active session, an internal error caused playback to stop.
 
-The `getState()` method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the `LocalMediaSourceState` and returned. 
+Both `playerEvent()` and `playerError()` are expected to provide the appropriate sessionId.
+
+Call `playerEvent("PlaybackSessionStarted", sessionId)` to tell the Engine that the user brought the `LocalMediaSource` to the foreground with a GUI interaction. The Engine considers the source to have an active playback session, although it may or may not be playing yet. If no other Alexa media source is playing, utterances such as “Alexa, play” target this source. You must also call `playerEvent("PlaybackSessionStarted", sessionId)` when the source is brought into the foreground by a call to `play()` or `playControl()` as a result of a user voice request. Once the source starts playing, call `playerEvent("PlaybackStarted", sessionId)`.
+
+Call `playerEvent("PlaybackSessionEnded", sessionId)` to tell the Engine that the `LocalMediaSource` is no longer in the foreground, typically as a result of a GUI interaction from the user after the player is stopped. The Engine considers the source inactive or not in focus, and starting a new playback session for the source requires a further GUI interaction or user voice request to Alexa that targets the source by name.
+
+```	
+class MyFMRadioLocalMediaSource : public aace::alexa::LocalMediaSource {
+...
+    // public method in source handler	
+    void setAlexaFocusForFMRadio( bool isFocused ) {  
+        ...
+        if (isFocused) {
+            ...  
+    	    // FM Radio begins playback independently of Alexa
+       	    playerEvent("PlaybackSessionStarted", m_sessionId);
+        } else {
+            ...    
+     	    // Notify Alexa that FM Radio is no longer the active media source on the device as a result of platform driven change
+       	    playerEvent("PlaybackSessionEnded", m_sessionId);
+        }
+        ...
+    }
+...    
+```
+>**Note:** Only one `LocalMediaSource` type can have Alexa focus at a time.
+
+>**Note:** `setFocus()` and `setFocus(bool)` methods are deprecated for the `LocalMediaSource` platform interface. `playerEvent()` with `"PlaybackSessionStarted"` or `"PlaybackSessionEnded"` should be used instead of `setFocus(true)` and `setFocus(false)`.
+
+Please abide by following rules related to `sessionId` in your `LocalMediaSource` integration:
+
+- `sessionId` is a universally unique identifier (UUID) generated according to the RFC 4122 specification.
+
+- If a media source starts because of a call to `play(contentSelector, payload, sessionId)` from the Engine, note the `sessionId` parameter and use it in any `playerEvent()` calls until the session is inactive.
+
+- If a media source starts for any other reason (e.g. a call to `playControl(RESUME)` from the Engine, or user GUI interaction on the head unit), create a new `sessionId` and use it in any `playerEvent()` calls until the session is inactive.
+
+- A `sessionId` is always associated with one media source playback session, so `USB`'s `sessionId` should be different than `COMPACT_DISC`'s `sessionId`.
+
+- An individual `LocalMediaSource` should maintain the `sessionId` for the whole cycle from playback session start to playback session end.
+
+- For any "opening" `playerEvent()` call for a particular `sessionId` (e.g. `"PlaybackSessionStarted"`, `"PlaybackStarted"`), you must report a corresponding closing call (e.g. `"PlaybackStopped"`, `"PlaybackSessionEnded"`) at the appropriate time (i.e., when the source is stopped, switched, etc.)
+
+### Reporting Playback State
+
+The `getState()` method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the `LocalMediaSourceState` and returned.
 
 Many fields of the `LocalMediaSourceState` are not required for local media source players. You should omit these as noted below.
 
@@ -1100,7 +1144,7 @@ The following table describes the fields comprising a `LocalMediaSourceState`, w
 | supportedContentSelectors      | ContentSelector[]  | No | see ContentSelector |
 | spiVersion      | String  |  Yes | must be "1.0"  |
 
-`supportedOperations` should list the operations which the local media source supports. Below is a list of all `SupportedPlaybackOperation`:
+`supportedOperations` should list the operations that the local media source supports. Below is a list of all `SupportedPlaybackOperation`:
 
 ```
 LocalMediaSource::SupportedPlaybackOperation::PLAY,
@@ -1121,7 +1165,7 @@ LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
 LocalMediaSource::SupportedPlaybackOperation::REWIND,
 LocalMediaSource::SupportedPlaybackOperation::START_OVER
 ```
->**Note:** Currently PLAY/PAUSE/STOP are always supported for a source. Passing null allows ALL supported operations for the source. 
+>**Note:** Currently PLAY/PAUSE/STOP are always supported for a source. Passing null allows ALL supported operations for the source.
 
 
 `supportedContentSelectors` should list the content selection types the local source can support. Below is a table of valid pairs.
@@ -1131,27 +1175,29 @@ LocalMediaSource::SupportedPlaybackOperation::START_OVER
 | `AM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `FM_RADIO` |  `PRESET`, `FREQUENCY` |
 | `SIRIUS_XM` |  `PRESET`, `CHANNEL` |
+| `DEFAULT` |  `PRESET` |
+
 
 `launched` specifies whether the source is enabled. The player is disabled for use with Alexa when this value is false, such as when a removable source like USB is disconnected.
 
-## Handling Global Presets
+### Example Sequence Diagrams
 
-The Global Preset interface handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (`AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`) actually corresponds to the preset.
+The following diagrams show examples of Local Media Source usage:
 
-The meaning of the `preset` passed through `setGlobalPreset()` is determined by the `GlobalPreset` platform implementation registered with the Engine and should suit the needs of the vehicle's infotainment system. When the `setGlobalPreset()` method is called, your implementation should map the preset to a preset that makes sense for your current client context.
+**1. Starting FM by voice**
+<p>
+<img src="./assets/Starting_FM_By_Voice.png" border="1px">
+</p>
 
-You must register a `GlobalPreset` implementation with the Engine in order for Alexa to set presets for any local media `Source` type that may use them (e.g. `AM_RADIO`, `FM_RADIO`, `SIRIUS_XM`). 
+**2. Switching from FM to DEFAULT media source with GUI**
+<p>
+<img src="./assets/Switching_Default_With_GUI.png" border="1px">
+</p>
 
-```
-#include <AACE/Alexa/GlobalPreset.h>
-...
-class MyGlobalPresetHandler : public aace::alexa::GlobalPreset {	
-public:
-void setGlobalPreset( int preset ) override {
-    // handle the preset, via routing to local media source
-}
-...
-```    
+**3. Switching between different DEFAULT sources**
+<p>
+<img src="./assets/DEFAULT_to_DEFAULT_Switching.png" border="1px">
+</p>
 
 ## Handling Notifications
 

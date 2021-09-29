@@ -155,6 +155,7 @@ public:
 
     // FocusHandlerInterface
     void setFocus(const std::string& playerId, bool focusAcquire) override;
+    void setDefaultPlayerFocus() override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
     void onConnectionStatusChanged(const Status status, const ChangedReason reason) override;
@@ -245,6 +246,10 @@ private:
      * Condition variable for thread to wait for 
      */
     std::shared_ptr<aace::alexa::GlobalPreset> m_globalPresetHandler;
+    /**
+     * Default @c ExternalMediaAdapterHandler.
+     */
+    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterHandlerInterface> m_defaultExternalMediaAdapter;
 
     /**
      * Only blocking operations, such as those requiring @c m_playersMutex, performed from asynchronous API calls not 

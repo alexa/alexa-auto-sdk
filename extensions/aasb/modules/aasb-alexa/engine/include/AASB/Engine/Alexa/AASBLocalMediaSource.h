@@ -36,7 +36,7 @@ public:
         std::shared_ptr<aace::engine::aasb::MessageBrokerInterface> messageBroker);
 
     // aace::alexa::LocalMediaSource
-    bool play(ContentSelector contentSelectorType, const std::string& payload) override;
+    bool play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId) override;
     bool playControl(aace::alexa::LocalMediaSource::PlayControlType controlType) override;
     bool seek(std::chrono::milliseconds offset) override;
     bool adjustSeek(std::chrono::milliseconds deltaOffset) override;

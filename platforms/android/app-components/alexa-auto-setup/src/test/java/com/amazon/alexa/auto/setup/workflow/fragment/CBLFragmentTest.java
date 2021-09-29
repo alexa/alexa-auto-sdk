@@ -119,10 +119,6 @@ public class CBLFragmentTest {
             View view = fragment.getView();
 
             assertNotNull(view);
-            assertEquals(View.VISIBLE, view.findViewById(R.id.login_error_text_view).getVisibility());
-
-            TextView loginStartBtnText = (TextView) view.findViewById(R.id.try_again_action_button);
-            assertEquals("Try Again", loginStartBtnText.getText().toString());
         });
     }
 

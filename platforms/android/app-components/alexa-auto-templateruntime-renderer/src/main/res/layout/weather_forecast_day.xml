@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_marginTop="@dimen/weather_forecast_day_marginTop"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <ImageView
+        android:id="@+id/weather_card_forecast_icon"
+        android:layout_width="@dimen/weather_forecast_day_icon_width"
+        android:layout_height="@dimen/weather_forecast_day_icon_height"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/weather_card_forecast_day"
+        style="@style/WeatherText"
+        android:layout_width="@dimen/weather_forecast_day_text_width"
+        android:layout_height="@dimen/weather_forecast_day_text_height"
+        android:layout_marginStart="@dimen/weather_forecast_day_text_marginStart"
+        android:textSize="@dimen/weather_forecast_day_text_size"
+        app:layout_constraintTop_toBottomOf="@id/weather_card_forecast_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/weather_card_forecast_temp_high"
+        style="@style/WeatherText"
+        android:layout_width="@dimen/weather_forecast_day_highlow_text_width"
+        android:layout_height="@dimen/weather_forecast_day_highlow_text_height"
+        android:layout_marginStart="@dimen/weather_forecast_day_high_text_marginStart"
+        android:textSize="@dimen/weather_forecast_day_highlow_text_size"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/weather_card_forecast_day"
+        app:layout_constraintEnd_toStartOf="@id/weather_card_forecast_temp_low"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/weather_card_forecast_temp_low"
+        style="@style/WeatherText"
+        android:layout_width="@dimen/weather_forecast_day_highlow_text_width"
+        android:layout_height="@dimen/weather_forecast_day_highlow_text_height"
+        android:layout_marginStart="@dimen/weather_forecast_day_low_text_marginStart"
+        android:textSize="@dimen/weather_forecast_day_highlow_text_size"
+        app:layout_constraintTop_toBottomOf="@id/weather_card_forecast_day"
+        app:layout_constraintStart_toEndOf="@id/weather_card_forecast_temp_high"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

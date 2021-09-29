@@ -1,0 +1,32 @@
+@startuml
+skinparam roundcorner 10
+participant Driver 
+participant "3P Nav App" as Nav
+participant NavigationHandler 
+participant "Auto SDK" as SDK
+participant Alexa
+
+Driver->SDK: "Which exit should I take for the airport"
+SDK-> NavigationHandler : getNavigationState()
+activate NavigationHandler
+NavigationHandler -->SDK : navigation context
+deactivate NavigationHandler
+SDK -> Alexa : Recognize event with context
+
+Alexa->SDK : AnnounceManeuver directive
+
+SDK->NavigationHandler : announceManeuver()
+NavigationHandler->Nav : announce the maneuver
+alt Success
+	Nav->Nav : "You need to take exit 45 Airport Ave for San Jose airport" TTS by navigation system
+    NavigationHandler<-Nav : maneuver announced
+    NavigationHandler->SDK: navigationEvent(EXIT_GUIDANCE_ANNOUNCED)
+    SDK->Alexa : AnnounceManeuverSuccess event
+else Error	
+
+	Nav->Nav : "Cannot find your next exit" TTS by navigation system
+    NavigationHandler<-Nav : maneuver announcement failed
+    NavigationHandler->SDK: navigationError(EXIT_GUIDANCE_FAILED, ROUTE_NOT_FOUND, "")
+    SDK->Alexa : AnnounceManeuverFailed event
+end
+@enduml

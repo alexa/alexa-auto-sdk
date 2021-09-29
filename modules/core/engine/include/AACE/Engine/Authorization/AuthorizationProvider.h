@@ -50,7 +50,7 @@ public:
      * with state as @c AUTHORIZING on the start of authorization process and with @c AUTHORIZED on the
      * successful completion of the authorization.
      * 
-     * @param data The string representation of the json passed by the platform implemenation.
+     * @param data The string representation of the json passed by the platform implementation.
      * @return Return @c true on successful start of the authorization process, otherwise @c false.
      */
     virtual bool startAuthorization(const std::string& data) = 0;

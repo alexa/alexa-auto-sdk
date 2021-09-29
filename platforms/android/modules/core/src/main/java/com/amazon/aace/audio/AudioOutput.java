@@ -27,7 +27,7 @@ import com.amazon.aace.core.NativeRef;
  * @c false.
  *
  * The platform implementation may call @c mediaError() or @c mediaStateChanged() with @c MediaState.BUFFERING
- * at any time during a playback operation to notify the Engine of an error or buffer underrun, respectvely.
+ * at any time during a playback operation to notify the Engine of an error or buffer underrun, respectively.
  * When the media player resumes playback after a buffer underrun, the platform implementation should call
  * @c mediaStateChanged() with @c MediaState.PLAYING.
  *

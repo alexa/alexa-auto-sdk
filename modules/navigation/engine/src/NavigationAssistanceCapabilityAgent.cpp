@@ -213,19 +213,19 @@ void NavigationAssistanceCapabilityAgent::handleAnnounceManeuverDirective(std::s
         return;
     }
     if (!document.HasMember("type")) {
-        AACE_ERROR(LX(TAG, "handleAnnounceManeuverDirective").d("reason", "missing manueverType value"));
+        AACE_ERROR(LX(TAG, "handleAnnounceManeuverDirective").d("reason", "missing maneuverType value"));
         sendExceptionEncounteredAndReportFailed(
             info,
-            "Missing manueverType value",
+            "Missing maneuverType value",
             alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
         return;
     }
     std::string manueuverType = document["type"].GetString();
     if (announceManeuverTypeValues.find(manueuverType) == announceManeuverTypeValues.end()) {
-        AACE_ERROR(LX(TAG, "handleAnnounceManeuverDirective").m("invalidManueverTypeValue"));
+        AACE_ERROR(LX(TAG, "handleAnnounceManeuverDirective").m("invalidManeuverTypeValue"));
         sendExceptionEncounteredAndReportFailed(
             info,
-            "invalid manuever type value",
+            "invalid maneuver type value",
             alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
         return;
     }

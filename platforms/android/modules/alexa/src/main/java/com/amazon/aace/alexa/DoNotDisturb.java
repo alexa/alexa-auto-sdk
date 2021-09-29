@@ -18,7 +18,7 @@ package com.amazon.aace.alexa;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * DoNotDisturb should be extended to handle receving state changes from the engine,
+ * DoNotDisturb should be extended to handle receiving state changes from the engine,
  * and for sending state change events for the Do Not Disturb Setting.
  * For more information about Do Not Disturb see the interface overview:
  * https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html

@@ -25,11 +25,15 @@ namespace audio {
 
 class AudioInputEngineInterface {
 public:
+    virtual ~AudioInputEngineInterface() = default;
+
     virtual ssize_t write(const int16_t* data, const size_t size) = 0;
 };
 
 class AudioOutputEngineInterface {
 public:
+    virtual ~AudioOutputEngineInterface() = default;
+
     /**
      * Describes an error during a audio playback operation
      */

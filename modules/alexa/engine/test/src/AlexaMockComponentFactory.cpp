@@ -14,6 +14,7 @@
  */
 
 #include <AACE/Test/Alexa/AlexaMockComponentFactory.h>
+#include <acsdkShutdownManager/ShutdownManager.h>
 
 namespace aace {
 namespace test {
@@ -29,6 +30,11 @@ void AlexaMockComponentFactory::doShutdown() {
     for (auto& rs : m_shutdownList) {
         rs->shutdown();
         rs.reset();
+    }
+
+    // ShutdownManager does not extend the RequiresShutdown class
+    if (m_mockShutDownManager != nullptr) {
+        m_mockShutDownManager->shutdown();
     }
 }
 
@@ -428,6 +434,18 @@ std::shared_ptr<aace::test::avs::MockAudioPlayerObserverInterface> AlexaMockComp
     }
 
     return m_mockAudioPlayerObserverInterface;
+}
+
+std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> AlexaMockComponentFactory::
+    getShutDownNotifierMock() {
+    if (m_mockShutDownNotifier == nullptr) {
+        m_mockShutDownNotifier = std::make_shared<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier>();
+    }
+    if (m_mockShutDownManager == nullptr) {
+        m_mockShutDownManager = alexaClientSDK::acsdkShutdownManager::ShutdownManager::createShutdownManagerInterface(
+            m_mockShutDownNotifier);
+    }
+    return m_mockShutDownNotifier;
 }
 
 //

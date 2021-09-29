@@ -20,11 +20,16 @@
 #include <string>
 
 #include "AACE/Core/PlatformInterface.h"
+#include "LocalMediaSource.h"
 
 /** @file */
 
 namespace aace {
 namespace alexa {
+
+/**
+  * @deprecated This class will be removed very soon. Use @c LocalMediaSource class instead with ContentSelector PRESET
+  */
 
 class GlobalPreset : public aace::core::PlatformInterface {
 public:
@@ -35,8 +40,8 @@ public:
     virtual ~GlobalPreset();
 
     /**
+     * @deprecated Use @c LocalMediaSource class with DEFAULT source with @c LocalMediaSource::ContentSelector::PRESET instead
      * Called after receiving a global preset play directive
-     *
      * @param [in] The preset integer from the playbackContextToken
      */
     virtual void setGlobalPreset(int preset) = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ RangeController& CarControlDataProvider::getRangeController(
 void CarControlDataProvider::initialize(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configs) {
     json carControl;
 
-    // See if a car control configuration is specified that will overrride
+    // See if a car control configuration is specified that will override
     // the generated one
     for (auto config : configs) {
         auto configStream = config->getStream();
@@ -132,7 +132,7 @@ std::string CarControlDataProvider::genKey(std::string endpointId, std::string c
 }
 
 // Build an example car control configuration for the Auto SDK Engine
-// See modules/car-control/assets/assets-1P.json for all the friendly names for each asset
+// See modules/car-control/assets/assets-1P.json for the friendly names for each asset
 std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider::generateCarControlConfig() {
     auto config = CarControlConfiguration::create();
 
@@ -549,6 +549,48 @@ std::shared_ptr<aace::core::config::EngineConfiguration> CarControlDataProvider:
                     .addAssetId(alexa::setting::AUTO)
             .addToggleController("climate.sync", false)
                 .addAssetId(alexa::setting::CLIMATE_SYNC);
+
+        // To use the custom asset example in the code block below, first copy the sample
+        // assets file defined in samples/cpp/assets/sampledata/CarControlCustomAssets.json
+        // to the path /opt/AAC/etc/CarControlCustomAssets.json before launching the sample app.
+        //
+        // If you are using LVC and want to test the custom assets offline, additionally
+        // copy the contents of CarControlCustomAssets.json into 
+        // /opt/LVC/data/led-service/assets/assets.json 
+        // (or whatever path is used in your led-service-config.json config file's 
+        // "AACE.CarControl.CustomAssetsFilePath") and remove the '#ifndef LOCALVOICECONTROL'
+        // check below
+
+        #ifndef LOCALVOICECONTROL
+        std::string customAssetsPath = "/opt/AAC/etc/CarControlCustomAssets.json";
+        std::ifstream stream(customAssetsPath);
+        if (stream.good()) {
+            //---------------------------------------------------------------------
+            // Specify the path to the file that defines additional custom assets
+            // used by this example.
+            //---------------------------------------------------------------------
+            config->addCustomAssetsPath("/opt/AAC/etc/CarControlCustomAssets.json")
+
+            //---------------------------------------------------------------------
+            // Create a sample "custom thing" endpoint to demonstrate using custom
+            // assets.
+            //
+            // Things to try:
+            //    "Alexa, turn [on|off] the custom thing"
+            //    "Alexa, set my custom object color to pink"
+            //---------------------------------------------------------------------
+            .createEndpoint("customThing")
+                .addAssetId("My.CustomThing")
+                .addPowerController(false)
+                .addModeController("color", false, false)
+                    .addAssetId(alexa::setting::COLOR)
+                    .addValue("VIOLET")
+                        .addAssetId(alexa::color::VIOLET)
+                    .addValue("PINK")
+                        .addAssetId("My.Color.Pink"); 
+        }
+        #endif  // LOCALVOICECONTROL
+
     // clang-format on
     return config;
 }

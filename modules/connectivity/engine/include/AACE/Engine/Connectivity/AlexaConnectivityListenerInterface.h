@@ -97,7 +97,7 @@ public:
         /// Represents time at which the state value was recorded.
         alexaClientSDK::avsCommon::utils::timing::TimePoint timeOfSample;
 
-        /// The number of milliseconds that have elapsed since the state value was last confrimed.
+        /// The number of milliseconds that have elapsed since the state value was last confirmed.
         std::chrono::milliseconds uncertaintyInMilliseconds;
     };
 
@@ -132,7 +132,7 @@ public:
         /// Represents time at which the state value was recorded.
         alexaClientSDK::avsCommon::utils::timing::TimePoint timeOfSample;
 
-        /// The number of milliseconds that have elapsed since the state value was last confrimed.
+        /// The number of milliseconds that have elapsed since the state value was last confirmed.
         std::chrono::milliseconds uncertaintyInMilliseconds;
     };
 
@@ -201,7 +201,7 @@ public:
         /// Represents time at which the state value was recorded.
         alexaClientSDK::avsCommon::utils::timing::TimePoint timeOfSample;
 
-        /// The number of milliseconds that have elapsed since the state value was last confrimed.
+        /// The number of milliseconds that have elapsed since the state value was last confirmed.
         std::chrono::milliseconds uncertaintyInMilliseconds;
     };
 
@@ -270,7 +270,7 @@ public:
         /// Represents time at which the state value was recorded.
         alexaClientSDK::avsCommon::utils::timing::TimePoint timeOfSample;
 
-        /// The number of milliseconds that have elapsed since the state value was last confrimed.
+        /// The number of milliseconds that have elapsed since the state value was last confirmed.
         std::chrono::milliseconds uncertaintyInMilliseconds;
     };
 

@@ -5,7 +5,7 @@ android {
     defaultConfig {
         minSdkVersion 26
         versionCode 1
-        versionName "3.2.1"
+        versionName "3.3"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -48,6 +48,7 @@ dependencies {
     implementation deps.androidx_appcompat
     implementation deps.androidx_constraint
     implementation deps.eventbus
+    implementation deps.androidx_recycler_view
 
     testImplementation deps.junit
     testImplementation deps.mockito

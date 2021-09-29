@@ -32,7 +32,6 @@ public class SessionViewControllerImpl implements SessionViewController {
 
     @Override
     public Optional<ViewGroup> getTemplateRuntimeViewContainer() {
-        mTemplateDisplayed.onNext(true);
         return mVoiceView == null ? Optional.empty() : Optional.of(mVoiceView);
     }
 
@@ -47,5 +46,10 @@ public class SessionViewControllerImpl implements SessionViewController {
     @Override
     public Observable<Boolean> getTemplateDisplayedObservable() {
         return mTemplateDisplayed;
+    }
+
+    @Override
+    public void setTemplateDisplayed() {
+        mTemplateDisplayed.onNext(true);
     }
 }

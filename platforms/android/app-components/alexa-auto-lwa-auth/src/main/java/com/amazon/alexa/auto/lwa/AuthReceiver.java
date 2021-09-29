@@ -66,7 +66,8 @@ public class AuthReceiver extends BroadcastReceiver {
 
             switch (authState) {
                 case "AUTHORIZED":
-                    EventBus.getDefault().post(new AuthWorkflowData(AuthState.Auth_Provider_Authorized, null, null));
+                    // It means we have successfully received and saved the auth token on the device side.
+                    EventBus.getDefault().post(new AuthWorkflowData(AuthState.Auth_Provider_Token_Saved, null, null));
                     break;
                 case "UNAUTHORIZED":
                     EventBus.getDefault().post(

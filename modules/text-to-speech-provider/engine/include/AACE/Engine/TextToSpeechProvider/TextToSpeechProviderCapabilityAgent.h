@@ -66,7 +66,7 @@ public:
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
     getCapabilityConfigurations() override;
 
-    // Function to initate the prepare speech request
+    // Function to initiate the prepare speech request
     void prepareSpeech(const std::string& speechId, const std::string& text, const std::string& assistantId);
 
 private:

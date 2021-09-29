@@ -31,6 +31,7 @@ import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsipc.IPCConstants;
 import com.amazon.alexaautoclientservice.constants.AudioSourceConstants;
+import com.amazon.alexaautoclientservice.modules.mediaManager.MediaSource;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 
 public class FileUtil {
@@ -68,6 +70,8 @@ public class FileUtil {
 
     public static final String AACS_CONFIG_NETWORK_INFO_PROVIDER = "NetworkInfoProvider";
     public static final String AACS_CONFIG_LOCATION_PROVIDER = "LocationProvider";
+    public static final String AACS_CONFIG_LOCAL_MEDIA_SOURCE = "LocalMediaSource";
+    public static final String AACS_CONFIG_LOCAL_MEDIA_SOURCE_METADATA = "localMediaSourceMetadata";
     public static final String AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
     public static final String AACS_CONFIG_PROPERTY_MANAGER = "PropertyManager";
 
@@ -77,6 +81,7 @@ public class FileUtil {
             put(AACS_CONFIG_LOCATION_PROVIDER, "location");
             put(AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER, "alexa");
             put(AACS_CONFIG_PROPERTY_MANAGER, "propertyManager");
+            put(AACS_CONFIG_LOCAL_MEDIA_SOURCE, "alexa");
         }
     };
 
@@ -436,30 +441,21 @@ public class FileUtil {
         return moduleConfig;
     }
 
-    public static boolean isPersistentSystemService(@NonNull Context context) {
+    /**
+     * Checks boolean config fields in "aacs.general"
+     * @param field
+     * @return
+     */
+    public static boolean isEnabledInAACSGeneralConfig(@NonNull String field) {
         try {
-            Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "persistentSystemService");
+            Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, field);
             if (!(leafNodeValue instanceof Boolean)) {
-                Log.w(TAG, "Defaulting to persistentSystemService=false, since the leaf node value was not valid");
+                Log.w(TAG, String.format("Defaulting to %s=false, since the leaf node value was not valid", field));
                 return false;
             }
             return (Boolean) leafNodeValue;
         } catch (Exception e) {
-            Log.w(TAG, "Defaulting to persistentSystemService=false, since it was not specified in config.");
-            return false;
-        }
-    }
-
-    public static boolean isStartServiceOnBootEnabled(@NonNull Context context) {
-        try {
-            Object leafNodeValue = getLeafNodeValueFromJson(mGeneralConfiguration, "startServiceOnBootEnabled");
-            if (!(leafNodeValue instanceof Boolean)) {
-                Log.w(TAG, "Defaulting to startServiceOnBootEnabled=false, since the leaf node value was not valid");
-                return false;
-            }
-            return (Boolean) leafNodeValue;
-        } catch (Exception e) {
-            Log.w(TAG, "Defaulting to startServiceOnBootEnabled=false, since it was not specified in config.");
+            Log.w(TAG, String.format("Defaulting to %s=false, since it was not specified in config.", field));
             return false;
         }
     }
@@ -789,5 +785,56 @@ public class FileUtil {
         mEngineConfiguration = null;
         mDefaultHandlerConfiguration = null;
         mExtrasConfiguration = null;
+    }
+
+    /**
+     * @return List of MediaSource objects populated from the config file
+     */
+    public static List<MediaSource> getLocalMediaSourceList() {
+        final List<MediaSource> mLocalMediaSources = new ArrayList<>();
+        try {
+            Object leafNodeValue = mDefaultHandlerConfiguration.opt(AACS_CONFIG_LOCAL_MEDIA_SOURCE_METADATA);
+            if (leafNodeValue == null) {
+                Log.w(TAG,
+                        String.format("getLeafNodeValueFromJson: key=%s did not exist in the JSONObject",
+                                AACS_CONFIG_LOCAL_MEDIA_SOURCE));
+                return mLocalMediaSources;
+            }
+            if (!(leafNodeValue instanceof JSONArray)) {
+                Log.w(TAG, "Defaulting to empty list for \"sources\", since the leaf node value was not valid.");
+                return mLocalMediaSources;
+            }
+            JSONArray list = (JSONArray) leafNodeValue;
+            for (int i = 0; i < list.length(); i++) {
+                JSONObject item = list.getJSONObject(i);
+                boolean isSupported = item.optBoolean("supported", false);
+                if (!isSupported)
+                    continue;
+                MediaSource source = new MediaSource(item.getString("sourceType"), item.getString("mediaPackageName"),
+                        item.getString("mediaServiceClass"), item.optBoolean("supportsSetChannel", false),
+                        item.optBoolean("supportsSetFrequency", false), item.optBoolean("supportsSetPreset", false));
+                Log.v(TAG, "Adding local media source " + source.getSourceType());
+                if (item.has("metadataTitleKey"))
+                    source.putMetadataTitleKey(item.getString("metadataTitleKey"));
+                if (item.has("metadataTrackIdKey"))
+                    source.putMetadataTrackIdKey(item.getString("metadataTrackIdKey"));
+                if (item.has("metadataTrackNumberKey"))
+                    source.putMetadataTrackNumberKey(item.getString("metadataTrackNumberKey"));
+                if (item.has("metadataArtistKey"))
+                    source.putMetadataArtistKey(item.getString("metadataArtistKey"));
+                if (item.has("metadataAlbumKey"))
+                    source.putMetadataAlbumKey(item.getString("metadataAlbumKey"));
+                if (item.has("metadataDurationKey"))
+                    source.putMetadataDurationKey(item.getString("metadataDurationKey"));
+                mLocalMediaSources.add(source);
+            }
+            return mLocalMediaSources;
+        } catch (Exception e) {
+            Log.e(TAG,
+                    String.format(
+                            "Defaulting to isDefaultImplementationEnabled=false for %s, since the configuration was not valid. Exception= %s",
+                            AACS_CONFIG_LOCAL_MEDIA_SOURCE, e.getMessage()));
+            return mLocalMediaSources;
+        }
     }
 }

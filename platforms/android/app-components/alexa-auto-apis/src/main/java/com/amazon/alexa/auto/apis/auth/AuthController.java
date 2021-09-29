@@ -63,4 +63,11 @@ public interface AuthController {
      * User request to cancel login with current auth mode.
      */
     void cancelLogin(AuthMode mode);
+
+    /**
+     * Get user identity when login with CBL.
+     *
+     * @return UserIdentity User identity.
+     */
+    UserIdentity getUserIdentity();
 }

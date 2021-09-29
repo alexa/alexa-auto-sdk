@@ -65,7 +65,7 @@ public:
      * @param service Represents the authorization service
      * @param key An opaque key to identify the authorization data
      * @param data The data represented as json string
-     * @return Returns the value of the key if available otherwise returns an emtpy string.
+     * @return Returns the value of the key if available. Otherwise, returns an empty string.
      */
     virtual std::string onGetAuthorizationData(const std::string& service, const std::string& key) = 0;
 

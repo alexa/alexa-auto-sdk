@@ -52,7 +52,7 @@ struct GetPropertyMessageReply {
             std::string replyToId;
         };
         static const std::string& version() {
-            static std::string version = "3.2";
+            static std::string version = "3.3";
             return version;
         }
         static const std::string& messageType() {
@@ -75,7 +75,7 @@ struct GetPropertyMessageReply {
         return action;
     }
     static const std::string& version() {
-        static std::string version = "3.2";
+        static std::string version = "3.3";
         return version;
     }
     static const std::string& messageType() {

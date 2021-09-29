@@ -73,7 +73,11 @@ public:
         /**
          * DAB source
          */
-        DAB
+        DAB,
+        /**
+         * Default, unnamed media source
+         */
+        DEFAULT
     };
 
     /**
@@ -262,6 +266,7 @@ public:
     virtual ~LocalMediaSource();
 
     /**
+     * @deprecated This function will be removed very soon. Use the new @c LocalMediaSource#play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId) instead
      * Called when the user calls play with a content selection type
      * 
      * @param [in] ContentSelector Content selection type 
@@ -271,7 +276,18 @@ public:
      * @return @c true if the platform implementation successfully handled the call, 
      * else @c false
      */
-    virtual bool play(ContentSelector contentSelectorType, const std::string& payload) = 0;
+    virtual bool play(ContentSelector contentSelectorType, const std::string& payload);
+
+    /**
+     * Called when the user calls play with a content selection type
+     * 
+     * @param [in] ContentSelector Content selection type 
+     * @param [in] payload Content selector payload (e.g. "1", "98.7 FM HD 1", "bbc radio four")
+     * @param sessionId A universally unique identifier (UUID) generated according to the RFC 4122 specification. Since Alexa is starting the session here, use this session Id for further events and errors.
+     * @return @c true if the platform implementation successfully handled the call, 
+     * else @c false
+     */
+    virtual bool play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId);
 
     /**
      * Occurs during playback control via voice interaction
@@ -339,12 +355,18 @@ public:
 
     /**
      * Should be called on a local media source player event. This will sync the context with AVS.
+     * Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method.
      *
      * @param [in] eventName Canonical event name. Accepted values: 
+     *      @li "PlaybackSessionStarted"
+     *      @li "PlaybackSessionEnded"
      *      @li "PlaybackStarted"
      *      @li "PlaybackStopped"
+     *
+     * @param [in] sessionId A universally unique identifier (UUID) generated according to the RFC 4122 specification. If playback session is started because of @c LocalMediaSource#play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId), use the same session Id. If the session is started due to any other reason, generate unique UUID and use it as a session ID until session is not ended.
+     *
      */
-    void playerEvent(const std::string& eventName);
+    void playerEvent(const std::string& eventName, const std::string& sessionId = "");
 
     /**
      * Should be called on a local media source player error.
@@ -357,11 +379,20 @@ public:
      * @param [in] description The detailed error description
      *
      * @param [in] fatal true if the error is fatal
+     *
+     * @param [in] sessionId A universally unique identifier (UUID) generated according to the RFC 4122 specification. If playback session is started because of @c LocalMediaSource#play(ContentSelector contentSelectorType, const std::string& payload, const std::string& sessionId), use the same session Id. If the session is started due to any other reason, generate unique UUID and use it as a session ID until session is not ended.
      */
-    void playerError(const std::string& errorName, long code, const std::string& description, bool fatal);
+    void playerError(
+        const std::string& errorName,
+        long code,
+        const std::string& description,
+        bool fatal,
+        const std::string& sessionId = "");
 
     /**
+     * @deprecated This function will be removed very soon. Use the @c LocalMediaSource#playerEvent(const std::string& eventName, const std::string& sessionId) instead with playbackSessionStarted and playbackSessionEnded events
      * Should be called on local media source player events. This will switch the media focus to that context.
+     * Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method.
      */
     void setFocus(bool focusAcquire = true);
 
@@ -376,7 +407,6 @@ public:
 
 private:
     std::weak_ptr<aace::alexa::LocalMediaSourceEngineInterface> m_localMediaSourceEngineInterface;
-
     Source m_source;
 };
 
@@ -408,6 +438,9 @@ inline std::ostream& operator<<(std::ostream& stream, const LocalMediaSource::So
             break;
         case LocalMediaSource::Source::DAB:
             stream << "DAB";
+            break;
+        case LocalMediaSource::Source::DEFAULT:
+            stream << "DEFAULT";
             break;
     }
     return stream;

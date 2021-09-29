@@ -51,20 +51,19 @@ public class AACSMessageLogger {
 
     public AACSMessageLogger() {
         // Init HashSet to store all actions that need response
-        String[] replyList = {Action.AddressBook.ADD_ADDRESS_BOOK,
-                Action.AddressBook.REMOVE_ADDRESS_BOOK, Action.AlexaConnectivity.CONNECTIVITY_STATE_CHANGE,
-                Action.AlexaConnectivity.GET_CONNECTIVITY_STATE, Action.AlexaConnectivity.GET_IDENTIFIER,
-                Action.AudioOutput.GET_DURATION, Action.AudioOutput.GET_NUM_BYTES_BUFFERED,
-                Action.AudioOutput.GET_POSITION, Action.AudioPlayer.GET_PLAYER_DURATION,
-                Action.AudioPlayer.GET_PLAYER_POSITION, Action.AuthProvider.GET_AUTH_STATE,
-                Action.AuthProvider.GET_AUTH_TOKEN, Action.Authorization.GET_AUTHORIZATION_DATA,
-                Action.CBL.GET_REFRESH_TOKEN, Action.CarControl.ADJUST_CONTROLLER_VALUE,
-                Action.CarControl.SET_CONTROLLER_VALUE, Action.EqualizerController.GET_BAND_LEVELS,
-                Action.LocalMediaSource.GET_STATE, Action.LocationProvider.GET_COUNTRY,
-                Action.LocationProvider.GET_LOCATION, Action.Navigation.GET_NAVIGATION_STATE,
-                Action.NetworkInfoProvider.GET_NETWORK_STATUS, Action.NetworkInfoProvider.GET_WIFI_SIGNAL_STRENGTH,
-                Action.PhoneCallController.CREATE_CALL_ID, Action.PropertyManager.GET_PROPERTY,
-                Action.TextToSpeech.GET_CAPABILITIES};
+        String[] replyList = {Action.AddressBook.ADD_ADDRESS_BOOK, Action.AddressBook.REMOVE_ADDRESS_BOOK,
+                Action.AlexaConnectivity.CONNECTIVITY_STATE_CHANGE, Action.AlexaConnectivity.GET_CONNECTIVITY_STATE,
+                Action.AlexaConnectivity.GET_IDENTIFIER, Action.AudioOutput.GET_DURATION,
+                Action.AudioOutput.GET_NUM_BYTES_BUFFERED, Action.AudioOutput.GET_POSITION,
+                Action.AudioPlayer.GET_PLAYER_DURATION, Action.AudioPlayer.GET_PLAYER_POSITION,
+                Action.AuthProvider.GET_AUTH_STATE, Action.AuthProvider.GET_AUTH_TOKEN,
+                Action.Authorization.GET_AUTHORIZATION_DATA, Action.CBL.GET_REFRESH_TOKEN,
+                Action.CarControl.ADJUST_CONTROLLER_VALUE, Action.CarControl.SET_CONTROLLER_VALUE,
+                Action.EqualizerController.GET_BAND_LEVELS, Action.LocalMediaSource.GET_STATE,
+                Action.LocationProvider.GET_COUNTRY, Action.LocationProvider.GET_LOCATION,
+                Action.Navigation.GET_NAVIGATION_STATE, Action.NetworkInfoProvider.GET_NETWORK_STATUS,
+                Action.NetworkInfoProvider.GET_WIFI_SIGNAL_STRENGTH, Action.PhoneCallController.CREATE_CALL_ID,
+                Action.PropertyManager.GET_PROPERTY, Action.TextToSpeech.GET_CAPABILITIES};
         mReplyActionList = new HashSet<>();
         mReplyActionList.addAll(Arrays.asList(replyList));
 

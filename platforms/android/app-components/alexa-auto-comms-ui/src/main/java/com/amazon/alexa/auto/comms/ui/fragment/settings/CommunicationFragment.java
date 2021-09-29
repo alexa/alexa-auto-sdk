@@ -31,7 +31,7 @@ import java.util.List;
  * Communication fragment to manage all connected bluetooth devices in a list.
  */
 public class CommunicationFragment extends Fragment {
-    private static final String TAG = NetworkFragment.class.getSimpleName();
+    private static final String TAG = CommunicationFragment.class.getSimpleName();
 
     private NavController mController;
 

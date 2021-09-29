@@ -73,7 +73,7 @@ public:
 
     /**
      * Function to set the metadata of a synthesized speech resource.
-     * @param [in] metadata The metdata associated with the synthesized
+     * @param [in] metadata The metadata associated with the synthesized
      * speech
      * 
      */

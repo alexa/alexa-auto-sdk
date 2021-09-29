@@ -42,7 +42,8 @@ const std::unordered_map<aace::alexa::LocalMediaSource::Source, std::string, Enu
     {aace::alexa::LocalMediaSource::Source::LINE_IN, "Local LINE_IN"},
     {aace::alexa::LocalMediaSource::Source::COMPACT_DISC, "Local COMPACT_DISC"},
     {aace::alexa::LocalMediaSource::Source::SIRIUS_XM, "Local SIRIUS_XM"},
-    {aace::alexa::LocalMediaSource::Source::DAB, "Local DAB"}};
+    {aace::alexa::LocalMediaSource::Source::DAB, "Local DAB"},
+    {aace::alexa::LocalMediaSource::Source::DEFAULT, "Local DEFAULT"}};
 
 const std::unordered_map<aace::alexa::LocalMediaSource::Source, aace::alexa::LocalMediaSource::MediaType, EnumHash>
     LocalMediaSourceToType = {
@@ -54,7 +55,9 @@ const std::unordered_map<aace::alexa::LocalMediaSource::Source, aace::alexa::Loc
         {aace::alexa::LocalMediaSource::Source::LINE_IN, aace::alexa::LocalMediaSource::MediaType::OTHER},
         {aace::alexa::LocalMediaSource::Source::COMPACT_DISC, aace::alexa::LocalMediaSource::MediaType::TRACK},
         {aace::alexa::LocalMediaSource::Source::SIRIUS_XM, aace::alexa::LocalMediaSource::MediaType::STATION},
-        {aace::alexa::LocalMediaSource::Source::DAB, aace::alexa::LocalMediaSource::MediaType::STATION}};
+        {aace::alexa::LocalMediaSource::Source::DAB, aace::alexa::LocalMediaSource::MediaType::STATION},
+        {aace::alexa::LocalMediaSource::Source::DEFAULT, aace::alexa::LocalMediaSource::MediaType::OTHER},
+};
 
 }  // namespace
 
@@ -97,19 +100,24 @@ std::weak_ptr<logger::LoggerHandler> LocalMediaSourceHandler::getLoggerHandler()
     return m_loggerHandler;
 }
 
-bool LocalMediaSourceHandler::play(ContentSelector contentSelectorType, const std::string& payload) {
+bool LocalMediaSourceHandler::play(
+    ContentSelector contentSelectorType,
+    const std::string& payload,
+    const std::string& sessionId) {
     std::stringstream ss;
     ss << "play::source=" << m_source << " play:contentSelectorType=" << contentSelectorType
-       << " play:payload=" + payload;
+       << " play:payload=" + payload << " play:sessionId=" + sessionId;
     log(logger::LoggerHandler::Level::INFO, ss.str());
     m_localMediaSourceStateMap[m_source] = "PLAYING";
-
+    m_sessionId = sessionId;
     if (auto activity = m_activity.lock()) {
         activity->runOnUIThread([=]() {
             if (auto console = m_console.lock()) {
                 console->printRuler();
                 console->printLine(m_sourceMediaProvider, "play:", payload);
                 console->printRuler();
+                playerEvent("PlaybackSessionStarted", m_sessionId);
+                playerEvent("PlaybackStarted", m_sessionId);
             }
         });
     }
@@ -122,9 +130,23 @@ bool LocalMediaSourceHandler::playControl(PlayControlType controlType) {
     switch (controlType) {
         case PlayControlType::RESUME:
             m_localMediaSourceStateMap[m_source] = "PLAYING";
+            if (m_sessionId.empty()) {
+                //This is an example, randon UUID unique for every local media source is expected here
+                //Actual implementation can use their preferable way to generate UUID
+                m_sessionId = "881f70f9-7309-43f7-a559-c378fa43a19a";
+            }
+            playerEvent("PlaybackSessionStarted", m_sessionId);
+            playerEvent("PlaybackStarted", m_sessionId);
             break;
         case PlayControlType::PAUSE:
             m_localMediaSourceStateMap[m_source] = "PAUSED";
+            playerEvent("PlaybackStopped", m_sessionId);
+            break;
+        case PlayControlType::STOP:
+            m_localMediaSourceStateMap[m_source] = "STOPPED";
+            playerEvent("PlaybackStopped", m_sessionId);
+            playerEvent("PlaybackSessionEnded", m_sessionId);
+            m_sessionId = "";  //Reset the session Id
             break;
         default:
             // no-op for other control types
@@ -238,6 +260,14 @@ LocalMediaSourceHandler::LocalMediaSourceState LocalMediaSourceHandler::getState
                  LocalMediaSource::SupportedPlaybackOperation::START_OVER,
                  LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
                  LocalMediaSource::SupportedPlaybackOperation::REWIND});
+            break;
+        case LocalMediaSource::Source::DEFAULT:
+            supportedOperations.insert(
+                supportedOperations.end(),
+                {LocalMediaSource::SupportedPlaybackOperation::NEXT,
+                 LocalMediaSource::SupportedPlaybackOperation::PREVIOUS,
+                 LocalMediaSource::SupportedPlaybackOperation::PLAY,
+                 LocalMediaSource::SupportedPlaybackOperation::PAUSE});
             break;
     }
 

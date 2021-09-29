@@ -10,7 +10,13 @@ public class LoginEvent {
     public static final String LANGUAGE_IS_SUPPORTED_EVENT = "Language_Is_Supported";
     public static final String LANGUAGE_IS_NOT_SUPPORTED_EVENT = "Language_Is_Not_Supported";
     public static final String LANGUAGE_SELECTION_COMPLETE_EVENT = "Language_Selection_Is_Complete";
+    public static final String LOCATION_CONSENT_COMPLETED = "Location_Consent_Completed";
     public static final String CBL_AUTH_FINISHED = "CBL_Auth_Finished";
     public static final String CBL_AUTH_RESTARTED = "CBL_Auth_Restarted";
-    public static final String AUTH_PROVIDER_AUTH_FINISHED = "Auth_Provider_Auth_Finished";
+    public static final String PREVIEW_MODE_ENABLED = "PreviewMode_Enabled";
+    public static final String CBL_FLOW_SETUP_COMPLETED = "CBL_Flow_Setup_Completed";
+    public static final String PREVIEW_MODE_FLOW_SETUP_COMPLETED = "PreviewMode_Flow_Setup_Completed";
+    public static final String LOGIN = "Login";
+    public static final String SETUP_ERROR = "Setup_Error";
+
 }

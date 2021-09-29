@@ -25,7 +25,7 @@ namespace carControl {
 /**
  * Interface for the car control engine, with responsibilities as follows:
  *  @li Provides access to invoke the capability controllers of the @c CarControl platform interface
- *  @li Register and query whether a @c CarControlLocalService is available, which disables some functionaility of
+ *  @li Register and query whether a @c CarControlLocalService is available, which disables some functionality of
  *  the online-only car control engine for delegation to the local service
  */
 class CarControlServiceInterface {

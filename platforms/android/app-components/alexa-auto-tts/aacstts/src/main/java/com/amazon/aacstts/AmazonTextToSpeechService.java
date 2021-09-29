@@ -58,8 +58,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Design Doc
- * https://wiki.labcollab.net/confluence/display/Doppler/%5BAlexa%5D+Android+Text+To+Speech
+ * AmazonTextToSpeechService implements the abstract Android TextToSpeechService interfaces. It communciates
+ * with AACS core service via the AASB TextToSpeech messages to fulfill the Text-to-Speech requests.
  */
 public class AmazonTextToSpeechService extends TextToSpeechService {
     private static final String TAG = AACS_TTS_LOG_PREFIX + AmazonTextToSpeechService.class.getSimpleName();
@@ -229,7 +229,7 @@ public class AmazonTextToSpeechService extends TextToSpeechService {
                     TTSConstants.Action.PREPARE_SPEECH, synthesisCallback);
         } catch (Exception e) {
             synthesisCallback.error(TextToSpeech.ERROR_SYNTHESIS);
-            Log.e(TAG, "onSynthesizeText: Exception occurred while trying to synthezie the text", e);
+            Log.e(TAG, "onSynthesizeText: Exception occurred while trying to synthesize the text", e);
         }
         synthesisCallback.done();
     }
@@ -397,7 +397,7 @@ public class AmazonTextToSpeechService extends TextToSpeechService {
                 return Integer.parseInt(networkTimeOut);
             } catch (NumberFormatException ex) {
                 Log.i(TAG,
-                        "Exception occurred while trying to derive netweork timeout. "
+                        "Exception occurred while trying to derive network timeout. "
                                 + "Falling back to Default timeout : " + NETWORK_DEFAULT_TIMEOUT_MS + "(ms)");
             }
         }

@@ -49,6 +49,7 @@ enum class Source {
     COMPACT_DISC,
     SIRIUS_XM,
     DAB,
+    DEFAULT,
 };
 
 inline std::string toString(Source enumValue) {
@@ -71,6 +72,8 @@ inline std::string toString(Source enumValue) {
             return "SIRIUS_XM";
         case (Source::DAB):
             return "DAB";
+        case (Source::DEFAULT):
+            return "DEFAULT";
     }
     throw std::runtime_error("invalidSourceType");
 }
@@ -86,6 +89,7 @@ inline Source toSource(const std::string& stringValue) {
         {"COMPACT_DISC", Source::COMPACT_DISC},
         {"SIRIUS_XM", Source::SIRIUS_XM},
         {"DAB", Source::DAB},
+        {"DEFAULT", Source::DEFAULT},
     };
 
     auto search = map.find(stringValue);

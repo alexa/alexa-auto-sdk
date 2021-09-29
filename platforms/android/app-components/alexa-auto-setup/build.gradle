@@ -7,7 +7,7 @@ android {
     defaultConfig {
         minSdkVersion 26
         versionCode 1
-        versionName "3.2.1"
+        versionName "3.3"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -47,6 +47,7 @@ android {
 dependencies {
     implementation project(':aacscommonutils')
     implementation project(':aacsconstants')
+    implementation project(':aacsipc')
 
     implementation project(":alexa-auto-apis")
     implementation project(":alexa-auto-apps-common-ui")

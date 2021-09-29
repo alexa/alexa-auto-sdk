@@ -66,7 +66,7 @@ public class AACSServiceController {
                     AACS_SAMPLE_APP_FILE_PROVIDER,
                     file);
             context.grantUriPermission(
-                    AACSConstants.AACS_PACKAGE_NAME,
+                    AACSConstants.getAACSPackageName(new WeakReference<Context>(context)),
                     fileUri,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION);
             fileUris.add(fileUri);
@@ -74,7 +74,7 @@ public class AACSServiceController {
 
         Intent shareFileIntent = new Intent();
         shareFileIntent.setComponent(
-                new ComponentName(AACSConstants.AACS_PACKAGE_NAME, AACSConstants.AACS_CLASS_NAME));
+                new ComponentName(AACSConstants.getAACSPackageName(new WeakReference<Context>(context)), AACSConstants.AACS_CLASS_NAME));
         shareFileIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
         shareFileIntent.setType(context.getContentResolver().getType(fileUris.get(0)));
         shareFileIntent.putExtra(AACSConstants.CONFIG_MODULE, module);

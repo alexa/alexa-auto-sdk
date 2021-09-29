@@ -118,18 +118,21 @@ public:
         ROUTE_GUIDANCE_UNMUTED,
 
         /*
-         * Default alternate routes were successfully found and displayed. Send in response to showAlternativeRoutes() directive.
-         */
+        * @deprecated
+        * This enum is deprecated and will be removed in future. Use the showAlternativeRoutesSucceeded() API instead
+        */
         DEFAULT_ALTERNATE_ROUTES_SHOWN,
 
         /*
-         * Alternate routes with shorter times were successfully found and displayed. Send in response to showAlternativeRoutes() directive.
-         */
+        * @deprecated
+        * This enum is deprecated and will be removed in future. Use the showAlternativeRoutesSucceeded() API instead
+        */
         SHORTER_TIME_ROUTES_SHOWN,
 
         /*
-         * Alternate routes with shorter distances were successfully found and displayed. Send in response to showAlternativeRoutes() directive.
-         */
+        * @deprecated
+        * This enum is deprecated and will be removed in future. Use the showAlternativeRoutesSucceeded() API instead
+        */
         SHORTER_DISTANCE_ROUTES_SHOWN,
 
         /*

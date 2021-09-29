@@ -19,6 +19,7 @@ import androidx.navigation.NavController;
 
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
+import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthState;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
 import com.amazon.alexa.auto.setup.R;
@@ -100,7 +101,8 @@ public class AuthProviderAuthenticatedFragmentTest {
             TextView finishView = view.findViewById(R.id.sign_in_action_button);
             finishView.performClick();
 
-            verify(mMockNavController, times(1)).navigate(R.id.navigation_fragment_cblStart);
+            verify(mMockLoginViewModel, times(1)).userFinishedLogin();
+            verify(mMockLoginViewModel, times(1)).userSwitchedLogin(AuthMode.CBL_AUTHORIZATION);
         });
     }
 

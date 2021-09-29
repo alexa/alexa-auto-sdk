@@ -174,7 +174,7 @@ public class AudioFocusController implements AudioManager.OnAudioFocusChangeList
      */
     public void startPlaybackAfterAcquiringFocus() {
         Log.d(TAG,
-                "Start Playback (after acquring focus). Current audio focus state: " + focusStateToString(mCurrentState)
+                "Start Playback (after acquiring focus). Current audio focus state: " + focusStateToString(mCurrentState)
                         + " (" + mName + ")");
 
         switch (mCurrentState) {

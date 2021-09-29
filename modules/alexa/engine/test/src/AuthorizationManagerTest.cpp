@@ -126,7 +126,7 @@ TEST_F(AuthorizationManagerTest, test_verifyRegistrationAndStartAuthorizationCor
     auto validAdapter = std::make_shared<StrictMock<MockAuthorizationAdapterInterface>>();
     authorizationManager->registerAuthorizationAdapter("test", validAdapter);
 
-    // Calling startAuthorization with emtpy service name
+    // Calling startAuthorization with empty service name
     startAuthorizationResult = authorizationManager->startAuthorization("");
     ASSERT_EQ(startAuthorizationResult, AuthorizationManager::StartAuthorizationResult::FAILED)
         << "StartAuthorizationResult expected to be FAILED";

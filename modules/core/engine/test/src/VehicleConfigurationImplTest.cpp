@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,12 +17,16 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
+#include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Vehicle/VehicleConfiguration.h"
 
 namespace aace {
 namespace engine {
 namespace test {
 namespace vehicle {
+
+// json namespace alias
+namespace json = aace::engine::utils::json;
 
 /// Test harness for @c VehicleConfigurationImpl class
 class VehicleConfigurationImplTest : public ::testing::Test {
@@ -36,28 +40,30 @@ public:
  * Test createVehicleInfoConfig() expecting a valid VehicleConfigurationImplTest to be returned.
  */
 TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration;
+    std::ostringstream configStr;
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
-    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string& temp =
-        "{\n"
-        "    \"aace.vehicle\": {\n"
-        "        \"info\": {\n"
-        "            \"make\": \"Honda\",\n"
-        "            \"model\": \"Odyssey\",\n"
-        "            \"trim\": \"EX-L\",\n"
-        "            \"year\": \"2019\",\n"
-        "            \"geography\": \"US\",\n"
-        "            \"version\": \"1.0\",\n"
-        "            \"os\": \"darwin\",\n"
-        "            \"arch\": \"x86_64\",\n"
-        "            \"language\": \"en_US\",\n"
-        "            \"microphone\": \"SingleArray\",\n"
-        "            \"vehicleIdentifier\": \"123456789a\"\n"
-        "        }\n"
-        "    }\n"
-        "}";
 
-    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    // clang-format off
+    json::Value config = {
+        {"aace.vehicle",{
+            {"info",{
+                {"make","Honda"},
+                {"model","Odyssey"},
+                {"trim","EX-L"},
+                {"year","2019"},
+                {"geography","US"},
+                {"version","1.0"},
+                {"os","darwin"},
+                {"arch","x86_64"},
+                {"language","en_US"},
+                {"microphone","SingleArray"},
+                {"vehicleIdentifier","123456789a"}
+            }}
+        }}
+    };
+    // clang-format on
+
     testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
         {{VehiclePropertyType::MAKE, "Honda"},
          {VehiclePropertyType::MODEL, "Odyssey"},
@@ -71,61 +77,61 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
          {VehiclePropertyType::MICROPHONE, "SingleArray"},
          {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
 
-    //Convert to ostringstream for comparing the istream
-    std::ostringstream expectedString, actualString;
-    expectedString << expectedConfiguration->getStream()->rdbuf();
-    actualString << testConfiguration->getStream()->rdbuf();
-    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+    // Convert to JSON for object comparison
+    configStr << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(true, config == json::toJson(configStr.str())) << "Error in the Configuration String";
 }
 
 /**
  * Test createVehicleInfoConfig() expecting a valid VehicleConfigurationImplTest to be returned.
  */
 TEST_F(VehicleConfigurationImplTest, createOperatingCountryConfig) {
-    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string& temp =
-        "{\n"
-        "    \"aace.vehicle\": {\n"
-        "        \"operatingCountry\": \"US\"\n"
-        "    }\n"
-        "}";
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration;
+    std::ostringstream configStr;
 
-    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    // clang-format off
+    json::Value config = {
+        {"aace.vehicle",{
+            {"operatingCountry","US"}
+        }}
+    };
+    // clang-format on
+
     testConfiguration = aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig("US");
 
-    //Convert to ostringstream for comparing the istream
-    std::ostringstream expectedString, actualString;
-    expectedString << expectedConfiguration->getStream()->rdbuf();
-    actualString << testConfiguration->getStream()->rdbuf();
-    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+    // Convert to JSON for object comparison
+    configStr << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(true, config == json::toJson(configStr.str())) << "Error in the Configuration String";
 }
 
 /**
  * Test create() expecting a valid VehicleConfigurationImplTest to be returned.
  */
 TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString) {
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration;
+    std::ostringstream configStr;
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
-    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string& temp =
-        "{\n"
-        "    \"aace.vehicle\": {\n"
-        "        \"info\": {\n"
-        "            \"make\": \"Honda\",\n"
-        "            \"model\": \"Odyssey\",\n"
-        "            \"trim\": \"EX-L\",\n"
-        "            \"year\": \"2019\",\n"
-        "            \"geography\": \"US\",\n"
-        "            \"version\": \"1.0\",\n"
-        "            \"os\": \"\",\n"
-        "            \"arch\": \"x86_64\",\n"
-        "            \"language\": \"en_US\",\n"
-        "            \"microphone\": \"SingleArray\",\n"
-        "            \"vehicleIdentifier\": \"123456789a\"\n"
-        "        }\n"
-        "    }\n"
-        "}";
 
-    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    // clang-format off
+    json::Value config = {
+        {"aace.vehicle",{
+            {"info",{
+                {"make","Honda"},
+                {"model","Odyssey"},
+                {"trim","EX-L"},
+                {"year","2019"},
+                {"geography","US"},
+                {"version","1.0"},
+                {"os",""},
+                {"arch","x86_64"},
+                {"language","en_US"},
+                {"microphone","SingleArray"},
+                {"vehicleIdentifier","123456789a"}
+            }}
+        }}
+    };
+    // clang-format on
+
     testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
         {{VehiclePropertyType::MAKE, "Honda"},
          {VehiclePropertyType::MODEL, "Odyssey"},
@@ -139,39 +145,39 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
          {VehiclePropertyType::MICROPHONE, "SingleArray"},
          {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
 
-    //Convert to ostringstream for comparing the istream
-    std::ostringstream expectedString, actualString;
-    expectedString << expectedConfiguration->getStream()->rdbuf();
-    actualString << testConfiguration->getStream()->rdbuf();
-    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+    // Convert to JSON for object comparison
+    configStr << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(true, config == json::toJson(configStr.str())) << "Error in the Configuration String";
 }
 
 /**
  * Test create() expecting a valid VehicleConfigurationImplTest to be returned.
  */
 TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinValueString) {
+    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration;
+    std::ostringstream configStr;
     using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
-    std::shared_ptr<aace::core::config::EngineConfiguration> testConfiguration, expectedConfiguration;
-    const std::string& temp =
-        "{\n"
-        "    \"aace.vehicle\": {\n"
-        "        \"info\": {\n"
-        "            \"make\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"model\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"trim\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"year\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"geography\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"version\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"os\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"arch\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"language\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"microphone\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\",\n"
-        "            \"vehicleIdentifier\": \"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?\"\n"
-        "        }\n"
-        "    }\n"
-        "}";
 
-    expectedConfiguration = aace::core::config::StreamConfiguration::create(std::make_shared<std::stringstream>(temp));
+    // clang-format off
+    json::Value config = {
+        {"aace.vehicle",{
+            {"info",{
+                {"make","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"model","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"trim","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"year","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"geography","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"version","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"os","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"arch","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"language","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"microphone","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"vehicleIdentifier","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}
+            }}
+        }}
+    };
+    // clang-format on
+
     testConfiguration = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(
         {{VehiclePropertyType::MAKE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::MODEL, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
@@ -185,11 +191,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinV
          {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::VEHICLE_IDENTIFIER, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}});
 
-    //Convert to ostringstream for comparing the istream
-    std::ostringstream expectedString, actualString;
-    expectedString << expectedConfiguration->getStream()->rdbuf();
-    actualString << testConfiguration->getStream()->rdbuf();
-    EXPECT_EQ(0, expectedString.str().compare(actualString.str())) << "Error in the Configuration String";
+    // Convert to JSON for object comparison
+    configStr << testConfiguration->getStream()->rdbuf();
+    EXPECT_EQ(true, config == json::toJson(configStr.str())) << "Error in the Configuration String";
 }
 
 }  // namespace vehicle

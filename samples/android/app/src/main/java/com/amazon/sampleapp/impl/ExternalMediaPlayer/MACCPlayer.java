@@ -223,9 +223,10 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     @Override
     public boolean getState(String localPlayerId, ExternalMediaAdapter.ExternalMediaAdapterState stateToReturn) {
+        mLogger.postVerbose(TAG, "getState called");
         ExternalMediaPlayerState state = mClient.getState(localPlayerId);
         if (state == null) {
-            mLogger.postVerbose(TAG, "Something went wrong");
+            mLogger.postError(TAG, "Something went wrong");
             return false;
         }
         MediaAppMetaData metaData = state.getMediaAppPlaybackState().getMediaAppMetaData();
@@ -278,13 +279,15 @@ public class MACCPlayer extends ExternalMediaAdapter {
 
     private MediaType getMediaType(String mediaType) {
         if (mediaType == null) {
-            return null;
+            return MediaType.TRACK;
         }
         switch (mediaType) {
+            case "AD":
+                return MediaType.AD;
             case "TRACK":
+            default:
                 return MediaType.TRACK;
         }
-        return mediaType.equals("TRACK") ? MediaType.TRACK : MediaType.AD;
     }
 
     private Favorites getFavorites(PlayBackStateFields.favorite favourite) {

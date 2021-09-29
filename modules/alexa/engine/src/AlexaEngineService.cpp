@@ -108,6 +108,15 @@ static const std::string SERVICE_NAME_AUTH_PROVIDER = "alexa:auth-provider";
 /// Program Name for Metrics
 static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaEngineService";
 
+/// Default timeout for clearing the RenderTemplate display card when SpeechSynthesizer is in FINISHED state.
+static const std::chrono::milliseconds DEFAULT_TTS_FINISHED_TIMEOUT_MS{8000};
+
+/// Default timeout for clearing the RenderPlayerInfo display card when AudioPlayer is in FINISHED state.
+static const std::chrono::milliseconds DEFAULT_AUDIO_FINISHED_TIMEOUT_MS{2000};
+
+/// Default timeout for clearing the RenderPlayerInfo display card when AudioPlayer is in STOPPED/PAUSED state.
+static const std::chrono::milliseconds DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS{1800000};
+
 // register the service
 REGISTER_SERVICE(AlexaEngineService)
 
@@ -216,7 +225,7 @@ bool AlexaEngineService::registerProperties() {
 
 bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> configuration) {
     try {
-        // configure static interupt model with audio ducking off
+        // configure static interrupt model with audio ducking off
         std::shared_ptr<std::istream> duckingConfigStream = aace::engine::alexa::AudioDuckingConfig::getConfig(false);
 
         // Initialize the Alexa Client SDK
@@ -305,7 +314,7 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
             std::move(avsGatewayManagerStorage), m_customerDataManager, config);
         ThrowIfNull(m_avsGatewayManager, "createAVSGatewayManagerFailed");
 
-        // Create Synchronize State Sender Factory instance to utilize Synchroinze State from AVS
+        // Create Synchronize State Sender Factory instance to utilize Synchronize State from AVS
         auto synchronizeStateSenderFactory =
             alexaClientSDK::synchronizeStateSender::SynchronizeStateSenderFactory::create(
                 m_contextManager, m_metricRecorder);
@@ -343,7 +352,7 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         // Create the audio factory
         m_audioFactory = std::make_shared<alexaClientSDK::applicationUtilities::resources::audio::AudioFactory>();
 
-        // Create the system sound palyer
+        // Create the system sound player
         auto audioManager = getContext()->getServiceInterface<aace::engine::audio::AudioManagerInterface>("aace.audio");
         ThrowIfNull(audioManager, "invalidAudioManager");
         m_systemSoundPlayer = SystemSoundPlayer::create(audioManager, m_audioFactory->systemSounds());
@@ -375,7 +384,6 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
 
         rapidjson::Document deviceSDKConfig(rapidjson::kObjectType);
         auto deviceSDKConfigRoot = deviceSDKConfig.GetObject();
-
         // copy the device sdk config from "aace.alexa" first
         if (alexaConfigRoot.HasMember("avsDeviceSDK") && alexaConfigRoot["avsDeviceSDK"].IsObject()) {
             ThrowIfNot(
@@ -515,6 +523,52 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
             if (deviceSDKConfigRoot["deviceSettings"].HasMember("defaultTimezone")) {
                 m_timezone = deviceSDKConfigRoot["deviceSettings"]["defaultTimezone"].GetString();
             }
+        }
+
+        if (deviceSDKConfigRoot.HasMember("templateRuntimeCapabilityAgent")) {
+            auto& allocator = deviceSDKConfig.GetAllocator();
+
+            // Add defaults for any fields not provided in configuration
+            auto templateRuntimeCapabilityAgentNode = deviceSDKConfigRoot["templateRuntimeCapabilityAgent"].GetObject();
+            if (!templateRuntimeCapabilityAgentNode.HasMember("displayCardTTSFinishedTimeout")) {
+                templateRuntimeCapabilityAgentNode.AddMember(
+                    "displayCardTTSFinishedTimeout",
+                    rapidjson::Value().SetUint64(DEFAULT_TTS_FINISHED_TIMEOUT_MS.count()),
+                    allocator);
+            }
+            if (!templateRuntimeCapabilityAgentNode.HasMember("displayCardAudioPlaybackFinishedTimeout")) {
+                templateRuntimeCapabilityAgentNode.AddMember(
+                    "displayCardAudioPlaybackFinishedTimeout",
+                    rapidjson::Value().SetUint64(DEFAULT_AUDIO_FINISHED_TIMEOUT_MS.count()),
+                    allocator);
+            }
+            if (!templateRuntimeCapabilityAgentNode.HasMember("displayCardAudioPlaybackStoppedPausedTimeout")) {
+                templateRuntimeCapabilityAgentNode.AddMember(
+                    "displayCardAudioPlaybackStoppedPausedTimeout",
+                    rapidjson::Value().SetUint64(DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS.count()),
+                    allocator);
+            }
+        } else {
+            auto& allocator = deviceSDKConfig.GetAllocator();
+            rapidjson::Document templateRuntimeCapabilityAgentConfig(rapidjson::kObjectType);
+            auto templateRuntimeCapabilityAgentConfigRoot = templateRuntimeCapabilityAgentConfig.GetObject();
+
+            // Config not provided, adding the automotive default values
+            templateRuntimeCapabilityAgentConfigRoot.AddMember(
+                "displayCardTTSFinishedTimeout",
+                rapidjson::Value().SetUint64(DEFAULT_TTS_FINISHED_TIMEOUT_MS.count()),
+                allocator);
+            templateRuntimeCapabilityAgentConfigRoot.AddMember(
+                "displayCardAudioPlaybackFinishedTimeout",
+                rapidjson::Value().SetUint64(DEFAULT_AUDIO_FINISHED_TIMEOUT_MS.count()),
+                allocator);
+            templateRuntimeCapabilityAgentConfigRoot.AddMember(
+                "displayCardAudioPlaybackStoppedPausedTimeout",
+                rapidjson::Value().SetUint64(DEFAULT_AUDIO_STOPPED_PAUSED_TIMEOUT_MS.count()),
+                allocator);
+
+            deviceSDKConfigRoot.AddMember(
+                "templateRuntimeCapabilityAgent", std::move(templateRuntimeCapabilityAgentConfigRoot), allocator);
         }
 
         if (alexaConfigRoot.HasMember("authProvider") && alexaConfigRoot["authProvider"].IsObject()) {
@@ -946,7 +1000,17 @@ bool AlexaEngineService::start() {
             }
             m_endpointManager->waitForPendingRegistrationsToEnqueue();
         }
+        m_previouslyStarted = true;
 
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AlexaEngineService::engineStarted() {
+    try {
         // Start the authorization if auth provider platform interface is registered.
         if (m_authProviderEngineImpl != nullptr) {
             m_authProviderEngineImpl->startAuthorization();
@@ -958,7 +1022,6 @@ bool AlexaEngineService::start() {
             ThrowIfNot(m_speechRecognizerEngineImpl->enableWakewordDetection(), "enabledWakewordDetectionFailed");
         }
 
-        m_previouslyStarted = true;
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "start").d("reason", ex.what()));
@@ -1260,7 +1323,7 @@ bool AlexaEngineService::shutdown() {
         m_visualFocusManager.reset();
         m_metricRecorder.reset();
 
-        // shutdown the executer
+        // shutdown the executor
         m_executor.shutdown();
 
         // uninitialize the alexa client

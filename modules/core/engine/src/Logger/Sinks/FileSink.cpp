@@ -72,7 +72,7 @@ std::shared_ptr<FileSink> FileSink::create(
             std::make_shared<std::ofstream>(sink->m_filename, append ? std::ios::out : std::ios::out | std::ios::trunc);
         ThrowIfNot(sink->m_stream->is_open(), "openStreamFailed");
 
-        // enbale the sink
+        // enable the sink
         sink->m_enabled = true;
 
         return sink;

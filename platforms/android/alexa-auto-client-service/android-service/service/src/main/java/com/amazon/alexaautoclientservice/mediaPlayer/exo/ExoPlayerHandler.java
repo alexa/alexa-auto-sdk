@@ -122,8 +122,15 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
     }
 
     private void initializePlayer() {
+
+        com.google.android.exoplayer2.audio.AudioAttributes audioAttributes = 
+            new com.google.android.exoplayer2.audio.AudioAttributes.Builder()
+                .setContentType(mAudioFocusAttributes.mContentType)
+                .setUsage(mAudioFocusAttributes.mUsage).build();
+
         mPlayer = new SimpleExoPlayer.Builder(mContext).build();
         mPlayer.addListener(new PlayerEventListener());
+        mPlayer.setAudioAttributes(audioAttributes, false);
         mPlayer.setPlayWhenReady(false);
     }
 

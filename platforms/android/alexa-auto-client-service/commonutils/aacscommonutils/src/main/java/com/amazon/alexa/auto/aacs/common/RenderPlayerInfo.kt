@@ -1,5 +1,6 @@
 package com.amazon.alexa.auto.aacs.common
 
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.util.*
 
@@ -47,8 +48,12 @@ data class PlaybackControl (
 @JsonClass(generateAdapter = true)
 data class RenderPlayerInfoPayload (
     val content : RenderPlayerContent,
-    val controls : List<PlaybackControl>
-)
+    @Json(name = "controls")
+    val _controls : List<PlaybackControl>?
+) {
+    // Expose non nullable playback controls
+    val controls : List<PlaybackControl> = _controls.orEmpty()
+}
 
 @JsonClass(generateAdapter = true)
 data class RenderPlayerInfo (

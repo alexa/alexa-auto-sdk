@@ -22,6 +22,7 @@
 #include <AIP/AudioInputProcessor.h>
 #include <AIP/AudioProvider.h>
 #include <AIP/Initiator.h>
+#include <AVSCommon/AVS/CapabilityChangeNotifierInterface.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/SDKInterfaces/AudioInputProcessorObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
@@ -83,6 +84,7 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifierInterface> capabilityChangeNotifier,
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
         std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
         const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifier);
@@ -107,15 +109,18 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifierInterface> capabilityChangeNotifier,
         std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder = nullptr,
         std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter = nullptr,
         const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers =
             std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>());
 
-    // SpeechRecognizerEngineInterface
+    /// @name @c aace::alexa::SpeechRecognizerEngineInterface functions
+    /// @{
     bool onStartCapture(Initiator initiator, uint64_t keywordBegin, uint64_t keywordEnd, const std::string& keyword)
         override;
     bool onStopCapture() override;
+    /// @}
 
     // keyword detection
     bool isWakewordEnabled();
@@ -123,11 +128,14 @@ public:
     bool enableWakewordDetection();
     bool disableWakewordDetection();
 
-    // AudioInputProcessorObserverInterface
+    /// @name @c alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface functions
+    /// @{
     void onStateChanged(
         alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State state) override;
+    /// @}
 
-    // KeyWordObserverInterface
+    /// @name @c alexaClientSDK::avsCommon::sdkInterfaces::KeyWordObserverInterface functions
+    /// @{
     void onKeyWordDetected(
         std::shared_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream> stream,
         std::string keyword,
@@ -135,12 +143,14 @@ public:
             KeyWordObserverInterface::UNSPECIFIED_INDEX,
         alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex = KeyWordObserverInterface::UNSPECIFIED_INDEX,
         std::shared_ptr<const std::vector<char>> KWDMetadata = nullptr) override;
+    /// @}
 
     // Observers states for notifying the wakeword
     void addObserver(std::shared_ptr<WakewordObserverInterface> observer);
     void removeObserver(std::shared_ptr<WakewordObserverInterface> observer);
 
-    // ConnectionStatusObserverInterface
+    /// @name @c alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface functions
+    /// @{
     void onConnectionStatusChanged(
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason)
@@ -150,6 +160,7 @@ public:
         const std::vector<
             alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
             engineStatuses) override;
+    /// @}
 
 protected:
     virtual void doShutdown() override;
@@ -166,12 +177,40 @@ private:
 
     bool initializeAudioInputStream();
 
-    //void setExpectingAudioState( bool state );
-    bool waitForExpectingAudioState(bool state, const std::chrono::seconds duration = std::chrono::seconds(3));
+    /**
+     * Blocks up to the specified @a duration until the @ SpeechRecognizerEngineImpl expecting audio state
+     * transitions to the caller's expected state.
+     * Do not call this function on a thread holding @c m_expectingAudioMutex.
+     *
+     * @param expectingAudio Whether to expect audio. 
+     *        @c true to wait for @ SpeechRecognizerEngineImpl to be expecting audio from the open audio input channel,
+     *        else @c false to wait for @ SpeechRecognizerEngineImpl to stop expecting audio.
+     * @param duration The duration to wait in seconds.
+     * @return @c true if @a expectingAudio state was reached within @a duration, else @c false
+     */
+    bool waitForExpectingAudioState(bool expectingAudio, const std::chrono::seconds duration = std::chrono::seconds(3));
+
+    /**
+     * Returns whether the SpeechRecognizerEngineImpl is currently expecting audio to be delivered from an input
+     * channel via a call to @c write. Do not call this function on a thread holding @c m_expectingAudioMutex.
+     */
+    bool isExpectingAudio();
+    /**
+     * Returns whether the SpeechRecognizerEngineImpl is currently expecting audio to be delivered from an input
+     * channel via a call to @c write. Only call this function on a thread holding @c m_expectingAudioMutex.
+     */
+    bool isExpectingAudioLocked();
+
+    /**
+     * Gets the current audio input channel ID.
+     * Do not call this function on a thread holding @c m_expectingAudioMutex.
+     * 
+     * @return @c m_currentChannelId
+     */
+    aace::engine::audio::AudioInputChannelInterface::ChannelId getCurrentChannelId();
 
     bool startAudioInput();
     bool stopAudioInput();
-    bool isExpectingAudio();
     ssize_t write(const int16_t* data, const size_t size);
 
 private:
@@ -183,13 +222,21 @@ private:
     std::unique_ptr<alexaClientSDK::avsCommon::avs::AudioInputStream::Writer> m_audioInputWriter;
 
     std::shared_ptr<aace::engine::audio::AudioInputChannelInterface> m_audioInputChannel;
+    /**
+     * The current audio input channel ID. Access is serialized by @c m_expectingAudioMutex.
+     */
     aace::engine::audio::AudioInputChannelInterface::ChannelId m_currentChannelId =
         aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL;
+    /**
+     * Mutex to serialize access to the expecting audio condition, i.e. @c m_currentChannelId and any functions changing
+     * the condition.
+     */
+    std::mutex m_expectingAudioMutex;
+    std::condition_variable m_expectingAudioState_cv;
 
     unsigned int m_wordSize;
 
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> m_wakewordEngineAdapter;
-    //bool m_expectingAudio = false;
     bool m_wakewordEnabled = false;
     bool m_initialWakewordEnabledState = true;
 
@@ -199,17 +246,18 @@ private:
     // the aip state
     AudioInputProcessorObserverInterface::State m_state;
 
-    // mutex for blocking
-    std::mutex m_expectingAudioMutex;
-    std::condition_variable m_expectingAudioState_cv;
-
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> m_directiveSequencer;
 
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> m_dialogUXStateAggregator;
 
-    // store observers for notifying wakewordDetection
+    /**
+     * Observers to notify of wake word detection.
+     */
     std::unordered_set<std::shared_ptr<WakewordObserverInterface>> m_observers;
-    std::mutex m_mutex;
+    /**
+     * Mutex to serialize access to @c m_observers.
+     */
+    std::mutex m_observerMutex;
 
     aace::alexa::AlexaClient::ConnectionStatus m_connectionStatus;
 };

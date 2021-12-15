@@ -32,8 +32,28 @@ public:
 
     static constexpr ChannelId INVALID_CHANNEL = std::numeric_limits<int32_t>::min();
 
+    /**
+     * Request to start audio input and register a callback to receive the audio data. 
+     *
+     * @note The callback will not be called while @c start is in progress.
+     *
+     * @param callback The function to call when audio data is available.
+     * @return The ID of the audio channel that was opened as a result of @c start().
+     */
     virtual ChannelId start(AudioWriteCallback callback) = 0;
-    virtual bool stop(ChannelId id) = 0;
+
+    /**
+     * Request to stop receiving audio data for the audio channel with the specified ID.
+     *
+     * @note The registered callback associated with @c id will not be called again after @c stop returns.
+     *
+     * @param id The ID of the audio channel requesting to stop receiving audio.
+     */
+    virtual void stop(ChannelId id) = 0;
+
+    /**
+     * Shut down the @c AudioInputChannelInterface.
+     */
     virtual void doShutdown() = 0;
 };
 

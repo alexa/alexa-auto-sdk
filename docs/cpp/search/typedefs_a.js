@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['templateruntimetimeout',['TemplateRuntimeTimeout',['../classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a27fcf72e4bbe6b90e7d86f14c09c577c',1,'aace::alexa::config::AlexaConfiguration']]]
+  ['statuscode',['StatusCode',['../classaace_1_1connectivity_1_1_alexa_connectivity.html#ae0c713d0bd876d87af35632d8b199927',1,'aace::connectivity::AlexaConnectivity']]]
 ];

@@ -1,0 +1,54 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+actor User Order 10
+participant Application  order 30
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+opt "with Dial"
+User -> Alexa : "Call Bob"
+Alexa -> AutoSDK : Dial directive 
+AutoSDK -> Application : Receive Dial message with Bob's details
+Application -> AutoSDK : Publish CallStateChanged message with **DIALING** state
+AutoSDK -> Alexa : DialStarted event
+end
+
+opt "with Redial"
+User -> Alexa : "Redial"
+Alexa -> AutoSDK : Redial directive 
+AutoSDK -> Application : Receive Redial message
+Application -> AutoSDK : Publish CallStateChanged message with **DIALING** state
+AutoSDK -> Alexa : RedialStarted event 
+end 
+
+... Platform detects an phone ringing ...
+Application -> AutoSDK : Publish CallStateChanged message with **OUTBOUND_RINGING** state
+AutoSDK -> Alexa : OutBoundRingingStarted event
+
+... Platform detects an active phone call ...
+Application -> AutoSDK : Publish CallStateChanged message with **ACTIVE** state
+AutoSDK -> Alexa : CallActivated directive
+
+User -> Alexa : "End Call" 
+Alexa -> AutoSDK : Stop directive 
+AutoSDK -> Application : Receive Stop message
+Application -> AutoSDK : Publish CallStateChanged message with **IDLE** state
+AutoSDK -> Alexa : CallTerminated event
+
+@enduml

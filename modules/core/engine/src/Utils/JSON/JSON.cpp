@@ -310,7 +310,6 @@ bool merge(
     rapidjson::Document::AllocatorType& allocator,
     const std::string& path) {
     try {
-        AACE_WARN(LX(TAG).d("reason", "deprecated"));
         for (auto next = from.begin(); next != from.end(); next++) {
             auto intoNode = into.FindMember(next->name);
 
@@ -348,7 +347,6 @@ bool merge(
 
 std::shared_ptr<rapidjson::Document> parse(std::shared_ptr<std::istream> stream, rapidjson::Type type) {
     try {
-        AACE_WARN(LX(TAG).d("reason", "deprecated"));
         rapidjson::IStreamWrapper isw(*stream);
 
         auto document = std::make_shared<rapidjson::Document>();
@@ -367,7 +365,6 @@ std::shared_ptr<rapidjson::Document> parse(std::shared_ptr<std::istream> stream,
 
 std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::Type type) {
     try {
-        AACE_WARN(LX(TAG).d("reason", "deprecated"));
         auto document = std::make_shared<rapidjson::Document>();
 
         document->Parse(value.c_str());
@@ -384,7 +381,6 @@ std::shared_ptr<rapidjson::Document> parse(const std::string& value, rapidjson::
 
 std::string toString(const rapidjson::Document& document, bool prettyPrint) {
     rapidjson::StringBuffer buffer;
-    AACE_WARN(LX(TAG).d("reason", "deprecated"));
     if (prettyPrint) {
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
         document.Accept(writer);
@@ -397,7 +393,6 @@ std::string toString(const rapidjson::Document& document, bool prettyPrint) {
 }
 
 std::shared_ptr<std::stringstream> toStream(const rapidjson::Document& document, bool prettyPrint) {
-    AACE_WARN(LX(TAG).d("reason", "deprecated"));
     return std::make_shared<std::stringstream>(toString(document, prettyPrint));
 }
 

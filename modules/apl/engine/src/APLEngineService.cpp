@@ -82,6 +82,9 @@ bool APLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::apl::
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
+        auto audioFocusManager = alexaComponents->getAudioFocusManager();
+        ThrowIfNull(audioFocusManager, "audioFocusManagerInvalid");
+
         auto visualFocusManager = alexaComponents->getVisualFocusManager();
         ThrowIfNull(visualFocusManager, "visualFocusManagerInvalid");
 
@@ -91,6 +94,7 @@ bool APLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::apl::
         m_aplEngineImpl = aace::engine::apl::APLEngineImpl::create(
             apl,
             defaultCapabilitiesRegistrar,
+            audioFocusManager,
             visualFocusManager,
             exceptionSender,
             messageSender,

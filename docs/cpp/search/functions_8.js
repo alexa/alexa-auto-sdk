@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['listenusingiap2',['listenUsingiAP2',['../classaace_1_1bluetooth_1_1_bluetooth_provider.html#a29e75260cc9989492497e7b276d65145',1,'aace::bluetooth::BluetoothProvider']]],
+  ['listenusingrfcomm',['listenUsingRfcomm',['../classaace_1_1bluetooth_1_1_bluetooth_provider.html#a8efc72e2e9aee87e114186ff93233f9c',1,'aace::bluetooth::BluetoothProvider']]],
   ['localadjustbandlevels',['localAdjustBandLevels',['../classaace_1_1alexa_1_1_equalizer_controller.html#a3b65b2452d162ab9e074a6d4cc2a0168',1,'aace::alexa::EqualizerController']]],
   ['localadjustvolume',['localAdjustVolume',['../classaace_1_1alexa_1_1_alexa_speaker.html#ae09e49988bc163c950883e2d3afc5173',1,'aace::alexa::AlexaSpeaker']]],
   ['localmediasourcestate',['LocalMediaSourceState',['../classaace_1_1alexa_1_1_local_media_source_1_1_local_media_source_state.html#a723b558daff74779e029b96f48ec0f22',1,'aace::alexa::LocalMediaSource::LocalMediaSourceState']]],
@@ -12,5 +14,8 @@ var searchData=
   ['locationserviceaccesschanged',['locationServiceAccessChanged',['../classaace_1_1location_1_1_location_provider.html#ada8a11d25bde2e2d760cbb38c445f9cf',1,'aace::location::LocationProvider']]],
   ['log',['log',['../classaace_1_1logger_1_1_logger.html#a3cb300839a1de085377517669522ad78',1,'aace::logger::Logger']]],
   ['logevent',['logEvent',['../classaace_1_1logger_1_1_logger.html#a5114127c48c451e846ca3d1b120a3f44',1,'aace::logger::Logger']]],
-  ['logout',['logout',['../classaace_1_1authorization_1_1_authorization.html#a66f95375e98f4b8012f5f2531100550c',1,'aace::authorization::Authorization']]]
+  ['login',['login',['../classaace_1_1alexa_1_1_external_media_adapter.html#a96bb8efcb2543da52c01bcb50e1ecc7a',1,'aace::alexa::ExternalMediaAdapter']]],
+  ['logincomplete',['loginComplete',['../classaace_1_1alexa_1_1_external_media_adapter.html#a88309779a5b42dc313942aab6e1feb38',1,'aace::alexa::ExternalMediaAdapter']]],
+  ['logout',['logout',['../classaace_1_1alexa_1_1_external_media_adapter.html#a3663ab45e41484de6c96140e5c161a8f',1,'aace::alexa::ExternalMediaAdapter::logout()'],['../classaace_1_1authorization_1_1_authorization.html#a66f95375e98f4b8012f5f2531100550c',1,'aace::authorization::Authorization::logout()']]],
+  ['logoutcomplete',['logoutComplete',['../classaace_1_1alexa_1_1_external_media_adapter.html#ab86f7e5ee076c56fe7d9bf249dc65d2d',1,'aace::alexa::ExternalMediaAdapter']]]
 ];

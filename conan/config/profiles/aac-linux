@@ -1,0 +1,6 @@
+include(default)
+
+[settings]
+os=Linux
+os_build=Linux
+compiler.libcxx=libstdc++11

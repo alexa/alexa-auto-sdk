@@ -1,1 +1,0 @@
-static const char* AASB_NAVIGATION_MODULE = "aasb.navigation";

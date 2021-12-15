@@ -36,8 +36,8 @@ public:
     PrepareSpeechResult(
         const std::string& speechId,
         std::shared_ptr<aace::audio::AudioStream> preparedAudio,
-        const std::string& speechMetadata,
-        const std::string& m_failureReason);
+        const std::string& speechMetadata = "",
+        const std::string& m_failureReason = "");
     PrepareSpeechResult& operator=(const PrepareSpeechResult& other) = default;
 
     /**

@@ -1,0 +1,322 @@
+topic: AudioOutput
+namespace: aasb.message.audio.audioOutput
+path: Audio/AudioOutput
+
+messages:
+  - action: GetNumBytesBuffered
+    direction: outgoing
+    desc: Returns the amount of audio data buffered.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+    reply:
+      - name: bufferedBytes
+        type: int
+        desc: The number of bytes of the audio data buffered, or 0 if it's unknown.
+
+  - action: Resume
+    direction: outgoing
+    desc: Notifies the platform implementation to resume an audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+
+  - action: Play
+    direction: outgoing
+    desc: Notifies the platform implementation to play an audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source being played.
+
+  - action: SetPosition
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation to set the playback position of the current 
+      audio source in the platform media player.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+      - name: position
+        type: int
+        desc: The playback position in milliseconds to set in the platform media player.
+
+  - action: Prepare
+    direction: outgoing
+    desc: Notifies the platform implementation to prepare an audio URL for playback.
+    name: PrepareURL
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: audioType
+        type: AudioOutputAudioType
+        desc: The type of audio data to be played.
+      - name: token
+        desc: A unique token for this audio source.
+      - name: source
+        desc: Stream source description. # TODO: update!
+        value: URL
+      - name: url
+        desc: The URL audio stream being provided.
+      - name: repeating
+        type: bool
+        desc: True if the platform should loop the audio when playing.
+
+  - action: GetPosition
+    direction: outgoing
+    desc: >
+      Returns the current playback position of the platform media player. If the audio 
+      source is not playing, the most recent position played should be returned.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+    reply:
+      - name: position
+        type: int
+        desc: The platform media player's playback position in milliseconds.
+
+  - action: Pause
+    direction: outgoing
+    desc: Notifies the platform implementation to pause an audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source being paused.
+
+  - action: MediaError
+    direction: incoming
+    desc: Notifies the Engine of an error during audio playback.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+      - name: error
+        type: MediaError
+        desc: The error encountered by the platform media player during playback.
+      - name: description
+        desc: A description of the error.
+        default: ""
+
+  - action: GetDuration
+    direction: outgoing
+    desc: Request the duration of the current audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+    reply:
+      - name: duration
+        type: int
+        desc: >
+          The duration of the current audio source. If the duration is unknown, 
+          then -1 should be returned.
+
+  - action: Stop
+    direction: outgoing
+    desc: Notifies the platform implementation to stop an audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+
+  - action: Prepare
+    direction: outgoing
+    desc: Notifies the platform implementation to prepare an audio stream for playback.
+    name: PrepareStream
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: audioType
+        type: AudioOutputAudioType
+        desc: The type of audio data to be played.
+      - name: token
+        desc: A unique token for this audio stream.
+      - name: source
+        desc: Stream source description. # TODO: update!
+        value: STREAM
+      - name: streamId
+        desc: The URL audio stream being provided.
+      - name: repeating
+        type: bool
+        desc: True if the platform should loop the audio when playing.
+      - name: encoding
+        type: AudioStreamEncoding
+        desc: The stream encoding format if known.
+      - name: properties
+        type: dict
+        desc: List of properties associated with the audio stream.
+
+  - action: MutedStateChanged
+    direction: outgoing
+    desc: Notifies the platform implementation that the muted state has changed for an audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: state
+        type: MutedState
+        desc: The muted state to apply to the audio source.
+
+  - action: VolumeChanged
+    direction: outgoing
+    desc: Notifies the platform implementation that the volume has changed for an audio source.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: volume
+        type: float
+        desc: The playback position in milliseconds to set in the platform media player.
+
+  - action: MayDuck
+    direction: outgoing
+    desc: Notifies the platform implementation only if prepared media may duck the volume.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+
+  - action: StartDucking
+    direction: outgoing
+    desc: Notifies the platform implementation to move the playback in background. If platform implementation supports audio ducking, reduce the media player volume according to platform guidelines.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+
+  - action: StopDucking
+    direction: outgoing
+    desc: Notifies the platform implementation to move the playback in foreground. If platform implementation supports audio ducking, restore the media player volume to original value.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+
+  - action: MediaStateChanged
+    direction: incoming
+    desc: >
+      Notifies the Engine of an audio playback state change in the platform implementation. Must be 
+      called when the platform media player transitions between stopped and playing states.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+      - name: state
+        type: MediaState
+        desc: The new playback state of the platform media player.
+
+  - action: AudioFocusEvent
+    direction: incoming
+    desc: >
+      Report the engine about the Audio Focus action. Request engine to perform the action mentioned in the parameter.
+    payload:
+      - name: channel
+        desc: Name of the channel that is providing audio.
+      - name: token
+        desc: The unique token of the audio source.
+      - name: focusAction
+        type: FocusAction
+        desc: Report the engine what focus action client has taken due to the external audio focus event.
+
+types:
+  - name: AudioStreamProperty
+    type: struct
+    values:
+      - name: name
+        desc: Stream property name.
+      - name: value
+        desc: Stream property value.
+      
+  - name: MediaState
+    type: enum
+    values:
+      - name: STOPPED
+        desc: The audio source is not currently playing. It may have paused, stopped, or finished.
+      - name: PLAYING
+        desc: The audio source is currently playing.
+      - name: BUFFERING
+        desc: The audio source is currently buffering data.
+
+  - name: MediaError
+    type: enum
+    values:
+      - name: MEDIA_ERROR_UNKNOWN
+        desc: An unknown error occurred.
+      - name: MEDIA_ERROR_INVALID_REQUEST
+        desc: The server recognized the request as malformed (e.g. bad request, unauthorized, forbidden, not found, etc).
+      - name: MEDIA_ERROR_SERVICE_UNAVAILABLE
+        desc: The client was unable to reach the service.
+      - name: MEDIA_ERROR_INTERNAL_SERVER_ERROR
+        desc: The server accepted the request but was unable to process it as expected.
+      - name: MEDIA_ERROR_INTERNAL_DEVICE_ERROR
+        desc: There was an internal error on the client.
+
+  - name: AudioOutputAudioType
+    type: enum
+    values:
+      - name: TTS
+        desc: Text-to-Speech audio type.
+      - name: MUSIC
+        desc: Music audio type.
+      - name: NOTIFICATION
+        desc: Notification audio type.
+      - name: ALARM
+        desc: Alarm audio type.
+      - name: EARCON
+        desc: Earcon audio type.
+      - name: COMMUNICATION
+        desc: Communication audio type.
+      - name: RINGTONE
+        desc: Ringtone audio type.
+
+  - name: AudioStreamEncoding
+    type: enum
+    values:
+      - name: UNKNOWN
+        desc: Unknown encoding type.
+      - name: LPCM
+        desc: LPCM encoding type.
+      - name: MP3
+        desc: MP3 encoding type.
+      - name: OPUS
+        desc: Opus encoding type.
+
+  - name: MutedState
+    type: enum
+    values:
+      - name: MUTED
+        desc: Muted audio state.
+      - name: UNMUTED
+        desc: Unmuted audio state.
+
+  - name: AudioOutputSourceType
+    type: enum
+    values:
+      - name: URI
+        desc: URI source type.
+      - name: STREAM
+        desc: Stream audio type.
+
+  - name: FocusAction
+    type: enum
+    values:
+      - name: REPORT_DUCKING_STARTED
+        desc: This action informs Alexa engine that ducking is initiated by platform interface. Highly recommended to provide information so that engine would not override the action.
+      - name: REPORT_DUCKING_STOPPED
+        desc: This action informs Alexa engine that ducking is stopped by platform interface. Highly recommended to provide information so that engine can duck if required.  
+

@@ -1,0 +1,4452 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+    
+    
+      
+        <title>C++ Sample App - Alexa Auto SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a617204b.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.9204c3b2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#alexa-auto-sdk-c-sample-app" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Alexa Auto SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              C++ Sample App
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../GETSTARTED/" class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../BUILDING/" class="md-tabs__link">
+        Build Auto SDK
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../SDK_MODULES/" class="md-tabs__link">
+        Modules
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../aacs/android/" class="md-tabs__link">
+        AACS
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="./" class="md-tabs__link md-tabs__link--active">
+        Sample App
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../LINUX_INTEGRATION/" class="md-tabs__link">
+      Linux Integration
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../MIGRATION/" class="md-tabs__link">
+        Migration Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../NEED_HELP/" class="md-tabs__link">
+      Need Help?
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-tabs__link">
+        More
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Alexa Auto SDK" class="md-nav__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    Alexa Auto SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GETSTARTED/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Build Auto SDK
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Build Auto SDK" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Build Auto SDK
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BUILDING/" class="md-nav__link">
+        Build Alexa Auto SDK
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../builder/">Auto SDK Builder Tool Reference</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Auto SDK Builder Tool Reference" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Auto SDK Builder Tool Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Modules
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Modules" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Modules
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SDK_MODULES/" class="md-nav__link">
+        Auto SDK Modules and Extensions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2">
+          AASB
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/aasb/aasb-docs/AASB/" class="md-nav__link">
+        AASB Message Definition
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/address-book/">Address Book</a>
+          
+            <label for="__nav_4_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Address Book" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Address Book
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3_2" type="checkbox" id="__nav_4_3_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_3_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/address-book/aasb-docs/AddressBook/" class="md-nav__link">
+        Address Book
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/alexa/">Alexa</a>
+          
+            <label for="__nav_4_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Alexa" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          Alexa
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4_2" type="checkbox" id="__nav_4_4_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_4_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/Alerts/" class="md-nav__link">
+        Alerts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/AlexaClient/" class="md-nav__link">
+        AlexaClient
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/AlexaSpeaker/" class="md-nav__link">
+        AlexaSpeaker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/AudioPlayer/" class="md-nav__link">
+        AudioPlayer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/AuthProvider/" class="md-nav__link">
+        AuthProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/DeviceSetup/" class="md-nav__link">
+        DeviceSetup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/DoNotDisturb/" class="md-nav__link">
+        DoNotDisturb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/EqualizerController/" class="md-nav__link">
+        EqualizerController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/ExternalMediaAdapter/" class="md-nav__link">
+        ExternalMediaAdapter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/GlobalPreset/" class="md-nav__link">
+        GlobalPreset
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/LocalMediaSource/" class="md-nav__link">
+        LocalMediaSource
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/MediaPlaybackRequestor/" class="md-nav__link">
+        MediaPlaybackRequestor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/Notifications/" class="md-nav__link">
+        Notifications
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/PlaybackController/" class="md-nav__link">
+        PlaybackController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/SpeechRecognizer/" class="md-nav__link">
+        SpeechRecognizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/alexa/aasb-docs/TemplateRuntime/" class="md-nav__link">
+        TemplateRuntime
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5" type="checkbox" id="__nav_4_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/apl/">APL</a>
+          
+            <label for="__nav_4_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          APL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5_2" type="checkbox" id="__nav_4_5_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_5_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/apl/aasb-docs/APL/" class="md-nav__link">
+        APL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_6" type="checkbox" id="__nav_4_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/bluetooth/">Bluetooth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Bluetooth" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_6">
+          <span class="md-nav__icon md-icon"></span>
+          Bluetooth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7" type="checkbox" id="__nav_4_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/car-control/">CarControl</a>
+          
+            <label for="__nav_4_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CarControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_7">
+          <span class="md-nav__icon md-icon"></span>
+          CarControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7_2" type="checkbox" id="__nav_4_7_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_7_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/car-control/aasb-docs/CarControl/" class="md-nav__link">
+        CarControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8" type="checkbox" id="__nav_4_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/cbl/">CBL</a>
+          
+            <label for="__nav_4_8">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CBL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_8">
+          <span class="md-nav__icon md-icon"></span>
+          CBL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8_2" type="checkbox" id="__nav_4_8_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_8_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/cbl/aasb-docs/CBL/" class="md-nav__link">
+        CBL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9" type="checkbox" id="__nav_4_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/connectivity/">Connectivity</a>
+          
+            <label for="__nav_4_9">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Connectivity" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_9">
+          <span class="md-nav__icon md-icon"></span>
+          Connectivity
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9_2" type="checkbox" id="__nav_4_9_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_9_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/connectivity/aasb-docs/AlexaConnectivity/" class="md-nav__link">
+        AlexaConnectivity
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10" type="checkbox" id="__nav_4_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/core/">Core</a>
+          
+            <label for="__nav_4_10">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_10">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10_2" type="checkbox" id="__nav_4_10_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_10_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/AudioInput/" class="md-nav__link">
+        AudioInput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/AudioOutput/" class="md-nav__link">
+        AudioOutput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/Authorization/" class="md-nav__link">
+        Authorization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/DeviceUsage/" class="md-nav__link">
+        DeviceUsage
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/LocationProvider/" class="md-nav__link">
+        LocationProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/NetworkInfoProvider/" class="md-nav__link">
+        NetworkInfoProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/core/aasb-docs/PropertyManager/" class="md-nav__link">
+        PropertyManager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11" type="checkbox" id="__nav_4_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/custom-domain/">CustomDomain</a>
+          
+            <label for="__nav_4_11">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CustomDomain" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_11">
+          <span class="md-nav__icon md-icon"></span>
+          CustomDomain
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11_2" type="checkbox" id="__nav_4_11_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_11_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/custom-domain/aasb-docs/CustomDomain/" class="md-nav__link">
+        CustomDomain
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_12" type="checkbox" id="__nav_4_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/loopback-detector/">LoopbackDetector</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="LoopbackDetector" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_12">
+          <span class="md-nav__icon md-icon"></span>
+          LoopbackDetector
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13" type="checkbox" id="__nav_4_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/messaging/">Messaging</a>
+          
+            <label for="__nav_4_13">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Messaging" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_13">
+          <span class="md-nav__icon md-icon"></span>
+          Messaging
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13_2" type="checkbox" id="__nav_4_13_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_13_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_13_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/messaging/aasb-docs/Messaging/" class="md-nav__link">
+        Messaging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14" type="checkbox" id="__nav_4_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/navigation/">Navigation</a>
+          
+            <label for="__nav_4_14">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Navigation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_14">
+          <span class="md-nav__icon md-icon"></span>
+          Navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14_2" type="checkbox" id="__nav_4_14_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_14_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/navigation/aasb-docs/Navigation/" class="md-nav__link">
+        Navigation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15" type="checkbox" id="__nav_4_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/phone-control/">PhoneControl</a>
+          
+            <label for="__nav_4_15">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="PhoneControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_15">
+          <span class="md-nav__icon md-icon"></span>
+          PhoneControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15_2" type="checkbox" id="__nav_4_15_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_15_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/phone-control/aasb-docs/PhoneCallController/" class="md-nav__link">
+        PhoneControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_16" type="checkbox" id="__nav_4_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/system-audio/">SystemAudio</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="SystemAudio" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_16">
+          <span class="md-nav__icon md-icon"></span>
+          SystemAudio
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17" type="checkbox" id="__nav_4_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/text-to-speech/">TextToSpeech</a>
+          
+            <label for="__nav_4_17">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeech" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_17">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeech
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17_2" type="checkbox" id="__nav_4_17_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_17_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_17_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../modules/text-to-speech/aasb-docs/TextToSpeech/" class="md-nav__link">
+        TextToSpeech
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_18" type="checkbox" id="__nav_4_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../modules/text-to-speech-provider/">TextToSpeechProvider</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeechProvider" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_18">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeechProvider
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/">AACS</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/">Configuration</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3" type="checkbox" id="__nav_5_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_3">
+          Common
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Common" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_3">
+          <span class="md-nav__icon md-icon"></span>
+          Common
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_1" type="checkbox" id="__nav_5_3_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/ipc/">IPC</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="IPC" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          IPC
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_2" type="checkbox" id="__nav_5_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/commonutils/">Common Utils</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Common Utils" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Common Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">AACS Instrumentation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Instrumentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Instrumentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/sample-app/">AACS Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Sample App" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          App Components
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="App Components" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          App Components
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_1" type="checkbox" id="__nav_5_6_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apis/">alexa-auto-apis</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apis" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apis
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2" type="checkbox" id="__nav_5_6_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
+          
+            <label for="__nav_5_6_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apl-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2_2" type="checkbox" id="__nav_5_6_2_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/">APL Render</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL Render" data-md-level="4">
+        <label class="md-nav__title" for="__nav_5_6_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          APL Render
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_3" type="checkbox" id="__nav_5_6_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-ui/">alexa-auto-apps-common-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_3">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_4" type="checkbox" id="__nav_5_6_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-util/">alexa-auto-apps-common-util</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-util" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_4">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-util
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_5" type="checkbox" id="__nav_5_6_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-carcontrol/">alexa-auto-carcontrol</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-carcontrol" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_5">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-carcontrol
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_6" type="checkbox" id="__nav_5_6_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-comms-ui/">alexa-auto-comms-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-comms-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_6">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-comms-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_7" type="checkbox" id="__nav_5_6_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-contacts/">alexa-auto-contacts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-contacts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_7">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-contacts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_8" type="checkbox" id="__nav_5_6_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-device-usage/">alexa-auto-device-usage</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-device-usage" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_8">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-device-usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_9" type="checkbox" id="__nav_5_6_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-lwa-auth/">alexa-auto-lwa-auth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-lwa-auth" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_9">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-lwa-auth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_10" type="checkbox" id="__nav_5_6_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-media-player/">alexa-auto-media-player</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-media-player" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_10">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-media-player
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_11" type="checkbox" id="__nav_5_6_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-navigation/">alexa-auto-navigation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-navigation" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_11">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_12" type="checkbox" id="__nav_5_6_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-settings/">alexa-auto-settings</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-settings" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_12">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-settings
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_13" type="checkbox" id="__nav_5_6_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-setup/">alexa-auto-setup</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-setup" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_13">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-setup
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_14" type="checkbox" id="__nav_5_6_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-telephony/">alexa-auto-telephony</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-telephony" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_14">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-telephony
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_15" type="checkbox" id="__nav_5_6_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-templateruntime-renderer/">alexa-auto-templateruntime-renderer</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-templateruntime-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_15">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-templateruntime-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_16" type="checkbox" id="__nav_5_6_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-tts/">alexa-auto-tts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-tts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_16">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-tts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_17" type="checkbox" id="__nav_5_6_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-ux-restrictions/">alexa-auto-ux-restrictions</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-ux-restrictions" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_17">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-ux-restrictions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_18" type="checkbox" id="__nav_5_6_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-interaction/">alexa-auto-voice-interaction</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-interaction" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_18">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_19" type="checkbox" id="__nav_5_6_19" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-ui/">alexa-auto-voice-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_19">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" checked>
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index md-nav__link--active">
+          <a href="./">Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Sample App" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LINUX_INTEGRATION/" class="md-nav__link">
+        Linux Integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Migration Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION/" class="md-nav__link">
+        General Migration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION_TO_AASB_MESSAGEBROKER/" class="md-nav__link">
+        Migration to AASB MessageBroker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NEED_HELP/" class="md-nav__link">
+        Need Help?
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          More
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="More" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          More
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SECURITY/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    Table of Contents
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    Prerequisites
+  </a>
+  
+    <nav class="md-nav" aria-label="Prerequisites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#amazon-developer-account" class="md-nav__link">
+    Amazon developer account
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#register-product-and-security-profile" class="md-nav__link">
+    Register product and security profile
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-device-capabilities" class="md-nav__link">
+    Optional device capabilities
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-and-run-the-sample-app" class="md-nav__link">
+    Build and Run the Sample App
+  </a>
+  
+    <nav class="md-nav" aria-label="Build and Run the Sample App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-using-builder-tool" class="md-nav__link">
+    Build using Builder Tool
+  </a>
+  
+    <nav class="md-nav" aria-label="Build using Builder Tool">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-the-sample-app" class="md-nav__link">
+    Run the Sample App
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-using-conan" class="md-nav__link">
+    Build using Conan
+  </a>
+  
+    <nav class="md-nav" aria-label="Build using Conan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specify-build-options" class="md-nav__link">
+    Specify build options
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-environment-variables-for-configuration-values" class="md-nav__link">
+    Specify environment variables for configuration values
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-the-sample-app" class="md-nav__link">
+    Configure the Sample App
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-the-sample-app" class="md-nav__link">
+    Use the Sample App
+  </a>
+  
+    <nav class="md-nav" aria-label="Use the Sample App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authenticate-with-avs-using-code-based-linking-cbl" class="md-nav__link">
+    Authenticate with AVS using Code-Based Linking (CBL)
+  </a>
+  
+    <nav class="md-nav" aria-label="Authenticate with AVS using Code-Based Linking (CBL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#start-the-cbl-authorization" class="md-nav__link">
+    Start the CBL authorization
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cancel-the-authorization" class="md-nav__link">
+    Cancel the authorization
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-out-of-the-cbl-authorization" class="md-nav__link">
+    Log out of the CBL authorization
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multimedia-support-for-qnx" class="md-nav__link">
+    Multimedia support for QNX
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audiofile-menu" class="md-nav__link">
+    AudioFile menu
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#handle-unknown-locations-for-navigation-use-cases" class="md-nav__link">
+    Handle unknown locations for navigation use-cases
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enable-siriusxm-as-a-local-media-source" class="md-nav__link">
+    Enable SiriusXM as a local media source
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    Troubleshooting
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+<h1 id="alexa-auto-sdk-c-sample-app">Alexa Auto SDK C++ Sample App</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#build-and-run-the-sample-app">Build and Run the Sample App</a></li>
+<li><a href="#configure-the-sample-app">Configure the Sample App</a></li>
+<li><a href="#use-the-sample-app">Use the Sample App</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+<h2 id="overview">Overview</h2>
+<p>The purpose of the C++ Sample App is to provide useful example code to help you integrate your implementation with the Alexa Auto SDK. The C++ Sample App provides an example of creating and configuring an instance of the Engine, and using the MessageBroker API to subscribe to messages from the Engine. It also provides examples of handling audio and stream based interfaces with the MessageStream API, and replying to messages from the Engine. The C++ Sample App also includes detailed logs for interactions with the Alexa Auto SDK, as well as UI elements relevant to the implementation.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<h3 id="amazon-developer-account">Amazon developer account</h3>
+<p>To use the C++ Sample App, you need an <a href="https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/">Amazon Developer</a> account.</p>
+<h3 id="register-product-and-security-profile">Register product and security profile</h3>
+<p>After creating an Amazon developer account, you'll need to <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html">register a product and create a security profile</a> on the AVS developer portal.</p>
+<p>When you follow the instructions to <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information">fill in the product information</a>:</p>
+<ul>
+<li>Use your own custom information, taking note of the <strong>Product ID</strong>, as this information is required to confingure the Sample App.</li>
+<li>Be sure to select <strong>Automotive</strong> from the <strong>Product category</strong> pull-down.</li>
+</ul>
+<p>When you follow the instructions to <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile">set up your security profile</a>, generate a <strong>Client ID</strong> and take note of it, as this information is required to confingure the Sample App.</p>
+<h3 id="optional-device-capabilities">Optional device capabilities</h3>
+<p>In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's <strong>Amazon ID</strong> from the Developer Console and follow the directions on the <a href="../../NEED_HELP/#requesting-additional-functionality">Need Help?</a> page.</p>
+<blockquote>
+<p><strong>Note:</strong> Most of the commands that follow are meant to be run from this <code>alexa-auto-sdk</code> directory.</p>
+</blockquote>
+<h2 id="build-and-run-the-sample-app">Build and Run the Sample App</h2>
+<p>Before you build and run the Sample App, it is recommended that you first review and understand how to <a href="../../BUILDING/">build Auto SDK</a>. The Sample App can be built by using the Auto SDK Builder Tool, or by using Conan to build the Auto SDK and Sample App packages directly. Each option is described in more detail in this section.</p>
+<h3 id="build-using-builder-tool">Build using Builder Tool</h3>
+<p>The C++ Sample App can be built using the Auto SDK Builder Tool by specifying the <code>--with-sampleapp</code> or <code>--sampleapp</code> option when doing a build. The following examples should be run with <code>alexa-auto-sdk</code> as the working directory.</p>
+<p>To build Auto SDK and Sample App with all modules included:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py --with-sampleapp
+</code></pre></div>
+<p>The build archive is created in the <code>builder/deploy</code> directory, and will include the Sample App binary, along with all of the required libs and configuration files needed to run the application. The name of the archive will depend on your build settings, but in general will match the following pattern:</p>
+<div class="highlight"><pre><span></span><code>aac-&lt;version&gt;-&lt;os&gt;_&lt;arch&gt;-&lt;build-type&gt;-&lt;datetime&gt;.tgz
+</code></pre></div>
+<p>You can extract the contents of the build archive to any location on your target device, with the following command:</p>
+<div class="highlight"><pre><span></span><code>$ tar -xvzf &lt;archive&gt;.tgz
+</code></pre></div>
+<p>After extracting the contents, the directory structure should look something like the following:</p>
+<div class="highlight"><pre><span></span><code>aac-dev-linux_x86_64-release/
+  ├─ bin/
+  |  └─ SampleApp 
+  ├─ docs/
+  ├─ include/
+  ├─ lib/
+  |  ├─ libAACECore.so 
+  |  └─ ... 
+  ├─ share/
+  |  ├─ sampleapp/
+  |  |  ├─ certs/
+  |  |  ├─ config/
+  |  |  |  └─ config.json 
+  |  |  ├─ inputs/
+  |  |  ├─ menu/
+  |  |  |  └─ menu.json 
+  |  |  └─ sampledata/
+  |  └─ ... 
+  └─ aac-buildinfo.txt
+</code></pre></div>
+<h4 id="run-the-sample-app">Run the Sample App</h4>
+<p>Before running the Sample App, you are required to configure the settings defined in the <code>share/sampleapp/config/config.json</code> file, including setting up your unique client ID and product information. This is described in more detail in the <a href="#configure-the-sample-app">Configure the Sample App</a> section of this document. Once the configuration changes have been made, you can run the Sample App from the root directory of the extracted archive using the following command:</p>
+<div class="highlight"><pre><span></span><code>$ <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>lib:+:<span class="si">${</span><span class="nv">DYLD_LIBRARY_PATH</span><span class="si">}</span> <span class="se">\</span>
+    <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>lib:+:<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span> <span class="se">\</span>
+    ./bin/SampleApp -c share/sampleapp/config/config.json -m share/sampleapp/menu/menu.json
+</code></pre></div>
+<h3 id="build-using-conan">Build using Conan</h3>
+<p>The Auto SDK C++ Sample App can be configured using the provided Conan recipe, and then built with CMake. The Conan recipe requires packages that are defined as part of Auto SDK, which must first be installed into the local cache (see <a href="../../BUILDING/">Building Auto SDK</a> for instructions about how to install Auto SDK Conan packages). If you are specifying any additional dependencies, such as extra modules for Auto SDK, those packages must also be installed in the Conan cache before configuring the Sample App.</p>
+<p>If the required dependencies are already installed, the following commands can be used to quickly configure, build and run the Sample App.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># export auto sdk conan dependencies</span>
+$ python conan/setup.py
+
+<span class="c1"># configure the sample app and install it in a build directory</span>
+$ conan install samples/cpp -if<span class="o">=</span>build-sampleapp -b missing
+
+<span class="c1"># build the sample app in the build directory</span>
+$ conan build samples/cpp -bf<span class="o">=</span>build-sampleapp
+
+<span class="c1"># run the sample app from the build directory</span>
+$ <span class="nb">cd</span> build-sampleapp
+$ <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>lib:+:<span class="si">${</span><span class="nv">DYLD_LIBRARY_PATH</span><span class="si">}</span> <span class="se">\</span>
+     <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>lib:+:<span class="si">${</span><span class="nv">LD_LIBRARY_PATH</span><span class="si">}</span> <span class="se">\</span>
+     ./bin/SampleApp -c ./config/config.json -m ./menu/menu.json
+</code></pre></div>
+<blockquote>
+<p>Note: These examples assume your working directory is set to the root <code>alexa-auto-sdk</code> directory.</p>
+</blockquote>
+<h4 id="specify-build-options">Specify build options</h4>
+<p>You can use the following command line options with the Conan install command. The options are defined in the Conan recipe:</p>
+<p><strong><code>aac_modules</code></strong> - Specify default Auto SDK modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. If this option is not overriden, the default value will be <code>core, alexa, cbl, system-audio</code>.</p>
+<p><strong><code>extra_modules</code></strong> - Specify additional modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. This is a useful option if you want to specify modules to build in addition to the default modules, rather than replacing the default modules entirely.</p>
+<p>You can specify the options above using <code>-o</code> when running the Conan command. For example, to specify addtional modules that are included when building the Sample App, you can us the following option:</p>
+<div class="highlight"><pre><span></span><code>$ conan install samples/cpp -if<span class="o">=</span>build-sampleapp -b missing <span class="se">\ </span>
+    -o <span class="nv">extra_modules</span><span class="o">=</span><span class="s2">&quot;navigation,phone-control&quot;</span>
+</code></pre></div>
+<h4 id="specify-environment-variables-for-configuration-values">Specify environment variables for configuration values</h4>
+<p>For convenience, a <a href="./assets/config/config.json">config file template</a> has been included for the core Auto SDK modules with well-known tokens (e.g. <code>CLIENT_ID</code>, <code>PRODUCT_ID</code>) for various configuration values. You can set environment variables for these tokens; when building the Sample App, they will be replaced in the configuration file.</p>
+<p>For example you can set an environment variable when running <code>conan install</code> like this:</p>
+<div class="highlight"><pre><span></span><code>$ <span class="nv">CLIENT_ID</span><span class="o">=</span>xxxx <span class="se">\</span>
+  <span class="nv">PRODUCT_ID</span><span class="o">=</span>xxxx <span class="se">\</span>
+    conan install ...
+</code></pre></div>
+<h2 id="configure-the-sample-app">Configure the Sample App</h2>
+<p>You can pass one or more configuration files to the Sample App using the <code>--config &lt;config-file-path&gt;</code> flag. When you build additional modules with the sample app, you may need to pass module-specific configuration. Please refer to the <code>README</code> file within each module to get this configuration information. </p>
+<p>For convenience, a <a href="./assets/config/config.json">config file template</a> has been included for the core Auto SDK modules. You must customize this template with values specific to your implementation. You can either edit the configuration file manually or specify environment variables that can be used to override the configuration values when building the Sample App with Conan, see how to <a href="#specify-environment-variables-for-configuration-values">specify environment variables for configuration values</a>.</p>
+<p>To change the config file manually, follow these steps:</p>
+<ol>
+<li>
+<p>Edit the <a href="./assets/config/config.json">config file template</a> and save it.</p>
+</li>
+<li>
+<p>Replace the <code>${YOUR_CLIENT_ID}</code>, <code>${YOUR_PRODUCT_ID}</code>, and <code>${YOUR_DEVICE_SERIAL_NUMBER}</code> placeholders with your values as follows:</p>
+</li>
+<li>Replace <code>${YOUR_CLIENT_ID}</code> with the Client ID, which you can find in your device's Security Profile under the <strong>Other devices and platforms</strong> tab.</li>
+<li>Replace <code>${YOUR_PRODUCT_ID}</code> with the Product ID, which you can find under the <strong>Products</strong> tab on the AVS Developer Console. (It is different from the Amazon ID.)</li>
+<li>Replace <code>${YOUR_DEVICE_SERIAL_NUMBER}</code> with an arbitrary value that must not contain spaces and must be unique.</li>
+</ol>
+<blockquote>
+<p><strong>Note:</strong> The Client ID and Product ID must correspond to a development device profile that you created as an <strong>automotive</strong> product by selecting the <code>Automotive</code> product category when you <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information">filled in the product information</a>.  </p>
+</blockquote>
+<ol>
+<li>Replace the <code>${DATA_PATH}</code> and <code>${CERTS_PATH}</code> with paths to your database and certificates, respectively. You must ensure that the directories exist and have write permissions.</li>
+</ol>
+<blockquote>
+<p><strong>Note:</strong> The Auto SDK engine will fail to start if the database directory path does not exist or does not have write permissions.</p>
+</blockquote>
+<ol>
+<li>Modify the vehicle information (<code>aace.vehicle</code>) to match your vehicle specifics.</li>
+</ol>
+<h2 id="use-the-sample-app">Use the Sample App</h2>
+<h3 id="authenticate-with-avs-using-code-based-linking-cbl">Authenticate with AVS using Code-Based Linking (CBL)</h3>
+<p>Every request to AVS requires an Login with Amazon (LWA) access token. Code-Based Linking (CBL) is the recommended method to acquire access tokens and is demonstrated by the C++ Sample App. After the Sample App launches, you will see the Main Menu. Follow these steps to authorize your device with AVS using CBL.</p>
+<h4 id="start-the-cbl-authorization">Start the CBL authorization</h4>
+<ol>
+<li>
+<p>Press <code>A</code>, the Sample App displays the below message:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">################################################################################</span>
+<span class="c1">#                                                                              #</span>
+<span class="c1">#                              Authorization Menu                              #</span>
+<span class="c1">#                                                                              #</span>
+<span class="c1">################################################################################</span>
+
+<span class="o">[</span> <span class="m">1</span> <span class="o">]</span>    Start CBL Authorization
+<span class="o">[</span> esc <span class="o">]</span>  Go back
+</code></pre></div>
+</li>
+<li>
+<p>Press <code>1</code> to start the CBL authorization. The Sample App displays messages, including a code and a URL in a format similar to the following:</p>
+<div class="highlight"><pre><span></span><code>###########################
+          123456     
+############################################
+     url: http://www.amazon.com/us/code 
+############################################
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> You may have to scroll up to see the code and URL.</p>
+</blockquote>
+</li>
+<li>
+<p>Open a browser and navigate to the URL displayed in the Sample App.</p>
+</li>
+<li>In the browser, enter the code displayed in the Sample App.</li>
+<li>Click <strong>Continue</strong> and follow the instructions in the browser to complete the authentication.</li>
+</ol>
+<h4 id="cancel-the-authorization">Cancel the authorization</h4>
+<p>After you start the authorization, the <code>Authorization</code> menu displays option [1] for you to cancel the authorization that is in progress. Press <code>1</code> to cancel the authorization.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">################################################################################</span>
+<span class="c1">#                                                                              #</span>
+<span class="c1">#                              Authorization Menu                              #</span>
+<span class="c1">#                                                                              #</span>
+<span class="c1">################################################################################</span>
+
+ <span class="o">[</span> <span class="m">1</span> <span class="o">]</span>    Cancel CBL Authorization
+ <span class="o">[</span> esc <span class="o">]</span>  Go back
+</code></pre></div>
+<h4 id="log-out-of-the-cbl-authorization">Log out of the CBL authorization</h4>
+<p>After the device is registered successfully, the Sample App displays option [1] in the <code>Authorization</code> menu for you to log out of CBL authorization. Press <code>1</code> to log out from the authorization.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">################################################################################</span>
+<span class="c1">#                                                                              #</span>
+<span class="c1">#                              Authorization Menu                              #</span>
+<span class="c1">#                                                                              #</span>
+<span class="c1">################################################################################</span>
+
+ <span class="o">[</span> <span class="m">1</span> <span class="o">]</span>    Logout CBL Authorization
+ <span class="o">[</span> esc <span class="o">]</span>  Go back
+</code></pre></div>
+<h3 id="multimedia-support-for-qnx">Multimedia support for QNX</h3>
+<p>The C++ Sample App supports the <a href="https://blackberry.qnx.com/content/dam/qnx/products/qnxcar/QNX_MultimediaSuite_ProductBrief_Online_FINAL.pdf">BlackBerry QNX Multimedia Suite</a> for live audio input and output on QNX platforms. </p>
+<blockquote>
+<p><strong>Note:</strong> The SHOUTcast/lcecast streaming format is not supported.</p>
+</blockquote>
+<p>See the <a href="../../modules/system-audio/">System Audio extension README</a> for details about configuring audio input and output on QNX platforms.</p>
+<h3 id="audiofile-menu">AudioFile menu</h3>
+<p>The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the <a href="./assets/menu/MENU.md#audiofile">C++ Sample App Menu System documentation</a> for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the <a href="../../modules/system-audio/">System Audio</a> configuration defined in the config-system-audio.json file.</p>
+<blockquote>
+<p><strong>Note:</strong> The AudioFile menu appears on platforms that do not provide built-in audio support (such as platforms that are under development). On platforms that provide built-in audio support, the AudioFile menu does not appear. </p>
+</blockquote>
+<h3 id="handle-unknown-locations-for-navigation-use-cases">Handle unknown locations for navigation use-cases</h3>
+<p>Your platform implementation should handle cases where a GPS location cannot be obtained by returning the <code>UNDEFINED</code> value provided by the Auto SDK. In these cases, the Auto SDK does not report the location in the context, and your platform implementation should return a localization object initialized with <code>UNDEFINED</code> values for latitude and longitude ((latitude,longitude) = (<code>UNDEFINED</code>,<code>UNDEFINED</code>)) in the context object of every SpeechRecognizer event. </p>
+<h3 id="enable-siriusxm-as-a-local-media-source">Enable SiriusXM as a local media source</h3>
+<p>The Sample App does not configure SiriusXM as a local media source by default. If you need the SiriusXM local media source, you must enable and build it. To do this, add the following line to the list of local media sources in the <a href="./src/Application.cpp#L493"><code>Application.cpp</code></a> class then rebuild the Sample App:</p>
+<p><code>{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr }</code></p>
+<blockquote>
+<p><strong>Note:</strong> When SiriusXM is present as a local media source, the cloud defaults to local SiriusXM only and blocks any use of the cloud SiriusXM service even if the local implementation/service is unavailable or not enabled. </p>
+</blockquote>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li>When interacting with Alexa, if the Dialog State goes from <code>LISTENING</code> immediately to <code>IDLE</code>, you might not be logged in. Try <a href="#authenticate-with-avs-using-code-based-linking-cbl">logging into your account via CBL</a> by tapping <code>A</code> from the Main Menu.</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> For security reasons, authentication is not persisted if you quit the Sample App.  Upon relaunch, you must re-authenticate via CBL.  Restarting the app using the menu system, however, preserves authentication.</p>
+</blockquote>
+<ul>
+<li>
+<p>If the device serial number is not unique, the authentication state bounces between <code>PENDING</code> and <code>CONNECTED</code> states:</p>
+<div class="highlight"><pre><span></span><code>Auth state changed: REFRESHED ( NO_ERROR )
+Connection status changed: PENDING ( ACL_CLIENT_REQUEST )
+Connection status changed: CONNECTED ( ACL_CLIENT_REQUEST )
+Connection status changed: PENDING ( SERVER_SIDE_DISCONNECT )
+status changed: CONNECTED ( ACL_CLIENT_REQUEST )
+Connection status changed: PENDING ( SERVER_SIDE_DISCONNECT )
+...
+</code></pre></div>
+</li>
+</ul>
+<p>To resolve this, edit the <code>samples/cpp/assets/config.json</code> file and choose a unique serial number.</p>
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../../aacs/android/app-components/alexa-auto-voice-ui/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Alexa Auto Voice UI" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Alexa Auto Voice UI
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../../LINUX_INTEGRATION/" class="md-footer__link md-footer__link--next" aria-label="Next: Linux Integration" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Linux Integration
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2016 - 2021 Amazon
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      
+    
+  </body>
+</html>

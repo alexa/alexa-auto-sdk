@@ -23,6 +23,8 @@ namespace propertyManager {
 
 class PropertyManagerEngineInterface {
 public:
+    virtual ~PropertyManagerEngineInterface() = default;
+
     /**
      * Describes the state of a property change.
      */

@@ -1,0 +1,93 @@
+topic: CBL
+namespace: aasb.message.cbl.cbl
+path: CBL/CBL
+
+messages:
+  - action: CBLStateChanged
+    direction: outgoing
+    desc: (Deprecated) Notifies the platform implementation of an authorization flow state change.
+    payload:
+      - name: state
+        type: CBLState
+        desc: State of the CBL Authorization flow.
+      - name: reason
+        type: CBLStateChangedReason
+        desc: The state change reason.
+      - name: url
+        desc: The localeized url to enter the CBL code.
+      - name: code
+        desc: The CBL code.
+
+  - action: ClearRefreshToken
+    direction: outgoing
+    desc: (Deprecated) Notifies the platform implementation to clear the refresh token.
+
+  - action: SetRefreshToken
+    direction: outgoing
+    desc: (Deprecated) Notifies the platform implemnentation to set the refresh token.
+    payload:
+      - name: refreshToken
+        desc: The refresh token.
+      
+  - action: GetRefreshToken
+    direction: outgoing
+    desc: (Deprecated) Returns the refresh token stored by the platform implementation, otherwise return an empty string.
+    reply:
+      - name: refreshToken
+        desc: The refresh token.
+ 
+  - action: SetUserProfile
+    direction: outgoing
+    desc: (Deprecated) Notifies the platform implementation about the user profile. This is notified only when `requestUserProfile` is enabled in the configuration.
+    payload:
+      - name: name
+        desc: The logged in user name.
+      - name: email
+        desc: The logged in user email.
+  
+  - action: Start
+    direction: incoming
+    desc: (Deprecated) Notifies the Engine to cancel the authorization process.
+
+  - action: Cancel
+    direction: incoming
+    desc: (Deprecated) Notifies the Engine to cancel the authorization process.
+  
+  - action: Reset
+    direction: incoming
+    desc: (Deprecated) Notifies the Engine to reset the authorization state.
+
+types:
+  - name: CBLState
+    desc: Specifies the state of the authorization flow.
+    type: enum
+    values:
+      - name: STARTING
+        desc: CBL process is starting.
+      - name: REQUESTING_CODE_PAIR
+        desc: Initiating the process to request a code pair.
+      - name: CODE_PAIR_RECEIVED
+        desc: Code pair is received and is waiting on user to authenticate.
+      - name: REFRESHING_TOKEN
+        desc: Refreshing token stage has begun.
+      - name: REQUESTING_TOKEN
+        desc: Requesting for authorization token.
+      - name: STOPPING
+        desc: CBL process is ending.
+
+  - name: CBLStateChangedReason
+    desc: Specifies the reason for the state change.
+    type: enum
+    values:
+      - name: SUCCESS
+        desc: The CBL state changed successfully.
+      - name: ERROR
+        desc: Error occurred in the CBL process.
+      - name: TIMEOUT
+        desc: Request timed out.
+      - name: CODE_PAIR_EXPIRED
+        desc: Code pair has expired and user will need to initiate the authentication process again.
+      - name: AUTHORIZATION_EXPIRED
+        desc: The refresh token is invalid, revoked, or was issued to a different client.
+      - name: NONE
+        desc: No reason specified.

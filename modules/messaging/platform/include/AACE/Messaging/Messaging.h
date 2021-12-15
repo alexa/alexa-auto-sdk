@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -37,6 +37,11 @@ namespace messaging {
  * they are uploaded. Additionally, the platform implementation is responsible
  * for sending messages, updating message status, and providing the messaging endpoint
  * connection state and permissions.
+ *
+ * @deprecated This platform interface is deprecated. 
+ *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class Messaging : public aace::core::PlatformInterface {
 protected:

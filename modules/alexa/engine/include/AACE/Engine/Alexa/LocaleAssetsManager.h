@@ -18,9 +18,13 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
+#include <unordered_set>
 
+#include <acsdkShutdownManagerInterfaces/ShutdownNotifierInterface.h>
 #include <AVSCommon/SDKInterfaces/LocaleAssetsManagerInterface.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
 
 namespace aace {
 namespace engine {
@@ -32,12 +36,13 @@ namespace alexa {
  * This manager will use the @c AlexaClientSDKConfig.json to retrieve the supported locales. For devices with wake word
  * enabled this class will support "ALEXA" only.
  */
-class LocaleAssetsManager : public alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface {
+class LocaleAssetsManager
+        : public alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsManagerInterface
+        , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 public:
     /**
      * Create a LocaleAssetsManager object.
      *
-     * @param enableWakeWord Indicates whether wake words are enabled in this device or not.
      * @return A pointer to a new LocaleAssetsManager object if it succeeds; otherwise, @c nullptr.
      */
     static std::shared_ptr<LocaleAssetsManager> create(bool enableWakeWord);
@@ -53,6 +58,22 @@ public:
     std::set<Locale> getSupportedLocales() const override;
     LocaleCombinations getSupportedLocaleCombinations() const override;
     Locale getDefaultLocale() const override;
+    void addLocaleAssetsObserver(
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsObserverInterface>& observer)
+        override;
+    void removeLocaleAssetsObserver(
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsObserverInterface>& observer)
+        override;
+    void onConfigurationChanged(const alexaClientSDK::avsCommon::avs::CapabilityConfiguration& configuration) override;
+    void setEndpointRegistrationManager(
+        const std::shared_ptr<
+            alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>& manager)
+        override;
+    /// @}
+
+    /// @name RequiresShutdown methods
+    /// @{
+    void doShutdown() override;
     /// @}
 private:
     /**
@@ -79,6 +100,15 @@ private:
 
     /// The default locale.
     Locale m_defaultLocale;
+
+    /// Mutex to synchronize access to observers.
+    std::mutex m_observersMutex;
+
+    //// Members below are modified after initialization and hence should be synchronized.
+
+    /// Set with observers.
+    std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsObserverInterface>>
+        m_observers;
 };
 
 }  // namespace alexa

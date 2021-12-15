@@ -1,0 +1,25 @@
+From 91bc5d4b813359c9b16ef660b8d949d69461ff06 Mon Sep 17 00:00:00 2001
+From: Patrick Tsai <yingtsai@amazon.com>
+Date: Fri, 13 Aug 2021 17:44:48 -0700
+Subject: [PATCH 1/1] Set DEFAULT_SSL_STRICT to FALSE by default
+
+---
+ ext/soup/gstsouphttpsrc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/soup/gstsouphttpsrc.c b/ext/soup/gstsouphttpsrc.c
+index a899222..8a56ecd 100644
+--- a/ext/soup/gstsouphttpsrc.c
++++ b/ext/soup/gstsouphttpsrc.c
+@@ -126,7 +126,7 @@ enum
+ #define DEFAULT_SOUP_LOG_LEVEL       SOUP_LOGGER_LOG_HEADERS
+ #define DEFAULT_COMPRESS             FALSE
+ #define DEFAULT_KEEP_ALIVE           TRUE
+-#define DEFAULT_SSL_STRICT           TRUE
++#define DEFAULT_SSL_STRICT           FALSE
+ #define DEFAULT_SSL_CA_FILE          NULL
+ #define DEFAULT_SSL_USE_SYSTEM_CA_FILE TRUE
+ #define DEFAULT_TLS_DATABASE         NULL
+-- 
+2.32.0
+

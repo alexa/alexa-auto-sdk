@@ -1,0 +1,64 @@
+topic: $interface.topic
+namespace: $interface.namespace
+path: $interface.path
+version: $interface.version
+
+#set $message_names=$interface.get_message_names()
+#if $message_names
+messages:
+  #for $next in $message_names
+  #set $message=$interface.get_message( $next )
+  - action: $message.action
+    direction: $message.direction
+    desc: $message.description
+    #if $message.alt_name
+    name: $message.alt_name
+    #end if
+    #if $message.payload
+    payload:
+      #for $field in $message.payload
+      - name: $field.name
+        #if not $field.type == "string"
+        type: $field.type
+        #end if
+        desc: $field.description
+        #if $field.value
+        value: $field.value
+        #end if
+      #end for
+    #end if
+    #if $message.reply
+    reply:
+      #for $field in $message.reply
+      - name: $field.name
+        desc: $field.description
+      #end for
+    #end if
+
+  #end for
+#end if
+#set $type_names=$interface.get_type_names()
+#if $type_names
+types:
+  #for $next in $type_names
+  #set $type=$interface.get_type( $next )
+  - name: $type.name
+    type: $type.type
+    #if $type.alias
+    alias: $type.alias
+    #end if
+    #if $type.values
+    values:
+      #for $value in $type.values
+      - name: $value.name
+        #if not $value.type == "string"
+        type: $value.type
+        #end if
+        desc: $value.description
+        #if $value.default
+        default: $value.default
+        #end if
+      #end for
+    #end if
+  #end for
+#end if

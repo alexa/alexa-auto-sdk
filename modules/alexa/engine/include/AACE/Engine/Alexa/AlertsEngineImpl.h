@@ -70,7 +70,7 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface>
             alertsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
         class DeviceSettingsDelegate& deviceSettingsDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder);
 
@@ -89,7 +89,7 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface>
             alertsAudioFactory,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
         class DeviceSettingsDelegate& deviceSettingsDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder);
 

@@ -34,6 +34,10 @@ namespace apl {
  *
  * https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html
  *
+ * @deprecated This platform interface is deprecated. 
+ *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class APL : public aace::core::PlatformInterface {
 protected:
@@ -97,6 +101,30 @@ public:
         const std::string& sourceType,
         const std::string& jsonPayload,
         const std::string& token) = 0;
+
+    /**
+     * Notifies the platform implementation of APL runtime environment properties that must be updated.
+     * The Engine will generate these values based on the @c setAPLProperty() values. The APL runtime
+     * will be affected by these values.
+     *
+     * @param [in] properties A JSON object in string form containing the APL runtime properties that need
+     * to be updated.
+     * @code {.json}
+     * {
+     *      "<property name>" : "<property value>"
+     * }
+     * @endcode
+     *
+     * @attention Supported names and values.
+     *
+     * Name          | Value                                        | Description
+     * ------------- | -------------------------------------------- | ------------------------------------------------------------
+     * drivingState  | parked, moving                               | Sets the Automobile driving state runtime property.
+     * theme         | light, dark, light-<themeId>, dark-<themeId> | APL viewport theme value.
+     * video         | enabled, disabled                            | Indicates if video should be allowed in the APL document.
+     *
+     */
+    virtual void updateAPLRuntimeProperties(const std::string& properties) = 0;
 
     /**
      * Notifies the Engine to clear the card from the screen and release any focus being held.
@@ -206,6 +234,26 @@ public:
      * @param [in] state The window state context object.
      */
     void sendDeviceWindowState(const std::string& state);
+
+    /**
+     * The rendered APL experience will rely on the value of some defined properties.
+     * The platform implementation must report these values to provide a safe visual
+     * experience in the vehicle.
+     *
+     * @param [in] name The name of the property.
+     * @param [in] value The value of the property.
+     *
+     * @note Contact your Solutions Architect for an updated list of automotive themes identifiers.
+     *
+     * @attention Supported names and values.
+     *
+     * Name          | Value                                   | Description
+     * ------------- | --------------------------------------- | ---------------------------------------------------------
+     * drivingState  | parked, moving                          | Set this property when vehicle driving state changes.
+     * uiMode        | day, night                              | This affects the contrast of certified APL experiences.
+     * themeId       | (night) black, gray, (day) gray1, gray2 | Optional value that can be empty string. Valid values for day and night mode are specified.  
+     */
+    void setPlatformProperty(const std::string& name, const std::string& value);
 
     /**
      * @internal

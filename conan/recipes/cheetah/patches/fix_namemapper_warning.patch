@@ -1,0 +1,22 @@
+--- lib/Cheetah/Compiler.py	2020-10-01 06:41:16.000000000 -0700
++++ lib/Cheetah/Compiler.py	2021-07-14 12:51:51.000000000 -0700
+@@ -1626,12 +1626,13 @@
+         # the time:
+         if not NameMapper.C_VERSION:
+             if not sys.platform.startswith('java'):
+-                warnings.warn(
+-                    "\nYou don't have the C version of NameMapper installed! "
+-                    "I'm disabling Cheetah's useStackFrames option as it is "
+-                    "painfully slow with the Python version of NameMapper. "
+-                    "You should get a copy of Cheetah "
+-                    "with compiled C version of NameMapper.")
++                pass
++                # warnings.warn(
++                #     "\nYou don't have the C version of NameMapper installed! "
++                #     "I'm disabling Cheetah's useStackFrames option as it is "
++                #     "painfully slow with the Python version of NameMapper. "
++                #     "You should get a copy of Cheetah "
++                #     "with compiled C version of NameMapper.")
+             self.setSetting('useStackFrames', False)
+ 
+         self._compiled = False

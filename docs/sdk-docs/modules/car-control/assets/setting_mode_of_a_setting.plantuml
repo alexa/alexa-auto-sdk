@@ -1,0 +1,45 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+actor User Order 10
+participant Application  order 20
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 30
+participant "Alexa" as Alexa <<avs>> order 40
+
+note right of User
+"Set the AC intensity to minimum"
+end note
+
+User -> Alexa
+
+...
+Alexa -> AutoSDK: ModeController.SetMode directive
+activate AutoSDK
+AutoSDK -> Application: Receive SetModeControllerValue message
+Application -> Application: Set AC setting
+Application -> AutoSDK: Publish SetControllerValueMessage Reply
+AutoSDK -> Alexa: Alexa.Response event
+deactivate AutoSDK
+
+...
+note left of Alexa
+SpeechSynthesizer.Speak directive
+    <<Alexa speech response>>
+end note
+Alexa -> Application
+
+@enduml

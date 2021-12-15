@@ -22,8 +22,8 @@
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
-#include <AVSCommon/SDKInterfaces/TemplateRuntimeObserverInterface.h>
-#include <TemplateRuntime/TemplateRuntime.h>
+#include <SmartScreenSDKInterfaces/TemplateRuntimeObserverInterface.h>
+#include <TemplateRuntimeCapabilityAgent/TemplateRuntime.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/TemplateRuntime.h"
@@ -36,7 +36,7 @@ class RenderPlayerInfoCardsProviderInterfaceDelegate;
 
 class TemplateRuntimeEngineImpl
         : public aace::alexa::TemplateRuntimeEngineInterface
-        , public alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface
+        , public alexaSmartScreenSDK::smartScreenSDKInterfaces::TemplateRuntimeObserverInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<TemplateRuntimeEngineImpl> {
 private:
@@ -79,19 +79,20 @@ public:
     //
     void renderTemplateCard(const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState)
         override;
-    void clearTemplateCard() override;
+    void clearTemplateCard(const std::string& token) override;
     void renderPlayerInfoCard(
         const std::string& jsonPayload,
-        alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo,
-        alexaClientSDK::avsCommon::avs::FocusState focusState) override;
-    void clearPlayerInfoCard() override;
+        alexaSmartScreenSDK::smartScreenSDKInterfaces::AudioPlayerInfo audioPlayerInfo,
+        alexaClientSDK::avsCommon::avs::FocusState focusState,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MediaPropertiesInterface> mediaProperties) override;
+    void clearPlayerInfoCard(const std::string& token) override;
 
 protected:
     virtual void doShutdown() override;
 
 private:
     std::shared_ptr<aace::alexa::TemplateRuntime> m_templateRuntimePlatformInterface;
-    std::shared_ptr<alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime>
+    std::shared_ptr<alexaSmartScreenSDK::smartScreenCapabilityAgents::templateRuntime::TemplateRuntime>
         m_templateRuntimeCapabilityAgent;
 
     std::unordered_set<

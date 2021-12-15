@@ -468,63 +468,90 @@ void PhoneCallControllerCapabilityAgent::updateContextManager(const std::string&
 }
 
 std::string PhoneCallControllerCapabilityAgent::getContextString() {
-    rapidjson::Document document(rapidjson::kObjectType);
+    try {
+        rapidjson::Document document(rapidjson::kObjectType);
 
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
 
-    rapidjson::Value device(rapidjson::kObjectType);
-    device.AddMember(
-        "connectionState", rapidjson::Value(connectionStateToString(m_connectionState).c_str(), allocator), allocator);
-    document.AddMember("device", device, allocator);
+        rapidjson::Value device(rapidjson::kObjectType);
+        device.AddMember(
+            "connectionState", rapidjson::Value(connectionStateToString(m_connectionState).c_str(), allocator), allocator);
+        document.AddMember("device", device, allocator);
 
-    rapidjson::Value configuration(rapidjson::kObjectType);
-    rapidjson::Value callingFeature(rapidjson::kArrayType);
-    for (auto it : m_deviceConfigurationMap) {
-        rapidjson::Value tempConfig(rapidjson::kObjectType);
-        tempConfig.AddMember(
-            rapidjson::Value(configurationFeatureToString(it.first).c_str(), allocator),
-            rapidjson::Value().SetBool(it.second),
-            allocator);
-        callingFeature.PushBack(tempConfig, allocator);
-    }
-    rapidjson::Value tempConfig(rapidjson::kObjectType);
-    tempConfig.AddMember("OVERRIDE_RINGTONE_SUPPORTED", rapidjson::Value().SetBool(false), allocator);
-    callingFeature.PushBack(tempConfig, allocator);
-
-    configuration.AddMember("callingFeature", callingFeature, allocator);
-    document.AddMember("configuration", configuration, allocator);
-
-    rapidjson::Value allCalls(rapidjson::kArrayType);
-    for (auto it : m_allCallsMap) {
-        if (it.second == CallState::IDLE) {
-            continue;
+        rapidjson::Value configuration(rapidjson::kObjectType);
+        rapidjson::Value callingFeature(rapidjson::kArrayType);
+        for (auto it : m_deviceConfigurationMap) {
+            rapidjson::Value tempConfig(rapidjson::kObjectType);
+            tempConfig.AddMember(
+                rapidjson::Value(configurationFeatureToString(it.first).c_str(), allocator),
+                rapidjson::Value().SetBool(it.second),
+                allocator);
+            callingFeature.PushBack(tempConfig, allocator);
         }
-        rapidjson::Value tempCall(rapidjson::kObjectType);
-        tempCall.AddMember("callId", rapidjson::Value(it.first.c_str(), allocator), allocator);
-        tempCall.AddMember("callState", rapidjson::Value(callStateToString(it.second).c_str(), allocator), allocator);
-        allCalls.PushBack(tempCall, allocator);
+        rapidjson::Value tempConfig(rapidjson::kObjectType);
+        tempConfig.AddMember("OVERRIDE_RINGTONE_SUPPORTED", rapidjson::Value().SetBool(false), allocator);
+        callingFeature.PushBack(tempConfig, allocator);
+
+        configuration.AddMember("callingFeature", callingFeature, allocator);
+        document.AddMember("configuration", configuration, allocator);
+
+        rapidjson::Value allCalls(rapidjson::kArrayType);
+        for (auto it : m_allCallsMap) {
+            if (it.second == CallState::IDLE) {
+                continue;
+            }
+            rapidjson::Value tempCall(rapidjson::kObjectType);
+            tempCall.AddMember("callId", rapidjson::Value(it.first.c_str(), allocator), allocator);
+            tempCall.AddMember("callState", rapidjson::Value(callStateToString(it.second).c_str(), allocator), allocator);
+            allCalls.PushBack(tempCall, allocator);
+        }
+        document.AddMember("allCalls", allCalls, allocator);
+
+        if (callExist(m_currentCallId) && getCallState(m_currentCallId) != CallState::IDLE) {
+            rapidjson::Value currentCall(rapidjson::kObjectType);
+            currentCall.AddMember("callId", rapidjson::Value(m_currentCallId.c_str(), allocator), allocator);
+            document.AddMember("currentCall", currentCall, allocator);
+        }
+
+        ThrowIfNot(document.Accept(writer), "failedToWriteJsonDocument");
+        return buffer.GetString();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return "";
     }
-    document.AddMember("allCalls", allCalls, allocator);
-
-    if (callExist(m_currentCallId) && getCallState(m_currentCallId) != CallState::IDLE) {
-        rapidjson::Value currentCall(rapidjson::kObjectType);
-        currentCall.AddMember("callId", rapidjson::Value(m_currentCallId.c_str(), allocator), allocator);
-        document.AddMember("currentCall", currentCall, allocator);
-    }
-
-    ThrowIfNot(document.Accept(writer), "failedToWriteJsonDocument");
-
-    return buffer.GetString();
 }
 
 const std::pair<std::string, std::string> PhoneCallControllerCapabilityAgent::buildEventAndUpdateContext(
         const std::string& eventName,
         const std::string& payload) {
+    const std::pair<std::string, std::string> emptyPair;
     std::string context = getContextString();
+    rapidjson::Document contextPayload;
+    if (contextPayload.Parse(context.c_str()).HasParseError()) {
+        AACE_ERROR(LX(TAG).d("reason", "failedToParseContextPayload"));
+        return emptyPair;
+    } 
+    rapidjson::Document document(rapidjson::kArrayType);
+    rapidjson::StringBuffer buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+
+    rapidjson::Value contextObject(rapidjson::kObjectType);
+    contextObject.AddMember("payload", contextPayload, allocator);
+    rapidjson::Value header(rapidjson::kObjectType);
+    header.AddMember("namespace", rapidjson::Value(NAMESPACE.c_str(), allocator), allocator);
+    header.AddMember("name", rapidjson::Value("PhoneCallControllerState", allocator), allocator);
+    contextObject.AddMember("header", header, allocator);
+    document.PushBack(contextObject, allocator);
+
+    if (!document.Accept(writer)) {
+        AACE_ERROR(LX(TAG).d("reason", "failedToCreateContextWithHeader"));
+        return emptyPair;
+    }
     updateContextManager(context);
-    return buildJsonEventString(eventName, "", payload, context);
+    return buildJsonEventString(eventName, "", payload, buffer.GetString());
 }
 
 void PhoneCallControllerCapabilityAgent::executeOnFocusChanged(
@@ -599,11 +626,16 @@ void PhoneCallControllerCapabilityAgent::executeCallStateChanged(
     } else {
         payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
     }
-    ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildEventAndUpdateContext(eventName, buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
-    m_messageSender->sendMessage(request);
+    try {
+        ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
+        auto event = buildEventAndUpdateContext(eventName, buffer.GetString());
+        ThrowIf(event.second.empty(), "failedToCreateEvent");
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        m_messageSender->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 void PhoneCallControllerCapabilityAgent::executeCallFailed(
@@ -615,26 +647,32 @@ void PhoneCallControllerCapabilityAgent::executeCallFailed(
         return;
     }
 
-    rapidjson::Document payload(rapidjson::kObjectType);
-    rapidjson::Document errorPayload(rapidjson::kObjectType);
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    try {
+        rapidjson::Document payload(rapidjson::kObjectType);
+        rapidjson::Document errorPayload(rapidjson::kObjectType);
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
-    errorPayload.AddMember(
-        "code", rapidjson::Value(callErrorToString(code).c_str(), payload.GetAllocator()), payload.GetAllocator());
-    errorPayload.AddMember(
-        "message", rapidjson::Value(message.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    payload.AddMember("error", errorPayload, payload.GetAllocator());
-    ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
+        errorPayload.AddMember(
+            "code", rapidjson::Value(callErrorToString(code).c_str(), payload.GetAllocator()), payload.GetAllocator());
+        errorPayload.AddMember(
+            "message", rapidjson::Value(message.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        payload.AddMember("error", errorPayload, payload.GetAllocator());
+        ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    removeCall(callId);
-    m_callMethodMap.erase(callId);
-    releaseCommunicationsChannelFocus();
+        removeCall(callId);
+        m_callMethodMap.erase(callId);
+        releaseCommunicationsChannelFocus();
 
-    auto event = buildEventAndUpdateContext("CallFailed", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
-    m_messageSender->sendMessage(request);
+        auto event = buildEventAndUpdateContext("CallFailed", buffer.GetString());
+        ThrowIf(event.second.empty(), "failedToCreateEvent");
+
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        m_messageSender->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 void PhoneCallControllerCapabilityAgent::executeCallerIdReceived(
@@ -645,56 +683,74 @@ void PhoneCallControllerCapabilityAgent::executeCallerIdReceived(
         return;
     }
 
-    rapidjson::Document payload(rapidjson::kObjectType);
-    rapidjson::Document receivedCallPayload(rapidjson::kObjectType);
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    try {
+        rapidjson::Document payload(rapidjson::kObjectType);
+        rapidjson::Document receivedCallPayload(rapidjson::kObjectType);
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
-    receivedCallPayload.AddMember(
-        "callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    receivedCallPayload.AddMember(
-        "callerId", rapidjson::Value(callerId.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    payload.AddMember("receivedCall", receivedCallPayload, payload.GetAllocator());
-    ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
+        receivedCallPayload.AddMember(
+            "callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        receivedCallPayload.AddMember(
+            "callerId", rapidjson::Value(callerId.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        payload.AddMember("receivedCall", receivedCallPayload, payload.GetAllocator());
+        ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildEventAndUpdateContext("CallerIdReceived", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
-    m_messageSender->sendMessage(request);
+        auto event = buildEventAndUpdateContext("CallerIdReceived", buffer.GetString());
+        ThrowIf(event.second.empty(), "failedToCreateEvent");
+
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        m_messageSender->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 void PhoneCallControllerCapabilityAgent::executeSendDTMFSucceeded(const std::string& callId) {
-    rapidjson::Document payload(rapidjson::kObjectType);
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    try {
+        rapidjson::Document payload(rapidjson::kObjectType);
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
-    payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
+        payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildEventAndUpdateContext("SendDTMFSucceeded", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
-    m_messageSender->sendMessage(request);
+        auto event = buildEventAndUpdateContext("SendDTMFSucceeded", buffer.GetString());
+        ThrowIf(event.second.empty(), "failedToCreateEvent");
+
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        m_messageSender->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 void PhoneCallControllerCapabilityAgent::executeSendDTMFFailed(
     const std::string& callId,
     aace::phoneCallController::PhoneCallControllerEngineInterface::DTMFError code,
     const std::string& message) {
-    rapidjson::Document payload(rapidjson::kObjectType);
-    rapidjson::Document errorPayload(rapidjson::kObjectType);
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    try {
+        rapidjson::Document payload(rapidjson::kObjectType);
+        rapidjson::Document errorPayload(rapidjson::kObjectType);
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
-    errorPayload.AddMember(
-        "code", rapidjson::Value(dtmfErrorToString(code).c_str(), payload.GetAllocator()), payload.GetAllocator());
-    errorPayload.AddMember(
-        "message", rapidjson::Value(message.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
-    payload.AddMember("error", errorPayload, payload.GetAllocator());
-    ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
+        errorPayload.AddMember(
+            "code", rapidjson::Value(dtmfErrorToString(code).c_str(), payload.GetAllocator()), payload.GetAllocator());
+        errorPayload.AddMember(
+            "message", rapidjson::Value(message.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        payload.AddMember("callId", rapidjson::Value(callId.c_str(), payload.GetAllocator()), payload.GetAllocator());
+        payload.AddMember("error", errorPayload, payload.GetAllocator());
+        ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
-    auto event = buildEventAndUpdateContext("SendDTMFFailed", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
-    m_messageSender->sendMessage(request);
+        auto event = buildEventAndUpdateContext("SendDTMFFailed", buffer.GetString());
+        ThrowIf(event.second.empty(), "failedToCreateEvent");
+
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        m_messageSender->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 void PhoneCallControllerCapabilityAgent::acquireCommunicationsChannelFocus() {

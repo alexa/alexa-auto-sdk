@@ -79,6 +79,11 @@ bool EngineImpl::initialize() {
             ThrowIfNot(next->handleInitializeEngineEvent(shared_from_this()), "handleInitializeEngineEventFailed");
         }
 
+        // get a reference to the message broker service interface
+        auto messageBrokerService = getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+        ThrowIfNull(messageBrokerService, "invalidMessageBrokerServiceInterface");
+        m_messageBrokerService = messageBrokerService;
+
         // set initialize flag
         m_initialized = true;
 
@@ -460,6 +465,56 @@ bool EngineImpl::registerPlatformInterface(
         return false;
     }
 }
+
+std::shared_ptr<aace::core::MessageBroker> EngineImpl::getMessageBroker() {
+    return shared_from_this();
+}
+
+void EngineImpl::publish(const std::string& message) {
+    try {
+        auto messageBrokerService = m_messageBrokerService.lock();
+        ThrowIfNull(messageBrokerService, "invalidMessageBrokerService");
+        auto messageBroker = messageBrokerService->getMessageBroker();
+        ThrowIfNull(messageBroker, "invalidMessageBroker");
+        messageBroker->publish(message,aace::engine::messageBroker::Message::Direction::INCOMING).send();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+void EngineImpl::subscribe(MessageHandler handler, const std::string& topic, const std::string& action) {
+    try {
+        auto messageBrokerService = m_messageBrokerService.lock();
+        ThrowIfNull(messageBrokerService, "invalidMessageBrokerService");
+        auto messageBroker = messageBrokerService->getMessageBroker();
+        ThrowIfNull(messageBroker, "invalidMessageBroker");
+        
+        auto cb = handler;
+
+        messageBroker->subscribe(
+            topic, action,
+            [cb](const aace::engine::messageBroker::Message& message) {
+                cb(message.str());
+            },
+            aace::engine::messageBroker::Message::Direction::OUTGOING );
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+std::shared_ptr<aace::core::MessageStream> EngineImpl::openStream(const std::string& streamId, aace::core::MessageStream::Mode mode) {
+    try {
+        auto messageBrokerService = m_messageBrokerService.lock();
+        ThrowIfNull(messageBrokerService, "invalidMessageBrokerService");
+        auto streamManager = messageBrokerService->getStreamManager();
+        ThrowIfNull(streamManager, "invalidStreamManager");
+        return streamManager->requestStreamHandler(streamId, mode);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return nullptr;
+    }
+}
+
 
 }  // namespace core
 }  // namespace engine

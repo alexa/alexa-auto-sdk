@@ -23,6 +23,8 @@ namespace addressBook {
 
 class AddressBookEngineInterface {
 public:
+    virtual ~AddressBookEngineInterface() = default;
+
     using AddressBookType = aace::addressBook::AddressBook::AddressBookType;
 
     virtual bool onAddAddressBook(

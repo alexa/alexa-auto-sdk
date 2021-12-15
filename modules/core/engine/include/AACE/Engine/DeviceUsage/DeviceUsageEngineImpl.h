@@ -18,8 +18,6 @@
 
 #include <memory>
 
-#include <AVSCommon/Utils/RequiresShutdown.h>
-
 #include "AACE/DeviceUsage/DeviceUsage.h"
 #include "AACE/DeviceUsage/DeviceUsageEngineInterfaces.h"
 

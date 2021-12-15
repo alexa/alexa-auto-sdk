@@ -1,0 +1,61 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 29
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 29
+        versionCode 1
+        versionName "4.0"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        useLibrary 'android.car'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            def project = "alexa-auto-ux-restrictions"
+            def separator = "_"
+            def buildType = variant.buildType.name
+            def apkName = project + separator + buildType + ".aar"
+            outputFileName = new File(apkName)
+        }
+    }
+
+}
+
+dependencies {
+    implementation project(path: ':aacscommonutils')
+    implementation project(path: ':aacsconstants')
+    implementation project(path: ':alexa-auto-apis')
+    implementation project(path: ':alexa-auto-apps-common-util')
+    implementation project(':aacsipc')
+
+    implementation deps.androidx_appcompat
+    implementation deps.androidx_constraint
+    implementation deps.rxjava3
+
+    // Dagger
+    implementation deps.dagger
+    annotationProcessor deps.dagger_compiler
+}

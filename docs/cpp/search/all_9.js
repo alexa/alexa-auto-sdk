@@ -6,6 +6,8 @@ var searchData=
   ['level',['Level',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786',1,'aace::logger::LoggerEngineInterface::Level()'],['../classaace_1_1logger_1_1_logger.html#acde0b19d1be1c61274536b6a955d2d7a',1,'aace::logger::Logger::Level()'],['../classaace_1_1logger_1_1config_1_1_logger_configuration.html#a11d693782db686f4ac4667fb814d0b29',1,'aace::logger::config::LoggerConfiguration::Level()']]],
   ['line_5fin',['LINE_IN',['../classaace_1_1alexa_1_1_local_media_source.html#a193e995a51acffd671f2e9b93fe176b3a8ed9247709b828e86d4db1e0a207e2c5',1,'aace::alexa::LocalMediaSource']]],
   ['listening',['LISTENING',['../classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eac0ff938e396e72c225bd66562b80a77e',1,'aace::alexa::AlexaClient']]],
+  ['listenusingiap2',['listenUsingiAP2',['../classaace_1_1bluetooth_1_1_bluetooth_provider.html#a29e75260cc9989492497e7b276d65145',1,'aace::bluetooth::BluetoothProvider']]],
+  ['listenusingrfcomm',['listenUsingRfcomm',['../classaace_1_1bluetooth_1_1_bluetooth_provider.html#a8efc72e2e9aee87e114186ff93233f9c',1,'aace::bluetooth::BluetoothProvider']]],
   ['localadjustbandlevels',['localAdjustBandLevels',['../classaace_1_1alexa_1_1_equalizer_controller.html#a3b65b2452d162ab9e074a6d4cc2a0168',1,'aace::alexa::EqualizerController']]],
   ['localadjustvolume',['localAdjustVolume',['../classaace_1_1alexa_1_1_alexa_speaker.html#ae09e49988bc163c950883e2d3afc5173',1,'aace::alexa::AlexaSpeaker']]],
   ['localmediasource',['LocalMediaSource',['../classaace_1_1alexa_1_1_local_media_source.html',1,'aace::alexa']]],
@@ -28,6 +30,9 @@ var searchData=
   ['logger',['Logger',['../classaace_1_1logger_1_1_logger.html',1,'aace::logger']]],
   ['loggerconfiguration',['LoggerConfiguration',['../classaace_1_1logger_1_1config_1_1_logger_configuration.html',1,'aace::logger::config']]],
   ['loggerengineinterface',['LoggerEngineInterface',['../classaace_1_1logger_1_1_logger_engine_interface.html',1,'aace::logger']]],
-  ['logout',['logout',['../classaace_1_1authorization_1_1_authorization.html#a66f95375e98f4b8012f5f2531100550c',1,'aace::authorization::Authorization']]],
+  ['login',['login',['../classaace_1_1alexa_1_1_external_media_adapter.html#a96bb8efcb2543da52c01bcb50e1ecc7a',1,'aace::alexa::ExternalMediaAdapter']]],
+  ['logincomplete',['loginComplete',['../classaace_1_1alexa_1_1_external_media_adapter.html#a88309779a5b42dc313942aab6e1feb38',1,'aace::alexa::ExternalMediaAdapter']]],
+  ['logout',['logout',['../classaace_1_1alexa_1_1_external_media_adapter.html#a3663ab45e41484de6c96140e5c161a8f',1,'aace::alexa::ExternalMediaAdapter::logout()'],['../classaace_1_1authorization_1_1_authorization.html#a66f95375e98f4b8012f5f2531100550c',1,'aace::authorization::Authorization::logout()']]],
+  ['logoutcomplete',['logoutComplete',['../classaace_1_1alexa_1_1_external_media_adapter.html#ab86f7e5ee076c56fe7d9bf249dc65d2d',1,'aace::alexa::ExternalMediaAdapter']]],
   ['loop',['LOOP',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8ca9159b3578e4e1eb31ffdf90acd6f6e40',1,'aace::alexa::PlaybackControllerEngineInterface']]]
 ];

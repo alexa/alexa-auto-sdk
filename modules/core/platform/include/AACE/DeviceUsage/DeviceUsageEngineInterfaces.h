@@ -29,6 +29,8 @@ namespace deviceUsage {
  */
 class DeviceUsageEngineInterface {
 public:
+    virtual ~DeviceUsageEngineInterface() = default;
+
     virtual void onReportNetworkDataUsage(const std::string& usage) = 0;
 };
 

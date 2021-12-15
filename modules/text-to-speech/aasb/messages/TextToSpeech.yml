@@ -1,0 +1,64 @@
+topic: TextToSpeech
+namespace: aasb.message.textToSpeech.textToSpeech
+path: TextToSpeech/TextToSpeech
+
+messages:
+  - action: PrepareSpeechFailed
+    direction: outgoing
+    desc: Notifies the platform implementation about a failed speech synthesis.
+    payload:
+      - name: speechId
+        desc: The speech ID.
+      - name: reason
+        desc: The failure reason.
+
+  - action: PrepareSpeech
+    direction: incoming
+    desc: Prepare Speech from a text/SSML input.
+    payload:
+      - name: speechId
+        desc: The speech ID.
+      - name: text
+        desc: The text/SSML to be used for speech synthesis.
+      - name: provider
+        desc: The text to speech provider to be used for speech synthesis.
+      - name: options
+        desc: The options to be used for speech synthesis.
+        default: ""
+
+  - action: PrepareSpeechCompleted
+    direction: outgoing
+    desc: Notifies the platform implementation about a successful speech synthesis.
+    payload:
+      - name: speechId
+        desc: The speech ID.
+      - name: token
+        desc: A unique token for this audio stream.
+      - name: source
+        desc: source description.
+        value: STREAM
+      - name: streamId
+        desc: The URL audio stream being provided.
+      - name: encoding
+        type: AudioStreamEncoding
+        desc: The stream encoding format if known.
+      - name: properties
+        type: dict
+        desc: List of properties associated with the audio stream.
+      - name: metadata
+        desc: The metadata associated with the speech resource.
+
+  - action: GetCapabilities
+    direction: incoming
+    desc: Get Capabilities of a Text to Speech provider.
+    payload:
+      - name: provider
+        desc: The provider string. Use text-to-speech-provider here.
+    reply:
+      - name: capabilities
+        desc: The capabilities of the Text to Speech provider.
+
+types:
+  - name: AudioStreamEncoding
+    type: alias
+    alias: aasb.message.audio.audioOutput.AudioStreamEncoding

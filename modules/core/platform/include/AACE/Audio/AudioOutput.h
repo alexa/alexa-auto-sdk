@@ -62,6 +62,12 @@ public:
     using MediaError = aace::audio::AudioOutputEngineInterface::MediaError;
 
     /**
+     * Describes a focus action platform interface reports or requests
+     * @sa @c aace::audio::AudioOutputEngineInterface::FocusAction
+     */
+    using FocusAction = aace::audio::AudioOutputEngineInterface::FocusAction;
+
+    /**
      * Used when audio time is unknown or indeterminate.
      */
     static const int64_t TIME_UNKNOWN = -1;
@@ -106,6 +112,14 @@ public:
     virtual bool prepare(const std::string& url, bool repeating) = 0;
 
     /**
+     * Notifies the platform implementation only if prepared media allows platform interface to duck the volume
+     * if any high priority audio stream is in the focus. If platform interface ducks the volume, report the
+     * state using @c audioFocusEvent always. If @c mayDuck is not called, platform interface can assume that media
+     * is not allowed to duck. 
+     */
+    virtual void mayDuck() = 0;
+
+    /**
      * Notifies the platform implementation to start playback of the current audio source. After returning @c true,
      * the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING
      * when the media player begins playing the audio or @c mediaError() if an error occurs.
@@ -148,6 +162,22 @@ public:
      * else @c false
      */
     virtual bool resume() = 0;
+
+    /**
+     * Notifies the platform implementation to move the playback in background.
+     * If platform implementation supports audio ducking, reduce the media player volume according to platform guidelines.
+     * @return @c true if the platform implementation successfully attenuated the volume, else @c false.
+     * If @c false is returned, @c stopDucking call will not be received.
+     */
+    virtual bool startDucking() = 0;
+
+    /**
+     * Notifies the platform implementation to move the playback in foreground.
+     * If platform implementation supports audio ducking, restore the media player volume to original value.
+     * @return @c true if the platform implementation successfully restored the volume, else @c false.
+     * If @c false is returned, internal state considers that platform implementation is still in the ducked state which may result into unexpected behavior.
+     */
+    virtual bool stopDucking() = 0;
 
     /**
      * Returns the current playback position of the platform media player.
@@ -225,6 +255,13 @@ public:
     void mediaError(MediaError error, const std::string& description = "");
 
     /**
+     * Request engine to perform the action mentioned in the parameter.
+     *
+     * @param [in] action An @c FocusAction platform interface wishes to request.
+     */
+    void audioFocusEvent(FocusAction action);
+
+    /**
      * @internal
      * Sets the Engine interface delegate.
      *
@@ -243,6 +280,18 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioOutput::MutedSt
             break;
         case AudioOutput::MutedState::UNMUTED:
             stream << "UNMUTED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const AudioOutput::FocusAction& action) {
+    switch (action) {
+        case AudioOutput::FocusAction::REPORT_DUCKING_STARTED:
+            stream << "REPORT_DUCKING_STARTED";
+            break;
+        case AudioOutput::FocusAction::REPORT_DUCKING_STOPPED:
+            stream << "REPORT_DUCKING_STOPPED";
             break;
     }
     return stream;

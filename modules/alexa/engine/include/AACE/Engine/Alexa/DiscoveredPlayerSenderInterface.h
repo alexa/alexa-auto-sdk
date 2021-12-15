@@ -27,6 +27,8 @@ namespace alexa {
 
 class DiscoveredPlayerSenderInterface {
 public:
+    virtual ~DiscoveredPlayerSenderInterface() = default;
+
     virtual void reportDiscoveredPlayers(
         const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers) = 0;
     virtual void removeDiscoveredPlayer(const std::string& localPlayerId) = 0;

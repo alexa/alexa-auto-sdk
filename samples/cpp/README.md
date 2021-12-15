@@ -1,72 +1,161 @@
-# Alexa Auto SDK C++ Sample App on Linux
+# Alexa Auto SDK C++ Sample App
 
-The purpose of the C++ Sample App is to provide useful example code to help you integrate your platform implementation with the Alexa Auto SDK. The C++ Sample App provides an example of creating and configuring an instance of the Engine, overriding the default implementation of each Alexa Auto platform interface, and registering those custom interface handlers with the Engine. It includes one default example implementation of authorizing with Alexa Voice Service (AVS) via Code Based Linking (CBL). The C++ Sample App also includes detailed logs for interactions with the Alexa Auto SDK and convenience features for viewing those logs in the application, as well as UI elements relevant to each platform interface implementation.
-<!-- omit in toc -->
 ## Table of Contents
 
+- [Overview](#overview)
 - [Prerequisites](#prerequisites)
-- [Enabling Optional Device Capabilities](#enabling-optional-device-capabilities)
-- [Setting up the C++ Sample App](#setting-up-the-c-sample-app)
-- [Building the C++ Sample App](#building-the-c-sample-app)
-- [Running the C++ Sample App](#running-the-c-sample-app)
-- [Using the C++ Sample App](#using-the-c-sample-app)
+- [Build and Run the Sample App](#build-and-run-the-sample-app)
+- [Configure the Sample App](#configure-the-sample-app)
+- [Use the Sample App](#use-the-sample-app)
 - [Troubleshooting](#troubleshooting)
-- [Known Issues](#known-issues)
+
+## Overview
+The purpose of the C++ Sample App is to provide useful example code to help you integrate your implementation with the Alexa Auto SDK. The C++ Sample App provides an example of creating and configuring an instance of the Engine, and using the MessageBroker API to subscribe to messages from the Engine. It also provides examples of handling audio and stream based interfaces with the MessageStream API, and replying to messages from the Engine. The C++ Sample App also includes detailed logs for interactions with the Alexa Auto SDK, as well as UI elements relevant to the implementation.
 
 ## Prerequisites
 
-### Amazon Developer Account
+### Amazon developer account
 
 To use the C++ Sample App, you need an [Amazon Developer](https://developer.amazon.com/docs/app-submission/manage-account-and-permissions.html#create-a-developer-account/) account.
 
-### Registered Product and Security Profile
+### Register product and security profile
 
 After creating an Amazon developer account, you'll need to [register a product and create a security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html) on the AVS developer portal.
 
 When you follow the instructions to [fill in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information):
 
-* Use your own custom information, taking note of the **Product ID**, as this information is required for your [configuration file](#configuration-file) .
+* Use your own custom information, taking note of the **Product ID**, as this information is required to confingure the Sample App.
 * Be sure to select **Automotive** from the **Product category** pull-down.
 
-When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required for your [configuration file](#configuration-file).
+When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required to confingure the Sample App.
 
-### Linux Ubuntu 16.04 LTS
-
-All development and testing of the C++ Sample App has been performed on Linux Ubuntu 16.04 LTS. You need around 15GB of free space for building the Alexa Auto SDK and C++ Sample App for one target. Working with multiple targets can significantly increase the storage footprint.
-
-### Configuration File
-
-The C++ Sample App requires one or more [configuration files](#editing-the-configuration-file) for device information, module configuration, and Alexa settings.
-
-## Enabling Optional Device Capabilities
+### Optional device capabilities
 
 In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality) page.
 
-## Setting up the C++ Sample App
-
-Create your project directory (if you do not already have one):
-
-```shell
-$ mkdir ~/Projects
-$ cd ~/Projects
-```
-
-Clone the `alexa-auto-sdk` repository into your project directory:
-
-```shell
-$ git clone https://github.com/alexa/alexa-auto-sdk.git
-$ cd alexa-auto-sdk
-$ export AAC_SDK_HOME=$(pwd)
-```
-
 >**Note:** Most of the commands that follow are meant to be run from this `alexa-auto-sdk` directory.
 
-### Editing the Configuration File
+## Build and Run the Sample App
 
-You can pass one or more configuration files to the Sample App using the `--config <config-file-path>` flag. When you build additional modules with the sample app, you may need to pass module-specific configuration. Please refer to the `README` file within each module to get this configuration information. For convenience, a [config file template](./assets/config.json.in) has been included for the core Auto SDK modules. 
-You must customize this template with values specific to your implementation. To do this:
+Before you build and run the Sample App, it is recommended that you first review and understand how to [build Auto SDK](../../BUILDING.md). The Sample App can be built by using the Auto SDK Builder Tool, or by using Conan to build the Auto SDK and Sample App packages directly. Each option is described in more detail in this section.
 
-1. Edit the [config file template](./assets/config.json.in) and save it as `samples/cpp/assets/config.json`.
+### Build using Builder Tool
+
+The C++ Sample App can be built using the Auto SDK Builder Tool by specifying the `--with-sampleapp` or `--sampleapp` option when doing a build. The following examples should be run with `alexa-auto-sdk` as the working directory.
+
+To build Auto SDK and Sample App with all modules included:
+
+```bash
+$ ./builder/build.py --with-sampleapp
+```
+
+The build archive is created in the `builder/deploy` directory, and will include the Sample App binary, along with all of the required libs and configuration files needed to run the application. The name of the archive will depend on your build settings, but in general will match the following pattern:
+
+```
+aac-<version>-<os>_<arch>-<build-type>-<datetime>.tgz
+```
+
+You can extract the contents of the build archive to any location on your target device, with the following command:
+
+```shell
+$ tar -xvzf <archive>.tgz
+```
+
+After extracting the contents, the directory structure should look something like the following:
+
+```
+aac-dev-linux_x86_64-release/
+  ├─ bin/
+  |  └─ SampleApp 
+  ├─ docs/
+  ├─ include/
+  ├─ lib/
+  |  ├─ libAACECore.so 
+  |  └─ ... 
+  ├─ share/
+  |  ├─ sampleapp/
+  |  |  ├─ certs/
+  |  |  ├─ config/
+  |  |  |  └─ config.json 
+  |  |  ├─ inputs/
+  |  |  ├─ menu/
+  |  |  |  └─ menu.json 
+  |  |  └─ sampledata/
+  |  └─ ... 
+  └─ aac-buildinfo.txt
+```
+
+#### Run the Sample App
+
+Before running the Sample App, you are required to configure the settings defined in the `share/sampleapp/config/config.json` file, including setting up your unique client ID and product information. This is described in more detail in the [Configure the Sample App](#configure-the-sample-app) section of this document. Once the configuration changes have been made, you can run the Sample App from the root directory of the extracted archive using the following command:
+
+```shell
+$ DYLD_LIBRARY_PATH=lib:+:${DYLD_LIBRARY_PATH} \
+    LD_LIBRARY_PATH=lib:+:${LD_LIBRARY_PATH} \
+    ./bin/SampleApp -c share/sampleapp/config/config.json -m share/sampleapp/menu/menu.json
+```
+
+### Build using Conan
+
+The Auto SDK C++ Sample App can be configured using the provided Conan recipe, and then built with CMake. The Conan recipe requires packages that are defined as part of Auto SDK, which must first be installed into the local cache (see [Building Auto SDK](../../BUILDING.md) for instructions about how to install Auto SDK Conan packages). If you are specifying any additional dependencies, such as extra modules for Auto SDK, those packages must also be installed in the Conan cache before configuring the Sample App.
+
+If the required dependencies are already installed, the following commands can be used to quickly configure, build and run the Sample App.
+
+```bash
+# export auto sdk conan dependencies
+$ python conan/setup.py
+
+# configure the sample app and install it in a build directory
+$ conan install samples/cpp -if=build-sampleapp -b missing
+
+# build the sample app in the build directory
+$ conan build samples/cpp -bf=build-sampleapp
+
+# run the sample app from the build directory
+$ cd build-sampleapp
+$ DYLD_LIBRARY_PATH=lib:+:${DYLD_LIBRARY_PATH} \
+  	 LD_LIBRARY_PATH=lib:+:${LD_LIBRARY_PATH} \
+     ./bin/SampleApp -c ./config/config.json -m ./menu/menu.json
+
+```
+> Note: These examples assume your working directory is set to the root `alexa-auto-sdk` directory.
+
+#### Specify build options
+
+You can use the following command line options with the Conan install command. The options are defined in the Conan recipe:
+
+**`aac_modules`** - Specify default Auto SDK modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. If this option is not overriden, the default value will be `core, alexa, cbl, system-audio`.
+
+**`extra_modules`** - Specify additional modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. This is a useful option if you want to specify modules to build in addition to the default modules, rather than replacing the default modules entirely.
+
+You can specify the options above using `-o` when running the Conan command. For example, to specify addtional modules that are included when building the Sample App, you can us the following option:
+
+```shell
+$ conan install samples/cpp -if=build-sampleapp -b missing \ 
+	-o extra_modules="navigation,phone-control"
+```
+
+#### Specify environment variables for configuration values
+
+For convenience, a [config file template](./assets/config/config.json) has been included for the core Auto SDK modules with well-known tokens (e.g. `CLIENT_ID`, `PRODUCT_ID`) for various configuration values. You can set environment variables for these tokens; when building the Sample App, they will be replaced in the configuration file.
+
+For example you can set an environment variable when running `conan install` like this:
+
+```bash
+$ CLIENT_ID=xxxx \
+  PRODUCT_ID=xxxx \
+    conan install ...
+```
+
+## Configure the Sample App
+
+You can pass one or more configuration files to the Sample App using the `--config <config-file-path>` flag. When you build additional modules with the sample app, you may need to pass module-specific configuration. Please refer to the `README` file within each module to get this configuration information. 
+
+For convenience, a [config file template](./assets/config/config.json) has been included for the core Auto SDK modules. You must customize this template with values specific to your implementation. You can either edit the configuration file manually or specify environment variables that can be used to override the configuration values when building the Sample App with Conan, see how to [specify environment variables for configuration values](#specify-environment-variables-for-configuration-values).
+
+To change the config file manually, follow these steps:
+
+1. Edit the [config file template](./assets/config/config.json) and save it.
 
 2. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_PRODUCT_ID}`, and `${YOUR_DEVICE_SERIAL_NUMBER}` placeholders with your values as follows:
    * Replace `${YOUR_CLIENT_ID}` with the Client ID, which you can find in your device's Security Profile under the **Other devices and platforms** tab.
@@ -75,84 +164,22 @@ You must customize this template with values specific to your implementation. To
 
  >**Note:** The Client ID and Product ID must correspond to a development device profile that you created as an **automotive** product by selecting the `Automotive` product category when you [filled in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information).  
 
-3. Additionally, you may customize the value of the database file paths that are included in the template. For example, you could change the `databaseFilePath` for the `miscDatabase` field to `/my/db/folder/miscDB.db` instead of `/opt/AAC/data/miscDatabase.db`. However, if you modify the database directory path, you must ensure that the directory exists and has write permissions. Therefore, for the previous example, you must ensure that `/my/db/folder` exists and has write permissions.
+3. Replace the `${DATA_PATH}` and `${CERTS_PATH}` with paths to your database and certificates, respectively. You must ensure that the directories exist and have write permissions.
 
  >**Note:** The Auto SDK engine will fail to start if the database directory path does not exist or does not have write permissions.
 
 4. Modify the vehicle information (`aace.vehicle`) to match your vehicle specifics.
 
-### Installing Dependencies
+## Use the Sample App
 
-After you have customized the configuration template, install dependencies:
+### Authenticate with AVS using Code-Based Linking (CBL)
 
-```shell
-sudo apt-get update
-sudo apt-get upgrade -y
-sudo apt-get install -y gstreamer1.0-libav \
-                        gstreamer1.0-plugins-bad \
-                        gstreamer1.0-plugins-good \
-                        libgstreamer-plugins-bad1.0-dev \
-                        libgstreamer-plugins-base1.0-dev \
-                        libgstreamer-plugins-good1.0-dev \
-                        libgstreamer1.0-dev
-```
+Every request to AVS requires an Login with Amazon (LWA) access token. Code-Based Linking (CBL) is the recommended method to acquire access tokens and is demonstrated by the C++ Sample App. After the Sample App launches, you will see the Main Menu. Follow these steps to authorize your device with AVS using CBL.
 
->**Note:** The command sequence above installs the minimum set of GStreamer libraries and plugins required by the [System Audio extension](../../extensions/system-audio/README.md) for audio capture/playback on Linux and Mac. See [Recommended Media Support](https://developer.amazon.com/docs/alexa-voice-service/recommended-media-support.html) for a list of codecs, containers, streaming formats, and playlists that your product should support to provide a familiar Alexa experience to your customers.
-
-## Building the C++ Sample App
-
-Follow the instructions in the [Alexa Auto SDK Builder](../../builder/README.md) documentation to set up your development environment, then from `${AAC_SDK_HOME}`, build the C++ Sample App with debug symbols:
-
-```shell
-$ builder/build.sh <platform> -t <target> --debug
-```
-
-For example, to build for just native Linux, use:
-
-```shell
-$ builder/build.sh linux -t native --debug
-```
-
-To build for multiple targets, include a comma-separated list of target values. For example:
-
-```shell
-$ builder/build.sh linux -t native,pokyarm,pokyarm64 --debug
-```
-
-See the [Alexa Auto SDK Builder documentation](../../builder/README.md#running-builder) for a list of supported platforms and targets.
-
->**Note:** The first run might take up to an hour to complete while OpenEmbedded generates all necessary toolchains internally.
-
-Install the generated C++ Sample App package into `/opt/AAC`:
-
-```shell
-$ sudo tar xf builder/deploy/native/aac-sdk-build-native.tar.gz -C /
-```
-Copy the edited config file from `samples/cpp/assets/config.json` to `/opt/AAC/etc/config.json`:
-
-`cp ${AAC_SDK_HOME}/samples/cpp/assets/config.json /opt/AAC/etc/`
-
-## Running the C++ Sample App
-
-The C++ Sample App requires that you specify one or more configuration files and other parameters at the command line. For convenience all needed configuration files and assets (such as certificates, sample data, and menu) are automatically copied to `/opt/AAC/etc/`. To run the C++ Sample App using default installation files:
-
-```shell
-$ LD_LIBRARY_PATH=/opt/AAC/lib \
-  /opt/AAC/bin/SampleApp --cbreak --config /opt/AAC/etc/config.json \
-                                  --menu   /opt/AAC/etc/menu.json > SampleApp.log
-```
-
->**Note:** The `config.json` file contains your device information and Alexa settings. The [menu file](./assets/menu.json) drives the hierarchical interactive text based menu system. Refer to the [menu documentation](./assets/MENU.md) for more information.
->
->When you run the C++ Sample App, a `config-system-audio.json` file with default audio settings for Linux platforms is copied to `/opt/AAC/etc`. For information about how to modify these settings for QNX, see the [System Audio extension README](../../extensions/system-audio/README.md#running-the-c-sampleapp-with-the-audio-configuration).
-
-### Authenticating with AVS using Code-Based Linking (CBL)
-
-After the Sample App launches, you will see the Main Menu. Follow these steps to authorize your device with AVS using CBL.
-
-#### Starting the CBL authorization
+#### Start the CBL authorization
 
 1. Press `A`, the Sample App displays the below message:
+
     ```shell
     ################################################################################
     #                                                                              #
@@ -163,6 +190,7 @@ After the Sample App launches, you will see the Main Menu. Follow these steps to
     [ 1 ]    Start CBL Authorization
     [ esc ]  Go back
     ```
+    
 2. Press `1` to start the CBL authorization. The Sample App displays messages, including a code and a URL in a format similar to the following:
 
     ```
@@ -178,7 +206,7 @@ After the Sample App launches, you will see the Main Menu. Follow these steps to
 4. In the browser, enter the code displayed in the Sample App.
 5. Click **Continue** and follow the instructions in the browser to complete the authentication.
 
-#### Canceling the authorization
+#### Cancel the authorization
 
 After you start the authorization, the `Authorization` menu displays option [1] for you to cancel the authorization that is in progress. Press `1` to cancel the authorization.
 
@@ -193,7 +221,7 @@ After you start the authorization, the `Authorization` menu displays option [1] 
  [ esc ]  Go back
 ```
 
-#### Logging out of the CBL authorization
+#### Log out of the CBL authorization
 
 After the device is registered successfully, the Sample App displays option [1] in the `Authorization` menu for you to log out of CBL authorization. Press `1` to log out from the authorization.
 
@@ -209,38 +237,25 @@ After the device is registered successfully, the Sample App displays option [1] 
 
 ```
 
-### Tailing the Log File
-
-Open a new terminal and tail the SampleApp.log file:
-
-```shell
-$ tail -f SampleApp.log
-```
-
-## Using the C++ Sample App
-### Authorization with AVS in the Sample App
-
-Every request to AVS requires an Login with Amazon (LWA) access token. Code-Based Linking (CBL) is the recommended method to acquire access tokens and is demonstrated by the C++ Sample App. See the [CBL module README](../../modules/cbl/README.md) for details about the Auto SDK's implementation of CBL.
-
-### Multimedia Support for QNX
+### Multimedia support for QNX
 
 The C++ Sample App supports the [BlackBerry QNX Multimedia Suite](https://blackberry.qnx.com/content/dam/qnx/products/qnxcar/QNX_MultimediaSuite_ProductBrief_Online_FINAL.pdf) for live audio input and output on QNX platforms. 
 
 >**Note:** The SHOUTcast/lcecast streaming format is not supported.
 
-See the [System Audio extension README](../../extensions/system-audio/README.md) for details about configuring audio input and output on QNX platforms.
+See the [System Audio extension README](../../modules/system-audio/README.md) for details about configuring audio input and output on QNX platforms.
 
-### AudioFile Menu
+### AudioFile menu
 
-The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](./assets/MENU.md#audiofile) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the [System Audio](../../extensions/system-audio/README.md) configuration defined in the config-system-audio.json file.
+The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](./assets/menu/MENU.md#audiofile) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the [System Audio](../../modules/system-audio/README.md) configuration defined in the config-system-audio.json file.
 
 >**Note:** The AudioFile menu appears on platforms that do not provide built-in audio support (such as platforms that are under development). On platforms that provide built-in audio support, the AudioFile menu does not appear. 
 
-### Handling Unknown Locations for Navigation Use Cases
+### Handle unknown locations for navigation use-cases
 Your platform implementation should handle cases where a GPS location cannot be obtained by returning the `UNDEFINED` value provided by the Auto SDK. In these cases, the Auto SDK does not report the location in the context, and your platform implementation should return a localization object initialized with `UNDEFINED` values for latitude and longitude ((latitude,longitude) = (`UNDEFINED`,`UNDEFINED`)) in the context object of every SpeechRecognizer event. 
 
-### Enabling SiriusXM as a Local Media Source
-The Sample App does not configure SiriusXM as a local media source by default. If you need the SiriusXM local media source, you must enable and build it. To do this, uncomment the following line in the [`Application.cpp`](./SampleApp/src/Application.cpp) class, then rebuild the Sample App:
+### Enable SiriusXM as a local media source
+The Sample App does not configure SiriusXM as a local media source by default. If you need the SiriusXM local media source, you must enable and build it. To do this, add the following line to the list of local media sources in the [`Application.cpp`](./src/Application.cpp#L493) class then rebuild the Sample App:
 
 `{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr }`
 
@@ -248,7 +263,7 @@ The Sample App does not configure SiriusXM as a local media source by default. I
 
 ## Troubleshooting
 
-* When interacting with Alexa, if the Dialog State goes from `LISTENING` immediately to `IDLE`, you might not be logged in. Try [logging into your account via CBL](#authenticating-with-avs-using-code-based-linking-cbl) by tapping `A` from the Main Menu.
+* When interacting with Alexa, if the Dialog State goes from `LISTENING` immediately to `IDLE`, you might not be logged in. Try [logging into your account via CBL](#authenticate-with-avs-using-code-based-linking-cbl) by tapping `A` from the Main Menu.
 
  >**Note:** For security reasons, authentication is not persisted if you quit the Sample App.  Upon relaunch, you must re-authenticate via CBL.  Restarting the app using the menu system, however, preserves authentication.
 
@@ -264,7 +279,4 @@ The Sample App does not configure SiriusXM as a local media source by default. I
     ...
     ```
     
-    To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
-    
-## Known Issues
-None.
+To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.

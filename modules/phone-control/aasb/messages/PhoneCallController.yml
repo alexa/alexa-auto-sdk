@@ -1,0 +1,170 @@
+topic: PhoneCallController
+namespace: aasb.message.phoneCallController.phoneCallController
+path: PhoneCallController/PhoneCallController
+
+messages:
+  - action: SendDTMF
+    direction: outgoing
+    desc: Notifies the platform implementation to send a DTMF signal to the calling device.
+    payload:
+      - name: payload
+        desc: Details of the DTMF request in structured JSON format.
+
+  - action: Dial
+    direction: outgoing
+    desc: Notifies the platform implementation to initiate an outgoing phone call to the destination address.
+    payload:
+      - name: payload
+        desc: Details of the dial request in structured JSON format.
+
+  - action: CreateCallId
+    direction: incoming
+    desc: Generates a unique identifier for a call.
+    reply:
+      - name: callId
+        desc: Unique identifier for a call.
+
+  - action: CallStateChanged
+    direction: incoming
+    desc: Notifies the Engine of a change in the state of an ongoing call.
+    payload:
+      - name: state
+        type: CallState
+        desc: The state of the call.
+      - name: callId
+        desc: The unique identifier associated with the call.
+      - name: callerId
+        desc: The identifier for a contact.
+        default: ""
+
+  - action: SendDTMFSucceeded
+    direction: incoming
+    desc: Notifies the Engine that sending the DTMF signal succeeded.
+    payload:
+      - name: callId
+        desc: The unique identifier for the associated call.
+
+  - action: ConnectionStateChanged
+    direction: incoming
+    desc: Notifies the Engine of a change in connection to a calling device.
+    payload:
+      - name: state
+        type: ConnectionState
+        desc: The state of connection to a calling device.
+
+  - action: CallFailed
+    direction: incoming
+    desc: Notifies the Engine of an error related to a call.
+    payload:
+      - name: callId
+        desc: The unique identifier for the call associated with the error.
+      - name: code
+        type: CallError
+        desc: The error type.
+      - name: message
+        desc: A description of the error.
+        default: ""
+
+  - action: CallerIdReceived
+    direction: incoming
+    desc: Notifies the Engine that a caller id was received for an inbound call.
+    payload:
+      - name: callId
+        desc: The unique identifier for the call associated with the callId.
+      - name: callerId
+        desc: The caller's identifier or phone number.
+
+  - action: DeviceConfigurationUpdated
+    direction: incoming
+    desc: Notifies the Engine of the calling feature configuration of the connected calling device.
+    payload:
+      - name: configurationMap
+        desc: A map of configuration properties to the boolean state of the properties.
+
+  - action: Redial
+    direction: outgoing
+    desc: Notifies the platform implementation to redial the last called phone number.
+    payload:
+      - name: payload
+        desc: Details of the redial request in structured JSON format.
+
+  - action: Stop
+    direction: outgoing
+    desc: Notifies the platform implementation to end an ongoing call or stop inbound or outbound call setup.
+    payload:
+      - name: payload
+        desc: Details of the stop request in structured JSON format.
+
+  - action: Answer
+    direction: outgoing
+    desc: Notifies the platform implementation to answer an inbound call.
+    payload:
+      - name: payload
+        desc: Details of the answer request in structured JSON format.
+
+  - action: SendDTMFFailed
+    direction: incoming
+    desc: Notifies the Engine that the DTMF signal could not be delivered to the remote party.
+    payload:
+      - name: callId
+        desc: callId The unique identifier for the associated call.
+      - name: code
+        type: DTMFError
+        desc: The error type.
+      - name: message
+        desc: A description of the error.
+        default: ""
+
+types:
+  - name: CallingDeviceConfigurationProperty
+    type: enum
+    values:
+      - name: DTMF_SUPPORTED
+        desc: Whether the device supports DTMF signaling.
+
+  - name: ConnectionState
+    type: enum
+    values:
+      - name: CONNECTED
+        desc: A calling device is connected.
+      - name: DISCONNECTED
+        desc: No calling device is connected.
+
+  - name: DTMFError
+    type: enum
+    values:
+      - name: CALL_NOT_IN_PROGRESS
+        desc: There is no active call through which a DTMF signal can be sent.
+      - name: DTMF_FAILED
+        desc: Generic DTMF error.
+
+  - name: CallError
+    type: enum
+    values:
+      - name: NO_CARRIER
+        desc: No carrier is available on the calling device.
+      - name: BUSY
+        desc: The calling device is busy when setting up an outbound call, such as when a call is already in progress.
+      - name: NO_ANSWER
+        desc: The remote party did not answer the call.
+      - name: NO_NUMBER_FOR_REDIAL
+        desc: Redial was requested, but there is no previously dialed number available.
+      - name: OTHER
+        desc: Generic error.
+
+  - name: CallState
+    type: enum
+    values:
+      - name: IDLE
+        desc: The call is not in an active state.
+      - name: DIALING
+        desc: The outbound call is initiated by the user. Call setup is in progress.
+      - name: OUTBOUND_RINGING
+        desc: The outbound call has been set up, and the remote party is alerted.
+      - name: ACTIVE
+        desc: The call is active, and media is being transmitted between the caller and remote party.
+      - name: CALL_RECEIVED
+        desc: An alert for the inbound call has been received.
+      - name: INBOUND_RINGING
+        desc: The inbound call is ringing.
+

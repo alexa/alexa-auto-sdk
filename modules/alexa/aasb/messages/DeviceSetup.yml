@@ -1,0 +1,26 @@
+topic: DeviceSetup
+namespace: aasb.message.alexa.deviceSetup
+path: Alexa/DeviceSetup
+
+messages:
+  - action: SetupCompleted
+    direction: incoming
+    desc: SetupCompleted description. # TODO
+
+  - action: SetupCompletedResponse
+    direction: outgoing
+    desc: SetupCompletedResponse description # TODO
+    payload:
+      - name: statusCode
+        type: StatusCode
+        desc: Status description. # TODO
+
+types:
+  - name: StatusCode
+    type: enum
+    values:
+      - name: SUCCESS
+        desc: Successful description. # TODO
+      - name: FAIL
+        desc: Failure description. # TODO
+

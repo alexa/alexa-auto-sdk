@@ -1,0 +1,27 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+participant Application  order 10
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 30
+participant "Alexa" as Alexa <<avs>> order 40
+
+Application -> Application : update device configuration
+Application -> AutoSDK : Publish DeviceConfigurationUpdated message
+AutoSDK -> Alexa : updates Alexa with the calling feature configuration of the calling device
+
+@enduml

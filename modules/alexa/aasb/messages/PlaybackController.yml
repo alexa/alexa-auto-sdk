@@ -1,0 +1,60 @@
+topic: PlaybackController
+namespace: aasb.message.alexa.playbackController
+path: Alexa/PlaybackController
+
+messages:
+
+  - action: ButtonPressed
+    direction: incoming
+    desc: > 
+      Notifies the Engine of a platform button request (i.e. Play/Pause/Next/Previous/Skip Forward/Skip Backward)
+      For certain playback types, the Engine will issue playback directives to the AudioPlayer MediaPlayer
+      to control playback on the platform.
+    payload:
+      - name: button
+        type: PlaybackButton
+        desc: The playback button type.
+
+  - action: TogglePressed
+    direction: incoming
+    desc: >
+      Notifies the Engine of a platform toggle request (i.e. Shuffle/Loop/Repeat/Thumbs Up/Thumbs Down) For certain 
+      playback types, the Engine will issue playback directives to the AudioPlayer MediaPlayer.
+    payload:
+      - name: toggle
+        type: PlaybackToggle
+        desc: The playback toggle type.
+      - name: action
+        type: bool
+        desc: The toggle action.
+
+types:
+  - name: PlaybackButton
+    type: enum
+    values:
+      - name: PLAY
+        desc: Play button.
+      - name: PAUSE
+        desc: Pause button.
+      - name: NEXT
+        desc: Next button.
+      - name: PREVIOUS
+        desc: Previous button.
+      - name: SKIP_FORWARD
+        desc: Skip Forward button.
+      - name: SKIP_BACKWARD
+        desc: Skip Backward button.
+
+  - name: PlaybackToggle
+    type: enum
+    values:
+      - name: SHUFFLE
+        desc: Shuffle toggle.
+      - name: LOOP
+        desc: Loop toggle.
+      - name: REPEAT
+        desc: Repeat toggle.
+      - name: THUMBS_UP
+        desc: Thumbs Up toggle.
+      - name: THUMBS_DOWN
+        desc: Thumbs Down toggle.

@@ -32,7 +32,7 @@ bool equal(const std::string& str1, const std::string& str2, bool caseSensitive)
         return str1 == str2;
     } else {
         // iterate through the chars in the two strings
-        for (auto j = 0; j < str1.size(); j++) {
+        for (size_t j = 0; j < str1.size(); j++) {
             ReturnIf(std::tolower(str1[j]) != std::tolower(str2[j]), false);
         }
     }

@@ -148,6 +148,7 @@ bool SpeechRecognizerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifierInterface> capabilityChangeNotifier,
     std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
     const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers) {
@@ -187,6 +188,7 @@ bool SpeechRecognizerEngineImpl::initialize(
             assetsManager,
             deviceSettingsDelegate.getWakeWordConfirmationSetting(),
             deviceSettingsDelegate.getSpeechConfirmationSetting(),
+            capabilityChangeNotifier,
             deviceSettingsDelegate.getWakeWordsSetting(),
             speechEncoder,
             alexaClientSDK::capabilityAgents::aip::AudioProvider::null(),
@@ -245,6 +247,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface> systemSoundPlayer,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifierInterface> capabilityChangeNotifier,
     std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
     const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers) {
@@ -264,6 +267,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
         ThrowIfNull(connectionManager, "invalidConnectionManager");
         ThrowIfNull(systemSoundPlayer, "invalidSystemSoundPlayer");
         ThrowIfNull(metricRecorder, "invalidMetricsRecorder");
+        ThrowIfNull(capabilityChangeNotifier, "invalidCapabilityChangeNotifier");
 
         speechRecognizerEngineImpl = std::shared_ptr<SpeechRecognizerEngineImpl>(
             new SpeechRecognizerEngineImpl(speechRecognizerPlatformInterface, audioFormat));
@@ -285,6 +289,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
                 systemSoundPlayer,
                 propertyManager,
                 metricRecorder,
+                capabilityChangeNotifier,
                 speechEncoder,
                 wakewordEngineAdapter,
                 initiatorVerifiers),
@@ -357,16 +362,19 @@ bool SpeechRecognizerEngineImpl::initializeAudioInputStream() {
     }
 }
 
-bool SpeechRecognizerEngineImpl::waitForExpectingAudioState(bool state, const std::chrono::seconds duration) {
+bool SpeechRecognizerEngineImpl::waitForExpectingAudioState(bool expectingAudio, const std::chrono::seconds duration) {
     std::unique_lock<std::mutex> lock(m_expectingAudioMutex);
 
-    return m_expectingAudioState_cv.wait_for(lock, duration, [this, state]() { return state == isExpectingAudio(); });
+    return m_expectingAudioState_cv.wait_for(
+        lock, duration, [this, expectingAudio]() { return expectingAudio == isExpectingAudioLocked(); });
 }
 
 bool SpeechRecognizerEngineImpl::startAudioInput() {
+    AACE_VERBOSE(LX(TAG));
+    std::unique_lock<std::mutex> lock(m_expectingAudioMutex);
     try {
         // if we are already expecting audio then don't attempt to start the audio
-        if (isExpectingAudio()) {
+        if (isExpectingAudioLocked()) {
             AACE_WARN(LX(TAG, "startAudioInput").d("reason", "alreadyExpectingAudio"));
             return true;
         }
@@ -388,7 +396,7 @@ bool SpeechRecognizerEngineImpl::startAudioInput() {
             m_currentChannelId == aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL,
             "audioInputChannelStartFailed");
 
-        // notify mutext that the expecting audio state has changed
+        // notify mutex that the expecting audio state has changed
         m_expectingAudioState_cv.notify_all();
 
         return true;
@@ -399,28 +407,39 @@ bool SpeechRecognizerEngineImpl::startAudioInput() {
 }
 
 bool SpeechRecognizerEngineImpl::stopAudioInput() {
+    AACE_VERBOSE(LX(TAG));
+    std::unique_lock<std::mutex> lock(m_expectingAudioMutex);
     try {
         ThrowIf(
             m_currentChannelId == aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL,
             "invalidAudioChannelId");
-        ThrowIfNot(m_audioInputChannel->stop(m_currentChannelId), "audioInputChannelStopFailed");
-
-        // notify mutext that the expecting audio state has changed
-        m_expectingAudioState_cv.notify_all();
+        m_audioInputChannel->stop(m_currentChannelId);
 
         // reset the channel id
         m_currentChannelId = aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL;
 
+        // notify expecting audio wait condition that the state has changed
+        m_expectingAudioState_cv.notify_all();
+
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "stopAudioInput").d("reason", ex.what()).d("id", m_currentChannelId));
-        m_currentChannelId = aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL;
         return false;
     }
 }
 
 bool SpeechRecognizerEngineImpl::isExpectingAudio() {
+    std::unique_lock<std::mutex> lock(m_expectingAudioMutex);
+    return isExpectingAudioLocked();
+}
+
+bool SpeechRecognizerEngineImpl::isExpectingAudioLocked() {
     return m_currentChannelId != aace::engine::audio::AudioInputChannelInterface::INVALID_CHANNEL;
+}
+
+aace::engine::audio::AudioInputChannelInterface::ChannelId SpeechRecognizerEngineImpl::getCurrentChannelId() {
+    std::unique_lock<std::mutex> lock(m_expectingAudioMutex);
+    return m_currentChannelId;
 }
 
 // SpeechRecognizer
@@ -429,6 +448,7 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
     uint64_t keywordBegin,
     uint64_t keywordEnd,
     const std::string& keyword) {
+    AACE_INFO(LX(TAG).d("initiator", initiator));
     std::stringstream ss;
     ss << initiator;
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStartCapture", {METRIC_SPEECHRECOGNIZER_START_CAPTURE, ss.str()});
@@ -508,18 +528,19 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
                        .d("reason", ex.what())
                        .d("initiator", initiator)
                        .d("state", m_state)
-                       .d("id", m_currentChannelId));
+                       .d("id", getCurrentChannelId()));
         return false;
     }
 }
 
 bool SpeechRecognizerEngineImpl::onStopCapture() {
+    AACE_INFO(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStopCapture", {METRIC_SPEECHRECOGNIZER_STOP_CAPTURE});
     try {
         ThrowIfNot(m_audioInputProcessor->stopCapture().get(), "stopCaptureFailed");
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onStopCapture").d("reason", ex.what()).d("id", m_currentChannelId));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", getCurrentChannelId()));
         return false;
     }
 }
@@ -534,18 +555,18 @@ ssize_t SpeechRecognizerEngineImpl::write(const int16_t* data, const size_t size
 
         return result;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "write").d("reason", ex.what()).d("id", m_currentChannelId));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", getCurrentChannelId()));
         return -1;
     }
 }
 
 void SpeechRecognizerEngineImpl::addObserver(std::shared_ptr<WakewordObserverInterface> observer) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_observerMutex);
     m_observers.insert(observer);
 }
 
 void SpeechRecognizerEngineImpl::removeObserver(std::shared_ptr<WakewordObserverInterface> observer) {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_observerMutex);
     m_observers.erase(observer);
 }
 
@@ -571,7 +592,7 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
             m_speechRecognizerPlatformInterface->wakewordDetected(keyword);
 
             // notify observers about the wakeword detected
-            std::lock_guard<std::mutex> lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_observerMutex);
 
             for (const auto& next : m_observers) {
                 next->wakewordDetected(keyword);
@@ -604,6 +625,7 @@ bool SpeechRecognizerEngineImpl::startCapture(
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index keywordEnd,
     const std::string& keyword) {
     try {
+        AACE_VERBOSE(LX(TAG));
         // ask the aip to start recognizing input
         auto startOfSpeechTimestamp = std::chrono::steady_clock::now();
         if (alexaClientSDK::capabilityAgents::aip::Initiator::WAKEWORD == initiator) {
@@ -623,7 +645,7 @@ bool SpeechRecognizerEngineImpl::startCapture(
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "startCapture").d("reason", ex.what()).d("id", m_currentChannelId));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", getCurrentChannelId()));
         m_audioInputProcessor->resetState();
         return false;
     }
@@ -639,6 +661,8 @@ bool SpeechRecognizerEngineImpl::isWakewordEnabled() {
 
 bool SpeechRecognizerEngineImpl::enableWakewordDetection() {
     try {
+        AACE_INFO(LX(TAG));
+
         // check to make sure wakeword is supported
         ThrowIfNot(isWakewordSupported(), "wakewordNotSupported");
 
@@ -666,6 +690,7 @@ bool SpeechRecognizerEngineImpl::enableWakewordDetection() {
 }
 
 bool SpeechRecognizerEngineImpl::disableWakewordDetection() {
+    AACE_INFO(LX(TAG));
     bool success = true;
 
     try {
@@ -685,13 +710,13 @@ bool SpeechRecognizerEngineImpl::disableWakewordDetection() {
     m_wakewordEngineAdapter->disable();
     m_wakewordEnabled = false;
 
-    //setExpectingAudioState( false );
-
     return success;
 }
 
 void SpeechRecognizerEngineImpl::onStateChanged(
     alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State state) {
+    AACE_VERBOSE(LX(TAG).d("state", state));
+
     m_state = state;
 
     // state changed to BUSY means that either the StopCapture directive has been received
@@ -703,7 +728,6 @@ void SpeechRecognizerEngineImpl::onStateChanged(
                 if (stopAudioInput() == false) {
                     AACE_ERROR(LX(TAG, "handleAudioStateChanged").d("reason", "stopAudioInputFailed"));
                 }
-                //setExpectingAudioState( false );
             }
         }
     } else if (state == alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::IDLE) {
@@ -711,15 +735,10 @@ void SpeechRecognizerEngineImpl::onStateChanged(
             if (stopAudioInput() == false) {
                 AACE_ERROR(LX(TAG, "handleAudioStateChanged").d("reason", "stopAudioInputFailed"));
             }
-
-            //setExpectingAudioState( false );
         }
     } else if (
         state ==
         alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State::EXPECTING_SPEECH) {
-        // let the recognizer know we are expecting audio from the platform interface
-        //setExpectingAudioState( true );
-
         // call platform interface if we are starting the recognizer and the
         // wakeword engine was not already enabled...
         if (m_wakewordEnabled == false) {

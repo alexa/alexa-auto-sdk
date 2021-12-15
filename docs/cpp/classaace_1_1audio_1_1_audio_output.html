@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -87,6 +87,8 @@ Public Types</h2></td></tr>
 <tr class="separator:ab1be1bc2a34898eba12b799787d908c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3259653b849b84a183de95091860dd21"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a3259653b849b84a183de95091860dd21">MediaError</a> = aace::audio::AudioOutputEngineInterface::MediaError</td></tr>
 <tr class="separator:a3259653b849b84a183de95091860dd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c1ae35009e69410b2b4e7be3f36c187"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a4c1ae35009e69410b2b4e7be3f36c187">FocusAction</a> = aace::audio::AudioOutputEngineInterface::FocusAction</td></tr>
+<tr class="separator:a4c1ae35009e69410b2b4e7be3f36c187"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -94,6 +96,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2e67f2223e68d842685da2f32f14d49d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac65040330bf053723e6ded2df6c2da88"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#ac65040330bf053723e6ded2df6c2da88">prepare</a> (const std::string &amp;url, bool repeating)=0</td></tr>
 <tr class="separator:ac65040330bf053723e6ded2df6c2da88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a662b7237e069d491c278b3175b3246a8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a662b7237e069d491c278b3175b3246a8">mayDuck</a> ()=0</td></tr>
+<tr class="separator:a662b7237e069d491c278b3175b3246a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5318ee52ef7ec7216ede5d09b7099c80"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a5318ee52ef7ec7216ede5d09b7099c80">play</a> ()=0</td></tr>
 <tr class="separator:a5318ee52ef7ec7216ede5d09b7099c80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80a92aeb055e394e6661c43f9217c670"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a80a92aeb055e394e6661c43f9217c670">stop</a> ()=0</td></tr>
@@ -102,6 +106,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ab0a3cb1163e4a2b4fa6ed0fbb54bdc4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16da42e4ec758e6635ab01c01bd435e5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a16da42e4ec758e6635ab01c01bd435e5">resume</a> ()=0</td></tr>
 <tr class="separator:a16da42e4ec758e6635ab01c01bd435e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a127f6c48e927c2ad6d908dc7ba724da5"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a127f6c48e927c2ad6d908dc7ba724da5">startDucking</a> ()=0</td></tr>
+<tr class="separator:a127f6c48e927c2ad6d908dc7ba724da5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a616f8d7ed77d3afcbb684977bf98368b"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a616f8d7ed77d3afcbb684977bf98368b">stopDucking</a> ()=0</td></tr>
+<tr class="separator:a616f8d7ed77d3afcbb684977bf98368b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04ff4005d0f36300bc54421906b89299"><td class="memItemLeft" align="right" valign="top">virtual int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a04ff4005d0f36300bc54421906b89299">getPosition</a> ()=0</td></tr>
 <tr class="separator:a04ff4005d0f36300bc54421906b89299"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d621811ac53c6128ad435546ba964e7"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a2d621811ac53c6128ad435546ba964e7">setPosition</a> (int64_t position)=0</td></tr>
@@ -118,6 +126,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0159c40c50906ee017f1de903fc23590"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e4b3034d90818de56f925b227f2c2b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a5e4b3034d90818de56f925b227f2c2b7">mediaError</a> (<a class="el" href="classaace_1_1audio_1_1_audio_output.html#a3259653b849b84a183de95091860dd21">MediaError</a> error, const std::string &amp;description=&quot;&quot;)</td></tr>
 <tr class="separator:a5e4b3034d90818de56f925b227f2c2b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c7eb63ef509c2e39888c0b841f1be5d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a8c7eb63ef509c2e39888c0b841f1be5d">audioFocusEvent</a> (<a class="el" href="classaace_1_1audio_1_1_audio_output.html#a4c1ae35009e69410b2b4e7be3f36c187">FocusAction</a> action)</td></tr>
+<tr class="separator:a8c7eb63ef509c2e39888c0b841f1be5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -157,6 +167,21 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Describes an error during a media playback operation </p><dl class="section see"><dt>See also</dt><dd><code>aace::alexa::MediaPlayerEngineInterface::MediaError</code> </dd></dl>
+
+</div>
+</div>
+<a id="a4c1ae35009e69410b2b4e7be3f36c187"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c1ae35009e69410b2b4e7be3f36c187">&#9670;&nbsp;</a></span>FocusAction</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using aace::audio::AudioOutput::FocusAction =  aace::audio::AudioOutputEngineInterface::FocusAction</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Describes a focus action platform interface reports or requests </p><dl class="section see"><dt>See also</dt><dd><code>aace::audio::AudioOutputEngineInterface::FocusAction</code> </dd></dl>
 
 </div>
 </div>
@@ -280,6 +305,32 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a662b7237e069d491c278b3175b3246a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a662b7237e069d491c278b3175b3246a8">&#9670;&nbsp;</a></span>mayDuck()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::audio::AudioOutput::mayDuck </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation only if prepared media allows platform interface to duck the volume if any high priority audio stream is in the focus. If platform interface ducks the volume, report the state using <code>audioFocusEvent</code> always. If <code>mayDuck</code> is not called, platform interface can assume that media is not allowed to duck. </p>
+
+</div>
+</div>
 <a id="a5318ee52ef7ec7216ede5d09b7099c80"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5318ee52ef7ec7216ede5d09b7099c80">&#9670;&nbsp;</a></span>play()</h2>
 
@@ -385,6 +436,58 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 <p>Notifies the platform implementation to resume playback of the current audio source. After returning <code>true</code>, the platform implementation must call <code><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a0159c40c50906ee017f1de903fc23590">mediaStateChanged()</a></code> with <code>MediaState.PLAYING</code> when the media player resumes the audio or <code><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a5e4b3034d90818de56f925b227f2c2b7">mediaError()</a></code> if an error occurs.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
+
+</div>
+</div>
+<a id="a127f6c48e927c2ad6d908dc7ba724da5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a127f6c48e927c2ad6d908dc7ba724da5">&#9670;&nbsp;</a></span>startDucking()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool aace::audio::AudioOutput::startDucking </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to move the playback in background. If platform implementation supports audio ducking, reduce the media player volume according to platform guidelines. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully attenuated the volume, else <code>false</code>. If <code>false</code> is returned, <code>stopDucking</code> call will not be received. </dd></dl>
+
+</div>
+</div>
+<a id="a616f8d7ed77d3afcbb684977bf98368b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a616f8d7ed77d3afcbb684977bf98368b">&#9670;&nbsp;</a></span>stopDucking()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool aace::audio::AudioOutput::stopDucking </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation to move the playback in foreground. If platform implementation supports audio ducking, restore the media player volume to original value. </p><dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully restored the volume, else <code>false</code>. If <code>false</code> is returned, internal state considers that platform implementation is still in the ducked state which may result into unexpected behavior. </dd></dl>
 
 </div>
 </div>
@@ -634,6 +737,31 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a8c7eb63ef509c2e39888c0b841f1be5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c7eb63ef509c2e39888c0b841f1be5d">&#9670;&nbsp;</a></span>audioFocusEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void aace::audio::AudioOutput::audioFocusEvent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classaace_1_1audio_1_1_audio_output.html#a4c1ae35009e69410b2b4e7be3f36c187">FocusAction</a>&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Request engine to perform the action mentioned in the parameter.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">action</td><td>An <code>FocusAction</code> platform interface wishes to request. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a6e6edf1cd19f4da033cfe3607d8872f3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6e6edf1cd19f4da033cfe3607d8872f3">&#9670;&nbsp;</a></span>TIME_UNKNOWN</h2>
@@ -663,7 +791,7 @@ Static Public Attributes</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

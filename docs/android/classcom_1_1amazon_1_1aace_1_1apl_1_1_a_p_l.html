@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -91,6 +91,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aec3a62d39544f8a79a6577c3adc29900"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e7a734a3c5045cfc2f978485975387c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a1e7a734a3c5045cfc2f978485975387c">interruptCommandSequence</a> (String token)</td></tr>
 <tr class="separator:a1e7a734a3c5045cfc2f978485975387c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8265265f94368f013d406a91b6c3b7b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#ad8265265f94368f013d406a91b6c3b7b">updateAPLRuntimeProperties</a> (String properties)</td></tr>
+<tr class="separator:ad8265265f94368f013d406a91b6c3b7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -118,10 +120,14 @@ Protected Member Functions</h2></td></tr>
 <tr class="separator:a02696580fc976b4ab7596512a5613c1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a846222db2e1244525bedcc935274a582"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#a846222db2e1244525bedcc935274a582">sendDeviceWindowState</a> (String state)</td></tr>
 <tr class="separator:a846222db2e1244525bedcc935274a582"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae35c1175f6ff0be3848ba29f7a1f22d2"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html#ae35c1175f6ff0be3848ba29f7a1f22d2">setPlatformProperty</a> (String name, String value)</td></tr>
+<tr class="separator:ae35c1175f6ff0be3848ba29f7a1f22d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> should be extended to handle receiving Alexa Presentation <code>RenderDocument</code> and <code>ExecuteCommands</code> directives from AVS. These directives contain metadata for rendering or operating on display cards for devices with GUI support. For more information about Alexa Presentation Language (<a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a>) see the interface overview:</p>
-<p><a href="https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html">https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html</a> </p>
+<p><a href="https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html">https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html</a></p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000029">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>aace::core::MessageBroker </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ad7a2d8bcd734b02486ccced4656df947"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad7a2d8bcd734b02486ccced4656df947">&#9670;&nbsp;</a></span>renderDocument()</h2>
@@ -291,6 +297,31 @@ Protected Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">token</td><td>The <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> presentation token associated with the current rendered document. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad8265265f94368f013d406a91b6c3b7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8265265f94368f013d406a91b6c3b7b">&#9670;&nbsp;</a></span>updateAPLRuntimeProperties()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void com.amazon.aace.apl.APL.updateAPLRuntimeProperties </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>properties</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation of <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> runtime environment properties that must be updated. The Engine will generate these values based on the <code>setAPLProperty()</code> values. The <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> runtime will be affected by these values.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">properties</td><td>A JSON object in string form containing the <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> runtime properties that need to be updated. <div class="fragment"><div class="line">{</div><div class="line">     &quot;drivingState&quot; : &quot;parked|moving&quot;,</div><div class="line">     &quot;theme&quot; : &quot;light|light-gray1|light-gray2|dark|dark-black|dark-gray&quot;,</div><div class="line">     &quot;video&quot; : &quot;enabled|disabled&quot;</div><div class="line">}</div></div><!-- fragment --> </td></tr>
   </table>
   </dd>
 </dl>
@@ -743,12 +774,68 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ae35c1175f6ff0be3848ba29f7a1f22d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae35c1175f6ff0be3848ba29f7a1f22d2">&#9670;&nbsp;</a></span>setPlatformProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">final void com.amazon.aace.apl.APL.setPlatformProperty </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The rendered <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> experience will rely on the value of some defined properties. The platform implementation must report these values to provide a safe visual experience in the vehicle.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the property. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>The value of the property.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Contact your Solutions Architect for an updated list of automotive themes identifiers.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>Supported names and values.</dd></dl>
+<table class="doxtable">
+<tr>
+<th>Name </th><th>Values </th><th>Description  </th></tr>
+<tr>
+<td>drivingState </td><td>parked, moving </td><td>Set this property when vehicle driving state changes. </td></tr>
+<tr>
+<td>uiMode </td><td>day, night </td><td>This affects the contrast of certified <a class="el" href="classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html">APL</a> experiences. </td></tr>
+<tr>
+<td>themeId </td><td>&lt;string&gt; </td><td>Contact Solutions Architect for list of values. </td></tr>
+</table>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

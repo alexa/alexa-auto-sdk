@@ -42,8 +42,8 @@ ExternalMediaAdapterHandler::ExternalMediaAdapterHandler(
     std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
     std::shared_ptr<FocusHandlerInterface> focusHandler) :
         ExternalMediaAdapterHandlerInterface::ExternalMediaAdapterHandlerInterface(TAG),
-        m_discoveredPlayerSender(discoveredPlayerSender),
         m_focusHandler(focusHandler),
+        m_discoveredPlayerSender(discoveredPlayerSender),
         m_muted(false),
         m_volume(DEFAULT_SPEAKER_VOLUME) {
 }

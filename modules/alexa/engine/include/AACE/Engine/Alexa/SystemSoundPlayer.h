@@ -53,6 +53,7 @@ public:
     // aace::audio::AudioOutputEngineInterface
     void onMediaStateChanged(MediaState state) override;
     void onMediaError(MediaError error, const std::string& description) override;
+    void onAudioFocusEvent(FocusAction action) override;
 
     // alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface
     std::shared_future<bool> playTone(Tone tone) override;

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            Rendez-vous à <font color=\'#33B5E5\'>%1$s</font> et connectez-vous. Puis saisissez ce code :
+        ]]>
+    </string>
+    <string name="try_alexa_button">ESSAYER ALEXA</string>
+    <string name="privacy_notice_button">Avis de confidentialité</string>
+    <string name="terms_of_use_button">Conditions d\'utilisation</string>
+    <string name="login_action_retry_button">Réessayer</string>
+    <string name="sign_in_action_button">SE CONNECTER</string>
+    <string name="login_later_action_button">SE CONNECTER PLUS TARD</string>
+    <string name="login_connect_to_aacs">Veuillez patienter pendant la connexion à AACS…</string>
+    <string name="login_message">Utilisez la voix pour tirer le maximum de votre conduite. Alexa peut vous aider avec les itinéraires, la musique, les appels, et plus encore.</string>
+    <string name="enable_preview_mode_header">Activer Alexa sans se connecter?</string>
+    <string name="enable_preview_mode_action_button">ACCEPTER ET ACTIVER ALEXA</string>
+    <string name="enable_preview_mode_message">Vous pouvez continuer à parler à Alexa pour demander les nouvelles et obtenir des itinéraires. Pour la musique, la météo, la maison intelligente et plus encore, connectez-vous.</string>
+    <string name="enable_preview_mode_disclaimer">Amazon traite et retient les interactions d\'Alexa et des autres données dans le nuage pour fournir et améliorer nos services.  En sélectionnant «&#160;Accepter et activer Alexa&#160;», vous acceptez les <annotation placeholder="">Conditions d\'utilisation Amazon</annotation> et <annotation placeholder="">toutes les conditions disponibles ici</annotation>. \n\n<annotation placeholder="">Découvrez comment Alexa est conçue pour protéger votre vie privée</annotation>.</string>
+    <string name="enable_preview_mode_error_message">Un problème est survenu pendant l\'activation du mode Aperçu. Veuillez réessayer.</string>
+    <string name="login_method_or_text">Ou scannez ce code&#160;:</string>
+    <string name="login_finish_heading_text">Tout est prêt, %1$s!</string>
+    <string name="login_finish_try_text">Essayez&#160;:</string>
+    <string name="login_network_settings">PARAMÈTRES RÉSEAU</string>
+    <string name="login_network_error_heading_text">Erreur réseau</string>
+    <string name="login_network_error_body_text">Alexa a besoin d\'accéder à l\'Internet pour terminer la configuration. \n Veuillez vérifier votre connexion réseau et réessayer.</string>
+    <string name="cbl_login_title">Connectez-vous à votre compte Amazon</string>
+    <string name="cbl_login_alexa_hint1">«&#160;Alexa, règle la température sur 22.&#160;»</string>
+    <string name="cbl_login_alexa_hint2">«&#160;Alexa, trouve un café&#160;»</string>
+    <string name="cbl_login_alexa_hint3">«&#160;Alexa, joue de la musique&#160;»</string>
+    <string name="auth_provider_login_alexa_hint1">«&#160;Alexa, règle la température sur 22.&#160;»</string>
+    <string name="auth_provider_login_alexa_hint2">«&#160;Alexa, emmène-moi à l\'aéroport.&#160;»</string>
+    <string name="auth_provider_login_alexa_hint3">«&#160;Alexa, règle la radio sur 88,5 FM.&#160;»</string>
+    <string name="auth_provider_sign_in_hint">Pour la musique, la météo, la maison intelligente, et plus encore, connectez-vous.</string>
+    <string name="login_all_done_btn_text">TERMINÉ</string>
+    <string name="setting_alexa_language_title">Langue d\'Alexa</string>
+    <string name="select_language_action_button">SÉLECTIONNER LA LANGUE</string>
+    <string name="select_language_body">Alexa n\'est pas disponible en %1$s. Sélectionnez une langue pour Alexa.</string>
+    <string name="select_language_continue_button">CONTINUER</string>
+    <string name="setup_not_complete_header">Un problème est survenu</string>
+    <string name="setup_not_complete_text">Un problème est survenu pendant la configuration d\'Alexa. Veuillez réessayer.</string>
+    <string name="setup_not_complete_text_with_alexa_custom_assistant">Un problème est survenu pendant la configuration. Veuillez réessayer.</string>
+    <string name="cbl_login_error_message">Un problème est survenu pendant la connexion. Veuillez réessayer.</string>
+    <string name="setup_not_complete_retry_button">RÉESSAYER</string>
+    <string name="skip_permission_button_text">IGNORER</string>
+    <string name="use_location_button_text">UTILISER LA LOCALISATION</string>
+    <string name="location_permission_header_text">Qu\'y a-t-il à proximité?</string>
+    <string name="location_permission_body_text">Partagez la localisation de votre véhicule avec Alexa pour obtenir des réponses plus intelligentes sur les restaurants à proximité, la météo locale et plus encore.</string>
+    <string name="location_permission_body_text_with_alexa_custom_assistant">Partagez la localisation de votre véhicule avec [Brandon] et Alexa pour obtenir des réponses plus intelligentes sur les restaurants à proximité, la météo locale et plus encore.</string>
+    <string name="location_permission_hint_text">«&#160;Alexa, trouve des restaurants à proximité.&#160;»</string>
+</resources>

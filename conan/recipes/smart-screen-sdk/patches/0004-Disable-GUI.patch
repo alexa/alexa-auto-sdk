@@ -1,0 +1,25 @@
+From cf7c0c54df12fe851ebb2f78b8eacc8da472f2d2 Mon Sep 17 00:00:00 2001
+From: Eze Cervantes <ezeqc@amazon.com>
+Date: Thu, 9 Sep 2021 16:43:12 -0700
+Subject: [PATCH] Disable GUI
+
+---
+ modules/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/modules/CMakeLists.txt b/modules/CMakeLists.txt
+index 45145b6..fde1e54 100644
+--- a/modules/CMakeLists.txt
++++ b/modules/CMakeLists.txt
+@@ -6,5 +6,5 @@ project(modules LANGUAGES CXX)
+ add_subdirectory("Alexa")
+ if (NOT MSVC)
+ 	# For UWP, build the GUIClient on UWP branch on a different platform
+-	add_subdirectory("GUI")
+-endif()
+\ No newline at end of file
++  # add_subdirectory("GUI")
++endif()
+-- 
+2.30.1 (Apple Git-130)
+

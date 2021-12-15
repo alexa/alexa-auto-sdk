@@ -1,0 +1,5071 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+    
+    
+      
+        <title>Navigation Module - Alexa Auto SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a617204b.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.9204c3b2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#navigation-module" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Alexa Auto SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Navigation Module
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../GETSTARTED/" class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../BUILDING/" class="md-tabs__link">
+        Build Auto SDK
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../SDK_MODULES/" class="md-tabs__link md-tabs__link--active">
+        Modules
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../aacs/android/" class="md-tabs__link">
+        AACS
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../samples/cpp/" class="md-tabs__link">
+        Sample App
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../LINUX_INTEGRATION/" class="md-tabs__link">
+      Linux Integration
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../MIGRATION/" class="md-tabs__link">
+        Migration Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../NEED_HELP/" class="md-tabs__link">
+      Need Help?
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-tabs__link">
+        More
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Alexa Auto SDK" class="md-nav__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    Alexa Auto SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GETSTARTED/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Build Auto SDK
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Build Auto SDK" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Build Auto SDK
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BUILDING/" class="md-nav__link">
+        Build Alexa Auto SDK
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../builder/">Auto SDK Builder Tool Reference</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Auto SDK Builder Tool Reference" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Auto SDK Builder Tool Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Modules
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Modules" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Modules
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SDK_MODULES/" class="md-nav__link">
+        Auto SDK Modules and Extensions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2">
+          AASB
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aasb/aasb-docs/AASB/" class="md-nav__link">
+        AASB Message Definition
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../address-book/">Address Book</a>
+          
+            <label for="__nav_4_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Address Book" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Address Book
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3_2" type="checkbox" id="__nav_4_3_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_3_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../address-book/aasb-docs/AddressBook/" class="md-nav__link">
+        Address Book
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../alexa/">Alexa</a>
+          
+            <label for="__nav_4_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Alexa" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          Alexa
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4_2" type="checkbox" id="__nav_4_4_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_4_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/Alerts/" class="md-nav__link">
+        Alerts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AlexaClient/" class="md-nav__link">
+        AlexaClient
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AlexaSpeaker/" class="md-nav__link">
+        AlexaSpeaker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AudioPlayer/" class="md-nav__link">
+        AudioPlayer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AuthProvider/" class="md-nav__link">
+        AuthProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/DeviceSetup/" class="md-nav__link">
+        DeviceSetup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/DoNotDisturb/" class="md-nav__link">
+        DoNotDisturb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/EqualizerController/" class="md-nav__link">
+        EqualizerController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/ExternalMediaAdapter/" class="md-nav__link">
+        ExternalMediaAdapter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/GlobalPreset/" class="md-nav__link">
+        GlobalPreset
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/LocalMediaSource/" class="md-nav__link">
+        LocalMediaSource
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/MediaPlaybackRequestor/" class="md-nav__link">
+        MediaPlaybackRequestor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/Notifications/" class="md-nav__link">
+        Notifications
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/PlaybackController/" class="md-nav__link">
+        PlaybackController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/SpeechRecognizer/" class="md-nav__link">
+        SpeechRecognizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/TemplateRuntime/" class="md-nav__link">
+        TemplateRuntime
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5" type="checkbox" id="__nav_4_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../apl/">APL</a>
+          
+            <label for="__nav_4_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          APL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5_2" type="checkbox" id="__nav_4_5_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_5_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../apl/aasb-docs/APL/" class="md-nav__link">
+        APL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_6" type="checkbox" id="__nav_4_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../bluetooth/">Bluetooth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Bluetooth" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_6">
+          <span class="md-nav__icon md-icon"></span>
+          Bluetooth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7" type="checkbox" id="__nav_4_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../car-control/">CarControl</a>
+          
+            <label for="__nav_4_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CarControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_7">
+          <span class="md-nav__icon md-icon"></span>
+          CarControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7_2" type="checkbox" id="__nav_4_7_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_7_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../car-control/aasb-docs/CarControl/" class="md-nav__link">
+        CarControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8" type="checkbox" id="__nav_4_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../cbl/">CBL</a>
+          
+            <label for="__nav_4_8">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CBL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_8">
+          <span class="md-nav__icon md-icon"></span>
+          CBL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8_2" type="checkbox" id="__nav_4_8_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_8_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cbl/aasb-docs/CBL/" class="md-nav__link">
+        CBL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9" type="checkbox" id="__nav_4_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../connectivity/">Connectivity</a>
+          
+            <label for="__nav_4_9">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Connectivity" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_9">
+          <span class="md-nav__icon md-icon"></span>
+          Connectivity
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9_2" type="checkbox" id="__nav_4_9_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_9_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connectivity/aasb-docs/AlexaConnectivity/" class="md-nav__link">
+        AlexaConnectivity
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10" type="checkbox" id="__nav_4_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../core/">Core</a>
+          
+            <label for="__nav_4_10">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_10">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10_2" type="checkbox" id="__nav_4_10_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_10_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/AudioInput/" class="md-nav__link">
+        AudioInput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/AudioOutput/" class="md-nav__link">
+        AudioOutput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/Authorization/" class="md-nav__link">
+        Authorization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/DeviceUsage/" class="md-nav__link">
+        DeviceUsage
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/LocationProvider/" class="md-nav__link">
+        LocationProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/NetworkInfoProvider/" class="md-nav__link">
+        NetworkInfoProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/PropertyManager/" class="md-nav__link">
+        PropertyManager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11" type="checkbox" id="__nav_4_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../custom-domain/">CustomDomain</a>
+          
+            <label for="__nav_4_11">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CustomDomain" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_11">
+          <span class="md-nav__icon md-icon"></span>
+          CustomDomain
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11_2" type="checkbox" id="__nav_4_11_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_11_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-domain/aasb-docs/CustomDomain/" class="md-nav__link">
+        CustomDomain
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_12" type="checkbox" id="__nav_4_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../loopback-detector/">LoopbackDetector</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="LoopbackDetector" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_12">
+          <span class="md-nav__icon md-icon"></span>
+          LoopbackDetector
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13" type="checkbox" id="__nav_4_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../messaging/">Messaging</a>
+          
+            <label for="__nav_4_13">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Messaging" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_13">
+          <span class="md-nav__icon md-icon"></span>
+          Messaging
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13_2" type="checkbox" id="__nav_4_13_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_13_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_13_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../messaging/aasb-docs/Messaging/" class="md-nav__link">
+        Messaging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14" type="checkbox" id="__nav_4_14" checked>
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index md-nav__link--active">
+          <a href="./">Navigation</a>
+          
+            <label for="__nav_4_14">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Navigation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_14">
+          <span class="md-nav__icon md-icon"></span>
+          Navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14_2" type="checkbox" id="__nav_4_14_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_14_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/Navigation/" class="md-nav__link">
+        Navigation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15" type="checkbox" id="__nav_4_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../phone-control/">PhoneControl</a>
+          
+            <label for="__nav_4_15">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="PhoneControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_15">
+          <span class="md-nav__icon md-icon"></span>
+          PhoneControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15_2" type="checkbox" id="__nav_4_15_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_15_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phone-control/aasb-docs/PhoneCallController/" class="md-nav__link">
+        PhoneControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_16" type="checkbox" id="__nav_4_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../system-audio/">SystemAudio</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="SystemAudio" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_16">
+          <span class="md-nav__icon md-icon"></span>
+          SystemAudio
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17" type="checkbox" id="__nav_4_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../text-to-speech/">TextToSpeech</a>
+          
+            <label for="__nav_4_17">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeech" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_17">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeech
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17_2" type="checkbox" id="__nav_4_17_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_17_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_17_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../text-to-speech/aasb-docs/TextToSpeech/" class="md-nav__link">
+        TextToSpeech
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_18" type="checkbox" id="__nav_4_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../text-to-speech-provider/">TextToSpeechProvider</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeechProvider" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_18">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeechProvider
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/">AACS</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/">Configuration</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3" type="checkbox" id="__nav_5_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_3">
+          Common
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Common" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_3">
+          <span class="md-nav__icon md-icon"></span>
+          Common
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_1" type="checkbox" id="__nav_5_3_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/ipc/">IPC</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="IPC" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          IPC
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_2" type="checkbox" id="__nav_5_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/commonutils/">Common Utils</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Common Utils" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Common Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">AACS Instrumentation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Instrumentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Instrumentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/sample-app/">AACS Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Sample App" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          App Components
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="App Components" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          App Components
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_1" type="checkbox" id="__nav_5_6_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apis/">alexa-auto-apis</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apis" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apis
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2" type="checkbox" id="__nav_5_6_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
+          
+            <label for="__nav_5_6_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apl-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2_2" type="checkbox" id="__nav_5_6_2_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/">APL Render</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL Render" data-md-level="4">
+        <label class="md-nav__title" for="__nav_5_6_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          APL Render
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_3" type="checkbox" id="__nav_5_6_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-ui/">alexa-auto-apps-common-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_3">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_4" type="checkbox" id="__nav_5_6_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-util/">alexa-auto-apps-common-util</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-util" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_4">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-util
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_5" type="checkbox" id="__nav_5_6_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-carcontrol/">alexa-auto-carcontrol</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-carcontrol" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_5">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-carcontrol
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_6" type="checkbox" id="__nav_5_6_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-comms-ui/">alexa-auto-comms-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-comms-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_6">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-comms-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_7" type="checkbox" id="__nav_5_6_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-contacts/">alexa-auto-contacts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-contacts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_7">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-contacts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_8" type="checkbox" id="__nav_5_6_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-device-usage/">alexa-auto-device-usage</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-device-usage" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_8">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-device-usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_9" type="checkbox" id="__nav_5_6_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-lwa-auth/">alexa-auto-lwa-auth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-lwa-auth" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_9">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-lwa-auth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_10" type="checkbox" id="__nav_5_6_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-media-player/">alexa-auto-media-player</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-media-player" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_10">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-media-player
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_11" type="checkbox" id="__nav_5_6_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-navigation/">alexa-auto-navigation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-navigation" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_11">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_12" type="checkbox" id="__nav_5_6_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-settings/">alexa-auto-settings</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-settings" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_12">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-settings
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_13" type="checkbox" id="__nav_5_6_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-setup/">alexa-auto-setup</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-setup" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_13">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-setup
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_14" type="checkbox" id="__nav_5_6_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-telephony/">alexa-auto-telephony</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-telephony" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_14">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-telephony
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_15" type="checkbox" id="__nav_5_6_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-templateruntime-renderer/">alexa-auto-templateruntime-renderer</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-templateruntime-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_15">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-templateruntime-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_16" type="checkbox" id="__nav_5_6_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-tts/">alexa-auto-tts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-tts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_16">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-tts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_17" type="checkbox" id="__nav_5_6_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-ux-restrictions/">alexa-auto-ux-restrictions</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-ux-restrictions" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_17">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-ux-restrictions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_18" type="checkbox" id="__nav_5_6_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-interaction/">alexa-auto-voice-interaction</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-interaction" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_18">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_19" type="checkbox" id="__nav_5_6_19" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-ui/">alexa-auto-voice-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_19">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../samples/cpp/">Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Sample App" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LINUX_INTEGRATION/" class="md-nav__link">
+        Linux Integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Migration Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION/" class="md-nav__link">
+        General Migration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION_TO_AASB_MESSAGEBROKER/" class="md-nav__link">
+        Migration to AASB MessageBroker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NEED_HELP/" class="md-nav__link">
+        Need Help?
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          More
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="More" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          More
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SECURITY/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    Table of Contents
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    Overview 
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuring-the-navigation-module" class="md-nav__link">
+    Configuring the Navigation Module 
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuring the Navigation Module ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#android-integration" class="md-nav__link">
+    Android Integration 
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-navigation-aasb-messages" class="md-nav__link">
+    Using the Navigation AASB Messages 
+  </a>
+  
+    <nav class="md-nav" aria-label="Using the Navigation AASB Messages ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#providing-the-current-navigation-state" class="md-nav__link">
+    Providing the Current Navigation State 
+  </a>
+  
+    <nav class="md-nav" aria-label="Providing the Current Navigation State ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples-of-navigation-state-payload" class="md-nav__link">
+    Examples of Navigation State Payload
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#starting-navigation" class="md-nav__link">
+    Starting Navigation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stopping-navigation" class="md-nav__link">
+    Stopping Navigation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-a-waypoint" class="md-nav__link">
+    Adding a Waypoint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#canceling-a-waypoint" class="md-nav__link">
+    Canceling a Waypoint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#showing-previous-waypoints" class="md-nav__link">
+    Showing Previous Waypoints
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#navigating-to-a-previous-waypoint" class="md-nav__link">
+    Navigating to a Previous Waypoint
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-turn-and-lane-guidance-information" class="md-nav__link">
+    Getting Turn and Lane Guidance Information
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+<h1 id="navigation-module">Navigation Module</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#configuring-the-navigation-module">Configuring the Navigation Module</a></li>
+<li><a href="#using-the-navigation-aasb-messages">Using the Navigation AASB Messages</a></li>
+<li><a href="#providing-the-current-navigation-state">Providing the Current Navigation State</a></li>
+<li><a href="#starting-navigation">Starting Navigation</a></li>
+<li><a href="#stopping-navigation">Stopping Navigation</a></li>
+<li><a href="#adding-a-waypoint">Adding a Waypoint</a></li>
+<li><a href="#canceling-a-waypoint">Canceling a Waypoint</a></li>
+<li><a href="#showing-previous-waypoints">Showing Previous Waypoints</a></li>
+<li><a href="#navigating-to-a-previous-waypoint">Navigating to a Previous Waypoint</a></li>
+<li><a href="#getting-turn-and-lane-guidance-information">Getting Turn and Lane Guidance Information</a></li>
+<li><a href="#getting-road-regulation-information">Getting Road Regulation Information</a></li>
+<li><a href="#controlling-the-display">Controlling the Display</a></li>
+<li><a href="#showing-alternative-routes">Showing Alternative Routes</a></li>
+<li><a href="#integrating-the-navigation-module-into-your-application">Integrating the Navigation Module Into Your Application</a></li>
+</ul>
+<h2 id="overview">Overview <a id="overview"></a></h2>
+<p>The <code>Navigation</code> module enables your Alexa Auto SDK client application to use the navigation capabilities of Alexa and provides support for Alexa to interface with the onboard navigation system.</p>
+<p>Your integration is responsible for handling navigation actions when notified to do so by the Engine. How these requests are handled is based on your navigation provider.</p>
+<h2 id="configuring-the-navigation-module">Configuring the Navigation Module <a id="configuring-the-navigation-module"></a></h2>
+<p>To inform Alexa which navigation provider is used on the head unit, configure the <code>Navigation</code> module. Sometimes Alexa needs to query a cloud navigation provider API to fulfill a user request. Knowing which provider is used on the device allows for better customer experience because Alexa's results can more closely match what the user sees on the screen in the navigation app.</p>
+<p>To configure the <code>Navigation</code> module, use the <em>"aace.navigation"</em> JSON object specified below in your Engine configuration:</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.navigation&quot;: {
+        &quot;providerName&quot;: &quot;{{STRING}}&quot;
+    }
+}
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aace.navigation.providerName</td>
+<td>string</td>
+<td>No</td>
+<td>The navigation service provider name. <br><br> <strong>Accepted values:</strong> <ul> <li> <code>"HERE"</code> (default) </li> <li> <code>"TOMTOM"</code></li> <li> <code>"TELENAV"</code> </li> </ul></td>
+<td><code>"HERE"</code></td>
+</tr>
+</tbody>
+</table>
+<p>Like all Auto SDK Engine configurations, you can either define this JSON in a file and construct an <code>EngineConfiguration</code> from that file, or you can use the provided configuration factory function <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1navigation_1_1config_1_1_navigation_configuration.html#ab984104f14947c042b67c8ed17b55364"><code>aace::navigation::config::NavigationConfiguration::createNavigationConfig</code></a> to programmatically construct the <code>EngineConfiguration</code> in the proper format.</p>
+<details>
+<p><summary>Click to expand or collapse NavigationConfiguration C++ sample code</summary></p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AACE/Navigation/NavigationConfiguration.h&gt;</span><span class="cp"></span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">EngineConfiguration</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">configurations</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">navigationConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">navigation</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">NavigationConfiguration</span><span class="o">::</span><span class="n">createNavigationConfig</span><span class="p">(</span><span class="s">&quot;HERE&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="n">configurations</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">navigationConfig</span><span class="p">);</span><span class="w"></span>
+
+<span class="c1">// ... create other EngineConfiguration objects and add them to configurations...</span>
+
+<span class="n">m_engine</span><span class="o">-&gt;</span><span class="n">configure</span><span class="p">(</span><span class="n">configurations</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+</details>
+<p><br/></p>
+<h3 id="android-integration">Android Integration <a id="config-android"></a></h3>
+<p>To use the <code>Navigation</code> module Engine configuration with AACS, use <em>"aacs.navigation"</em> instead of <em>"aace.navigation"</em> in your AACS configuration file:</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aacs.navigation&quot;: {
+        &quot;providerName&quot;: &quot;{{STRING}}&quot;
+    }
+}
+</code></pre></div>
+<details>
+<p><summary>Click to expand or collapse details for Android integration without AACS</summary>
+<br/></p>
+<p>AACS is the recommended way to integrate Auto SDK for Android. However, if your integration does not use AACS, you can use the Java factory method <a href="https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1navigation_1_1config_1_1_navigation_configuration.html#a62f13d2ba1b21e4554de195083903331"><code>com.amazon.aace.navigation.config.NavigationConfiguration.createNavigationConfig</code></a> to programmatically construct the <code>EngineConfiguration</code> in the proper format.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">com.amazon.aace.navigation.config.NavigationConfiguration</span><span class="p">;</span>
+
+<span class="c1">// Configure the Engine</span>
+<span class="n">EngineConfiguration</span> <span class="n">navigationConfiguration</span> <span class="o">=</span> <span class="n">NavigationConfiguration</span><span class="p">.</span><span class="na">createNavigationConfig</span><span class="p">(</span><span class="s">&quot;HERE&quot;</span><span class="p">);</span>
+
+<span class="n">mEngine</span><span class="p">.</span><span class="na">configure</span><span class="p">(</span><span class="k">new</span> <span class="n">EngineConfiguration</span><span class="o">[]</span><span class="p">{</span>
+    <span class="c1">// other config objects,</span>
+    <span class="n">navigationConfiguration</span><span class="p">,</span>
+    <span class="c1">// ...</span>
+<span class="p">});</span>
+</code></pre></div>
+</details>
+<p><br/></p>
+<h2 id="using-the-navigation-aasb-messages">Using the Navigation AASB Messages <a id="using-the-navigation-aasb-messages"></a></h2>
+<h3 id="providing-the-current-navigation-state">Providing the Current Navigation State <a id="providing-the-current-navigation-state"></a></h3>
+<p>The navigation state context informs Alexa whether the device is navigating and provides Alexa with the user's routing information or the destination set by the user. Such information is necessary for Alexa to respond to route-based utterances, allowing the user to use the following features:</p>
+<ul>
+<li>Adding or removing waypoints</li>
+<li>Obtaining Estimated Time of Arrival (ETA)</li>
+<li>Obtaining Distance To Arrival (DTA)</li>
+</ul>
+<p>When the user requests navigation information based on the current route, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#getnavigationstate"><code>GetNavigationState</code> message</a>. The implementation should respond with the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#getnavigationstatereply"><code>GetNavigationStateReply</code> message</a> containing the navigation state passed as a JSON string payload.</p>
+<blockquote>
+<p><strong>Note:</strong> Returning the navigation state must be quick. If querying the navigation provider for state information takes significant time, Amazon recommends that the application periodically query the provider to update the state in a cache. Then the application can obtain the information each time the Engine requests the navigation state.</p>
+</blockquote>
+<p>The following table explains the properties in the JSON.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>state</td>
+<td>String</td>
+<td>Yes</td>
+<td>The navigation device state. <br><br><strong>Accepted values:</strong> <ul><li><code>"NAVIGATING"</code>: Navigation engine is navigating to a predefined destination set. </li> <li><code>"NOT_NAVIGATING"</code>: Navigation is not in progress.</li></ul></td>
+</tr>
+<tr>
+<td>shapes</td>
+<td>Array of arrays</td>
+<td>Yes (if <code>state</code> is <code>"NAVIGATING"</code>)</td>
+<td>The array contains an ordered list of coordinates depicting the route from the source to destination. Each coordinate is a latitude-longitude pair, specified as an array of doubles (in that order). The array can be empty. The maximum number of coordinates is 100.<br><br> <strong>Special considerations:</strong> <ul><li>The set of coordinates might not represent the complete route.</li><li>Shapes are provider specific. The shape of a route can correspond to one of these versions: a complete route, a route for a view port, or a route defined for a particular distance.</li><li>It is recommended to use one mile spacing between each coordinate in the shapes array.</li><li>The coordinates in the array are ordered in the same direction as the user is driving.</li></ul></td>
+</tr>
+<tr>
+<td>waypoints</td>
+<td>Array</td>
+<td>Yes</td>
+<td>List of objects, each representing a waypoint that is a stop on the route. Expand the section below for more information. <br><br> <strong>Note:</strong> Can be empty except when <code>state</code> is <code>"NAVIGATING"</code>.</td>
+</tr>
+</tbody>
+</table>
+<details>
+<p><summary>Click to expand or collapse the properties of <code>waypoints</code> object</summary></p>
+<p></br></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Yes</td>
+<td>Type of the location on the route. <br><br><strong>Accepted values:</strong> <ul><li><code>SOURCE</code>: The location from which the user starts driving.</li><li><code>DESTINATION</code>: Final location to which the user wants to navigate to.</li><li><code>INTERIM</code>: Intermediate stop where the user wants to navigate to before reaching the destination.</ul></td>
+</tr>
+<tr>
+<td>estimatedTimeOfArrival</td>
+<td>Object</td>
+<td>No (Applicable only if <code>type</code> is <code>"DESTINATION"</code> or <code>"INTERIM"</code>.)</td>
+<td>Time of arrival at the waypoint, specified in the ISO-8601 time format.</td>
+</tr>
+<tr>
+<td>estimatedTimeOfArrival.ideal</td>
+<td>String</td>
+<td>No</td>
+<td>Expected arrival time without considering traffic, diversions, etc.</td>
+</tr>
+<tr>
+<td>estimatedTimeOfArrival.predicted</td>
+<td>String</td>
+<td>Yes</td>
+<td>Expected arrival time, after considering traffic conditions. If the ideal ETA and predicted ETA match, only the predicted ETA will be populated.</td>
+</tr>
+<tr>
+<td>address</td>
+<td>Object</td>
+<td>No</td>
+<td>Address of the waypoint specified in multiple string fields, such as <code>addressLine1</code>, <code>city</code>, etc. <br><br><strong>Note:</strong> <code>countryCode</code> is a 3-letter country code in ISO 3166-1 alpha-3 format.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>No</td>
+<td>Name of the waypoint (e.g., "work" or "Starbucks").</td>
+</tr>
+<tr>
+<td>coordinate</td>
+<td>Array</td>
+<td>Yes</td>
+<td>An array consisting of the waypoint's latitude and longitude (in that order). The data type of latitude and longitude is double.</td>
+</tr>
+<tr>
+<td>pointOfInterest</td>
+<td>Object</td>
+<td>No</td>
+<td>Information about the waypoint if the waypoint is also a point of interest (POI). Expand the section below for more information.</td>
+</tr>
+</tbody>
+</table>
+<p>
+
+</p>
+</details>
+<details>
+<p><summary>Click to expand or collapse the properties of <code>pointOfInterest</code> object</summary> </p>
+<p></br></p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>String</td>
+<td>No (recommended if available)</td>
+<td>ID for the POI known to Alexa. If <code>id</code> is provided, you can omit other properties of <code>pointOfInterest</code>. If the waypoint is added by the user via the navigation app, omit <code>id</code> because Alexa cannot recognize any ID assigned by the app. You can specify the ID if the waypoint is added by Alexa (e.g., by the utterance "Alexa, navigate to Whole Foods along the way"). It is specified in the <code>StartNavigation</code> message payload received from Alexa.</td>
+</tr>
+<tr>
+<td>hoursOfOperation</td>
+<td>Array</td>
+<td>No</td>
+<td>Hours of operation for the POI.</td>
+</tr>
+<tr>
+<td>hoursOfOperation.dayOfWeek</td>
+<td>String</td>
+<td>Y</td>
+<td>Day of week for this day. <br><br><strong>Accepted values:</strong> <code>"MONDAY"</code>, <code>"TUESDAY"</code>, <code>"WEDNESDAY"</code>, <code>"THURSDAY"</code>, <code>"FRIDAY"</code>, <code>"SATURDAY"</code>, <code>"SUNDAY"</code>.</td>
+</tr>
+<tr>
+<td>hoursOfOperation.hours</td>
+<td>Array</td>
+<td>Yes</td>
+<td>List of times when the POI is open or closed for the day, specified in ISO 8601 format with the timezone offset (time difference from UTC). <br></br>Properties in the array are:<ul><li><code>open</code>: Time at which the POI is open.</li><li><code>close</code>: Time at which the POI is closed.</li></ul>Timezone considerations:<ul><li>If the user and the POI are in different timezones, hours are converted to the timezone of the POI.</li><li>If timezone offset is omitted, the time is assumed to be a UTC time and then converted to the POI's timezone.</li></ul><strong>Note:</strong> Hours for the next 7 days are provided by the data provider.</td>
+</tr>
+<tr>
+<td>hoursOfOperation.type</td>
+<td>String</td>
+<td>Yes</td>
+<td>Status of the current operation. <br><br><strong>Accepted values:</strong> <code>"OPEN_DURING_HOURS"</code>, <code>"OPEN_24_HOURS"</code>, <code>"CLOSED"</code>, <code>"UNKNOWN"</code>, <code>"HOLIDAY"</code>.</td>
+</tr>
+<tr>
+<td>phoneNumber</td>
+<td>String</td>
+<td>No</td>
+<td>Phone number of the POI in E.164 format.</td>
+</tr>
+</tbody>
+</table>
+<p>
+
+</p>
+</details>
+<p></br></p>
+<h4 id="examples-of-navigation-state-payload">Examples of Navigation State Payload</h4>
+<details>
+<p><summary>Click to expand or collapse example Navigation State payload when navigation is in progress</summary></p>
+<p></br></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;NAVIGATING&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;waypoints&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;SOURCE&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;addressLine1&quot;</span><span class="p">:</span> <span class="s2">&quot;2795 Augustine Drive&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;addressLine2&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;addressLine3&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;Santa Clara&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;districtOrCounty&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;stateOrRegion&quot;</span><span class="p">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;countryCode&quot;</span><span class="p">:</span> <span class="s2">&quot;USA&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;postalCode&quot;</span><span class="p">:</span> <span class="s2">&quot;95054&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;work&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;coordinate&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mf">37.3809462</span><span class="p">,</span>
+        <span class="mf">-121.9794846</span>
+      <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;INTERIM&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;estimatedTimeOfArrival&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;ideal&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-09T17:00:00-08:00&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;predicted&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-09T17:10:00-08:00&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;addressLine1&quot;</span><span class="p">:</span> <span class="s2">&quot;750 Castro Street&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;addressLine2&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;addressLine3&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;Mountain View&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;districtOrCounty&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;stateOrRegion&quot;</span><span class="p">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;countryCode&quot;</span><span class="p">:</span> <span class="s2">&quot;USA&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;postalCode&quot;</span><span class="p">:</span> <span class="s2">&quot;94041&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Starbucks&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;coordinate&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mf">37.3809461</span><span class="p">,</span>
+        <span class="mf">-122.0830221</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;pointOfInterest&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;AlexaLocalSearch:eyJpZCI6InllbHA6OnRGV01ySS1VWERGa09FcnZ6eXJ0clEiLCJjb3ZlcnMiOnsiUExBQ0VTX1JFUE8iOiJ5ZWxwOjp0RldNckktVVhERmtPRXJ2enlydHJRIn0sInF1ZXJ5SWQiOiItNjYxMzI1NTYxIiwiZGRiVGFibGVOYW1lIjoiZXMtbHNzLTIwMjEwNjE2Iiwid2VibGFiQWxsb2NhdGlvbnMiOnsiQUxTU19XRUJMQUJfT05CT0FSRF9URVNUSU5HXzI4MDI4NiI6IlQxIiwiQUxFWEFfTE9DQUxTRUFSQ0hfUExBQ0VUWVBFX0NMQVNTSUZJRVJfMzA4MTY5IjoiQyIsIkFMRVhBX0xPQ0FMX1NFQVJDSF9MMlJfRU5USVRZX1NIQURPV18yOTA5MDUiOiJDIiwiQUxFWEFfTE9DQUxfU0VBUkNIX1RSSUdHRVJfQU1CSUdVT1VTX1FVRVJZX0lERU5USUZJQ0FUSU9OXzMyNjMxNSI6IlQxIn19&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;phoneNumber&quot;</span><span class="p">:</span> <span class="s2">&quot;+14084968523&quot;</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+      <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;DESTINATION&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;estimatedTimeOfArrival&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;ideal&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-09T17:30:00-08:00&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;predicted&quot;</span><span class="p">:</span> <span class="s2">&quot;2019-12-09T17:40:00-08:00&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;address&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;addressLine1&quot;</span><span class="p">:</span> <span class="s2">&quot;4800 El Camino Real&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;addressLine2&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;addressLine3&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;Los Altos&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;districtOrCounty&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;stateOrRegion&quot;</span><span class="p">:</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;countryCode&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;postalCode&quot;</span><span class="p">:</span> <span class="s2">&quot;94022&quot;</span>
+      <span class="p">},</span>
+      <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Whole Foods Market&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;coordinate&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="mf">37.3991897</span><span class="p">,</span>
+        <span class="mf">-122.1106268</span>
+      <span class="p">],</span>
+      <span class="nt">&quot;pointOfInterest&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;hoursOfOperation&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span>
+            <span class="nt">&quot;dayOfWeek&quot;</span><span class="p">:</span> <span class="s2">&quot;MONDAY&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;hours&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="nt">&quot;open&quot;</span><span class="p">:</span> <span class="s2">&quot;08:00:00-08:00&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;close&quot;</span><span class="p">:</span> <span class="s2">&quot;22:00:00-08:00&quot;</span>
+              <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;OPEN_DURING_HOURS&quot;</span>
+          <span class="p">}</span>
+        <span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">],</span>
+  <span class="nt">&quot;shapes&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">[</span>
+      <span class="s2">&quot;37.380946&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;-121.9794846&quot;</span>
+    <span class="p">],</span>
+    <span class="p">[</span>
+      <span class="s2">&quot;37.380545&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;-122.073252&quot;</span>
+    <span class="p">],</span>
+    <span class="err">...</span>
+  <span class="p">]</span>
+<span class="p">}</span>   
+</code></pre></div>
+</details>
+<details>
+<p><summary>Click to expand or collapse example Navigation State payload when navigation no navigation is in progress</summary></p>
+<p></br></p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="nt">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;NOT_NAVIGATING&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;waypoints&quot;</span><span class="p">:[],</span>
+  <span class="nt">&quot;shapes&quot;</span><span class="p">:[]</span>
+<span class="p">}</span>
+</code></pre></div>
+</details>
+<p></br></p>
+<h3 id="starting-navigation">Starting Navigation</h3>
+<p>To start navigation, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#startnavigation"><code>StartNavigation</code> message</a> passing a JSON string payload containing the destination information.</p>
+<p>The following table explains the properties in the JSON.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>transportationMode</td>
+<td>String</td>
+<td>No</td>
+<td>The mode of transportation. <br><br> <strong>Accepted Values:</strong> <ul> <li><code>"BIKING"</code></li> <li><code>"DRIVING"</code></li> <li><code>"TRANSIT"</code></li> <li><code>"WALKING"</code></li> </ul></td>
+</tr>
+<tr>
+<td>waypoints</td>
+<td>Array</td>
+<td>Yes</td>
+<td>List of objects, each representing a waypoint that is a stop on the route. <br></br>The properties use the same schema used for state reporting. See the <a href="#providing-the-current-navigation-state">Providing the Current Navigation State</a> section.</td>
+</tr>
+</tbody>
+</table>
+<details>
+<p><summary>Click to expand or collapse the <code>StartNavigation</code> message payload schema</summary></p>
+<p></br></p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;transportationMode&quot;: &quot;DRIVING&quot;,
+    &quot;waypoints&quot;:[
+       {
+          &quot;type&quot;:&quot;{{STRING}}&quot;,
+          &quot;estimatedTimeOfArrival&quot;:{
+             &quot;ideal&quot;:&quot;{{STRING}}&quot;,
+             &quot;predicted&quot;:&quot;{{STRING}}&quot;
+          },
+          &quot;address&quot;: {
+               &quot;addressLine1&quot;: &quot;{{STRING}}&quot;,
+               &quot;addressLine2&quot;: &quot;{{STRING}}&quot;,
+               &quot;addressLine3&quot;: &quot;{{STRING}}&quot;,
+               &quot;city&quot;: &quot;{{STRING}}&quot;,
+               &quot;districtOrCounty&quot;: &quot;{{STRING}}&quot;,
+               &quot;stateOrRegion&quot;: &quot;{{STRING}}&quot;,
+               &quot;countryCode&quot;: &quot;{{STRING}}&quot;, 
+               &quot;postalCode&quot;: &quot;{{STRING}}&quot;
+          },
+          &quot;coordinate&quot;:[
+             {{LATITUDE_DOUBLE}},
+             {{LONGITUDE_DOUBLE}}
+          ],
+          &quot;name&quot;:&quot;{{STRING}}&quot;
+       },
+       {
+          &quot;type&quot;:&quot;{{STRING}}&quot;,
+          &quot;estimatedTimeOfArrival&quot;:{
+             &quot;ideal&quot;:&quot;{{STRING}}&quot;,
+             &quot;predicted&quot;:&quot;{{STRING}}&quot;
+          },
+          &quot;address&quot;:&quot;{{STRING}}&quot;,
+          &quot;coordinate&quot;:[
+             {{LATITUDE_DOUBLE}},
+             {{LONGITUDE_DOUBLE}}
+          ],
+          &quot;name&quot;:&quot;{{STRING}}&quot;,
+          &quot;pointOfInterest&quot;:{
+             &quot;id&quot;:&quot;{{STRING}}&quot;,
+             &quot;hoursOfOperation&quot;:[
+                {
+                   &quot;dayOfWeek&quot;:&quot;{{STRING}}&quot;,
+                   &quot;hours&quot;:[
+                      {
+                         &quot;open&quot;:&quot;{{STRING}}&quot;,
+                         &quot;close&quot;:&quot;{{STRING}}&quot;
+                      }
+                   ],
+                   &quot;type&quot;:&quot;{{STRING}}&quot;
+                }
+             ],
+             &quot;phoneNumber&quot;:&quot;{{STRING}}&quot;
+        }
+      }
+    ]
+  }      
+}
+</code></pre></div>
+</details>
+<p></br></p>
+<blockquote>
+<p><strong>Note:</strong> The waypoints in the route are determined by Alexa either through a proximity search or by resolving the user's uploaded navigation favorite name to its location. Your implementation should calculate the route from the <code>SOURCE</code> waypoint to the <code>DESTINATION</code> waypoint, with stops along the way at <code>INTERIM</code> waypoints in the order in which they appear in the payload. If there are multiple routes, your implementation should either pick the fastest route if no user interaction is possible, or let the user choose the route. After the route is chosen, your implementation should start navigation.</p>
+</blockquote>
+<p>If navigation starts successfully, your implementation should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent"><code>NavigationEvent</code> message</a> with a <code>NAVIGATION_STARTED</code> event. Otherwise, it should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror"><code>NavigationError</code> message</a> with the  <code>NAVIGATION_START_FAILED</code> type, and <code>INTERNAL_SERVICE_ERROR</code> or <code>ROUTE_NOT_FOUND</code> code.</p>
+<details>
+<p><summary>Click to expand or collapse sequence diagram: Starting Navigation</summary>
+<br></br></p>
+<p><img alt="Start_Navigation" src="assets/start_navigation.png" /></p>
+</details>
+<p></br></p>
+<h3 id="stopping-navigation">Stopping Navigation</h3>
+<p>To stop navigation, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#cancelnavigation"><code>CancelNavigation</code> message</a>. Consequently, when the Engine publishes the next <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#getnavigationstate"><code>GetNavigationState</code> message</a> the state should be <code>NOT_NAVIGATING</code>.</p>
+<details>
+<p><summary>Click to expand or collapse sequence diagram: Stopping Navigation</summary>
+<br></br></p>
+<p><img alt="Stopping_Navigation" src="assets/cancel_navigation.png" /></p>
+</details>
+<p></br></p>
+<h3 id="adding-a-waypoint">Adding a Waypoint</h3>
+<p>If the user wants to add a waypoint, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#startnavigation"><code>StartNavigation</code> message</a>. </p>
+<p>If navigation is in progress or route is present, the route to the final destination is changed by including the additional waypoint. Your implementation should calculate or re-calculate the route with the information of the waypoint.</p>
+<p>If the waypoint is added successfully, your implementation should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent"><code>NavigationEvent</code> message</a> with a <code>NAVIGATION_STARTED</code> event. Otherwise, it should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror"><code>NavigationError</code> message</a> with the  <code>NAVIGATION_START_FAILED</code> type, and <code>INTERNAL_SERVICE_ERROR</code> or  <code>ROUTE_NOT_FOUND</code> code.</p>
+<details>
+<p><summary>Click to expand or collapse sequence diagram: Adding a Waypoint</summary>
+<br></br></p>
+<p><img alt="Add_Waypoint" src="assets/add_waypoint.png" /></p>
+</details>
+<p></br></p>
+<h3 id="canceling-a-waypoint">Canceling a Waypoint</h3>
+<p>If the user wants to cancel a waypoint, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#startnavigation"><code>StartNavigation</code> message</a> after receiving the directive from Alexa with the updated waypoints. Your implementation should start navigation using the updated waypoints.</p>
+<p>If navigation is started successfully, your implementation should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent"><code>NavigationEvent</code> message</a> with a <code>NAVIGATION_STARTED</code> event. Otherwise, it should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror"><code>NavigationError</code> message</a> with the  <code>NAVIGATION_START_FAILED</code> type, and <code>INTERNAL_SERVICE_ERROR</code> or  <code>ROUTE_NOT_FOUND</code> code.</p>
+<details>
+<p><summary>Click to expand or collapse sequence diagram: Canceling a Waypoint</summary>
+<br></br></p>
+<p><img alt="Cancel_Waypoint" src="assets/remove_waypoint.png" /></p>
+</details>
+<p></br></p>
+<h3 id="showing-previous-waypoints">Showing Previous Waypoints</h3>
+<p>If the user wants to display previous waypoints, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#showpreviouswaypoints"><code>ShowPreviousWaypoints</code> message</a>. Each waypoint displayed includes at least the address.</p>
+<p>If the device can successfully display the previous waypoints, your implementation should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent"><code>NavigationEvent</code> message</a> with a  <code>PREVIOUS_WAYPOINTS_SHOWN</code> event. Otherwise, it should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror"><code>NavigationError</code> message</a> with the <code>SHOW_PREVIOUS_WAYPOINTS_FAILED</code> type, and <code>INTERNAL_SERVICE_ERROR</code> or <code>NO_PREVIOUS_WAYPOINTS</code> code.</p>
+<blockquote>
+<p><strong>Note:</strong> It is the responsibility of the navigation provider to store and provide the previous destination list to the user.</p>
+</blockquote>
+<details>
+<p><summary>Click to expand or collapse sequence diagram: Showing Previous Waypoints</summary>
+<br></br></p>
+<p><img alt="Show_Previous_Waypoint" src="assets/show_previous_waypoints.png" /></p>
+</details>
+<p></br></p>
+<h3 id="navigating-to-a-previous-waypoint">Navigating to a Previous Waypoint</h3>
+<p>If the user wants to  navigate to a previous waypoint, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigatetopreviouswaypoint"><code>NavigateToPreviousWaypoint</code> message</a>.</p>
+<p>The navigation app retrieves the most recently used destination, calculates a route from the current location, selects the fastest route or a route preferred by the user, and starts navigation.</p>
+<p>If the device can successfully display the previous waypoints, your implementation should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent"><code>NavigationEvent</code> message</a> with a <code>PREVIOUS_NAVIGATION_STARTED</code> event. Otherwise, it should publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror"><code>NavigationError</code> message</a> with the <code>PREVIOUS_NAVIGATION_START_FAILED</code> type, and <code>INTERNAL_SERVICE_ERROR</code> or <code>NO_PREVIOUS_WAYPOINTS</code> code.</p>
+<details>
+<p><summary>Click to expand or collapse sequence diagram: Navigating to a Previous Waypoint</summary>
+<br></br></p>
+<p><img alt="Navigate_Waypoint" src="assets/navigate_previous_waypoint.png" /></p>
+</details>
+<p></br></p>
+<h3 id="getting-turn-and-lane-guidance-information">Getting Turn and Lane Guidance Information</h3>
+<p>If the user wants to get turn and lane guidance, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#announcemaneuver"><code>AnnounceManeuver</code> message</a>, passing a JSON string payload containing the manueuver information.</p>
+<p>The following table explains the properties in the JSON.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>type</td>
+<td>String</td>
+<td>Yes</td>
+<td>Specifies the type of information requested. <br><br><strong>Accepted values:</strong> <p><ul><li><code>"TURN"</code>:  The user asks about a turn. (e.g., "What's my next turn?")</li><li><code>"EXIT"</code>: The user asks about a freeway exit. (e.g., "What's my next exit?")</li><li><code>"ENTER"</code>: The user asks about how to get onto a street. (e.g., "Which lane should I be to get onto the US-101?")</li><li><code>"MERGE"</code>: The user asks about the merge onto a street. (e.g., "Alexa, which lane do i need to merge onto the highway?")</li><li><code>"LANE"</code>: The user asks for lane guidance. (e.g., "Alexa, which lane to take?")</li></ul></td>
+</tr>
+<tr>
+<td>targetLocation</td>
+<td>Object</td>
+<td>No</td>
+<td>Describes the location for which maneuver information is requested. If the target location is a POI, user place, or street address, Alexa provides at least one field in this object. If the utterance does not include a location (e.g., "Alexa, what's my next turn?"), <code>targetLocation</code> is omitted.</td>
+</tr>
+<tr>
+<td>targetLocation.name</td>
+<td>String</td>
+<td>No</td>
+<td>Specifies the name of the location (e.g., "HOME" or "WORK") for which the user requests the maneuver instruction.</td>
+</tr>
+<tr>
+<td>targetLocation.address</td>
+<td>Object</td>
+<td>No</td>
+<td>Specifies the address for which the user requests the maneuver instruction. The object contains multiple string fields, which together form the complete address.</td>
+</tr>
+<tr>
+<td>targetLocation.coordinate</td>
+<td>Array</td>
+<td>No</td>
+<td>The array value specifies the latitude and longitude of the target location. Data type for the values in the array is double.</td>
+</tr>
+</tbody>
+</table>
+<p>
+
+<details markdown="1"><summary>Click to expand or collapse the <code>AnnounceManeuver</code> message schema</summary> 
+
+</br>
+
+<div class="highlight"><pre><span></span><code>{
+  &quot;type&quot;: &quot;{{STRING}}&quot;,
+  &quot;targetLocation&quot; : {
+        &quot;name&quot;: &quot;{{STRING}}&quot;,
+        &quot;address&quot;: { 
+            &quot;addressLine1&quot;: &quot;{{STRING}}&quot;, 
+            &quot;addressLine2&quot;: &quot;{{STRING}}&quot;, 
+            &quot;addressLine3&quot;: &quot;{{STRING}}&quot;, 
+            &quot;city&quot;: &quot;{{STRING}}&quot;,
+            &quot;districtOrCounty&quot;: &quot;{{STRING}}&quot;,
+            &quot;stateOrRegion&quot;: &quot;{{STRING}}&quot;,
+            &quot;countryCode&quot;: &quot;{{STRING}}&quot;,
+            &quot;postalCode&quot;: &quot;{{STRING}}&quot;
+        },
+        &quot;coordinate&quot;: [
+            {{LATITUDE_DOUBLE}},
+            {{LONGITUDE_DOUBLE}}
+        ]
+  }
+}
+</code></pre></div>
+
+</details>
+</br>
+
+Your implementation should provide the navigation instruction as follows:
+
+* If `targetLocation` is omitted, announce the next maneuver along the route.
+* If `targetLocation` is specified and the location is along the route, announce the maneuver about the location. If `targetLocation` is specified but the location is not along the route, calculate the route to the location, announce maneuver from the user's current location to the target location, and inform the user the target location is NOT along the current route.
+
+If the device can provide the maneuver instruction successfully, your implementation should publish the [`NavigationEvent` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent) with one of the following events:
+
+> **events:** `TURN_GUIDANCE_ANNOUNCED`, `EXIT_GUIDANCE_ANNOUNCED`, `ENTER_GUIDANCE_ANNOUNCED`, `MERGE_GUIDANCE_ANNOUNCED`, `LANE_GUIDANCE_ANNOUNCED`
+
+Otherwise, your implementation should publish the [`NavigationError` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror) with a type and code from the following:
+
+> **types:** `TURN_GUIDANCE_FAILED`, `EXIT_GUIDANCE_FAILED`, `ENTER_GUIDANCE_FAILED`, `MERGE_GUIDANCE_FAILED`, `LANE_GUIDANCE_FAILED`\
+> **codes:** `INTERNAL_SERVICE_ERROR`, `ROUTE_NOT_FOUND`, `NOT_SUPPORTED`
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Getting Turn and Lane Guidance Information</summary>
+<br></br>
+
+![Announce_Maneuver_Guidance](./assets/announce_maneuver.png)
+
+</details>
+</br>
+
+### Getting Road Regulation Information
+
+If the user wants to get road regulation information, the Engine publishes the [`AnnounceRoadRegulation` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#announceroadregulation), which passes a payload with the following schema:
+
+<div class="highlight"><pre><span></span><code>{
+  &quot;type&quot;: &quot;{{STRING}}&quot;
+}
+</code></pre></div>
+
+| Property | Type | Required | Description |
+|-|-|-|-|
+| type | String | Yes | Type of road regulation requested. <br><br> **Accepted values:** <ul> <li>`"SPEED_LIMIT"` specifies the speed limit at the current position (e.g., when the user asks, "Alexa, what is the speed limit?").</li> <li>`"CARPOOL_RULES"` specifies the carpool regulations on the current highway (e.g., when the user asks, "Alexa, is carpool free now?").</li> </ul>|
+
+If the device can provide the road regulation information successfully, your implementation should publish the [`NavigationEvent` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent) with a `SPEED_LIMIT_REGULATION_ANNOUNCED` or `CARPOOL_RULES_REGULATION_ANNOUNCED` event. Otherwise, it should publish the [`NavigationError` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror) with the `SPEED_LIMIT_REGULATION_FAILED` or  `CARPOOL_RULES_REGULATION_FAILED` type, and `INTERNAL_SERVICE_ERROR` or `NOT_SUPPORTED` code.
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Getting Road Regulation Information</summary>
+<br></br>
+
+![Announce_Road_Regulation_Guidance](./assets/announce_road_regulation.png)
+
+</details>
+</br>
+
+### Controlling the Display
+
+If the user wants to control the map display on the screen, the Engine publishes the [`ControlDisplay` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#controldisplay).
+
+If the device can adjust the display successfully, your implementation should publish the [`NavigationEvent` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationevent) with one of the following event:
+
+> **events:** `ROUTE_OVERVIEW_SHOWN`, `DIRECTIONS_LIST_SHOWN`, `ZOOMED_IN`, `ZOOMED_OUT`, `MAP_CENTERED`, `ORIENTED_NORTH`, `SCROLLED_NORTH`, `SCROLLED_UP`, `SCROLLED_EAST`, `SCROLLED_RIGHT`, `SCROLLED_SOUTH`, `SCROLLED_DOWN`, `SCROLLED_WEST`, `SCROLLED_LEFT`, `ROUTE_GUIDANCE_MUTED`, `ROUTE_GUIDANCE_UNMUTED`
+
+Otherwise, your implementation should publish the [`NavigationError` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror) with a type and code from the following:
+
+> **types:** `ROUTE_OVERVIEW_FAILED`, `DIRECTIONS_LIST_FAILED`, `ZOOMED_IN_FAILED`, `ZOOMED_OUT_FAILED`, `MAP_CENTERED_FAILED`, `ORIENTED_NORTH_FAILED`, `SCROLLED_NORTH_FAILED`, `SCROLLED_UP_FAILED`, `SCROLLED_EAST_FAILED`, `SCROLLED_RIGHT_FAILED`, `SCROLLED_SOUTH_FAILED`, `SCROLLED_DOWN_FAILED`, `SCROLLED_WEST_FAILED`, `SCROLLED_LEFT_FAILED`, `ROUTE_GUIDANCE_MUTED_FAILED`, `ROUTE_GUIDANCE_UNMUTED_FAILED`\
+> **codes:** `INTERNAL_SERVICE_ERROR`, `ROUTE_NOT_FOUND`, `NOT_SUPPORTED`, `NOT_ALLOWED`
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Controlling the Display</summary>
+<br></br>
+
+![Map_Control](./assets/map_control.png)
+
+</details>
+</br>
+
+### Showing Alternative Routes
+
+If the user wants to display alternative routes, the Engine publishes the [`ShowAlternativeRoutes` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#showalternativeroutes), which passes the type of alternate route to be displayed.
+
+If the device can display the alternative route successfully, your implementation should publish the [`ShowAlternativeRoutesSucceeded` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#showalternativeroutessucceeded) with a payload containing information about the alternative route.
+
+The following table explains the properties in the JSON.
+
+| Property | Type | Required | Description |
+|-|-|-|-|
+| inquiryType | String | Yes | The type of alternative routes based on the user's preference. <br><br>**Accepted values:** <ul><li>`"DEFAULT"`, which means there is no preference as to whether the alternate route saves time or distance.</li><li>`"SHORTER_TIME"`, which means the alternate route saves time.</li><li>`"SHORTER_DISTANCE"`, which means the alternate route saves distance.</li></ul>
+| alternateRoute | Object | Yes | Information about the best route that matches the preference specified by `inquiryType`.
+| alternateRoute.labels | Array of strings |Yes | Unique names within a route (e.g., names of highways) used to distinguish between alternative routes. Each label might contain the direction of the route.
+| alternateRoute.savings | Array | No | List of savings achieved by the route. 
+| alternateRoute.savings.type | String | Yes | The type of savings. <br><br>**Accepted values:** `"DISTANCE"` or `"TIME"`.
+| alternateRoute.savings.amount | Float | Yes | The amount of savings achieved by the route. Alexa uses prescribed unit to convert the amount of savings to improve user experience, if needed.
+| alternateRoute.savings.unit | String | Yes | Measurement unit of the savings. <br><br>**Accepted values:** `"MINUTE"`, `"HOUR"`, `"YARD"`, `"FOOT"`, `"MILE"`, `"METER"`, or `"KILOMETER"`.
+
+<details markdown="1"><summary>Click to expand or collapse the <code>ShowAlternativeRoutesSucceeded</code> message schema</summary> 
+
+</br>
+
+<div class="highlight"><pre><span></span><code>{
+  &quot;inquiryType&quot;: &quot;{{STRING}}&quot;,
+  &quot;alternateRoute&quot;:
+  {
+      &quot;labels&quot;: [&quot;{{STRING}}&quot;],
+      &quot;savings&quot;: [
+          {
+              &quot;type&quot;: &quot;{{STRING}}&quot;,
+              &quot;amount&quot;: &quot;{{FLOAT}}&quot;,
+              &quot;unit&quot;: &quot;{{STRING}}&quot;
+          }
+      ]              
+  }
+}
+</code></pre></div>
+
+</details>
+</br>
+
+Otherwise, your implementation should publish the [`NavigationError` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/navigation/aasb-docs/Navigation/index.html#navigationerror) with a type and code from the following:
+
+> **types:** `DEFAULT_ALTERNATE_ROUTES_FAILED`, `SHORTER_TIME_ROUTES_FAILED`, `SHORTER_DISTANCE_ROUTES_FAILED`\
+> **codes:** `INTERNAL_SERVICE_ERROR`, `ROUTE_NOT_FOUND`, `NOT_SUPPORTED`, `NOT_ALLOWED`
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Showing Alternative Routes</summary>
+<br></br>
+
+![Show_Alternate_Routes](./assets/show_alternate_routes.png)
+
+</details>
+</br>
+
+## Integrating the Navigation Module Into Your Application <a id="integrating-the-navigation-module-into-your-application"></a>
+
+### C++ MessageBroker Integration
+
+Use the Engine's `MessageBroker` to subscribe to and publish *"Navigation"* AASB messages.
+
+<details markdown="1"><summary>Click to expand or collapse C++ sample code</summary>
+
+<br></br>
+
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AACE/Core/MessageBroker.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/AlternateRouteType.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ControlDisplay.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ErrorCode.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ErrorType.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/EventName.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/RoadRegulation.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/AnnounceManeuverMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/AnnounceRoadRegulationMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/CancelNavigationMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ControlDisplayMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/GetNavigationStateMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/NavigationErrorMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/NavigationEventMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/NavigateToPreviousWaypointMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ShowAlternativeRoutesMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ShowAlternativeRoutesSucceededMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/ShowPreviousWaypointsMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Navigation/Navigation/StartNavigationMessage.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;nlohmann/json.hpp&gt;</span><span class="cp"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nlohmann</span><span class="o">::</span><span class="n">json</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">class</span> <span class="nc">MyNavigationHandler</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::subscribeToAASBMessages</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleAnnounceManeuverMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">AnnounceManeuverMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">AnnounceManeuverMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleAnnounceRoadRegulationMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">AnnounceRoadRegulationMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">AnnounceRoadRegulationMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleCancelNavigationMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">CancelNavigationMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">CancelNavigationMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleControlDisplayMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">ControlDisplayMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">ControlDisplayMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleGetNavigationStateMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">GetNavigationStateMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">GetNavigationStateMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleNavigateToPreviousWaypointMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">NavigateToPreviousWaypointMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">NavigateToPreviousWaypointMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleShowAlternativeRoutesMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">ShowAlternativeRoutesMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">ShowAlternativeRoutesMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleShowPreviousWaypointsMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">ShowPreviousWaypointsMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">ShowPreviousWaypointsMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleStartNavigationMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">StartNavigationMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">StartNavigationMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the AnnounceManeuver message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleAnnounceManeuverMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">AnnounceManeuverMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">announceManeuver</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">payload</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the AnnounceRoadRegulation message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleAnnounceRoadRegulationMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">AnnounceRoadRegulationMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">announceRoadRegulation</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">roadRegulation</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the CancelNavigation message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleCancelNavigationMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">cancelNavigation</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the ControlDisplay message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleControlDisplayMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ControlDisplayMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">controlDisplay</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">controlDisplay</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the GetNavigationState message from the Engine and publish the</span>
+<span class="w">  </span><span class="c1">// reply message containing the current navigation state</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleGetNavigationStateMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">GetNavigationStateMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">GetNavigationStateMessageReply</span><span class="w"> </span><span class="n">replyMsg</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">replyMsg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">messageDescription</span><span class="p">.</span><span class="n">replyToId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">replyMsg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">navigationState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getNavigationState</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">replyMsg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the NavigateToPreviousWaypoint message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleNavigateToPreviousWaypointMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">navigateToPreviousWaypoint</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the ShowAlternativeRoutes message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleShowAlternativeRoutesMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ShowAlternativeRoutesMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">showAlternativeRoutes</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">alternateRouteType</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the ShowPreviousWaypoints message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleShowPreviousWaypointsMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">showPreviousWaypoints</span><span class="p">();</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Handle the StartNavigation message from the Engine</span>
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::handleStartNavigationMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">StartNavigationMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">startNavigation</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">payload</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::navigationError</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">ErrorType</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">ErrorCode</span><span class="w"> </span><span class="n">code</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">description</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">NavigationErrorMessage</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">type</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">code</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">description</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::navigationEvent</span><span class="p">(</span><span class="n">EventName</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">NavigationEventMessage</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">event</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::showAlternativeRoutesSucceeded</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">payload</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ShowAlternativeRoutesSucceededMessage</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">payload</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::startNavigation</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">payload</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Update the previous destinations list</span>
+
+<span class="w">    </span><span class="c1">// Call navigationEvent(EventName::NAVIGATION_STARTED)</span>
+<span class="w">    </span><span class="c1">// If error occurs call navigationError() with ErrorType::NAVIGATION_START_FAILED and the ErrorCode describing the type of failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyNavigationHandler::navigateToPreviousWaypoint</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call navigationEvent(EventName::PREVIOUS_NAVIGATION_STARTED)</span>
+<span class="w">    </span><span class="c1">// If any error occurs call navigationError() with ErrorType::PREVIOUS_NAVIGATION_START_FAILED and the ErrorCode describing the type of failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">NavigationHandler::showPreviousWaypoints</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call navigationEvent(EventName::PREVIOUS_WAYPOINTS_SHOWN)</span>
+<span class="w">    </span><span class="c1">// If error occurs call navigationError() with ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED and the ErrorCode describing the type of failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">NavigationHandler::showAlternativeRoutes</span><span class="p">(</span><span class="n">AlternateRouteType</span><span class="w"> </span><span class="n">alternateRouteType</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Based on the AlternativeRouteType obtain the alternative route information</span>
+
+<span class="w">    </span><span class="c1">// Call showAlternativeRoutesSucceeded()</span>
+<span class="w">    </span><span class="c1">// If error occurs call navigationError() with ErrorType and ErrorCode describing failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">NavigationHandler::controlDisplay</span><span class="p">(</span><span class="n">ControlDisplay</span><span class="w"> </span><span class="n">controlDisplay</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call navigationEvent() for the requested map control request</span>
+<span class="w">    </span><span class="c1">// If error occurs call navigationError() with ErrorType and ErrorCode describing failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">NavigationHandler::announceManeuver</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">payload</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call navigationEvent() for the requested manueuver instruction</span>
+<span class="w">    </span><span class="c1">// If error occurs call navigationError() with ErrorType and ErrorCode describing failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="nf">NavigationHandler::announceRoadRegulation</span><span class="p">(</span><span class="n">RoadRegulation</span><span class="w"> </span><span class="n">roadRegulation</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Call navigationEvent() for the requested road regulation</span>
+<span class="w">    </span><span class="c1">// If error occurs call navigationError() with ErrorType and ErrorCode describing failure</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="nf">NavigationHandler::cancelNavigation</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Clear the navigation state </span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="nf">NavigationHandler::getNavigationState</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Return current navigation state</span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="p">};</span><span class="w"></span>
+</code></pre></div>
+
+ </details>
+ </br>
+
+ ### Android Integration
+
+The Alexa Auto Client Service (AACS) provides the `Navigation App Component` to integrate the Auto SDK `Navigation` module on Android. See the [AACS Navigation App Component documentation](../../aacs/android/app-components/alexa-auto-navigation/README.md) for more information.
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../messaging/aasb-docs/Messaging/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Messaging" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Messaging
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="aasb-docs/Navigation/" class="md-footer__link md-footer__link--next" aria-label="Next: Navigation" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Navigation
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2016 - 2021 Amazon
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      
+    
+  </body>
+</html>

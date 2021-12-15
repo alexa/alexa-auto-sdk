@@ -1,0 +1,35 @@
+topic: AudioInput
+namespace: aasb.message.audio.audioInput
+path: Audio/AudioInput
+
+messages:
+  - action: StopAudioInput
+    direction: outgoing
+    desc: Notifies the platform implementation to stop writing audio samples to the Engine.
+    payload:
+      - name: streamId
+        desc: Stream ID that is used to write audio data to.
+        example: "4f52d5a6-2b36-4723-93d5-4e569be99961"
+
+  - action: StartAudioInput
+    direction: outgoing
+    desc: Notifies the platform implementation to start writing audio samples to the Engine.
+    payload:
+      - name: name
+        desc: Name of the Engine component that is requesting audio.
+      - name: audioType
+        type: AudioInputAudioType
+        desc: The type of audio data being requested.
+      - name: streamId
+        desc: Stream ID that is used to write audio data to.
+
+types:
+  - name: AudioInputAudioType
+    type: enum
+    values:
+      - name: VOICE
+        desc: Voice audio type.
+      - name: COMMUNICATION
+        desc: Communication audio type.
+      - name: LOOPBACK
+        desc: Loopback audio type.

@@ -1,0 +1,55 @@
+topic: LocationProvider
+namespace: aasb.message.location.locationProvider
+path: Location/LocationProvider
+
+messages:
+  - action: LocationServiceAccessChanged
+    direction: incoming
+    desc: Notifies the Engine of a change in location service access.
+    payload:
+      - name: access
+        type: LocationServiceAccess
+        desc: Describes the access to the geolocation service on the device.
+
+  - action: GetCountry
+    direction: outgoing
+    desc: Requests the ISO country code for the current geolocation of the device.
+    reply:
+      - name: country
+        desc: The current country.
+
+  - action: GetLocation
+    direction: outgoing
+    desc: Requests the current geolocation of the device.
+    reply:
+      - name: location
+        type: Location
+        desc: The current location.
+
+types:
+  - name: Location
+    type: struct
+    values:
+      - name: latitude
+        type: float
+        desc: Location latitude. Use -1 if the location is not available.
+      - name: longitude
+        type: float
+        desc: Location longitude. Use -1 if the location is not available.
+      - name: altitude
+        type: float
+        desc: A location altitude in meters.
+        default: -1
+      - name: accuracy
+        type: float
+        desc: A location accuracy in meters.
+        default: -1
+      
+  - name: LocationServiceAccess
+    type: enum
+    values:
+      - name: DISABLED
+        desc: The location service on the device is disabled (e.g., GPS is turned off).
+      - name: ENABLED
+        desc: The location service on the device is enabled (e.g., GPS is turned on).
+

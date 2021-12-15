@@ -13,8 +13,6 @@
  * permissions and limitations under the License.
  */
 
-#include "AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h"
-
 #include "AACE/Engine/Alexa/TemplateRuntimeEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Utils/Metrics/Metrics.h"
@@ -91,11 +89,12 @@ bool TemplateRuntimeEngineImpl::initialize(
         // set observer on each element in the set and then caches the set.  The set cannot be modified after the constructor.  In our case, we want
         // to be able to initialize our platform interfaces in an arbitrary order so we need to manage the set of renderPlayerInfoCardsProviderInterfaces
         // in this class.  As such, we pass in an empty set to the TemplateRuntime and ensure that we call setObserver and clear when applicable.
-        m_templateRuntimeCapabilityAgent = alexaClientSDK::capabilityAgents::templateRuntime::TemplateRuntime::create(
-            std::unordered_set<
-                std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>{},
-            focusManager,
-            exceptionSender);
+        m_templateRuntimeCapabilityAgent =
+            alexaSmartScreenSDK::smartScreenCapabilityAgents::templateRuntime::TemplateRuntime::create(
+                std::unordered_set<std::shared_ptr<
+                    alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>{},
+                focusManager,
+                exceptionSender);
         ThrowIfNull(m_templateRuntimeCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         setRenderPlayerInfoCardsProviderInterface(renderPlayerInfoCardsProviderInterfaces);
@@ -180,15 +179,16 @@ void TemplateRuntimeEngineImpl::renderTemplateCard(
     m_templateRuntimePlatformInterface->renderTemplate(jsonPayload, convertFocusState(focusState));
 }
 
-void TemplateRuntimeEngineImpl::clearTemplateCard() {
+void TemplateRuntimeEngineImpl::clearTemplateCard(const std::string& token) {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearTemplateCard", {METRIC_TEMPLATERUNTIME_CLEAR_TEMPLATE});
     m_templateRuntimePlatformInterface->clearTemplate();
 }
 
 void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
     const std::string& jsonPayload,
-    alexaClientSDK::avsCommon::sdkInterfaces::TemplateRuntimeObserverInterface::AudioPlayerInfo audioPlayerInfo,
-    alexaClientSDK::avsCommon::avs::FocusState focusState) {
+    alexaSmartScreenSDK::smartScreenSDKInterfaces::AudioPlayerInfo audioPlayerInfo,
+    alexaClientSDK::avsCommon::avs::FocusState focusState,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MediaPropertiesInterface> mediaProperties) {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderPlayerInfoCard", {METRIC_TEMPLATERUNTIME_RENDER_PLAYER_INFO});
     m_templateRuntimePlatformInterface->renderPlayerInfo(
         jsonPayload,
@@ -197,7 +197,7 @@ void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
         convertFocusState(focusState));
 }
 
-void TemplateRuntimeEngineImpl::clearPlayerInfoCard() {
+void TemplateRuntimeEngineImpl::clearPlayerInfoCard(const std::string& token) {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearPlayerInfoCard", {METRIC_TEMPLATERUNTIME_CLEAR_PLAYER_INFO});
     m_templateRuntimePlatformInterface->clearPlayerInfo();
 }

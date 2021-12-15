@@ -19,6 +19,8 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 #include <AACE/Engine/Utils/Metrics/Metrics.h>
 
+#include <sstream>
+
 namespace aace {
 namespace engine {
 namespace network {
@@ -96,6 +98,29 @@ bool NetworkInfoProviderEngineImpl::setNetworkInterface(const std::string& netwo
 
         return true;
 
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool NetworkInfoProviderEngineImpl::setNetworkHttpProxyHeader(const std::string& headers) {
+    AACE_DEBUG(LX(TAG));
+    try {
+        ThrowIf(headers.empty(), "proxyHeadersEmpty");
+
+        auto headersVector = std::vector<std::string>{};
+        auto ss = std::stringstream{headers};
+
+        for (std::string line; std::getline(ss, line, '\n');) {
+            headersVector.push_back(line);
+        }
+
+        std::lock_guard<std::mutex> lock(m_mutex);
+        for (const auto& next : m_observers) {
+            next->onNetworkProxyHeadersAvailable(headersVector);
+        }
+        return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;

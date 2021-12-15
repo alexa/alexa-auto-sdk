@@ -83,7 +83,9 @@ rapidjson::Value buildPlaybackState(
     rapidjson::Value playerJson;
     playerJson.SetObject();
 
-    playerJson.AddMember(PLAYER_ID, playerId, allocator);
+    if (!playerId.empty()) {
+        playerJson.AddMember(PLAYER_ID, playerId, allocator);
+    }
     playerJson.AddMember(STATE, playbackState.state, allocator);
     auto operations = buildSupportedOperations(playbackState.supportedOperations, allocator);
     playerJson.AddMember(OPERATIONS, operations, allocator);
@@ -186,6 +188,7 @@ bool buildDefaultPlayerState(rapidjson::Value* document, rapidjson::Document::Al
     if (!document) {
         return false;
     }
+
     document->AddMember(STATE, DEFAULT_STATE, allocator);
     rapidjson::Value opArray(rapidjson::kArrayType);
     document->AddMember(OPERATIONS, opArray, allocator);
@@ -193,7 +196,6 @@ bool buildDefaultPlayerState(rapidjson::Value* document, rapidjson::Document::Al
     document->AddMember(REPEAT, REPEAT_STATUS_STRING(false, false), allocator);
     document->AddMember(FAVORITE, RatingToString(Favorites::NOT_RATED), allocator);
     document->AddMember(POSITIONINMS, 0, allocator);
-
     return true;
 }
 

@@ -1,0 +1,91 @@
+{
+    "aace.alexa": {
+        "avsDeviceSDK": {
+            "deviceInfo": {
+                "clientId": "${CLIENT_ID}",
+                "productId": "${PRODUCT_ID}",
+                "deviceSerialNumber": "${DEVICE_SERIAL_NUMBER}",
+                "manufacturerName": "${MANUFACTURER_NAME}",
+                "description": "${DEVICE_DESCRIPTION}"
+            },
+            "libcurlUtils": {
+                "CURLOPT_CAPATH": "${CERTS_PATH}"
+            },
+            "miscDatabase": {
+                "databaseFilePath": "${DATA_PATH}/miscDatabase.db"
+            },
+            "certifiedSender": {
+                "databaseFilePath": "${DATA_PATH}/certifiedSender.db"
+            },
+            "alertsCapabilityAgent": {
+                "databaseFilePath": "${DATA_PATH}/alertsCapabilityAgent.db"
+            },
+            "notifications": {
+                "databaseFilePath": "${DATA_PATH}/notifications.db"
+            },
+            "capabilitiesDelegate": {
+                "databaseFilePath": "${DATA_PATH}/capabilitiesDatabase.db"
+            },
+            "deviceSettings": {
+                "databaseFilePath": "${DATA_PATH}/deviceSettings.db",
+                "defaultLocale":"en-US",
+                "defaultTimezone":"America/Vancouver"
+            }
+        },
+        "requestMediaPlayback": {
+            "mediaResumeThreshold": 20000
+        }
+    },
+    "aace.storage": {
+        "localStoragePath": "${DATA_PATH}/aace-storage.db",
+        "storageType": "sqlite"
+    },
+    "aace.vehicle": {
+        "info": {
+            "make": "${VEHICLE_MAKE}",
+            "model": "${VEHICLE_MODEL}",
+            "year": "${VEHICLE_YEAR}",
+            "trim": "${VEHICLE_TRIM}",
+            "geography": "${VEHICLE_GEOGRAPHY}",
+            "version": "${VEHICLE_VERSION}",
+            "os": "${VEHICLE_OS}",
+            "arch": "${VEHICLE_ARCH}",
+            "language": "${VEHICLE_LANGUAGE}",
+            "microphone": "${VEHICLE_MICROPHONE}",
+            "vehicleIdentifier": "${VEHICLE_IDENTIFIER}"
+        },
+        "operatingCountry": "${VEHICLE_COUNTRTY}"
+    },
+    "aace.cbl" : {
+        "enableUserProfile": false
+    },
+    "aace.logger": {
+        "sinks": [{
+            "id": "verbose.logs",
+            "type": "aace.logger.sink.file",
+            "config": {
+                "path": "${DATA_PATH}",
+                "prefix": "sampleapp-log"
+            },
+            "rules": [{
+                "level": "VERBOSE"
+            }]
+        }]
+    },
+    "aasb.alexa": {
+      "LocalMediaSource": {
+        "types": ["FM_RADIO", "AM_RADIO","BLUETOOTH", "USB", "SATELLITE_RADIO",
+                    "LINE_IN", "COMPACT_DISC", "DAB", "DEFAULT"]
+      }
+    },
+    "aasb.apl": {
+       "APL": {
+          "enabled": false
+       }
+    },
+    "aasb.customDomain": {
+        "CustomDomain": {    
+            "enabled": false
+        }
+    }
+}

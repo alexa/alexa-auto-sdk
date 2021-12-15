@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/setup_navigation"
+    app:startDestination="@id/navigation_fragment_login">
+
+    <fragment
+        android:id="@+id/navigation_fragment_login"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.LoginFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_network"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.NetworkFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_startLanguageSelection"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.LanguageSelectionFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_languageSelection"
+        android:name="com.amazon.alexa.auto.settings.AlexaSettingsLanguagesFragment"
+        android:label="@string/setting_alexa_language_title"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_enablePreviewMode"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.EnablePreviewModeFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_locationConsent"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.LocationConsentFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_cblLoginFinish"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLLoginFinishFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_authProviderAuthenticatedFinish"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.AuthProviderAuthenticatedFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_cblStart"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_communication"
+        android:name="com.amazon.alexa.auto.comms.ui.fragment.setup.CommunicationConsentFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_setupNotComplete"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.SetupNotCompleteFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_cblLoginError"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLLoginErrorFragment"/>
+</navigation>

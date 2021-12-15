@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['seek',['seek',['../classaace_1_1alexa_1_1_local_media_source.html#af1bdc078c4702c3f8b7a864dd0095a47',1,'aace::alexa::LocalMediaSource']]],
+  ['seek',['seek',['../classaace_1_1alexa_1_1_external_media_adapter.html#a95da75990f502cac72ed8b15cb4e2bc6',1,'aace::alexa::ExternalMediaAdapter::seek()'],['../classaace_1_1alexa_1_1_local_media_source.html#af1bdc078c4702c3f8b7a864dd0095a47',1,'aace::alexa::LocalMediaSource::seek()']]],
+  ['sendconnectivityevent',['sendConnectivityEvent',['../classaace_1_1connectivity_1_1_alexa_connectivity.html#a07992367aa0b66f931ca374da0feb86d',1,'aace::connectivity::AlexaConnectivity']]],
   ['senddatasourcefetchrequestevent',['sendDataSourceFetchRequestEvent',['../classaace_1_1apl_1_1_a_p_l.html#a306d1701b8132eb2306b22880e4401e8',1,'aace::apl::APL']]],
   ['senddevicewindowstate',['sendDeviceWindowState',['../classaace_1_1apl_1_1_a_p_l.html#ac3b76e6d3ad96161c5e37f2d3728ae1d',1,'aace::apl::APL']]],
   ['senddocumentstate',['sendDocumentState',['../classaace_1_1apl_1_1_a_p_l.html#a87d590c8a9a8f32c36bf15b41ce6d1a0',1,'aace::apl::APL']]],
@@ -17,10 +18,11 @@ var searchData=
   ['setdefaultzone',['setDefaultZone',['../classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ac1c48da7ee8a6244c27414b97a40f3a0',1,'aace::carControl::config::CarControlConfiguration']]],
   ['setdocumentidletimeout',['setDocumentIdleTimeout',['../classaace_1_1apl_1_1_a_p_l.html#ad6270378b772440b1d4679b844d4d928',1,'aace::apl::APL']]],
   ['setdonotdisturb',['setDoNotDisturb',['../classaace_1_1alexa_1_1_do_not_disturb.html#adf4a853a8f3366e416127d1f1767ccab',1,'aace::alexa::DoNotDisturb']]],
-  ['setfocus',['setFocus',['../classaace_1_1alexa_1_1_local_media_source.html#ad1217e4c192da618ae846ba57c8611ac',1,'aace::alexa::LocalMediaSource']]],
+  ['setfocus',['setFocus',['../classaace_1_1alexa_1_1_external_media_adapter.html#a62328f4019ee4f59192e92606c5b4a57',1,'aace::alexa::ExternalMediaAdapter::setFocus()'],['../classaace_1_1alexa_1_1_local_media_source.html#ad1217e4c192da618ae846ba57c8611ac',1,'aace::alexa::LocalMediaSource::setFocus()']]],
   ['setglobalpreset',['setGlobalPreset',['../classaace_1_1alexa_1_1_global_preset.html#a9cecca4284cee3de1215a53bb3b763ea',1,'aace::alexa::GlobalPreset']]],
   ['setindicator',['setIndicator',['../classaace_1_1alexa_1_1_notifications.html#ac88ce22736f266b4ef6d703b7e2fbc58',1,'aace::alexa::Notifications']]],
   ['setmodecontrollervalue',['setModeControllerValue',['../classaace_1_1car_control_1_1_car_control.html#a68e0a7b00fa0024f83240e273817390a',1,'aace::carControl::CarControl']]],
+  ['setplatformproperty',['setPlatformProperty',['../classaace_1_1apl_1_1_a_p_l.html#a09d51de009a384fd4bb59a8da39b8231',1,'aace::apl::APL']]],
   ['setposition',['setPosition',['../classaace_1_1audio_1_1_audio_output.html#a2d621811ac53c6128ad435546ba964e7',1,'aace::audio::AudioOutput']]],
   ['setproperty',['setProperty',['../classaace_1_1property_manager_1_1_property_manager.html#a07bd961c86047b1b1e5de7366bf83820',1,'aace::propertyManager::PropertyManager']]],
   ['setrangecontrollervalue',['setRangeControllerValue',['../classaace_1_1car_control_1_1_car_control.html#a6eb554713a311dcf2dbe6aca00e1739e',1,'aace::carControl::CarControl']]],
@@ -34,8 +36,11 @@ var searchData=
   ['start',['start',['../classaace_1_1cbl_1_1_c_b_l.html#a98ab22f22a9e395718c09730b35c9bdf',1,'aace::cbl::CBL::start()'],['../classaace_1_1core_1_1_engine.html#ace84ee80b94b7da5c7f38390d5a160d7',1,'aace::core::Engine::start()']]],
   ['startauthorization',['startAuthorization',['../classaace_1_1authorization_1_1_authorization.html#af93d589976a27961166a454ca50239eb',1,'aace::authorization::Authorization']]],
   ['startcapture',['startCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#ab2d1df9942a32ff6eb829211a1ebffba',1,'aace::alexa::SpeechRecognizer']]],
+  ['startducking',['startDucking',['../classaace_1_1audio_1_1_audio_output.html#a127f6c48e927c2ad6d908dc7ba724da5',1,'aace::audio::AudioOutput']]],
   ['startnavigation',['startNavigation',['../classaace_1_1navigation_1_1_navigation.html#abb26aed1a2b2fb215fd9c69cb9b6511c',1,'aace::navigation::Navigation']]],
   ['stop',['stop',['../classaace_1_1audio_1_1_audio_output.html#a80a92aeb055e394e6661c43f9217c670',1,'aace::audio::AudioOutput::stop()'],['../classaace_1_1core_1_1_engine.html#a456599306224a018b0c7b708594671f2',1,'aace::core::Engine::stop()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#adbeb8a3a5c7f6e7bfd290ebe81770cae',1,'aace::phoneCallController::PhoneCallController::stop()']]],
   ['stopcapture',['stopCapture',['../classaace_1_1alexa_1_1_speech_recognizer.html#afbbd237e855308ed0d440c7f3d469a69',1,'aace::alexa::SpeechRecognizer']]],
-  ['stopforegroundactivity',['stopForegroundActivity',['../classaace_1_1alexa_1_1_alexa_client.html#a5ac8bb84af2126339c7bf685d3540bac',1,'aace::alexa::AlexaClient']]]
+  ['stopducking',['stopDucking',['../classaace_1_1audio_1_1_audio_output.html#a616f8d7ed77d3afcbb684977bf98368b',1,'aace::audio::AudioOutput']]],
+  ['stopforegroundactivity',['stopForegroundActivity',['../classaace_1_1alexa_1_1_alexa_client.html#a5ac8bb84af2126339c7bf685d3540bac',1,'aace::alexa::AlexaClient']]],
+  ['subscribe',['subscribe',['../classaace_1_1core_1_1_message_broker.html#a772d071dfd5916d8502defb703932a56',1,'aace::core::MessageBroker']]]
 ];

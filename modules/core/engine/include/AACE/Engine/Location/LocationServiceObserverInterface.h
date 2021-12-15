@@ -24,6 +24,8 @@ namespace location {
 
 class LocationServiceObserverInterface {
 public:
+    virtual ~LocationServiceObserverInterface() = default;
+
     using LocationServiceAccess = aace::location::LocationProviderEngineInterface::LocationServiceAccess;
 
     /**

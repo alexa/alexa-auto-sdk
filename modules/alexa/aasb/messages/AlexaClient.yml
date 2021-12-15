@@ -1,0 +1,109 @@
+topic: AlexaClient
+namespace: aasb.message.alexa.alexaClient
+path: Alexa/AlexaClient
+
+messages:
+  - action: ConnectionStatusChanged
+    direction: outgoing
+    desc: Notifies the platform implementation of an AVS connection status change.
+    payload:
+      - name: status
+        type: ConnectionStatus
+        desc: The new AVS connection status.
+      - name: reason
+        type: ConnectionChangedReason
+        desc: The reason for the status change.
+
+  - action: DialogStateChanged
+    direction: outgoing
+    desc: Notifies the platform implementation of an Alexa dialog state change.
+    payload:
+      - name: state
+        type: DialogState
+        desc: The new Alexa dialog state.
+
+  - action: AuthStateChanged
+    direction: outgoing
+    desc: Notifies the platform implementation of an AVS authorization state change.
+    payload:
+      - name: state
+        type: AuthState
+        desc: The new authorization state.
+      - name: error
+        type: AuthError
+        desc: The error state of the authorization attempt.
+
+  - action: StopForegroundActivity
+    direction: incoming
+    desc: Notifies the Engine to stop foreground activity.
+
+types:
+  - name: AuthState
+    type: alias
+    alias: aasb.message.alexa.authProvider.AuthState
+
+  - name: AuthError
+    type: alias
+    alias: aasb.message.alexa.authProvider.AuthError
+
+  - name: DialogState
+    type: enum
+    values:
+      - name: IDLE
+        desc: Alexa is idle and ready for an interaction.
+      - name: LISTENING
+        desc: Alexa is currently listening.
+      - name: EXPECTING
+        desc: Alexa is currently expecting a response from the user.
+      - name: THINKING
+        desc: A user request has completed, and no more user input is being accepted. Alexa is waiting for a response from AVS.
+      - name: SPEAKING
+        desc: Alexa is responding to a request with speech.
+
+  - name: ConnectionStatus
+    type: enum
+    values:
+      - name: DISCONNECTED
+        desc: Not connected to AVS.
+      - name: PENDING
+        desc: Attempting to establish a connection to AVS.
+      - name: CONNECTED
+        desc: Connected to AVS.
+
+  - name: ConnectionChangedReason
+    type: enum
+    values:
+      - name: NONE
+        desc: No reason specified.
+      - name: SUCCESS
+        desc: The connection status changed due to a successful operation.
+      - name: UNRECOVERABLE_ERROR
+        desc: The connection status changed due to an error from which there is no recovery.
+      - name: ACL_CLIENT_REQUEST
+        desc: The connection status changed due to a client request.
+      - name: ACL_DISABLED
+        desc: The connection attempt failed because connection was disabled.
+      - name: DNS_TIMEDOUT
+        desc: The connection attempt failed due to a DNS resolution timeout.
+      - name: CONNECTION_TIMEDOUT
+        desc: The connection attempt failed due to a connection timeout.
+      - name: CONNECTION_THROTTLED
+        desc: The connection attempt failed due to excessive load on the server.
+      - name: INVALID_AUTH
+        desc: The provided access credentials were invalid.
+      - name: PING_TIMEDOUT
+        desc: There was a timeout sending a ping request.
+      - name: WRITE_TIMEDOUT
+        desc: There was a timeout writing to AVS.
+      - name: READ_TIMEDOUT
+        desc: There was a timeout reading from AVS.
+      - name: FAILURE_PROTOCOL_ERROR
+        desc: There was an underlying protocol error.
+      - name: INTERNAL_ERROR
+        desc: There was an internal error.
+      - name: SERVER_INTERNAL_ERROR
+        desc: There was an internal error on the server.
+      - name: SERVER_SIDE_DISCONNECT
+        desc: The server asked the client to reconnect.
+      - name: SERVER_ENDPOINT_CHANGED
+        desc: The server endpoint has changed.

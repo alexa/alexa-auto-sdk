@@ -29,10 +29,16 @@ public:
     Version(const std::string& str);
     Version(const Version& version);
 
+    uint8_t major_version();
+    uint8_t minor_version();
+    uint8_t revision_version();
+    std::string tag_version();
+
     std::string toString();
 
     bool operator==(const Version& other);
     bool operator<(const Version& other);
+    bool operator>(const Version& other);
 
     friend std::ostream& operator<<(std::ostream& stream, const Version& version);
 

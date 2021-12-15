@@ -1,0 +1,5 @@
+include(default)
+
+[settings]
+os=Macos
+os_build=Macos

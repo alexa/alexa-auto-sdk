@@ -44,7 +44,6 @@ private:
      * Initializes the object.
      * 
      * @param authorizationManagerInterface To carry out the required authorization flow with @c AuthorizationManager.
-     * @param customerDataManager The @c CustomerDataManager object that will track the CustomerDataHandler.
      */
     bool initialize(std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface);
 

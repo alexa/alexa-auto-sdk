@@ -23,6 +23,8 @@ namespace connectivity {
 
 class AlexaConnectivityEngineInterface {
 public:
+    virtual ~AlexaConnectivityEngineInterface() = default;
+
     /**
      * Indicates the delivery status of @c sendConnectivityEvent.
      */

@@ -21,6 +21,8 @@ namespace cbl {
 
 class CBLEngineInterface {
 public:
+    virtual ~CBLEngineInterface() = default;
+
     virtual void onStart() = 0;
     virtual void onCancel() = 0;
     virtual void onReset() = 0;

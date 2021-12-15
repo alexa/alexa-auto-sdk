@@ -64,7 +64,7 @@ private:
 private:
     std::shared_ptr<TextToSpeechEngineImpl> m_textToSpeechEngineImpl;
     std::mutex m_textToSpeechProviderMutex;
-
+    std::string m_preferedProvider;
     // Map to store Text To Speech provider name and the associated Text To Speech Providers
     std::unordered_map<std::string, std::shared_ptr<TextToSpeechSynthesizerInterface>>
         m_registeredTextToSpeechProviders;

@@ -28,6 +28,8 @@ namespace network {
  */
 class NetworkInfoProviderEngineInterface {
 public:
+    virtual ~NetworkInfoProviderEngineInterface() = default;
+
     /**
      * Describes the status of network connectivity
      */

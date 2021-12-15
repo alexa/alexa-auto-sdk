@@ -1,0 +1,47 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+actor Driver Order 10
+participant Application  order 30
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+Application -> AutoSDK: Publish ConversationReport message
+AutoSDK -> Alexa: ConversationReport event
+
+Driver -> Alexa: "Read my messages"
+Alexa -> Driver: "One message from Bob" 
+Alexa -> Driver: "Hello!"
+Alexa -> AutoSDK: UpdateMessagesStatus directive
+AutoSDK -> Application: Receive UpdateMessagesStatus message
+Alexa -> Driver: "Received this morning!"
+
+alt "Success Reported"
+	Application -> AutoSDK: Publish UpdateMessagesStatusSucceeded
+    AutoSDK -> Alexa: UpdateMessagesStatusSucceeded event
+else "Fail Reported"
+	Application -> AutoSDK: Publish UpdateMessagesStatusFailed
+    AutoSDK -> Alexa: UpdateMessagesStatusFailed event
+end
+
+Alexa -> AutoSDK: UploadConversations directive
+AutoSDK -> Application: Receive UploadConversations message
+Application -> AutoSDK: Publish ConvesationsReport message 
+AutoSDK -> Alexa: ConversationsReport event
+
+@enduml

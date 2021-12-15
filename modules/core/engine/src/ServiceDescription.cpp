@@ -19,6 +19,13 @@
 
 #include "AACE/Engine/Core/ServiceDescription.h"
 
+#ifndef SCNd8
+  #define SCNd8 "hhd"
+#endif
+#ifndef SCNu8
+  #define SCNu8 "hhu"
+#endif
+
 namespace aace {
 namespace engine {
 namespace core {
@@ -79,6 +86,22 @@ Version::Version(const Version& version) {
     m_tag = version.m_tag;
 }
 
+uint8_t Version::major_version() {
+    return m_major;
+}
+
+uint8_t Version::minor_version() {
+    return m_minor;
+}
+
+uint8_t Version::revision_version() {
+    return m_revision;
+}
+
+std::string Version::tag_version() {
+    return m_tag;
+}
+
 std::string Version::toString() {
     std::stringstream ss;
 
@@ -92,7 +115,11 @@ bool Version::operator==(const Version& other) {
 }
 
 bool Version::operator<(const Version& other) {
-    return m_major < other.m_major || m_minor < other.m_minor || m_revision < other.m_revision;
+    return m_major < other.m_major || (m_major == other.m_major && (m_minor < other.m_minor || (m_minor == other.m_minor && m_revision < other.m_revision)));
+}
+
+bool Version::operator>(const Version& other) {
+    return m_major > other.m_major || (m_major == other.m_major && (m_minor > other.m_minor || (m_minor == other.m_minor && m_revision > other.m_revision)));
 }
 
 std::ostream& operator<<(std::ostream& stream, const Version& version) {

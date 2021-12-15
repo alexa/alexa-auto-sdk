@@ -1,0 +1,87 @@
+topic: CustomDomain
+namespace: aasb.message.customDomain.customDomain
+path: CustomDomain/CustomDomain
+
+messages:
+  - action: HandleDirective
+    direction: outgoing
+    desc: Notifies the platform on a new custom directive.
+    payload:
+      - name: directiveNamespace
+        desc: The namespace of the custom directive to be handled.
+      - name: directiveName
+        desc: The name of the custom directive.
+      - name: directivePayload
+        desc: An opaque JSON payload sent to the device.
+      - name: correlationToken
+        desc: An opaque token that must be included in any events responding to this directive.
+      - name: messageId
+        desc: A unique ID used to identify a specific directive. Used to report directive handling result.
+  
+  - action: CancelDirective
+    direction: outgoing
+    desc: Notifies the platform to cancel the specific directive with given messageId.
+    payload:
+      - name: directiveNamespace
+        desc: The namespace of the cancelled directive.
+      - name: directiveName
+        desc: The name of the cancelled directive.
+      - name: correlationToken
+        desc: The correlationToken of the cancelled directive.
+      - name: messageId
+        desc: A unique ID used to identify a specific directive.
+
+  - action: GetContext
+    direction: outgoing
+    desc: Called to query the current custom states under given namespace from the device.
+    payload: 
+      - name: contextNamespace
+        desc: The namespace of the queried context.
+    reply:
+      - name: customContext
+        desc: The context for the queried namespace in a String representation of a valid JSON object (escaped). You can find the defined structure of context JSON in Custom Domain Platform Interface.
+
+  - action: ReportDirectiveHandlingResult
+    direction: incoming
+    desc: Notifies the engine about the result of a directive handling.
+    payload:
+      - name: directiveNamespace
+        desc: The namespace of the custom directive.
+      - name: messageId
+        desc: The messageId that uniquely identifies which directive this report is for.
+      - name: result
+        type: ResultType
+        desc: The result of the handling.
+
+  - action: SendEvent
+    direction: incoming
+    desc: Notifes the engine to send a custom event.
+    payload:
+      - name: eventNamespace
+        desc: The namespace of the custom event to be sent.
+      - name: eventName
+        desc: The name of the event.
+      - name: eventPayload
+        desc: An opaque JSON payload in the format of escaped JSON string sent to the cloud with the event.
+      - name: requiresContext
+        type: bool
+        desc: A boolean indicating if this event must be sent with context.
+      - name: correlationToken
+        desc: The token correlating this event to a directive. Required only if this event is sent as a response to a directive.
+        default: ""
+      - name: customContext
+        desc: The context corresponding to eventNamespace in a String representation of a valid JSON object (escaped). It's optional but recommended to provide the context with the event to reduce the amount of AASB message transactions. You can find the defined structure of context JSON in Custom Domain Platform Interface.
+        default: ""
+
+types:
+- name: ResultType
+  type: enum
+  values:
+    - name: UNEXPECTED_INFORMATION_RECEIVED
+      desc: The directive sent to your client was malformed or the payload does not conform to the directive specification.
+    - name: UNSUPPORTED_OPERATION
+      desc: The operation specified by the namespace/name in the directive's header are not supported by the client.
+    - name: INTERNAL_ERROR
+      desc: An error occurred while the device was handling the directive and the error does not fall into the specified categories.
+    - name: SUCCESS
+      desc: The directive handling is successful.

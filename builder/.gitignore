@@ -1,6 +1,2 @@
-/android-toolchain
-/downloads
-/build
-/deploy
-*.pyc
-/.extralocal.conf
+.builder
+deploy

@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="contacts_permission_consent_title">Appelez vos contacts avec Alexa</string>
+    <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Configurer les appels vocaux</string>
+    <string name="contacts_permission_consent_body">Autoriser le téléversement des contacts sur %1$s vers le service Amazon.</string>
+    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Appelez les contacts de votre téléphone mains libres avec [Acme Brandon] et Amazon Alexa. Vos contacts sur %1$s seront téléversés vers le service Amazon.</string>
+    <string name="contacts_upload_consent_title">Contacts</string>
+    <string name="contacts_upload_consent_summary">Pour permettre d\'appeler des contacts avec Alexa, les contacts sur ce téléphone seront téléversés vers le service Amazon.</string>
+    <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Téléversez les contacts vers le service Amazon pour les appeler et leur envoyer un message par leur nom</string>
+    <string name="contacts_consent_yes">ACTIVER</string>
+    <string name="contacts_consent_yes_with_alexa_custom_assistant">Utiliser les contacts</string>
+    <string name="contacts_consent_skip">IGNORER</string>
+    <string name="comms_permission_status">Contacts %1$s</string>
+    <string name="comms_permission_enabled">activé</string>
+    <string name="comms_permission_disabled">désactivé</string>
+    <string name="comms_sample_utterance">«&#160;Alexa, appelle Sam.&#160;»</string>
+    <string name="sms_consent_title">Messages texte</string>
+    <string name="sms_consent_summary">Pour activer les messages texte avec Alexa, les messages texte sur ce téléphone seront téléversés vers le nuage Amazon.</string>
+    <string name="sms_consent_summary_with_alexa_custom_assistant">Téléversez les messages texte vers le service Amazon pour qu\'on vous les lise</string>
+    <string name="pair_new_device">Nouveau jumelage</string>
+</resources>

@@ -87,32 +87,25 @@ AudioInputChannelInterface::ChannelId AudioInputEngineImpl::start(AudioWriteCall
     }
 }
 
-bool AudioInputEngineImpl::stop(ChannelId id) {
+void AudioInputEngineImpl::stop(ChannelId id) {
     try {
         std::lock_guard<std::mutex> clientLock(m_mutex);
         std::unique_lock<std::mutex> callbackLock(m_callbackMutex);
 
         auto it = m_callbackMap.find(id);
         ThrowIf(it == m_callbackMap.end(), "invalidChannelId");
+        m_callbackMap.erase(it);
+        bool shouldStopAudioInput = m_callbackMap.empty();
+        callbackLock.unlock();
 
         // call the platform stopAudioInput() if the channel is the only channel
         // requesting audio from the audio provider
-        if (m_callbackMap.size() == 1) {
-            // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
-            callbackLock.unlock();
+        if (shouldStopAudioInput) {
             emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "stop", {METRIC_AUDIO_INPUT_STOP_AUDIO_INPUT});
             ThrowIfNot(m_platformAudioInput->stopAudioInput(), "stopPlatformAudioInputFailed");
-            callbackLock.lock();
         }
-
-        // we successfully stopped the platform audio, so we need to remove
-        // the audio channel from the channel list
-        m_callbackMap.erase(it);
-
-        return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "stop").d("reason", ex.what()));
-        return false;
     }
 }
 

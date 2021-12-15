@@ -45,7 +45,7 @@ public:
 
     static std::unique_ptr<DeviceSettingsDelegate> createDeviceSettingsDelegate(
         const alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode& configurationRoot,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
         std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder);
 

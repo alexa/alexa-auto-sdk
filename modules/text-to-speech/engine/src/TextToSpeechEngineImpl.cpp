@@ -142,6 +142,9 @@ bool TextToSpeechEngineImpl::executeOnPrepareSpeech(
             if (optionsPayload.contains(REQUEST_PAYLOAD_KEY)) {
                 requestPayload = optionsPayload.at(REQUEST_PAYLOAD_KEY).dump();
             }
+            else {
+                requestPayload = options;
+            }
         }
         m_executor.submit(
             [speechId, text, textToSpeechProvider, requestTimeout, requestPayload, textToSpeechPlatformInterface] {

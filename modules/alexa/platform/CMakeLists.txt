@@ -22,6 +22,7 @@ set(HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/SpeechSynthesizer.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/TemplateRuntime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/DeviceSetup.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/MediaPlaybackRequestor.h
 )
 
 source_group("Header Files" FILES ${HEADERS})
@@ -44,6 +45,7 @@ add_library(AACEAlexaPlatform SHARED
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SpeechSynthesizer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TemplateRuntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DeviceSetup.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/MediaPlaybackRequestor.cpp
 )
 
 target_include_directories(AACEAlexaPlatform

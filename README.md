@@ -1,125 +1,65 @@
 # Overview of the Alexa Auto SDK
 
-The Alexa Auto SDK contains essential client-side software required to integrate Alexa into the automobile. The Auto SDK provides libraries that connect to Alexa and expose C++ and Java interfaces for your vehicle software to implement the platform-specific behavior for audio input, media streaming, calling through a connected phone, turn-by-turn navigation, controlling vehicle features such as heaters and lights, and more. You can use the included sample applications, one for C++ and one for Android, to learn about the Auto SDK interfaces and to test interactions before integration.
+The Alexa Auto SDK contains essential client-side software required to integrate Alexa into the automobile. The Auto SDK provides libraries that connect to Alexa and expose interfaces for your vehicle software to implement the platform-specific behavior for audio input, media streaming, calling through a connected phone, turn-by-turn navigation, controlling vehicle features such as heaters and lights, and more. You can use the included sample application to learn about the Auto SDK interfaces and to test interactions before integration.
+
+The contents of this repository are distributed under several different license agreements. Please refer to the [LICENSE](./LICENSE) file for the license terms applicable to the materials that you are using.
 
 <!-- omit in toc -->
 ## Table of Contents
 - [Auto SDK Architecture](#auto-sdk-architecture)
-- [Auto SDK Modules and Extensions](#auto-sdk-modules-and-extensions)
-- [Alexa Auto Client Service (AACS)](#alexa-auto-client-service-aacs)
+- [Getting Started](#getting-started)
+- [Auto SDK Integration](#auto-sdk-integration)
 - [Security Best Practices](#security-best-practices)
 - [See Also](#see-also)
 
 ## Auto SDK Architecture
 
-The following architecture diagram illustrates a common design used for integrating the Auto SDK into the vehicle software. 
+The Auto SDK is modular, with a system of components that provide the runtime implementation of the Auto SDK. Each module exposes interfaces to handle specific functionality such as audio input and output, authorization, media streaming, navigation and controlling vehicle features. Most of the modules are included in the Auto SDK. Modules not downloadable with the Auto SDK from GitHub are available as extensions, which you can obtain with help from your Amazon Solutions Architect (SA) or Partner Manager. See [here](./SDK_MODULES.md) for more information on Auto SDK modules and extensions.
 
-<img src="./assets/aac_architecture.png" />
-</p>
-</details>
-The following sections describe the relationships among components in the architecture.
+## Getting Started
 
-### Auto SDK Engine
-The Engine is a system of components that provide the runtime implementation of the Auto SDK. The main program of your application or background service creates an instance of the Engine and configures the instance, registers platform interface handlers, and manages its lifecycle. When started by the main program, the Engine maintains a connection to Alexa, manages runtime execution states, and provides the underlying implementation of the functionality of the platform interfaces.
+### Prerequisites
+Complete the following steps before you get started with the Auto SDK:
 
-### Platform Interfaces
-Platform interfaces are abstract interfaces provided by the Auto SDK for you to implement the platform-specific functionality of the Auto SDK integration. “Platform-specific functionality” refers to components of the integration that interact with the hardware, operating system, underlying software frameworks, or external libraries. Each platform interface defines an API for the application to interact with the Engine for a particular component, such as audio input or location services. The Engine invokes a registered platform interface “handler” when it needs to query data or delegate handling, such as rendering visual elements or placing a phone call, to your custom implementation. The handler invokes the Engine to provide a callback to a request from the Engine or provide a proactive notification of a state change.
+1. Register for an [Amazon Developer Account](https://developer.amazon.com/home.html) and [create an Alexa device and security profile](./NEED_HELP.md#registering-a-product-and-creating-a-security-profile) to use the Auto SDK.
+2. Make sure that you meet the requirements for building the Auto SDK and understand the dependencies, as described in the SDK builder [README](./builder/README.md).  
 
-### Handlers
-Bridging the Engine and other processes running in the head unit, a handler implements the functionality required by the platform interface it extends. The implementation of a handler may include using an event bus, platform-specific inter-process communication (IPC) mechanisms, direct implementations with system libraries, or deep integrations with existing applications.
+### Build Auto SDK
+Follow these steps to get started with the Auto SDK:
 
-## Auto SDK Modules and Extensions
-The Auto SDK is organized into logically related groups of functionality called “modules,” which enable you to select only the features you want to include in your integration. Each module includes “Platform” and “Engine” libraries. The Platform library includes the platform interfaces and configuration options required for a feature, and the Engine library augments the base functionality of the Engine with the underlying implementation of the feature. 
+1. Clone the `alexa-auto-sdk` repository into your project.
+2. If you want to use the optional Auto SDK modules, download the modules from the locations listed below.
+	* [AmazonLite Wake Word extension](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Amazonlite%20Extension)
 
->**Note:** The libraries of each module are written in C++, but building the Auto SDK for an Android target enables an Android version of the modules that provide Java wrappers on the C++ interfaces for easier use.
+	* [Alexa Communications extension](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Alexa%20Comms%20Extension)
 
-The following sections describe the modules included in the Auto SDK. Modules not downloadable with the Auto SDK from GitHub are available as extensions, which you can obtain with help from your Amazon Solutions Architect (SA) or Partner Manager.
+	* [Local Voice Control extension](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Local%20Voice%20Control%20Extension)
 
-### Core Module
+	* [Device Client Metrics (DCM) extension](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Metric%20Upload%20Service%20Extension)
 
-The Core module (for [C++](./modules/core/README.md) or [Android](./platforms/android/modules/core/README.md)) provides the infrastructure for audio input and output, authorization, logging, location reporting, metrics, property management, network monitoring services, local storage, and vehicle information services. The infrastructure is necessary for any module that provides platform interfaces (for example, the Alexa module). 
+	* [Voice Chrome for Android extension](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Auto%20SDK%20Voice%20Chrome%20Extension)
 
-### Alexa Module
+	>The version of the optional extension archive must match the version of the Auto SDK that you are using. For example, if you are using Auto SDK 3.0 and want to install the Local Voice Control extension, you must download version 3.0 of the Local Voice Control extension archive.
 
-The Alexa module (for [C++](./modules/alexa/README.md) or [Android](./platforms/android/modules/alexa/README.md)) supports Alexa features such as speech input and output, authorization, volume control, media playback, equalizer control, template and state rendering, local media sources, alerts, notifications, and do not disturb. 
+	>**Note:** The Alexa Presentation Language (APL) module is provided publicly, but requires [additional packages](https://developer.amazon.com/alexa/console/avs/preview/resources/details/Alexa%20Auto%20SDK%20Alexa%20Presentation%20Language%20module) to be downloaded to successfully build.
+	
+3. Build the Auto SDK as described in the builder [README](./builder/README.md).
+      
+The following section provides the details of integrating with Android and Linux based platforms:
 
-### Navigation Module
+## Auto SDK Integration
 
-The Navigation module (for [C++](./modules/navigation/README.md) or [Android](./platforms/android/modules/navigation/README.md)) provides support for Alexa to interface with the onboard navigation system.
+### Integrating Auto SDK in Android-based platforms
 
-### Phone Call Controller Module
+The Alexa Auto Client Service (AACS) simplifies the process of integrating the Auto SDK in Android-based devices. AACS is an Alexa Auto SDK feature packaged in a stand alone Android application package (APK) or in an Android archive library (AAR). After you install, configure, and initialize AACS, it communicates with the applications, providing an interface between the applications and various Alexa functions, such as navigation and car control. You can also include AACS as an Android archive (AAR) in the application if you do not want to run AACS as a separate app. 
 
-The Phone Call Controller module (for [C++](./modules/phone-control/README.md) or [Android](./platforms/android/modules/phonecontrol/README.md)) provides support for Alexa to interface with the onboard telephony system.
+[Learn more >>](./aacs/android/README.md)
 
-### Address Book Module
+### Integrating Auto SDK in Linux-based platforms
 
-The Address Book module (for [C++](./modules/address-book/README.md) or [Android](./platforms/android/modules/addressbook/README.md)) augments the communications and navigation capabilities of Alexa with user data such as phone contacts and navigation favorites ("home", "work", etc.).
+The Alexa Auto Service Bridge (AASB) simplifies the process of integrating the Auto SDK in Linux-based devices. AASB framework provides a Message Broker API that transmits JSON messages between the OEM application and the Auto SDK. This API can be used publish and subscribe to AASB messages to implement the platform-specific functionality of the Auto SDK integration.
 
-### Code-Based Linking (CBL) Module
-
-The CBL module (for [C++](./modules/cbl/README.md) or [Android](./platforms/android/modules/cbl/README.md)) implements the CBL mechanism of acquiring Login with Amazon (LWA) access tokens. For information about the CBL mechanism, see the [Code-Based Linking documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-cbl.html).
-
-### Alexa Presentation Language (APL) Module
-The APL module (for [C++](./modules/apl/README.md) or [Android](./platforms/android/modules/apl/README.md)) enables devices to support a visual Alexa experience.
-
->**Note:** The [APL Render module](./platforms/android/modules/apl-render/README.md) is provided to enable APL rendering capabilities in an Android application. 
-
-### Messaging Module 
-The Messaging module (for [C++](./modules/messaging/README.md) or [Android](./platforms/android/modules/messaging/README.md)) provides support for Short Message Service (SMS) capabilities of Alexa such as sending and reading text messages.
-
-### Car Control Module
-The Car Control module (for [C++](./modules/car-control/README.md) or [Android](./platforms/android/modules/car-control/README.md)) enables your application to build a custom vehicle-control experience that allows the user to voice-control vehicle features using Alexa.
-
-### Connectivity Module
-The Connectivity module (for [C++](./modules/connectivity/README.md) or [Android](./platforms/android/modules/connectivity/README.md)) creates a lower data consumption mode for Alexa, allowing automakers to offer tiered functionality based on the status of their connectivity plans.
-
-### Text To Speech (TTS) Module
-The TTS module (for [C++](./modules/text-to-speech/README.md) or [Android](./platforms/android/modules/text-to-speech/README.md)) enables a platform implementation to request synthesis of Alexa speech on demand from a text or Speech Synthesis Markup Language (SSML) string.
-
-### Text To Speech (TTS) Provider Module
-The TTS provider module (for [C++](./modules/text-to-speech-provider/README.md) or [Android](./platforms/android/modules/text-to-speech-provider/README.md)) synthesizes Alexa speech on demand. This module requires Auto SDK to be built with the Local Voice Control extension.
-  
-### AmazonLite Wake Word Extension
-Wake Word enables hands-free, voice-initiated interactions with Alexa. The Wake Word extension enables AmazonLite Wake Word support in the Auto SDK.
-
-### Alexa Communications Extension
-The Alexa Communications extension enables integration with Alexa-to-Alexa calling, Alexa-to-PSTN calling, and messaging capabilities.
-
-### Alexa Custom Assistant Extension
-The Alexa Custom Assistant extension provides the functionality for toggling the settings of Alexa and the automaker's voice assistant, and notifies the IVI system at runtime about updates to the acting assistant for a specific interaction.
-
-### Bluetooth Extension
-The Bluetooth extension allows the Auto SDK to connect to devices through the Bluetooth Classic or Bluetooth Low Energy (BLE) protocol. Using these protocols, the Auto SDK can offer Bluetooth-based features to users of Android or iOS smartphones.
-
-### Device Client Metrics (DCM) Extension
-The Device Client Metrics (DCM) extension enables logging and uploading Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and user perceived latency (UPL) between the request and Alexa’s response.
-
-### Geolocation Extension
-The Geolocation extension adds geolocation consent support to the Auto SDK, enabling the user to grant consent to location sharing with Alexa from your application.
-
-### Local Voice Control (LVC) Extension
-The LVC extension provides car control, communication, navigation, local search, and entertainment functionality, without an internet connection. It includes components that run an Alexa endpoint inside the vehicle's head unit.
-#### Local Voice Control Module
-The Local Voice Control module adds core functionality to Auto SDK to enable offline features. The module infrastructure bridges the Auto SDK Engine to the offline Alexa endpoint running in the head unit and is necessary for all other modules in the LVC extension.
-#### Local Skill Service Module
-The Local Skill Service module provides a multipurpose service to the Auto SDK Engine that enables components running alongside the offline Alexa endpoint to communicate with the Auto SDK Engine. The module infrastructure is necessary for other modules in the LVC extension.
-#### Local Navigation Module
-The Local Navigation module enables you to provide customers with offline Alexa local search and navigation to points of interest (i.e., categories, chains, and entities) and addresses.
-#### Address Book Local Service Module
-The Address Book Local Service module works with the Address Book module and the Local Skill Service module to augment the offline communications and navigation capabilities of Alexa with user data such as phone contacts and navigation favorites.
-#### Car Control Local Service Module
-The Car Control Local Service module works with the Car Control module and the Local Skill Service module to enable users to control vehicle features offline with Alexa.
-
-### Mobile Authorization Extension
-The Mobile Authorization extension enables applications running on the vehicle's head unit to simplify the login experience. To log in to Alexa, the user uses the Alexa mobile app on a paired smartphone instead of opening a web browser and entering a code.
-
-### Voice Chrome for Android Extension
-The Voice Chrome extension adds Voice Chrome support to the Auto SDK for Android x86 64-bit and Android ARM 32/64-bit platforms. Voice Chrome provides a consistent set of visual cues representing Alexa attention state across a range of Alexa-enabled devices. The Voice Chrome extension includes a prebuilt Android AAR library for easy integration with your applications, as well as a patch to the Android Sample App that adds the Voice Chrome functionality.
-
-## Alexa Auto Client Service (AACS)
-AACS simplifies the process of integrating the Auto SDK in Android-based devices. After you install, configure, and initialize AACS, it communicates with the applications, providing an interface between the applications and various Alexa functions, such as navigation and car control. You can also include AACS as an Android archive (AAR) in the application if you don't want to run AACS as a separate app. For more information about AACS, see the AACS [README](./platforms/android/alexa-auto-client-service/README.md).
-
-AACS requires the Alexa Auto Service Bridge (AASB) extension, which provides a message-based interface to the Auto SDK Engine.  For more information about AASB, see the [AASB README](./extensions/aasb/README.md).
+[Learn more >>](./LINUX_INTEGRATION.md)
 
 ## Security Best Practices
 
@@ -135,11 +75,7 @@ All Alexa products are required to follow the [Security Best Practices for Alexa
 The following documents or websites provide more information about the Auto SDK.
 
 * [In-vehicle Alexa experience design guidelines](https://developer.amazon.com/en-US/docs/alexa/alexa-auto/about-this-guide.html) include principles, voice, visual, user interface (UI) patterns, and multimodal best practices. 
-* [Getting Started Guide](./GETSTARTED.md) provides steps for getting started with the Auto SDK and for downloading extensions.
 * [Change Log](./CHANGELOG.md) provides a summary of feature enhancements, updates, and resolved and known issues. 
-* [Android Sample App](./samples/android/README.md) and [C++ Sample App](./samples/cpp/README.md) READMEs provide release notes about the sample apps.
-* For Auto SDK API documentation, see the interface reference documentation:
-    * [Alexa Auto SDK for Android](https://alexa.github.io/alexa-auto-sdk/docs/android/)
-    * [Alexa Auto SDK for C++](https://alexa.github.io/alexa-auto-sdk/docs/cpp/)
+* AASB message definition provides the reference documentation for AASB messages. You can find AASB message definition for each module [here.](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/index.html) by navigating to "Modules" tab and select a module on the left menu. For example, you can find AASB message definition for Address Book module [here.](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/address-book/aasb-docs/AddressBook/index.html)
+* [AACS Sample App](./aacs/android/README.md) and [C++ Sample App](./samples/cpp/README.md) READMEs provide information about the sample apps. This helps you test interactions before integration.
 * [Migration Guide](./MIGRATION.md) describes how to migrate from one Auto SDK version to another.
-

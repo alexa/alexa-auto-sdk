@@ -25,6 +25,8 @@ namespace addressBook {
 
 class AddressBookServiceInterface {
 public:
+    virtual ~AddressBookServiceInterface() = default;
+
     // Subscribe to AddressBook Engine
     virtual void addObserver(std::shared_ptr<AddressBookObserver> observer) = 0;
 

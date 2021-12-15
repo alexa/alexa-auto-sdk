@@ -13,12 +13,14 @@
  * permissions and limitations under the License.
  */
 
-#include <iostream>
+#ifndef NO_SYSLOG
 #include <syslog.h>
+#endif
+#include <iostream>
 
-#include "AACE/Engine/Logger/Sinks/SyslogSink.h"
-#include "AACE/Engine/Logger/LogFormatter.h"
-#include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Logger/Sinks/SyslogSink.h>
+#include <AACE/Engine/Logger/LogFormatter.h>
+#include <AACE/Engine/Core/EngineMacros.h>
 
 namespace aace {
 namespace engine {
@@ -29,12 +31,18 @@ namespace sink {
 static const std::string TAG("aace.logger.sink.SyslogSink");
 
 SyslogSink::SyslogSink(const std::string& id) : Sink(id) {
+#ifndef NO_SYSLOG
     openlog(nullptr, 0, LOG_USER);
     setlogmask(LOG_UPTO(LOG_DEBUG));
+#else
+    AACE_WARN(LX(TAG).m("Syslog support is not enabled!"));
+#endif
 }
 
 SyslogSink::~SyslogSink() {
+#ifndef NO_SYSLOG
     closelog();
+#endif
 }
 
 std::shared_ptr<SyslogSink> SyslogSink::create(const std::string& id) {
@@ -46,6 +54,7 @@ void SyslogSink::log(
     std::chrono::system_clock::time_point time,
     const char* threadMoniker,
     const char* text) {
+#ifndef NO_SYSLOG
     int syslogLevel;
 
     switch (level) {
@@ -78,6 +87,7 @@ void SyslogSink::log(
         syslogLevel,
         "%s",
         LogFormatter::format(level, std::chrono::system_clock::time_point(), threadMoniker, text).c_str());
+#endif
 }
 
 }  // namespace sink

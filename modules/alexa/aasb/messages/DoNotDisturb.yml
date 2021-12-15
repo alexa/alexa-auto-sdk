@@ -1,0 +1,21 @@
+topic: DoNotDisturb
+namespace: aasb.message.alexa.doNotDisturb
+path: Alexa/DoNotDisturb
+
+messages:
+  - action: SetDoNotDisturb
+    direction: outgoing
+    desc: Handle setting of DND directive.
+    payload:
+      - name: doNotDisturb
+        type: bool
+        desc: setting state.
+
+  - action: DoNotDisturbChanged
+    direction: incoming
+    desc: Notifies the Engine of a platform request to set the DND State.
+    payload:
+      - name: doNotDisturb
+        type: bool
+        desc: setting state.
+

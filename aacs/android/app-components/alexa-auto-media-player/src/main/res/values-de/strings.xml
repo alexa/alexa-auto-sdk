@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Alexa Media</string>
+    <string name="notification_channel">Alexa-Musik</string>
+    <string name="notification_channel_description">Alexa-Musik mit Mediensteuerung</string>
+    <string name="notification_service_title">Alexa-Musik</string>
+    <string name="playback_control_skip_forward">Vorwärts</string>
+    <string name="playback_control_skip_backward">Zurück</string>
+    <string name="playback_control_thumbsup">Daumen hoch</string>
+    <string name="playback_control_thumbsdown">Daumen runter</string>
+    <string name="playback_control_shuffle">Zufallswiedergabe</string>
+    <string name="playback_control_loop">Endlosschleife</string>
+    <string name="playback_control_next">Weiter</string>
+    <string name="playback_control_previous">Zurück</string>
+    <string name="alexa_music_login_required">Bitte rufen Sie die Alexa-Einstellungen auf und melden Sie sich mit Amazon an, um Musik mit Alexa abzuspielen</string>
+    <string name="alexa_music_login_text">Anmelden</string>
+    <string name="alexa_music_alexa_not_selected_va">Stellen Sie Alexa als Assistent-App ein, um Musik mit Alexa abzuspielen</string>
+    <string name="alexa_music_select_va">Wählen Sie Alexa als Assistent-App aus</string>
+    <string name="alexa_music_hint_1">Versuchen Sie es mit: „Alexa, spiel Musik.“</string>
+    <string name="artist_msp_seperator">&#160;|&#160;</string>
+</resources>

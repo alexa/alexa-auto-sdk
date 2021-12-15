@@ -50,13 +50,12 @@ bool NotificationsEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface>
         notificationsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     try {
         ThrowIfNot(initializeAudioChannel(audioOutputChannel, speakerManager), "initializeAudioChannelFailed");
 
-        //auto notificationRenderer = alexaClientSDK::capabilityAgents::notifications::NotificationRenderer::create( std::static_pointer_cast<MediaPlayerInterface>( shared_from_this() ) );
         m_notificationRenderer =
             alexaClientSDK::acsdkNotifications::NotificationRenderer::create(shared_from_this(), focusManager);
         ThrowIfNull(m_notificationRenderer, "couldNotCreateNotificationsRenderer");
@@ -76,13 +75,13 @@ bool NotificationsEngineImpl::initialize(
             metricRecorder);
         ThrowIfNull(m_notificationsCapabilityAgent, "couldNotCreateCapabilityAgent");
 
-        // add the notification state changed observer
-        m_notificationsCapabilityAgent->addObserver(
-            std::dynamic_pointer_cast<alexaClientSDK::acsdkNotificationsInterfaces::NotificationsObserverInterface>(
-                shared_from_this()));
-
         // register capability with the default endpoint
         capabilitiesRegistrar->withCapability(m_notificationsCapabilityAgent, m_notificationsCapabilityAgent);
+
+        // add the notification state changed observer
+        m_notificationsCapabilityAgent->getNotificationsNotifierInterface()->addObserver(
+            std::dynamic_pointer_cast<alexaClientSDK::acsdkNotificationsInterfaces::NotificationsObserverInterface>(
+                shared_from_this()));
 
         return true;
     } catch (std::exception& ex) {
@@ -101,7 +100,7 @@ std::shared_ptr<NotificationsEngineImpl> NotificationsEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::NotificationsAudioFactoryInterface>
         notificationsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     std::shared_ptr<NotificationsEngineImpl> notificationsEngineImpl = nullptr;
@@ -152,7 +151,7 @@ void NotificationsEngineImpl::doShutdown() {
     AudioChannelEngineImpl::doShutdown();
 
     if (m_notificationsCapabilityAgent != nullptr) {
-        m_notificationsCapabilityAgent->removeObserver(
+        m_notificationsCapabilityAgent->getNotificationsNotifierInterface()->removeObserver(
             std::dynamic_pointer_cast<alexaClientSDK::acsdkNotificationsInterfaces::NotificationsObserverInterface>(
                 shared_from_this()));
         m_notificationsCapabilityAgent->shutdown();

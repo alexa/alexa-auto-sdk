@@ -550,6 +550,10 @@ void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState 
                     // fall through to call @c pause() here as well.
                     case PlayerActivity::PLAYING:
                     case PlayerActivity::BUFFER_UNDERRUN: {
+                        if (behavior == MixingBehavior::MAY_DUCK) {
+                            AACE_DEBUG(LX(TAG).d("behavior", "MAY_DUCK"));
+                            return;
+                        }
                         for (auto adapterHandler : m_adapterHandlers) {
                             // check against currently known playback state, not already paused
                             auto adapterStates = adapterHandler->getAdapterStates();
@@ -779,9 +783,7 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(*document, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG, "preprocessDirectiveFailed").d("reason", "nullPlayerId"));
-        sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
-        return nullptr;
+        AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
     // adapter handler specific code
@@ -794,7 +796,7 @@ std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDi
     {
         std::lock_guard<std::mutex> lock{m_adaptersMutex};
         if (!adapter) {
-            AACE_ERROR(LX(TAG, "preprocessDirectiveFailed").d("reason", "nullAdapter").d(PLAYER_ID, playerId));
+            AACE_ERROR(LX(TAG, "nullAdapterForThePlayer").d(PLAYER_ID, playerId));
             sendExceptionEncounteredAndReportFailed(info, "nullAdapter.");
             return nullptr;
         }
@@ -933,40 +935,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
     });
 
     return;
-
-    // One or more players failed to be parsed.
-    if (!parseAllSucceeded) {
-        sendExceptionEncounteredAndReportFailed(
-            info,
-            "One or more player was not successfully parsed",
-            ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
-    } else {
-        setHandlingCompleted(info);
-    }
-
-    {
-        std::lock_guard<std::mutex> lock(m_authorizedMutex);
-
-        for (const auto& idToLocalId : m_authorizedAdapters) {
-            if (newAuthorizedAdapters.count(idToLocalId.first) == 0) {
-                deauthorizedLocal.insert(idToLocalId.second);
-
-                const auto& adapter = getAdapterByLocalPlayerId(idToLocalId.second);
-                if (adapter) {
-                    adapter->handleAuthorized(false, "", "");
-                }
-            }
-        }
-
-        m_authorizedAdapters = newAuthorizedAdapters;
-    }
-
-    // Update the sender.
-    m_authorizedSender->updateAuthorizedPlayers(newAuthorizedAdaptersKeys);
-
-    m_executor.submit([this, authorizedForJson, deauthorizedLocal]() {
-        sendAuthorizationCompleteEvent(authorizedForJson, deauthorizedLocal);
-    });
 }
 
 std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterByPlayerId(const std::string& playerId) {
@@ -1270,9 +1238,7 @@ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, Reques
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
-        sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
-        return;
+        AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
     int64_t position;
@@ -1305,9 +1271,7 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, 
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
-        sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
-        return;
+        AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
     int64_t deltaPosition;
@@ -1344,14 +1308,11 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, 
 
 void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-
     auto adapter = preprocessDirective(info, &payload);
 
     std::string playerId;
     if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
-        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
-        sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
-        return;
+        AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
     if (!adapter) {
@@ -1724,17 +1685,9 @@ void ExternalMediaPlayer::executeProvideState(
     }
 
     if (stateProviderName == SESSION_STATE) {
-        // begin adapter handler specific code
         state = provideSessionState(adapterStates);
-        // else
-        //         state = provideSessionState();
-        // end adapter handler specific code
     } else if (stateProviderName == PLAYBACK_STATE) {
-        // begin adapter handler specific code
         state = providePlaybackState(adapterStates);
-        // else
-        //         state = providePlaybackState();
-        // end adapter handler specific code
     } else {
         AACE_ERROR(LX(TAG, "executeProvideState").d("reason", "unknownStateProviderName"));
         return;
@@ -1758,7 +1711,12 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
 
     state.AddMember(rapidjson::StringRef(AGENT_KEY), std::string(m_agentString), stateAlloc);
     state.AddMember(rapidjson::StringRef(SPI_VERSION_KEY), std::string(ExternalMediaPlayer::SPI_VERSION), stateAlloc);
-    state.AddMember(rapidjson::StringRef(PLAYER_IN_FOCUS), m_playerInFocus, stateAlloc);
+    //Set playerInFocus null when default player is in focus, else set a named player's playerId.
+    if (m_playerInFocus.empty()) {
+        state.AddMember(rapidjson::StringRef(PLAYER_IN_FOCUS), rapidjson::Value(), stateAlloc);
+    } else {
+        state.AddMember(rapidjson::StringRef(PLAYER_IN_FOCUS), m_playerInFocus, stateAlloc);
+    }
 
     rapidjson::Value players(rapidjson::kArrayType);
 
@@ -1782,8 +1740,10 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
 
     // adapter handler specific code
     for (auto adapterState : adapterStates) {
-        rapidjson::Value playerJson = buildSessionState(adapterState.sessionState, stateAlloc);
-        players.PushBack(playerJson, stateAlloc);
+        if (!adapterState.sessionState.playerId.empty()) {
+            rapidjson::Value playerJson = buildSessionState(adapterState.sessionState, stateAlloc);
+            players.PushBack(playerJson, stateAlloc);
+        }
     }
 
     state.AddMember(rapidjson::StringRef(PLAYERS), players, stateAlloc);
@@ -1802,11 +1762,6 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
 std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::alexa::AdapterState> adapterStates) {
     rapidjson::Document state(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
-
-    // Fill the default player state.
-    if (!buildDefaultPlayerState(&state, stateAlloc)) {
-        return "";
-    }
 
     // Fetch actual PlaybackState from every player supported by the ExternalMediaPlayer.
     rapidjson::Value players(rapidjson::kArrayType);
@@ -1833,11 +1788,26 @@ std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::
 
     notifyRenderPlayerInfoCardsObservers();
 
+    // Fill the default player state.
+    bool defaultPlayerExists = false;
+    rapidjson::Value playerJson;
     // adapter handlers
     for (auto adapterState : adapterStates) {
-        rapidjson::Value playerJson =
-            buildPlaybackState(adapterState.sessionState.playerId, adapterState.playbackState, stateAlloc);
-        players.PushBack(playerJson, stateAlloc);
+        if (!adapterState.sessionState.playerId.empty()) {
+            rapidjson::Value playerJson =
+                buildPlaybackState(adapterState.sessionState.playerId, adapterState.playbackState, stateAlloc);
+            players.PushBack(playerJson, stateAlloc);
+        } else {
+            defaultPlayerExists = true;
+            playerJson = buildPlaybackState("", adapterState.playbackState, stateAlloc);
+        }
+    }
+
+    if (defaultPlayerExists) {
+        state.CopyFrom(playerJson, stateAlloc);
+    } else if (!defaultPlayerExists && !buildDefaultPlayerState(&state, stateAlloc)) {
+        AACE_ERROR(LX(TAG, "PlaybackStateCreationFailed for defaultPlayer"));
+        return "";
     }
 
     state.AddMember(PLAYERS, players, stateAlloc);

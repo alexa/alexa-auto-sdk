@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -90,6 +90,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:abab09ff31a4c13f8841bc124d87c24eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b1e5999b008bee74249d162c95be7c7"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#a5b1e5999b008bee74249d162c95be7c7">registerPlatformInterface</a> (std::initializer_list&lt; std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1_platform_interface.html">aace::core::PlatformInterface</a> &gt;&gt; platformInterfaceList)=0</td></tr>
 <tr class="separator:a5b1e5999b008bee74249d162c95be7c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0ff52b7868f34f4876c925efbfa52fe"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1_message_broker.html">MessageBroker</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1core_1_1_engine.html#ad0ff52b7868f34f4876c925efbfa52fe">getMessageBroker</a> ()=0</td></tr>
+<tr class="separator:ad0ff52b7868f34f4876c925efbfa52fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a> must be instantiated by the platform implementation. Along with the platform interfaces, it is responsible for managing the interactions between the platform and AVS.</p>
@@ -354,12 +356,38 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ad0ff52b7868f34f4876c925efbfa52fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0ff52b7868f34f4876c925efbfa52fe">&#9670;&nbsp;</a></span>getMessageBroker()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1_message_broker.html">MessageBroker</a>&gt; aace::core::Engine::getMessageBroker </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Returns the <a class="el" href="classaace_1_1core_1_1_engine.html">Engine</a>'s <a class="el" href="classaace_1_1core_1_1_message_broker.html">MessageBroker</a> instance. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

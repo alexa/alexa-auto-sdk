@@ -18,10 +18,13 @@
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
-#include "AACE/Core/Engine.h"
-#include "AACE/Logger/Logger.h"
-#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
+#include <AACE/Core/Engine.h>
+#include <AACE/Core/MessageBroker.h>
+#include <AACE/Logger/Logger.h>
+#include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
+#include <AACE/Engine/MessageBroker/MessageBrokerServiceInterface.h>
 #include "EngineServiceManager.h"
 #include "ServiceDescription.h"
 
@@ -31,6 +34,7 @@ namespace core {
 
 class EngineImpl
         : public aace::core::Engine
+        , public aace::core::MessageBroker
         , public aace::engine::core::EngineContext
         , public std::enable_shared_from_this<EngineImpl> {
 private:
@@ -51,6 +55,13 @@ public:
     bool stop() override;
     bool shutdown() override;
 
+    std::shared_ptr<aace::core::MessageBroker> getMessageBroker() override;
+
+    // MessageBroker implementation
+    void publish(const std::string& message) override;
+    void subscribe(MessageHandler handler, const std::string& topic = "", const std::string& action = "") override;
+    std::shared_ptr<aace::core::MessageStream> openStream(const std::string& streamId, aace::core::MessageStream::Mode mode) override;
+
     // create the engine
     static std::shared_ptr<EngineImpl> create();
     std::string getProperty_version();
@@ -68,6 +79,7 @@ private:
 private:
     std::unordered_map<std::string, std::shared_ptr<EngineService>> m_registeredServiceMap;
     std::vector<std::shared_ptr<EngineService>> m_orderedServiceList;
+    std::weak_ptr<aace::engine::messageBroker::MessageBrokerServiceInterface> m_messageBrokerService;
 
     // engine flags
     bool m_running = false;

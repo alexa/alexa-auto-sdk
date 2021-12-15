@@ -16,6 +16,9 @@
 #ifndef AACE_ENGINE_NETWORK_NETWORK_INFO_OBSERVER_H
 #define AACE_ENGINE_NETWORK_NETWORK_INFO_OBSERVER_H
 
+#include <string>
+#include <vector>
+
 #include "AACE/Network/NetworkEngineInterfaces.h"
 
 namespace aace {
@@ -56,6 +59,12 @@ public:
     virtual void onNetworkInterfaceChangeStatusChanged(
         const std::string& networkInterface,
         NetworkInterfaceChangeStatus status) = 0;
+
+    /**
+     * Notifies the observer about availability of the custom http proxy headers.
+     */
+    virtual void onNetworkProxyHeadersAvailable(const std::vector<std::string>& headers) {
+    }
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const NetworkInfoObserver::NetworkInterfaceChangeStatus& status) {

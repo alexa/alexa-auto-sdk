@@ -1,0 +1,283 @@
+topic: Navigation
+namespace: aasb.message.navigation.navigation
+path: Navigation/Navigation
+
+messages:
+  - action: ShowAlternativeRoutesSucceeded
+    direction: incoming
+    desc: Notifies AVS of successful showing of alternative routes to the user.
+    payload:
+      - name: payload
+        desc: data containing the alternative route information.
+
+  - action: ShowAlternativeRoutes
+    direction: outgoing
+    desc: Notifies the platform implementation to show alternative routes.
+    payload:
+      - name: alternateRouteType
+        type: AlternateRouteType
+        desc: alternateRouteType The type of alternate route requested.
+
+  - action: ShowPreviousWaypoints
+    direction: outgoing
+    desc: Notifies the platform implementation to display list of previous waypoints.
+
+  - action: ControlDisplay
+    direction: outgoing
+    desc: Notifies the platform implementation to perform user interaction with the onscreen map application.
+    payload:
+      - name: controlDisplay
+        type: ControlDisplay
+        desc: the user requested map control.
+
+  - action: AnnounceRoadRegulation
+    direction: outgoing
+    desc: Notifies the platform implementation to give details about road regulations about the road segments that the user is on.
+    payload:
+      - name: roadRegulation
+        type: RoadRegulation
+        desc: Type of road regulation requested.
+
+  - action: CancelNavigation
+    direction: outgoing
+    desc: Notifies the platform implementation to cancel navigation.
+
+  - action: NavigationError
+    direction: incoming
+    desc: Notifies the Engine of error in handling a Navigation directive.
+    payload:
+      - name: type
+        type: ErrorType
+        desc: ErrorType describing which operation failed.
+      - name: code
+        type: ErrorCode
+        desc: ErrorCode describing the type of failure.
+      - name: description
+        desc: String providing additional information.
+
+  - action: NavigationEvent
+    direction: incoming
+    desc: Notifies the Engine of successful handling of a Navigation directive.
+    payload:
+      - name: event
+        type: EventName
+        desc: EventName describing which operation was successful.
+
+  - action: AnnounceManeuver
+    direction: outgoing
+    desc: Notifies the platform implementation to give details about a maneuver to next waypoint on the route or a completely different waypoint off route.
+    payload:
+      - name: payload
+        desc: JSON data containing the manueuver information.
+
+  - action: NavigateToPreviousWaypoint
+    direction: outgoing
+    desc: Notifies the platform implementation to start navigation to the previous waypoint.
+
+  - action: GetNavigationState
+    direction: outgoing
+    desc: Retrieve the navigation state from the platform.
+    reply:
+      - name: navigationState
+        desc: the current NavigationState JSON payload.
+
+  - action: StartNavigation
+    direction: outgoing
+    desc: Notifies the platform implementation to start the navigation.
+    payload:
+      - name: payload
+        desc: JSON data containing the destination information.
+
+types:
+  - name: AlternateRouteType
+    type: enum
+    values:
+      - name: DEFAULT
+        desc: description for DEFAULT.
+      - name: SHORTER_TIME
+        desc: description for SHORTER_TIME.
+      - name: SHORTER_DISTANCE
+        desc: description for SHORTER_DISTANCE.
+
+  - name: ControlDisplay
+    type: enum
+    values:
+      - name: SHOW_ROUTE_OVERVIEW
+        desc: description for SHOW_ROUTE_OVERVIEW.
+      - name: SHOW_DIRECTIONS_LIST
+        desc: description for SHOW_DIRECTIONS_LIST.
+      - name: ZOOM_IN
+        desc: description for ZOOM_IN.
+      - name: ZOOM_OUT
+        desc: description for ZOOM_OUT.
+      - name: CENTER_MAP_ON_CURRENT_LOCATION
+        desc: description for CENTER_MAP_ON_CURRENT_LOCATION.
+      - name: ORIENT_NORTH
+        desc: description for ORIENT_NORTH.
+      - name: SCROLL_NORTH
+        desc: description for SCROLL_NORTH.
+      - name: SCROLL_UP
+        desc: description for SCROLL_UP.
+      - name: SCROLL_EAST
+        desc: description for SCROLL_EAST.
+      - name: SCROLL_RIGHT
+        desc: description for SCROLL_RIGHT.
+      - name: SCROLL_SOUTH
+        desc: description for SCROLL_SOUTH.
+      - name: SCROLL_DOWN
+        desc: description for SCROLL_DOWN.
+      - name: SCROLL_WEST
+        desc: description for SCROLL_WEST.
+      - name: SCROLL_LEFT
+        desc: description for SCROLL_LEFT.
+      - name: MUTE_ROUTE_GUIDANCE
+        desc: navigation sounds off.
+      - name: UNMUTE_ROUTE_GUIDANCE
+        desc: navigation sounds on.
+
+  - name: RoadRegulation
+    type: enum
+    values:
+      - name: SPEED_LIMIT
+        desc: description for SHOW_ROUTE_OVERVIEW.
+      - name: CARPOOL_RULES
+        desc: description for SHOW_DIRECTIONS_LIST.
+
+  - name: ErrorType
+    type: enum
+    values:
+      - name: NAVIGATION_START_FAILED
+        desc: Navigation failed to start. Send in response to startNavigation() directive.
+      - name: SHOW_PREVIOUS_WAYPOINTS_FAILED
+        desc: List of previous waypoints failed to display. Send in response to showPreviousWaypoints() directive.
+      - name: PREVIOUS_NAVIGATION_START_FAILED
+        desc: The previous navigation route failed to start. Send in response to navigateToPreviousWaypoint() directive.
+      - name: ROUTE_OVERVIEW_FAILED
+        desc: Overview of route was failed to display. Send in response to controlDisplay() directive.
+      - name: DIRECTIONS_LIST_FAILED
+        desc: List of directions was failed to display. Send in response to controlDisplay() directive.
+      - name: ZOOM_IN_FAILED
+        desc: Map zoom-in unsuccessful. Send in response to controlDisplay() directive.
+      - name: ZOOM_OUT_FAILED
+        desc: Map zoom-out unsuccessful. Send in response to controlDisplay() directive.
+      - name: CENTER_FAILED
+        desc: Map centering unsuccessful. Send in response to controlDisplay() directive.
+      - name: ORIENT_NORTH_FAILED
+        desc: Map alignment to north unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_NORTH_FAILED
+        desc: Moving map North was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_UP_FAILED
+        desc: Moving map upwards was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_EAST_FAILED
+        desc: Moving map East was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_RIGHT_FAILED
+        desc: Moving map rightwards was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_SOUTH_FAILED
+        desc: Moving map South was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_DOWN_FAILED
+        desc: Moving map downwards was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_WEST_FAILED
+        desc: Moving map west was unsuccessful. Send in response to controlDisplay() directive.
+      - name: SCROLL_LEFT_FAILED
+        desc: Moving map leftwards was unsuccessful. Send in response to controlDisplay() directive.
+      - name: MUTED_ROUTE_GUIDANCE_FAILED
+        desc: Map sounds failed to be muted. Send in response to controlDisplay() directive.
+      - name: UNMUTED_ROUTE_GUIDANCE_FAILED
+        desc: Map sounds failed to be unmuted. Send in response to controlDisplay() directive.
+      - name: DEFAULT_ALTERNATE_ROUTES_FAILED
+        desc: Displaying default alternate routes was unsuccessful. Send in response to showAlternativeRoutes() directive.
+      - name: SHORTER_TIME_ROUTES_FAILED
+        desc: Displaying alternate routes with shorter times was unsuccessful. Send in response to showAlternativeRoutes() directive.
+      - name: SHORTER_DISTANCE_ROUTES_FAILED
+        desc: Displaying alternate routes with shorter distances was unsuccessful. Send in response to showAlternativeRoutes() directive.
+      - name: TURN_GUIDANCE_FAILED
+        desc: Next turn announcement was unsuccessful. Send in response to announceManeuver() directive.
+      - name: EXIT_GUIDANCE_FAILED
+        desc: Next exit announcement was unsuccessful. Send in response to announceManeuver() directive.
+      - name: ENTER_GUIDANCE_FAILED
+        desc: Announcement for entering directions was unsuccessful. Send in response to announceManeuver() directive.
+      - name: MERGE_GUIDANCE_FAILED
+        desc: Announcement for merging directions was unsuccessful. Send in response to announceManeuver() directive.
+      - name: LANE_GUIDANCE_FAILED
+        desc: Lane guidance announcement was unsuccessful. Send in response to announceManeuver() directive.
+      - name: SPEED_LIMIT_REGULATION_FAILED
+        desc: Current speed limit announcement was unsuccessful. Send in response to announceRoadRegulation() directive.
+      - name: CARPOOL_RULES_REGULATION_FAILED
+        desc: Carpool status announcement was unsuccessful. Send in response to announceRoadRegulation() directive.
+
+  - name: ErrorCode
+    type: enum
+    values:
+      - name: INTERNAL_SERVICE_ERROR
+        desc: Failure caused by an unexpected service or client implementation error.
+      - name: ROUTE_NOT_FOUND
+        desc: Failed because the route could not be found.
+      - name: NO_PREVIOUS_WAYPOINTS
+        desc: Failed because there are no previous waypoints available.
+      - name: NOT_SUPPORTED
+        desc: The operation requested is not supported or implemented.
+      - name: NOT_ALLOWED
+        desc: The operation requested can't be performed now.
+
+  - name: EventName
+    type: enum
+    values:
+      - name: NAVIGATION_STARTED
+        desc: Navigation was started. Send in response to startNavigation() directive.
+      - name: PREVIOUS_WAYPOINTS_SHOWN
+        desc: List of previous waypoints was displayed. Send in response to showPreviousWaypoints() directive.
+      - name: PREVIOUS_NAVIGATION_STARTED
+        desc: The previous navigation route was started. Send in response to navigateToPreviousWaypoint() directive.
+      - name: ROUTE_OVERVIEW_SHOWN
+        desc: Overview of route was displayed. Send in response to controlDisplay() directive.
+      - name: DIRECTIONS_LIST_SHOWN
+        desc: List of directions was displayed. Send in response to controlDisplay() directive.
+      - name: ZOOMED_IN
+        desc: Map successfully zoomed in. Send in response to controlDisplay() directive.
+      - name: ZOOMED_OUT
+        desc: Map successfully zoomed out. Send in response to controlDisplay() directive.
+      - name: MAP_CENTERED
+        desc: Map successfully centered. Send in response to controlDisplay() directive.
+      - name: ORIENTED_NORTH
+        desc: Map successfully aligned with north up. Send in response to controlDisplay() directive.
+      - name: SCROLLED_NORTH
+        desc: Map successfully moved in North direction. Send in response to controlDisplay() directive.
+      - name: SCROLLED_UP
+        desc: Map successfully moved upwards. Send in response to controlDisplay() directive.
+      - name: SCROLLED_EAST
+        desc: Map successfully moved in East direction. Send in response to controlDisplay() directive.
+      - name: SCROLLED_RIGHT
+        desc: Map successfully moved rightwards. Send in response to controlDisplay() directive.
+      - name: SCROLLED_SOUTH
+        desc: Map successfully moved in South direction. Send in response to controlDisplay() directive.
+      - name: SCROLLED_DOWN
+        desc: Map successfully moved downwards. Send in response to controlDisplay() directive.
+      - name: SCROLLED_WEST
+        desc: Map successfully moved in West direction. Send in response to controlDisplay() directive.
+      - name: SCROLLED_LEFT
+        desc: Map successfully moved leftwards. Send in response to controlDisplay() directive.
+      - name: ROUTE_GUIDANCE_MUTED
+        desc: Map sounds were muted. Send in response to controlDisplay() directive.
+      - name: ROUTE_GUIDANCE_UNMUTED
+        desc: Map sounds were unmuted. Send in response to controlDisplay() directive.
+      - name: DEFAULT_ALTERNATE_ROUTES_SHOWN
+        desc: Default alternate routes were successfully found and displayed. Send in response to showAlternativeRoutes() directive.
+      - name: SHORTER_TIME_ROUTES_SHOWN
+        desc: Alternate routes with shorter times were successfully found and displayed. Send in response to showAlternativeRoutes() directive.
+      - name: SHORTER_DISTANCE_ROUTES_SHOWN
+        desc: Alternate routes with shorter distances were successfully found and displayed. Send in response to showAlternativeRoutes() directive.
+      - name: TURN_GUIDANCE_ANNOUNCED
+        desc: Next turn was successfully announced. Send in response to announceManeuver() directive.
+      - name: EXIT_GUIDANCE_ANNOUNCED
+        desc: Next exit was successfully announced. Send in response to announceManeuver() directive.
+      - name: ENTER_GUIDANCE_ANNOUNCED
+        desc: Directions for entering successfully announced. Send in response to announceManeuver() directive.
+      - name: MERGE_GUIDANCE_ANNOUNCED
+        desc: Directions for merging successfully announced. Send in response to announceManeuver() directive.
+      - name: LANE_GUIDANCE_ANNOUNCED
+        desc: Lane guidance was successfully announced. Send in response to announceManeuver() directive.
+      - name: SPEED_LIMIT_REGULATION_ANNOUNCED
+        desc: Current speed limit successfully announced. Send in response to announceRoadRegulation() directive.
+      - name: CARPOOL_RULES_REGULATION_ANNOUNCED
+        desc: Carpool status successfully announced. Send in response to announceRoadRegulation() directive.
+

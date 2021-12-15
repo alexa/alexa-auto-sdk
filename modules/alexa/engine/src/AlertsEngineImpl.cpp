@@ -58,7 +58,7 @@ bool AlertsEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
     class DeviceSettingsDelegate& deviceSettingsDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     try {
@@ -128,7 +128,7 @@ std::shared_ptr<AlertsEngineImpl> AlertsEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::AlertsAudioFactoryInterface> alertsAudioFactory,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> dataManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> dataManager,
     class DeviceSettingsDelegate& deviceSettingsDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
     std::shared_ptr<AlertsEngineImpl> alertsEngineImpl = nullptr;

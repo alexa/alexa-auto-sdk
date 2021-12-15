@@ -24,13 +24,13 @@ Follow these steps to get started with the Auto SDK:
    
 4. Install the built package on your device as described in the builder [README](./builder/README.md).
    
-5. Create and configure an instance of the Engine. For details, see the [C++](./modules/core/README.md#creating-the-engine) or [Android](./platforms/android/modules/core/README.md#creating-the-engine) Core module documentation.
+5. Create and configure an instance of the Engine. For details, see the [Core module](./modules/core/README.md#creating-the-engine) documentation.
     
 6. Extend the Auto SDK interfaces by creating a custom handler for each interface that you want to implement and registering the handler with the Engine.
 
 7. Start the Engine using the `start()` command.
    
-8. Use the Sample App ([C++](./samples/cpp/README.md) or [Android](./samples/android/README.md)) to see how the Auto SDK works and to test end-to-end functionality. 
+8. Use the Sample App ([C++](./samples/cpp/README.md) or [Android](./aacs/android/sample-app/README.md)) to see how the Auto SDK works and to test end-to-end functionality. 
 
 ## Downloading Optional Extensions
     

@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -122,7 +122,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a712968f4a35418dbcbc0e4b74599dcf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> should be extended to use Alexa to switch among media sources local to the device. It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, DAB and CD player sources. </p>
+<div class="textblock"><p><code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> should be extended to use Alexa to switch among media sources local to the device. It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, DAB and CD player sources.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000018">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>aace::core::MessageBroker </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="ac3b7c0af177039a95960a43e8c94ddc0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac3b7c0af177039a95960a43e8c94ddc0">&#9670;&nbsp;</a></span>play() <span class="overload">[1/2]</span></h2>
@@ -149,7 +151,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000016">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#ab5a7492cd229a3a72753e77c409c687b">play(ContentSelector selector, String payload, String sessionId)</a></code> instead Called when the user first calls play for the local media via voice control. ( Currently this is not used in <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a>)</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000019">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#ab5a7492cd229a3a72753e77c409c687b">play(ContentSelector selector, String payload, String sessionId)</a></code> instead Called when the user first calls play for the local media via voice control. ( Currently this is not used in <a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a>)</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the platform implementation successfully handled the call, else <code>false</code> </dd></dl>
 
 </div>
@@ -310,7 +312,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000017">Deprecated:</a></b></dt><dd>This method will be removed very soon. Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a9dacaa1ab009aee994b0b01d03f78988">playerEvent(String eventName, String sessionId)</a></code> instead Should be called on a local media source player event. This will sync the context with AVS.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000020">Deprecated:</a></b></dt><dd>This method will be removed very soon. Use <code><a class="el" href="classcom_1_1amazon_1_1aace_1_1alexa_1_1_local_media_source.html#a9dacaa1ab009aee994b0b01d03f78988">playerEvent(String eventName, String sessionId)</a></code> instead Should be called on a local media source player event. This will sync the context with AVS.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">eventName</td><td>Canonical event name. Accepted values are "PlaybackStarted", "PlaybackStopped" </td></tr>
@@ -394,7 +396,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000018">Deprecated:</a></b></dt><dd>This method will be removed very soon. Use <code>playerError</code>(String errorName, long code, String description, boolean fatal, String sessionId) instead Should be called on a local media source player error.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000021">Deprecated:</a></b></dt><dd>This method will be removed very soon. Use <code>playerError</code>(String errorName, long code, String description, boolean fatal, String sessionId) instead Should be called on a local media source player error.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">errorName</td><td>The name of the error. Accepted values:"INTERNAL_ERROR" </td></tr>
@@ -481,7 +483,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000019">Deprecated:</a></b></dt><dd>Use the <code>playerEvent</code>(String eventName, String sessionId) instead with "playbackSessionStarted" and "playbackSessionEnded" events Should be called on local media source player events. This will switch the media focus to that context.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000022">Deprecated:</a></b></dt><dd>Use the <code>playerEvent</code>(String eventName, String sessionId) instead with "playbackSessionStarted" and "playbackSessionEnded" events Should be called on local media source player events. This will switch the media focus to that context.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">focusAcquire</td><td>true if focus should be acquired, false if focus should be abandoned</td></tr>
@@ -506,7 +508,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000020">Deprecated:</a></b></dt><dd>Use the <code>playerEvent</code>(String eventName, String sessionId) instead with "playbackSessionStarted" and "playbackSessionEnded" events Overload of above for backward compatibility. Always acquires focus.</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000023">Deprecated:</a></b></dt><dd>Use the <code>playerEvent</code>(String eventName, String sessionId) instead with "playbackSessionStarted" and "playbackSessionEnded" events Overload of above for backward compatibility. Always acquires focus.</dd></dl>
 <p><b> Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method. </b> </p>
 
 </div>
@@ -586,7 +588,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

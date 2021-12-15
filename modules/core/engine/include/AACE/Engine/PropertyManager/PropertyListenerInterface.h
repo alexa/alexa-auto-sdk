@@ -28,6 +28,8 @@ namespace propertyManager {
  */
 class PropertyListenerInterface {
 public:
+    virtual ~PropertyListenerInterface() = default;
+
     /**
      * Notifies the listener about a property value change.
      * @note The listener should return immediately from this method.

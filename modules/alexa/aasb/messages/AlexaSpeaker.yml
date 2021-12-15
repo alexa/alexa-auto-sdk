@@ -1,0 +1,75 @@
+topic: AlexaSpeaker
+namespace: aasb.message.alexa.alexaSpeaker
+path: Alexa/AlexaSpeaker
+
+messages:
+  - action: LocalAdjustVolume
+    direction: incoming
+    desc: > 
+      Notifies the Engine of a relative adjustment to the volume setting of the Speaker,
+      originating on the platform. The delta value is relative to the current volume setting 
+      and is positive to increase volume or negative to reduce volume. The volume delta value 
+      should be scaled to fit the needs of the platform.
+    payload:
+      - name: type
+        type: SpeakerType
+        desc: The type of Alexa speaker being set.
+      - name: delta
+        type: int
+        desc: The volume adjustment to apply to the Speaker.
+
+  - action: SpeakerSettingsChanged
+    direction: outgoing
+    desc: > 
+      Notifies the platform implementation that the speaker settings have changed for
+      a specific speaker type.
+    payload:
+      - name: type
+        type: SpeakerType
+        desc: The type of Alexa speaker being set.
+      - name: local
+        type: bool
+        desc: True if the change originated from calling localSetVolume().
+      - name: volume
+        type: int
+        desc: he new volume setting of the Speaker.
+      - name: mute
+        type: bool
+        desc: The mute setting of the Speaker.
+
+  - action: LocalSetVolume
+    direction: incoming
+    desc: >
+      Notifies the Engine of a volume change event originating on the platform, such as a user 
+      pressing a "volume up" or "volume down" button. If the Speaker is AVS_SPEAKER_VOLUME, 
+      the Engine will respond with a call to setVolume() on each AVS-synced Speaker.
+    payload:
+      - name: type
+        type: SpeakerType
+        desc: The type of Alexa speaker being set.
+      - name: volume
+        type: int
+        desc: The new volume setting of the Speaker.
+
+  - action: LocalSetMute
+    direction: incoming
+    desc: >
+      Notifies the Engine of a mute setting change event originating on the platform, such as a 
+      user pressing a "mute" button. If the Speaker is AVS_SPEAKER_VOLUME, the Engine will respond
+      with a call to setMute() on each AVS-synced Speaker.
+    payload:
+      - name: type
+        type: SpeakerType
+        desc: The type of Alexa speaker being set.
+      - name: mute
+        type: bool
+        desc: The new mute setting of the Speaker.
+
+types:
+  - name: SpeakerType
+    type: enum
+    values:
+      - name: ALEXA_VOLUME
+        desc: The Speaker type that is controlled by AVS.
+      - name: ALERTS_VOLUME
+        desc: The Speaker type that is controlled locally by the platform.

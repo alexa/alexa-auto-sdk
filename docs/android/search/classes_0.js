@@ -2,12 +2,11 @@ var searchData=
 [
   ['action',['Action',['../classcom_1_1amazon_1_1aace_1_1car_control_1_1_car_control_configuration_1_1_action.html',1,'com::amazon::aace::carControl::CarControlConfiguration']]],
   ['activityevent',['ActivityEvent',['../enumcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l_1_1_activity_event.html',1,'com::amazon::aace::apl::APL']]],
-  ['addressbookconfiguration',['AddressBookConfiguration',['../classcom_1_1amazon_1_1aace_1_1addressbook_1_1config_1_1_address_book_configuration.html',1,'com::amazon::aace::addressbook::config']]],
-  ['addressbooktype',['AddressBookType',['../enumcom_1_1amazon_1_1aace_1_1addressbook_1_1_address_book_1_1_address_book_type.html',1,'com::amazon::aace::addressbook::AddressBook']]],
   ['alerts',['Alerts',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html',1,'com::amazon::aace::alexa']]],
   ['alertstate',['AlertState',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts_1_1_alert_state.html',1,'com::amazon::aace::alexa::Alerts']]],
   ['alexaclient',['AlexaClient',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client.html',1,'com::amazon::aace::alexa']]],
   ['alexaconfiguration',['AlexaConfiguration',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html',1,'com::amazon::aace::alexa::config']]],
+  ['alexaconnectivity',['AlexaConnectivity',['../classcom_1_1amazon_1_1aace_1_1connectivity_1_1_alexa_connectivity.html',1,'com::amazon::aace::connectivity']]],
   ['alexaspeaker',['AlexaSpeaker',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_speaker.html',1,'com::amazon::aace::alexa']]],
   ['apl',['APL',['../classcom_1_1amazon_1_1aace_1_1apl_1_1_a_p_l.html',1,'com::amazon::aace::apl']]],
   ['aplconfiguration',['APLConfiguration',['../classcom_1_1amazon_1_1aace_1_1apl_1_1config_1_1_a_p_l_configuration.html',1,'com::amazon::aace::apl::config']]],

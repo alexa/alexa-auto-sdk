@@ -1,0 +1,185 @@
+apply plugin: 'com.android.application'
+apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 30
+    defaultConfig {
+        applicationId "com.amazon.alexa.auto.app"
+        minSdkVersion 27
+        versionCode 1
+        versionName "4.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+        }
+    }
+
+    flavorDimensions "type"
+    productFlavors {
+        remote {
+            dimension "type"
+        }
+        local {
+            dimension "type"
+        }
+    }
+
+    testOptions {
+        // Unit Test: Make all android methods return true by default
+        unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
+    }
+
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def project = "alexa-auto-app"
+            def separator = "_"
+            def buildType = variant.buildType.name
+            def version = variant.versionName
+            def apkName = project + separator + buildType + separator + version + ".apk"
+            outputFileName = new File(apkName)
+        }
+    }
+
+    // Prevent duplicate .so libraries
+    packagingOptions {
+        pickFirst '**/*.so'
+        doNotStrip '**/*.so'
+    }
+
+    ndkVersion = "20.0.5594570"
+}
+
+ext {
+    remoteLibVersion = "4.0+"
+}
+dependencies {
+    def tasks = gradle.startParameter.getTaskNames()
+    if (tasks.empty || tasks.any { it.toLowerCase().contains("local") }) {
+        implementation fileTree(include: ['*.aar'], dir: gradle.ext.aarDir)
+    } else if (tasks.any { it.toLowerCase().contains("remote") }) {
+        remoteImplementation "com.amazon.alexa.aace:aasb:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:addressbook:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:apl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:bluetooth:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:car-control:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:cbl:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:connectivity:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:custom-domain:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:messaging:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:navigation:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:text-to-speech:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:text-to-speech-provider:${remoteLibVersion}@aar"
+    }
+
+    // AACS Projects.
+    implementation project(':aacs')
+    implementation project(':aacs-extra')
+    implementation project(':aacs-maccandroid')
+    implementation project(':aacsconstants')
+    implementation project(':aacsipc')
+    implementation project(':aacscommonutils')
+    implementation project(':alexa-auto-tts')
+
+    if(project.hasProperty('enabledTelephony')){
+        implementation project(':alexa-auto-telephony')
+    }
+    if(project.hasProperty('enabledCarControl')){
+        implementation project(':alexa-auto-carcontrol')
+    }
+    if(project.hasProperty('enabledContacts')){
+       implementation project(':alexa-auto-contacts')
+    }
+
+    // AACS Sample App Projects.
+    implementation project(':alexa-auto-apis')
+    implementation project(':alexa-auto-apps-common-ui')
+    implementation project(':alexa-auto-apps-common-util')
+    implementation project(':alexa-auto-lwa-auth')
+    implementation project(':alexa-auto-setup')
+    implementation project(':alexa-auto-media-player')
+    implementation project(':alexa-auto-voice-interaction')
+    implementation project(':alexa-auto-navigation')
+    implementation project(':alexa-auto-settings')
+    implementation project(':alexa-auto-comms-ui')
+    implementation project(':alexa-auto-templateruntime-renderer')
+
+    if (project.hasProperty('enabledUXRestrictions')) {
+        implementation project(':alexa-auto-ux-restrictions')
+    }
+
+    implementation project(':alexa-auto-voice-ui')
+
+    if(project.hasProperty('enabledAPL')){
+        implementation project(':alexa-auto-apl-renderer')
+    }
+
+    if(project.hasProperty('enabledDeviceUsage')){
+        implementation project(':alexa-auto-device-usage')
+    }
+
+    // AACS module factories.
+    for (extra_module_factory_name in gradle.ext.extra_module_factory_names) {
+        implementation project(':' + extra_module_factory_name)
+    }
+
+    // Extra modules for AACS Sample App Projects.
+    for (extra_module_project_name in gradle.ext.extra_module_project_names) {
+        implementation project(':' + extra_module_project_name)
+    }
+
+    // AndroidX dependencies
+    implementation deps.androidx_annotation
+    implementation deps.androidx_appcompat
+    implementation deps.androidx_core
+    implementation deps.androidx_constraint
+    implementation deps.androidx_preference
+
+    // Kotlin
+    implementation deps.kotlin_stdlib
+    implementation deps.androidx_core_ktx
+
+    // Navigation between UI components.
+    implementation deps.androidx_navigation_fragment
+    implementation deps.androidx_navigation_ui
+
+    // Dagger
+    implementation deps.dagger
+    kapt deps.dagger_compiler
+
+    // RX
+    implementation deps.rxjava3
+
+    //Event Bus
+    implementation deps.eventbus
+
+    //Unit Tests
+    testImplementation deps.junit
+    testImplementation deps.mockito
+    testImplementation deps.mockito_inline
+    testImplementation deps.androidx_test_core
+    testImplementation deps.androidx_arch_core_testing
+    testImplementation deps.roboelectric
+}

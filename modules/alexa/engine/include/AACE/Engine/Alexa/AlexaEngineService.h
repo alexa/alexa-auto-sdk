@@ -26,11 +26,12 @@
 #include <vector>
 #include <atomic>
 
-#include <acsdkShutdownManager/ShutdownNotifier.h>
-#include <acsdkShutdownManagerInterfaces/ShutdownManagerInterface.h>
 #include <ACL/AVSConnectionManager.h>
 #include <ACL/Transport/PostConnectSequencerFactory.h>
 #include <ACL/Transport/TransportFactoryInterface.h>
+#include <acsdkInteractionModel/InteractionModelFactory.h>
+#include <acsdkShutdownManager/ShutdownNotifier.h>
+#include <acsdkShutdownManagerInterfaces/ShutdownManagerInterface.h>
 #include <ADSL/MessageInterpreter.h>
 #include <AFML/ActivityTrackerInterface.h>
 #include <AFML/AudioActivityTracker.h>
@@ -39,6 +40,7 @@
 #include <Alexa/AlexaInterfaceCapabilityAgent.h>
 #include <ApiGateway/ApiGatewayCapabilityAgent.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManager.h>
+#include <AVSCommon/AVS/CapabilityChangeNotifier.h>
 #include <AVSCommon/AVS/DialogUXStateAggregator.h>
 #include <AVSCommon/AVS/ExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/Audio/AlertsAudioFactoryInterface.h>
@@ -52,7 +54,7 @@
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DialogUXStateObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/DirectiveSequencerInterface.h>
-#include "AVSCommon/SDKInterfaces/Endpoints/EndpointBuilderInterface.h"
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointBuilderInterface.h>
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/GlobalSettingsObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
@@ -71,28 +73,29 @@
 #include <CertifiedSender/CertifiedSender.h>
 #include <ContextManager/ContextManager.h>
 #include <Endpoints/EndpointRegistrationManager.h>
-#include <InteractionModel/InteractionModelCapabilityAgent.h>
-#include <RegistrationManager/RegistrationManager.h>
-#include <RegistrationManager/RegistrationObserverInterface.h>
+#include <RegistrationManager/CustomerDataManagerFactory.h>
+#include <RegistrationManager/RegistrationManagerFactory.h>
+#include <RegistrationManager/RegistrationNotifierInterface.h>
 #include <SpeakerManager/SpeakerManager.h>
 #include <SQLiteStorage/SQLiteMiscStorage.h>
 #include <System/SoftwareInfoSender.h>
 #include <System/UserInactivityMonitor.h>
-#include <AACE/Engine/Alexa/AlexaEngineLocationStateProvider.h>
+
 #include "AACE/Engine/Alexa/DeviceSetupEngineImpl.h"
-#include "AACE/Engine/Alexa/LocaleAssetsManager.h"
 #include "AACE/Engine/Alexa/ExternalMediaAdapterRegistrationInterface.h"
+#include "AACE/Engine/Alexa/LocaleAssetsManager.h"
 #include "AACE/Engine/Audio/AudioEngineService.h"
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Location/LocationEngineService.h"
 #include "AACE/Engine/Logger/LoggerEngineService.h"
 #include "AACE/Engine/Network/NetworkEngineService.h"
 #include "AACE/Engine/Network/NetworkInfoObserver.h"
-#include "AACE/Engine/Vehicle/VehicleEngineService.h"
-#include "AACE/Engine/Storage/StorageEngineService.h"
+#include "AACE/Engine/PropertyManager/PropertyDescription.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
-#include "AACE/Engine/PropertyManager/PropertyDescription.h"
+#include "AACE/Engine/Storage/StorageEngineService.h"
+#include "AACE/Engine/Vehicle/VehicleEngineService.h"
+#include <AACE/Engine/Alexa/AlexaEngineLocationStateProvider.h>
 
 #include "AlertsEngineImpl.h"
 #include "AlexaClientEngineImpl.h"
@@ -102,6 +105,7 @@
 #include "AlexaEngineLogger.h"
 #include "AlexaSpeakerEngineImpl.h"
 #include "AudioPlayerEngineImpl.h"
+#include "AuthorizationManager.h"
 #include "AuthProviderEngineImpl.h"
 #include "DeviceSettingsDelegate.h"
 #include "DoNotDisturbEngineImpl.h"
@@ -109,6 +113,7 @@
 #include "EqualizerControllerEngineImpl.h"
 #include "ExternalMediaPlayerEngineImpl.h"
 #include "GeolocationServiceInterface.h"
+#include "MediaPlaybackRequestorEngineImpl.h"
 #include "NotificationsEngineImpl.h"
 #include "PlaybackControllerEngineImpl.h"
 #include "SpeechRecognizerEngineImpl.h"
@@ -118,7 +123,6 @@
 #include "WakewordEngineManager.h"
 #include "WakewordObservableInterface.h"
 #include "WakewordObserverInterface.h"
-#include "AuthorizationManager.h"
 
 namespace aace {
 namespace engine {
@@ -171,8 +175,8 @@ public:
     /// alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface
     /// @{
     void onCapabilitiesStateChange(
-        CapabilitiesObserverInterface::State newState,
-        CapabilitiesObserverInterface::Error newError,
+        alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface::State newState,
+        alexaClientSDK::avsCommon::sdkInterfaces::CapabilitiesObserverInterface::Error newError,
         const std::vector<std::string>& addedOrUpdatedEndpointIds,
         const std::vector<std::string>& deletedEndpointIds) override;
     /// @}
@@ -182,6 +186,7 @@ public:
     void onNetworkInfoChanged(NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength) override;
     void onNetworkInterfaceChangeStatusChanged(const std::string& networkInterface, NetworkInterfaceChangeStatus status)
         override;
+    void onNetworkProxyHeadersAvailable(const std::vector<std::string>& headers) override;
     /// @}
 
     /// AlexaComponentInterface
@@ -198,7 +203,8 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> getConnectionManager()
         override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> getContextManager() override;
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() override;
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> getCustomerDataManager()
+        override;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
     getDefaultEndpointCapabilitiesRegistrar() override;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() override;
@@ -332,6 +338,8 @@ private:
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::ExternalMediaAdapter> externalMediaAdapter);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::GlobalPreset> globalPreset);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::LocalMediaSource> localMediaSource);
+    bool registerPlatformInterfaceType(
+        std::shared_ptr<aace::alexa::MediaPlaybackRequestor> mediaPlaybackRequestorPlatformInterface);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::Notifications> notifications);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::PlaybackController> playbackController);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::SpeechRecognizer> speechRecognizer);
@@ -370,21 +378,23 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceCapabilityAgent> m_alexaCapabilityAgent;
     std::shared_ptr<alexaClientSDK::capabilityAgents::apiGateway::ApiGatewayCapabilityAgent>
         m_apiGatewayCapabilityAgent;
-    std::shared_ptr<alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent>
-        m_interactionModelCapabilityAgent;
     std::shared_ptr<alexaClientSDK::capabilityAgents::speakerManager::SpeakerManager> m_speakerManager;
     std::shared_ptr<alexaClientSDK::capabilityAgents::system::SoftwareInfoSender> m_softwareInfoSender;
     std::shared_ptr<alexaClientSDK::capabilityAgents::system::UserInactivityMonitor> m_userActivityMonitor;
     std::shared_ptr<alexaClientSDK::capabilitiesDelegate::CapabilitiesDelegate> m_capabilitiesDelegate;
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> m_certifiedSender;
     std::shared_ptr<alexaClientSDK::endpoints::EndpointRegistrationManager> m_endpointManager;
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> m_customerDataManager;
-    std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManager> m_registrationManager;
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> m_customerDataManager;
+    std::shared_ptr<alexaClientSDK::registrationManager::RegistrationNotifierInterface> m_registrationManagerNotifier;
+    std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManagerInterface> m_registrationManager;
     std::shared_ptr<AuthorizationManager> m_authorizationManager;
     std::unique_ptr<DeviceSettingsDelegate> m_deviceSettingsDelegate;
     std::shared_ptr<alexaClientSDK::acl::PostConnectSequencerFactory> m_postConnectSequencerFactory;
     std::shared_ptr<alexaClientSDK::storage::sqliteStorage::SQLiteMiscStorage> m_miscStorage;
     std::shared_ptr<alexaClientSDK::capabilityAgents::alexa::AlexaInterfaceMessageSender> m_alexaMessageSender;
+    std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifier> m_capabilityChangeNotifier;
+    alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::acsdkInteractionModel::InteractionModelFactoryInterfaces>
+        m_interactionModelCA;
 
     std::shared_ptr<aace::engine::alexa::LocaleAssetsManager> m_localeAssetManager;
 
@@ -440,6 +450,7 @@ private:
     std::shared_ptr<aace::engine::alexa::DoNotDisturbEngineImpl> m_doNotDisturbEngineImpl;
     std::shared_ptr<aace::engine::alexa::EqualizerControllerEngineImpl> m_equalizerControllerEngineImpl;
     std::shared_ptr<aace::engine::alexa::ExternalMediaPlayerEngineImpl> m_externalMediaPlayerEngineImpl;
+    std::shared_ptr<aace::engine::alexa::MediaPlaybackRequestorEngineImpl> m_mediaPlaybackRequestorEngineImpl;
     std::shared_ptr<aace::engine::alexa::NotificationsEngineImpl> m_notificationsEngineImpl;
     std::shared_ptr<aace::engine::alexa::PlaybackControllerEngineImpl> m_playbackControllerEngineImpl;
     std::shared_ptr<aace::engine::alexa::SpeechRecognizerEngineImpl> m_speechRecognizerEngineImpl;
@@ -462,11 +473,17 @@ private:
     // Endpoint builder factory
     std::shared_ptr<aace::engine::alexa::EndpointBuilderFactory> m_endpointBuilderFactory;
 
+    /// MediaPlaybackRequestor config values.
+    long long int m_mediaResumeThreshold;
+
     // executor
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 
     // determine if alexa engine service was shut down in async callback methods
     std::atomic<bool> m_isShuttingDown;
+
+    // holds ducking config value
+    bool m_duckingEnabled;
 
     std::mutex m_setPropertyResultCallbackMutex;
 };

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amazon.alexa.auto.apl">
+
+    <uses-permission android:name="com.amazon.alexaautoclientservice" />
+
+    <application
+        android:allowBackup="true"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:extractNativeLibs="true">
+
+        <receiver
+            android:name=".receiver.APLReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.APL" />
+                <action android:name="com.amazon.aacs.aasb.RenderDocument" />
+                <action android:name="com.amazon.aacs.aasb.ExecuteCommands" />
+                <action android:name="com.amazon.aacs.aasb.GetVisualContext" />
+                <action android:name="com.amazon.aacs.aasb.ClearDocument" />
+                <action android:name="com.amazon.aacs.aasb.ClearAllExecuteCommands" />
+                <action android:name="com.amazon.aacs.aasb.ClearCard" />
+                <action android:name="com.amazon.aacs.aasb.InterruptCommandSequence" />
+                <action android:name="com.amazon.aacs.aasb.SetDocumentIdleTimeout" />
+                <action android:name="com.amazon.aacs.aasb.UpdateAPLRuntimeProperties" />
+                <category android:name="com.amazon.aacs.aasb.AlexaClient" />
+                <action android:name="com.amazon.aacs.aasb.DialogStateChanged"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.APLThemeReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.alexa.auto.apl" />
+                <action android:name="com.amazon.alexa.auto.apl.UpdateAPLTheme"/>
+            </intent-filter>
+        </receiver>
+    </application>
+
+</manifest>

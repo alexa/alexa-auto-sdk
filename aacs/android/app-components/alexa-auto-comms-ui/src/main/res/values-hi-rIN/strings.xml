@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="contacts_permission_consent_title">Alexa के ज़रिए अपने कॉन्टैक्ट में शामिल लोगों को कॉल करें</string>
+    <string name="contacts_permission_consent_title_with_alexa_custom_assistant">वॉइस कॉलिंग सेट अप करें</string>
+    <string name="contacts_permission_consent_body">%1$s पर मौजूद कॉन्टैक्ट को Amazon सेवा पर अपलोड करने की अनुमति दें.</string>
+    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">[Acme Brandon] और Amazon Alexa के साथ अपने फ़ोन में मौजूद कॉन्टैक्ट को हैंड्स-फ़्री कॉलिंग करें. %1$s पर मौजूद आपके कॉन्टैक्ट को Amazon सेवा पर अपलोड किया जाएगा.</string>
+    <string name="contacts_upload_consent_title">कॉन्टैक्ट</string>
+    <string name="contacts_upload_consent_summary">Alexa के ज़रिए कॉन्टैक्ट के साथ कॉलिंग चालू करने के लिए, इस फ़ोन पर मौजूद कॉन्टैक्ट को Amazon सेवा पर अपलोड किया जाएगा.</string>
+    <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">उन्हें नाम से कॉल और मैसेज करने के लिए Amazon सेवा पर कॉन्टैक्ट अपलोड करें</string>
+    <string name="contacts_consent_yes">चालू करें</string>
+    <string name="contacts_consent_yes_with_alexa_custom_assistant">कॉन्टैक्ट का इस्तेमाल करें</string>
+    <string name="contacts_consent_skip">छोड़ें</string>
+    <string name="comms_permission_status">कॉन्टैक्ट %1$s</string>
+    <string name="comms_permission_enabled">चालू है</string>
+    <string name="comms_permission_disabled">बंद है</string>
+    <string name="comms_sample_utterance">\"Alexa, सैम को कॉल करो\"</string>
+    <string name="sms_consent_title">SMS मैसेज</string>
+    <string name="sms_consent_summary">Alexa के साथ SMS मैसेजिंग चालू करने के लिए, इस फ़ोन पर मौजूद SMS मैसेज Amazon क्लाउड पर अपलोड किए जाएंगे.</string>
+    <string name="sms_consent_summary_with_alexa_custom_assistant">SMS मैसेज को Amazon सेवा में अपलोड करें ताकि आपको उन्हें पढ़कर सुनाया जा सके</string>
+    <string name="pair_new_device">नया डिवाइस पेयर करें</string>
+</resources>

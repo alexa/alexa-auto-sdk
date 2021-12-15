@@ -1,0 +1,5805 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+    
+    
+      
+        <title>Alexa Module - Alexa Auto SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a617204b.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.9204c3b2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#alexa-module" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Alexa Auto SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Alexa Module <!-- omit in toc -->
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../GETSTARTED/" class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../BUILDING/" class="md-tabs__link">
+        Build Auto SDK
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../SDK_MODULES/" class="md-tabs__link md-tabs__link--active">
+        Modules
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../aacs/android/" class="md-tabs__link">
+        AACS
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../samples/cpp/" class="md-tabs__link">
+        Sample App
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../LINUX_INTEGRATION/" class="md-tabs__link">
+      Linux Integration
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../MIGRATION/" class="md-tabs__link">
+        Migration Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../NEED_HELP/" class="md-tabs__link">
+      Need Help?
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-tabs__link">
+        More
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Alexa Auto SDK" class="md-nav__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    Alexa Auto SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GETSTARTED/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Build Auto SDK
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Build Auto SDK" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Build Auto SDK
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BUILDING/" class="md-nav__link">
+        Build Alexa Auto SDK
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../builder/">Auto SDK Builder Tool Reference</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Auto SDK Builder Tool Reference" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Auto SDK Builder Tool Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Modules
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Modules" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Modules
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SDK_MODULES/" class="md-nav__link">
+        Auto SDK Modules and Extensions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2">
+          AASB
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aasb/aasb-docs/AASB/" class="md-nav__link">
+        AASB Message Definition
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../address-book/">Address Book</a>
+          
+            <label for="__nav_4_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Address Book" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Address Book
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3_2" type="checkbox" id="__nav_4_3_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_3_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../address-book/aasb-docs/AddressBook/" class="md-nav__link">
+        Address Book
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" checked>
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index md-nav__link--active">
+          <a href="./">Alexa</a>
+          
+            <label for="__nav_4_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Alexa" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          Alexa
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4_2" type="checkbox" id="__nav_4_4_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_4_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/Alerts/" class="md-nav__link">
+        Alerts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/AlexaClient/" class="md-nav__link">
+        AlexaClient
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/AlexaSpeaker/" class="md-nav__link">
+        AlexaSpeaker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/AudioPlayer/" class="md-nav__link">
+        AudioPlayer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/AuthProvider/" class="md-nav__link">
+        AuthProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/DeviceSetup/" class="md-nav__link">
+        DeviceSetup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/DoNotDisturb/" class="md-nav__link">
+        DoNotDisturb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/EqualizerController/" class="md-nav__link">
+        EqualizerController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/ExternalMediaAdapter/" class="md-nav__link">
+        ExternalMediaAdapter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/GlobalPreset/" class="md-nav__link">
+        GlobalPreset
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/LocalMediaSource/" class="md-nav__link">
+        LocalMediaSource
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/MediaPlaybackRequestor/" class="md-nav__link">
+        MediaPlaybackRequestor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/Notifications/" class="md-nav__link">
+        Notifications
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/PlaybackController/" class="md-nav__link">
+        PlaybackController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/SpeechRecognizer/" class="md-nav__link">
+        SpeechRecognizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/TemplateRuntime/" class="md-nav__link">
+        TemplateRuntime
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5" type="checkbox" id="__nav_4_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../apl/">APL</a>
+          
+            <label for="__nav_4_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          APL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5_2" type="checkbox" id="__nav_4_5_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_5_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../apl/aasb-docs/APL/" class="md-nav__link">
+        APL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_6" type="checkbox" id="__nav_4_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../bluetooth/">Bluetooth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Bluetooth" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_6">
+          <span class="md-nav__icon md-icon"></span>
+          Bluetooth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7" type="checkbox" id="__nav_4_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../car-control/">CarControl</a>
+          
+            <label for="__nav_4_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CarControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_7">
+          <span class="md-nav__icon md-icon"></span>
+          CarControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7_2" type="checkbox" id="__nav_4_7_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_7_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../car-control/aasb-docs/CarControl/" class="md-nav__link">
+        CarControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8" type="checkbox" id="__nav_4_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../cbl/">CBL</a>
+          
+            <label for="__nav_4_8">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CBL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_8">
+          <span class="md-nav__icon md-icon"></span>
+          CBL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8_2" type="checkbox" id="__nav_4_8_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_8_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cbl/aasb-docs/CBL/" class="md-nav__link">
+        CBL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9" type="checkbox" id="__nav_4_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../connectivity/">Connectivity</a>
+          
+            <label for="__nav_4_9">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Connectivity" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_9">
+          <span class="md-nav__icon md-icon"></span>
+          Connectivity
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9_2" type="checkbox" id="__nav_4_9_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_9_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connectivity/aasb-docs/AlexaConnectivity/" class="md-nav__link">
+        AlexaConnectivity
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10" type="checkbox" id="__nav_4_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../core/">Core</a>
+          
+            <label for="__nav_4_10">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_10">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10_2" type="checkbox" id="__nav_4_10_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_10_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/AudioInput/" class="md-nav__link">
+        AudioInput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/AudioOutput/" class="md-nav__link">
+        AudioOutput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/Authorization/" class="md-nav__link">
+        Authorization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/DeviceUsage/" class="md-nav__link">
+        DeviceUsage
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/LocationProvider/" class="md-nav__link">
+        LocationProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/NetworkInfoProvider/" class="md-nav__link">
+        NetworkInfoProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/aasb-docs/PropertyManager/" class="md-nav__link">
+        PropertyManager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11" type="checkbox" id="__nav_4_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../custom-domain/">CustomDomain</a>
+          
+            <label for="__nav_4_11">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CustomDomain" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_11">
+          <span class="md-nav__icon md-icon"></span>
+          CustomDomain
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11_2" type="checkbox" id="__nav_4_11_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_11_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-domain/aasb-docs/CustomDomain/" class="md-nav__link">
+        CustomDomain
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_12" type="checkbox" id="__nav_4_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../loopback-detector/">LoopbackDetector</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="LoopbackDetector" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_12">
+          <span class="md-nav__icon md-icon"></span>
+          LoopbackDetector
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13" type="checkbox" id="__nav_4_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../messaging/">Messaging</a>
+          
+            <label for="__nav_4_13">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Messaging" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_13">
+          <span class="md-nav__icon md-icon"></span>
+          Messaging
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13_2" type="checkbox" id="__nav_4_13_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_13_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_13_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../messaging/aasb-docs/Messaging/" class="md-nav__link">
+        Messaging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14" type="checkbox" id="__nav_4_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../navigation/">Navigation</a>
+          
+            <label for="__nav_4_14">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Navigation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_14">
+          <span class="md-nav__icon md-icon"></span>
+          Navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14_2" type="checkbox" id="__nav_4_14_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_14_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../navigation/aasb-docs/Navigation/" class="md-nav__link">
+        Navigation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15" type="checkbox" id="__nav_4_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../phone-control/">PhoneControl</a>
+          
+            <label for="__nav_4_15">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="PhoneControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_15">
+          <span class="md-nav__icon md-icon"></span>
+          PhoneControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15_2" type="checkbox" id="__nav_4_15_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_15_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phone-control/aasb-docs/PhoneCallController/" class="md-nav__link">
+        PhoneControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_16" type="checkbox" id="__nav_4_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../system-audio/">SystemAudio</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="SystemAudio" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_16">
+          <span class="md-nav__icon md-icon"></span>
+          SystemAudio
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17" type="checkbox" id="__nav_4_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../text-to-speech/">TextToSpeech</a>
+          
+            <label for="__nav_4_17">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeech" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_17">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeech
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17_2" type="checkbox" id="__nav_4_17_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_17_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_17_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../text-to-speech/aasb-docs/TextToSpeech/" class="md-nav__link">
+        TextToSpeech
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_18" type="checkbox" id="__nav_4_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../text-to-speech-provider/">TextToSpeechProvider</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeechProvider" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_18">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeechProvider
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/">AACS</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/">Configuration</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3" type="checkbox" id="__nav_5_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_3">
+          Common
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Common" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_3">
+          <span class="md-nav__icon md-icon"></span>
+          Common
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_1" type="checkbox" id="__nav_5_3_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/ipc/">IPC</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="IPC" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          IPC
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_2" type="checkbox" id="__nav_5_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/commonutils/">Common Utils</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Common Utils" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Common Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">AACS Instrumentation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Instrumentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Instrumentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/sample-app/">AACS Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Sample App" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          App Components
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="App Components" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          App Components
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_1" type="checkbox" id="__nav_5_6_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apis/">alexa-auto-apis</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apis" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apis
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2" type="checkbox" id="__nav_5_6_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
+          
+            <label for="__nav_5_6_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apl-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2_2" type="checkbox" id="__nav_5_6_2_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/">APL Render</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL Render" data-md-level="4">
+        <label class="md-nav__title" for="__nav_5_6_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          APL Render
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_3" type="checkbox" id="__nav_5_6_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-ui/">alexa-auto-apps-common-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_3">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_4" type="checkbox" id="__nav_5_6_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-util/">alexa-auto-apps-common-util</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-util" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_4">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-util
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_5" type="checkbox" id="__nav_5_6_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-carcontrol/">alexa-auto-carcontrol</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-carcontrol" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_5">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-carcontrol
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_6" type="checkbox" id="__nav_5_6_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-comms-ui/">alexa-auto-comms-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-comms-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_6">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-comms-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_7" type="checkbox" id="__nav_5_6_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-contacts/">alexa-auto-contacts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-contacts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_7">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-contacts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_8" type="checkbox" id="__nav_5_6_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-device-usage/">alexa-auto-device-usage</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-device-usage" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_8">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-device-usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_9" type="checkbox" id="__nav_5_6_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-lwa-auth/">alexa-auto-lwa-auth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-lwa-auth" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_9">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-lwa-auth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_10" type="checkbox" id="__nav_5_6_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-media-player/">alexa-auto-media-player</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-media-player" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_10">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-media-player
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_11" type="checkbox" id="__nav_5_6_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-navigation/">alexa-auto-navigation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-navigation" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_11">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_12" type="checkbox" id="__nav_5_6_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-settings/">alexa-auto-settings</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-settings" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_12">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-settings
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_13" type="checkbox" id="__nav_5_6_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-setup/">alexa-auto-setup</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-setup" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_13">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-setup
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_14" type="checkbox" id="__nav_5_6_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-telephony/">alexa-auto-telephony</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-telephony" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_14">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-telephony
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_15" type="checkbox" id="__nav_5_6_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-templateruntime-renderer/">alexa-auto-templateruntime-renderer</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-templateruntime-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_15">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-templateruntime-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_16" type="checkbox" id="__nav_5_6_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-tts/">alexa-auto-tts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-tts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_16">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-tts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_17" type="checkbox" id="__nav_5_6_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-ux-restrictions/">alexa-auto-ux-restrictions</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-ux-restrictions" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_17">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-ux-restrictions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_18" type="checkbox" id="__nav_5_6_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-interaction/">alexa-auto-voice-interaction</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-interaction" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_18">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_19" type="checkbox" id="__nav_5_6_19" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-ui/">alexa-auto-voice-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_19">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../samples/cpp/">Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Sample App" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LINUX_INTEGRATION/" class="md-nav__link">
+        Linux Integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Migration Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION/" class="md-nav__link">
+        General Migration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION_TO_AASB_MESSAGEBROKER/" class="md-nav__link">
+        Migration to AASB MessageBroker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NEED_HELP/" class="md-nav__link">
+        Need Help?
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          More
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="More" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          More
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SECURITY/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#alexa-module-overview" class="md-nav__link">
+    Alexa module overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-the-alexa-module" class="md-nav__link">
+    Configure the Alexa module
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-up-alexa-for-the-user" class="md-nav__link">
+    Set up Alexa for the user
+  </a>
+  
+    <nav class="md-nav" aria-label="Set up Alexa for the user">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authorize-the-device-with-authorization" class="md-nav__link">
+    Authorize the device with Authorization
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-the-out-of-box-experience-with-devicesetup" class="md-nav__link">
+    Start the out-of-box experience with DeviceSetup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-device-settings-with-propertymanager" class="md-nav__link">
+    Update Device Settings with PropertyManager
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#provide-user-speech-input-to-alexa-with-speechrecognizer" class="md-nav__link">
+    Provide user speech input to Alexa with SpeechRecognizer 
+  </a>
+  
+    <nav class="md-nav" aria-label="Provide user speech input to Alexa with SpeechRecognizer ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#invoke-alexa-with-tap-and-release" class="md-nav__link">
+    Invoke Alexa with tap-and-release
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoke-alexa-with-press-and-hold" class="md-nav__link">
+    Invoke Alexa with press-and-hold
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invoke-alexa-with-voice-using-amazonlite-wake-word-engine" class="md-nav__link">
+    Invoke Alexa with voice using Amazonlite wake word engine
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reduce-data-usage-with-audio-encoding" class="md-nav__link">
+    Reduce data usage with audio encoding
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#play-alexa-speech-to-the-user-with-speechsynthesizer" class="md-nav__link">
+    Play Alexa speech to the user with SpeechSynthesizer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#track-alexa-state-changes-with-alexaclient" class="md-nav__link">
+    Track Alexa state changes with AlexaClient
+  </a>
+  
+    <nav class="md-nav" aria-label="Track Alexa state changes with AlexaClient">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#render-alexas-attention-state" class="md-nav__link">
+    Render Alexa's attention state
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitor-alexas-connection-status" class="md-nav__link">
+    Monitor Alexa's connection status
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitor-alexas-authorization-state" class="md-nav__link">
+    Monitor Alexa's authorization state
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-cards-on-screen-with-templateruntime" class="md-nav__link">
+    Display cards on screen with TemplateRuntime
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stream-alexa-media-content" class="md-nav__link">
+    Stream Alexa media content
+  </a>
+  
+    <nav class="md-nav" aria-label="Stream Alexa media content">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#play-media-with-audioplayer" class="md-nav__link">
+    Play media with AudioPlayer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#view-media-metadata-on-screen-with-templateruntime" class="md-nav__link">
+    View media metadata on screen with TemplateRuntime
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#press-media-playback-control-buttons-with-playbackcontroller" class="md-nav__link">
+    Press media playback control buttons with PlaybackController
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adjust-equalizer-settings-with-equalizercontroller" class="md-nav__link">
+    Adjust equalizer settings with EqualizerController
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resume-media-playback-at-startup-with-mediaplaybackrequestor" class="md-nav__link">
+    Resume media playback at startup with MediaPlaybackRequestor
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enable-audio-ducking-for-alexa-media-content" class="md-nav__link">
+    Enable audio ducking for Alexa media content
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-local-media-with-localmediasoure" class="md-nav__link">
+    Control local media with LocalMediaSoure
+  </a>
+  
+    <nav class="md-nav" aria-label="Control local media with LocalMediaSoure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#starting-playback-with-content-selection-by-voice" class="md-nav__link">
+    Starting Playback with Content Selection by Voice
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controlling-playback-by-voice" class="md-nav__link">
+    Controlling Playback by Voice
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reporting-playback-events" class="md-nav__link">
+    Reporting Playback Events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reporting-playback-state" class="md-nav__link">
+    Reporting Playback State
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-sequence-diagrams" class="md-nav__link">
+    Example Sequence Diagrams
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-external-media-apps-with-externalmediaadapter" class="md-nav__link">
+    Control external media apps with ExternalMediaAdapter 
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-volume-with-alexaspeaker" class="md-nav__link">
+    Control volume with AlexaSpeaker
+  </a>
+  
+    <nav class="md-nav" aria-label="Control volume with AlexaSpeaker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#set-a-custom-volume-range" class="md-nav__link">
+    Set a custom volume range
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manage-timers-alarms-and-reminders-with-alerts" class="md-nav__link">
+    Manage timers, alarms, and reminders with Alerts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#render-notification-indicators-with-notifications" class="md-nav__link">
+    Render notification indicators with Notifications
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#block-notifications-with-donotdisturb" class="md-nav__link">
+    Block notifications with DoNotDisturb
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+<h1 id="alexa-module">Alexa Module <!-- omit in toc --></h1>
+<p><strong>Table of Contents</strong> <!-- omit in toc --></p>
+<ul>
+<li><a href="#alexa-module-overview">Alexa module overview</a></li>
+<li><a href="#configure-the-alexa-module">Configure the Alexa module</a></li>
+<li><a href="#set-up-alexa-for-the-user">Set up Alexa for the user</a></li>
+<li><a href="#authorize-the-device-with-authorization">Authorize the device with Authorization</a></li>
+<li><a href="#start-the-out-of-box-experience-with-devicesetup">Start the out-of-box experience with DeviceSetup</a></li>
+<li><a href="#update-device-settings-with-propertymanager">Update Device Settings with PropertyManager</a></li>
+<li><a href="#provide-user-speech-input-to-alexa-with-speechrecognizer-">Provide user speech input to Alexa with SpeechRecognizer <a name="speechRecognizer"></a></a></li>
+<li><a href="#invoke-alexa-with-tap-and-release">Invoke Alexa with tap-and-release</a></li>
+<li><a href="#invoke-alexa-with-press-and-hold">Invoke Alexa with press-and-hold</a></li>
+<li><a href="#invoke-alexa-with-voice-using-amazonlite-wake-word-engine">Invoke Alexa with voice using Amazonlite wake word engine</a></li>
+<li><a href="#reduce-data-usage-with-audio-encoding">Reduce data usage with audio encoding</a></li>
+<li><a href="#play-alexa-speech-to-the-user-with-speechsynthesizer">Play Alexa speech to the user with SpeechSynthesizer</a></li>
+<li><a href="#track-alexa-state-changes-with-alexaclient">Track Alexa state changes with AlexaClient</a></li>
+<li><a href="#render-alexas-attention-state">Render Alexa's attention state</a></li>
+<li><a href="#monitor-alexas-connection-status">Monitor Alexa's connection status</a></li>
+<li><a href="#monitor-alexas-authorization-state">Monitor Alexa's authorization state</a></li>
+<li><a href="#display-cards-on-screen-with-templateruntime">Display cards on screen with TemplateRuntime</a></li>
+<li><a href="#stream-alexa-media-content">Stream Alexa media content</a></li>
+<li><a href="#play-media-with-audioplayer">Play media with AudioPlayer</a></li>
+<li><a href="#view-media-metadata-on-screen-with-templateruntime">View media metadata on screen with TemplateRuntime</a></li>
+<li><a href="#press-media-playback-control-buttons-with-playbackcontroller">Press media playback control buttons with PlaybackController</a></li>
+<li><a href="#adjust-equalizer-settings-with-equalizercontroller">Adjust equalizer settings with EqualizerController</a></li>
+<li><a href="#resume-media-playback-at-startup-with-mediaplaybackrequestor">Resume media playback at startup with MediaPlaybackRequestor</a></li>
+<li><a href="#enable-audio-ducking-for-alexa-media-content">Enable audio ducking for Alexa media content</a></li>
+<li><a href="#control-local-media-with-localmediasoure">Control local media with LocalMediaSoure</a></li>
+<li><a href="#starting-playback-with-content-selection-by-voice">Starting Playback with Content Selection by Voice</a></li>
+<li><a href="#controlling-playback-by-voice">Controlling Playback by Voice</a></li>
+<li><a href="#reporting-playback-state">Reporting Playback State</a></li>
+<li><a href="#example-sequence-diagrams">Example Sequence Diagrams</a></li>
+<li><a href="#control-external-media-apps-with-externalmediaadapter-">Control external media apps with ExternalMediaAdapter <a name="externalMediaAdapter"></a></a></li>
+<li><a href="#control-volume-with-alexaspeaker">Control volume with AlexaSpeaker</a></li>
+<li><a href="#set-a-custom-volume-range">Set a custom volume range</a></li>
+<li><a href="#manage-timers-alarms-and-reminders-with-alerts">Manage timers, alarms, and reminders with Alerts</a></li>
+<li><a href="#render-notification-indicators-with-notifications">Render notification indicators with Notifications</a></li>
+<li><a href="#block-notifications-with-donotdisturb">Block notifications with DoNotDisturb</a></li>
+</ul>
+<h2 id="alexa-module-overview">Alexa module overview</h2>
+<p>The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features. The Engine handles steps to send events and sequence directives so you can focus on using the provided AASB messages to interact with Alexa.</p>
+<blockquote>
+<p><strong>Important!</strong>: If you are an Android developer, your application will use the <a href="../aacs/android/README.md"><strong>Alexa Auto Client Service (AACS)</strong></a> as its foundation. AACS implements much of the core Auto SDK setup, abstracting it from your application and exposing only a necessary subset of the Auto SDK API in an Android-specific way. Some of the information presented in this documentation and documentation for other SDK modules might not pertain to your application exactly as written for cases in which AACS provides the implementation or further abstracts it, so keep this in mind while reading. Use the module documentation to understand the underlying layers of Auto SDK, if interested, and to reference the Engine configuration and AASB message definitions for the features you do need to build into your application yourself. </p>
+<p><strong>Important!:</strong> Not every section of this documented is updated to reflect the Auto SDK 4.0 MessageBroker message API. Some sections still include text, code samples, or diagrams that show deprecated platform intefaces rather than their corresponding AASB message interface equivalents. Your application will use the the AASB message interfaces with MessageBroker. This document will be fully updated in the next Auto SDK version. For each interface you use, refer to its individual AASB message reference documentation.</p>
+</blockquote>
+<h2 id="configure-the-alexa-module">Configure the Alexa module</h2>
+<p>The <code>Alexa</code> module defines required and optional configuration objects that you include in the Engine configuration for your application. You can define the configuration objects in a file or construct them programatically with the relevant configuration factory functions.</p>
+<p>Your application must provide the <code>aace.alexa</code> configuration in the same format as the example specified below. Alternatively, use the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html"><code>AlexaConfiguration</code></a> factory functions to generate individual elements of this configuration.</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot;: {
+        &quot;avsDeviceSDK&quot;: {
+            &quot;deviceInfo&quot;: {
+                &quot;clientId&quot;: &quot;${CLIENT_ID}&quot;,
+                &quot;productId&quot;: &quot;${PRODUCT_ID}&quot;,
+                &quot;deviceSerialNumber&quot;: &quot;${DEVICE_SERIAL_NUMBER}&quot;,
+                &quot;manufacturerName&quot;: &quot;${MANUFACTURER_NAME}&quot;,
+                &quot;description&quot;: &quot;${DEVICE_DESCRIPTION}&quot;
+            },
+            &quot;libcurlUtils&quot;: {
+                &quot;CURLOPT_CAPATH&quot;: &quot;${CERTS_PATH}&quot;
+            },
+            &quot;miscDatabase&quot;: {
+                &quot;databaseFilePath&quot;: &quot;${DATA_PATH}/miscDatabase.db&quot;
+            },
+            &quot;certifiedSender&quot;: {
+                &quot;databaseFilePath&quot;: &quot;${DATA_PATH}/certifiedSender.db&quot;
+            },
+            &quot;alertsCapabilityAgent&quot;: {
+                &quot;databaseFilePath&quot;: &quot;${DATA_PATH}/alertsCapabilityAgent.db&quot;
+            },
+            &quot;notifications&quot;: {
+                &quot;databaseFilePath&quot;: &quot;${DATA_PATH}/notifications.db&quot;
+            },
+            &quot;capabilitiesDelegate&quot;: {
+                &quot;databaseFilePath&quot;: &quot;${DATA_PATH}/capabilitiesDatabase.db&quot;
+            },
+            &quot;deviceSettings&quot;: {
+                &quot;databaseFilePath&quot;: &quot;${DATA_PATH}/deviceSettings.db&quot;,
+                &quot;defaultLocale&quot;:&quot;en-US&quot;,
+                &quot;defaultTimezone&quot;:&quot;America/Vancouver&quot;
+            }
+        },
+        &quot;requestMediaPlayback&quot;: {
+            &quot;mediaResumeThreshold&quot;: 20000
+        }
+    },
+    &quot;aasb.alexa&quot;: {
+      &quot;LocalMediaSource&quot;: {
+        &quot;types&quot;: [&quot;FM_RADIO&quot;, &quot;AM_RADIO&quot;,&quot;BLUETOOTH&quot;, &quot;USB&quot;, &quot;SATELLITE_RADIO&quot;,
+                    &quot;LINE_IN&quot;, &quot;COMPACT_DISC&quot;, &quot;DAB&quot;, &quot;DEFAULT&quot;]
+      }
+    }
+}
+</code></pre></div>
+<p>The <code>deviceInfo</code> field contains the details of the device. The fields <code>libcurlUtils</code>, <code>miscDatabase</code>, <code>certifiedSender</code>, <code>alertsCapabilityAgent</code>, <code>notifications</code>, and <code>capabilitiesDelegate</code> specify the respective database file paths.</p>
+<p>The <code>deviceSettings</code> field specifies the settings on the device. The following list describes the settings:</p>
+<ul>
+<li><code>databaseFilePath</code> is the path to the SQLite database that stores persistent settings. The database will be created on initialization if it does not already exist.</li>
+<li><code>defaultLocale</code> specifies the default locale setting, which is Alexa's locale setting until updated on the device. The default value of <code>defaultLocale</code> is “en-US”.</li>
+<li><code>locales</code> specifies the list of locales supported by the device. The default value is <code>["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]</code>.</li>
+<li><code>localeCombinations</code> specifies the list of locale pairs available on a device that supports multi-locale mode. Through the Dynamic Language Switching feature, Alexa can communicate with the user of such device in languages specified in the locale pairs. In each pair, the first value is the primary locale, which Alexa uses most often when interacting with the user. The second value is the secondary locale, which specifies an additional language that Alexa uses when responding to an utterance in the corresponding language. For example, if ["en-US", "es-US"] is declared in <code>localeCombinations</code> and the device specifies this pair as the current locale setting, Alexa primarily operates in English for the U.S. but can understand and respond to utterances in Spanish for the U.S., without requiring the device to update the locale setting.</li>
+</ul>
+<p>By default, <code>localeCombinations</code> is a list of the following combinations, which are also the supported combinations as of 2021-02-02. It is possible for the default value to be different from the list of supported combinations in the future. For updates to the supported combinations, see the <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations">Alexa Voice Service documentation</a>.</p>
+<ul>
+<li>["en-US", "es-US"]</li>
+<li>["es-US", "en-US"]</li>
+<li>["en-IN", "hi-IN"]</li>
+<li>["hi-IN", "en-IN"]</li>
+<li>["en-CA", "fr-CA"]</li>
+<li>["fr-CA", "en-CA"]</li>
+<li>["en-US", "es-ES"]</li>
+<li>["es-ES", "en-US"]</li>
+<li>["en-US", "de-DE"]</li>
+<li>["de-DE", "en-US"]</li>
+<li>["en-US", "fr-FR"]</li>
+<li>["fr-FR", "en-US"]</li>
+<li>["en-US", "it-IT"]</li>
+<li>["it-IT", "en-US"]</li>
+<li>["en-US", "ja-JP"]</li>
+<li>["ja-JP", "en-US"]</li>
+</ul>
+<p>When a device operates in multi-locale mode, an application can select any locale pair in the list above as the locale setting if the following
+  conditions are met:</p>
+<ul>
+<li>The device's primary locale setting is the first locale in the selected pair. </li>
+<li>The device also supports the secondary locale in the pair.</li>
+<li>The pair is specified in <code>localeCombinations</code>.</li>
+</ul>
+<p><strong>Note:</strong> Dynamic Language Switching is only available in online mode. </p>
+<h2 id="set-up-alexa-for-the-user">Set up Alexa for the user</h2>
+<h3 id="authorize-the-device-with-authorization">Authorize the device with Authorization</h3>
+<p>In order to make requests to Alexa, your application requires a Login with Amazon (LWA) access token. The access token grants the device access to Alexa on behalf of the signed-in user. As part of the user sign-in experience for your application, obtain access tokens for Alexa and provide them to the Engine as outlined in the <a href="../core/AUTHORIZATION/"><code>Alexa Auto SDK Authorization</code></a>.</p>
+<h3 id="start-the-out-of-box-experience-with-devicesetup">Start the out-of-box experience with DeviceSetup</h3>
+<blockquote>
+<p><strong>Note:</strong> This feature requires Amazon to allowlist your device. For help, <a href="../../NEED_HELP/#requesting-additional-functionality">contact your Amazon Solutions Architect or partner manager</a>.</p>
+</blockquote>
+<p>After the user signs in to your application during or after the out-of-box experience, the application starts the Engine and publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/DeviceSetup/index.html#setupcompleted"><code>DeviceSetup.SetupCompleted</code> message</a> to notify Alexa that the setup is complete. The Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/DeviceSetup/index.html#setupcompletedresponse"><code>DeviceSetup.SetupCompletedResponse</code></a> to your application to indicate Alexa was notified successfully. In to the <code>SetupCompleted</code> event, Alexa starts an onboarding experience including a short first-time conversation with the user. </p>
+<p>Because <code>SetupCompleted</code> triggers an onboarding experience, do not publish the message if the signed-in user has already seen the experience. The onboarding experience is for first-time users only and might differ for returning users.</p>
+<blockquote>
+<p><strong>Note:</strong> Do not publish the <code>SetupCompleted</code> message if user is in <a href="../connectivity/README.MD">Connectivity Mode</a> or Preview Mode or if the user has disabled handsfree listening. Publishing <code>SetupCompleted</code> in these conditions causes undesireable user experience.</p>
+</blockquote>
+<h3 id="update-device-settings-with-propertymanager">Update Device Settings with PropertyManager</h3>
+<p>After starting the Engine, use the <code>PropertyManager</code> to update any Alexa properties that you need to keep in sync at startup. See <a href="../core/RUNTIME_PROPERTIES/">Alexa Auto SDK Property Manager</a> for details.</p>
+<h2 id="provide-user-speech-input-to-alexa-with-speechrecognizer">Provide user speech input to Alexa with SpeechRecognizer <a name="speechRecognizer"></a></h2>
+<p>At startup time, the <code>SpeechRecognizer</code> component in the Engine <a href="../core/AUDIO/">opens an audio input channel</a> of type <code>VOICE</code> for the application to provide the user speech to Alexa. The application subscribes to the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioInput/index.html#startaudioinput"><code>AudioInput.StartAudioInput</code></a> and <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioInput/index.html#stopaudioinput"><code>AudioInput.StopAudioInput</code></a> messages as outlined in <a href="../core/AUDIO/">Alexa Auto SDK Audio Channels</a>. When the Engine expects to receive audio from the application, it prompts the application by publishing a <code>StartAudioInput</code> message with <code>audioType</code> <code>VOICE</code>. The application provides the voice audio input until the Engine publishes a <code>StopAudioInput</code> message.</p>
+<p>The user decides when to speak to Alexa by invoking her with a tap-to-talk GUI button press, a push-to-talk physical button press, or—in vehicles supporting voice-initiated listening—an "Alexa" utterance. </p>
+<h3 id="invoke-alexa-with-tap-and-release">Invoke Alexa with tap-and-release</h3>
+<p>For button press-and-release Alexa invocation, the application publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#startcapture"><code>SpeechRecognizer.StartCapture</code> message</a> with <code>initiator</code> <code>TAP_TO_TALK</code> to tell the Engine that the user pressed the Alexa invocation button and wants to speak to Alexa. When requested, the application provides audio to the Engine until Alexa detects the end of the user's speech. The Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#endofspeechdetected"><code>SpeechRecognizer.EndOfSpeechDetected</code> message</a> to the application and requests the application to stop providing audio if no other Engine components require it.</p>
+<h3 id="invoke-alexa-with-press-and-hold">Invoke Alexa with press-and-hold</h3>
+<p>For button press-and-hold Alexa invocation, the application publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#startcapture"><code>SpeechRecognizer.StartCapture</code> message</a> with <code>initiator</code> <code>HOLD_TO_TALK</code> to tell the Engine that the user is holding down the Alexa invocation button and wants to speak to Alexa until releasing the button. When requested, the application provides audio to the Engine. When the user finishes speaking and releases the button, the application notifies the Engine by publishing the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#stopcapture"><code>SpeechRecognizer.StopCapture</code> message</a>, and the Engine requests the application to stop providing audio if no other Engine components require it.</p>
+<h3 id="invoke-alexa-with-voice-using-amazonlite-wake-word-engine">Invoke Alexa with voice using Amazonlite wake word engine</h3>
+<blockquote>
+<p><strong>Note:</strong> To use the Amazonlite wake word engine in your application, <a href="../../NEED_HELP/#requesting-additional-functionality">contact your Amazon Solutions Architect or partner manager</a>.</p>
+</blockquote>
+<p>When the application uses the <code>Amazonlite</code> Auto SDK module for wake word detection, the application notifies the Engine when the user has handsfree listening enabled (i.e., privacy mode is off) by publishing the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/PropertyManager/index.html#setproperty"><code>PropertyManager.SetProperty</code> message</a> with <code>property</code> set to <code>aace.alexa.wakewordEnabled</code> and <code>value</code> set to <code>true</code>. The Engine enables Amazonlite wake word detection and requests audio input from the application. The application provides audio to the Engine for continuous wake word detection until the application disables handsfree listening by setting the <code>aace.alexa.wakewordEnabled</code> property to <code>false</code>. After disabling Amazonlite wake word detection, the Engine requests the application to stop providing audio if there no other Engine components require it.</p>
+<p>When Amazonlite detects the "Alexa" wake word in the continuous audio stream provided by the application, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#wakeworddetected"><code>SpeechRecognizer.WakewordDetected</code> message</a> and starts an interaction similar to one triggered by tap-to-talk invocation. When Alexa detects the end of the user's speech, the Engine publishes the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#endofspeechdetected"><code>SpeechRecognizer.EndOfSpeechDetected</code> message</a> but keeps the audio input stream open for further wake word detection.</p>
+<h3 id="reduce-data-usage-with-audio-encoding">Reduce data usage with audio encoding</h3>
+<p>To save bandwidth when the Engine sends user speech to Alexa in <code>SpeechRecognizer.Recognize</code> events, you can configure the Engine to encode the audio with the <a href="https://www.opus-codec.org/docs/html_api/group__opusencoder.html">Opus audio encoding format</a> by adding the following object to your Engine configuration:</p>
+<p><div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot;: {
+       &quot;speechRecognizer&quot;: {
+           &quot;encoder&quot;: {
+                &quot;name&quot;: &quot;opus&quot;
+           }
+       }
+    }
+}
+</code></pre></div>
+When you set this configuration in your application, the Engine still expects the application to provide audio in the Linear PCM format specified in the <a href="../core/AUDIO/">Alexa Auto SDK Audio Channels</a>; the Engine internally changes the encoding to Opus prior to including the audio attachment in the <code>Recognize</code> event.</p>
+<details>
+<summary>Click to expand or collapse details— Generate the configuration programatically with the C++ factory function</summary>
+<p><br/></p>
+<p>If your application generates Engine configuration programmatically instead of using a JSON file, you can use the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aacb872514a75a1fdc3d54d17b64a2ec6"><code>aace::alexa::config::AlexaConfiguration::createSpeechRecognizerConfig</code></a> factory function to create the <code>EngineConfiguration</code> object.</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AACE/Alexa/AlexaConfiguration.h&gt;</span><span class="cp"></span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">EngineConfiguration</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">configurations</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">auto</span><span class="w"> </span><span class="n">speechRecognizerConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">alexa</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">AlexaConfiguration</span><span class="o">::</span><span class="n">createSpeechRecognizerConfig</span><span class="p">(</span><span class="s">&quot;opus&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="n">configurations</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">speechRecognizerConfig</span><span class="p">);</span><span class="w"></span>
+
+<span class="c1">// ... create other EngineConfiguration objects and add them to configurations...</span>
+
+<span class="n">m_engine</span><span class="o">-&gt;</span><span class="n">configure</span><span class="p">(</span><span class="n">configurations</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+</details>
+<p><br/></p>
+<details>
+<summary>Click to expand or collapse details— Generate the configuration programatically with the Java factory method</summary>
+<p><br/></p>
+<p>AACS is the recommended way to integrate Auto SDK for Android, so your application should provide the <code>aacs.alexa</code> configuration in the AACS configuration file. However, if your application does not use AACS, and it generates Engine configuration programmatically instead of using a JSON file, you can use the <a href="https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8d70d4b326745849824994e380d7d5f9"><code>com.amazon.aace.alexa.config.AlexaConfiguration.createSpeechRecognizerConfig</code></a> factory method to create the <code>EngineConfiguration</code> object.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">com.amazon.aace.alexa.config.AlexaConfiguration</span><span class="p">;</span>
+
+<span class="n">EngineConfifguration</span> <span class="n">speechRecognizerConfig</span> <span class="o">=</span> <span class="n">AlexaConfiguration</span><span class="p">.</span><span class="na">createSpeechRecognizerConfig</span><span class="p">(</span><span class="s">&quot;opus&quot;</span><span class="p">);</span>
+
+<span class="n">mEngine</span><span class="p">.</span><span class="na">configure</span><span class="p">(</span><span class="k">new</span> <span class="n">EngineConfiguration</span><span class="o">[]</span><span class="p">{</span>
+    <span class="c1">// ...add other EngineConfiguration objects...</span>
+    <span class="n">speechRecognizerConfig</span>
+<span class="p">});</span>
+</code></pre></div>
+</details>
+<p><br/></p>
+<h2 id="play-alexa-speech-to-the-user-with-speechsynthesizer">Play Alexa speech to the user with SpeechSynthesizer</h2>
+<p>At startup time, the <code>SpeechSynthesizer</code> component in the Engine <a href="../core/AUDIO/">opens an audio output channel</a> of type <code>TTS</code> for the application to play Alexa speech responses to the user. <code>SpeechSynthesizer</code> has no messages of its own for the application to handle because it uses the standard audio output framework specified in the <code>Core</code> module. When Alexa responds to a user request with speech, the Engine publishes an <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioOutput/index.html#prepare"><code>AudioOutput.Prepare</code> message</a> with <code>audioType</code> <code>TTS</code>. The application uses the payload of the message to open the audio stream and buffer the audio data. The application plays the audio to the user when the Engine publishes an <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioOutput/index.html#play"><code>AudioOutput.Play</code> message</a> with matching <code>token</code>.</p>
+<h2 id="track-alexa-state-changes-with-alexaclient">Track Alexa state changes with AlexaClient</h2>
+<h3 id="render-alexas-attention-state">Render Alexa's attention state</h3>
+<p>Your application can subscribe to the <code>AlexaClient.DialogStateChanged</code> message to be notified what state Alexa dialog is in (e.g., Alexa started listening to the user's speech or started speaking her response). This message helps your application render Alexa's attention state UI such as Voice Chrome and audio cues without having to derive these states by tracking your application's microphone and media player.</p>
+<p>The following diagram shows how you might use the dialog state changes to provide Alexa attention feedback during an interaction.</p>
+<details>
+<summary>Click to expand or collapse sequence diagram: Alexa invocation</summary>
+<p><img alt="TTT_interaction" src="assets/diagrams/out/complete-interaction-tap-to-talk-sequence.svg" /></p>
+</details>
+<p><br/></p>
+<h3 id="monitor-alexas-connection-status">Monitor Alexa's connection status</h3>
+<p>Your application can subscribe to the <code>AlexaClient.ConnectionStatusChanged</code> message to be notified when the status of the Engine's connection to Alexa has changed (e.g., the Engine lost connection to Alexa). You might use this information, for instance, to enable or disable certain functionality or display information to the user.</p>
+<h3 id="monitor-alexas-authorization-state">Monitor Alexa's authorization state</h3>
+<p>Your application can subscribe to the <code>AlexaClient.AuthStateChanged</code> message to be notified what state the Engine is in with respect to the user sign in. For example, the state is <code>REFRESHED</code> when the Engine has an access token.</p>
+<h2 id="display-cards-on-screen-with-templateruntime">Display cards on screen with TemplateRuntime</h2>
+<p>Alexa sends visual metadata (display card templates) for your device to display. When template information is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the information that is received from Alexa. There are two display card template types:</p>
+<ul>
+<li>The <a href="https://alexa.design/DevDocRenderTemplate">Template</a> type provides visuals associated with a user request to accompany Alexa speech.</li>
+<li>The <a href="https://amzn.to/DevDocTemplatePlayerInfo">PlayerInfo</a> type provides visuals associated with media playing through the <code>AudioPlayer</code> interface. This includes playback control buttons, which must be used with the <code>PlaybackController</code> interface.</li>
+</ul>
+<p>You can programmatically generate template runtime configuration using the <code>aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig()</code> factory method, or provide the equivalent JSON values in a configuration file.</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot; {
+        &quot;templateRuntimeCapabilityAgent&quot;: {
+            &quot;displayCardTTSFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,
+            &quot;displayCardAudioPlaybackFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,
+            &quot;displayCardAudioPlaybackStoppedPausedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;
+        }
+}
+</code></pre></div>
+<p>To implement a custom handler for GUI templates, extend the <code>TemplateRuntime</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/TemplateRuntime.h&gt;
+class MyTemplateRuntime : public aace::alexa::TemplateRuntime {
+    public:
+        void renderTemplate( const std::string&amp; payload, FocusState focusState ) override {
+        // handle rendering the template data specified in payload
+        }
+
+        void renderPlayerInfo( const std::string&amp; payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) override {
+        // handle rendering the player info data specified in payload
+        }
+};
+...
+
+// Register the platform interface with the Engine
+engine-&gt;registerPlatformInterface( std::make_shared&lt;MyTemplateRuntime&gt;() );
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.</p>
+</blockquote>
+<h2 id="stream-alexa-media-content">Stream Alexa media content</h2>
+<h3 id="play-media-with-audioplayer">Play media with AudioPlayer</h3>
+<p>When an audio media stream is received from Alexa, it is the responsibility of the platform implementation to play the stream in a platform-specific media player. The <code>aace::alexa::AudioPlayer</code> class informs the platform of the changes in player state being tracked by the Engine. This can be used to update the platform GUI, for example.</p>
+<p>To implement a custom handler for audio player output, extend the <code>AudioPlayer</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/AudioPlayer.h&gt;
+class MyAudioPlayer : public aace::alexa::AudioPlayer {
+    public:
+        void playerActivityChanged( PlayerActivity state ) override {
+            // on state change, update playback control UI
+        }
+};
+...
+
+// Register the platform interface with the Engine
+auto myAudioPlayer = std::make_shared&lt;MyAudioPlayer&gt;();
+engine-&gt;registerPlatformInterface( myAudioPlayer );
+</code></pre></div>
+<h3 id="view-media-metadata-on-screen-with-templateruntime">View media metadata on screen with TemplateRuntime</h3>
+<p>Your application subscribes to the <code>TemplateRuntime.RenderPlayerInfo</code> AASB message to receive metadata about the active media playback for you to display. See the <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html">TemplateRuntime AVS documentation</a> for details about the payload. </p>
+<h3 id="press-media-playback-control-buttons-with-playbackcontroller">Press media playback control buttons with PlaybackController</h3>
+<p>The Engine provides a platform interface <code>aace::alexa::PlaybackController</code> for the platform implementation to report on-device transport control button presses for media playing through Alexa. For example, if the user presses the on-screen pause button while listening to Amazon Music through Alexa's <code>AudioPlayer</code> interface, the platform implementation calls a <code>PlaybackController</code> method to report the button press to the Engine.</p>
+<blockquote>
+<p><strong>Note:</strong> <code>PlaybackController</code> method calls to manage <code>AudioPlayer</code>'s state or playback queue proactively report button presses or the equivalent so that Alexa can react; they do <em>not</em> report changes to the playback state that happen locally first. The Alexa cloud manages the playback queue for <code>AudioPlayer</code> content, so each <code>PlaybackController</code> method call is a request for Alexa to act on the user's local request. The result of the request will come as one or more method invocations on the <code>AudioOutput</code> associated with the channel used for <code>AudioPlayer</code>.</p>
+<p><strong>Note:</strong> If your implementation needs to stop <code>AudioPlayer</code> media in response to system events, such as audio focus transitions to audio playing outside the scope of the Auto SDK, use <code>PlaybackController</code> to notify the Engine of such changes. However, keep in mind that the expected usage of the interface does not change when it is used in this use case.</p>
+<p><strong>Note:</strong> <code>PlaybackController</code> only controls media coming from Alexa, i.e. the <code>AudioPlayer</code>. <code>PlaybackController</code> should not be used with the expectation of controlling playback for non-media Alexa audio sources like <code>SpeechSynthesizer</code> or Alexa-aware external media sources integrated with <code>ExternalMediaAdapter</code> or <code>LocalMediaSource</code>. Additionally, calling a <code>PlaybackController</code> method while audio is playing through another Alexa-aware external media source will produce unexpected results and is not recommended.</p>
+</blockquote>
+<p>Whenever Alexa plays media through <code>AudioPlayer</code>, the Engine calls the platform interface method <code>aace::alexa::TemplateRuntime::renderPlayerInfo()</code> to provide visual metadata associated with the media that your implementation should render for the end user. The payload of this method includes descriptions of GUI controls to be displayed and the state in which to display them. When the user interacts with these on-screen controls, your implementation must use the <code>PlaybackController</code> interface to report the button presses to the Engine.</p>
+<p>The table below maps the controls from the <code>renderPlayerInfo()</code> payload to the corresponding calls in <code>PlaybackController</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="left">RenderPlayerInfo control name</th>
+<th align="left">PlaybackController</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>PlaybackButton</strong></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">"PLAY_PAUSE"</td>
+<td align="left">PLAY</td>
+</tr>
+<tr>
+<td align="left">"PLAY_PAUSE"</td>
+<td align="left">PAUSE</td>
+</tr>
+<tr>
+<td align="left">"NEXT"</td>
+<td align="left">NEXT</td>
+</tr>
+<tr>
+<td align="left">"PREVIOUS"</td>
+<td align="left">PREVIOUS</td>
+</tr>
+<tr>
+<td align="left">"SKIP_FORWARD"</td>
+<td align="left">SKIP_FORWARD</td>
+</tr>
+<tr>
+<td align="left">"SKIP_BACKWARD"</td>
+<td align="left">SKIP_BACKWARD</td>
+</tr>
+<tr>
+<td align="left"><strong>PlaybackToggle</strong></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">"SHUFFLE"</td>
+<td align="left">SHUFFLE</td>
+</tr>
+<tr>
+<td align="left">"LOOP"</td>
+<td align="left">LOOP</td>
+</tr>
+<tr>
+<td align="left">"REPEAT"</td>
+<td align="left">REPEAT</td>
+</tr>
+<tr>
+<td align="left">"THUMBS_UP"</td>
+<td align="left">THUMBS_UP</td>
+</tr>
+<tr>
+<td align="left">"THUMBS_DOWN"</td>
+<td align="left">THUMBS_DOWN</td>
+</tr>
+</tbody>
+</table>
+<p>To implement a custom handler for the playback controller, extend the <code>PlaybackController</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/PlaybackController.h&gt;
+class MyPlaybackController : public aace::alexa::PlaybackController {
+    ...
+
+    void platformPlayButtonPressed() { // called by some platform event
+          buttonPressed(PlaybackButton::PLAY);
+    }          
+    ...
+
+    void platformScrubForwardGUIButtonPressed(){ //called by the platform on an available GUI button event
+        buttonPressed(PlaybackButton::SKIP_FORWARD);
+    }
+    ...
+
+    void platformShuffleGUIButtonPressed(){ //called by the platform on an available GUI toggle event
+        togglePressed(PlaybackToggle::SHUFFLE, true); //the action should send the value opposing the last playerinfo state for that toggle control
+    }
+    ...  
+};
+...
+
+// Register the platform interface with the Engine
+engine-&gt;registerPlatformInterface( std::make_shared&lt;MyPlaybackController&gt;() );
+</code></pre></div>
+<h3 id="adjust-equalizer-settings-with-equalizercontroller">Adjust equalizer settings with EqualizerController</h3>
+<p>The Equalizer Controller enables Alexa voice control of the device's audio equalizer settings, which includes making gain level adjustments to any of the supported frequency bands ("BASS", "MIDRANGE", and/or "TREBLE") using the device's onboard audio processing. </p>
+<p>The platform implementation is responsible for the following:</p>
+<ul>
+<li>Determining how each supported band affects the audio</li>
+<li>Mapping Alexa's equalizer bands to the bands supported on the device, if they do not directly correspond</li>
+<li>Scaling Alexa's level values as necessary so that each step corresponds to one decibel of amplitude gain on the device</li>
+<li>Applying equalization to only selected portions of the audio output so that Alexa's speech, alarms, etc. will not be affected</li>
+<li>Persisting settings across power cycles</li>
+</ul>
+<p>You can programmatically generate Equalizer Controller configuration with details such as supported bands, default state, and decibel adjustment range using the <code>aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig()</code> factory method, or provide the equivalent JSON values in a configuration file.</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot; {
+        &quot;equalizer&quot;: {
+            &quot;bands&quot;: {
+                &quot;BASS&quot;: true,
+                &quot;MIDRANGE&quot;: false,
+                &quot;TREBLE&quot;: true
+            },
+            &quot;defaultState&quot;: {
+                &quot;bands&quot;: {
+                    &quot;BASS&quot;: 4,
+                    &quot;TREBLE&quot;: -1
+                }
+            },
+            &quot;minLevel&quot;: -6,
+            &quot;maxLevel&quot;: 6
+        }
+    }
+}
+</code></pre></div>
+<p>// For example, 2 supported bands with amplitude gains ranging from -8dB to +8dB, each with a default of 0dB</p>
+<div class="highlight"><pre><span></span><code>auto eqConfig = aace::alexa::config::AlexaConfiguration::createEqualizerControllerConfig(
+    {EqualizerBand::BASS, EqualizerBand::TREBLE},
+    -8,
+     8,
+    { {EqualizerBand::BASS, 0}, {EqualizerBand::TREBLE, 0} } );
+engine-&gt;configure( { //other config objects..., eqConfig, ... } );
+
+...
+</code></pre></div>
+<p>To implement a custom handler for Equalizer Controller, extend the <code>EqualizerController</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/EqualizerController.h&gt;
+
+using EqualizerBand = aace::alexa::EqualizerController::EqualizerBand;
+using EqualizerBandLevel = aace::alexa::EqualizerController::EqualizerBandLevel;
+
+class MyEqualizerControllerHandler : public aace::alexa::EqualizerController {
+  public:
+    void setBandLevels( std::vector&lt;EqualizerBandLevel&gt; bandLevels ) override {
+    // Handle performing audio equalization on the device 
+    // according to the provided band dB level settings
+
+    // This invocation may come from &quot;Alexa, reset bass&quot;, 
+    // &quot;Alexa, reset my equalizer&quot;, &quot;Alexa, increase treble&quot;, etc.
+    }
+
+    std::vector&lt;EqualizerBandLevel&gt; getBandLevels() override {
+        // Return the current band level settings on the device
+        return m_currentBandLevels;
+    }
+};
+...
+
+// Register the platform interface with the Engine
+auto m_equalizerController = std::make_shared&lt;MyEqualizerControllerHandler&gt;();
+engine-&gt;registerPlatformInterface( m_equalizerController );
+
+...
+
+// If levels are adjusted using local on-device controls, call inherited methods to notify the Engine:
+
+// To set a band to an absolute gain level in decibels
+std::vector&lt;EqualizerBandLevel&gt; settings{ {EqualizerBand::BASS, 4} }; // Sets bass amplitude to +4dB
+m_equalizerController-&gt;localSetBandLevels( settings );
+
+// To make a relative adjustment to level settings
+std::vector&lt;EqualizerBandLevel&gt; adjustments{ {EqualizerBand::BASS, -2} }; // Decreases bass gain by 2dB
+m_equalizerController-&gt;localAdjustBandLevels( adjustments );
+
+// To reset gain levels to the configured defaults (usually 0dB)
+std::vector&lt;EqualizerBand&gt; bands{EqualizerBand::BASS, EqualizerBand::TREBLE}; // Resets bass and treble bands
+m_equalizerController-&gt;localResetBands( bands );
+</code></pre></div>
+<h3 id="resume-media-playback-at-startup-with-mediaplaybackrequestor">Resume media playback at startup with MediaPlaybackRequestor</h3>
+<p>Alexa Media-Resume is a feature that helps Alexa play customers’ favorite content when they start their Alexa-enabled vehicles. Media-resume simplifies the content selection and playing process for customers, removing the need for them to use dash touch buttons or to ask Alexa.
+To resume the media, Alexa auto SDK needs to send <code>RequestMediaPlayback</code> event with the Invocation reason <code>AUTOMOTIVE_STARTUP</code>. To implement a handler, extend the <code>aace::alexa::MediaPlaybackRequestor</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/MediaPlaybackRequestor.h&gt;
+class MediaPlaybackRequestorHandler : public aace::alexa::MediaPlaybackRequestor {
+    public:
+    void mediaPlaybackResponse(MediaPlaybackRequestStatus mediaPlaybackRequestStatus) override {
+        //Handle the status change
+    }
+};
+...
+
+// Register the platform interface with the Engine
+engine-&gt;registerPlatformInterface( std::make_shared&lt;MediaPlaybackRequestorHandler&gt;());
+</code></pre></div>
+<p><code>requestMediaPlayback</code> is the API to send the event to the cloud. This API needs <code>InvocationReason</code> and <code>elapsedBootTime</code> as input parameters.</p>
+<p><code>mediaPlaybackResponse</code> callback receives the status of the <code>requestMediaPlayback</code> API call asynchronously.</p>
+<p><code>InvocationReason</code> enum indicates the invocation reason for calling the event. <code>AUTOMOTIVE_STARTUP</code> represents a situation where platform automatically calls <code>requestMediaPlayback</code> API to automatically resume the media after infotainment system reboot. <code>EXPLICIT_USER_ACTION</code> represents resuming the media after explicit driver action by pressing the button or switch. Music resuming on <code>EXPLICIT_USER_ACTION</code> is not yet supported and this will be enabled in the future. Please check with your partner manager before using this action.</p>
+<p><code>MediaPlaybackRequestStatus</code> enum indicate the status of the <code>requestMediaPlayback</code> API call. <code>SUCCESS</code> means <code>RequestMediaPlayback</code> event is successfully reported to the cloud. <code>FAILED_CAN_RETRY</code> means <code>requestMediaPlayback</code> API call can not be processed because Alexa Auto SDK is not in the connected state but platform implementation can retry after some time. <code>FAILED_TIMEOUT</code> means threshold time is crossed and media can not be resumed now. Driver can play media by making a voice request. <code>ERROR</code> means API could not be called successfully and media can not be resumed.</p>
+<p>This feature needs following configuration. Please contact to your partner manager for finalizing the threshold numbers.
+<div class="highlight"><pre><span></span><code>&quot;aace.alexa&quot;: {
+    &quot;requestMediaPlayback&quot;: {
+      &quot;mediaResumeThreshold&quot;: 30000
+    }
+}
+</code></pre></div>
+<code>mediaResumeThreshold</code> is the maximum time in milliseconds to receive the <code>requestMediaPlayback</code> API call from the platform implementation. Platform implementation should consider their boot time, time to initialize alexa and get connected to send the <code>RequestMediaPlayback</code> event successfully. Platform team and partner manager should try to keep this time minimum for the better user experience. Delayed media resume can surprise driver and result in driver distraction.</p>
+<blockquote>
+<p><strong>Note:</strong> This feature assumes that client platform maintains the media sessions and request individual media applications to resume playback if that media application was active and playing before the device shuts down.</p>
+<p><strong>Note:</strong> <code>requestMediaPlayback</code> API call expects a elapsed boot time i.e. number of milliseconds elapsed from the device boot up. This feature assumes that client platform provides the correct value using their proprietary methods. The <code>mediaResumeThreshold</code> value and <code>elapsedBootTime</code> value are compared together for the guardrail condition.</p>
+</blockquote>
+<h3 id="enable-audio-ducking-for-alexa-media-content">Enable audio ducking for Alexa media content</h3>
+<p>Your application can configure the Engine to enable audio ducking for media that plays through <code>AudioPlayer</code>. See <a href="../core/AUDIO/#enable-music-ducking">Alexa Auto SDK Audio Channels</a> for details.</p>
+<h2 id="control-local-media-with-localmediasoure">Control local media with LocalMediaSoure</h2>
+<p>The <code>LocalMediaSource</code> interface allows the platform to register a local media source by type (<code>BLUETOOTH</code>, <code>USB</code>, <code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SATELLITE_RADIO</code>, <code>LINE_IN</code>, <code>COMPACT_DISC</code>, <code>SIRIUS_XM</code>, <code>DAB</code>, and <code>DEFAULT</code>). Registering a local media source allows playback control of that source via Alexa (e.g. "Alexa, play the CD player"). It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").</p>
+<p><code>DEFAULT</code> media source is a generic media source that can be used for controlling any local media source on the OEM infotainment system. It is recommended to use <code>DEFAULT</code> media source for all local media except Alexa music, MACC-supported deep linked media players, and other registered Local Media Sources. <code>DEFAULT</code> media player can not be launched by name like "Alexa, Play CD player" but it can be used to control playback actions reported in the <a href="#reporting-playback-state"><code>supportedOperations</code></a>. For example, "Alexa, play" resumes the default player playback as long a the DEFAULT source is in <a href="#reporting-playback-events">focus</a>.</p>
+<p>The following is an example of registering a CD player local media source using type <code>Source.COMPACT_DISC</code>:</p>
+<div class="highlight"><pre><span></span><code>auto m_CDLocalMediaSource = std::make_shared&lt;MyCDLocalMediaSource&gt;( Source.COMPACT_DISC );
+engine-&gt;registerPlatformInterface( m_CDLocalMediaSource );
+</code></pre></div>
+<p>To implement a custom handler for a CD player local media source extend the <code>LocalMediaSource</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/LocalMediaSource.h&gt;
+class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
+  public:
+    MyCDLocalMediaSource( LocalMediaSource::Source source ) {
+        m_source = source;  
+        ...
+    }
+    ...
+}; 
+... 
+</code></pre></div>
+<h3 id="starting-playback-with-content-selection-by-voice">Starting Playback with Content Selection by Voice</h3>
+<p>The <code>play()</code> method is called when Alexa invokes play by <code>ContentSelector</code> type (<code>FREQUENCY</code>, <code>CHANNEL</code>, <code>PRESET</code>) for a radio local media source (<code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SIRIUS_XM</code>, <code>DAB</code>). The <code>payload</code> is a string that depends on the <code>ContentSelector</code> type and local media <code>Source</code> type (e.g., "1", "98.7 FM HD 1").</p>
+<div class="highlight"><pre><span></span><code>bool play( ContentSelector type, std::string payload, const std::string&amp; sessionId ) override {
+    // play initiation for frequency, channel, or presets
+    ...
+}
+</code></pre></div>
+<p>The table below provides details about the supported <code>ContentSelector</code> types based on <code>Source</code> type:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Source type</th>
+<th align="left">Supported content selector(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">FM</td>
+<td align="left">FREQUENCY, PRESET</td>
+</tr>
+<tr>
+<td align="left">AM</td>
+<td align="left">FREQUENCY, PRESET</td>
+</tr>
+<tr>
+<td align="left">SXM</td>
+<td align="left">CHANNEL, PRESET</td>
+</tr>
+<tr>
+<td align="left">DAB</td>
+<td align="left">CHANNEL</td>
+</tr>
+<tr>
+<td align="left">DEFAULT</td>
+<td align="left">PRESET</td>
+</tr>
+</tbody>
+</table>
+<p>The supported ranges and increments for valid frequency, preset, and channel may vary depending on the region you are in. Contact your partner manager for more detailed information.</p>
+<blockquote>
+<p><strong>Note:</strong> The <code>DAB</code> channel payload is the radio station name string. If supported, then the name string must be handled by the client's DAB implementation.</p>
+</blockquote>
+<p>The <code>play()</code> method will not be invoked if a source cannot handle the specified <code>ContentSelector</code> type.</p>
+<p>The <code>DEFAULT</code> <code>Local Media Source</code> handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (<code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SIRIUS_XM</code>) actually corresponds to the preset. The meaning of the preset in the <code>payload</code> parameter of <code>play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</code>is determined by the <code>DEFAULT</code> platform implementation and should suit the needs of the vehicle's infotainment system, i.e. when the <code>play()</code> method is called, your implementation should map the preset to a preset that makes sense for the current context.</p>
+<blockquote>
+<p><strong>Note:</strong> The <code>GlobalPreset</code> platform interface is deprecated. Use <code>DEFAULT</code> <code>LocalMediaSource</code> instead.</p>
+</blockquote>
+<h3 id="controlling-playback-by-voice">Controlling Playback by Voice</h3>
+<p>The <code>playControl()</code> method is called with a <code>PlayControlType</code>(<code>RESUME</code>, <code>PAUSE</code>, <code>STOP</code>, <code>NEXT</code>, <code>PREVIOUS</code>, <code>START_OVER</code>, <code>FAST_FORWARD</code>, <code>REWIND</code>, <code>ENABLE_REPEAT_ONE</code>, <code>ENABLE_REPEAT</code>, <code>DISABLE_REPEAT</code>, <code>ENABLE_SHUFFLE</code>, <code>DISABLE_SHUFFLE</code>, <code>FAVORITE</code>, <code>UNFAVORITE</code>) when Alexa invokes a playback control on the local media source.</p>
+<div class="highlight"><pre><span></span><code>bool playControl( PlayControlType controlType ) override {
+    // handle the control type appropriately for CD player
+    return true;
+}
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> The <code>play()</code> method is used to initiate playback with specified content selection, whereas <code>playControl(RESUME)</code> is used to play or resume the source when content is not specified or not supported. E.g. FM receives <code>play()</code> when the user requests FM with a specific frequency ("Alexa, play 98.7 FM radio"), and USB receives <code>playControl(RESUME)</code> when the user requests playback with just the source name ("Alexa, play USB").</p>
+</blockquote>
+<p>The <code>seek()</code> and <code>adjustSeek()</code> methods are invoked to seek the currently focused <code>LocalMediaSource</code>. These methods are only used by sources that are capable of seeking. <code>seek()</code> is for specifying an absolute offset, whereas <code>adjustSeek()</code> is for specifying a relative offset. </p>
+<div class="highlight"><pre><span></span><code>bool seek( long offset ) override {
+    // handle seeking CD player
+}
+...
+
+bool adjustSeek( long offset ) override {
+    // handle adjusting seek for CD player
+}
+</code></pre></div>
+<p>The <code>volumeChanged()</code> and <code>mutedStateChanged()</code> methods are invoked to change the volume and mute state of the currently focused local media player. <code>volumeChanged()</code> specifies the new volume. <code>mutedStateChanged()</code> specifies the new <code>MutedState</code>.</p>
+<div class="highlight"><pre><span></span><code>@Override
+public boolean volumeChanged( float volume ) {
+    // handle volume change
+}
+...
+
+@Override
+public boolean mutedStateChanged( MutedState state ) {
+    // handle setting mute state
+}
+...
+</code></pre></div>
+<h3 id="reporting-playback-events">Reporting Playback Events</h3>
+<p>The <code>LocalMediaSource</code> interface provides methods <code>playerEvent()</code> and <code>playerError()</code> for your implementation to report events regarding the state of the playback session managed by your local source. Even though your local source manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the  <code>playerEvent()</code> and <code>playerError()</code> calls provide important information to the Engine:</p>
+<ol>
+<li>
+<p>The Engine may use calls to these methods to synchronize the state of your local source's playback session with Alexa.</p>
+</li>
+<li>
+<p>The Engine may react to these calls according to the event name specified to update its internal view of your local source's state. Particular event names indicate if the source is focused on the system (meaning it has an active playback session) or if it is un-focused (meaning it is not in use and is brought into use only by further on-device interaction by the user or a user voice request to Alexa). The Engine uses this information to sync its internal focus management.</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th align="left">playerEvent() event name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">"PlaybackSessionStarted"</td>
+<td align="left">The local media source is switched from the inactive to active media state or a new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing).</td>
+</tr>
+<tr>
+<td align="left">"PlaybackSessionEnded"</td>
+<td align="left">The local media source is switched from the active to inactive media state or an active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus.</td>
+</tr>
+<tr>
+<td align="left">"PlaybackStarted"</td>
+<td align="left">During an active session, the local source has started to play or resumed from a paused state.</td>
+</tr>
+<tr>
+<td align="left">"PlaybackStopped"</td>
+<td align="left">During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="left">playerError() event name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">"INTERNAL_ERROR"</td>
+<td align="left">During an active session, an internal error caused playback to stop.</td>
+</tr>
+</tbody>
+</table>
+<p>Both <code>playerEvent()</code> and <code>playerError()</code> are expected to provide the appropriate sessionId.</p>
+<p>Call <code>playerEvent("PlaybackSessionStarted", sessionId)</code> to tell the Engine that the user brought the <code>LocalMediaSource</code> to the foreground with a GUI interaction. The Engine considers the source to have an active playback session, although it may or may not be playing yet. If no other Alexa media source is playing, utterances such as “Alexa, play” target this source. You must also call <code>playerEvent("PlaybackSessionStarted", sessionId)</code> when the source is brought into the foreground by a call to <code>play()</code> or <code>playControl()</code> as a result of a user voice request. Once the source starts playing, call <code>playerEvent("PlaybackStarted", sessionId)</code>.</p>
+<p>Call <code>playerEvent("PlaybackSessionEnded", sessionId)</code> to tell the Engine that the <code>LocalMediaSource</code> is no longer in the foreground, typically as a result of a GUI interaction from the user after the player is stopped. The Engine considers the source inactive or not in focus, and starting a new playback session for the source requires a further GUI interaction or user voice request to Alexa that targets the source by name.</p>
+<div class="highlight"><pre><span></span><code>class MyFMRadioLocalMediaSource : public aace::alexa::LocalMediaSource {
+...
+    // public method in source handler  
+    void setAlexaFocusForFMRadio( bool isFocused ) {  
+        ...
+        if (isFocused) {
+            ...  
+            // FM Radio begins playback independently of Alexa
+            playerEvent(&quot;PlaybackSessionStarted&quot;, m_sessionId);
+        } else {
+            ...    
+            // Notify Alexa that FM Radio is no longer the active media source on the device as a result of platform driven change
+            playerEvent(&quot;PlaybackSessionEnded&quot;, m_sessionId);
+        }
+        ...
+    }
+...    
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> Only one <code>LocalMediaSource</code> type can have Alexa focus at a time.</p>
+<p><strong>Note:</strong> <code>setFocus()</code> and <code>setFocus(bool)</code> methods are deprecated for the <code>LocalMediaSource</code> platform interface. <code>playerEvent()</code> with <code>"PlaybackSessionStarted"</code> or <code>"PlaybackSessionEnded"</code> should be used instead of <code>setFocus(true)</code> and <code>setFocus(false)</code>.</p>
+</blockquote>
+<p>Please abide by following rules related to <code>sessionId</code> in your <code>LocalMediaSource</code> integration:</p>
+<ul>
+<li>
+<p><code>sessionId</code> is a universally unique identifier (UUID) generated according to the RFC 4122 specification.</p>
+</li>
+<li>
+<p>If a media source starts because of a call to <code>play(contentSelector, payload, sessionId)</code> from the Engine, note the <code>sessionId</code> parameter and use it in any <code>playerEvent()</code> calls until the session is inactive.</p>
+</li>
+<li>
+<p>If a media source starts for any other reason (e.g. a call to <code>playControl(RESUME)</code> from the Engine, or user GUI interaction on the head unit), create a new <code>sessionId</code> and use it in any <code>playerEvent()</code> calls until the session is inactive.</p>
+</li>
+<li>
+<p>A <code>sessionId</code> is always associated with one media source playback session, so <code>USB</code>'s <code>sessionId</code> should be different than <code>COMPACT_DISC</code>'s <code>sessionId</code>.</p>
+</li>
+<li>
+<p>An individual <code>LocalMediaSource</code> should maintain the <code>sessionId</code> for the whole cycle from playback session start to playback session end.</p>
+</li>
+<li>
+<p>For any "opening" <code>playerEvent()</code> call for a particular <code>sessionId</code> (e.g. <code>"PlaybackSessionStarted"</code>, <code>"PlaybackStarted"</code>), you must report a corresponding closing call (e.g. <code>"PlaybackStopped"</code>, <code>"PlaybackSessionEnded"</code>) at the appropriate time (i.e., when the source is stopped, switched, etc.)</p>
+</li>
+</ul>
+<h3 id="reporting-playback-state">Reporting Playback State</h3>
+<p>The <code>getState()</code> method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the <code>LocalMediaSourceState</code> and returned.</p>
+<p>Many fields of the <code>LocalMediaSourceState</code> are not required for local media source players. You should omit these as noted below.</p>
+<div class="highlight"><pre><span></span><code>LocalMediaSourceState getState() override {
+    LocalMediaSourceState stateToReturn = std::make_shared&lt;LocalMediaSourceState&gt;();
+    stateToReturn.playbackState.albumName = &quot;mock albumName&quot;;
+    // fill in all required state information (see below)
+    return stateToReturn;
+}
+</code></pre></div>
+<p>The following table describes the fields comprising a <code>LocalMediaSourceState</code>, which includes two sub-components: <code>PlaybackState</code> and <code>SessionState</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="left">State</th>
+<th align="left">Type</th>
+<th align="left">Required</th>
+<th align="left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>PlaybackState</strong></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">state</td>
+<td align="left">String</td>
+<td align="left">Yes</td>
+<td align="left">"IDLE"/"STOPPED"/"PLAYING"</td>
+</tr>
+<tr>
+<td align="left">supportedOperations</td>
+<td align="left">SupportedPlaybackOperation[]</td>
+<td align="left">Yes</td>
+<td align="left">see SupportedPlaybackOperation</td>
+</tr>
+<tr>
+<td align="left">trackOffset</td>
+<td align="left">long</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">shuffleEnabled</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">repeatEnabled</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">favorites</td>
+<td align="left">Favorites</td>
+<td align="left">No</td>
+<td align="left">see Favorites</td>
+</tr>
+<tr>
+<td align="left">type</td>
+<td align="left">String</td>
+<td align="left">Yes</td>
+<td align="left">must be set to "ExternalMediaPlayerMusicItem"</td>
+</tr>
+<tr>
+<td align="left">playbackSource</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">If available else use local player name</td>
+</tr>
+<tr>
+<td align="left">playbackSourceId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">trackName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">If available else use local player name</td>
+</tr>
+<tr>
+<td align="left">trackId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">trackNumber</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">artistName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">artistId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">albumName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">albumId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">tinyURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">smallURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">mediumURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">largeURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">coverId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">mediaProvider</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">mediaType</td>
+<td align="left">MediaType</td>
+<td align="left">No</td>
+<td align="left">see MediaType</td>
+</tr>
+<tr>
+<td align="left">duration</td>
+<td align="left">long</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left"><strong>SessionsState</strong></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">endpointId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">loggedIn</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">userName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">isGuest</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">launched</td>
+<td align="left">boolean</td>
+<td align="left">Yes</td>
+<td align="left">true if the source is enabled, false otherwise</td>
+</tr>
+<tr>
+<td align="left">active</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">accessToken</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">tokenRefreshInterval</td>
+<td align="left">long</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">supportedContentSelectors</td>
+<td align="left">ContentSelector[]</td>
+<td align="left">No</td>
+<td align="left">see ContentSelector</td>
+</tr>
+<tr>
+<td align="left">spiVersion</td>
+<td align="left">String</td>
+<td align="left">Yes</td>
+<td align="left">must be "1.0"</td>
+</tr>
+</tbody>
+</table>
+<p><code>supportedOperations</code> should list the operations that the local media source supports. Below is a list of all <code>SupportedPlaybackOperation</code>:</p>
+<div class="highlight"><pre><span></span><code>LocalMediaSource::SupportedPlaybackOperation::PLAY,
+LocalMediaSource::SupportedPlaybackOperation::PAUSE,
+LocalMediaSource::SupportedPlaybackOperation::STOP,
+LocalMediaSource::SupportedPlaybackOperation::PREVIOUS,
+LocalMediaSource::SupportedPlaybackOperation::NEXT,
+LocalMediaSource::SupportedPlaybackOperation::ENABLE_SHUFFLE,
+LocalMediaSource::SupportedPlaybackOperation::DISABLE_SHUFFLE,
+LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT_ONE,
+LocalMediaSource::SupportedPlaybackOperation::ENABLE_REPEAT,
+LocalMediaSource::SupportedPlaybackOperation::DISABLE_REPEAT,
+LocalMediaSource::SupportedPlaybackOperation::SEEK,
+LocalMediaSource::SupportedPlaybackOperation::ADJUST_SEEK,
+LocalMediaSource::SupportedPlaybackOperation::FAVORITE,
+LocalMediaSource::SupportedPlaybackOperation::UNFAVORITE,
+LocalMediaSource::SupportedPlaybackOperation::FAST_FORWARD,
+LocalMediaSource::SupportedPlaybackOperation::REWIND,
+LocalMediaSource::SupportedPlaybackOperation::START_OVER
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> Currently PLAY/PAUSE/STOP are always supported for a source. Passing null allows ALL supported operations for the source.</p>
+</blockquote>
+<p><code>supportedContentSelectors</code> should list the content selection types the local source can support. Below is a table of valid pairs.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Source</th>
+<th align="left">Supportable <code>ContentSelector</code> Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>AM_RADIO</code></td>
+<td align="left"><code>PRESET</code>, <code>FREQUENCY</code></td>
+</tr>
+<tr>
+<td align="left"><code>FM_RADIO</code></td>
+<td align="left"><code>PRESET</code>, <code>FREQUENCY</code></td>
+</tr>
+<tr>
+<td align="left"><code>SIRIUS_XM</code></td>
+<td align="left"><code>PRESET</code>, <code>CHANNEL</code></td>
+</tr>
+<tr>
+<td align="left"><code>DEFAULT</code></td>
+<td align="left"><code>PRESET</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>launched</code> specifies whether the source is enabled. The player is disabled for use with Alexa when this value is false, such as when a removable source like USB is disconnected.</p>
+<h3 id="example-sequence-diagrams">Example Sequence Diagrams</h3>
+<p>The following diagrams show examples of Local Media Source usage:</p>
+<p><strong>1. Starting FM by voice</strong></p>
+<p>
+<img src="./assets/Starting_FM_By_Voice.png" border="1px">
+</p>
+
+<p><strong>2. Switching from FM to DEFAULT media source with GUI</strong></p>
+<p>
+<img src="./assets/Switching_Default_With_GUI.png" border="1px">
+</p>
+
+<p><strong>3. Switching between different DEFAULT sources</strong></p>
+<p>
+<img src="./assets/DEFAULT_to_DEFAULT_Switching.png" border="1px">
+</p>
+
+<h2 id="control-external-media-apps-with-externalmediaadapter">Control external media apps with ExternalMediaAdapter <a name="externalMediaAdapter"></a></h2>
+<p>The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:</p>
+<ul>
+<li>A media connection client to interface the EMP Adapter to the external app. AACS provides an app component called the Media App Command and Control (MACC) client that provides most of the deep-linking integration specified below. The AACS Sample App supports an example using the Media App Command and Control (MACC) client to play the Android Spotify app. </li>
+<li></li>
+<li>An embedded media app. For information about external embedded media app solutions, contact your SA or Partner Manager.</li>
+</ul>
+<blockquote>
+<p><strong>Note:</strong> If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement. </p>
+</blockquote>
+<p>When advised by your SA or Partner Manager, configure the External Media Player Adapter to the device's capabilities. See <code>aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig</code> for details on configuring the supported agent, or provide the equivalent JSON values in a configuration file.</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot;: {
+        &quot;externalMediaPlayer&quot;: {
+            &quot;agent&quot;: &quot;&lt;agent&gt;&quot;
+
+  }
+}
+</code></pre></div>
+<p>You must register and implement each ExternalMediaAdapter (along with its associated external client or library). After the engine establishes a connection to the Alexa service, you can run discovery to validate each external media application. You can report discovered external media players by calling <code>reportDiscoveredPlayers()</code> at any point during runtime. When the Alexa service recognizes the player, you will get a call to the <code>authorize()</code> method including the player's authorization status. Both the <code>reportDiscoveredPlayers()</code> method and the <code>authorize()</code> method can contain one or more players in their JSON payloads. Validating the application enables Alexa to exercise playback control over the registered source type. </p>
+<p>The <code>login()</code> and <code>logout()</code> methods inform AVS of login state changes, if applicable. If your application has the ability to handle cloud-based login and logout, you should also call the <code>loginComplete()</code> and <code>logoutComplete()</code> methods where appropriate. </p>
+<p>When the user makes an Alexa voice request (for example, "Play Spotify"), the <code>play()</code> method is invoked. This method contains various parameters, including the player id of the player to which the playback information should be routed. </p>
+<p>Whether through voice or GUI event, the <code>playControl()</code> method is called with the relevant <code>PlayControlType</code>. Similar to <code>play()</code> the control should be routed to the appropriate player.</p>
+<p>The <code>PlayControlType</code> is determined by player's <code>supportedOperations</code>, which are specified by your implementation in the return value of <code>getState()</code>. </p>
+<p>The <code>ExternalMediaAdapter</code> interface provides methods <code>playerEvent()</code> and <code>playerError()</code> for your implementation to report events regarding the state of the playback session managed by your external player. Even though your player manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the <code>playerEvent()</code> and <code>playerError()</code> calls provide important information to the Engine:</p>
+<ol>
+<li>
+<p>The Engine may use calls to these methods to synchronize the state of your player’s playback session with Alexa.</p>
+</li>
+<li>
+<p>The Engine may react to these calls according to the event name specified to update its internal view of your player’s state. Particular event names indicate if the player is focused on the system (meaning it has an active playback session) or if it is un-focused (meaning it is not in use and is brought into use only by further on-device interaction by the user or a user voice request to Alexa). The Engine uses this information to sync its internal focus management.</p>
+</li>
+</ol>
+<p>The tables below describe each supported event name and what it means to the Engine. Usage of these events depends on the particular type of player controlled by the <code>ExternalMediaAdapter</code> instance, so contact your Solutions Architect (SA) or Partner Manager for guidance regarding supported embedded and external app solutions.</p>
+<table>
+<thead>
+<tr>
+<th align="left">playerEvent() event name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">"PlaybackSessionStarted"</td>
+<td align="left">A new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing).</td>
+</tr>
+<tr>
+<td align="left">"PlaybackStarted"</td>
+<td align="left">During an active session, the player has started to play or resumed from a paused state. The Engine considers the player active and in focus.</td>
+</tr>
+<tr>
+<td align="left">"TrackChanged"</td>
+<td align="left">During an active session, one track has ended and another has started. The Engine uses this primarily for state reporting.</td>
+</tr>
+<tr>
+<td align="left">"PlaybackNext"</td>
+<td align="left">During an active session, the player skipped from one track to the next track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting.</td>
+</tr>
+<tr>
+<td align="left">"PlaybackPrevious"</td>
+<td align="left">During an active session, the player skipped from one track to the previous track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting.</td>
+</tr>
+<tr>
+<td align="left">"PlayModeChanged"</td>
+<td align="left">During an active session, some user setting for the track or playback session changed, such as the favorite setting or the shuffle mode. The Engine uses this primarily for state reporting.</td>
+</tr>
+<tr>
+<td align="left">"PlaybackStopped"</td>
+<td align="left">During an active session, the player has paused or stopped, either as a result of a GUI interaction or a user voice request to Alexa. The Engine considers the player active and in focus, just not currently playing. User voice requests to resume still control the player.</td>
+</tr>
+<tr>
+<td align="left">"PlaybackSessionEnded"</td>
+<td align="left">An active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus.</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="left">playerError() event name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">"INTERNAL_ERROR"</td>
+<td align="left">Any fatal player error has occurred</td>
+</tr>
+<tr>
+<td align="left">"UNKNOWN_ERROR"</td>
+<td align="left">An unknown error occurred</td>
+</tr>
+<tr>
+<td align="left">"UNPLAYABLE_BY_AUTHORIZATION"</td>
+<td align="left">The media couldn't be played due to an unauthorized account</td>
+</tr>
+<tr>
+<td align="left">"UNPLAYABLE_BY_STREAM_CONCURRENCY"</td>
+<td align="left">The media couldn't be played due to the number of accounts currently streaming</td>
+</tr>
+<tr>
+<td align="left">"UNPLAYABLE_BY_ACCOUNT"</td>
+<td align="left">The media couldn't be played due to the account type</td>
+</tr>
+<tr>
+<td align="left">"UNPLAYABLE_BY_REGION"</td>
+<td align="left">The media couldn't be played due to the current region</td>
+</tr>
+<tr>
+<td align="left">"UNPLAYABLE_BY_PARENTAL_CONTROL"</td>
+<td align="left">The media couldn't be played due to parental settings</td>
+</tr>
+<tr>
+<td align="left">"UNPLAYABLE_BY_SUBSCRIPTION"</td>
+<td align="left">The media couldn't be played due to the subscription type</td>
+</tr>
+<tr>
+<td align="left">"OPERATION_REJECTED_UNINTERRUPTIBLE"</td>
+<td align="left">The operation could not be performed due to non interruptible media</td>
+</tr>
+<tr>
+<td align="left">"OPERATION_REJECTED_END_OF_QUEUE"</td>
+<td align="left">The operation could not be performed due to the end of media being reached</td>
+</tr>
+<tr>
+<td align="left">"OPERATION_UNSUPPORTED"</td>
+<td align="left">The operation was not supported</td>
+</tr>
+<tr>
+<td align="left">"OPERATION_REJECTED_SKIP_LIMIT"</td>
+<td align="left">The operation failed because a skip limit was reached</td>
+</tr>
+<tr>
+<td align="left">"PLAYER_UNKNOWN"</td>
+<td align="left">An unknown player was detected</td>
+</tr>
+<tr>
+<td align="left">"PLAYER_NOT_FOUND"</td>
+<td align="left">The player was not discovered</td>
+</tr>
+<tr>
+<td align="left">"PLAYER_CONNECTION_REJECTED"</td>
+<td align="left">The connection to the player failed</td>
+</tr>
+<tr>
+<td align="left">"PLAYER_CONNECTION_TIMEOUT"</td>
+<td align="left">The connection to the player timed out</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>seek()</code> and <code>adjustSeek()</code> methods are invokable via Alexa if the currently in-focus external player supports them. <code>seek()</code> specifies an absolute offset, whereas <code>adjustSeek()</code> specifies a relative offset. </p>
+<p>The <code>volumeChanged()</code> and <code>mutedStateChanged()</code> methods are invoked to change the volume and mute state of the currently-focused external player. <code>volumeChanged()</code> specifies the new volume. <code>mutedStateChanged()</code> specifies the new <code>MutedState</code>.</p>
+<p>The <code>getState()</code> method is called to synchronize the external player's state with the cloud. This method is used to maintain correct state during startup, and after every Alexa request. </p>
+<p>You construct the <code>ExternalMediaAdapterState</code> object using the data taken from the media app connection client or embedded player app (associated via <code>localPlayerId</code>) and return the state information.</p>
+<p>The following table describes the fields comprising a <code>ExternalMediaAdapterState</code>, which includes two sub-components: <code>PlaybackState</code>, and <code>SessionState</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="left">State</th>
+<th align="left">Type</th>
+<th align="left">Required</th>
+<th align="left">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>PlaybackState</strong></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">state</td>
+<td align="left">String</td>
+<td align="left">Yes</td>
+<td align="left">"IDLE"/"STOPPED"/"PLAYING"</td>
+</tr>
+<tr>
+<td align="left">supportedOperations</td>
+<td align="left">SupportedPlaybackOperation[]</td>
+<td align="left">Yes</td>
+<td align="left">see SupportedOperation</td>
+</tr>
+<tr>
+<td align="left">trackOffset</td>
+<td align="left">long</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">shuffleEnabled</td>
+<td align="left">boolean</td>
+<td align="left">Yes</td>
+<td align="left">report shuffle status</td>
+</tr>
+<tr>
+<td align="left">repeatEnabled</td>
+<td align="left">boolean</td>
+<td align="left">Yes</td>
+<td align="left">report repeat status</td>
+</tr>
+<tr>
+<td align="left">favorites</td>
+<td align="left">Favorites</td>
+<td align="left">No</td>
+<td align="left">see Favorites</td>
+</tr>
+<tr>
+<td align="left">type</td>
+<td align="left">String</td>
+<td align="left">Yes</td>
+<td align="left">must be set as "ExternalMediaPlayerMusicItem"</td>
+</tr>
+<tr>
+<td align="left">playbackSource</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">If available else use local player name</td>
+</tr>
+<tr>
+<td align="left">playbackSourceId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">trackName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">If available else use local player name</td>
+</tr>
+<tr>
+<td align="left">trackId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">trackNumber</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">artistName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">artistId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">albumName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">albumId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">tinyURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">smallURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">mediumURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">largeURL</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">coverId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">mediaProvider</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left">mediaType</td>
+<td align="left">MediaType</td>
+<td align="left">Yes</td>
+<td align="left">see MediaType</td>
+</tr>
+<tr>
+<td align="left">duration</td>
+<td align="left">long</td>
+<td align="left">No</td>
+<td align="left">optional</td>
+</tr>
+<tr>
+<td align="left"><strong>SessionsState</strong></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left">endpointId</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">loggedIn</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">userName</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">isGuest</td>
+<td align="left">boolean</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">launched</td>
+<td align="left">boolean</td>
+<td align="left">Yes</td>
+<td align="left">true if the source is enabled, false otherwise</td>
+</tr>
+<tr>
+<td align="left">active</td>
+<td align="left">boolean</td>
+<td align="left">Yes</td>
+<td align="left">true if the application is in an active state</td>
+</tr>
+<tr>
+<td align="left">accessToken</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">tokenRefreshInterval</td>
+<td align="left">long</td>
+<td align="left">No</td>
+<td align="left">empty</td>
+</tr>
+<tr>
+<td align="left">playerCookie</td>
+<td align="left">String</td>
+<td align="left">No</td>
+<td align="left">A player may declare arbitrary information for itself</td>
+</tr>
+<tr>
+<td align="left">spiVersion</td>
+<td align="left">String</td>
+<td align="left">Yes</td>
+<td align="left">must be set as "1.0"</td>
+</tr>
+</tbody>
+</table>
+<p><code>supportedOperations</code> should be a list of the operations that the external media adapter supports. Below is a list of all possible <code>supportedOperations</code>.</p>
+<div class="highlight"><pre><span></span><code>SupportedPlaybackOperation.PLAY,
+SupportedPlaybackOperation.PAUSE,
+SupportedPlaybackOperation.STOP,
+SupportedPlaybackOperation.PREVIOUS,
+SupportedPlaybackOperation.NEXT,
+SupportedPlaybackOperation.ENABLE_SHUFFLE,
+SupportedPlaybackOperation.DISABLE_SHUFFLE,
+SupportedPlaybackOperation.ENABLE_REPEAT_ONE,
+SupportedPlaybackOperation.ENABLE_REPEAT,
+SupportedPlaybackOperation.DISABLE_REPEAT,
+SupportedPlaybackOperation.SEEK,
+SupportedPlaybackOperation.ADJUST_SEEK,
+SupportedPlaybackOperation.FAVORITE,
+SupportedPlaybackOperation.UNFAVORITE,
+SupportedPlaybackOperation.FAST_FORWARD,
+SupportedPlaybackOperation.REWIND,
+SupportedPlaybackOperation.START_OVER
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> Currently PLAY/PAUSE/STOP will always be supported for a source. Passing null will allow ALL supported operations for the source. </p>
+</blockquote>
+<h2 id="control-volume-with-alexaspeaker">Control volume with AlexaSpeaker</h2>
+<p>The Alexa service keeps track of two device volume types: <code>ALEXA_VOLUME</code> and <code>ALERTS_VOLUME</code>. The <code>aace::alexa::AlexaSpeaker</code> class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI if applicable. </p>
+<p><code>SpeakerManager</code> is a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".</p>
+<p>You can programmatically generate speaker manager configuration using the <code>aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig()</code> factory method, or provide the equivalent JSON values in a configuration file.
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot;: {
+        &quot;speakerManager&quot;: {
+            &quot;enabled&quot;: false
+        }
+    }
+}
+</code></pre></div></p>
+<h3 id="set-a-custom-volume-range">Set a custom volume range</h3>
+<p>You can use a custom volume control to support an Alexa device's native input volume range. By default, Alexa supports voice utterances that specify volume values between 0 and 10, but some devices may support a different range (i.e. 0 to 100). By placing on Amazon's allow list your Alexa device's volume range for your target platform, you can specify input volume levels per your device's range. Your device's input volume range is then mapped appropriately to the Alexa volume range.</p>
+<p>Contact your Alexa Auto Solution Architect (SA) for help with allow lists. Placing a device on the allow list requires the following parameters:</p>
+<ul>
+<li>DeviceTypeID: <YOUR_DEVICE_TYPE_ID></li>
+<li>Min: <YOUR_MIN_VOLUME_VALUE></li>
+<li>Max: <YOUR_MAX_VOLUME_VALUE></li>
+</ul>
+<p>This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by <code>AudioOutput</code> and <code>AlexaSpeaker</code> and map these values to the correct range in your implementation.</p>
+<h2 id="manage-timers-alarms-and-reminders-with-alerts">Manage timers, alarms, and reminders with Alerts</h2>
+<p>When an alert is received from Alexa, it is the responsibility of the platform implementation to play the alert sounds in a platform-specific media player. See the <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/alerts.html">AVS Alerts interface documentation</a> for more information about alerts. The state of the alert is also made available for the platform to react to. The playback is handled by whichever audio channel is assigned to the <code>ALERT</code> type.</p>
+<p>To implement a custom handler for alerts, extend the <code>Alerts</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/Alerts.h&gt;
+class MyAlerts : public aace::alexa::Alerts {
+    public:
+        void MyAlerts::alertStateChanged( const std::string&amp; alertToken, AlertState state, const std::string&amp; reason ) override {
+        //handle the alert state change
+        }
+
+        void MyAlerts::alertCreated( const std::string&amp; alertToken, const std::string&amp; detailedInfo ) override {
+        //handle the alert detailed info when alert is created (optional)
+            /*
+              * JSON string detailedInfo :
+              * {   
+              *  &quot;time&quot; : &lt;String&gt;
+              *  &quot;type&quot; : &lt;String&gt;
+              *  &quot;label&quot; : &lt;String&gt; 
+              * }
+              */
+        }
+
+        void MyAlerts::alertDeleted( const std::string&amp; alertToken ) override {
+            //handle the alert when alert is deleted (optional)
+        }
+};
+...
+
+// Register the platform interface with the Engine
+auto myAlertsMediaPlayer = std::make_shared&lt;MyMediaPlayer&gt;(...);
+auto myAlertsSpeaker = std::make_shared&lt;MySpeaker&gt;(...);
+auto myAlerts = std::make_shared&lt;MyAlerts&gt;(myAudioPlayerMediaPlayer, myAudioPlayerSpeaker);
+engine-&gt;registerPlatformInterface( myAlerts );
+</code></pre></div>
+<h2 id="render-notification-indicators-with-notifications">Render notification indicators with Notifications</h2>
+<p>It is the responsibility of the platform implementation to provide a visual indication to the user when notifications (for example, package shipment notifications, notifications from skills, etc.) are available from Alexa. See the <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/notifications.html">AVS Notifications interface documentation</a> for more information about notifications. The Engine uses the registered Notifications implementation to notify you when a notification indicator should be displayed or removed. It does not give any information about the notifications. Audio playback for the notification is handled by whichever audio channel is assigned to the <code>NOTIFICATION</code> type.</p>
+<p>To implement a custom handler for Notifications extend the <code>Notifications</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/Notifications.h&gt;
+using IndicatorState = aace::alexa::Notifications::IndicatorState;
+class MyNotificationsHandler : public aace::alexa::Notifications {
+
+  public:
+    void setIndicator( IndicatorState state ) override {
+        // set your notifications indicator!
+    }
+
+};
+...
+
+// Register the platform interface with the Engine
+auto m_notificationsHandler = std::make_shared&lt;MyNotificationsHandler&gt;();
+engine-&gt;registerPlatformInterface(m_notificationsHandler);
+</code></pre></div>
+<h2 id="block-notifications-with-donotdisturb">Block notifications with DoNotDisturb</h2>
+<p>The DoNotDisturb (DND) interface allows users to block all incoming notifications, announcements, and calls to their devices, and to set daily recurring schedules that turn DND off and on.  For details, see the <a href="https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html">DND Interface documentation</a>. The Engine uses the registered DND implementation to notify the client when DND has been set or unset. A user's voice request to change the DND state triggers audio playback, but no audio playback occurs when a user sets the DND state using the touch screen.</p>
+<p>To implement a custom handler for DND extend the <code>DoNotDisturb</code> class:</p>
+<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/DoNotDisturb&gt;
+
+class MyDoNotDisturbHandler : public aace::alexa::DoNotDisturb {
+
+  public:
+    void setDoNotDisturb( bool doNotDisturb ) override {
+        // set your DoNotDisturb indicator
+    }
+    // on user GUI setting change
+    ...
+        bool doNotDisturb = userSetState;
+        doNotDisturbChanged(doNotDisturb);
+    ...
+
+};
+...
+
+// Register the platform interface with the Engine
+auto m_doNotDisturbHandler = std::make_shared&lt;MyDoNotDisturbHandler&gt;();
+engine-&gt;registerPlatformInterface(m_doNotDisturbHandler);
+</code></pre></div>
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../address-book/aasb-docs/AddressBook/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Address Book" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Address Book
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="aasb-docs/Alerts/" class="md-footer__link md-footer__link--next" aria-label="Next: Alerts" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Alerts
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2016 - 2021 Amazon
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="alexa_settings_label" tools:ignore="MissingTranslation">Alexa</string>
+    <string name="setting_voice_assistance_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon]の設定</string>
+    <string name="setting_voice_assistance_alexa" tools:ignore="MissingTranslation">AmazonAlexaの設定</string>
+    <string name="setting_voice_assistance_enable_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon]をオンにする</string>
+    <string name="setting_voice_assistance_enable_alexa" tools:ignore="MissingTranslation">Amazon Alexaをオンにする</string>
+    <string name="setting_voice_assistance_wake_word" tools:ignore="MissingTranslation">ウェイクワード</string>
+    <string name="setting_voice_assistance_wake_word_summary" tools:ignore="MissingTranslation">音声アシスタントを使うには、「[Brandon]」または「アレクサ」と言ってください</string>
+    <string name="setting_voice_assistance_sounds_request_start_summary" tools:ignore="MissingTranslation">[Brandon]とAlexaが聞き取りを開始するときにサウンドで知らせます。</string>
+    <string name="setting_voice_assistance_sounds_request_end_summary" tools:ignore="MissingTranslation">[Brandon]とAlexaが聞き取りを終了するときにサウンドで知らせます。</string>
+    <string name="setting_voice_assistance_language" tools:ignore="MissingTranslation">言語</string>
+    <string name="setting_voice_assistance_setting_push_to_talk" tools:ignore="MissingTranslation">プッシュ・トゥ・トーク</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_alexa" tools:ignore="MissingTranslation">Amazon Alexa</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
+    <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">車の位置情報へのアクセスを[Brandon]とAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
+    <string name="setting_alexa_signin" tools:ignore="MissingTranslation">サインイン</string>
+    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexaハンズフリー</string>
+    <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">リクエスト開始トーン</string>
+    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Alexaによる聞き取りの開始をサウンドで知らせます。</string>
+    <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">リクエスト終了トーン</string>
+    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Alexaによる聞き取りの終了をサウンドで知らせます。</string>
+    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">「アレクサ」と言うと、Alexaが返事をします。</string>
+    <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">位置情報の共有</string>
+    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">車の位置情報へのアクセスをAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
+    <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">おやすみモード</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">通知をオフにする</string>
+    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">コミュニケーション</string>
+    <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">サウンド</string>
+    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexaの言語</string>
+    <string name="setting_alexa_signout" tools:ignore="MissingTranslation">サインアウト</string>
+    <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Alexaをオフにする</string>
+    <string name="setting_aacs" tools:ignore="MissingTranslation">Alexa Autoクライアントサービス</string>
+    <string name="settings_alexa" tools:ignore="MissingTranslation">設定</string>
+    <string name="logout" tools:ignore="MissingTranslation">サインアウトしますか?</string>
+    <string name="disable_alexa" tools:ignore="MissingTranslation">Alexaをオフにしますか?</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">Amazon Alexaからサインアウトしますか?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">サインアウト</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">キャンセル</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">オフにする</string>
+    <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">今後はこの車でAlexaを使用できなくなります。</string>
+    <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">基本設定の上書き</string>
+    <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">これを選択すると、以下のすべての設定が適用されます。</string>
+    <string name="preference_category_alexa_device" tools:ignore="MissingTranslation">Alexaデバイス</string>
+    <string name="preference_avsdevice_clientid" tools:ignore="MissingTranslation">クライアントID</string>
+    <string name="preference_avsdevice_productid" tools:ignore="MissingTranslation">製品ID</string>
+    <string name="preference_avsdevice_dsn" tools:ignore="MissingTranslation">デバイスのシリアル番号</string>
+    <string name="preference_avsdevice_manufacturer" tools:ignore="MissingTranslation">製造者</string>
+    <string name="preference_category_aacs_service" tools:ignore="MissingTranslation">AACS一般</string>
+    <string name="preference_aacs_startonboot" tools:ignore="MissingTranslation">デバイス起動時にAACSを開始</string>
+    <string name="preference_category_aacs_defaults" tools:ignore="MissingTranslation">AACSのデフォルト設定</string>
+    <string name="preference_aacs_use_aacs_audio_input" tools:ignore="MissingTranslation">AACSオーディオ入力を使用</string>
+    <string name="preference_category_aacs_control" tools:ignore="MissingTranslation">AACSを操作</string>
+    <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">AACSを起動して設定を適用</string>
+    <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">AACSをシャットダウン</string>
+    <string name="preference_aacs_start" tools:ignore="MissingTranslation">AACSを開始</string>
+</resources>

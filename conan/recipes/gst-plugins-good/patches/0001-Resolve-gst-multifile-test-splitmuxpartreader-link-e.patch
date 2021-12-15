@@ -1,0 +1,31 @@
+From 039ffd2117b306fde263eb9f22477be15724a756 Mon Sep 17 00:00:00 2001
+From: Patrick Tsai <yingtsai@amazon.com>
+Date: Tue, 12 Oct 2021 18:57:53 -0700
+Subject: [PATCH] Resolve gst/multifile/test-splitmuxpartreader link error
+
+gstdatetime.c:(.text+0x1876): undefined reference to `pow'
+---
+ gst/multifile/meson.build | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/gst/multifile/meson.build b/gst/multifile/meson.build
+index b7215f3..e194517 100644
+--- a/gst/multifile/meson.build
++++ b/gst/multifile/meson.build
+@@ -31,10 +31,12 @@ test_splitmuxpartreader_sources = [
+   'patternspec.c',
+ ]
+ 
++m_dep = cc.find_library('m', required : false)
++
+ executable('test-splitmuxpartreader',
+   test_splitmuxpartreader_sources,
+   c_args : gst_plugins_good_args,
+   include_directories : [configinc, libsinc],
+-  dependencies : [gsttag_dep, gstbase_dep],
++  dependencies : [gsttag_dep, gstbase_dep, m_dep],
+   install : false,
+ )
+-- 
+2.25.1
+

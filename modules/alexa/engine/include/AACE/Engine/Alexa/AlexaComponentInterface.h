@@ -38,7 +38,8 @@
 #include <AVSCommon/Utils/Metrics/MetricRecorderInterface.h>
 #include <ContextManager/ContextManager.h>
 #include <Endpoints/EndpointBuilder.h>
-#include <RegistrationManager/RegistrationManager.h>
+#include <RegistrationManager/CustomerDataManagerInterface.h>
+#include <RegistrationManager/RegistrationManagerInterface.h>
 #include <Settings/DeviceSettingsManager.h>
 #include <Settings/Storage/DeviceSettingStorageInterface.h>
 #include <SpeechSynthesizer/SpeechSynthesizer.h>
@@ -69,7 +70,8 @@ public:
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface>
     getConnectionManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> getContextManager() = 0;
-    virtual std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> getCustomerDataManager() = 0;
+    virtual std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface>
+    getCustomerDataManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
     getDefaultEndpointCapabilitiesRegistrar() = 0;
     virtual std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> getDeviceInfo() = 0;

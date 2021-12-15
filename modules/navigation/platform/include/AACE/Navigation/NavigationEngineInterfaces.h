@@ -21,6 +21,8 @@ namespace navigation {
 
 class NavigationEngineInterface {
 public:
+    virtual ~NavigationEngineInterface() = default;
+
     enum class EventName {
         /*
          * Navigation was started. Send in response to startNavigation() directive.

@@ -46,6 +46,7 @@ public:
     virtual void networkInfoChanged(NetworkStatus status, int wifiSignalStrength) override;
 
     bool setNetworkInterface(const std::string& networkInterface);
+    bool setNetworkHttpProxyHeader(const std::string& headers);
 
 private:
     std::unordered_set<std::shared_ptr<NetworkInfoObserver>> m_observers;

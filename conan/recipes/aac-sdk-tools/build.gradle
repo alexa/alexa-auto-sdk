@@ -1,0 +1,66 @@
+// For generateAbiFiltersDeploy()
+//apply from: '${project.rootDir}/abifilter.gradle'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.0'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        minSdkVersion 22
+        targetSdkVersion 26
+        versionCode 1
+        versionName '3.2'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+            jniDebuggable true
+        }
+    }
+    sourceSets {
+        main {
+            setRoot 'android/src/main'
+        }
+    }
+    libraryVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = 'aac-module.aar'
+        }
+    }
+    dependencies {
+        compileOnly fileTree( dir: 'android/libs', include: ['*.aar'] )
+    }
+
+    // Disable stripping to prevent known NDK r20 issues:
+    // - https://github.com/android/ndk/issues/843
+    // - https://github.com/android/ndk/issues/1148
+    packagingOptions {
+        doNotStrip '**/*'
+    }
+
+    ndkPath "${System.env.ANDROID_NDK_ROOT}"
+}
+

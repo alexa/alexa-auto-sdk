@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="contacts_permission_consent_title">Call your contacts with Alexa</string>
+    <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Set up voice calling</string>
+    <string name="contacts_permission_consent_body">Allow contacts on %1$s to be uploaded to the Amazon service.</string>
+    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Call your phone contacts hands-free with [Acme Brandon] and Amazon Alexa. Your contacts on %1$s will be uploaded to the Amazon service.</string>
+    <string name="contacts_upload_consent_title">Contacts</string>
+    <string name="contacts_upload_consent_summary">To enable calling contacts with Alexa, contacts on this phone will be uploaded to the Amazon service.</string>
+    <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Upload contacts to the Amazon service to call \&amp; message them by name</string>
+    <string name="contacts_consent_yes">ENABLE</string>
+    <string name="contacts_consent_yes_with_alexa_custom_assistant">Use contacts</string>
+    <string name="contacts_consent_skip">SKIP</string>
+    <string name="comms_permission_status">Contacts %1$s</string>
+    <string name="comms_permission_enabled">enabled</string>
+    <string name="comms_permission_disabled">disabled</string>
+    <string name="comms_sample_utterance">\"Alexa, call Sam\"</string>
+    <string name="sms_consent_title">SMS messages</string>
+    <string name="sms_consent_summary">To enable SMS messaging with Alexa, SMS messages on this phone wil be uploaded to the Amazon cloud.</string>
+    <string name="sms_consent_summary_with_alexa_custom_assistant">Upload SMS messages to the Amazon service to have them read to you</string>
+    <string name="pair_new_device">Pair new</string>
+</resources>

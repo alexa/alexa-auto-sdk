@@ -1,0 +1,46 @@
+topic: AlexaConnectivity
+namespace: aasb.message.connectivity.alexaConnectivity
+path: Connectivity/AlexaConnectivity
+
+messages:
+  - action: GetConnectivityState
+    direction: outgoing
+    desc: Retrieve the connectivity state from the platform implementation.
+    reply:
+      - name: connectivityState
+        desc: A string representing the connectivity state in structured JSON format.
+
+  - action: ConnectivityStateChange
+    direction: incoming
+    desc: Notifies the Engine of a change in the connectivity state. The Engine calls getConnectivityState to retrieve the the connectivity state and communicate any changes to Alexa.
+    reply:
+      - name: success
+        type: bool
+        desc: Returns true if connectivity state was processed successfully, false otherwise.
+
+  - action: GetIdentifier
+    direction: outgoing
+    desc: Retrieve the identifier from the platform implementation.
+    reply:
+      - name: identifier
+        desc: A string representing the identifier.
+
+  - action: SendConnectivityEvent
+    direction: incoming
+    desc: Notifies an event in the connectivity to the Engine.
+    payload:
+      - name: event
+        desc: The stringified JSON containing the event.
+    reply:
+      - name: statusCode
+        type: StatusCode
+        desc: Represents the delivery status of event.
+
+types:
+  - name: StatusCode
+    type: enum
+    values:
+      - name: SUCCESS
+        desc: The event was sent to AVS successfully.
+      - name: FAIL
+        desc: The event was not sent to AVS successfully.

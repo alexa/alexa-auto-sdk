@@ -1,0 +1,49 @@
+topic: MediaPlaybackRequestor
+namespace: aasb.message.alexa.mediaPlaybackRequestor
+path: Alexa/MediaPlaybackRequestor
+
+messages:
+
+  - action: RequestMediaPlayback
+    direction: incoming
+    desc: >
+      OEM Developers are expected to call this method whenever Alexa is the right candidate for the media resume.
+    payload:
+      - name: invocationReason
+        type: InvocationReason
+        desc: Reason for calling this API.
+      - name: elapsedBootTime
+        type: int64
+        desc: Provide the elapsed boot time in mili seconds if your platform does not provide a right value using https://developer.android.com/reference/android/os/SystemClock#elapsedRealtime() or https://man7.org/linux/man-pages/man2/sysinfo.2.html uptime.
+
+  - action: MediaPlaybackResponse
+    direction: outgoing
+    desc: Result of the RequestMediaPlayback request.
+    payload:
+      - name: mediaPlaybackRequestStatus
+        type: MediaPlaybackRequestStatus
+        desc: Enum value representing the response of the RequestMediaPlaybackMessage request.
+
+types:
+
+  - name: MediaPlaybackRequestStatus
+    type: enum
+    values:
+      - name: SUCCESS
+        desc: Successful description.
+      - name: FAILED_CAN_RETRY
+        desc: Failure description.
+      - name: FAILED_TIMEOUT
+        desc: Too late to send RequestMediaPlaybackMessage, Failed to deliver.
+      - name: ERROR
+        desc: Event call is failed because of an error.
+
+  - name: InvocationReason
+    type: enum
+    values:
+      - name: AUTOMOTIVE_STARTUP
+        desc: System call for the automatic media resume.
+      - name: EXPLICIT_USER_ACTION
+        desc: Driver action for the media resume.
+
+

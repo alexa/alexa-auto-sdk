@@ -1,0 +1,276 @@
+project.logger.lifecycle("Building AACS library")
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+android {
+    compileSdkVersion 30
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 30
+        versionCode 1
+        versionName "4.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            debuggable true
+            jniDebuggable true
+            testCoverageEnabled true
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "type"
+    productFlavors {
+        remote {
+            dimension "type"
+        }
+        local {
+            dimension "type"
+        }
+    }
+    // Prevent duplicate .so libraries
+    packagingOptions {
+        pickFirst '**/*.so'
+        doNotStrip '**/*.so'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+ext {
+    remoteLibVersion = "4.0+"
+}
+
+dependencies {
+    def tasks = gradle.startParameter.getTaskNames()
+    if (tasks.empty || tasks.any { it.toLowerCase().contains("local") }) {
+        compileOnly fileTree(include: ['*.aar'], dir: 'libs')
+        compileOnly project(':aacs-maccandroid')
+        compileOnly project(':aacs-extra')
+        compileOnly project(':aacsconstants')
+        compileOnly project(':aacsipc')
+        compileOnly project(':aacscommonutils')
+    } else if (tasks.any { it.toLowerCase().contains("remote") }) {
+        remoteCompileOnly "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aace:maccandroid:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aace:aasb:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aace:aacs-extra:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aacs:aacsipc:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aacs:aacsconstants:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aacs:aacscommonutils:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aace:bluetooth:${remoteLibVersion}@aar"
+    }
+
+    // AACS module factories.
+    for (extra_module_factory_name in gradle.ext.extra_module_factory_names) {
+        implementation project(':' + extra_module_factory_name)
+    }
+
+    implementation deps.androidx_core
+    implementation deps.androidx_media
+    implementation deps.androidx_annotation
+
+    // Kotlin
+    implementation deps.kotlin_stdlib
+    implementation deps.androidx_core_ktx
+
+    // Dagger
+    implementation deps.dagger
+    kapt deps.dagger_compiler
+
+    // RX
+    implementation deps.rxjava3
+
+    // Glide
+    implementation deps.glide
+
+    // Exo Player
+    implementation deps.exoplayer_core
+    implementation deps.exoplayer_dash
+    implementation deps.exoplayer_smooth
+    implementation deps.exoplayer_hls
+
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.0.1'
+
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation "androidx.preference:preference:1.1.0"
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+
+    androidTestImplementation 'androidx.test.ext:junit:1.0.0'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'org.mockito:mockito-android:2.22.0'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.25.0'
+    testImplementation 'org.robolectric:robolectric:4.3'
+}
+
+ext.auto_sdk_home = new File(gradle.ext.aacsRoot, "../..").getCanonicalPath()
+ext.conan_config_home = new File(auto_sdk_home, "conan/config").getCanonicalPath()
+ext.conan_home = new File(auto_sdk_home, "builder/.builder")
+ext.env_params = []
+if (project.hasProperty("conanHome")) {
+    conan_home = project.getProperties().get("conanHome")
+    if (conan_home.contains("~")) {
+        conan_home = conan_home.replaceFirst("^~", System.getProperty("user.home"))
+    }
+    project.logger.lifecycle("Changing Conan home to: " + conan_home)
+}
+
+tasks.whenTaskAdded { task ->
+    // if local build is used and "skip" is not specified in the project property,
+    // invoke Conan to build Auto SDK AARs.
+    if ((task.name == 'assembleLocalDebug' || task.name == 'assembleLocalRelease')
+            && !project.hasProperty("skipDeps")) {
+        task.dependsOn buildDeps
+    }
+}
+
+task buildDeps(type: Exec) {
+    def jsonFile = file(new File(conan_home, ".conan/recipe_config.txt").getCanonicalPath())
+    doFirst {
+        delete 'libs'
+
+        if (project.hasProperty("cleanDeps")) {
+            delete new File(conan_home, ".conan")
+        }
+
+        def recipes = [:]
+        if (jsonFile.exists()) {
+            def parsedJson = new JsonSlurper().parseText(jsonFile.text)
+            recipes = parsedJson.getAt("recipes")
+            if (recipes == null) {
+                recipes = [:]
+            }
+        }
+
+        executeConan(['conan', 'config', 'init', '-f'])
+        executeConan(['conan', 'config', 'install', '-t', 'dir', conan_config_home])
+
+        // always export aac-sdk-tools first
+        def search_directories = ["${auto_sdk_home}/conan/recipes/aac-sdk-tools", "${auto_sdk_home}/conan/recipes", "${auto_sdk_home}/modules",
+                              "${auto_sdk_home}/tools", "${auto_sdk_home}/platforms", "${auto_sdk_home}/aacs/android"]
+
+        search_directories = search_directories + gradle.ext.extra_module_paths
+
+        def extra_modules = []
+        for (directory in search_directories) {
+            def dir = new File(directory)
+            if (!dir.exists()) continue
+             dir.traverse(type: groovy.io.FileType.FILES, nameFilter: "conanfile.py") { itr ->
+                if (recipes.getAt(itr.getCanonicalPath()) == null || project.hasProperty("force")) {
+                    executeConan(["conan", "export", itr.getCanonicalPath()])
+                    recipes.put(itr.getCanonicalPath(), getRecipeName("name", itr.getCanonicalPath()))
+
+                }
+                if (directory in gradle.ext.extra_module_paths) {
+                    def module_name = getRecipeName("module_name", itr.getCanonicalPath())
+                    if (module_name != null && !module_name.toString().empty) {
+                        extra_modules << module_name
+                    }
+                }
+            }
+        }
+
+        def recipes_json = JsonOutput.toJson(["recipes": recipes])
+        if (jsonFile.getParentFile().exists() || jsonFile.getParentFile().mkdirs()) {
+            jsonFile.write(JsonOutput.prettyPrint(recipes_json))
+        }
+
+        def tasks = gradle.startParameter.getTaskNames()
+        def command = ['conan', 'install', gradle.ext.aacsRoot, '--build', 'outdated',
+                   '-pr:h', 'aac-android', '-pr:b', 'default']
+         // add extra modules
+        if (extra_modules != null && extra_modules.size() != 0) {
+            project.logger.lifecycle("Found Auto SDK extensions: " + extra_modules.join(','))
+            command << "-o" << "extra_modules=" + extra_modules.join(',')
+        }
+        // add build type
+        if (tasks.empty || tasks.any { it.toLowerCase().contains("debug") }) {
+            command << "-s:h" << "build_type=Debug"
+            if (project.hasProperty("sensitiveLogs")) {
+                command << "-o" << "with_sensitive_logs=True"
+            }
+        }
+
+        // add arch option
+        if (project.hasProperty("arch")) {
+            command << "-s:h" << "arch=" + project.getProperties().get("arch")
+        }
+        
+        // add conan options
+        if (project.hasProperty("conanOptions")) {
+            def conanOptions = project.getProperties().getOrDefault("conanOptions","").split(',')
+            for (option in conanOptions){
+                command << "-o" << option
+            }
+        }
+
+        if(extra_modules.contains("coassistant") && extra_modules.contains("local-voice-control")) {
+                command << "-o" << "aac-module-local-voice-control:with_coassistant=True"
+        }
+
+        if (project.hasProperty("acceptLicenses")) {
+            env_params << ['BUILDER_ACCEPT_LICENSES', 'true']
+        }
+
+        standardInput = System.in
+        environment 'CONAN_USER_HOME', conan_home
+        for (env in env_params) {
+            environment env[0], env[1]
+        }
+        commandLine command
+        project.logger.lifecycle("Executing Conan build: ${command.join(' ')}")
+    }
+
+    doLast {
+        if(execResult.exitValue == 0) {
+            project.logger.lifecycle("Conan build succeeded!")
+        } else {
+            project.logger.lifecycle("Conan build failed!")
+        }
+    }
+}
+ext.getRecipeName = { type, path ->
+    def recipe_name = new ByteArrayOutputStream()
+    exec {
+        environment 'CONAN_USER_HOME', conan_home
+        commandLine "conan", "inspect", path, "--raw", type
+        standardOutput = recipe_name
+    }
+    return recipe_name.toString().trim()
+}
+
+ext.executeConan = { command ->
+    def result = exec {
+        environment 'CONAN_USER_HOME', conan_home
+        for (env in env_params) {
+            environment env[0], env[1]
+        }
+        commandLine command
+    }
+
+    if (result.exitValue == 0) {
+        project.logger.lifecycle("Successfully executed command: ${command.join(' ')}")
+    } else {
+        project.logger.lifecycle("Failed to execute command: ${command.join(' ')}")
+    }
+}

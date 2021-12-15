@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/network_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:theme="@style/Theme.Alexa.Standard">
+
+    <ImageView
+        android:id="@+id/alexa_logo_view"
+        android:layout_width="@dimen/login_alexa_image_width"
+        android:layout_height="@dimen/login_alexa_image_height"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/login_item_margin_start"
+        android:layout_marginEnd="@dimen/login_item_margin_end"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:src="@drawable/alexa_logo"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/network_error_header"
+        style="@style/Alexa.Heading2Text"
+        android:text="@string/login_network_error_heading_text"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/login_margin_start"
+        android:layout_marginEnd="@dimen/login_margin_start"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alexa_logo_view"/>
+
+    <TextView
+        android:id="@+id/network_error_body"
+        style="@style/Alexa.Heading3Text"
+        android:text="@string/login_network_error_body_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:layout_marginStart="@dimen/login_margin_start_double"
+        android:layout_marginEnd="@dimen/login_margin_start_double"
+        android:gravity="center_horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/network_error_header"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <ImageButton
+        android:id="@id/network_error_img"
+        android:layout_width="@dimen/network_error_img_width"
+        android:layout_height="@dimen/network_error_img_height"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:background="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_wifi_help"
+        android:tint="#FFFFFF"
+        android:alpha="0.4"
+        app:layout_constraintBottom_toTopOf="@+id/network_settings_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/network_error_body" />
+
+    <TextView
+        android:id="@+id/network_settings_btn"
+        style="@style/Alexa.Button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:layout_marginBottom="@dimen/login_confirm_item_margin_top"
+        android:text="@string/login_network_settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

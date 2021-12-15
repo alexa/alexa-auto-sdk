@@ -52,12 +52,13 @@ static const std::string METRIC_APL_EXECUTE_COMMANDS_RESULT = "ExecuteCommandsRe
 static const std::string METRIC_APL_PROCESS_ACTIVITY_EVENT = "ProcessActivityEvent";
 
 APLEngineImpl::APLEngineImpl(std::shared_ptr<aace::apl::APL> aplPlatformInterface) :
-        avsCommon::utils::RequiresShutdown(TAG), m_aplPlatformInterface(aplPlatformInterface) {
+        avsCommon::utils::RequiresShutdown(TAG), m_aplPlatformInterface(aplPlatformInterface), m_stopDialog(false) {
 }
 
 bool APLEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
+    std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> audioFocusManager,
     std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
     std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
@@ -82,6 +83,11 @@ bool APLEngineImpl::initialize(
             }
         )";
 
+        // Initialize Audio Focus Manager
+        ThrowIfNull(audioFocusManager, "nullAudioFocusManager");
+        m_audioFocusManager = audioFocusManager;
+        m_audioFocusManager->addObserver(shared_from_this());
+
         AACE_DEBUG(LX(TAG).d("deviceWindowState", deviceWindowState));
         m_visualCharacteristics->setDeviceWindowState(deviceWindowState);
 
@@ -93,7 +99,7 @@ bool APLEngineImpl::initialize(
         ThrowIfNull(m_aplCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         m_aplCapabilityAgent->addObserver(shared_from_this());
-        m_aplCapabilityAgent->setAPLMaxVersion("1.5");
+        m_aplCapabilityAgent->setAPLMaxVersion("1.9");
         dialogUXStateAggregator->addObserver(m_aplCapabilityAgent);
 
         // Register capability with the default endpoint
@@ -110,6 +116,7 @@ std::shared_ptr<APLEngineImpl> APLEngineImpl::create(
     std::shared_ptr<aace::apl::APL> aplPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
+    std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> audioFocusManager,
     std::shared_ptr<avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
     std::shared_ptr<avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
@@ -124,6 +131,7 @@ std::shared_ptr<APLEngineImpl> APLEngineImpl::create(
         ThrowIfNot(
             aplEngineImpl->initialize(
                 capabilitiesRegistrar,
+                audioFocusManager,
                 visualFocusManager,
                 exceptionSender,
                 messageSender,
@@ -155,6 +163,10 @@ void APLEngineImpl::doShutdown() {
     if (m_aplPlatformInterface != nullptr) {
         m_aplPlatformInterface->setEngineInterface(nullptr);
     }
+
+    if (m_audioFocusManager != nullptr) {
+        m_audioFocusManager.reset();
+    }
 }
 
 void APLEngineImpl::provideState(const std::string& aplToken, const unsigned int stateRequestToken) {
@@ -177,11 +189,13 @@ void APLEngineImpl::renderDocument(
     AACE_INFO(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderDocument", METRIC_APL_RENDER_DOCUMENT, 1);
     if (m_aplPlatformInterface != nullptr) {
-        m_aplPlatformInterface->renderDocument(jsonPayload, token, windowId);
+        m_executor.submit([this, jsonPayload, token, windowId]() {
+            m_aplPlatformInterface->renderDocument(jsonPayload, token, windowId);
+        });
     }
 }
 
-void APLEngineImpl::clearDocument(const std::string& token) {
+void APLEngineImpl::clearDocument(const std::string& token, bool focusCleared) {
     AACE_INFO(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearDocument", METRIC_APL_CLEAR_DOCUMENT, 1);
     if (m_aplPlatformInterface != nullptr) {
@@ -216,7 +230,12 @@ void APLEngineImpl::interruptCommandSequence(const std::string& token) {
     }
 }
 
-void APLEngineImpl::onPresentationSessionChanged(const std::string& id, const std::string& skillId) {
+void APLEngineImpl::onPresentationSessionChanged(
+    const std::string& id,
+    const std::string& skillId,
+    const std::vector<alexaSmartScreenSDK::smartScreenSDKInterfaces::GrantedExtension>& grantedExtensions,
+    const std::vector<alexaSmartScreenSDK::smartScreenSDKInterfaces::AutoInitializedExtension>&
+        autoInitializedExtensions) {
     AACE_INFO(LX(TAG));
     // No-op
 }
@@ -234,13 +253,29 @@ void APLEngineImpl::onClearAllExecuteCommands() {
     emitCounterMetrics(
         METRIC_PROGRAM_NAME_SUFFIX, "onClearAllExecuteCommands", METRIC_APL_CLEAR_ALL_EXECUTE_COMMANDS, 1);
     if (m_aplCapabilityAgent != nullptr) {
-        m_aplCapabilityAgent->clearAllExecuteCommands();
+        m_aplCapabilityAgent->clearExecuteCommands();
     }
 }
 
 void APLEngineImpl::onSendUserEvent(const std::string& payload) {
     AACE_INFO(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSendUserEvent", METRIC_APL_SEND_USER_EVENT, 1);
+
+    // Stop any Speak directives so that incoming APL documents can render
+    if (m_audioFocusManager != nullptr && m_stopDialog) {
+        try {
+            auto userEvent = json::parse(payload);
+            if (userEvent["/source/type"_json_pointer] == "TouchWrapper") {
+                AACE_INFO(LX(TAG).m("Stopping foreground activity on touch wrapper event"));
+                m_audioFocusManager->stopForegroundActivity();
+            } else {
+                AACE_DEBUG(LX(TAG).m("Not stopping foreground activity"));
+            }
+        } catch (json::exception& ex) {
+            AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        }
+    }
+
     if (m_aplCapabilityAgent != nullptr) {
         m_aplCapabilityAgent->sendUserEvent(payload);
     }
@@ -311,6 +346,30 @@ void APLEngineImpl::onSendDeviceWindowState(const std::string& state) {
     if (m_visualCharacteristics != nullptr) {
         m_visualCharacteristics->setDeviceWindowState(state);
     }
+}
+
+void APLEngineImpl::onSetPlatformProperty(const std::string& name, const std::string& value) {
+    AACE_INFO(LX(TAG).d("name", name).d("value", value));
+    m_executor.submit([this, name, value]() {
+        m_aplRuntimePropertyGenerator.handleProperty(name, value);
+        executeUpdateRuntimeProperties();
+    });
+}
+
+void APLEngineImpl::executeUpdateRuntimeProperties() {
+    auto properties = m_aplRuntimePropertyGenerator.getAPLRuntimeProperties();
+    m_aplPlatformInterface->updateAPLRuntimeProperties(properties);
+    AACE_INFO(LX(TAG).d("aplRuntimeProperties", properties));
+}
+
+void APLEngineImpl::onFocusChanged(
+    const std::string& channelName,
+    alexaClientSDK::avsCommon::avs::FocusState newFocus) {
+    m_stopDialog =
+        (channelName == alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::DIALOG_CHANNEL_NAME) &&
+        (newFocus == alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND);
+
+    AACE_DEBUG(LX(TAG).d("active dialog", m_stopDialog));
 }
 
 }  // namespace apl

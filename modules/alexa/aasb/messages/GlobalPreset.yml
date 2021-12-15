@@ -1,0 +1,13 @@
+topic: GlobalPreset
+namespace: aasb.message.alexa.globalPreset
+path: Alexa/GlobalPreset
+
+messages:
+  - action: SetGlobalPreset
+    direction: outgoing
+    desc: Called after receiving a global preset play directive.
+    payload:
+      - name: preset
+        type: int
+        desc: The preset integer from the playbackContextToken.
+

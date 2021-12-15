@@ -1,0 +1,33 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+actor User Order 10
+participant Application  order 30
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+note right of User 
+connects/disconnects
+phone on the head unit
+end note
+User -> Application
+
+Application -> AutoSDK : Publish ConnectionStateChanged message
+AutoSDK -> Alexa : updates Alexa with the connection state of the calling device
+
+@enduml

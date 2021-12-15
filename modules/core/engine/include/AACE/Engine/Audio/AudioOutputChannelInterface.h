@@ -30,10 +30,13 @@ public:
 
     virtual bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) = 0;
     virtual bool prepare(const std::string& url, bool repeating) = 0;
+    virtual void mayDuck() = 0;
     virtual bool play() = 0;
     virtual bool stop() = 0;
     virtual bool pause() = 0;
     virtual bool resume() = 0;
+    virtual bool startDucking() = 0;
+    virtual bool stopDucking() = 0;
     virtual int64_t getPosition() = 0;
     virtual bool setPosition(int64_t position) = 0;
     virtual int64_t getDuration() = 0;

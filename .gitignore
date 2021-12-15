@@ -10,6 +10,7 @@
 /build
 # CLion build folder
 /cmake-build-*
-/extras
+/extensions/*/**
 compile_commands.json
 tools/builder
+__pycache__

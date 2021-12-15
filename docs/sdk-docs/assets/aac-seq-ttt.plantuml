@@ -1,0 +1,73 @@
+@startuml
+
+hide footbox
+
+skinparam sequence {
+ArrowColor black
+ActorBorderColor black
+ActorBackgroundColor white
+ActorFontName Arial
+LifeLineBorderColor black
+LifeLineBackgroundColor black
+ParticipantBorderColor black
+ParticipantBackgroundColor #eaf2f8 
+}
+
+skinparam NoteBorderThickness 1
+skinparam NoteBorderColor black
+skinparam NoteBackgroundColor #01cafc
+skinparam NoteFontColor #bdf1fe
+
+
+actor "**Driver**\n(tap to talk)" as Driver order 10
+
+participant "**AlexaClientHandler**\naace::alexa::AlexaClient" as AlexaClient  order 20 
+participant "**SpeechRecognizerHandler**\naace::alexa::SpeechRecognizer" as SpeechRecognizer order 30
+participant "**AudioInputHandler**\naace::audio::AudioInput" as AudioInput order 32
+participant "**Microphone**\n(Native Implementation)" as Microphone order 35 
+participant "**Alexa Auto SDK**\n**Engine**" as Engine order 100 #46c1cd
+participant "**AVS**\n(Alexa endpoint)" as AVS order 150 #FFFFF
+
+Driver->SpeechRecognizer : Initiate tap to talk
+SpeechRecognizer->Engine : tapToTalk()
+note left  
+1
+end note
+
+Engine->AVS : Recognize(event)
+AlexaClient<--Engine : dialogStateChanged(LISTENING)
+Driver<--AlexaClient : Display Voice Chrome\nfor //listening// state
+AudioInput<--Engine  : startAudioInput()
+note left #01cafc 
+2
+end note
+
+AudioInput->Microphone : Open micropohone
+activate Microphone #add8e6
+loop until stopAudioInput() called
+    Driver->Microphone : //"What's the weather?"//
+    AudioInput<--Microphone : PCM data
+    AudioInput->Engine : write(data, size)
+    Engine->AVS : Write audio data
+end
+AVS-->Engine : StopCapture(directive)
+SpeechRecognizer<--Engine : endOfSpeechDetected()
+AudioInput<--Engine : stopAudioInput()
+AudioInput->Microphone : Close microphone
+deactivate Microphone
+AlexaClient<--Engine : dialogStateChanged(THINKING)
+note left #01cafc 
+3
+end note
+
+Driver<--AlexaClient : Display Voice Chrome\nfor //thinking// state
+
+legend right
+|= Legend: |
+|<#eaf2f8>OEM Implementation|
+|<#46c1cd>Alexa Auto SDK Engine|
+|<#add8e6>Audio input buffer processing flow|
+endlegend
+
+@enduml
+

@@ -1,1 +1,0 @@
-static const char* AASB_CORE_MODULE = "aasb.core";

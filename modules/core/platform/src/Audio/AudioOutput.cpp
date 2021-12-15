@@ -41,5 +41,11 @@ void AudioOutput::setEngineInterface(
     m_audioOutputEngineInterface = audioOutputEngineInterface;
 }
 
+void AudioOutput::audioFocusEvent(FocusAction action) {
+    if (auto m_audioOutputEngineInterface_lock = m_audioOutputEngineInterface.lock()) {
+        m_audioOutputEngineInterface_lock->onAudioFocusEvent(action);
+    }
+}
+
 }  // namespace audio
 }  // namespace aace

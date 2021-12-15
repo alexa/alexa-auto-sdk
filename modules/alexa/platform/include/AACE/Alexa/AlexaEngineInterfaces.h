@@ -33,6 +33,8 @@ namespace alexa {
  */
 class AlexaSpeakerEngineInterface {
 public:
+    virtual ~AlexaSpeakerEngineInterface() = default;
+
     /**
      * Specifies the type of the AlexaSpeaker to control
      */
@@ -71,6 +73,8 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaSpeakerEngineIn
  */
 class SpeechRecognizerEngineInterface {
 public:
+    virtual ~SpeechRecognizerEngineInterface() = default;
+
     /**
      * Describes type of event that initiated the speech request.
      */
@@ -123,6 +127,8 @@ inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngi
  */
 class AlertsEngineInterface {
 public:
+    virtual ~AlertsEngineInterface() = default;
+
     virtual void onLocalStop() = 0;
     virtual void removeAllAlerts() = 0;
 };
@@ -132,6 +138,8 @@ public:
  */
 class PlaybackControllerEngineInterface {
 public:
+    virtual ~PlaybackControllerEngineInterface() = default;
+
     /**
      * Describes the playback button type
      */
@@ -242,6 +250,8 @@ inline std::ostream& operator<<(std::ostream& stream, const PlaybackControllerEn
  */
 class AuthProviderEngineInterface {
 public:
+    virtual ~AuthProviderEngineInterface() = default;
+
     /**
      * Describes the state of client authorization with AVS
      */
@@ -418,6 +428,8 @@ inline std::ostream& operator<<(std::ostream& stream, const AuthProviderEngineIn
  */
 class ExternalMediaAdapterEngineInterface {
 public:
+    virtual ~ExternalMediaAdapterEngineInterface() = default;
+
     /**
      * Describes a discovered external media player app
      */
@@ -461,6 +473,8 @@ public:
  */
 class LocalMediaSourceEngineInterface {
 public:
+    virtual ~LocalMediaSourceEngineInterface() = default;
+
     virtual void onPlayerEvent(const std::string& eventName, const std::string& sessionId) = 0;
     virtual void onPlayerError(
         const std::string& errorName,
@@ -476,6 +490,8 @@ public:
  */
 class DoNotDisturbEngineInterface {
 public:
+    virtual ~DoNotDisturbEngineInterface() = default;
+
     /**
      * @internal
      * Notifies the Engine that A DND change has been initiated by the client
@@ -491,6 +507,8 @@ public:
  */
 class EqualizerControllerEngineInterface {
 public:
+    virtual ~EqualizerControllerEngineInterface() = default;
+
     /**
      * Describes the equalizer bands supported by Alexa. The platform implementation may support a subset of these.
      */
@@ -573,6 +591,8 @@ inline std::ostream& operator<<(std::ostream& stream, const EqualizerControllerE
  */
 class AudioPlayerEngineInterface {
 public:
+    virtual ~AudioPlayerEngineInterface() = default;
+
     /**
      * Returns the current playback position of the audio player.
      * If the audio source is not playing, the most recent position played
@@ -597,6 +617,8 @@ public:
  */
 class TemplateRuntimeEngineInterface {
 public:
+    virtual ~TemplateRuntimeEngineInterface() = default;
+
     /**
      * Notifies the Engine that a display card has been cleared from the screen. Upon getting
      * this notification, the @c TemplateRuntime will release the visual channel.
@@ -609,6 +631,8 @@ public:
  */
 class AlexaClientEngineInterface {
 public:
+    virtual ~AlexaClientEngineInterface() = default;
+
     virtual void onStopForegroundActivity() = 0;
 };
 
@@ -617,8 +641,89 @@ public:
  */
 class DeviceSetupEngineInterface {
 public:
+    virtual ~DeviceSetupEngineInterface() = default;
+
     virtual void onSetupCompleted() = 0;
 };
+
+/**
+ * MediaPlaybackRequestorEngineInterface
+ */
+class MediaPlaybackRequestorEngineInterface {
+public:
+    /**
+     * This enumeration represents the reason requestMediaPlayback API
+     */
+    enum class InvocationReason {
+        /**
+         * Initiating the media resume by the system
+         */
+        AUTOMOTIVE_STARTUP,
+
+        /**
+         * @note: This reason is not accepted yet.
+         * 
+         * Initiating the media resume by the driver through physical button. 
+         */
+        EXPLICIT_USER_ACTION
+    };
+
+    /**
+     * Describes the response status of the @c requestMediaPlayback call for the media resume.
+     */
+    enum class MediaPlaybackRequestStatus {
+        /**
+         * Event call is successful
+         */
+        SUCCESS,
+        /**
+         * Event call is failed because Alexa is not connected, please retry. 
+         */
+        FAILED_CAN_RETRY,
+        /**
+         * Event call is failed because of the threshold timeout. 
+         */
+        FAILED_TIMEOUT,
+        /**
+         * Event call is failed because of an error. 
+         */
+        ERROR
+    };
+
+public:
+    virtual void onRequestMediaPlayback(InvocationReason invocationReason, long long int elapsedBootTime) = 0;
+};
+
+/**
+ * Provides a string representation for an @c MediaPlaybackRequestorEngineInterface::InvocationReason
+ *
+ * @param invocationReason The @c InvocationReason
+ * @return A string representation for the @c InvocationReason
+ */
+inline std::string invocationReasonToString(
+    const MediaPlaybackRequestorEngineInterface::InvocationReason& invocationReason) {
+    switch (invocationReason) {
+        case MediaPlaybackRequestorEngineInterface::InvocationReason::AUTOMOTIVE_STARTUP:
+            return "AUTOMOTIVE_STARTUP";
+        case MediaPlaybackRequestorEngineInterface::InvocationReason::EXPLICIT_USER_ACTION:
+            return "EXPLICIT_USER_ACTION";
+    }
+    return "UNKNOWN";
+}
+
+/**
+ * Write an @c MediaPlaybackRequestorEngineInterface::InvocationReason value to an @c ostream as a string
+ *
+ * @param stream The stream to write to
+ * @param band The @c InvocationReason value to write to the @c ostream
+ * @return The @c ostream argument that was written to
+ */
+inline std::ostream& operator<<(
+    std::ostream& stream,
+    const MediaPlaybackRequestorEngineInterface::InvocationReason& invocationReason) {
+    stream << invocationReasonToString(invocationReason);
+    return stream;
+}
 
 }  // namespace alexa
 }  // namespace aace

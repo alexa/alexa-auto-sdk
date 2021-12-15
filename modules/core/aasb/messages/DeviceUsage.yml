@@ -1,0 +1,12 @@
+topic: DeviceUsage
+namespace: aasb.message.deviceUsage.deviceUsage
+path: DeviceUsage/DeviceUsage
+
+messages:
+  - action: ReportNetworkDataUsage
+    direction: incoming
+    desc: Report network usage data to the Engine.
+    payload:
+      - name: usage
+        desc: A JSON String representation of the network usage data of the application. See the Core module documentation for complete details of the schema. 
+

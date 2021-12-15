@@ -24,6 +24,8 @@ namespace phoneCallController {
  */
 class PhoneCallControllerEngineInterface {
 public:
+    virtual ~PhoneCallControllerEngineInterface() = default;
+
     /**
      * Describes the state of connection to a calling device
      * 

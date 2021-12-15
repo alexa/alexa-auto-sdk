@@ -38,7 +38,7 @@ public:
 
     // AudioInputChannelInterface
     ChannelId start(AudioWriteCallback callback) override;
-    bool stop(ChannelId id) override;
+    void stop(ChannelId id) override;
     void doShutdown() override;
 
     // AudioInputChannelEngineInterface

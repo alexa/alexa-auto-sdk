@@ -1,0 +1,9 @@
+toolchains:
+  "2.6.1":
+    "armv7hf":
+      url: "https://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-cortexa8hf-neon-toolchain-2.6.1.sh"
+    "armv8":
+      url: "https://downloads.yoctoproject.org/releases/yocto/yocto-2.6.1/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-toolchain-2.6.1.sh"
+  "3.1.8":
+    "armv8":
+      url: "https://downloads.yoctoproject.org/releases/yocto/yocto-3.1.8/toolchain/x86_64/poky-glibc-x86_64-core-image-sato-aarch64-qemuarm64-toolchain-3.1.8.sh"

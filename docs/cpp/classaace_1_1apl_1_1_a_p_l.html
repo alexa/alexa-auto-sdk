@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -84,6 +84,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9441e36376baf10f844837b80e769c28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c8c2bc29a5c9b8f684069743b586bc5"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a2c8c2bc29a5c9b8f684069743b586bc5">dataSourceUpdate</a> (const std::string &amp;sourceType, const std::string &amp;jsonPayload, const std::string &amp;token)=0</td></tr>
 <tr class="separator:a2c8c2bc29a5c9b8f684069743b586bc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27fad281daef252e05b857e107a74677"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a27fad281daef252e05b857e107a74677">updateAPLRuntimeProperties</a> (const std::string &amp;properties)=0</td></tr>
+<tr class="separator:a27fad281daef252e05b857e107a74677"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6831186c4572d71e2094271563c1a805"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a6831186c4572d71e2094271563c1a805">clearCard</a> ()</td></tr>
 <tr class="separator:a6831186c4572d71e2094271563c1a805"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ea358a32c50da5fbe733bb370e640a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a7ea358a32c50da5fbe733bb370e640a2">clearAllExecuteCommands</a> ()</td></tr>
@@ -108,10 +110,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a87d590c8a9a8f32c36bf15b41ce6d1a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3b76e6d3ad96161c5e37f2d3728ae1d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#ac3b76e6d3ad96161c5e37f2d3728ae1d">sendDeviceWindowState</a> (const std::string &amp;state)</td></tr>
 <tr class="separator:ac3b76e6d3ad96161c5e37f2d3728ae1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09d51de009a384fd4bb59a8da39b8231"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a09d51de009a384fd4bb59a8da39b8231">setPlatformProperty</a> (const std::string &amp;name, const std::string &amp;value)</td></tr>
+<tr class="separator:a09d51de009a384fd4bb59a8da39b8231"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> should be extended to handle receiving Alexa Presentation <code>RenderDocument</code> and <code>ExecuteCommands</code> directives from AVS. These directives contain metadata for rendering or operating on display cards for devices with GUI support. For more information about Alexa Presentation Language (<a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a>) see the interface overview:</p>
-<p><a href="https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html">https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html</a> </p>
+<p><a href="https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html">https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html</a></p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000033">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1core_1_1_message_broker.html">aace::core::MessageBroker</a> </dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a605da3ae66ca91baa83f71442e0c4273"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a605da3ae66ca91baa83f71442e0c4273">&#9670;&nbsp;</a></span>renderDocument()</h2>
@@ -324,6 +330,50 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a27fad281daef252e05b857e107a74677"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27fad281daef252e05b857e107a74677">&#9670;&nbsp;</a></span>updateAPLRuntimeProperties()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::apl::APL::updateAPLRuntimeProperties </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>properties</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Notifies the platform implementation of <a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> runtime environment properties that must be updated. The Engine will generate these values based on the <code>setAPLProperty()</code> values. The <a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> runtime will be affected by these values.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">properties</td><td>A JSON object in string form containing the <a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> runtime properties that need to be updated. <div class="fragment"><div class="line">{</div><div class="line">     &quot;&lt;property name&gt;&quot; : &quot;&lt;property value&gt;&quot;</div><div class="line">}</div></div><!-- fragment --></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section attention"><dt>Attention</dt><dd>Supported names and values.</dd></dl>
+<table class="doxtable">
+<tr>
+<th>Name </th><th>Value </th><th>Description  </th></tr>
+<tr>
+<td>drivingState </td><td>parked, moving </td><td>Sets the Automobile driving state runtime property. </td></tr>
+<tr>
+<td>theme </td><td>light, dark, light-&lt;themeId&gt;, dark-&lt;themeId&gt; </td><td><a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> viewport theme value. </td></tr>
+<tr>
+<td>video </td><td>enabled, disabled </td><td>Indicates if video should be allowed in the <a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> document. </td></tr>
+</table>
 
 </div>
 </div>
@@ -677,12 +727,60 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a09d51de009a384fd4bb59a8da39b8231"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09d51de009a384fd4bb59a8da39b8231">&#9670;&nbsp;</a></span>setPlatformProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void aace::apl::APL::setPlatformProperty </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>The rendered <a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> experience will rely on the value of some defined properties. The platform implementation must report these values to provide a safe visual experience in the vehicle.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the property. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>The value of the property.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Contact your Solutions Architect for an updated list of automotive themes identifiers.</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>Supported names and values.</dd></dl>
+<table class="doxtable">
+<tr>
+<th>Name </th><th>Value </th><th>Description  </th></tr>
+<tr>
+<td>drivingState </td><td>parked, moving </td><td>Set this property when vehicle driving state changes. </td></tr>
+<tr>
+<td>uiMode </td><td>day, night </td><td>This affects the contrast of certified <a class="el" href="classaace_1_1apl_1_1_a_p_l.html">APL</a> experiences. </td></tr>
+<tr>
+<td>themeId </td><td>(night) black, gray, (day) gray1, gray2 </td><td>Optional value that can be empty string. Valid values for day and night mode are specified. </td></tr>
+</table>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

@@ -1,1 +1,0 @@
-static const char* AASB_MESSAGING_MODULE = "aasb.messaging";

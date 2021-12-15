@@ -1,0 +1,309 @@
+topic: LocalMediaSource
+namespace: aasb.message.alexa.localMediaSource
+path: Alexa/LocalMediaSource
+
+messages:
+  - action: PlayerEvent
+    direction: incoming
+    desc: Should be called on a local media source player event. This will sync the context with AVS.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: eventName
+        desc: Canonical event name.
+      - name: sessionId
+        desc: Universally unique identifier (UUID) generated according to the RFC 4122 specification. If playback session is started because of 'Play', use the same session Id. If the session is started due to any other reason, generate unique UUID and use it as a session ID until session is not ended.
+        default: ""
+
+  - action: PlayControl
+    direction: outgoing
+    desc: Occurs during playback control via voice interaction or PlaybackController interface.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: controlType
+        type: PlayControlType
+        desc: Playback control type being invoked.
+
+  - action: Seek
+    direction: outgoing
+    desc: Called when the user invokes media seek via speech.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: offset
+        type: int
+        desc: Offset position within media item, in milliseconds.
+
+  - action: SetFocus
+    direction: incoming
+    deprecated: This message is being deprecated. Please use the PlayerEvent with 'playbackSessionStarted' and 'playbackSessionEnded' events instead.
+    desc: >
+      Should be called on local media source player events. This will switch the media focus to 
+      that context.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+
+  - action: Play
+    direction: outgoing
+    desc: Called when the user calls play with a content selection type.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: contentSelectorType
+        type: ContentSelector
+        desc: Content selection type.
+      - name: payload
+        desc: Content selector payload.
+      - name: sessionId
+        desc: Universally unique identifier (UUID) generated according to the RFC 4122 specification. Since Alexa is starting the session here, use this session Id for further events and errors.
+
+  - action: GetState
+    direction: outgoing
+    desc: >
+      Must provide the local media source @PlaybackStateLocal, and @SessionStateLocal information 
+      to maintain cloud sync.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+    reply:
+      - name: state
+        type: LocalMediaSourceState
+        desc: state description. # TODO
+
+  - action: AdjustSeek
+    direction: outgoing
+    desc: Called when the user invokes media seek adjustment via speech.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: deltaOffset
+        type: int
+        desc: Change in offset position within media item, in milliseconds.
+
+  - action: MutedStateChanged
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation to apply a muted state has changed for the output 
+      channel.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: state
+        type: MutedState
+        desc: The muted state to apply to the output channel.
+
+  - action: VolumeChanged
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation to set the volume of the output channel. The volume 
+      value should be scaled to fit the needs of the platform.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: volume
+        type: float
+        desc: The volume to set on the output channel.
+
+  - action: PlayerError
+    direction: incoming
+    desc: Should be called on a local media source player error.
+    payload:
+      - name: source
+        type: Source
+        desc: LocalMediaSource source type.
+      - name: errorName
+        desc: The name of the error.
+      - name: code
+        type: int
+        desc: The error code.
+      - name: description
+        desc: The detailed error description.
+      - name: fatal
+        type: bool
+        desc: true if the error is fatal.
+      - name: sessionId
+        desc: Universally unique identifier (UUID) generated according to the RFC 4122 specification. If playback session is started because of 'Play', use the same session Id. If the session is started due to any other reason, generate unique UUID and use it as a session ID until session is not ended.
+        default: ""
+
+types:
+  - name: MutedState
+    type: alias
+    alias: aasb.message.alexa.externalMediaAdapter.MutedState
+
+  - name: PlayControlType
+    type: alias
+    alias: aasb.message.alexa.externalMediaAdapter.PlayControlType
+
+  - name: MediaType
+    type: alias
+    alias: aasb.message.alexa.externalMediaAdapter.MediaType
+
+  - name: SupportedPlaybackOperation
+    type: alias
+    alias: aasb.message.alexa.externalMediaAdapter.SupportedPlaybackOperation
+
+  - name: Favorites
+    type: alias
+    alias: aasb.message.alexa.externalMediaAdapter.Favorites
+
+  - name: LocalMediaSourceState
+    type: struct
+    values:
+      - name: sessionState
+        type: SessionState
+        desc: Variable to hold the session state.
+      - name: playbackState
+        type: PlaybackState
+        desc: Variable to hold the playback state.
+      
+  - name: PlaybackState
+    type: struct
+    values:
+      - name: state
+        desc: The state of the default player - IDLE/STOPPED/PAUSED/PLAYING/FINISHED/FAST_FORWARDING/REWINDING/BUFFER_UNDERRUN.
+      - name: supportedOperations
+        type: list:SupportedPlaybackOperation
+        desc: The set of states the default player can move into from its current state.
+      - name: trackOffset
+        type: int
+        desc: The offset of the track in milliseconds.
+      - name: shuffleEnabled
+        type: bool
+        desc: Bool to identify if shuffling is enabled.
+      - name: repeatEnabled
+        type: bool
+        desc: Bool to identify if looping of songs is enabled.
+      - name: favorites
+        type: Favorites
+        desc: The favorite status {"FAVORITED"/"UNFAVORITED"/"NOT_RATED"}.
+      - name: type
+        desc: The type of the media item. For now hard-coded to ExternalMediaAdapterMusicItem.
+      - name: playbackSource
+        desc: The display name for current playback context, e.g. playlist name.
+      - name: playbackSourceId
+        desc: >
+          An arbitrary identifier for current playback context as per the music provider, e.g. 
+          a URI that can be saved as a preset or queried to Music Service Provider services for 
+          additional info.
+      - name: trackName
+        desc: The display name for the currently playing trackname of the track.
+      - name: trackId
+        desc: The arbitrary identifier for currently playing trackid of the track as per the music provider.
+      - name: trackNumber
+        desc: >
+          The display value for the number or abstract position of the currently playing track 
+          in the album or context trackNumber of the track.
+      - name: artistName
+        desc: The display name for the currently playing artist.
+      - name: artistId
+        desc: >
+          An arbitrary identifier for currently playing artist as per the music provider, e.g. a URI that can 
+          be queried to MSP services for additional info.
+      - name: albumName
+        desc: The display name of the currently playing album.
+      - name: albumId
+        desc: >
+          Arbitrary identifier for currently playing album specific to the music provider, e.g. a URI that can 
+          be queried to MSP services for additional info.
+      - name: tinyURL
+        desc: The URL for tiny cover art image resource} .
+      - name: smallURL
+        desc: The URL for small cover art image resource} .
+      - name: mediumURL
+        desc: The URL for medium cover art image resource} .
+      - name: largeURL
+        desc: The URL for large cover art image resource} .
+      - name: coverId
+        desc: >
+          The Arbitrary identifier for cover art image resource specific to the music provider, for retrieval 
+          from an MSP API.
+      - name: mediaProvider
+        desc: >
+          Music Service Provider name for the currently playing media item; distinct from the application 
+          identity although the two may be the same.
+      - name: mediaType
+        type: MediaType
+        desc: The Media type enum value from {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} type of the media.
+      - name: duration
+        type: int
+        desc: Media item duration in milliseconds.
+      
+  - name: SessionState
+    type: struct
+    values:
+      - name: endpointId
+        desc: The unique device endpoint.
+      - name: loggedIn
+        type: bool
+        desc: Flag that identifies if a user is currently logged in or not.
+      - name: userName
+        desc: The userName of the user currently logged in via a Login directive from the AVS.
+      - name: isGuest
+        type: bool
+        desc: Flag that identifies if the user currently logged in is a guest or not.
+      - name: launched
+        type: bool
+        desc: Flag that identifies if an application has been launched or not.
+      - name: active
+        type: bool
+        desc: >
+          Flag that identifies if the application is currently active or not. This could mean different things 
+          for different applications.
+      - name: accessToken
+        desc: >
+          The accessToken used to login a user. The access token may also be used as a bearer token if the adapter 
+          makes an authenticated Web API to the music provider.
+      - name: tokenRefreshInterval
+        type: int64
+        desc: The validity period of the token in milliseconds.
+      - name: supportedContentSelectors
+        type: list:ContentSelector
+        desc: Array of content selector types supported by the player.
+      - name: spiVersion
+        desc: The only spiVersion that currently exists is '1.0'.
+      
+  - name: Source
+    type: enum
+    values:
+      - name: BLUETOOTH
+        desc: bluetooth source.
+      - name: USB
+        desc: USB source.
+      - name: FM_RADIO
+        desc: FM radio source.
+      - name: AM_RADIO
+        desc: AM radio source.
+      - name: SATELLITE_RADIO
+        desc: satellite radio source.
+      - name: LINE_IN
+        desc: audio line source.
+      - name: COMPACT_DISC
+        desc: CD player source.
+      - name: SIRIUS_XM
+        desc: SIRIUS XM source.
+      - name: DAB
+        desc: DAB source.
+      - name: DEFAULT
+        desc: DEFAULT source.
+
+  - name: ContentSelector
+    type: enum
+    values:
+      - name: FREQUENCY
+        desc: radio station selection.
+      - name: CHANNEL
+        desc: radio channel selection.
+      - name: PRESET
+        desc: preset selection.
+

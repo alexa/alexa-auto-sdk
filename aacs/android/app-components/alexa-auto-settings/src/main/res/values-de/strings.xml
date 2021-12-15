@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="alexa_settings_label" tools:ignore="MissingTranslation">Alexa</string>
+    <string name="setting_voice_assistance_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon]-Einstellungen</string>
+    <string name="setting_voice_assistance_alexa" tools:ignore="MissingTranslation">Amazon&#160;Alexa-Einstellungen</string>
+    <string name="setting_voice_assistance_enable_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon] aktivieren</string>
+    <string name="setting_voice_assistance_enable_alexa" tools:ignore="MissingTranslation">Amazon&#160;Alexa aktivieren</string>
+    <string name="setting_voice_assistance_wake_word" tools:ignore="MissingTranslation">Aktivierungswörter</string>
+    <string name="setting_voice_assistance_wake_word_summary" tools:ignore="MissingTranslation">Sagen Sie einfach „[Brandon]“ oder „Alexa“, um Unterstützung zu erhalten</string>
+    <string name="setting_voice_assistance_sounds_request_start_summary" tools:ignore="MissingTranslation">[Brandon] und Alexa spielen einen Ton ab, wenn sie mit dem Zuhören beginnen</string>
+    <string name="setting_voice_assistance_sounds_request_end_summary" tools:ignore="MissingTranslation">[Brandon] und Alexa spielen einen Ton ab, wenn sie das Zuhören beenden</string>
+    <string name="setting_voice_assistance_language" tools:ignore="MissingTranslation">Sprache</string>
+    <string name="setting_voice_assistance_setting_push_to_talk" tools:ignore="MissingTranslation">Push-to-Talk</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_alexa" tools:ignore="MissingTranslation">Amazon Alexa</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
+    <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">Teilen Sie den aktuellen Standort Ihres Fahrzeugs mit [Brandon] und Alexa, um so bessere Ergebnisse für Restaurants in der Nähe, das lokale Wetter und andere Anfragen zu erhalten.</string>
+    <string name="setting_alexa_signin" tools:ignore="MissingTranslation">Anmelden</string>
+    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexa Hands-free</string>
+    <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">Ton für den Start der Anfrage</string>
+    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Einen Ton abspielen, wenn Alexa mit dem Zuhören beginnt</string>
+    <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">Ton für das Ende der Anfrage</string>
+    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Einen Ton abspielen, wenn Alexa das Zuhören beendet</string>
+    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">Alexa reagiert jedes Mal, wenn Sie „Alexa“ sagen</string>
+    <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">Standortfreigabe</string>
+    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">Teilen Sie den aktuellen Standort Ihres Fahrzeugs mit Alexa, um so bessere Ergebnisse für Restaurants in der Nähe, das lokale Wetter und andere Anfragen zu erhalten.</string>
+    <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">Bitte nicht stören</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Deaktiviert Benachrichtigungen</string>
+    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">Kommunikation</string>
+    <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">Töne</string>
+    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexas Sprache</string>
+    <string name="setting_alexa_signout" tools:ignore="MissingTranslation">Abmelden</string>
+    <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Alexa deaktivieren</string>
+    <string name="setting_aacs" tools:ignore="MissingTranslation">Alexa&#160;Auto&#160;Client&#160;Service</string>
+    <string name="settings_alexa" tools:ignore="MissingTranslation">Einstellungen</string>
+    <string name="logout" tools:ignore="MissingTranslation">Abmelden?</string>
+    <string name="disable_alexa" tools:ignore="MissingTranslation">Alexa deaktivieren?</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">Möchten Sie sich von Amazon&#160;Alexa abmelden?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">ABMELDEN</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">ABBRECHEN</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">DEAKTIVIEREN</string>
+    <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">Alexa ist in diesem Fahrzeug dann nicht mehr verfügbar.</string>
+    <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">Grundeinstellungen außer Kraft setzen</string>
+    <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">Wenn diese Option ausgewählt wird, werden alle nachstehenden Einstellungen angewendet</string>
+    <string name="preference_category_alexa_device" tools:ignore="MissingTranslation">Alexa-Gerät</string>
+    <string name="preference_avsdevice_clientid" tools:ignore="MissingTranslation">Client-ID</string>
+    <string name="preference_avsdevice_productid" tools:ignore="MissingTranslation">Produkt-ID</string>
+    <string name="preference_avsdevice_dsn" tools:ignore="MissingTranslation">Geräte-Seriennummer</string>
+    <string name="preference_avsdevice_manufacturer" tools:ignore="MissingTranslation">Hersteller</string>
+    <string name="preference_category_aacs_service" tools:ignore="MissingTranslation">AACS – Allgemein</string>
+    <string name="preference_aacs_startonboot" tools:ignore="MissingTranslation">AACS beim Booten des Geräts starten</string>
+    <string name="preference_category_aacs_defaults" tools:ignore="MissingTranslation">AACS-Standardeinstelllungen</string>
+    <string name="preference_aacs_use_aacs_audio_input" tools:ignore="MissingTranslation">AACS-Audioeingang verwenden</string>
+    <string name="preference_category_aacs_control" tools:ignore="MissingTranslation">AACS steuern</string>
+    <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">AACS NEU STARTEN UND KONFIGURATION ANWENDEN</string>
+    <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">AACS ABSCHALTEN</string>
+    <string name="preference_aacs_start" tools:ignore="MissingTranslation">AACS STARTEN</string>
+</resources>

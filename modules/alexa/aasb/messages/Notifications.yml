@@ -1,0 +1,27 @@
+topic: Notifications
+namespace: aasb.message.alexa.notifications
+path: Alexa/Notifications
+
+messages:
+  - action: SetIndicator
+    direction: outgoing
+    desc: Notifies the platform implementation of whether a notification indicator should be rendered.
+    payload:
+      - name: state
+        type: IndicatorState
+        desc: The new notification indicator state.
+
+  - action: OnNotificationReceived
+    direction: outgoing
+    desc: Notifies the platform implementation of notification received.
+
+types:
+  - name: IndicatorState
+    type: enum
+    values:
+      - name: "OFF"
+        desc: The notification indicator should be turned off.
+      - name: "ON"
+        desc: The notification indicator should be turned on.
+      - name: UNKNOWN
+        desc: The notification indicator state is unknown.

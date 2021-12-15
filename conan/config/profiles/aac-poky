@@ -1,0 +1,12 @@
+include(default)
+[settings]
+compiler.version=8.2
+arch=armv7hf
+build_type=Release
+os=Linux
+compiler.libcxx=libstdc++11
+[build_requires]
+poky-sdk/2.6.1
+[options]
+[env]
+

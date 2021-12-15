@@ -18,7 +18,10 @@
 
 #include <unordered_map>
 
-#include <RegistrationManager/RegistrationManager.h>
+#include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
+#include <AVSCommon/SDKInterfaces/AuthObserverInterface.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
+#include <RegistrationManager/RegistrationManagerInterface.h>
 
 #include "AuthorizationManagerInterface.h"
 #include "AuthorizationManagerStorage.h"
@@ -42,9 +45,7 @@ public:
      * @param customerDataManager Component to register this component as a customer data container
      * @return On successful returns the reference to the @c AuthorizationManager otherwise returns the nullptr
      */
-    static std::shared_ptr<AuthorizationManager> create(
-        std::shared_ptr<AuthorizationManagerStorageInterface> storage,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager);
+    static std::shared_ptr<AuthorizationManager> create(std::shared_ptr<AuthorizationManagerStorageInterface> storage);
 
     /**
      * Get the reference to class that implements @c AuthDelegateInterface
@@ -60,7 +61,7 @@ public:
      * @param registrationManager Reference @c RegistrationManager used for performing logout process.
      */
     void setRegistrationManager(
-        std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManager> registrationManager);
+        std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManagerInterface> registrationManager);
 
     /// @name AuthorizationManagerInterface
     /// @{
@@ -101,9 +102,7 @@ private:
      * @param storage Stores and retrieves the active authorization from persistent storage.
      * @param customerDataManager Component to register this component as a customer data container
      */
-    AuthorizationManager(
-        std::shared_ptr<AuthorizationManagerStorageInterface> storage,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager);
+    AuthorizationManager(std::shared_ptr<AuthorizationManagerStorageInterface> storage);
 
     /**
      * Initializes the @c AuthorizationManager object
@@ -168,7 +167,7 @@ private:
     std::shared_ptr<AuthorizationManagerStorageInterface> m_storage;
 
     /// Reference to the @c RegistrationManager to carry out the logout process
-    std::weak_ptr<alexaClientSDK::registrationManager::RegistrationManager> m_registrationManager;
+    std::weak_ptr<alexaClientSDK::registrationManager::RegistrationManagerInterface> m_registrationManager;
 
     /// List of observers to be notified for the change in the auth state. Access is synchronized with @c m_mutex.
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface>>

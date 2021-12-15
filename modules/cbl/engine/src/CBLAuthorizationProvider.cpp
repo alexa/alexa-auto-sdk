@@ -861,6 +861,8 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
                 ThrowIfNull(listener, "invalidListenerReference");
 
                 auto data = listener->onGetAuthorizationData(m_service, AUTHORIZATION_DATA_REFRESH_TOKEN_KEY);
+                ThrowIf( data.empty(), "invalidAuthorizationData" );
+                
                 auto refreshTokenJson = json::parse(data);
                 if (refreshTokenJson.contains(AUTHORIZATION_JSON_DATA_REFRESH_TOKEN_KEY) &&
                     refreshTokenJson[AUTHORIZATION_JSON_DATA_REFRESH_TOKEN_KEY].is_string()) {

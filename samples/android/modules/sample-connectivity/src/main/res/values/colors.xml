@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- drawer -->
-    <color name="drawerSection">#424242</color>
-    <color name="drawerHeader">#fff5f5</color>
-
-</resources>

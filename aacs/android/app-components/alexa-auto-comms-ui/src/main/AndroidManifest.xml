@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.amazon.alexa.auto.comms.ui">
+
+    <!-- Enables getting intents from AACS -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="com.amazon.alexaautoclientservice"/>
+    <uses-permission android:name="com.amazon.aacstelephony" />
+    <uses-permission android:name="com.amazon.aacscontacts" />
+
+    <application
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true"
+        android:supportsRtl="true">
+        <receiver android:name="com.amazon.alexa.auto.comms.ui.receiver.BluetoothReceiver"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.amazon.aacstelephony" />
+                <action android:name="com.amazon.aacstelephony.bluetooth.connected"/>
+                <action android:name="com.amazon.aacstelephony.bluetooth.disconnected"/>
+                <action android:name="com.amazon.aacstelephony.bluetooth.connectionCheckCompleted"/>
+            </intent-filter>
+            <intent-filter>
+                <category android:name="com.amazon.alexa.auto.comms" />
+                <action android:name="com.amazon.alexa.auto.comms.primaryPhoneChanged"/>
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

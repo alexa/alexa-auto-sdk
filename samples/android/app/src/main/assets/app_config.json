@@ -1,9 +1,0 @@
-{
-  "config": {
-    "clientId": "<YOUR DEVICE'S CLIENT ID>",
-    "productId" : "<YOUR DEVICE'S PRODUCT ID>"
-  },
-  "metrics" : {
-    "amazonId" : "<YOUR DEVICE'S AMAZON ID>"
-  }
-}

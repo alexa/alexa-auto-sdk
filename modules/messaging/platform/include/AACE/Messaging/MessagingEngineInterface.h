@@ -21,6 +21,8 @@ namespace messaging {
 
 class MessagingEngineInterface {
 public:
+    virtual ~MessagingEngineInterface() = default;
+
     /**
      * An enum representing @c ErrorCode status error codes.
      */

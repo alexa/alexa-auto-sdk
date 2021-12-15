@@ -42,6 +42,11 @@ public:
         bool& changed,
         bool& async,
         const SetPropertyResultCallback& callbackFunction);
+    bool setProperty_httpProxyHeaders(
+        const std::string& value,
+        bool& changed,
+        bool& async,
+        const SetPropertyResultCallback& callbackFunction);
 
 protected:
     bool initialize() override;

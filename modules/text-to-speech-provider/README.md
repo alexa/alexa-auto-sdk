@@ -4,34 +4,34 @@
 <!-- omit in toc -->
 ## Table of Contents
 - [Overview](#overview)
-- [Understanding TTS Provider](#understanding-tts-provider)
-- [Specifying the TTS Provider in APIs](#specifying-the-tts-provider-in-apis)
+- [Configuring the TTS Provider Module](#configuring-the-tts-provider-module)
+- [Specifying the TTS Provider in AASB Messages](#specifying-the-tts-provider-in-aasb-messages)
 - [Using TTS Provider Module with Different Input Types](#using-tts-provider-module-with-different-input-types)
 - [TTS Capability Returned](#tts-capability-returned)
 - [SSML Examples](#ssml-examples)
 - [Errors](#errors)
 
 ## Overview
-The Text to Speech Provider module synthesizes Alexa speech on demand. Currently, the Auto SDK supports only one Text to Speech Provider, which uses Alexa's voice as the default voice for speech synthesis.
+The `Text to Speech Provider` module synthesizes Alexa speech on demand. Currently, the Auto SDK supports only one Text to Speech Provider, which uses Alexa's voice as the default voice for speech synthesis.
 
 The TTS Provider module performs the following functions:
 
 * Generating speech from a text or SSML document to provide the speech to the TTS module.
 * Providing capabilities based on the properties of the TTS provider, such as available locales.
-  
-## Understanding TTS Provider
+
 The TTS Provider module follows the existing AVS (Alexa Voice Service) protocol to carry out speech synthesis and requires connection to the Local Voice Control (LVC) service. If the device is disconnected from LVC, speech synthesis fails.
 
 >**Note**: The module can synthesize speech only in the current locale as set by the application. 
 
-The TTS provider requires no configuration. 
+## Configuring the TTS Provider Module
+The `Text To Speech Provider` module does not require Engine configuration.
 
-## Specifying the TTS Provider in APIs
+## Specifying the TTS Provider in AASB Messages
 
-In all the text-to-speech platform interface APIs that involve the provider parameter, use the string, "text-to-speech-provider", to specify the TTS provider.
+In all of the text-to-speech AASB messages that involve the provider parameter, use the string, "text-to-speech-provider", to specify the TTS provider.
 
 ## Using TTS Provider Module with Different Input Types
-How the TTS Provider module synthesizes speech depends on the input type and the `requestPayload` field in the options parameter of the `prepareSpeech()` API. The `requestPayload` structure is as follows:
+How the TTS Provider module synthesizes speech depends on the input type and the `requestPayload` field in the options parameter of the [`PrepareSpeech` message](https://alexa.github.io/alexa-auto-sdk/extensions/aasb/docs/TextToSpeech/PrepareSpeechMessage.html) published to the Engine when request speech synthesis. The `requestPayload` structure is as follows:
 
 ~~~
 {
@@ -56,7 +56,7 @@ The following list explains how the TTS Provider module synthesizes speech depen
 * If input is SSML and contains one or more unsupported tags, speech is synthesized but the unsupported tag is ignored. The text within the tag is synthesized normally.
 
 ## TTS Capability Returned
-The capability returned by the `getCapabilities()` API to the platform has the following payload structure:
+To request the capabilities of the TTS provider being used, your application publishes the [`GetCapabilities message`](https://alexa.github.io/alexa-auto-sdk/extensions/aasb/docs/TextToSpeech/GetCapabilitiesMessage.html). The Engine publishes the [`GetCapabilitiesReply` message](https://alexa.github.io/alexa-auto-sdk/extensions/aasb/docs/TextToSpeech/GetCapabilitiesMessageReply.html) with the following payload structure:
 
 ~~~
 "text-to-speech-provider" : {
@@ -84,7 +84,7 @@ The capability returned by the `getCapabilities()` API to the platform has the f
 * `<speak> Take the next left onto <sub alias=\"John Doe\">JD</sub> street </speak>`
 
 ## Errors
-The TTS provider defines its set of error strings or codes. The `prepareSpeechFailed()` API uses the `reason` parameter to send the error strings to the application.
+The TTS provider defines its set of error strings or codes. The [`PrepareSpeechFailed` message](https://alexa.github.io/alexa-auto-sdk/extensions/aasb/docs/TextToSpeech/PrepareSpeechFailedMessage.html) payload uses the `reason` parameter to send the error strings to the application.
 
 The following list describes the error strings used by the Local TTS provider:
 

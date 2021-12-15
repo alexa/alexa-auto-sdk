@@ -94,6 +94,9 @@ void SystemSoundPlayer::onMediaError(MediaError error, const std::string& descri
     m_sharedFuture = std::shared_future<bool>();
 }
 
+void SystemSoundPlayer::onAudioFocusEvent(FocusAction action) {
+}
+
 //
 // alexaClientSDK::avsCommon::sdkInterfaces::SystemSoundPlayerInterface
 //

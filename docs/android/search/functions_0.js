@@ -24,7 +24,6 @@ var searchData=
   ['alertstatechanged',['alertStateChanged',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_alerts.html#aaec21170ff0f51d02a9f72f0d41b1ad6',1,'com::amazon::aace::alexa::Alerts']]],
   ['announcemaneuver',['announceManeuver',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#aa9c67468d2301d910b4ae765f60f34d5',1,'com::amazon::aace::navigation::Navigation']]],
   ['announceroadregulation',['announceRoadRegulation',['../classcom_1_1amazon_1_1aace_1_1navigation_1_1_navigation.html#aee853c3f66d8205e733fb27644b829f1',1,'com::amazon::aace::navigation::Navigation']]],
-  ['answer',['answer',['../classcom_1_1amazon_1_1aace_1_1phonecontrol_1_1_phone_call_controller.html#a96fcb25d9e32de9524becbec82a79ed7',1,'com::amazon::aace::phonecontrol::PhoneCallController']]],
   ['authfailure',['authFailure',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_auth_provider.html#a73c6d42ae6537e38fa7a910cf84e5b8a',1,'com::amazon::aace::alexa::AuthProvider']]],
   ['authorizationerror',['authorizationError',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#ac2087542c1f5f41240fbe1154dc9dc51',1,'com::amazon::aace::authorization::Authorization']]],
   ['authorizationstatechanged',['authorizationStateChanged',['../classcom_1_1amazon_1_1aace_1_1authorization_1_1_authorization.html#aac7df2c628d7212d332bca7d04248087',1,'com::amazon::aace::authorization::Authorization']]],

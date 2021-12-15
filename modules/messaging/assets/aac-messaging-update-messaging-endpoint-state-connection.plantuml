@@ -1,0 +1,35 @@
+@startuml
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+actor Driver Order 10
+participant Application  order 30
+participant "Auto SDK Engine" as AutoSDK <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+note right of Driver
+connects/disconnects
+phone on car head unit 
+end note
+
+Driver -> Application
+Application -> AutoSDK : Publish UpdateMessagingEndpointState message
+...
+
+AutoSDK -> Alexa: updates Alexa with the state of messaging device
+...
+
+@enduml

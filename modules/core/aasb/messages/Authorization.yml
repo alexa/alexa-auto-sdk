@@ -1,0 +1,100 @@
+topic: Authorization
+namespace: aasb.message.authorization.authorization
+path: Authorization/Authorization
+
+messages:
+  - action: GetAuthorizationData
+    direction: outgoing
+    desc: Get the authorization data from the platform implementation.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: key
+        desc: The key for the requested data.
+    reply:
+      - name: data
+        desc: The data associated with the key if available, otherwise an empty string.
+
+  - action: SendEvent
+    direction: incoming
+    desc: Notifies the Engine of an authorization event.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: event
+        desc: The JSON string representing the payload of the event.
+
+  - action: CancelAuthorization
+    direction: incoming
+    desc: Notifies the Engine to cancel the authorization process.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+
+  - action: Logout
+    direction: incoming
+    desc: Notifies the Engine that device has been logged out.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+
+  - action: StartAuthorization
+    direction: incoming
+    desc: Notifies the Engine to start the authorization process.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: data
+        desc: The value of the data.
+
+  - action: AuthorizationError
+    direction: outgoing
+    desc: Notifies the platform implementation of an authorization error.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: error
+        desc: The authorization error that occurred.
+      - name: message
+        desc: The message describing the authorization error.
+
+  - action: SetAuthorizationData
+    direction: outgoing
+    desc: Notifies the platform implementation to store authorization data.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: key
+        desc: The key for the requested data.
+      - name: data
+        desc: The value of the data.
+
+  - action: EventReceived
+    direction: outgoing
+    desc: Notifies the platform implementation of a received authorization event.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: event
+        desc: The JSON string representing the received event.
+
+  - action: AuthorizationStateChanged
+    direction: outgoing
+    desc: Notifies the platform implementation that the authorization state changed.
+    payload:
+      - name: service
+        desc: The service used for authorization.
+      - name: state
+        type: AuthorizationState
+        desc: The new authorization state.
+
+types:
+  - name: AuthorizationState
+    type: enum
+    values:
+      - name: UNAUTHORIZED
+        desc: Device is unauthorized.
+      - name: AUTHORIZING
+        desc: Device authorization is in progress.
+      - name: AUTHORIZED
+        desc: Device is authorized.

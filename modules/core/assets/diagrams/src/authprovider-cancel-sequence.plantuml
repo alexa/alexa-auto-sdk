@@ -1,0 +1,15 @@
+@startuml
+
+skinparam roundcorner 10
+
+autonumber
+participant Application  order 20
+participant AuthorizationHandler  order 30
+participant "Auto SDK" as AutoSDK  order 40
+
+Application -> AuthorizationHandler : Canceling AuthProvider authorization flow.
+AuthorizationHandler -> AutoSDK : cancelAuthorization( "alexa:auth-provider" )
+
+AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:auth-provider", UNAUTHORIZED )
+
+@enduml

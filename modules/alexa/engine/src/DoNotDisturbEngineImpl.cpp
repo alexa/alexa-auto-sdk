@@ -53,7 +53,7 @@ bool DoNotDisturbEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     aace::engine::alexa::DeviceSettingsDelegate& deviceSettingsDelegate,
@@ -92,7 +92,7 @@ std::shared_ptr<DoNotDisturbEngineImpl> DoNotDisturbEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> connectionManager,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     aace::engine::alexa::DeviceSettingsDelegate& deviceSettingsDelegate,

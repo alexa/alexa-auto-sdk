@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -117,7 +117,7 @@ Public Types</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:ae2468e3779807990305dfd341ca3d19d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea96a47b1442b4c5fa2906b2e0d9a4a9"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#aea96a47b1442b4c5fa2906b2e0d9a4a9">PlayControlType</a> = ExternalMediaAdapter::PlayControlType</td></tr>
+<tr class="memitem:aea96a47b1442b4c5fa2906b2e0d9a4a9"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#aea96a47b1442b4c5fa2906b2e0d9a4a9">PlayControlType</a> = <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#ace89cdcfd6513894b1d434814721b1e6">ExternalMediaAdapter::PlayControlType</a></td></tr>
 <tr class="separator:aea96a47b1442b4c5fa2906b2e0d9a4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -126,7 +126,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a1a1f194d9ecc288b70fa09a04d937e8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfa5a4b31e25aad959be05d56a495fb8"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#acfa5a4b31e25aad959be05d56a495fb8">play</a> (<a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#ae2468e3779807990305dfd341ca3d19d">ContentSelector</a> contentSelectorType, const std::string &amp;payload, const std::string &amp;sessionId)</td></tr>
 <tr class="separator:acfa5a4b31e25aad959be05d56a495fb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad541a6f60242ad371b453570e1e8da4d"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#ad541a6f60242ad371b453570e1e8da4d">playControl</a> (<a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#aea96a47b1442b4c5fa2906b2e0d9a4a9">PlayControlType</a> controlType)=0</td></tr>
+<tr class="memitem:ad541a6f60242ad371b453570e1e8da4d"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#ad541a6f60242ad371b453570e1e8da4d">playControl</a> (<a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#ace89cdcfd6513894b1d434814721b1e6">PlayControlType</a> controlType)=0</td></tr>
 <tr class="separator:ad541a6f60242ad371b453570e1e8da4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1bdc078c4702c3f8b7a864dd0095a47"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#af1bdc078c4702c3f8b7a864dd0095a47">seek</a> (std::chrono::milliseconds offset)=0</td></tr>
 <tr class="separator:af1bdc078c4702c3f8b7a864dd0095a47"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,7 +148,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad1217e4c192da618ae846ba57c8611ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> should be extended to use Alexa to switch among media sources local to the device. It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources. </p>
+<div class="textblock"><p><code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> should be extended to use Alexa to switch among media sources local to the device. It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources.</p>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000025">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1core_1_1_message_broker.html">aace::core::MessageBroker</a> </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aea96a47b1442b4c5fa2906b2e0d9a4a9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aea96a47b1442b4c5fa2906b2e0d9a4a9">&#9670;&nbsp;</a></span>PlayControlType</h2>
@@ -157,7 +159,7 @@ Public Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using aace::alexa::LocalMediaSource::PlayControlType =  ExternalMediaAdapter::PlayControlType</td>
+          <td class="memname">using <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#ace89cdcfd6513894b1d434814721b1e6">aace::alexa::LocalMediaSource::PlayControlType</a> =  <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#ace89cdcfd6513894b1d434814721b1e6">ExternalMediaAdapter::PlayControlType</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -276,7 +278,7 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000016">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the new <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#acfa5a4b31e25aad959be05d56a495fb8">LocalMediaSource::play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</a></code> instead Called when the user calls play with a content selection type</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000026">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the new <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#acfa5a4b31e25aad959be05d56a495fb8">LocalMediaSource::play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</a></code> instead Called when the user calls play with a content selection type</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ContentSelector</td><td>Content selection type</td></tr>
@@ -352,7 +354,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual bool aace::alexa::LocalMediaSource::playControl </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#aea96a47b1442b4c5fa2906b2e0d9a4a9">PlayControlType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#ace89cdcfd6513894b1d434814721b1e6">PlayControlType</a>&#160;</td>
           <td class="paramname"><em>controlType</em></td><td>)</td>
           <td></td>
         </tr>
@@ -671,7 +673,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000017">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a7227c31de96b605df8e22b83eb161a32">LocalMediaSource::playerEvent(const std::string&amp; eventName, const std::string&amp; sessionId)</a></code> instead with playbackSessionStarted and playbackSessionEnded events Should be called on local media source player events. This will switch the media focus to that context. Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000027">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a7227c31de96b605df8e22b83eb161a32">LocalMediaSource::playerEvent(const std::string&amp; eventName, const std::string&amp; sessionId)</a></code> instead with playbackSessionStarted and playbackSessionEnded events Should be called on local media source player events. This will switch the media focus to that context. Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method. </dd></dl>
 
 </div>
 </div>
@@ -680,7 +682,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

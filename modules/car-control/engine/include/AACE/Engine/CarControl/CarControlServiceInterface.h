@@ -30,6 +30,8 @@ namespace carControl {
  */
 class CarControlServiceInterface {
 public:
+    virtual ~CarControlServiceInterface() = default;
+
     /**
      * Power on the controller identified by @c endpointId.
      *

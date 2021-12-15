@@ -51,17 +51,17 @@ bool Base64::encode(std::istream& src, std::ostream& dest) {
         }
 
         if (bytesRead) {
-            for (int j = bytesRead; j < 3; j++) in[j] = '\0';
+            for (size_t j = bytesRead; j < 3; j++) in[j] = '\0';
 
             out[0] = (in[0] & 0xfc) >> 2;
             out[1] = ((in[0] & 0x03) << 4) + ((in[1] & 0xf0) >> 4);
             out[2] = ((in[1] & 0x0f) << 2) + ((in[2] & 0xc0) >> 6);
 
-            for (int j = 0; j < bytesRead + 1; j++) {
+            for (size_t j = 0; j < bytesRead + 1; j++) {
                 dest << BASE64_ENCODING_TABLE[out[j]];
             }
 
-            for (int j = bytesRead; j < 3; j++) {
+            for (size_t j = bytesRead; j < 3; j++) {
                 dest << '=';
             }
         }
@@ -77,14 +77,14 @@ bool Base64::decode(std::istream& src, std::ostream& dest) {
     try {
         uint8_t in[4];
         uint8_t out[3];
-        int bytesRead = 0;
+        size_t bytesRead = 0;
         char c;
 
         while (src.good() && src.get(c) && BASE64_ENCODING_TABLE.find(c) != std::string::npos) {
             in[bytesRead++] = c;
 
             if (bytesRead == 4) {
-                for (int j = 0; j < 4; j++) {
+                for (size_t j = 0; j < 4; j++) {
                     in[j] = BASE64_ENCODING_TABLE.find(in[j]);
                 }
 
@@ -99,7 +99,7 @@ bool Base64::decode(std::istream& src, std::ostream& dest) {
         }
 
         if (bytesRead) {
-            for (int j = 0; j < bytesRead; j++) {
+            for (size_t j = 0; j < bytesRead; j++) {
                 in[j] = BASE64_ENCODING_TABLE.find(in[j]);
             }
 

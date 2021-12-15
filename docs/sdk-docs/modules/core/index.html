@@ -1,0 +1,5032 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../../logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+    
+    
+      
+        <title>Core Module - Alexa Auto SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.a617204b.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.9204c3b2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#core-module" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Alexa Auto SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Core Module <!-- omit in toc -->
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../.." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../GETSTARTED/" class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../BUILDING/" class="md-tabs__link">
+        Build Auto SDK
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../SDK_MODULES/" class="md-tabs__link md-tabs__link--active">
+        Modules
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../aacs/android/" class="md-tabs__link">
+        AACS
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../samples/cpp/" class="md-tabs__link">
+        Sample App
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../LINUX_INTEGRATION/" class="md-tabs__link">
+      Linux Integration
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../MIGRATION/" class="md-tabs__link">
+        Migration Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../NEED_HELP/" class="md-tabs__link">
+      Need Help?
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-tabs__link">
+        More
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Alexa Auto SDK" class="md-nav__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../../logo.png" alt="logo">
+
+    </a>
+    Alexa Auto SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GETSTARTED/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Build Auto SDK
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Build Auto SDK" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Build Auto SDK
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../BUILDING/" class="md-nav__link">
+        Build Alexa Auto SDK
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../builder/">Auto SDK Builder Tool Reference</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Auto SDK Builder Tool Reference" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Auto SDK Builder Tool Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Modules
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Modules" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Modules
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SDK_MODULES/" class="md-nav__link">
+        Auto SDK Modules and Extensions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2">
+          AASB
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aasb/aasb-docs/AASB/" class="md-nav__link">
+        AASB Message Definition
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../address-book/">Address Book</a>
+          
+            <label for="__nav_4_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Address Book" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Address Book
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3_2" type="checkbox" id="__nav_4_3_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_3_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../address-book/aasb-docs/AddressBook/" class="md-nav__link">
+        Address Book
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../alexa/">Alexa</a>
+          
+            <label for="__nav_4_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Alexa" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          Alexa
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4_2" type="checkbox" id="__nav_4_4_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_4_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/Alerts/" class="md-nav__link">
+        Alerts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AlexaClient/" class="md-nav__link">
+        AlexaClient
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AlexaSpeaker/" class="md-nav__link">
+        AlexaSpeaker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AudioPlayer/" class="md-nav__link">
+        AudioPlayer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/AuthProvider/" class="md-nav__link">
+        AuthProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/DeviceSetup/" class="md-nav__link">
+        DeviceSetup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/DoNotDisturb/" class="md-nav__link">
+        DoNotDisturb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/EqualizerController/" class="md-nav__link">
+        EqualizerController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/ExternalMediaAdapter/" class="md-nav__link">
+        ExternalMediaAdapter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/GlobalPreset/" class="md-nav__link">
+        GlobalPreset
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/LocalMediaSource/" class="md-nav__link">
+        LocalMediaSource
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/MediaPlaybackRequestor/" class="md-nav__link">
+        MediaPlaybackRequestor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/Notifications/" class="md-nav__link">
+        Notifications
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/PlaybackController/" class="md-nav__link">
+        PlaybackController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/SpeechRecognizer/" class="md-nav__link">
+        SpeechRecognizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alexa/aasb-docs/TemplateRuntime/" class="md-nav__link">
+        TemplateRuntime
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5" type="checkbox" id="__nav_4_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../apl/">APL</a>
+          
+            <label for="__nav_4_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          APL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5_2" type="checkbox" id="__nav_4_5_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_5_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../apl/aasb-docs/APL/" class="md-nav__link">
+        APL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_6" type="checkbox" id="__nav_4_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../bluetooth/">Bluetooth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Bluetooth" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_6">
+          <span class="md-nav__icon md-icon"></span>
+          Bluetooth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7" type="checkbox" id="__nav_4_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../car-control/">CarControl</a>
+          
+            <label for="__nav_4_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CarControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_7">
+          <span class="md-nav__icon md-icon"></span>
+          CarControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7_2" type="checkbox" id="__nav_4_7_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_7_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../car-control/aasb-docs/CarControl/" class="md-nav__link">
+        CarControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8" type="checkbox" id="__nav_4_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../cbl/">CBL</a>
+          
+            <label for="__nav_4_8">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CBL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_8">
+          <span class="md-nav__icon md-icon"></span>
+          CBL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8_2" type="checkbox" id="__nav_4_8_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_8_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cbl/aasb-docs/CBL/" class="md-nav__link">
+        CBL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9" type="checkbox" id="__nav_4_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../connectivity/">Connectivity</a>
+          
+            <label for="__nav_4_9">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Connectivity" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_9">
+          <span class="md-nav__icon md-icon"></span>
+          Connectivity
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9_2" type="checkbox" id="__nav_4_9_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_9_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../connectivity/aasb-docs/AlexaConnectivity/" class="md-nav__link">
+        AlexaConnectivity
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10" type="checkbox" id="__nav_4_10" checked>
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index md-nav__link--active">
+          <a href="./">Core</a>
+          
+            <label for="__nav_4_10">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_10">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10_2" type="checkbox" id="__nav_4_10_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_10_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/AudioInput/" class="md-nav__link">
+        AudioInput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/AudioOutput/" class="md-nav__link">
+        AudioOutput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/Authorization/" class="md-nav__link">
+        Authorization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/DeviceUsage/" class="md-nav__link">
+        DeviceUsage
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/LocationProvider/" class="md-nav__link">
+        LocationProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/NetworkInfoProvider/" class="md-nav__link">
+        NetworkInfoProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="aasb-docs/PropertyManager/" class="md-nav__link">
+        PropertyManager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11" type="checkbox" id="__nav_4_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../custom-domain/">CustomDomain</a>
+          
+            <label for="__nav_4_11">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CustomDomain" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_11">
+          <span class="md-nav__icon md-icon"></span>
+          CustomDomain
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11_2" type="checkbox" id="__nav_4_11_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_11_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom-domain/aasb-docs/CustomDomain/" class="md-nav__link">
+        CustomDomain
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_12" type="checkbox" id="__nav_4_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../loopback-detector/">LoopbackDetector</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="LoopbackDetector" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_12">
+          <span class="md-nav__icon md-icon"></span>
+          LoopbackDetector
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13" type="checkbox" id="__nav_4_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../messaging/">Messaging</a>
+          
+            <label for="__nav_4_13">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Messaging" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_13">
+          <span class="md-nav__icon md-icon"></span>
+          Messaging
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13_2" type="checkbox" id="__nav_4_13_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_13_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_13_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../messaging/aasb-docs/Messaging/" class="md-nav__link">
+        Messaging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14" type="checkbox" id="__nav_4_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../navigation/">Navigation</a>
+          
+            <label for="__nav_4_14">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Navigation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_14">
+          <span class="md-nav__icon md-icon"></span>
+          Navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14_2" type="checkbox" id="__nav_4_14_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_14_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../navigation/aasb-docs/Navigation/" class="md-nav__link">
+        Navigation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15" type="checkbox" id="__nav_4_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../phone-control/">PhoneControl</a>
+          
+            <label for="__nav_4_15">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="PhoneControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_15">
+          <span class="md-nav__icon md-icon"></span>
+          PhoneControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15_2" type="checkbox" id="__nav_4_15_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_15_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../phone-control/aasb-docs/PhoneCallController/" class="md-nav__link">
+        PhoneControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_16" type="checkbox" id="__nav_4_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../system-audio/">SystemAudio</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="SystemAudio" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_16">
+          <span class="md-nav__icon md-icon"></span>
+          SystemAudio
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17" type="checkbox" id="__nav_4_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../text-to-speech/">TextToSpeech</a>
+          
+            <label for="__nav_4_17">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeech" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_17">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeech
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17_2" type="checkbox" id="__nav_4_17_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_17_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_17_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../text-to-speech/aasb-docs/TextToSpeech/" class="md-nav__link">
+        TextToSpeech
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_18" type="checkbox" id="__nav_4_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../text-to-speech-provider/">TextToSpeechProvider</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeechProvider" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_18">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeechProvider
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/">AACS</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/">Configuration</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3" type="checkbox" id="__nav_5_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_3">
+          Common
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Common" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_3">
+          <span class="md-nav__icon md-icon"></span>
+          Common
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_1" type="checkbox" id="__nav_5_3_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/ipc/">IPC</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="IPC" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          IPC
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_2" type="checkbox" id="__nav_5_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/common/commonutils/">Common Utils</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Common Utils" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Common Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">AACS Instrumentation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Instrumentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Instrumentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/sample-app/">AACS Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Sample App" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          App Components
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="App Components" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          App Components
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_1" type="checkbox" id="__nav_5_6_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apis/">alexa-auto-apis</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apis" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apis
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2" type="checkbox" id="__nav_5_6_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
+          
+            <label for="__nav_5_6_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apl-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2_2" type="checkbox" id="__nav_5_6_2_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/">APL Render</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL Render" data-md-level="4">
+        <label class="md-nav__title" for="__nav_5_6_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          APL Render
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_3" type="checkbox" id="__nav_5_6_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-ui/">alexa-auto-apps-common-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_3">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_4" type="checkbox" id="__nav_5_6_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-apps-common-util/">alexa-auto-apps-common-util</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-util" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_4">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-util
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_5" type="checkbox" id="__nav_5_6_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-carcontrol/">alexa-auto-carcontrol</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-carcontrol" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_5">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-carcontrol
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_6" type="checkbox" id="__nav_5_6_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-comms-ui/">alexa-auto-comms-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-comms-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_6">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-comms-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_7" type="checkbox" id="__nav_5_6_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-contacts/">alexa-auto-contacts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-contacts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_7">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-contacts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_8" type="checkbox" id="__nav_5_6_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-device-usage/">alexa-auto-device-usage</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-device-usage" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_8">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-device-usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_9" type="checkbox" id="__nav_5_6_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-lwa-auth/">alexa-auto-lwa-auth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-lwa-auth" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_9">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-lwa-auth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_10" type="checkbox" id="__nav_5_6_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-media-player/">alexa-auto-media-player</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-media-player" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_10">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-media-player
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_11" type="checkbox" id="__nav_5_6_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-navigation/">alexa-auto-navigation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-navigation" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_11">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_12" type="checkbox" id="__nav_5_6_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-settings/">alexa-auto-settings</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-settings" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_12">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-settings
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_13" type="checkbox" id="__nav_5_6_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-setup/">alexa-auto-setup</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-setup" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_13">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-setup
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_14" type="checkbox" id="__nav_5_6_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-telephony/">alexa-auto-telephony</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-telephony" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_14">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-telephony
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_15" type="checkbox" id="__nav_5_6_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-templateruntime-renderer/">alexa-auto-templateruntime-renderer</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-templateruntime-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_15">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-templateruntime-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_16" type="checkbox" id="__nav_5_6_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-tts/">alexa-auto-tts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-tts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_16">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-tts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_17" type="checkbox" id="__nav_5_6_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-ux-restrictions/">alexa-auto-ux-restrictions</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-ux-restrictions" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_17">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-ux-restrictions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_18" type="checkbox" id="__nav_5_6_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-interaction/">alexa-auto-voice-interaction</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-interaction" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_18">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_19" type="checkbox" id="__nav_5_6_19" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../aacs/android/app-components/alexa-auto-voice-ui/">alexa-auto-voice-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_19">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../../samples/cpp/">Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Sample App" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../LINUX_INTEGRATION/" class="md-nav__link">
+        Linux Integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Migration Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION/" class="md-nav__link">
+        General Migration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MIGRATION_TO_AASB_MESSAGEBROKER/" class="md-nav__link">
+        Migration to AASB MessageBroker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../NEED_HELP/" class="md-nav__link">
+        Need Help?
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          More
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="More" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          More
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CODE_OF_CONDUCT/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CONTRIBUTING/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../SECURITY/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-module-overview" class="md-nav__link">
+    Core module overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understand-the-auto-sdk-api" class="md-nav__link">
+    Understand the Auto SDK API
+  </a>
+  
+    <nav class="md-nav" aria-label="Understand the Auto SDK API">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-engine" class="md-nav__link">
+    The Engine
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messagebroker" class="md-nav__link">
+    MessageBroker
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aasb-message-interfaces" class="md-nav__link">
+    AASB message interfaces
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manage-the-engine-lifecycle-in-your-application" class="md-nav__link">
+    Manage the Engine lifecycle in your application
+  </a>
+  
+    <nav class="md-nav" aria-label="Manage the Engine lifecycle in your application">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-the-engine" class="md-nav__link">
+    Create the Engine
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-the-engine" class="md-nav__link">
+    Configure the Engine
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure the Engine">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specify-configuration-in-a-file" class="md-nav__link">
+    Specify configuration in a file
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-configuration-programatically" class="md-nav__link">
+    Specify configuration programatically
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscribe-to-aasb-messages" class="md-nav__link">
+    Subscribe to AASB messages
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#start-the-engine" class="md-nav__link">
+    Start the Engine
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stop-the-engine" class="md-nav__link">
+    Stop the Engine
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shut-down-the-engine" class="md-nav__link">
+    Shut down the Engine
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-the-core-module" class="md-nav__link">
+    Configure the Core module
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure the Core module">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#required-vehicle-info-configuration" class="md-nav__link">
+    (Required) Vehicle info configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-storage-configuration" class="md-nav__link">
+    (Required) Storage configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-logger-configuration" class="md-nav__link">
+    (Optional) Logger configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-curl-configuration" class="md-nav__link">
+    (Optional) cURL configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-aasb-and-messagebroker-configuration" class="md-nav__link">
+    (Optional) AASB and MessageBroker configuration
+  </a>
+  
+    <nav class="md-nav" aria-label="(Optional) AASB and MessageBroker configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optional-configure-enabled-interfaces" class="md-nav__link">
+    (Optional) Configure enabled interfaces
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optional-configure-the-synchronous-message-timeout" class="md-nav__link">
+    (Optional) Configure the synchronous message timeout
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understand-the-key-core-engine-services" class="md-nav__link">
+    Understand the key core Engine services
+  </a>
+  
+    <nav class="md-nav" aria-label="Understand the key core Engine services">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#authorization" class="md-nav__link">
+    Authorization
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#audio-input-and-output" class="md-nav__link">
+    Audio input and output
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runtime-properties" class="md-nav__link">
+    Runtime properties
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#provide-core-device-status" class="md-nav__link">
+    Provide core device status
+  </a>
+  
+    <nav class="md-nav" aria-label="Provide core device status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#report-location-with-locationprovider" class="md-nav__link">
+    Report location with LocationProvider
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-network-status-changes-with-networkinfoprovider" class="md-nav__link">
+    Report network status changes with NetworkInfoProvider
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#report-data-usage-with-deviceusage" class="md-nav__link">
+    Report data usage with DeviceUsage
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+<h1 id="core-module">Core Module <!-- omit in toc --></h1>
+<p><strong>Table of Contents</strong> <!-- omit in toc --></p>
+<ul>
+<li><a href="#core-module-overview">Core module overview</a></li>
+<li><a href="#understand-the-auto-sdk-api">Understand the Auto SDK API</a></li>
+<li><a href="#the-engine">The Engine</a></li>
+<li><a href="#messagebroker">MessageBroker</a></li>
+<li><a href="#aasb-message-interfaces">AASB message interfaces</a></li>
+<li><a href="#manage-the-engine-lifecycle-in-your-application">Manage the Engine lifecycle in your application</a></li>
+<li><a href="#create-the-engine">Create the Engine</a></li>
+<li><a href="#configure-the-engine">Configure the Engine</a><ul>
+<li><a href="#specify-configuration-in-a-file">Specify configuration in a file</a></li>
+<li><a href="#specify-configuration-programatically">Specify configuration programatically</a></li>
+</ul>
+</li>
+<li><a href="#subscribe-to-aasb-messages">Subscribe to AASB messages</a></li>
+<li><a href="#start-the-engine">Start the Engine</a></li>
+<li><a href="#stop-the-engine">Stop the Engine</a></li>
+<li><a href="#shut-down-the-engine">Shut down the Engine</a></li>
+<li><a href="#configure-the-core-module">Configure the Core module</a></li>
+<li><a href="#required-vehicle-info-configuration">(Required) Vehicle info configuration</a></li>
+<li><a href="#required-storage-configuration">(Required) Storage configuration</a></li>
+<li><a href="#optional-logger-configuration">(Optional) Logger configuration</a></li>
+<li><a href="#optional-curl-configuration">(Optional) cURL configuration</a></li>
+<li><a href="#optional-aasb-and-messagebroker-configuration">(Optional) AASB and MessageBroker configuration</a><ul>
+<li><a href="#optional-configure-enabled-interfaces">(Optional) Configure enabled interfaces</a></li>
+<li><a href="#optional-configure-the-synchronous-message-timeout">(Optional) Configure the synchronous message timeout</a></li>
+</ul>
+</li>
+<li><a href="#understand-the-key-core-engine-services">Understand the key core Engine services</a></li>
+<li><a href="#authorization">Authorization</a></li>
+<li><a href="#audio-input-and-output">Audio input and output</a></li>
+<li><a href="#runtime-properties">Runtime properties</a></li>
+<li><a href="#provide-core-device-status">Provide core device status</a></li>
+<li><a href="#report-location-with-locationprovider">Report location with LocationProvider</a></li>
+<li><a href="#report-network-status-changes-with-networkinfoprovider">Report network status changes with NetworkInfoProvider</a></li>
+<li><a href="#report-data-usage-with-deviceusage">Report data usage with DeviceUsage</a></li>
+</ul>
+<h2 id="core-module-overview">Core module overview</h2>
+<p>The Alexa Auto SDK <code>Core</code> module is the heart of the SDK. The <code>Core</code> module acts as the foundation for all Auto SDK features by contributing the following essential elements to the SDK:
+- <strong>Defining the Auto SDK API for your application—</strong> <code>Core</code> defines the <code>Engine</code> and <code>MessageBroker</code> components. Alongside the Alexa Auto Services Bridge (AASB) messages defined by each Auto SDK module, these components comprise the core API for your application to access the features of Auto SDK. To learn about the API, see <a href="#understand-the-auto-sdk-api">Understand the Auto SDK API</a>.</p>
+<ul>
+<li>
+<p><strong>Providing an infrastructure to other modules—</strong> <code>Core</code> provides the base infrastructure of the Engine, which each Auto SDK module extends to add module-specific features. <code>Core</code> also defines the common Engine services for logging, audio I/O, authorization, and device settings. Each module uses these Engine services to provide its own module-specific features. To learn about the primary core services, see <a href="#understand-the-key-core-engine-services">Understand the key core Engine services</a>.</p>
+</li>
+<li>
+<p><strong>Receiving core device statuses from your application—</strong> <code>Core</code> includes AASB message interfaces for your application to report essential information such as device location and network connection status. The Engine uses this information to provide a reliable experience to the user. To learn about the core device status interfaces, see <a href="#provide-core-device-status">Provide core device status</a>. </p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Important!</strong>: If you are an Android developer, your application will use the <a href="../aacs/android/README.md"><strong>Alexa Auto Client Service (AACS)</strong></a> as its foundation. AACS implements much of the core Auto SDK setup, abstracting it from your application and exposing only a necessary subset of the Auto SDK API in an Android-specific way. Some of the information presented in this documentation and documentation for other SDK modules might not pertain to your application exactly as written for cases in which AACS provides the implementation or further abstracts it, so keep this in mind while reading. Use the module documentation to understand the underlying layers of Auto SDK, if interested, and to reference the Engine configuration and AASB message definitions for the features you do need to build into your application yourself. </p>
+</blockquote>
+<h2 id="understand-the-auto-sdk-api">Understand the Auto SDK API</h2>
+<p>The <code>Engine</code>, <code>MessageBroker</code>, and <code>AASB message interfaces</code> comprise the Auto SDK API. Your application uses these three components to build a complete Alexa client implementation for your vehicle. </p>
+<h3 id="the-engine">The Engine</h3>
+<p>The Auto SDK <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1core_1_1_engine.html">Engine</a> is a system of components that provide the core implementation of all Auto SDK features. With respect to Alexa, your application's Alexa client stack uses the Engine as the layer that sets up the connection to Alexa, publishes device capabilities, sends Alexa events, sequences Alexa directives, and more.</p>
+<p>Your application creates an instance of the Engine and uses a simple interface to <a href="manage-the-engine-lifecycle-in-your-application">manage the Engine lifecycle</a> for the duration of the application run time. Aside from setting up the Engine, the primary responsibility of your application is to provide the platform-specific, customizable integration details that make Alexa and other core SDK features work for <em>your</em> vehicle, in particular. Platform-specific integration might include interacting with external libraries or the underlying software frameworks of your operating system to complete the Auto SDK client stack with deep integration into the applications on your system.</p>
+<p>The Engine implements as much of the general functionality as possible; for integration details that it can't implement, the Engine delegates responsibility to your application via <a href="#aasb-message-interfaces">AASB messages</a> published through the <a href="#messageBroker">MessageBroker</a>.</p>
+<h3 id="messagebroker">MessageBroker</h3>
+<p>The <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1core_1_1_message_broker.html">MessageBroker</a> is the bridge in the Alexa Auto Services Bridge (AASB). MessageBroker provides a publish and subscribe API to the Engine and your application for communication with each other. In order to consume a message that the Engine publishes to your application, your application uses MessageBroker to subscribe to the message by specifying the message <code>topic</code> and <code>action</code> as well as a function for MessageBroker to invoke to deliver the message. Similarly, the Engine uses MessageBroker to subscribe to messages published by your application.</p>
+<h3 id="aasb-message-interfaces">AASB message interfaces</h3>
+<p>A typical Auto SDK module defines one or more AASB message interfaces. An interface groups logically related messages together with a <code>topic</code>. Within the <code>topic</code>, each interface has one or more <code>actions</code> to represent individual messages. I.e., a <code>topic</code> + <code>action</code> combination identifies a single message.</p>
+<p>For instance, the <code>Alexa</code> module defines many interfaces related to standard Alexa features. The <code>Alexa</code> module <code>SpeechRecogizer</code> interface defines messages for your application to publish to the Engine when the user invokes Alexa. It also defines messages the Engine publishes to your application to convey key events in the user speech stream. </p>
+<p>For example, your application publishes a <code>SpeechRecognizer.StartCapture</code> message when the user taps the Alexa invocation button:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+    <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;messageType&quot;</span><span class="p">:</span> <span class="s2">&quot;Publish&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;12345&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;messageDescription&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;SpeechRecognizer&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;StartCapture&quot;</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nt">&quot;payload&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;initiator&quot;</span><span class="p">:</span> <span class="s2">&quot;TAP_TO_TALK&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The Engine subscribes to this message at startup time, so it is ready to consume the message when published by your application. In response to the message, the Engine sends the user speech audio to Alexa. Alexa processes the speech, and when she detects the user has finished speaking, the Engine publishes a <code>SpeechRecognizer.EndOfSpeechDetected</code> message to your application:</p>
+<p><div class="highlight"><pre><span></span><code><span class="p">{</span>
+    <span class="nt">&quot;header&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;4.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;messageType&quot;</span><span class="p">:</span> <span class="s2">&quot;Publish&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;00876&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;messageDescription&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;SpeechRecognizer&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;EndOfSpeechDetected&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+Your application receives this message from MessageBroker if it subscribed to the <code>SpeechRecognizer</code> topic and <code>EndOfSpeechDetected</code> action.</p>
+<p>MessageBroker uses AASB messages as serialized JSON strings; however, for convenience, Auto SDK provides C++ wrapper classes for each message that help with the serialization and deserialization. The Auto SDK build system generates these wrapper classes as part of the build. </p>
+<h2 id="manage-the-engine-lifecycle-in-your-application">Manage the Engine lifecycle in your application</h2>
+<p>To use Auto SDK features, your application must instantiate and manage the lifecycle of the Engine.</p>
+<h3 id="create-the-engine">Create the Engine</h3>
+<p>During the launch sequence of your application, create one instance of the Engine using the static function <code>aace::core::Engine::create()</code>:</p>
+<p><div class="highlight"><pre><span></span><code><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Engine</span><span class="o">&gt;</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Engine</span><span class="o">::</span><span class="n">create</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+A typical application creates the Engine once when the user turns on the vehicle ignition and uses the instance until the user turns off the vehicle ignition.</p>
+<h3 id="configure-the-engine">Configure the Engine</h3>
+<p>After creating the Engine instance, configure it with the required Engine configurations. Engine configuration uses JSON serialized as strings, but you pass the configurations to the Engine in one or more <code>aace::core::config::EngineConfiguration</code> wrapper objects. Auto SDK provides two options to generate <code>EngineConfiguration</code> objects:
+- Specify your Engine configuration in a <a href="#specify-configuration-in-a-file">JSON file</a> and construct an <code>EngineConfiguration</code> from a path to the file
+- Build the configuration <a href="#specify-configuration-programatically">programatically</a> using one of the configuration factory functions.</p>
+<p>You can choose either option or a combination of both. I.e., you can generate a single <code>EngineConfiguration</code> object that includes all configuration data for the Engine components you use, or you can break up the configuration data into logical sections and generate multiple <code>EngineConfiguration</code> objects. For example, you might generate one <code>EngineConfiguration</code> object for each module.</p>
+<p>To configure the Engine, call the Engine's <code>configure()</code> function, passing in the <code>EngineConfiguration</code> object(s): </p>
+<ul>
+<li>
+<p>For a single <code>EngineConfiguration</code> object:</p>
+<div class="highlight"><pre><span></span><code>engine-&gt;configure( config );
+</code></pre></div>
+</li>
+<li>
+<p>For multiple <code>EngineConfiguration</code> objects:
+    <div class="highlight"><pre><span></span><code>  engine-&gt;configure( { xConfig, yConfig, zConfig } );
+</code></pre></div>
+    replacing <code>xConfig, yConfig, zConfig</code> with logical names to identify the <code>EngineConfiguration</code> objects you generated.</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>Note</strong>: For one Engine instance, you can call the <code>configure()</code> function only once, and you must call it before you subscribe to AASB messages with <code>MessageBroker</code> and before you start the Engine.</p>
+</blockquote>
+<h4 id="specify-configuration-in-a-file">Specify configuration in a file</h4>
+<p>Auto SDK provides the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1core_1_1config_1_1_configuration_file.html#a8ee151fa389256ca8e2df8626e76407e"><code>ConfigurationFile</code> class</a> that reads the configuration from a specified JSON file path and creates an <code>EngineConfiguration</code> object from that configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">ConfigurationFile</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="w"> </span><span class="err">“</span><span class="o">&lt;/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">filename</span><span class="p">.</span><span class="n">json</span><span class="o">&gt;</span><span class="err">”</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+<p>You can include all the configuration data in a single JSON file to create a single <code>EngineConfiguration</code> object. For example,</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">ConfigurationFile</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="w"> </span><span class="err">“</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">AAC</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">config</span><span class="p">.</span><span class="n">json</span><span class="err">”</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>Alternatively, you can break the configuration data into multiple JSON files to create multiple <code>EngineConfiguration</code> objects. For example,</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">coreConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">ConfigurationFile</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="w"> </span><span class="err">“</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">AAC</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">core</span><span class="o">-</span><span class="n">config</span><span class="p">.</span><span class="n">json</span><span class="err">”</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">alexaConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">ConfigurationFile</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="w"> </span><span class="err">“</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">AAC</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">alexa</span><span class="o">-</span><span class="n">config</span><span class="p">.</span><span class="n">json</span><span class="err">”</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+<span class="k">auto</span><span class="w"> </span><span class="n">navigationConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">ConfigurationFile</span><span class="o">::</span><span class="n">create</span><span class="p">(</span><span class="w"> </span><span class="err">“</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">AAC</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">navigation</span><span class="o">-</span><span class="n">config</span><span class="p">.</span><span class="n">json</span><span class="err">”</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<p>See documentation for individual module features to see the format of their respective JSON configuration. For example, <code>Core</code> outlines its required configurations in <a href="#configure-the-core-module">Configure the Core module</a>.</p>
+<h4 id="specify-configuration-programatically">Specify configuration programatically</h4>
+<p>Each Auto SDK module that defines configuration provides a factory class with functions that return <code>EngineConfiguration</code> objects. The values a function puts in the configuration it creates correspond to the function parameters. For example, you can configure the <code>Alexa</code> module's <code>alertsCapabilityAgent</code> settings by using the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#af7a3007198c8d8e47ce33edbf5c902a7"><code>AlexaConfiguration::createAlertsConfig()</code></a> function:</p>
+<div class="highlight"><pre><span></span><code><span class="k">auto</span><span class="w"> </span><span class="n">alertsConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">alexa</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">AlexaConfiguration</span><span class="o">::</span><span class="n">createAlertsConfig</span><span class="p">(</span><span class="s">&quot;&lt;/some/directory/path/for/databases&gt;&quot;</span><span class="w"> </span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+<h3 id="subscribe-to-aasb-messages">Subscribe to AASB messages</h3>
+<p>After you configure the Engine, use MessageBroker to subscribe to any AASB interface messages that your application will handle. For example, the following code uses the AASB message wrapper classes for the <code>SpeechRecognizer</code> interface to subscribe to messages from the Engine with <code>SpeechRecognizer</code> topic:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Alexa/SpeechRecognizer/StopCaptureMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Alexa/SpeechRecognizer/EndOfSpeechDetectedMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Alexa/SpeechRecognizer/WakewordDetectedMessage.h&gt;</span><span class="cp"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">SpeechRecognizerHandler::subscribeToAASBMessages</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleEndOfSpeechDetectedMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">EndOfSpeechDetectedMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">EndOfSpeechDetectedMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleWakewordDetectedMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="n">WakewordDetectedMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">        </span><span class="n">WakewordDetectedMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">SpeechRecognizerHandler::handleEndOfSpeechDetectedMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// MessageBroker invokes this function when the Engine publishes a SpeechRecognizer.EndOfSpeechDetected message</span>
+<span class="w">    </span><span class="c1">// Do something here!</span>
+<span class="w">    </span><span class="c1">// Return quickly to avoid blocking MessageBroker&#39;s outgoing thread</span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">SpeechRecognizerHandler::handleWakewordDetectedMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// MessageBroker invokes this function when the Engine publishes a SpeechRecognizer.WakewordDetected message</span>
+<span class="w">    </span><span class="c1">// Do something here!</span>
+<span class="w">    </span><span class="c1">// Return quickly to avoid blocking MessageBroker&#39;s outgoing thread</span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<blockquote>
+<p><strong>Note</strong>: For one Engine instance, you must subscribe to messages after configuring the Engine and before starting the Engine.</p>
+</blockquote>
+<h3 id="start-the-engine">Start the Engine</h3>
+<p>After configuring the Engine and subscribing to AASB messages, start the Engine by calling the Engine's <code>start()</code> function:</p>
+<p><div class="highlight"><pre><span></span><code><span class="n">engine</span><span class="o">-&gt;</span><span class="n">start</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+Engine start initializes the internal Engine components for each Engine component your application uses. With respect to Alexa, it starts the connection to Alexa if there is an internet connection and an Alexa access token. Wait to publish messages to the Engine until after <code>start()</code> completes.</p>
+<p>Your application can start the Engine more than once in its lifetime, if needed, by stopping the Engine and starting it again. However, you cannot start the Engine again after shutting it down.</p>
+<h3 id="stop-the-engine">Stop the Engine</h3>
+<p>When your application needs to halt the operations of the Engine, stop the Engine by calling the Engine's <code>stop()</code> function:
+<div class="highlight"><pre><span></span><code><span class="n">engine</span><span class="o">-&gt;</span><span class="n">stop</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+With respect to Alexa, stopping the Engine tears down the Alexa connection.
+Typically, Engine stop is a cleanup step before Engine shutdown. However, if you stopped the Engine at runtime and need to start it again, calling <code>start()</code> resumes Engine operations. With respect to Alexa, this includes reestablishing the Alexa connection.</p>
+<h3 id="shut-down-the-engine">Shut down the Engine</h3>
+<p>When your application is ready to exit, shut down the Engine by calling the Engine's <code>shutdown()</code> function.</p>
+<div class="highlight"><pre><span></span><code><span class="n">engine</span><span class="o">-&gt;</span><span class="n">shutdown</span><span class="p">();</span><span class="w"></span>
+</code></pre></div>
+<p>Make sure you also stop the Engine prior to shutting it down. After shutdown completes, you can safely dispose of the pointer to your Engine instance. You cannot use this instance of the Engine again.</p>
+<h2 id="configure-the-core-module">Configure the Core module</h2>
+<p>The <code>Core</code> module defines required and optional configuration objects that you include in the Engine configuration for your application. You can define the configuration objects in a file or construct them programatically with the relevant configuration factory functions.</p>
+<h3 id="required-vehicle-info-configuration">(Required) Vehicle info configuration</h3>
+<p>Your application must provide the <code>aace.vehicle</code> configuration specified below. The properties of the vehicle configuration are used for analytics.</p>
+<p><div class="highlight"><pre><span></span><code>{
+  &quot;aace.vehicle&quot;:
+  {
+     &quot;info&quot;: {
+         &quot;make&quot;: {{STRING}},
+         &quot;model&quot;: {{STRING}},
+         &quot;year&quot;: {{STRING}},
+         &quot;trim&quot;: {{STRING}},
+         &quot;geography&quot;: {{STRING}},
+         &quot;version&quot;: {{STRING}},
+         &quot;os&quot;: {{STRING}},
+         &quot;arch&quot;: {{STRING}},
+         &quot;language&quot;: {{STRING}},
+         &quot;microphone&quot;: {{STRING}},
+         &quot;vehicleIdentifier&quot;: {{STRING}}
+     }
+  }
+}
+</code></pre></div>
+The following table describes the properties in the configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>make</td>
+<td>string</td>
+<td>Yes</td>
+<td>The make of the vehicle</td>
+<td>—</td>
+</tr>
+<tr>
+<td>model</td>
+<td>string</td>
+<td>Yes</td>
+<td>The model of the vehicle</td>
+<td>—</td>
+</tr>
+<tr>
+<td>year</td>
+<td>integer as a string</td>
+<td>Yes</td>
+<td>The model year of the vehicle. The value must be an integer in the range 1900-2100.</td>
+<td>"2019"</td>
+</tr>
+<tr>
+<td>trim</td>
+<td>string</td>
+<td>No</td>
+<td>The trim package of the vehicle, identifying the vehicle's level of equipment or special features</td>
+<td>"Sport"</td>
+</tr>
+<tr>
+<td>geography</td>
+<td>string</td>
+<td>No</td>
+<td>The location of the vehicle</td>
+<td>"US",<br>"US-North",<br> "WA"</td>
+</tr>
+<tr>
+<td>version</td>
+<td>string</td>
+<td>No</td>
+<td>The client software version</td>
+<td>"4.0"</td>
+</tr>
+<tr>
+<td>os</td>
+<td>string</td>
+<td>No</td>
+<td>The operating system used by the head unit</td>
+<td>"AndroidOreo_8.1"</td>
+</tr>
+<tr>
+<td>arch</td>
+<td>string</td>
+<td>No</td>
+<td>The hardware architecture used by the head unit</td>
+<td>"x86_64"</td>
+</tr>
+<tr>
+<td>language</td>
+<td>string</td>
+<td>No</td>
+<td>The language or locale selected for Alexa by the vehicle owner</td>
+<td>"en-US",<br>"fr-CA"</td>
+</tr>
+<tr>
+<td>microphone</td>
+<td>string</td>
+<td>No</td>
+<td>The type and arrangement of microphone used in the vehicle</td>
+<td>"7 mic array, centrally mounted"</td>
+</tr>
+<tr>
+<td>vehicleIdentifier</td>
+<td>string</td>
+<td>Yes</td>
+<td>An identifier for the vehicle</td>
+<td>"1234abcd"</td>
+</tr>
+</tbody>
+</table>
+<p>Auto SDK provides the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html"><code>VehicleConfiguration::createVehicleInfoConfig()</code></a> factory function to generate the configuration programatically. </p>
+<blockquote>
+<p><strong>Important!</strong> To pass the certification process, the <code>vehicleIdentifier</code> value you provide must NOT be the vehicle identification number (VIN).</p>
+</blockquote>
+<h3 id="required-storage-configuration">(Required) Storage configuration</h3>
+<p>Your application must provide the <code>aace.storage</code> configuration specified below. The Engine uses the configured path to create a database to persist data across device reboots.</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.storage&quot;: {
+        &quot;localStoragePath&quot;: {{STRING}},
+        &quot;storageType&quot;: &quot;sqlite&quot;
+    }
+}
+</code></pre></div>
+<p>The following table describes the properties in the configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>localStoragePath</td>
+<td>string</td>
+<td>Yes</td>
+<td>The path to a directory for the Engine to create a database, including the database name</td>
+<td>"/opt/AAC/data/aace-storage.db"</td>
+</tr>
+<tr>
+<td>storageType</td>
+<td>string</td>
+<td>Yes</td>
+<td>The type of storage to use</td>
+<td>"sqlite"</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> This database is not the only one used by the Engine. Components in the <code>Alexa</code> module have similar configuration to store feature-specific settings and data. See <a href="../alexa/#configure-the-alexa-module">Configure the Alexa module</a> for details.</p>
+</blockquote>
+<h3 id="optional-logger-configuration">(Optional) Logger configuration</h3>
+<p>By default, the Engine writes logs to the console. You can configure the Engine to save logs to a file with the <code>aace.logger</code> configuration:</p>
+<div class="highlight"><pre><span></span><code>{
+  &quot;aace.logger&quot;: {
+    &quot;sinks&quot;: [
+        {
+            &quot;id&quot;: {{STRING}},
+            &quot;type&quot;: &quot;aace.logger.sink.file&quot;,
+            &quot;config&quot;: {
+                &quot;path&quot;: {{STRING}},
+                &quot;prefix&quot;: {{STRING}},
+                &quot;maxSize&quot;: {{INTEGER}},
+                &quot;maxFiles&quot;: {{INTEGER},
+                &quot;append&quot;: {{BOOLEAN}}
+            },
+            &quot;rules&quot;: [
+                {
+                    &quot;level&quot;: {{STRING}}
+                }
+            ]
+        }
+    ]
+}
+</code></pre></div>
+<p>The following table describes the properties in the configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>id</td>
+<td>string</td>
+<td>Yes</td>
+<td>A unique identifier for the log sink.</td>
+<td>"debug-logs"</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>type</td>
+<td>string</td>
+<td>Yes</td>
+<td>The type of the log sink. Use "aace.logger.sink.file" to write logs to a file.</td>
+<td>"aace.logger.sink.file"</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>config.<br>path</td>
+<td>string</td>
+<td>Yes</td>
+<td>An absolute path to a directory where the Engine creates the log file.</td>
+<td>"/opt/AAC/data"</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>config.<br>prefix</td>
+<td>string</td>
+<td>Yes</td>
+<td>The prefix for the log file.</td>
+<td>"auto-sdk"</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>config.<br>maxSize</td>
+<td>integer</td>
+<td>Yes</td>
+<td>The maximum size of the log file in bytes.</td>
+<td>5242880</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>config.<br>maxFiles</td>
+<td>integer</td>
+<td>Yes</td>
+<td>The maximum number of logs files.</td>
+<td>5</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>config.<br>append</td>
+<td>boolean</td>
+<td>Yes</td>
+<td>Use true to append logs to the existing file. Use false to overwrite the log files.</td>
+<td>false</td>
+</tr>
+<tr>
+<td>aace.logger.<br>sinks[i].<br>rules[j].<br>level</td>
+<td>enum string</td>
+<td>Yes</td>
+<td>The log level used to filter logs written to the sink. <br><br><strong>Accepted values:</strong><ul><li><code>"VERBOSE"</code></li><li><code>"INFO"</code></li><li><code>"WARN"</code></li><li><code>"ERROR"</code></li><li><code>"CRITICAL"</code></li><li><code>"METRIC"</code></li></ul></td>
+<td>"VERBOSE"</td>
+</tr>
+</tbody>
+</table>
+<details>
+<summary>Click to expand or collapse details— Generate the configuration programatically with the C++ factory function</summary>
+<p><br/></p>
+<p>Auto SDK provides the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1logger_1_1config_1_1_logger_configuration.html#ab58d322f01f350cf87c89c41e8257037"><code>LoggerConfiguration::createFileSinkConfig()</code></a> factory function to generate the configuration programatically. </p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;AACE/Logger/Logger.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;AACE/Logger/LoggerConfiguration.h&quot;</span><span class="cp"></span>
+
+
+<span class="k">auto</span><span class="w"> </span><span class="n">fileSinkConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aace</span><span class="o">::</span><span class="n">logger</span><span class="o">::</span><span class="n">config</span><span class="o">::</span><span class="n">LoggerConfiguration</span><span class="o">::</span><span class="n">createFileSinkConfig</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="s">&quot;debug-logs&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">aace</span><span class="o">::</span><span class="n">logger</span><span class="o">::</span><span class="n">LoggerEngineInterface</span><span class="o">::</span><span class="n">Level</span><span class="o">::</span><span class="n">VERBOSE</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s">&quot;opt/AAC/data&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s">&quot;auto-sdk&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mi">5242880</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="mi">5</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">engine</span><span class="o">-&gt;</span><span class="n">configure</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// ...other config objects...,</span>
+<span class="w">        </span><span class="n">fileSinkConfig</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+</code></pre></div>
+</details>
+<p><br/></p>
+<h3 id="optional-curl-configuration">(Optional) cURL configuration</h3>
+<p>The Auto SDK uses cURL for network connections. Your application can provide configuration to specify the cURL configuration:</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.alexa&quot;: {
+        &quot;avsDeviceSDK&quot;: {
+            &quot;libcurlUtils&quot; {
+                &quot;CURLOPT_CAPATH&quot;: {{STRING}},
+                &quot;CURLOPT_INTERFACE&quot;: {{STRING}},
+                &quot;CURLOPT_PROXY&quot;: {{STRING}}
+
+            }
+        }
+    }
+}
+</code></pre></div>
+<p>The following table describes the properties in the configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CURLOPT_CAPATH</td>
+<td>string</td>
+<td>Yes</td>
+<td>The path to the directory containing the CA certificates</td>
+<td>"/opt/AAC/certs"</td>
+</tr>
+<tr>
+<td>CURLOPT_INTERFACE</td>
+<td>string</td>
+<td>Yes</td>
+<td>The outgoing network interface. Can be a network interface name, an IP address, or a host name</td>
+<td>"wlan0"</td>
+</tr>
+<tr>
+<td>CURLOPT_PROXY</td>
+<td>string</td>
+<td>No</td>
+<td>The address of the HTTP proxy</td>
+<td>"http://127.0.0.1:8888"</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note:</strong> If the HTTP proxy requires credentials in HTTP headers to authenticate a user agent, you can <a href="#runtime-properties">specify the header with the <code>PropertyManager</code> interface</a> by using the <code>aace.network.httpProxyHeaders</code> property name. You can also change the network interface at runtime with the <code>aace.network.networkInterface</code> property name.</p>
+</blockquote>
+<p>Auto SDK provides the <a href="https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a2012a3f45f54d16f5d8f260bb16c49c1"><code>AlexaConfiguration::createCurlConfig()</code></a> factory function to generate the configuration programatically. </p>
+<h3 id="optional-aasb-and-messagebroker-configuration">(Optional) AASB and MessageBroker configuration</h3>
+<h4 id="optional-configure-enabled-interfaces">(Optional) Configure enabled interfaces</h4>
+<p>When you use a module, the Engine services of that module enable every interface defined in the module. This means that for every interface, if your application does not subscribe to the AASB messages of the interface, the Engine performs default handling for the messages you do not handle.</p>
+<p>To disable this setting, provide the following <code>aace.messageBroker</code> configuration object in your Engine configuration:</p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.messageBroker&quot;: {
+        &quot;autoEnableInterfaces&quot;: false
+    }
+}
+</code></pre></div>
+<p>You can also change this enablement on a per-interface basis. The <code>enabled</code> setting tells the Engine service whether to enable the interface. If you don't want the Engine to provide a default handler for a particular interface, you can disable the interface using the following configuration:</p>
+<p><div class="highlight"><pre><span></span><code>{
+    &quot;aasb.&lt;message_handler_engine_service_name&gt;&quot;: {
+        &quot;&lt;interface_name&gt;&quot;: {
+            &quot;enabled&quot;: false
+        }
+    }
+}
+</code></pre></div>
+For example, the below configuration disables the <code>TemplateRuntime</code> interface from the <code>Alexa</code> module and the <code>LocationProvider</code> interface from <code>Core</code> module. </p>
+<div class="highlight"><pre><span></span><code>{
+    &quot;aasb.alexa&quot;: {
+        &quot;TemplateRuntime&quot;: {
+            &quot;enabled&quot;: false
+        }
+    },
+   &quot;aasb.location&quot;: {
+      &quot;LocationProvider&quot;: {
+         &quot;enabled&quot;: false
+      }
+   }
+}
+</code></pre></div>
+<h4 id="optional-configure-the-synchronous-message-timeout">(Optional) Configure the synchronous message timeout</h4>
+<p>All the messages published by the Engine through MessageBroker are asynchronous; however, certain messages require your application to respond with a special synchronous-style <code>Reply</code> message. Your application must publish the reply quickly because the Engine blocks its execution thread while waiting for the response, and the MessageBroker cannot dispatch more messages while waiting. The following is an example of the <code>Reply</code> message for the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#getlocation"><code>LocationProvider.GetLocation</code> message</a>:
+<div class="highlight"><pre><span></span><code>{
+  &quot;header&quot;: {
+    &quot;id&quot;: &quot;4c4d13b6-6a8d-445b-931a-a3feb0878311&quot;,
+    &quot;messageType&quot;: &quot;Reply&quot;,
+    &quot;version&quot;: &quot;1.0&quot;,
+    &quot;messageDescription&quot;: {
+      &quot;replyToId&quot;: &quot;23b578ed-6dc3-460a-998e-1647ba6cde42&quot;
+    }
+  },
+  &quot;payload&quot;: {
+    &quot;location&quot;: {
+      &quot;latitude&quot;: 37.410,
+      &quot;longitude&quot;: -122.025
+    }
+  }
+}
+</code></pre></div>
+If your application does not publish the reply before the message timeout expires, the relevant Engine operation won't execute properly. The AASB message documentation for each interface specifies whether the interface requires any reply messages. </p>
+<p>The default timeout value for these messages is 500 milliseconds. In a busy system, the default timeout might not be long enough. You can configure this value by adding the optional field <code>defaultMessageTimeout</code> to the <code>aace.messageBroker</code> JSON object. The following example shows how to change the timeout to 1000 ms:
+<div class="highlight"><pre><span></span><code>{
+    &quot;aace.messageBroker&quot;: {
+        &quot;defaultMessageTimeout&quot;: 1000
+    }
+}
+</code></pre></div></p>
+<blockquote>
+<p><strong>Important!</strong> Since increasing the timeout increases the Engine's message processing time, use this configuration carefully. Consult with your Amazon Solutions Architect (SA) as needed.</p>
+</blockquote>
+<h2 id="understand-the-key-core-engine-services">Understand the key core Engine services</h2>
+<p>The <code>Core</code> module defines several Engine services for common functionality used by multiple Auto SDK modules. For example, the <code>Core</code>, <code>Alexa</code>, and <code>Alexa Comms</code> modules all require the application to play audio through platform-specific audio ouput channels. The <code>Core</code> module defines the core audio Engine service and corresponding <code>AudioOutput</code> AASB message interface, and all three modules use <code>AudioOutput</code> messages to request the application to play audio for their respective audio channels.</p>
+<p>The following list describes the primary core Engine services provided by the <code>Core</code> module. Each service defines to one or more important AASB message interfaces that your application is required to use.</p>
+<blockquote>
+<p><strong>Note:</strong> This is not a list of every Engine service in the <code>Core</code> module. For the most part, every AASB interface defined by <code>Core</code> also corresponds to a <code>Core</code> module Engine service that other modules might care about. The following lists the foundational core services that matter most to your application; the Engine cannot function without these.</p>
+</blockquote>
+<h3 id="authorization">Authorization</h3>
+<p>The <code>Authorization</code> interface specifies messages for your application to initiate device authorization, terminate device authorization, or provide authorization data, such as Alexa access tokens, to the Engine. See <a href="AUTHORIZATION/">Alexa Auto SDK Authorization</a> for more information.</p>
+<h3 id="audio-input-and-output">Audio input and output</h3>
+<p>The core audio Engine service provides a mechanism for Engine components of any module to open audio input and output channels in your application. Each component that requests an audio channel specifies its audio channel type so your application can provide different microphone and media player implementations for each channel. See <a href="AUDIO/">Alexa Auto SDK Audio Channels</a> for more information.</p>
+<h3 id="runtime-properties">Runtime properties</h3>
+<p>Different Auto SDK modules define properties based on their supported features. For example, the <code>Alexa</code> module requires a locale setting to notify Alexa which language to use when interacting with the user. The <code>Core</code> module provides a mechanism for Engine services to register properties they manage and listen to changes in properties managed by other modules. The <code>PropertyManager</code> interface specifies messages for your application and the Engine to query and update these properties. See <a href="RUNTIME_PROPERTIES/">Alexa Auto SDK Property Manager</a> for more information.</p>
+<h2 id="provide-core-device-status">Provide core device status</h2>
+<p>The <code>Core</code> module defines interfaces for your application to provide key "core" information about the status of the application or its runtime environment.</p>
+<h3 id="report-location-with-locationprovider">Report location with LocationProvider</h3>
+<p>Sometimes the user asks Alexa a question that requires she know the location in order to answer properly. For example, a user in San Francisco, California might say <em>"Alexa, what's the weather?"</em>. This user probably wants to hear Alexa say something like <em>"The weather in San Francisco is sixty-five degrees and overcast..."</em> rather than something like <em>"I can't find your exact location right now..."</em>. Similarly, the user might say <em>"Alexa, take me to the nearest Whole Foods"</em> and wants Alexa to start navigation to a Whole Foods that is actually nearby.</p>
+<p>To provide the user with accurate responses to local search commands, weather questions, and more, obtain the user's consent to share their location with Alexa and use the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html"><code>LocationProvider</code></a> interface.</p>
+<blockquote>
+<p><strong>Note:</strong> For Android applications, AACS provides a default implementation of <code>LocationProvider</code>. See the <a href="https://alexa.github.io/alexa-auto-sdk/aacs/android#default-platform-implementation">AACS Default Implementation documentation</a> for more information.</p>
+</blockquote>
+<p>Your application should subscribe to the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#getlocation"><code>LocationProvider.GetLocation</code></a> and <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#getcountry"><code>LocationProvider.GetCountry</code></a> messages to provide location data, such as geocoordinates and vehicle operating country, when the Engine requests it. These messages are synchronous-style and require your application to send the corresponding reply messages right away. To avoid blocking the MessageBroker outgoing thread and delaying user requests to Alexa, your application should keep the location data in a cache that you update frequently. Pull the location from the cache when the Engine requests it.</p>
+<p>The Engine won't publish the <code>GetLocation</code> message if it knows your application has lost access to the location data. Keep the Engine in sync with the state of your application's location provider availability by proactively publishing the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#locationserviceaccesschanged"><code>LocationServiceAccessChanged</code></a> message at startup and each time the state changes. For example, your application might publish this message with <code>access</code> set to <code>DISABLED</code> if the system revokes your application's access to location or if GPS turns off.</p>
+<blockquote>
+<p><strong>Note:</strong> The Engine does not persist this state across device reboots. To ensure the Engine always knows the initial state of location availability, publish a <code>LocationServiceAccessChanged</code> message each time you start the Engine. This includes notifying the Engine that <code>access</code> is <code>ENABLED</code>.</p>
+</blockquote>
+<details>
+<summary>Click to expand or collapse C++ example code</summary>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AACE/Core/MessageBroker.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Location/LocationProvider/GetCountryMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Location/LocationProvider/GetLocationMessage.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Location/LocationProvider/LocationServiceAccessChangedMessage.h&gt;</span><span class="cp"></span>
+
+<span class="k">class</span> <span class="nc">MyLocationProviderHandler</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Call before you start the Engine</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyLocationProviderHandler::subscribeToAASBMessages</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">            </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleGetCountryMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">            </span><span class="n">GetCountryMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">            </span><span class="n">GetCountryMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">        </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span><span class="w"></span>
+<span class="w">            </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">handleGetLocationMessage</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">            </span><span class="n">GetLocationMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"></span>
+<span class="w">            </span><span class="n">GetLocationMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyLocationProviderHandler::handleGetCountryMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">GetCountryMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Quickly publish the GetCountry reply message</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">country</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getCountryFromCache</span><span class="p">();</span><span class="w"> </span><span class="c1">// implement this stub</span>
+<span class="w">        </span><span class="n">GetCountryMessageReply</span><span class="w"> </span><span class="n">replyMsg</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">replyMsg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">messageDescription</span><span class="p">.</span><span class="n">replyToId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">replyMsg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">country</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">country</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">replyMsg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyLocationProviderHandler::handleGetLocationMessage</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">GetLocationMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// Quickly publish the GetCountry reply message</span>
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getLocationFromCache</span><span class="p">();</span><span class="w"> </span><span class="c1">// implement this stub</span>
+<span class="w">        </span><span class="n">GetLocationMessageReply</span><span class="w"> </span><span class="n">replyMsg</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">replyMsg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">messageDescription</span><span class="p">.</span><span class="n">replyToId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">msg</span><span class="p">.</span><span class="n">header</span><span class="p">.</span><span class="n">id</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="c1">// parse &quot;location&quot; and populate the fields of the reply message</span>
+<span class="w">        </span><span class="n">aasb</span><span class="o">::</span><span class="n">message</span><span class="o">::</span><span class="n">location</span><span class="o">::</span><span class="n">locationProvider</span><span class="o">::</span><span class="n">Location</span><span class="w"> </span><span class="n">replyLocation</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">replyLocation</span><span class="p">.</span><span class="n">latitude</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="c1">// the latitude from &quot;location&quot;;</span>
+<span class="w">        </span><span class="n">replyLocation</span><span class="p">.</span><span class="n">longitude</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="p">...</span><span class="w"> </span><span class="p">;</span><span class="w"> </span><span class="c1">// the longitude from &quot;location&quot;;</span>
+<span class="w">        </span><span class="n">replyMsg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">location</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">replyLocation</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">replyMsg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Call when the application access to location data changes</span>
+<span class="w">    </span><span class="c1">// and after starting the Engine</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">MyLocationProviderHandler::locationServiceAccessChanged</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">hasAccess</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">LocationServiceAccessChangedMessage</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hasAccess</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">             </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">access</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aasb</span><span class="o">::</span><span class="n">message</span><span class="o">::</span><span class="n">location</span><span class="o">::</span><span class="n">locationProvider</span><span class="o">::</span><span class="n">LocationServiceAccess</span><span class="o">::</span><span class="n">ENABLED</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">access</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">aasb</span><span class="o">::</span><span class="n">message</span><span class="o">::</span><span class="n">location</span><span class="o">::</span><span class="n">locationProvider</span><span class="o">::</span><span class="n">LocationServiceAccess</span><span class="o">::</span><span class="n">DISABLED</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">toString</span><span class="p">());</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+</details>
+<h3 id="report-network-status-changes-with-networkinfoprovider">Report network status changes with NetworkInfoProvider</h3>
+<p>Your application should monitor the network connection and notify the Engine of changes in the status using the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html"><code>NetworkInfoProvider</code></a> interface. The Engine uses this information to adjust its behavior, including tearing down the connection to Alexa cloud when your application reports that there is no internet connection. Although using <code>NetworkInfoProvider</code> is optional, you should use it so the Engine can avoid undesirable behavior; for instance, attempting to send events to Alexa when the lack of connectivity means the events are bound to fail.</p>
+<blockquote>
+<p><strong>Note:</strong> You must use the <code>NetworkInfoProvider</code> interface if your application uses the Local Voice Control (LVC) extension.</p>
+<p><strong>Note:</strong> For Android applications, AACS provides a default implementation of <code>NetworkInfoProvider</code>. See the <a href="https://alexa.github.io/alexa-auto-sdk/aacs/android#default-platform-implementation">AACS Default Implementation documentation</a> for more information.</p>
+</blockquote>
+<p>Various Engine components want the initial network status at startup so they can adapt their initial behavior accordingly. Your application should subscribe to the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html#getnetworkstatus"><code>NetworkInfoProvider.GetNetworkStatus</code></a> and <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html#getwifisignalstrength"><code>NetworkInfoProvider.GetWifiSignalStrength</code></a> to answer the inital query from the Engine. These messages are synchronous-style and require your application to send the corresponding reply messages right away. </p>
+<p>At runtime, publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html#networkstatuschanged"><code>NetworkInfoProvider.NetworkStatusChanged</code></a> message to notify the Engine of any status changes.</p>
+<h3 id="report-data-usage-with-deviceusage">Report data usage with DeviceUsage</h3>
+<p>Periodically publish the <a href="https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/DeviceUsage/index.html#reportnetworkdatausage"><code>DeviceUsage.ReportNetworkDataUsage</code></a> message (for example, at five minute intervals) to report network data usage to the Engine. If your application uses the <code>Device Client Metrics (DCM)</code> extension, the Engine tracks metrics with this information.</p>
+<p>The <code>usage</code> field in the payload is a JSON object as a string. The format of the JSON is the following:</p>
+<div class="highlight"><pre><span></span><code>{
+  &quot;startTimeStamp&quot; : {{LONG}},
+  &quot;endTimeStamp&quot; : {{LONG}},
+  &quot;networkInterfaceType&quot;: &quot;{{STRING}}&quot;,
+  &quot;dataPlanType&quot; : &quot;{{STRING}}&quot;,
+  &quot;bytesUsage&quot; :{
+       &quot;rxBytes&quot; : {{LONG}},
+       &quot;txBytes&quot; : {{LONG}}
+   }
+}
+</code></pre></div>
+<p>The following table describes the properties in the JSON:</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>startTimeStamp</td>
+<td>long</td>
+<td>Yes</td>
+<td>The starting timestamp in milliseconds for this network usage datapoint</td>
+<td>—</td>
+</tr>
+<tr>
+<td>endTimeStamp</td>
+<td>long</td>
+<td>Yes</td>
+<td>The ending timestamp in milliseconds for this network usage datapoint</td>
+<td>—</td>
+</tr>
+<tr>
+<td>networkInterfaceType</td>
+<td>string</td>
+<td>Yes</td>
+<td>The network interface name over which the data is recorded</td>
+<td>"WIFI",<br>"MOBILE"</td>
+</tr>
+<tr>
+<td>dataPlanType</td>
+<td>string</td>
+<td>No</td>
+<td>The type of data plan the device is subscribed to. This is an optional field and should be provided if your application uses the <code>AlexaConnectivity</code> module.</td>
+<td>See <a href="../connectivity/"><code>AlexaConnectivity</code></a></td>
+</tr>
+<tr>
+<td>bytesUsage<br>.rxBytes</td>
+<td>long</td>
+<td>Yes</td>
+<td>The bytes received over the network interface</td>
+<td>—</td>
+</tr>
+<tr>
+<td>bytesUsage<br>.txBytes</td>
+<td>long</td>
+<td>Yes</td>
+<td>The bytes transmitted over the network interface</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../connectivity/aasb-docs/AlexaConnectivity/" class="md-footer__link md-footer__link--prev" aria-label="Previous: AlexaConnectivity" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              AlexaConnectivity
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="aasb-docs/AudioInput/" class="md-footer__link md-footer__link--next" aria-label="Next: AudioInput" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              AudioInput
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2016 - 2021 Amazon
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      
+    
+  </body>
+</html>

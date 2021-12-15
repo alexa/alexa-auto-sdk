@@ -1,0 +1,5235 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      <link rel="icon" href="../logo.png">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+    
+    
+      
+        <title>Build Alexa Auto SDK - Alexa Auto SDK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.a617204b.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.9204c3b2.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#build-alexa-auto-sdk" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Alexa Auto SDK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Build Alexa Auto SDK
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08z"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href=".." class="md-tabs__link">
+      Home
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../GETSTARTED/" class="md-tabs__link">
+      Getting Started
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="./" class="md-tabs__link md-tabs__link--active">
+        Build Auto SDK
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../SDK_MODULES/" class="md-tabs__link">
+        Modules
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../aacs/android/" class="md-tabs__link">
+        AACS
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../samples/cpp/" class="md-tabs__link">
+        Sample App
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../LINUX_INTEGRATION/" class="md-tabs__link">
+      Linux Integration
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../CHANGELOG/" class="md-tabs__link">
+      CHANGELOG
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../MIGRATION/" class="md-tabs__link">
+        Migration Guide
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../NEED_HELP/" class="md-tabs__link">
+      Need Help?
+    </a>
+  </li>
+
+      
+        
+  
+  
+
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../CODE_OF_CONDUCT/" class="md-tabs__link">
+        More
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Alexa Auto SDK" class="md-nav__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
+      
+  <img src="../logo.png" alt="logo">
+
+    </a>
+    Alexa Auto SDK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    alexa/alexa-auto-sdk
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        Home
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GETSTARTED/" class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Build Auto SDK
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Build Auto SDK" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Build Auto SDK
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Build Alexa Auto SDK
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Build Alexa Auto SDK
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#supported-platforms-and-architectures" class="md-nav__link">
+    Supported platforms and architectures
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-build-requirements" class="md-nav__link">
+    General build requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-dependencies" class="md-nav__link">
+    Build dependencies
+  </a>
+  
+    <nav class="md-nav" aria-label="Build dependencies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    General
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    Linux
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos" class="md-nav__link">
+    macOS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understand-the-build-system" class="md-nav__link">
+    Understand the build system
+  </a>
+  
+    <nav class="md-nav" aria-label="Understand the build system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conan" class="md-nav__link">
+    Conan
+  </a>
+  
+    <nav class="md-nav" aria-label="Conan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-sdk-modules" class="md-nav__link">
+    Auto SDK modules
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#third-party-dependencies" class="md-nav__link">
+    Third party dependencies
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#builder-tool" class="md-nav__link">
+    Builder Tool
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alexa-auto-client-service" class="md-nav__link">
+    Alexa Auto Client Service
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-with-builder-tool" class="md-nav__link">
+    Build with Builder Tool
+  </a>
+  
+    <nav class="md-nav" aria-label="Build with Builder Tool">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specify-the-build-target" class="md-nav__link">
+    Specify the build target
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-which-modules-to-build" class="md-nav__link">
+    Specify which modules to build
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clean-build-artifacts" class="md-nav__link">
+    Clean build artifacts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-debug-libraries" class="md-nav__link">
+    Build debug libraries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#locate-the-build-output" class="md-nav__link">
+    Locate the build output
+  </a>
+  
+    <nav class="md-nav" aria-label="Locate the build output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#archive-contents" class="md-nav__link">
+    Archive contents
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-with-conan-directly" class="md-nav__link">
+    Build with Conan directly
+  </a>
+  
+    <nav class="md-nav" aria-label="Build with Conan directly">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#export-conan-recipes" class="md-nav__link">
+    Export Conan recipes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-modules" class="md-nav__link">
+    Build modules
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-build-settings-and-options" class="md-nav__link">
+    Specify build settings and options
+  </a>
+  
+    <nav class="md-nav" aria-label="Specify build settings and options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inspect-package-recipes" class="md-nav__link">
+    Inspect package recipes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remove-packages-from-the-cache" class="md-nav__link">
+    Remove packages from the cache
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-auto-sdk-in-other-recipes" class="md-nav__link">
+    Use Auto SDK in other recipes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-specific-build-information" class="md-nav__link">
+    Platform-specific build information
+  </a>
+  
+    <nav class="md-nav" aria-label="Platform-specific build information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#android" class="md-nav__link">
+    Android
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ubuntu" class="md-nav__link">
+    Ubuntu
+  </a>
+  
+    <nav class="md-nav" aria-label="Ubuntu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-gstreamer" class="md-nav__link">
+    Install GStreamer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-the-default-conan-profile" class="md-nav__link">
+    Update the default Conan profile
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poky" class="md-nav__link">
+    Poky
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qnx" class="md-nav__link">
+    QNX
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos_1" class="md-nav__link">
+    macOS
+  </a>
+  
+    <nav class="md-nav" aria-label="macOS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gstreamer-build-issue" class="md-nav__link">
+    GStreamer build issue
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    Windows
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-in-a-docker-container" class="md-nav__link">
+    Build in a Docker container
+  </a>
+  
+    <nav class="md-nav" aria-label="Build in a Docker container">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optimize-build-performance" class="md-nav__link">
+    Optimize build performance
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../builder/">Auto SDK Builder Tool Reference</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Auto SDK Builder Tool Reference" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Auto SDK Builder Tool Reference
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4">
+          Modules
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Modules" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Modules
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SDK_MODULES/" class="md-nav__link">
+        Auto SDK Modules and Extensions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_2">
+          AASB
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/aasb/aasb-docs/AASB/" class="md-nav__link">
+        AASB Message Definition
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/address-book/">Address Book</a>
+          
+            <label for="__nav_4_3">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Address Book" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Address Book
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3_2" type="checkbox" id="__nav_4_3_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_3_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/address-book/aasb-docs/AddressBook/" class="md-nav__link">
+        Address Book
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/alexa/">Alexa</a>
+          
+            <label for="__nav_4_4">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Alexa" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_4">
+          <span class="md-nav__icon md-icon"></span>
+          Alexa
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4_2" type="checkbox" id="__nav_4_4_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_4_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/Alerts/" class="md-nav__link">
+        Alerts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/AlexaClient/" class="md-nav__link">
+        AlexaClient
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/AlexaSpeaker/" class="md-nav__link">
+        AlexaSpeaker
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/AudioPlayer/" class="md-nav__link">
+        AudioPlayer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/AuthProvider/" class="md-nav__link">
+        AuthProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/DeviceSetup/" class="md-nav__link">
+        DeviceSetup
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/DoNotDisturb/" class="md-nav__link">
+        DoNotDisturb
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/EqualizerController/" class="md-nav__link">
+        EqualizerController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/ExternalMediaAdapter/" class="md-nav__link">
+        ExternalMediaAdapter
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/GlobalPreset/" class="md-nav__link">
+        GlobalPreset
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/LocalMediaSource/" class="md-nav__link">
+        LocalMediaSource
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/MediaPlaybackRequestor/" class="md-nav__link">
+        MediaPlaybackRequestor
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/Notifications/" class="md-nav__link">
+        Notifications
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/PlaybackController/" class="md-nav__link">
+        PlaybackController
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/SpeechRecognizer/" class="md-nav__link">
+        SpeechRecognizer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/alexa/aasb-docs/TemplateRuntime/" class="md-nav__link">
+        TemplateRuntime
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5" type="checkbox" id="__nav_4_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/apl/">APL</a>
+          
+            <label for="__nav_4_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_5">
+          <span class="md-nav__icon md-icon"></span>
+          APL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_5_2" type="checkbox" id="__nav_4_5_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_5_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/apl/aasb-docs/APL/" class="md-nav__link">
+        APL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_6" type="checkbox" id="__nav_4_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/bluetooth/">Bluetooth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Bluetooth" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_6">
+          <span class="md-nav__icon md-icon"></span>
+          Bluetooth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7" type="checkbox" id="__nav_4_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/car-control/">CarControl</a>
+          
+            <label for="__nav_4_7">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CarControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_7">
+          <span class="md-nav__icon md-icon"></span>
+          CarControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_7_2" type="checkbox" id="__nav_4_7_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_7_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_7_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/car-control/aasb-docs/CarControl/" class="md-nav__link">
+        CarControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8" type="checkbox" id="__nav_4_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/cbl/">CBL</a>
+          
+            <label for="__nav_4_8">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CBL" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_8">
+          <span class="md-nav__icon md-icon"></span>
+          CBL
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_8_2" type="checkbox" id="__nav_4_8_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_8_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_8_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/cbl/aasb-docs/CBL/" class="md-nav__link">
+        CBL
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9" type="checkbox" id="__nav_4_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/connectivity/">Connectivity</a>
+          
+            <label for="__nav_4_9">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Connectivity" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_9">
+          <span class="md-nav__icon md-icon"></span>
+          Connectivity
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_9_2" type="checkbox" id="__nav_4_9_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_9_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_9_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/connectivity/aasb-docs/AlexaConnectivity/" class="md-nav__link">
+        AlexaConnectivity
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10" type="checkbox" id="__nav_4_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/core/">Core</a>
+          
+            <label for="__nav_4_10">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Core" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_10">
+          <span class="md-nav__icon md-icon"></span>
+          Core
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_10_2" type="checkbox" id="__nav_4_10_2" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_10_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_10_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/AudioInput/" class="md-nav__link">
+        AudioInput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/AudioOutput/" class="md-nav__link">
+        AudioOutput
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/Authorization/" class="md-nav__link">
+        Authorization
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/DeviceUsage/" class="md-nav__link">
+        DeviceUsage
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/LocationProvider/" class="md-nav__link">
+        LocationProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/NetworkInfoProvider/" class="md-nav__link">
+        NetworkInfoProvider
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/core/aasb-docs/PropertyManager/" class="md-nav__link">
+        PropertyManager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11" type="checkbox" id="__nav_4_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/custom-domain/">CustomDomain</a>
+          
+            <label for="__nav_4_11">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="CustomDomain" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_11">
+          <span class="md-nav__icon md-icon"></span>
+          CustomDomain
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_11_2" type="checkbox" id="__nav_4_11_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_11_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_11_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/custom-domain/aasb-docs/CustomDomain/" class="md-nav__link">
+        CustomDomain
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_12" type="checkbox" id="__nav_4_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/loopback-detector/">LoopbackDetector</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="LoopbackDetector" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_12">
+          <span class="md-nav__icon md-icon"></span>
+          LoopbackDetector
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13" type="checkbox" id="__nav_4_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/messaging/">Messaging</a>
+          
+            <label for="__nav_4_13">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Messaging" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_13">
+          <span class="md-nav__icon md-icon"></span>
+          Messaging
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_13_2" type="checkbox" id="__nav_4_13_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_13_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_13_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/messaging/aasb-docs/Messaging/" class="md-nav__link">
+        Messaging
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14" type="checkbox" id="__nav_4_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/navigation/">Navigation</a>
+          
+            <label for="__nav_4_14">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Navigation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_14">
+          <span class="md-nav__icon md-icon"></span>
+          Navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_14_2" type="checkbox" id="__nav_4_14_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_14_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_14_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/navigation/aasb-docs/Navigation/" class="md-nav__link">
+        Navigation
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15" type="checkbox" id="__nav_4_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/phone-control/">PhoneControl</a>
+          
+            <label for="__nav_4_15">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="PhoneControl" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_15">
+          <span class="md-nav__icon md-icon"></span>
+          PhoneControl
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_15_2" type="checkbox" id="__nav_4_15_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_15_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_15_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/phone-control/aasb-docs/PhoneCallController/" class="md-nav__link">
+        PhoneControl
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_16" type="checkbox" id="__nav_4_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/system-audio/">SystemAudio</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="SystemAudio" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_16">
+          <span class="md-nav__icon md-icon"></span>
+          SystemAudio
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17" type="checkbox" id="__nav_4_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/text-to-speech/">TextToSpeech</a>
+          
+            <label for="__nav_4_17">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeech" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_17">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeech
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_17_2" type="checkbox" id="__nav_4_17_2" >
+      
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_4_17_2">
+          AASB Message Definition
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="AASB Message Definition" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_17_2">
+          <span class="md-nav__icon md-icon"></span>
+          AASB Message Definition
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../modules/text-to-speech/aasb-docs/TextToSpeech/" class="md-nav__link">
+        TextToSpeech
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_18" type="checkbox" id="__nav_4_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../modules/text-to-speech-provider/">TextToSpeechProvider</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="TextToSpeechProvider" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_18">
+          <span class="md-nav__icon md-icon"></span>
+          TextToSpeechProvider
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/">AACS</a>
+          
+            <label for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/service/">Configuration</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3" type="checkbox" id="__nav_5_3" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_3">
+          Common
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Common" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_3">
+          <span class="md-nav__icon md-icon"></span>
+          Common
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_1" type="checkbox" id="__nav_5_3_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/common/ipc/">IPC</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="IPC" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          IPC
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_3_2" type="checkbox" id="__nav_5_3_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/common/commonutils/">Common Utils</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Common Utils" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          Common Utils
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_4" type="checkbox" id="__nav_5_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">AACS Instrumentation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Instrumentation" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_4">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Instrumentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_5" type="checkbox" id="__nav_5_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/sample-app/">AACS Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="AACS Sample App" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_5">
+          <span class="md-nav__icon md-icon"></span>
+          AACS Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6" type="checkbox" id="__nav_5_6" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_6">
+          App Components
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="App Components" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_6">
+          <span class="md-nav__icon md-icon"></span>
+          App Components
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_1" type="checkbox" id="__nav_5_6_1" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-apis/">alexa-auto-apis</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apis" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_1">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apis
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2" type="checkbox" id="__nav_5_6_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
+          
+            <label for="__nav_5_6_2">
+              <span class="md-nav__icon md-icon"></span>
+            </label>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_2">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apl-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_2_2" type="checkbox" id="__nav_5_6_2_2" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/">APL Render</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="APL Render" data-md-level="4">
+        <label class="md-nav__title" for="__nav_5_6_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          APL Render
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_3" type="checkbox" id="__nav_5_6_3" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-apps-common-ui/">alexa-auto-apps-common-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_3">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_4" type="checkbox" id="__nav_5_6_4" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-apps-common-util/">alexa-auto-apps-common-util</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-apps-common-util" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_4">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-apps-common-util
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_5" type="checkbox" id="__nav_5_6_5" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-carcontrol/">alexa-auto-carcontrol</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-carcontrol" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_5">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-carcontrol
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_6" type="checkbox" id="__nav_5_6_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-comms-ui/">alexa-auto-comms-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-comms-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_6">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-comms-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_7" type="checkbox" id="__nav_5_6_7" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-contacts/">alexa-auto-contacts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-contacts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_7">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-contacts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_8" type="checkbox" id="__nav_5_6_8" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-device-usage/">alexa-auto-device-usage</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-device-usage" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_8">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-device-usage
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_9" type="checkbox" id="__nav_5_6_9" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-lwa-auth/">alexa-auto-lwa-auth</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-lwa-auth" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_9">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-lwa-auth
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_10" type="checkbox" id="__nav_5_6_10" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-media-player/">alexa-auto-media-player</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-media-player" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_10">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-media-player
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_11" type="checkbox" id="__nav_5_6_11" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-navigation/">alexa-auto-navigation</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-navigation" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_11">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-navigation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_12" type="checkbox" id="__nav_5_6_12" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-settings/">alexa-auto-settings</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-settings" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_12">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-settings
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_13" type="checkbox" id="__nav_5_6_13" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-setup/">alexa-auto-setup</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-setup" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_13">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-setup
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_14" type="checkbox" id="__nav_5_6_14" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-telephony/">alexa-auto-telephony</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-telephony" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_14">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-telephony
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_15" type="checkbox" id="__nav_5_6_15" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-templateruntime-renderer/">alexa-auto-templateruntime-renderer</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-templateruntime-renderer" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_15">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-templateruntime-renderer
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_16" type="checkbox" id="__nav_5_6_16" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-tts/">alexa-auto-tts</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-tts" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_16">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-tts
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_17" type="checkbox" id="__nav_5_6_17" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-ux-restrictions/">alexa-auto-ux-restrictions</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-ux-restrictions" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_17">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-ux-restrictions
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_18" type="checkbox" id="__nav_5_6_18" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-voice-interaction/">alexa-auto-voice-interaction</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-interaction" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_18">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-interaction
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_6_19" type="checkbox" id="__nav_5_6_19" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../aacs/android/app-components/alexa-auto-voice-ui/">alexa-auto-voice-ui</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="alexa-auto-voice-ui" data-md-level="3">
+        <label class="md-nav__title" for="__nav_5_6_19">
+          <span class="md-nav__icon md-icon"></span>
+          alexa-auto-voice-ui
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      
+      
+        
+          
+            
+          
+        
+      
+      
+        
+        
+        <div class="md-nav__link md-nav__link--index ">
+          <a href="../samples/cpp/">Sample App</a>
+          
+        </div>
+      
+      <nav class="md-nav" aria-label="Sample App" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Sample App
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../LINUX_INTEGRATION/" class="md-nav__link">
+        Linux Integration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CHANGELOG/" class="md-nav__link">
+        CHANGELOG
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_9" type="checkbox" id="__nav_9" >
+      
+      
+      
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_9">
+          Migration Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Migration Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_9">
+          <span class="md-nav__icon md-icon"></span>
+          Migration Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MIGRATION/" class="md-nav__link">
+        General Migration
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MIGRATION_TO_AASB_MESSAGEBROKER/" class="md-nav__link">
+        Migration to AASB MessageBroker
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../NEED_HELP/" class="md-nav__link">
+        Need Help?
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_11" type="checkbox" id="__nav_11" >
+      
+      
+      
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_11">
+          More
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="More" data-md-level="1">
+        <label class="md-nav__title" for="__nav_11">
+          <span class="md-nav__icon md-icon"></span>
+          More
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CODE_OF_CONDUCT/" class="md-nav__link">
+        Code of Conduct
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../CONTRIBUTING/" class="md-nav__link">
+        Contributing
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SECURITY/" class="md-nav__link">
+        Security
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#supported-platforms-and-architectures" class="md-nav__link">
+    Supported platforms and architectures
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#general-build-requirements" class="md-nav__link">
+    General build requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-dependencies" class="md-nav__link">
+    Build dependencies
+  </a>
+  
+    <nav class="md-nav" aria-label="Build dependencies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#general" class="md-nav__link">
+    General
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#linux" class="md-nav__link">
+    Linux
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos" class="md-nav__link">
+    macOS
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understand-the-build-system" class="md-nav__link">
+    Understand the build system
+  </a>
+  
+    <nav class="md-nav" aria-label="Understand the build system">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conan" class="md-nav__link">
+    Conan
+  </a>
+  
+    <nav class="md-nav" aria-label="Conan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#auto-sdk-modules" class="md-nav__link">
+    Auto SDK modules
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#third-party-dependencies" class="md-nav__link">
+    Third party dependencies
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#builder-tool" class="md-nav__link">
+    Builder Tool
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alexa-auto-client-service" class="md-nav__link">
+    Alexa Auto Client Service
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-with-builder-tool" class="md-nav__link">
+    Build with Builder Tool
+  </a>
+  
+    <nav class="md-nav" aria-label="Build with Builder Tool">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specify-the-build-target" class="md-nav__link">
+    Specify the build target
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-which-modules-to-build" class="md-nav__link">
+    Specify which modules to build
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clean-build-artifacts" class="md-nav__link">
+    Clean build artifacts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-debug-libraries" class="md-nav__link">
+    Build debug libraries
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#locate-the-build-output" class="md-nav__link">
+    Locate the build output
+  </a>
+  
+    <nav class="md-nav" aria-label="Locate the build output">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#archive-contents" class="md-nav__link">
+    Archive contents
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-with-conan-directly" class="md-nav__link">
+    Build with Conan directly
+  </a>
+  
+    <nav class="md-nav" aria-label="Build with Conan directly">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#export-conan-recipes" class="md-nav__link">
+    Export Conan recipes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-modules" class="md-nav__link">
+    Build modules
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#specify-build-settings-and-options" class="md-nav__link">
+    Specify build settings and options
+  </a>
+  
+    <nav class="md-nav" aria-label="Specify build settings and options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inspect-package-recipes" class="md-nav__link">
+    Inspect package recipes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remove-packages-from-the-cache" class="md-nav__link">
+    Remove packages from the cache
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#use-auto-sdk-in-other-recipes" class="md-nav__link">
+    Use Auto SDK in other recipes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#platform-specific-build-information" class="md-nav__link">
+    Platform-specific build information
+  </a>
+  
+    <nav class="md-nav" aria-label="Platform-specific build information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#android" class="md-nav__link">
+    Android
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ubuntu" class="md-nav__link">
+    Ubuntu
+  </a>
+  
+    <nav class="md-nav" aria-label="Ubuntu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-gstreamer" class="md-nav__link">
+    Install GStreamer
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-the-default-conan-profile" class="md-nav__link">
+    Update the default Conan profile
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#poky" class="md-nav__link">
+    Poky
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qnx" class="md-nav__link">
+    QNX
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#macos_1" class="md-nav__link">
+    macOS
+  </a>
+  
+    <nav class="md-nav" aria-label="macOS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gstreamer-build-issue" class="md-nav__link">
+    GStreamer build issue
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windows" class="md-nav__link">
+    Windows
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-in-a-docker-container" class="md-nav__link">
+    Build in a Docker container
+  </a>
+  
+    <nav class="md-nav" aria-label="Build in a Docker container">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#optimize-build-performance" class="md-nav__link">
+    Optimize build performance
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+
+<h1 id="build-alexa-auto-sdk">Build Alexa Auto SDK</h1>
+<h2 id="supported-platforms-and-architectures">Supported platforms and architectures</h2>
+<p>Auto SDK can be built for the following supported target platforms and hardware architectures:</p>
+<ul>
+<li>Android 5.1 Lollipop API Level 22 or higher.</li>
+<li>ARM 64-bit</li>
+<li>x86 64-bit</li>
+<li>QNX 7.0</li>
+<li>ARM 64-bit</li>
+<li>x86 64-bit</li>
+<li>Generic Linux</li>
+<li>x86 64-bit</li>
+<li>Poky Linux</li>
+<li>ARMv7a (+NEON)</li>
+<li>AArch64</li>
+<li>macOS</li>
+<li>x86 64-bit</li>
+</ul>
+<h2 id="general-build-requirements">General build requirements</h2>
+<p>You can build the Alexa Auto SDK natively on a Linux or macOS host, or you can use Docker. For specific information about Docker, see <a href="#build-in-a-docker-container">Build in a Docker container</a>.</p>
+<p>The following list describes the supported host configurations:</p>
+<ul>
+<li>Operating system:</li>
+<li>macOS Sierra</li>
+<li>Ubuntu 18.04 LTS (Bionic) or Ubuntu 20.04 LTS (Focal)</li>
+<li>Processor: 2.5 GHz</li>
+<li>Memory: 16 Gb</li>
+<li>Storage: 1 Gb+ available to use</li>
+</ul>
+<h2 id="build-dependencies">Build dependencies</h2>
+<p>To build Auto SDK, you must install the following dependencies on your host machine:</p>
+<h3 id="general">General</h3>
+<ul>
+<li><a href="https://www.python.org/downloads">Python 3.7</a></li>
+<li><a href="https://conan.io/downloads.html">Conan 1.33</a></li>
+<li><a href="https://cmake.org/install">CMake 3.12</a></li>
+</ul>
+<h3 id="linux">Linux</h3>
+<ul>
+<li>GCC</li>
+<li>GStreamer (see <a href="#install-gstreamer">Install GStreamer</a>)</li>
+</ul>
+<h3 id="macos">macOS</h3>
+<ul>
+<li>Xcode</li>
+</ul>
+<h2 id="understand-the-build-system">Understand the build system</h2>
+<p>Building software for multiple platforms can be complex because specific toolchains might vary depending on the build system and target platform. In general, there are two flavors of builds: native and cross-compiled. In a native build, the build system uses its own toolchain and libraries to build the software, so the compiled software can run on the platform that built it. In cross-compilation, the build system typically uses an installed toolchain to compile the software for a different target platform. It's possible that more than one toolchain is installed on a system, so extra steps are typically needed to cross-compile to those targets. Auto SDK uses <a href="https://conan.io">Conan</a>, along with other tools and scripts described in this section, to manage the complexities required to implement a complete build system.</p>
+<h3 id="conan">Conan</h3>
+<p>The Auto SDK build system uses Conan as its underlying package manager and build configuration tool. For every Conan package, there is a recipe that defines the dependencies of the package and specifies how to download and build the package source code. After building a package, Conan copies the binaries and other artifacts into a cache directory so other recipes that depend on that package can use the prebuilt binaries without rebuilding them. When a Conan recipe defines a dependency, Conan finds and builds the dependency as required, taking care of complexities such as transitive requirements, package version conflicts, and managing multiple versions of a package built with different configurations.</p>
+<p>Before using a package, Conan must export or download the package into the local cache. When a package recipe exists in the same local repository as the source code it builds, as is the case when you download Auto SDK, you must run <code>conan create</code> or <code>conan export</code> before other recipes can build the package. Community servers such as <a href="https://conan.io/center">Conan Center</a> host some popular third party libraries, however, so Conan automatically downloads them to the local cache as needed. Auto SDK requires a combination of Conan packages including local recipes for Auto SDK modules and tools, local recipes for third party packages, and third party packages hosted on the Conan Center server.</p>
+<p>Once Conan copies a package into the local cache, a recipe can build or consume the package based on the specified build configuration. Conan will build a new package version if the package version is required and missing from the cache. For example, if you build Auto SDK for Linux, Conan will build all of the required packages for the specified Linux target. If you then build for an Android target, Conan will rebuild all of the required packages for the Android target and cache both the Linux and Android versions. In addition to target platform, any option or setting that you specify when building a recipe affects the package version.</p>
+<h4 id="auto-sdk-modules">Auto SDK modules</h4>
+<p>Auto SDK includes a base Conan recipe class that all Auto SDK modules extend. This is defined in <code>conan/recipes/aac-sdk-tools</code>, and must be exported before other modules since it is required by each module's recipe definition. The base recipe defines common build options, and relies on specific conventions in the module's directory structure to find source files and headers, and to generate other artifacts that are needed at build time. A simple Conan recipe is required for each module to override abstract values in the base class (such as the module name), and to define any module specific dependencies or options that are required. A module can also define it's own CMake files, unique configuration, or even custom build steps as needed.</p>
+<p>For each module, the base recipe defines common options that are used to specify which components are included in the library. The default values provided in the base recipe should be used in most cases when you are building release libraries for production. For some cases, however, you may want to enabled features such as <code>with_sensitive_logs</code> or <code>with_unit_tests</code>, to add additional information when debugging issues with the libraries. To find out which options are defined for a specific module, you can use the <code>conan inspect</code> command to display information about any Conan recipe. This command will display all of options and default values for a recipe, including any options that are inherited from the base module recipe. See the <a href="#specify-build-settings-and-options">Specify build settings and options</a> section in this guide, for more information.</p>
+<p>Applications integrate with Auto SDK using the MessageBroker API, by publishing and subscribing to specific message topics and actions (see <a href="../modules/core/">Using the MessageBroker API</a>). Most modules provide interfaces that require these messages to be defined, in which case they will include one or more message definition files in the <code>aasb/messages</code> directory of the module. The model created by the message definitions are used when building Auto SDK to generate message headers that are required to build the module, and are also used to create documentation for each message interface. </p>
+<h4 id="third-party-dependencies">Third party dependencies</h4>
+<p>Auto SDK has dependencies on several third party packages (libraries and build tools for example), which may themselves have dependencies on other packages. In general, managing these types of build requirements can be very complex for a large project. Conan helps by providing community hosted recipes for many common packages, as well as by allowing developers to create there own package recipes. It is important to understand that some of the packages used by Auto SDK are pulled from the Conan Center remote server, while others are defined locally in the <code>conan/recipes</code> directory of Auto SDK. Local recipes are typically required when the package does not already exist on Conan Center, or there are specific patches or changes to the recipe that are needed for Auto SDK. </p>
+<h3 id="builder-tool">Builder Tool</h3>
+<p>The Builder Tool is a script that can be used to build Auto SDK libraries for supported platforms. It improves the build process by wrapping underlying Conan commands and options with a simple command line interface. Although it is possible to use Conan by itself to build Auto SDK - see the <a href="#build-with-conan-directly">Build with Conan directly</a> section of this guide, it is recommended to use the Builder Tool for common build tasks.</p>
+<h3 id="alexa-auto-client-service">Alexa Auto Client Service</h3>
+<p>Alexa Auto Client Service (AACS) is an Android service library that simplifies the process of integrating Auto SDK on Android-based devices. AACS has a dependency on Auto SDK native Android libraries, but can be built independently using standard Android development tools. For more information about building AACS, see the <a href="../aacs/android/sample-app/#building-the-aacs-sample-app-using-aacs-aar">Building AACS with AACS Sample App</a> section of the <a href="../aacs/android/">Alexa Auto Client Service</a> guide.</p>
+<h2 id="build-with-builder-tool">Build with Builder Tool</h2>
+<p>The Builder Tool script, <code>build.py</code> is located in the <code>builder</code> directory of the SDK. It wraps underlying Conan commands, and simplifies building libraries for Auto SDK modules on supported platforms. Individual modules, components, and dependencies in the SDK are described as packages in the builder. Each package has a corresponding Conan recipe that is used to build and deploy the package to the cache located in the builder's home directory. An archive containing all of the specified build artifacts is created from the cache, and written to the <code>deploy</code> directory of the builder, after the build has completed. This section descibes the most common commands used to build Auto SDK. For a complete reference to the Builder Tool command line interface, see <a href="../builder/">Builder Tool command reference</a>.</p>
+<p>Auto SDK currently supports native builds for Ubuntu Linux (x86_64) and MacOS, and building for each platform follows the same steps. After cloning the Auto SDK git repository on your system, the following examples should be run with <code>aac-sdk</code> as the working directory.</p>
+<p>The following command will build all of the modules that are included in the Auto SDK repository, along with any dependencies that are required for the target platform:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py
+</code></pre></div>
+<p>When you run the build command, the builder tool will export and configure any new build artifacts, such as package recipes or configuration files, that are discovered in the search path. The first time you run (or after cleaning the build cache), you'll see several log messages indicating that the build recipes are being exported to the local cache:</p>
+<div class="highlight"><pre><span></span><code><span class="o">[</span>BUILDER<span class="o">]</span> INFO: Python version: <span class="m">3</span>.7.3
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Cleaning cached builder data
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Builder home: ../aac-sdk/builder/.builder
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Conan home: ../aac-sdk/builder/.builder/.conan
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Gradle home: ../aac-sdk/builder/.builder/.gradle
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Configuring Conan...
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Installing Conan configuration: ../aac-sdk/conan/config
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Exporting recipe: aac-sdk-tools
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Exporting recipe: aac-module-core
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Exporting recipe: aac-module-alexa
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Exporting recipe: aac-module-cbl
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Exporting recipe: android-sdk-tools
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Exporting recipe: avs-device-sdk
+...
+</code></pre></div>
+<p>The builder keeps track of which recipes have already been added to the cache, so that the next time you run the build command only new recipes will be exported. It is possible, however, to tell the builder to force re-exporting a recipe (using the <code>-f</code> or <code>--force</code> option), and build it if necessary. The following command will force all Auto SDK module recipes to be re-exported:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -f <span class="s2">&quot;aac-module-*&quot;</span>
+</code></pre></div>
+<p>To explicitly force one or more recipes to be exported, you can specify the name of the module (or explicit package name) that you want. The following example will force the builder to re-export and build only the <code>alexa</code> and <code>cbl</code> modules.</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -f alexa cbl
+</code></pre></div>
+<p>Each time the builder is run, it will also attempt to re-configure Conan settings by initializing the Conan configuration and installing any config files found in the search path. This happens every time because it is possible, using Docker for example, to re-use the Conan home path when building with a different build system configuration. This step ensures that the Conan configuration will match the build system currently being used. In the case that you want to skip the configuration step for some reason (maybe you have overridden configuration settings in the Conan home manually), you can tell the builder to skip the configuration step using the <code>--skip-config</code> option:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py --skip-config
+</code></pre></div>
+<h3 id="specify-the-build-target">Specify the build target</h3>
+<p>Auto SDK can be cross-compiled for supported target systems by specifying the platform and architecture with the build command. Android and QNX targets can be built on either Linux or macOS, and Poky must be built using Linux. For information about specific build target requirements, see the <a href="#platform-specific-build-information">Platform-specific build information</a> section of this guide. To set the target platform using the Builder Tool, specify the <code>--platform,-p &lt;platform&gt;</code> option when doing a build:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p android
+</code></pre></div>
+<p>You can also set the target architecture by specifying the  <code>--arch,-a &lt;architecture&gt;</code> option:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p android -a x86_64
+</code></pre></div>
+<p>The following table defines the supported platforms and architectures.</p>
+<table>
+<thead>
+<tr>
+<th>platform</th>
+<th>arch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>android</td>
+<td>armv8, x86_64</td>
+</tr>
+<tr>
+<td>qnx</td>
+<td>armv8, x86_64</td>
+</tr>
+<tr>
+<td>poky</td>
+<td>armv8, armv7hf, x86_64, x86</td>
+</tr>
+</tbody>
+</table>
+<h3 id="specify-which-modules-to-build">Specify which modules to build</h3>
+<p>If you are using a subset of modules in Auto SDK, you can specify which modules to build on the command line using the <code>-m</code> or <code>--modules</code> option followed by a list of modules names. Dependent modules and libraries will be included transitively when specifying which modules to build. The following example will build the <code>core</code>, <code>alexa</code>, and <code>cbl</code> modules, and package them into the output archive:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -m core alexa cbl
+</code></pre></div>
+<p>You can verify which modules were specified in the build by looking at the <code>[requires]</code> section or <code>pkg_modules</code> option value in the <code>aac-buildinfo.txt</code> file:</p>
+<div class="highlight"><pre><span></span><code>[requires]
+    aac-module-alexa/dev
+    aac-module-cbl/dev
+    aac-module-core/dev
+
+[options]
+    ...
+    pkg_modules=aac-module-core/dev,aac-module-alexa/dev,aac-module-cbl/dev
+</code></pre></div>
+<p>You could also build the same modules by specifying the following on the command line:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -m cbl
+</code></pre></div>
+<p>This works because the <code>cbl</code> module depends on the <code>alexa</code> module, which depends on the <code>core</code> module - so even though they are not specified on the command line, <code>core</code> and <code>alexa</code> are transitively included. The <code>aac-buildinfo.txt</code> file will only show the <code>cbl</code> module under the <code>[requires]</code> section, however, the full list of included dependencies can be found under the <code>[full_requires]</code> section in the build info:</p>
+<div class="highlight"><pre><span></span><code>[full_requires]
+    aac-module-alexa/dev:1de4d8ddd6d19b16b05d95052195f9556361e7b5
+    aac-module-cbl/dev:8b2bd324ad68ca44682ed4ed11f0845ef8df1a5c
+    aac-module-core/dev:fe4587e72f3350cdb9dab53b293dfee0d5575a0a
+    ...
+</code></pre></div>
+<h3 id="clean-build-artifacts">Clean build artifacts</h3>
+<p>Conan caches binaries and artifacts for each package after it is built, so they can be used as dependencies by other packages without having to be re-built each time. If you make changes to the source code in the SDK, however, you must either explicitly force the builder to re-export and build the package (using the <code>--force,-f &lt;pattern&gt;</code> option of the builder), or remove the package entirely from the cache. To remove packages from the cache using the Builder Tool, you can use the <code>clean</code> command:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py clean &lt;pattern&gt;
+</code></pre></div>
+<p>You must specify the package name or regex-style pattern to clean. For example, to remove all of the packages from the cache, you can use the following command:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py clean <span class="s2">&quot;*&quot;</span>
+</code></pre></div>
+<p>To remove a specific module, you can either specify the package name or just the module's name:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py clean alexa
+</code></pre></div>
+<p>Since the convention used by Auto SDK is to specify the module's package name as <code>aac-module-&lt;name&gt;</code>, you can also use the full package name as part of the pattern. One way to remove all Auto SDK modules from the cache would be to use the following command:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py clean <span class="s2">&quot;aac-module-*&quot;</span>
+</code></pre></div>
+<p>If a package has been removed from the cache, the Builder Tool will automatically detect that it needs to be re-exported and built the next time you do a build, and it is not necessary to specify the package using the <code>--force</code> option.</p>
+<h3 id="build-debug-libraries">Build debug libraries</h3>
+<p>Building debug libraries for Auto SDK can be specified by using the <code>--debug</code> or <code>-g</code> option when doing a build:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -g
+</code></pre></div>
+<p>When this option is used, debug libraries for all of the Auto SDK modules and dependencies will be built if required, and exported to the build archive. If you want more specific control over which debug libraries to use, you can specify the <code>build_type</code> option as a Conan setting instead, using the <code>--conan-setting,-s &lt;name&gt;=&lt;value&gt;</code> build option. For example, to use debug libraries only for Auto SDK modules, you can use the following build command:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -s <span class="s2">&quot;aac-module-*&quot;</span>:build_type<span class="o">=</span>Debug
+</code></pre></div>
+<p>This is a less common use case, however, that requires you to be familiar with some of the underlying Conan build architecture. To learn more about some of the Conan specific options for building Auto SDK, see the <a href="#build-with-conan-directly">Build with Conan directly</a> section of this guide.</p>
+<h3 id="locate-the-build-output">Locate the build output</h3>
+<p>When you run the builder tool, all of the shared libraries and dependencies will be saved in an archive file in the <code>builder/deploy</code> directory by default. The name of the archive file is displayed in the console when the build is completed:</p>
+<div class="highlight"><pre><span></span><code><span class="o">[</span>BUILDER<span class="o">]</span> INFO: Created output archive: ../aac-dev-macos_x86_64-release-210706140415.tgz
+</code></pre></div>
+<p>The default name of the archive indicates the following information that is used to build the SDK: </p>
+<div class="highlight"><pre><span></span><code>aac-&lt;version&gt;-&lt;os&gt;_&lt;arch&gt;-&lt;build-type&gt;-&lt;datetime&gt;.tgz
+</code></pre></div>
+<p>Sometimes it is helpful to tag a build with an identifier, for example, if you want to indicate a build was made for a specific purpose. If you want to add an additional identifier to the archive name, you can use <code>--name</code> option when running the build tool:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py --name <span class="nb">test</span>
+...
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Created output archive: ../aac-dev-test-macos_x86_64-release-210706142403.tgz
+</code></pre></div>
+<p>It is also possible to completely override the output file name and path by specifying the <code>-o</code> or <code>--output</code> option on the command line:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py --output /mypath/custom-output.tgz
+...
+<span class="o">[</span>BUILDER<span class="o">]</span> INFO: Created output archive: /mypath/custom-output.tgz
+</code></pre></div>
+<p>If you don't want the builder to generate an output archive at all, you can specify the <code>--no-output</code> option on the command line. This is helpful if you just want to re-build one or more module, for example, to run unit tests or inspect the package libraries:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py --no-output
+</code></pre></div>
+<h4 id="archive-contents">Archive contents</h4>
+<p>The output archive created by the Builder Tool includes all of the build artifacts from the modules and dependencies specified by the build command. You can extract the archive with the following command (the exact filename will be slightly different for your build):</p>
+<div class="highlight"><pre><span></span><code>$ tar -xvzf builder/deploy/aac-dev-linux_x86_64-release.tgz
+</code></pre></div>
+<p>After you can extract the contents of the archive, there should be a directory with contents similar to the following file structure:</p>
+<div class="highlight"><pre><span></span><code>aac-dev-linux_x86_64-release/
+  ├─ docs/
+  ├─ include/
+  ├─ lib/
+  |  ├─ libAACECore.so
+  |  └─ ...
+  ├─ share/
+  └─ aac-buildinfo.txt
+</code></pre></div>
+<p>You can get additional information about the archive contents from a description file in the archive named <code>aac-buildinfo.txt</code>. The build description file can be used to identify which modules, settings, and options were used to generate the libraries by the build. The following is an example of the information found in the build description file:</p>
+<div class="highlight"><pre><span></span><code>[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=apple-clang
+    compiler.libcxx=libc++
+    compiler.version=11.0
+    os=Macos
+
+[requires]
+    aac-module-aasb/dev
+    aac-module-address-book/dev
+    aac-module-alexa/dev
+    aac-module-car-control/dev
+    aac-module-cbl/dev
+    aac-module-connectivity/dev
+    aac-module-core/dev
+    aac-module-messaging/dev
+    aac-module-navigation/dev
+    aac-module-phone-control/dev
+    aac-module-text-to-speech/dev
+
+[options]
+    aac_version=dev
+    with_sensitive_logs=False
+    pkg_modules=aac-module-aasb/dev,aac-module-address-book/dev,aac-module-alexa/dev,...    
+    with_aasb=False
+
+[full_settings]
+    arch=x86_64
+    build_type=Release
+    compiler=apple-clang
+    compiler.libcxx=libc++
+    compiler.version=11.0
+    os=Macos
+
+[full_requires]
+    aac-module-aasb/dev:4990d7e4c95bbcae311c6d13cb0e71a09ecd2f43
+    aac-module-address-book/dev:8b2bd324ad68ca44682ed4ed11f0845ef8df1a5c
+    aac-module-alexa/dev:1de4d8ddd6d19b16b05d95052195f9556361e7b5
+    ...
+</code></pre></div>
+<h2 id="build-with-conan-directly">Build with Conan directly</h2>
+<p>Conan can be used directly to build Auto SDK components and other package dependencies, or to use Auto SDK libraries in other Conan recipes. It's helpful to have a good general understanding of how Conan works first, and also to understand the basic Auto SDK build system. The examples in this section should be run with <code>aac-sdk</code> as the working directory.</p>
+<h3 id="export-conan-recipes">Export Conan recipes</h3>
+<p>The following script will find all of the Conan recipes in Auto SDK and export them to the local cache. Package binaries won't actually be built until they are required by another recipe during a build operation, or explicitly built by running the <code>conan create</code> command. This is a convenience script and is not required if you want to export or create packages individually.</p>
+<div class="highlight"><pre><span></span><code>$ ./conan/setup.py
+</code></pre></div>
+<p>If you want to export a single package individually, you can run the <code>conan export</code> command. For example, to export the alexa module to the local cache:</p>
+<div class="highlight"><pre><span></span><code>$ conan <span class="nb">export</span> modules/alexa
+</code></pre></div>
+<p>It is important to understand that exporting a module using the <code>conan export</code> command does not automatically find and export any of the dependent packages specified in the recipe. Attempting to build the alexa module would fail, unless all of the requirements can be resolved in the local cache. Running the <code>conan/setup.py</code> script is usually the safest option to ensure all required packages are copied to the cache, however, exporting a package individually can save time after you make changes, if you have previously exported all of the packages. </p>
+<h3 id="build-modules">Build modules</h3>
+<p>In most cases it shouldn't be necessary to manually build Auto SDK modules, since Conan can build missing dependencies when required by another recipe. It is possible, however, to create/build a package independently using Conan if needed. The following example shows how to create the Alexa module package from the command line:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa --build missing
+</code></pre></div>
+<p>The <code>conan create</code> command tells conan to create a new binary package from a recipe file and install it in the local cache. In the example above, <code>modules/alexa</code> refers to the parent directory in Auto SDK (<code>aac-sdk/modules/alexa</code>), where the <code>conanfile.py</code> recipe is located for the Alexa module.</p>
+<p>By specifying the <code>--build missing</code> option, Conan will automatically build dependencies where a binary package is missing for the specified build configuration. If the dependency has already been created it will not be built again.</p>
+<p>Using the <code>--build</code> flag without any additional options will force all of the dependencies to be rebuilt, even if the binary for the specified configuration already exists.</p>
+<h3 id="specify-build-settings-and-options">Specify build settings and options</h3>
+<p>When you build a Conan package, you can specify settings and options that result in different binaries when the source code is built. Conan <code>settings</code> are project-wide configurations, such as <code>os</code>, <code>compiler</code>, <code>build_type</code>, and <code>arch</code>. These settings should be applied to each package when selecting the correct binary. Most of the time, settings will be applied based on the selected (or default) profile. To view or modify a profile, you can use the <code>conan profile</code> command. To show the default profile values, you can enter the following command:</p>
+<div class="highlight"><pre><span></span><code>$ conan profile show default
+
+Configuration <span class="k">for</span> profile default:
+
+<span class="o">[</span>settings<span class="o">]</span>
+<span class="nv">os</span><span class="o">=</span>Macos
+<span class="nv">os_build</span><span class="o">=</span>Macos
+<span class="nv">arch</span><span class="o">=</span>x86_64
+<span class="nv">arch_build</span><span class="o">=</span>x86_64
+<span class="nv">compiler</span><span class="o">=</span>apple-clang
+compiler.version<span class="o">=</span><span class="m">11</span>.0
+compiler.libcxx<span class="o">=</span>libc++
+<span class="nv">build_type</span><span class="o">=</span>Release
+<span class="o">[</span>options<span class="o">]</span>
+<span class="o">[</span>build_requires<span class="o">]</span>
+<span class="o">[</span>env<span class="o">]</span>
+</code></pre></div>
+<p>You usually don't need to change settings specified in the profile, but if needed, you can override any setting value when running a Conan command. For example, to build a debug version of the alexa module, you can add <code>-s build_type=Debug</code> to the <code>conan create</code> command:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa -b missing -s <span class="nv">build_type</span><span class="o">=</span>Debug
+</code></pre></div>
+<p>Individual packages can also define <code>options</code> which are specific to it's own build requirements. One common option that most packages define is <code>shared</code>, which is used to build either the static or dynamic library. Options can also be used to specify conditional features which should be included in the build, for example, <code>libcurl</code> defines an option called <code>with_nghttp2</code> to specify that the build should include support for <code>http2</code>. </p>
+<h4 id="inspect-package-recipes">Inspect package recipes</h4>
+<p>To see which options a recipe has defined, you can use the <code>conan inspect</code> command:</p>
+<div class="highlight"><pre><span></span><code>$ conan inspect modules/alexa/conanfile.py 
+
+name: aac-module-alexa
+version: dev
+url: https://github.com/alexa/alexa-auto-sdk
+homepage: None
+license: Apache-2.0
+author: None
+description: Auto SDK module: alexa
+topics: None
+generators: cmake
+exports: None
+exports_sources: *
+short_paths: False
+apply_env: True
+build_policy: None
+revision_mode: <span class="nb">hash</span>
+settings: <span class="o">(</span><span class="s1">&#39;os&#39;</span>, <span class="s1">&#39;compiler&#39;</span>, <span class="s1">&#39;build_type&#39;</span>, <span class="s1">&#39;arch&#39;</span><span class="o">)</span>
+options:
+    message_version: ANY
+    shared: <span class="o">[</span>True, False<span class="o">]</span>
+    with_aasb: <span class="o">[</span>True, False<span class="o">]</span>
+    with_address_sanitizer: <span class="o">[</span>True, False<span class="o">]</span>
+    with_android_libs: <span class="o">[</span>True, False<span class="o">]</span>
+    with_coverage_tests: <span class="o">[</span>True, False<span class="o">]</span>
+    with_docs: <span class="o">[</span>True, False<span class="o">]</span>
+    with_engine: <span class="o">[</span>True, False<span class="o">]</span>
+    with_jni: <span class="o">[</span>True, False<span class="o">]</span>
+    with_latency_logs: <span class="o">[</span>True, False<span class="o">]</span>
+    with_messages: <span class="o">[</span>True, False<span class="o">]</span>
+    with_platform: <span class="o">[</span>True, False<span class="o">]</span>
+    with_sensitive_logs: <span class="o">[</span>True, False<span class="o">]</span>
+    with_unit_tests: <span class="o">[</span>True, False<span class="o">]</span>
+default_options:
+    message_version: <span class="m">4</span>.0
+    shared: True
+    with_aasb: True
+    with_address_sanitizer: False
+    with_android_libs: True
+    with_coverage_tests: False
+    with_docs: True
+    with_engine: True
+    with_jni: True
+    with_latency_logs: False
+    with_messages: True
+    with_platform: True
+    with_sensitive_logs: False
+    with_unit_tests: False
+deprecated: None
+</code></pre></div>
+<p>This command shows different attributes of the package, including its <code>options</code> and the default values for each option specified in <code>default_options</code>. To override a default option when building a package, you can add <code>-o [option]=[value]</code>. If you want to override an option for a specific package, then you can specify the package name as well, <code>-o [pkg]:[option]=[value]</code>. For example, to build and run unit tests for the alexa module, you can add <code>-o with_unit_tests=True</code> to the <code>conan create</code> command:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa -b missing -o <span class="nv">with_unit_tests</span><span class="o">=</span>True
+</code></pre></div>
+<h3 id="remove-packages-from-the-cache">Remove packages from the cache</h3>
+<p>Packages can be removed from the local cache if needed by using the <code>conan remove</code> command. For example, the following command can be used to remove the alexa module from the cache:</p>
+<div class="highlight"><pre><span></span><code>$ conan remove aac-module-alexa -f
+</code></pre></div>
+<p>The <code>-f</code> option is used to remove the package without confirmation. To remove all Auto SDK modules from the cache, you can specify the following pattern <code>aac-module-*</code> in place of a package name, or specify <code>*</code> to remove all packages:</p>
+<div class="highlight"><pre><span></span><code>$ conan remove <span class="s2">&quot;aac-module-*&quot;</span> -f
+$ conan remove <span class="s2">&quot;*&quot;</span>
+</code></pre></div>
+<blockquote>
+<p><strong>Note:</strong> when specifying a wildcard in the package name, you must surround the pattern with quotes.</p>
+</blockquote>
+<h3 id="use-auto-sdk-in-other-recipes">Use Auto SDK in other recipes</h3>
+<p>If you have your own project that uses Conan, to build an application or library for example, you can include Auto SDK packages in the requirements section of your Conan recipe. The following example shows how you can include Auto SDK modules that are built on the same development machine, in a <code>conanfile.txt</code> recipe:</p>
+<div class="highlight"><pre><span></span><code>[requires]
+aac-module-core/dev
+aac-module-alexa/dev
+aac-module-cbl/dev
+aac-module-system-audio/dev
+...
+</code></pre></div>
+<p>When you build your package, as long as the Auto SDK packages have been exported to the local cache, Conan will include the specified modules when building your project. It is important to note the convention used by Auto SDK, where all module packages are named <code>aac-module-&lt;module_name&gt;</code>, and the default package version when building locally will be <code>dev</code> unless overridden at build time.</p>
+<p>You can add Auto SDK modules as a requirement to <code>conanfile.py</code> recipes as well, by specifying them using the <code>requires</code> attribute in the recipe:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ConanRecipe</span><span class="p">(</span><span class="n">ConanFile</span><span class="p">):</span>
+    <span class="n">requires</span> <span class="o">=</span> 
+        <span class="p">[</span><span class="s2">&quot;aac-module-core/dev&quot;</span><span class="p">,</span><span class="s2">&quot;aac-module-alexa&quot;</span><span class="p">,</span><span class="s2">&quot;aac-module-cbl/dev&quot;</span><span class="p">,</span><span class="s2">&quot;aac-module-system-audio/dev&quot;</span><span class="p">]</span>
+    <span class="o">...</span>
+</code></pre></div>
+<h2 id="platform-specific-build-information">Platform-specific build information</h2>
+<h3 id="android">Android</h3>
+<p>Android can be cross-compiled on either MacOS or Linux, using the NDK toolchain build requirement specified in the <code>aac-android</code> profile. To build Android compatible binaries with the Builder Tool, simply use the <code>--platform</code> or <code>-p</code> option to specify the <code>android</code> platform.</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p android
+</code></pre></div>
+<p>By default the android configuration used to build the SDK is defined in the <code>aac-android</code> Conan profile:</p>
+<div class="highlight"><pre><span></span><code>[settings]
+os=Android
+os.api_level=26
+arch=armv8
+build_type=Release
+compiler=clang
+compiler.libcxx=libc++
+compiler.version=8
+
+[build_requires]
+android-sdk-tools/4.0@aac-sdk/stable
+</code></pre></div>
+<p>You can override default target architecture to build either the <code>armv8</code>, or <code>x86_64</code> version of the binaries by specifying the <code>--arch</code> or <code>-a</code> option on the command line:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p android --arch<span class="o">=</span>x86_64
+</code></pre></div>
+<blockquote>
+<p>The first time you build Auto SDK for Android, the Android SDK must be downloaded and installed. This is handled by the <code>android-sdk-tools</code> recipe in Auto SDK when you build, however, several license agreements must be manually accepted before any of the Android tools can be used. These agreements will need to be accepted anytime you change the builder home directory, or clean the builder cache as well. You can optionally accept all of the license agreements by specifying <code>-y</code> or <code>--accept-licenses</code> when running the builder from the command line.</p>
+</blockquote>
+<p>If you are using Conan directly to build Auto SDK libraries, you must specify the <code>--profile:host,-pr:b</code> and <code>--profile:build,-pr:b</code> options as part of the build command. In this case for Android, you would specify <code>aac-android</code> as the host (target) profile in your build command, in addition to explicitly specifying <code>default</code> as the build profile:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa -pr:h aac-android -pr:b default -b missing
+</code></pre></div>
+<p>You can override any setting for the target platform on the command line, for example, to build the <code>x86_64</code> version of the Android libraries you can specify <code>-s:h arch=x86_64</code> as an option:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa -pr:h aac-android -pr:b default -b missing -s:h <span class="nv">arch</span><span class="o">=</span>x86_64
+</code></pre></div>
+<h3 id="ubuntu">Ubuntu</h3>
+<p>Building Auto SDK for Linux on Ubuntu requires installing some additional dependencies, such as GStreamer if you are using the <code>system-audio</code> module.</p>
+<h4 id="install-gstreamer">Install GStreamer</h4>
+<p>The <code>system-audio</code> module uses GStreamer to implement the core audio interfaces, and must be installed prior to building. The following command will install the dependencies required to build with GStreamer:</p>
+<div class="highlight"><pre><span></span><code>$ apt install -y <span class="se">\</span>
+    pkg-config libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev <span class="se">\</span>
+    libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base <span class="se">\</span>
+    gstreamer1.0-plugins-good gstreamer1.0-plugins-bad <span class="se">\</span>
+    gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc <span class="se">\</span>
+    gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl <span class="se">\</span>
+    gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+</code></pre></div>
+<h4 id="update-the-default-conan-profile">Update the default Conan profile</h4>
+<p>You might run into an issue on Ubuntu where Conan does not detect the default <code>libstdc++11</code> setting properly, so it is recommended to check this when setting up your host environment. You can run the following command to update the default Conan profile to use the <code>libstdc++11</code> compiler option:</p>
+<div class="highlight"><pre><span></span><code>$ conan profile new default --detect
+$ conan profile update settings.compiler.libcxx<span class="o">=</span>libstdc++11 default
+</code></pre></div>
+<h3 id="poky">Poky</h3>
+<p>Poky can be cross compiled on Linux using the host Poky SDK toolchain. To build Poky compatible binaries with the Builder Tool, simple use the <code>--platform</code> or <code>-p</code> option to specify the <code>poky</code> platform.</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p poky
+</code></pre></div>
+<p>By default the poky configuration used to build the Auto SDK is defined in the aac-poky Conan profile:</p>
+<div class="highlight"><pre><span></span><code>[settings]
+compiler.version=8.2
+arch=armv7hf
+build_type=Release
+os=Linux
+compiler.libcxx=libstdc++11
+
+[build_requires]
+poky-sdk/2.6.1
+</code></pre></div>
+<p>You can override default target architecture to build either the <code>armv7hf</code>, or <code>armv8</code> version of the binaries by specifying the <code>--arch</code> or <code>-a</code> option on the command line:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p poky --arch<span class="o">=</span>armv8
+</code></pre></div>
+<blockquote>
+<p>The first time you build Auto SDK for Poky, the Poky SDK must be downloaded and installed. This is handled by the <code>poky-sdk</code> recipe in Auto SDK when you build, however, several license agreements must be manually accepted before the Poky SDK can be used. These agreements will need to be accepted anytime you change the builder home directory, or clean the builder cache as well. You can optionally accept all of the license agreements by specifying <code>-y</code> or <code>--accept-licenses</code> when running the builder from the command line.</p>
+</blockquote>
+<p>If you are using Conan directly to build Auto SDK libraries, you must specify the <code>--profile:host,-pr:h</code> and <code>--profile:build,-pr:b</code> options as part of the build command. In this case for Poky, you would specify <code>aac-poky</code> as the host (target) profile in your build command, in addition to explicitly specifying default as the build profile:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa -pr:h aac-poky -pr:b default -b missing
+</code></pre></div>
+<p>You can override any setting for the target platform on the command line, for example, to build the <code>armv8</code> version of the Poky libraries you can specify <code>-s:h arch=armv8</code> as an option:</p>
+<div class="highlight"><pre><span></span><code>$ conan create modules/alexa -pr:h aac-poky -pr:h default -b missing -s:h <span class="nv">arch</span><span class="o">=</span>armv8
+</code></pre></div>
+<h3 id="qnx">QNX</h3>
+<p>QNX can be cross compiled on Linux or MacOS using the host QNX SDP tools. To build QNX, you must install the <a href="http://blackberry.qnx.com/en/sdp7/sdp70_download">QNX 7.0 SDP</a> on your host as a prerequisite. To build QNX compatible binaries with the Builder Tool, simply use the <code>--platform</code> or <code>-p</code> option to specify the <code>qnx</code> platform:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p qnx
+</code></pre></div>
+<p>By default the QNX configuration used to build the Alexa Auto SDK is defined in the <code>aac-qnx</code> Conan profile:</p>
+<div class="highlight"><pre><span></span><code>[settings]
+os=Neutrino
+os.version=7.0
+arch=armv8
+compiler=qcc
+compiler.version=5.4
+compiler.libcxx=cxx
+compiler.cppstd=None
+
+[build_requires]
+qnx-cross-compiling/7.0.0
+[options]
+[env]
+</code></pre></div>
+<p>You can override default target architecture to build either the <code>armv8</code>, or <code>x86_64</code> version of the binaries by specifying the <code>--arch</code> or <code>-a</code> option on the command line:</p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p qnx --arch<span class="o">=</span>x86_64
+</code></pre></div>
+<p>The Conan recipe assumes that the QNX SDP is installed in your home director: <code>~/qnx700</code>, but you can override this by setting the <code>qnx7sdp_path</code> option using the <code>--conan-option</code> or <code>-o</code> argument on the command line: </p>
+<div class="highlight"><pre><span></span><code>$ ./builder/build.py -p qnx -o qnx7-sdp:qnx7sdp_path<span class="o">=</span>/path/to/qnx7sdp
+</code></pre></div>
+<h3 id="macos_1">macOS</h3>
+<p>macOS can be used as a build host for cross-compiled Android and QNX targets, as well and target for native development and testing.</p>
+<h4 id="gstreamer-build-issue">GStreamer build issue</h4>
+<p>There is a known issue where building GStreamer can fail due to a conflict with <code>openEXR</code> on macOS. This may be an issue if you are seeing the following type of errors in your build output:</p>
+<div class="highlight"><pre><span></span><code>In file included from ../source_subfolder/ext/openexr/gstopenexrdec.cpp:30:
+In file included from /usr/local/include/OpenEXR/ImfRgbaFile.h:23:
+In file included from /usr/local/include/OpenEXR/ImfHeader.h:22:
+In file included from /usr/local/include/Imath/ImathVec.h:17:
+/usr/local/include/Imath/ImathMath.h:152:36: error: expected <span class="s1">&#39;;&#39;</span> at end of declaration
+equalWithAbsError <span class="o">(</span>T x1, T x2, T e<span class="o">)</span> IMATH_NOEXCEPT
+                                   ^
+</code></pre></div>
+<p>Uninstalling <code>openEXR</code> has been reported to solve the problem:</p>
+<div class="highlight"><pre><span></span><code>$ brew uninstall --ignore-dependencies openEXR
+</code></pre></div>
+<h3 id="windows">Windows</h3>
+<blockquote>
+<p>Windows is not currently supported as a build host or target.</p>
+</blockquote>
+<h2 id="build-in-a-docker-container">Build in a Docker container</h2>
+<p>You can use Docker for native Linux builds, or any cross-compiler target that is supported with Linux, as long as the Docker container has the required build dependencies installed. For convenience, you can use the <code>aac-ubuntu-bionic</code> or <code>aac-ubuntu-focal</code> containers provided in the <code>conan/docker</code> directory of the SDK. The following commands should be run with <code>aac-sdk</code> as the working directory.</p>
+<p>Create the <code>aac-ubuntu-bionic</code> docker image:</p>
+<div class="highlight"><pre><span></span><code>$ docker build -t aac/ubuntu-bionic conan/docker/aac-ubuntu-bionic
+</code></pre></div>
+<p>Build Auto SDK using the Builder Tool:</p>
+<div class="highlight"><pre><span></span><code>$ docker run -it -v<span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home/conan/aac-sdk --rm <span class="se">\</span>
+    aac/ubuntu-bionic /bin/bash -c <span class="s2">&quot;aac-sdk/builder/build.py&quot;</span>
+</code></pre></div>
+<p>The option <code>-v$(pwd):/home/conan/aac-sdk</code> specifies that we want to mount the current directory on the host machine (which should be the Auto SDK root), to <code>/home/conan/aac-sdk</code> in the Docker container file system. After starting the container, you will be able to build Auto SDK using Conan with the same commands used on your host machine.</p>
+<p>When the build is complete, the output archive file will be saved to the mounted <code>aac-sdk/builder/deploy</code> directory of your host machine. If you inspect <code>aac-buildinfo.txt</code> in the archive, you should see that the libraries were built for <code>os=Linux, arch=x86_64</code>:</p>
+<div class="highlight"><pre><span></span><code>[settings]
+    arch=x86_64
+    build_type=Release
+    compiler=gcc
+    compiler.libcxx=libstdc++11
+    compiler.version=7
+    os=Linux
+</code></pre></div>
+<h3 id="optimize-build-performance">Optimize build performance</h3>
+<p>When you build Auto SDK using a Docker container it can take much longer to build than it would natively on your host computer. This is because the Builder Tool home directory is specified as <code>aac-sdk/builder</code> by default, which is a directory on the host file system. File operations in general are much slower when running on a mounted volume, so this will impact the build performance. One option is to specify a different home directory on the container's volume when running the build command instead. This will greatly improve the build time, however, you should be aware that when you remove the container the cached build artifacts may be lost. The Builder Tool will still write the output archive to <code>aac-sdk/builder/deploy</code> on the mounted volume by default, even if the home directory is changed.</p>
+<p>The following example shows how you can set the home directory using the <code>--home</code> option, when doing a build using Docker:</p>
+<div class="highlight"><pre><span></span><code>$ docker run -it -v<span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/home/conan/aac-sdk --rm <span class="se">\</span>
+    aac/ubuntu-bionic /bin/bash -c <span class="s2">&quot;aac-sdk/builder/build.py --home /home/conan&quot;</span>
+</code></pre></div>
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../GETSTARTED/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Getting Started
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../builder/" class="md-footer__link md-footer__link--next" aria-label="Next: Builder Tool Command Reference" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Builder Tool Command Reference
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2016 - 2021 Amazon
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.cefbb252.min.js"}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      
+    
+  </body>
+</html>

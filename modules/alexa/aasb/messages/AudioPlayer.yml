@@ -1,0 +1,45 @@
+topic: AudioPlayer
+namespace: aasb.message.alexa.audioPlayer
+path: Alexa/AudioPlayer
+
+messages:
+  - action: PlayerActivityChanged
+    direction: outgoing
+    desc: Notifies the platform implementation of a change in audio playback state.
+    payload:
+      - name: state
+        type: PlayerActivity
+        desc: The new playback state.
+
+  - action: GetPlayerPosition
+    direction: incoming
+    desc: Returns the current playback position of the audio player.
+    reply:
+      - name: playbackPosition
+        type: int
+        desc: The audio player's playback position in milliseconds.
+
+  - action: GetPlayerDuration
+    direction: incoming
+    desc: Returns the playback duration of the audio player.
+    reply:
+      - name: playbackDuration
+        type: int
+        desc: The audio player's playback duration in milliseconds.
+
+types:
+  - name: PlayerActivity
+    type: enum
+    values:
+      - name: IDLE
+        desc: Audio playback has not yet begun.
+      - name: PLAYING
+        desc: Audio is currently playing.
+      - name: STOPPED
+        desc: Audio playback is stopped, either from a stop directive or playback error.
+      - name: PAUSED
+        desc: Audio playback is paused.
+      - name: BUFFER_UNDERRUN
+        desc: Audio playback is stalled because a buffer underrun has occurred.
+      - name: FINISHED
+        desc: Audio playback is finished.

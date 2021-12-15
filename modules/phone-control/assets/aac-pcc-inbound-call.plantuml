@@ -1,0 +1,74 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+actor User Order 10
+participant Application  order 30
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+opt "Incoming Call"
+... Platform detects an incoming call ...
+opt "Incoming Call"
+Application -> AutoSDK : Publish CreateCallId message 
+activate AutoSDK
+AutoSDK -> Alexa : CreateCallId event
+AutoSDK -> Application : Receive CreateCallIdReply message
+deactivate AutoSDK
+Application -> AutoSDK : Publish CallStateChanged message with **CALL_RECEIVED** state
+AutoSDK -> Alexa : CallReceived event
+...
+
+... Start ringer ...
+Application -> AutoSDK : Publish CallStateChanged message with **INBOUND_RINGING** state
+AutoSDK -> Alexa : InboundRingingStarted event
+
+opt
+Application -> AutoSDK : Publish CallerIdReceived message
+AutoSDK -> Alexa : CallerIdReceived event
+end
+
+User -> Alexa : "Answer Call"
+Alexa -> AutoSDK : Answer directive
+AutoSDK -> Application : Receive Answer message
+end 
+
+opt "Already in Active Call"
+... Platform detects active call ...
+Application -> AutoSDK : Publish CreateCallId message 
+activate AutoSDK
+AutoSDK -> Alexa : CreateCallId event
+AutoSDK -> Application : Receive CreateCallIdReply message
+deactivate AutoSDK
+end
+
+Application -> AutoSDK : Publish CallStateChanged message with **ACTIVE** state
+AutoSDK -> Alexa : CallActivated event
+
+User -> Alexa : "Press 1 2 3 #"
+Alexa -> AutoSDK : SendDTMF directive
+AutoSDK -> Application : Receive SendDTMF message
+Application -> AutoSDK : Publish SendDTMFSucceeded message 
+AutoSDK -> Alexa : SendDTMFSucceeded event
+
+User -> Alexa : "End Call"
+
+Alexa -> AutoSDK : Stop directive 
+AutoSDK -> Application : Receive Stop message
+Application -> AutoSDK : Publish CallStateChanged message with **IDLE** state
+AutoSDK -> Alexa : CallTerminated event
+@enduml

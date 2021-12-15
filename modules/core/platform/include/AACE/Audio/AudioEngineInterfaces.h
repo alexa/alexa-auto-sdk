@@ -86,9 +86,27 @@ public:
         BUFFERING
     };
 
+    /**
+     * List of actions platform interface may wish Alexa to take when audio focus event occurs
+     *
+     */
+    enum class FocusAction {
+        /**
+         * This action informs Alexa engine that ducking is initiated by platform interface.
+         * Highly recommended to provide information so that engine would not override the action
+         */
+        REPORT_DUCKING_STARTED,
+        /**
+         * This action informs Alexa engine that ducking is stopped by platform interface.
+         * Highly recommended to provide information so that engine can duck if required
+         */
+        REPORT_DUCKING_STOPPED
+    };
+
     // media player interface
     virtual void onMediaStateChanged(MediaState state) = 0;
     virtual void onMediaError(MediaError error, const std::string& description) = 0;
+    virtual void onAudioFocusEvent(FocusAction action) = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioOutputEngineInterface::MediaState& state) {

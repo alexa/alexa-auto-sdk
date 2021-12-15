@@ -27,14 +27,11 @@ static const std::string TAG("AuthorizationManager");
 using namespace alexaClientSDK::avsCommon::sdkInterfaces;
 
 std::shared_ptr<AuthorizationManager> AuthorizationManager::create(
-    std::shared_ptr<AuthorizationManagerStorageInterface> storage,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager) {
+    std::shared_ptr<AuthorizationManagerStorageInterface> storage) {
     try {
         ThrowIfNull(storage, "invalidStorage");
-        ThrowIfNull(customerDataManager, "invalidCustomerDataManager");
 
-        auto authorizationManager =
-            std::shared_ptr<AuthorizationManager>(new AuthorizationManager(storage, customerDataManager));
+        auto authorizationManager = std::shared_ptr<AuthorizationManager>(new AuthorizationManager(storage));
 
         ThrowIfNot(authorizationManager->initialize(), "initializeFailed");
 
@@ -45,9 +42,7 @@ std::shared_ptr<AuthorizationManager> AuthorizationManager::create(
     }
 }
 
-AuthorizationManager::AuthorizationManager(
-    std::shared_ptr<AuthorizationManagerStorageInterface> storage,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> customerDataManager) :
+AuthorizationManager::AuthorizationManager(std::shared_ptr<AuthorizationManagerStorageInterface> storage) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
         m_activeAdapter{"", ""},
         m_authState{AuthObserverInterface::State::UNINITIALIZED},
@@ -74,7 +69,7 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface>
 }
 
 void AuthorizationManager::setRegistrationManager(
-    std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManager> registrationManager) {
+    std::shared_ptr<alexaClientSDK::registrationManager::RegistrationManagerInterface> registrationManager) {
     AACE_DEBUG(LX(TAG));
     try {
         ThrowIfNull(registrationManager, "invalidRegistrationManager");

@@ -24,6 +24,8 @@ namespace apl {
 
 class APLEngineInterface {
 public:
+    virtual ~APLEngineInterface() = default;
+
     enum class ActivityEvent {
         // GUI switched to active state.
         ACTIVATED,
@@ -53,6 +55,7 @@ public:
     virtual void onProcessActivityEvent(const std::string& source, ActivityEvent event) = 0;
     virtual void onSendDocumentState(const std::string& state) = 0;
     virtual void onSendDeviceWindowState(const std::string& state) = 0;
+    virtual void onSetPlatformProperty(const std::string& name, const std::string& value) = 0;
 };
 
 }  // namespace apl

@@ -1,284 +1,340 @@
-# Core Module
+# Core Module <!-- omit in toc -->
 
-The Auto SDK Core module contains the Engine base classes and the abstract platform interfaces that the platform or other modules can use.
+**Table of Contents** <!-- omit in toc -->
 
-<!-- omit in toc -->
-## Table of Contents
-- [Overview](#overview)
-- [Creating the Engine](#creating-the-engine)
-- [Configuring the Engine](#configuring-the-engine)
-  - [Configuration Database Files](#configuration-database-files)
-  - [Specifying Configuration Data Using a JSON File](#specifying-configuration-data-using-a-json-file)
-  - [Specifying Configuration Data Programmatically](#specifying-configuration-data-programmatically)
-  - [Vehicle Information Requirements](#vehicle-information-requirements)
-- [Extending the Default Platform Implementation](#extending-the-default-platform-implementation)
-  - [Implementing a Location Provider](#implementing-a-location-provider)
-  - [Implementing a Network Information Provider](#implementing-a-network-information-provider)
-  - [Implementing Log Events](#implementing-log-events)
-  - [Implementing Audio](#implementing-audio)
-- [Starting the Engine](#starting-the-engine)
-- [Stopping the Engine](#stopping-the-engine)
-- [Managing Runtime Properties with the Property Manager](#managing-runtime-properties-with-the-property-manager)
-  - [Property Manager Sequence Diagrams](#property-manager-sequence-diagrams)
-  - [Implementing a Custom Property Manager Handler](#implementing-a-custom-property-manager-handler)
-  - [Property Definitions](#property-definitions)
-- [Managing Authorization](#managing-authorization)
-  - [Authorization Sequence Diagrams](#authorization-sequence-diagrams)
-  - [Using the Authorization Module](#using-the-authorization-module)
-- [Providing network usage data to Auto SDK](#providing-network-usage-data-to-auto-sdk)
+- [Core module overview](#core-module-overview)
+- [Understand the Auto SDK API](#understand-the-auto-sdk-api)
+  - [The Engine](#the-engine)
+  - [MessageBroker](#messagebroker)
+  - [AASB message interfaces](#aasb-message-interfaces)
+- [Manage the Engine lifecycle in your application](#manage-the-engine-lifecycle-in-your-application)
+  - [Create the Engine](#create-the-engine)
+  - [Configure the Engine](#configure-the-engine)
+    - [Specify configuration in a file](#specify-configuration-in-a-file)
+    - [Specify configuration programatically](#specify-configuration-programatically)
+  - [Subscribe to AASB messages](#subscribe-to-aasb-messages)
+  - [Start the Engine](#start-the-engine)
+  - [Stop the Engine](#stop-the-engine)
+  - [Shut down the Engine](#shut-down-the-engine)
+- [Configure the Core module](#configure-the-core-module)
+  - [(Required) Vehicle info configuration](#required-vehicle-info-configuration)
+  - [(Required) Storage configuration](#required-storage-configuration)
+  - [(Optional) Logger configuration](#optional-logger-configuration)
+  - [(Optional) cURL configuration](#optional-curl-configuration)
+  - [(Optional) AASB and MessageBroker configuration](#optional-aasb-and-messagebroker-configuration)
+    - [(Optional) Configure enabled interfaces](#optional-configure-enabled-interfaces)
+    - [(Optional) Configure the synchronous message timeout](#optional-configure-the-synchronous-message-timeout)
+- [Understand the key core Engine services](#understand-the-key-core-engine-services)
+  - [Authorization](#authorization)
+  - [Audio input and output](#audio-input-and-output)
+  - [Runtime properties](#runtime-properties)
+- [Provide core device status](#provide-core-device-status)
+  - [Report location with LocationProvider](#report-location-with-locationprovider)
+  - [Report network status changes with NetworkInfoProvider](#report-network-status-changes-with-networkinfoprovider)
+  - [Report data usage with DeviceUsage](#report-data-usage-with-deviceusage)
 
-## Overview
+## Core module overview
 
-The Core module provides an easy way to integrate the Auto SDK into an application or a framework. To do this, follow these steps:
+The Alexa Auto SDK `Core` module is the heart of the SDK. The `Core` module acts as the foundation for all Auto SDK features by contributing the following essential elements to the SDK:
+- **Defining the Auto SDK API for your application—** `Core` defines the `Engine` and `MessageBroker` components. Alongside the Alexa Auto Services Bridge (AASB) messages defined by each Auto SDK module, these components comprise the core API for your application to access the features of Auto SDK. To learn about the API, see [Understand the Auto SDK API](#understand-the-auto-sdk-api).
 
-1. [Create](#creating-the-engine) and [configure](#configuring-the-engine) an instance of `aace::core::Engine`.
-2. [Override default platform implementation classes](#extending-the-default-platform-implementation) to extend the default Auto SDK platform implementation and register the platform interface handlers with the instantiated Engine.
-4. [Start the Engine](#starting-the-engine).
-5. [Change the runtime settings](#getting-and-setting-core-engine-properties) if desired.
+- **Providing an infrastructure to other modules—** `Core` provides the base infrastructure of the Engine, which each Auto SDK module extends to add module-specific features. `Core` also defines the common Engine services for logging, audio I/O, authorization, and device settings. Each module uses these Engine services to provide its own module-specific features. To learn about the primary core services, see [Understand the key core Engine services](#understand-the-key-core-engine-services).
 
-## Creating the Engine
+- **Receiving core device statuses from your application—** `Core` includes AASB message interfaces for your application to report essential information such as device location and network connection status. The Engine uses this information to provide a reliable experience to the user. To learn about the core device status interfaces, see [Provide core device status](#provide-core-device-status). 
 
-To create an instance of the Engine, call the static function `aace::core::Engine::create()`:
+> **Important!**: If you are an Android developer, your application will use the [**Alexa Auto Client Service (AACS)**](../aacs/android/README.md) as its foundation. AACS implements much of the core Auto SDK setup, abstracting it from your application and exposing only a necessary subset of the Auto SDK API in an Android-specific way. Some of the information presented in this documentation and documentation for other SDK modules might not pertain to your application exactly as written for cases in which AACS provides the implementation or further abstracts it, so keep this in mind while reading. Use the module documentation to understand the underlying layers of Auto SDK, if interested, and to reference the Engine configuration and AASB message definitions for the features you do need to build into your application yourself. 
 
-    std::shared_ptr<aace::core::Engine> engine = aace::core::Engine::create();
 
-## Configuring the Engine
+## Understand the Auto SDK API
 
-Before you can start the Engine, you must configure it using the required `aace::core::config::EngineConfiguration` object(s) for the services you will be using:
+The `Engine`, `MessageBroker`, and `AASB message interfaces` comprise the Auto SDK API. Your application uses these three components to build a complete Alexa client implementation for your vehicle. 
 
-1. Generate the `EngineConfiguration` object(s). You can do this [using a JSON configuration file](#specifying-configuration-data-using-a-json-file), [programmatically (using factory functions)](#specifying-configuration-data-programmatically), or using a combination of both approaches.
+### The Engine
 
-    >**Note:** You can generate a single `EngineConfiguration` object that includes all configuration data for the services you will be using, or you can break the configuration data into logical sections and generate multiple `EngineConfiguration` objects. For example, you might generate one `EngineConfiguration` object for each module.
-    
-2. Call the Engine's `configure()` function, passing in the `EngineConfiguration` object(s): 
+The Auto SDK [Engine](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1core_1_1_engine.html) is a system of components that provide the core implementation of all Auto SDK features. With respect to Alexa, your application's Alexa client stack uses the Engine as the layer that sets up the connection to Alexa, publishes device capabilities, sends Alexa events, sequences Alexa directives, and more.
 
-  * For a single `EngineConfiguration` object, use:
+Your application creates an instance of the Engine and uses a simple interface to [manage the Engine lifecycle](manage-the-engine-lifecycle-in-your-application) for the duration of the application run time. Aside from setting up the Engine, the primary responsibility of your application is to provide the platform-specific, customizable integration details that make Alexa and other core SDK features work for *your* vehicle, in particular. Platform-specific integration might include interacting with external libraries or the underlying software frameworks of your operating system to complete the Auto SDK client stack with deep integration into the applications on your system.
 
-      `engine->configure( config );`
+The Engine implements as much of the general functionality as possible; for integration details that it can't implement, the Engine delegates responsibility to your application via [AASB messages](#aasb-message-interfaces) published through the [MessageBroker](#messageBroker).
+
+### MessageBroker
+
+The [MessageBroker](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1core_1_1_message_broker.html) is the bridge in the Alexa Auto Services Bridge (AASB). MessageBroker provides a publish and subscribe API to the Engine and your application for communication with each other. In order to consume a message that the Engine publishes to your application, your application uses MessageBroker to subscribe to the message by specifying the message `topic` and `action` as well as a function for MessageBroker to invoke to deliver the message. Similarly, the Engine uses MessageBroker to subscribe to messages published by your application.
+
+### AASB message interfaces
+
+A typical Auto SDK module defines one or more AASB message interfaces. An interface groups logically related messages together with a `topic`. Within the `topic`, each interface has one or more `actions` to represent individual messages. I.e., a `topic` + `action` combination identifies a single message.
+
+For instance, the `Alexa` module defines many interfaces related to standard Alexa features. The `Alexa` module `SpeechRecogizer` interface defines messages for your application to publish to the Engine when the user invokes Alexa. It also defines messages the Engine publishes to your application to convey key events in the user speech stream. 
+
+For example, your application publishes a `SpeechRecognizer.StartCapture` message when the user taps the Alexa invocation button:
+
+```json
+{
+    "header": {
+        "version": "4.0",
+        "messageType": "Publish",
+        "id": "12345",
+        "messageDescription": {
+            "topic": "SpeechRecognizer",
+            "action": "StartCapture"
+        }
+    },
+    "payload": {
+        "initiator": "TAP_TO_TALK"
+    }
+}
+```
+
+The Engine subscribes to this message at startup time, so it is ready to consume the message when published by your application. In response to the message, the Engine sends the user speech audio to Alexa. Alexa processes the speech, and when she detects the user has finished speaking, the Engine publishes a `SpeechRecognizer.EndOfSpeechDetected` message to your application:
+
+```json
+{
+    "header": {
+        "version": "4.0",
+        "messageType": "Publish",
+        "id": "00876",
+        "messageDescription": {
+            "topic": "SpeechRecognizer",
+            "action": "EndOfSpeechDetected"
+        }
+    }
+}
+```
+Your application receives this message from MessageBroker if it subscribed to the `SpeechRecognizer` topic and `EndOfSpeechDetected` action.
+
+MessageBroker uses AASB messages as serialized JSON strings; however, for convenience, Auto SDK provides C++ wrapper classes for each message that help with the serialization and deserialization. The Auto SDK build system generates these wrapper classes as part of the build. 
+
+
+## Manage the Engine lifecycle in your application
+
+To use Auto SDK features, your application must instantiate and manage the lifecycle of the Engine.
+
+### Create the Engine
+
+During the launch sequence of your application, create one instance of the Engine using the static function `aace::core::Engine::create()`:
+
+```cpp
+std::shared_ptr<aace::core::Engine> engine = aace::core::Engine::create();
+```
+A typical application creates the Engine once when the user turns on the vehicle ignition and uses the instance until the user turns off the vehicle ignition.
+
+### Configure the Engine
+
+After creating the Engine instance, configure it with the required Engine configurations. Engine configuration uses JSON serialized as strings, but you pass the configurations to the Engine in one or more `aace::core::config::EngineConfiguration` wrapper objects. Auto SDK provides two options to generate `EngineConfiguration` objects:
+- Specify your Engine configuration in a [JSON file](#specify-configuration-in-a-file) and construct an `EngineConfiguration` from a path to the file
+- Build the configuration [programatically](#specify-configuration-programatically) using one of the configuration factory functions.
+
+You can choose either option or a combination of both. I.e., you can generate a single `EngineConfiguration` object that includes all configuration data for the Engine components you use, or you can break up the configuration data into logical sections and generate multiple `EngineConfiguration` objects. For example, you might generate one `EngineConfiguration` object for each module.
+
+To configure the Engine, call the Engine's `configure()` function, passing in the `EngineConfiguration` object(s): 
+
+* For a single `EngineConfiguration` object:
+
+    ~~~
+    engine->configure( config );
+    ~~~
   
- *  For multiple `EngineConfiguration` objects, use:
+* For multiple `EngineConfiguration` objects:
+    ~~~
+      engine->configure( { xConfig, yConfig, zConfig } );
+    ~~~
+    replacing `xConfig, yConfig, zConfig` with logical names to identify the `EngineConfiguration` objects you generated.
 
-      `engine->configure( { xConfig, yConfig, zConfig, ... } );`
-      
-      replacing `xConfig, yConfig, zConfig` with logical names to identify the `EngineConfiguration` objects you generated; for example: `coreConfig, alexaConfig, navigationConfig`
+> **Note**: For one Engine instance, you can call the `configure()` function only once, and you must call it before you subscribe to AASB messages with `MessageBroker` and before you start the Engine.
 
-> **Note**: You can call the Engine's `configure()` function only once, and you must call it before you register any platform interfaces or start the Engine.
+#### Specify configuration in a file
 
-### Configuration Database Files
+Auto SDK provides the [`ConfigurationFile` class](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1core_1_1config_1_1_configuration_file.html#a8ee151fa389256ca8e2df8626e76407e) that reads the configuration from a specified JSON file path and creates an `EngineConfiguration` object from that configuration:
 
-Some values in the Engine configuration, such as `"defaultlocale"`, are used only to configure the Engine the first time it is started. After the first start, the Auto SDK engine creates configuration database files (also referred to as SQLite database files) so that these settings are preserved the next time you start the application. You can change the default settings if desired.
-
-By default, the Auto SDK stores the configuration database files in the `/opt/AAC/data/` directory, but you have the option to change the path to the configuration database files as part of your Engine configuration. If you delete the database files, the Auto SDK will create new ones the next time you run the application.
-
-### Specifying Configuration Data Using a JSON File
-
-The Auto SDK provides a class in [`EngineConfiguration.h`](./platform/include/AACE/Core/EngineConfiguration.h) that reads the configuration from a specified JSON file and creates an `EngineConfiguration` object from that configuration:
-
-`aace::core::config::ConfigurationFile::create( “<filename.json>” )`
+```cpp
+aace::core::config::ConfigurationFile::create( “</path/to/filename.json>” )
+```
  
-You can include all the configuration data in a single JSON file to create a single `EngineConfiguration` object; for example:
-
-`auto config = aace::core::config::ConfigurationFile::create( “config.json” );`
-
-or break the configuration data into multiple JSON files to create multiple `EngineConfiguration` objects; for example:
+You can include all the configuration data in a single JSON file to create a single `EngineConfiguration` object. For example,
 
 ```cpp
-auto coreConfig = aace::core::config::ConfigurationFile::create( “core-config.json” );
-auto alexaConfig = aace::core::config::ConfigurationFile::create( “alexa-config.json” );
-auto navigationConfig = aace::core::config::ConfigurationFile::create( “navigation-config.json” );
+auto config = aace::core::config::ConfigurationFile::create( “/opt/AAC/config/config.json” );
 ```
 
-The [config.json.in](../../samples/cpp/assets/config.json.in) file provides an example of a JSON configuration file. If desired, you can use this file as a starting point for customizing the Engine configuration to suit your needs.
-
-### Specifying Configuration Data Programmatically
-
-You can also specify the configuration data programmatically by using the configuration factory functions provided in the library. For example, you can configure the `alertsCapabilityAgent` settings by instantiating an `EngineConfiguration` object with the following function:
+Alternatively, you can break the configuration data into multiple JSON files to create multiple `EngineConfiguration` objects. For example,
 
 ```cpp
-auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig
-    ("<SQLITE_DATABASE_FILE_PATH>" );
+auto coreConfig = aace::core::config::ConfigurationFile::create( “/opt/AAC/data/core-config.json” );
+auto alexaConfig = aace::core::config::ConfigurationFile::create( “/opt/AAC/data/alexa-config.json” );
+auto navigationConfig = aace::core::config::ConfigurationFile::create( “/opt/AAC/data/navigation-config.json” );
 ```
 
-See the API reference documentation for the [`AlexaConfiguration` class](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html) for details about the configurable functions used to generate the `EngineConfiguration` object.
+See documentation for individual module features to see the format of their respective JSON configuration. For example, `Core` outlines its required configurations in [Configure the Core module](#configure-the-core-module).
 
-### Vehicle Information Requirements
+#### Specify configuration programatically
 
-You must configure vehicle information in the Engine configuration. A sample configuration is detailed below. You can generate the `EngineConfiguration` object including this information by using this schema in a `.json` config file or programmatically through the `VehicleConfiguration::createVehicleInfoConfig()` factory function.
+Each Auto SDK module that defines configuration provides a factory class with functions that return `EngineConfiguration` objects. The values a function puts in the configuration it creates correspond to the function parameters. For example, you can configure the `Alexa` module's `alertsCapabilityAgent` settings by using the [`AlexaConfiguration::createAlertsConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#af7a3007198c8d8e47ce33edbf5c902a7) function:
 
 ```cpp
+auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig("</some/directory/path/for/databases>" );
+```
+
+###  Subscribe to AASB messages
+
+After you configure the Engine, use MessageBroker to subscribe to any AASB interface messages that your application will handle. For example, the following code uses the AASB message wrapper classes for the `SpeechRecognizer` interface to subscribe to messages from the Engine with `SpeechRecognizer` topic:
+
+```cpp
+#include <AASB/Message/Alexa/SpeechRecognizer/StopCaptureMessage.h>
+#include <AASB/Message/Alexa/SpeechRecognizer/EndOfSpeechDetectedMessage.h>
+#include <AASB/Message/Alexa/SpeechRecognizer/WakewordDetectedMessage.h>
+
+void SpeechRecognizerHandler::subscribeToAASBMessages() {
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleEndOfSpeechDetectedMessage(message); },
+        EndOfSpeechDetectedMessage::topic(),
+        EndOfSpeechDetectedMessage::action());
+
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleWakewordDetectedMessage(message); },
+        WakewordDetectedMessage::topic(),
+        WakewordDetectedMessage::action());
+}
+
+void SpeechRecognizerHandler::handleEndOfSpeechDetectedMessage(const std::string& message) {
+    // MessageBroker invokes this function when the Engine publishes a SpeechRecognizer.EndOfSpeechDetected message
+    // Do something here!
+    // Return quickly to avoid blocking MessageBroker's outgoing thread
+}
+
+void SpeechRecognizerHandler::handleWakewordDetectedMessage(const std::string& message) {
+    // MessageBroker invokes this function when the Engine publishes a SpeechRecognizer.WakewordDetected message
+    // Do something here!
+    // Return quickly to avoid blocking MessageBroker's outgoing thread
+}
+
+```
+
+> **Note**: For one Engine instance, you must subscribe to messages after configuring the Engine and before starting the Engine.
+
+### Start the Engine
+
+After configuring the Engine and subscribing to AASB messages, start the Engine by calling the Engine's `start()` function:
+
+```cpp
+engine->start();
+```
+Engine start initializes the internal Engine components for each Engine component your application uses. With respect to Alexa, it starts the connection to Alexa if there is an internet connection and an Alexa access token. Wait to publish messages to the Engine until after `start()` completes.
+
+Your application can start the Engine more than once in its lifetime, if needed, by stopping the Engine and starting it again. However, you cannot start the Engine again after shutting it down.
+
+### Stop the Engine
+
+When your application needs to halt the operations of the Engine, stop the Engine by calling the Engine's `stop()` function:
+```cpp
+engine->stop();
+```
+With respect to Alexa, stopping the Engine tears down the Alexa connection.
+Typically, Engine stop is a cleanup step before Engine shutdown. However, if you stopped the Engine at runtime and need to start it again, calling `start()` resumes Engine operations. With respect to Alexa, this includes reestablishing the Alexa connection.
+
+### Shut down the Engine
+
+When your application is ready to exit, shut down the Engine by calling the Engine's `shutdown()` function.
+
+```cpp
+engine->shutdown();
+```
+
+Make sure you also stop the Engine prior to shutting it down. After shutdown completes, you can safely dispose of the pointer to your Engine instance. You cannot use this instance of the Engine again.
+
+
+## Configure the Core module
+
+The `Core` module defines required and optional configuration objects that you include in the Engine configuration for your application. You can define the configuration objects in a file or construct them programatically with the relevant configuration factory functions.
+
+### (Required) Vehicle info configuration
+
+Your application must provide the `aace.vehicle` configuration specified below. The properties of the vehicle configuration are used for analytics.
+
+```
 {
   "aace.vehicle":
   {
      "info": {
-         "make": "<MAKE>",
-         "model": "<MODEL>",
-         "year": "<YEAR>",
-         "trim": "<TRIM>",
-         "geography": "<GEOGRAPHY>",
-         "version": "<SOFTWARE_VERSION>",
-         "os": "<OPERATING_SYSTEM>",
-         "arch": "<HARDWARE_ARCH>",
-         "language": "<LANGUAGE>",
-         "microphone": "<MICROPHONE>",
-         "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
+         "make": {{STRING}},
+         "model": {{STRING}},
+         "year": {{STRING}},
+         "trim": {{STRING}},
+         "geography": {{STRING}},
+         "version": {{STRING}},
+         "os": {{STRING}},
+         "arch": {{STRING}},
+         "language": {{STRING}},
+         "microphone": {{STRING}},
+         "vehicleIdentifier": {{STRING}}
      }
   }
 }
 ```
-For details about the vehicle properties included in the `VehicleConfiguration` class, see the[`VehicleConfiguration.h`](./platform/include/AACE/Vehicle/VehicleConfiguration.h) file.
+The following table describes the properties in the configuration:
 
->**Important!** To pass the certification process, the vehicle information that you provide in the Engine configuration must include a `"vehicleIdentifier"` that is NOT the vehicle identification number (VIN).
+| Property          | Type                | Required | Description                                                                                       | Example                          |
+| ----------------- | ------------------- | -------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
+| make              | string              | Yes      | The make of the vehicle                                                                           | —                                |
+| model             | string              | Yes      | The model of the vehicle                                                                          | —                                |
+| year              | integer as a string | Yes      | The model year of the vehicle. The value must be an integer in the range 1900-2100.               | "2019"                           |
+| trim              | string              | No       | The trim package of the vehicle, identifying the vehicle's level of equipment or special features | "Sport"                          |
+| geography         | string              | No       | The location of the vehicle                                                                       | "US",<br>"US-North",<br> "WA"    |
+| version           | string              | No       | The client software version                                                                       | "4.0"                            |
+| os                | string              | No       | The operating system used by the head unit                                                        | "AndroidOreo_8.1"                |
+| arch              | string              | No       | The hardware architecture used by the head unit                                                   | "x86_64"                         |
+| language          | string              | No       | The language or locale selected for Alexa by the vehicle owner                                    | "en-US",<br>"fr-CA"              |
+| microphone        | string              | No       | The type and arrangement of microphone used in the vehicle                                        | "7 mic array, centrally mounted" |
+| vehicleIdentifier | string              | Yes      | An identifier for the vehicle                                                                     | "1234abcd"                       |
 
-## Extending the Default Platform Implementation
+Auto SDK provides the [`VehicleConfiguration::createVehicleInfoConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html) factory function to generate the configuration programatically. 
 
-To extend each Auto SDK interface you will use in your platform implementation:
+>**Important!** To pass the certification process, the `vehicleIdentifier` value you provide must NOT be the vehicle identification number (VIN).
 
-1. Create a handler for the interface by overriding the various classes in the library that, when registered with the Engine, allow your application to interact with Amazon services.
-2. Register the handler with the Engine. The Engine class provides two functions for registering platform interface handlers, which allows you to register one or more interfaces at a time for convenience:
+### (Required) Storage configuration
 
-    ```
-    class MyInterface : public SpeechRecognizer {
-    ...
-
-    engine->registerPlatformInterface( std::make_shared<MyInterface>() );
-    ```
-    
-    OR  
-    
-    ```
-    std::shared_ptr::MyInterface1 myInterface1 =
-    std::make_shared<MyInterface1>();
-    std::shared_ptr::MyInterface2 myInterface2 =
-    std::make_shared<MyInterface2>();
-    engine->registerPlatformInterface({ myInterface1, myInterface2 });
-    ```
-
-The functions that you override in the interface handlers are typically associated with directives from Alexa Voice Service (AVS). The functions that are made available by the interfaces are typically associated with events or context sent to AVS. It is not always a one-to-one mapping, however, because the Auto SDK attempts to simplify the interaction with AVS.
-
-The sections below provide information about and examples for creating and registering [location provider](#implementing-a-location-provider), [network information provider](#implementing-a-network-information-provider), [logging](#implementing-log-events), and [audio](#implementing-audio) interface handlers with the Engine. For details about creating handlers for the various Auto SDK modules, see the README files for those modules.
-
-### Implementing a Location Provider
-
-The Engine provides a platform interface for implementing location requests from Alexa and other modules and a Location type definition. For some features, the platform interface is optional and dependent on the platform implementation. For other features, such as navigation and local search, the platform interface is required.
-
-The following sections describe the `LocationProvider` APIs.
-
-#### `getLocation()` and `getCountry()` 
-These virtual functions allow the Engine to retrieve the device's geographic coordinates and country code (based on the coordinates).
-
-The Engine calls `getLocation()` for each voice request to Alexa. Your application needs to construct a `Location` object with geographic coordinates obtained from the location service provider on the device. If the platform cannot retrieve the device location, your application must return the `Location` object with its fields set to `UNDEFINED`.
-
-#### `locationServiceAccessChanged(LocationServiceAccess access)`
-This function notifies the Engine of any change in the state of the location service access. 
-
-If the location provider on the device is disabled, for example, when GPS or network service is down, call `locationServiceAccessChanged(LocationServiceAccess::DISABLED)` to inform the Engine. This API allows the Engine to avoid querying the device location unnecessarily each time a voice request to Alexa is received. If the location provider is enabled again, for example, when the GPS or network service is restored, call `locationServiceAccessChanged(LocationServiceAccess::ENABLED)`. The Engine then resumes calling `getLocation()` to query the device location.
-
-#### Implementing `LocationProvider` Handler
-To implement a custom `LocationProvider` handler to provide location using the default Engine `LocationProvider` class, extend the `LocationProvider` class:
-
-```cpp
-#include <AACE/Location/LocationProvider.h>
-
-class MyLocationProvider : public aace::location::LocationProvider {
-
-  Location getLocation() override {
-    // get platform location
-    return m_platformLocation;
-  }
-  ...
-
-  m_platformLocation = aace::location::Location(...);
-};
-
-// Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MyLocationProvider>());
-```
-
-### Implementing a Network Information Provider
-
->**Note:** The `NetworkInfoProvider` platform interface is mandatory if you use the Local Voice Control (LVC) extension.
-
-The `NetworkInfoProvider` platform interface provides functions that you can implement in a custom handler to allow your application to monitor network connectivity and send network status change events to the Engine. Functions such as `getNetworkStatus()` and `getWifiSignalStrength()` allow the Engine to retrieve network status information, while the `networkStatusChanged()` function informs the Engine about network status changes.
-
-The `NetworkInfoProvider` functions are dependent on your platform implementation and are required by various internal Auto SDK components to get the initial network status from the network provider and update that status appropriately. When you implement the `NetworkInfoProvider` platform interface correctly, Auto SDK components that use the functions provided by this interface work more effectively and can adapt their internal behavior to the initial network status and changing network status events as they come in.
-
-> **Important!** Network connectivity monitoring is the responsibility of the platform. The Auto SDK doesn't monitor network connectivity.
-
-To implement a custom handler to monitor network connectivity and send network status change events, extend the `NetworkInfoProvider` class:
-
-```cpp
-#include <AACE/Network/NetworkInfoProvider.h>
-...
-class MyNetworkInfoProvider : public aace::network::NetworkInfoProvider {
-public:
-    aace::network::NetworkInfoProvider::NetworkStatus getNetworkStatus() override {
-        // Return the current network status as determined on the platform.
-        // Here we return the default, but you should return the real network status.
-        return aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED;
-    }
-
-    int getWifiSignalStrength() override {
-        // Return the current WiFi signal strength RSSI (Received Signal Strength Indicator)
-        // as determined on the platform.
-        // Here we return the default, but you should return the real WiFi signal strength.
-        return 100;
-    }
-
-};
-
-// Register the platform interface with the Engine
-auto myNetworkInfoProvider = std::make_shared<MyNetworkInfoProvider>();
-engine->registerPlatformInterface( myNetworkInfoProvider );
-
-...
-
-// Send networkStatusChanged() notifications as Network Status and WiFi signal strength change on the platform
-myNetworkInfoProvider->networkStatusChanged( networkStatus, wifiSignalStrength );
+Your application must provide the `aace.storage` configuration specified below. The Engine uses the configured path to create a database to persist data across device reboots.
 
 ```
+{
+    "aace.storage": {
+        "localStoragePath": {{STRING}},
+        "storageType": "sqlite"
+    }
+}
+```
 
-### Implementing Log Events
+The following table describes the properties in the configuration:
 
-The Engine provides a callback for implementing log events from the AVS SDK. This is optional, but useful for the platform implementation.
+| Property         | Type   | Required | Description                                                                              | Example                         |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------------------- | ------------------------------- |
+| localStoragePath | string | Yes      | The path to a directory for the Engine to create a database, including the database name | "/opt/AAC/data/aace-storage.db" |
+| storageType      | string | Yes      | The type of storage to use                                                               | "sqlite"                        |
 
-To implement a custom log event handler for logging events from AVS using the default engine Logger class, extend the `Logger` class:
+>**Note:** This database is not the only one used by the Engine. Components in the `Alexa` module have similar configuration to store feature-specific settings and data. See [Configure the Alexa module](../alexa/README.md#configure-the-alexa-module) for details.
 
-```cpp
-#include <AACE/Logger/Logger.h>
 
-class MyLogger : public aace::logger::Logger {
+### (Optional) Logger configuration
 
-  void logEvent(aace::logger::Logger::Level level, std::chrono::system_clock::time_point time, const std::string& source, const std::string& message) override {
-    //handle the log events from Auto SDK, AVS, or other source
-  };
-  ...
+By default, the Engine writes logs to the console. You can configure the Engine to save logs to a file with the `aace.logger` configuration:
 
-};
-
-// Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MyLogger>());
-```        
-
-#### Configuring Logger to Use a File Sink
-By default, the Engine writes logs to the console. You can configure the Engine to save logs to a file with an *"aace.logger"* JSON object:
-
-```jsonc
+```
 {
   "aace.logger": {
     "sinks": [
         {
-            "id": "{STRING}",
+            "id": {{STRING}},
             "type": "aace.logger.sink.file",
             "config": {
-                "path": "{STRING}",
-                "prefix": "{STRING}",
-                "maxSize": {INTEGER},
-                "maxFiles": {INTEGER},
-                "append": {BOOLEAN}
+                "path": {{STRING}},
+                "prefix": {{STRING}},
+                "maxSize": {{INTEGER}},
+                "maxFiles": {{INTEGER},
+                "append": {{BOOLEAN}}
             },
             "rules": [
                 {
-                    "level": "{STRING}"
+                    "level": {{STRING}}
                 }
             ]
         }
@@ -286,25 +342,29 @@ By default, the Engine writes logs to the console. You can configure the Engine 
 }
 ```
 
-| Property | Type | Required | Description | Example
-|-|-|-|-|-|
-| aace.logger.<br>sinks[i].<br>id | string | Yes | A unique identifier for the log sink. | "debug-logs"
-| aace.logger.<br>sinks[i].<br>type | string | Yes | The type of the log sink. Use "aace.logger.sink.file" to write logs to a file. | "aace.logger.sink.file"
-| aace.logger.<br>sinks[i].<br>config.<br>path | string | Yes | An absolute path where the Engine creates the log file. | "/opt/AAC/data"
-| aace.logger.<br>sinks[i].<br>config.<br>prefix | string | Yes | The prefix for the log file. | "auto-sdk"
-| aace.logger.<br>sinks[i].<br>config.<br>maxSize | integer | Yes | The maximum size of the log file in bytes. | 5242880
-| aace.logger.<br>sinks[i].<br>config.<br>maxFiles | integer | Yes | The maximum number of logs files. | 5
-| aace.logger.<br>sinks[i].<br>config.<br>append | boolean | Yes | Use true to append logs to the existing file. Use false to overwrite the log files.  | false
-| aace.logger.<br>sinks[i].<br>rules[j].<br>level | enum (log level) | Yes | The log level used to filter logs written to the sink. <br><br>**Accepted values:**<ul><li>`"VERBOSE"`</li><li>`"INFO"`</li><li>`"WARN"`</li><li>`"ERROR"`</li><li>`"CRITICAL"`</li><li>`"METRIC"`</li></ul> | "VERBOSE"
+The following table describes the properties in the configuration:
 
+| Property                                         | Type             | Required | Description                                                                                                                                                                                                  | Example                 |
+| ------------------------------------------------ | ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+| aace.logger.<br>sinks[i].<br>id                  | string           | Yes      | A unique identifier for the log sink.                                                                                                                                                                        | "debug-logs"            |
+| aace.logger.<br>sinks[i].<br>type                | string           | Yes      | The type of the log sink. Use "aace.logger.sink.file" to write logs to a file.                                                                                                                               | "aace.logger.sink.file" |
+| aace.logger.<br>sinks[i].<br>config.<br>path     | string           | Yes      | An absolute path to a directory where the Engine creates the log file.                                                                                                                                                      | "/opt/AAC/data"         |
+| aace.logger.<br>sinks[i].<br>config.<br>prefix   | string           | Yes      | The prefix for the log file.                                                                                                                                                                                 | "auto-sdk"              |
+| aace.logger.<br>sinks[i].<br>config.<br>maxSize  | integer          | Yes      | The maximum size of the log file in bytes.                                                                                                                                                                   | 5242880                 |
+| aace.logger.<br>sinks[i].<br>config.<br>maxFiles | integer          | Yes      | The maximum number of logs files.                                                                                                                                                                            | 5                       |
+| aace.logger.<br>sinks[i].<br>config.<br>append   | boolean          | Yes      | Use true to append logs to the existing file. Use false to overwrite the log files.                                                                                                                          | false                   |
+| aace.logger.<br>sinks[i].<br>rules[j].<br>level  | enum string | Yes      | The log level used to filter logs written to the sink. <br><br>**Accepted values:**<ul><li>`"VERBOSE"`</li><li>`"INFO"`</li><li>`"WARN"`</li><li>`"ERROR"`</li><li>`"CRITICAL"`</li><li>`"METRIC"`</li></ul> | "VERBOSE"               |
 
-You can either define this JSON in a file and construct an `EngineConfiguration` from that file, or you can use the provided configuration factory function [`aace::logger::config::LoggerConfiguration::createFileSinkConfig()`](./platform/include/AACE/Logger/LoggerConfiguration.h) to programmatically construct the `EngineConfiguration` in the proper format.
+<details markdown="1">
+<summary>Click to expand or collapse details— Generate the configuration programatically with the C++ factory function</summary>
+<br/>
+
+Auto SDK provides the [`LoggerConfiguration::createFileSinkConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1logger_1_1config_1_1_logger_configuration.html#ab58d322f01f350cf87c89c41e8257037) factory function to generate the configuration programatically. 
 
 ```c++
 #include "AACE/Logger/Logger.h"
 #include "AACE/Logger/LoggerConfiguration.h"
 
-// ...
 
 auto fileSinkConfig = aace::logger::config::LoggerConfiguration::createFileSinkConfig(
     "debug-logs",
@@ -314,386 +374,272 @@ auto fileSinkConfig = aace::logger::config::LoggerConfiguration::createFileSinkC
     5242880,
     5,
     false);
-m_engine->configure(
+
+engine->configure(
     {
-        // other config objects...,
+        // ...other config objects...,
         fileSinkConfig
-        // ...
     }
 );
 
-...
 ```
 
-### Implementing Audio
+</details>
+<br/>
 
-The platform should implement audio input and audio output handling. Other Auto SDK components can then make use of the provided implementation to provision audio input and output channels. 
-  
-The `AudioInputProvider` should provide a platform-specific implementation of the `AudioInput` interface, for the type of input specified by the `AudioInputType` parameter when its `openChannel()` function is called, with only one instance of `AudioInput` per `AudioInputType`. For example, the `SpeechRecognizer` engine implementation requests an audio channel for type `VOICE`, while AlexaComms requests a channel for type `COMMUNICATION` - the implementation determines if these are shared or separate input channels. If it is a shared input channel, then whenever the platform implementation writes data to the interface, any instance in the Engine that has opened that channel will receive a callback with the audio data.
-  
-```cpp
-#include <AACE/Audio/AudioInputProvider.h>
-...
-class AudioInputProviderHandler : public aace::audio::AudioInputProvider {
-public:
-    std::shared_ptr<aace::audio::AudioInput> openChannel(
-        const std::string& name, AudioInputType type ) override {
-        // Create a shared AudioInput for VOICE and COMMUNICATION input channels. In this
-        // use case both SpeechRecognizer and AlexaComms are sharing a single microphone.
-        if( type == AudioInputType::VOICE || type == AudioInputType::COMMUNICATION ) {
-            if( m_audioInputHandler == nullptr ) {
-                m_audioInputHandler = AudioInputHandler::create();
+### (Optional) cURL configuration
+
+The Auto SDK uses cURL for network connections. Your application can provide configuration to specify the cURL configuration:
+
+```
+{
+    "aace.alexa": {
+        "avsDeviceSDK": {
+            "libcurlUtils" {
+                "CURLOPT_CAPATH": {{STRING}},
+                "CURLOPT_INTERFACE": {{STRING}},
+                "CURLOPT_PROXY": {{STRING}}
+
             }
-            return m_audioInputHandler;
         }
-        // If a loopback audio can be provided then return the AudioInput implementation
-        // for the loopback audio source.
-        else if( type == AudioInputType::LOOPBACK ) {
-            if( m_loopbackInputHandler == nullptr ) {
-                m_loopbackInputHandler = LoopbackInputHandler::create();
-            }
-            return m_loopbackInputHandler;
-        }
-        else {
-            return nullptr;
-        }
-    }
-    ...
-};
-```
-
-The `AudioInput` interface is required to implement platform-specific support for providing audio data from a specific input channel when requested by the Auto SDK. When a request for audio input is made (for example tap-to-talk from `SpeechRecognizer`), the `AudioInput`'s `startAudioInput()` function is called and the implementation must start writing audio data until `stopAudioInput()` is called. 
-
-In the case where two components in the Auto SDK both request audio from the same channel, `startAudioInput()` will only be called when the first component requests the audio. All of the components that have requested audio from the input channel will receive a callback when audio data is written to the interface, until they explicitly cancel the request. The `stopAudioInput()` function will only be called after the last component has canceled its request to receive audio from the channel.
-
-The audio input format for all input types should be encoded as:
-
-* 16bit Linear PCM
-
-* 16kHz sample rate
-
-* Single channel
-
-* Signed, little endian byte order
-
-```cpp
-#include <AACE/Audio/AudioInput.h>
-...
-class AudioInputHandler : public aace::audio::AudioInput {
-public:
-    bool startAudioInput() override
-    {
-        // start receiving audio data from the platform specific input device
-        m_device.start( [this](const int16_t* data, const size_t size) {
-            // provide the audio data to engine by calling the
-            // AudioInput write() function...
-            write( data, size );
-        });
-    }
- 
-    bool stopAudioInput() override {
-        // stop requesting audio data from the platform specific input device
-        m_device.stop();
-    }
-    ...
-};
-```
-
-The `AudioOutputProvider` provides a platform-specific implementation of the `AudioOutput` interface, for the type of input specified by the `AudioOutputType` parameter, when its `openChannel()` function is called. The `AudioOutputProvider` should create a new instance of `AudioOutput` each time `openChannel()` is called. The `openChannel()` function will be called from components in the Auto SDK that require support for playing back audio. The characteristics of the audio that will be played on the channel are specified by the `AudioOutputType` parameter. The following types are currently defined by `AudioOutputType`:
-
- * TTS
- * MUSIC
- * NOTIFICATION
- * ALARM
- * EARCON
- * COMMUNICATION
-
-The `AudioOutputProvider` implementation determines how to handle each different audio type. The simplest implementation, for example, may ignore the audio type and return the same `AudioOutput` implementation for all channels. 
-
-A more sophisticated implementation may provide completely different `AudioOutput` implementations depending on the audio type - for example, providing a low level audio implementation for `NOTIFICATION` and `EARCON` types, and a high level implementation (such as ExoPlayer) for `TTS` and `MUSIC`. The best approach is highly dependent on your system-specific use case.
-
-```cpp
-#include <AACE/Audio/AudioOutputProvider.h>
-...
-class AudioOutputProviderHandler : public aace::audio::AudioOutputProvider {
-public:
-    std::shared_ptr<aace::audio::AudioOutput> openChannel(
-        const std::string& name, AudioOutputType type ) override {
-        // Simple implementation which returns a new instance of AudioOutputHandler
-        // whenever openChannel() is called. All types will have the sample implementation.
-        return AudioOutputHandler::create();
-    }
-    ...
-};
-```
-
-The `AudioOutput` describes a platform-specific implementation of an audio output channel. The platform should have one or more implementations of `AudioOutput`, depending on on the desired behavior. In addition to implementing the callback functions, each `AudioOutput` channel implementation should report the state of its media, when appropriate. 
-
-The full `AudioOutput` API is described below. 
-
-```cpp
-#include <AACE/Audio/AudioOutput.h>
-class AudioOutputHandler :
-    public aace::audio::AudioOutput,
-    public std::enable_shared_from_this<AudioOutputHandler> {
-    
-    bool prepare( std::shared_ptr<aace::audio::AudioStream> stream, bool repeating ) override{
-        ... // tell the platform media player to prepare audio stream
-        mediaStateChanged( MediaState::BUFFERING );
-        m_player->prepareStream( stream, repeating );
-    ...
-    
-    bool prepare( const std::string& url, bool repeating ) override {
-        ... // tell the platform media player to prepare the url
-        mediaStateChanged( MediaState::BUFFERING ); 
-        m_player->prepareUrl( url, repeating );
-    ...
- 
-    bool play() override {
-        ... // tell the platform media player to start playing
-        mediaStateChanged( MediaState::PLAYING );
-        m_player->play();
-    ...
- 
-    bool stop() override {
-        ... // tell the platform media player to stop playing
-        mediaStateChanged( MediaState::STOPPED );
-        m_player->stop();
-    ...
- 
-    bool pause() override {
-        ... // tell the platform media player to pause playback
-        mediaStateChanged( MediaState::STOPPED );
-        m_player->pause();
-    ...
- 
-    bool resume() override {
-        ... // tell the platform media player to resume playback
-        mediaStateChanged( MediaState::PLAYING );
-        m_player->resume();
-    ...
- 
-    int64_t getPosition() override {
-        ... // return the current media position of the platform media player
-        m_player->position();
-    ...
- 
-    bool setPosition( int64_t position ) override {
-        ... // set the current media position of the platform media player
-        m_player->setPosition( position );
-    ...
-    
-    int64_t getDuration() override {
-        ... // return the current media duration of the platform media player
-        return m_player.getCurrentDuration();
-    ...
-    
-    bool volumeChanged( float volume ) override {
-        ... // set the current media volume of the platform media player
-        m_player->setVolume( volume );
-    ...
-
-    bool mutedStateChanged( MutedState state ) override {
-        ... // set the current media mute state of the platform media player    
-        if( state == MutedState::MUTED ) m_player->setMuted( true );
-        else m_player->setMuted( false );
-    ...
-
-}; 
-```
-## Starting the Engine
-
-After creating and registering handlers for all required platform interfaces, you can start the Engine by calling the Engine's `start()` function. The Engine will first attempt to register all listed interface handlers, and then attempt to establish a connection with the given authorization implementation.
-
-```
-engine->start();
-```
-
-## Stopping the Engine
-If you need to stop the engine for any reason except for logging out the user, use the Engine's `stop()` function. You can then restart the Engine by calling `start()` again.
-
-```
-engine->stop();
-```
-
-You should call `shutdown()` on the Engine when the app is being destroyed or the user is logged out. This makes sure when the next user logs in, a corresponding publish message is sent to the cloud with new capabilities and configuration that is tied to the new user. 
-
-```
-engine->shutdown();
-```
-## Managing Runtime Properties with the Property Manager
-
-Certain modules in the Auto SDK define constants (for example `FIRMWARE_VERSION` and `LOCALE`) that are used to get and set the values of runtime properties in the Engine. Changes to property values may also be initiated from the Alexa Voice Service (AVS). For example, the `TIMEZONE` property may be changed through AVS when the user changes the timezone setting in the Alexa Companion App.
-
-The Auto SDK Property Manager maintains the runtime properties by storing properties and listeners to the properties and delegating the `setProperty()` and `getProperty()` calls from your application to the respective Engine services. It also calls `propertyChanged()` to notify your application about property value changes originating in the Engine. The Property Manager includes a `PropertyManager` platform interface that provides the following functions:
-
-* `setProperty()` - called by your application to set a property value in the Engine.
-* `getProperty()` - called by your application to retrieve a property value from the Engine.
-    >**Note:** `setProperty()` is asynchronous. After calling `setProperty()`, `getProperty()` returns the updated value only after the Engine calls `propertyStateChanged()` with `PropertyState::SUCCEEDED`.
-* `propertyStateChanged()` - notifies your application about the status of a property value change (`SUCCEEDED` or `FAILED`). This is an asynchronous response to your application's call to `setProperty()`.
-* `propertyChanged()` - notifies your application about a property value change in the Engine that was initiated internally, either by AVS or an Engine component.
-
-### Property Manager Sequence Diagrams
-
-#### Application Changes a Property Value
-The following sequence diagram illustrates the flow when your application calls `setProperty()` to set a property value in the Engine.
-
-![Set_Property](./assets/PropertyManager_set.png)
-
-#### Application Retrieves a Property Value
-The following sequence diagram illustrates the flow when your application calls `getProperty()` to retrieve a property value from the Engine.
-
-![Get_Property](./assets/PropertyManager_get.png)
-
-#### Notification of Property Value Change Initiated by AVS
-The following sequence diagram illustrates the flow when a property value change is initiated by AVS and the Property Manager notifies your application.
-
-![Property_Changed](./assets/PropertyManager_changed.png)
-
-### Implementing a Custom Property Manager Handler
-To implement a custom Property Manager handler to set and retrieve Engine property values and be notified of property value changes, extend the `PropertyManager` class:
-
-```cpp
-#include <AACE/PropertyManager/PropertyManager.h>
-
-class MyPropertyManager : public aace::propertyManager::PropertyManager {
-    
-    void propertyStateChanged(const std::string& name, const std::string& value, const PropertyState state) override {
-        // Handle the status of a property change after a call to setProperty().
-    }
-              
-    void propertyChanged(const std::string& name, const std::string& newValue) override {
-        // Handle the property value change initiated by the Engine.
-        // For example, if the user sets the TIMEZONE to "Pacific Standard Time - Vancouver"
-        // in the companion app, your application gets a call to:
-        // propertyChanged(aace::alexa::property::TIMEZONE, "America/Vancouver")
     }
 }
-...
+```
 
-// Register the platform interface with the Engine
-auto m_propertyManagerHandler = std::make_shared<MyPropertyManagerHandler>();
-engine->registerPlatformInterface( m_propertyManagerHandler );
+The following table describes the properties in the configuration:
 
-// You can also set and retrieve properties in the Engine by calling the inherited
-// setProperty() and getProperty() functions.
+| Property          | Type   | Required | Description                                                                                    | Example                 |
+| ----------------- | ------ | -------- | ---------------------------------------------------------------------------------------------- | ----------------------- |
+| CURLOPT_CAPATH    | string | Yes      | The path to the directory containing the CA certificates                                       | "/opt/AAC/certs"        |
+| CURLOPT_INTERFACE | string | Yes      | The outgoing network interface. Can be a network interface name, an IP address, or a host name | "wlan0"                 |
+| CURLOPT_PROXY     | string | No       | The address of the HTTP proxy                                                                  | "http://127.0.0.1:8888" |
 
-// For example, to set the LOCALE property to English-Canada:
-m_propertyManagerHandler->setProperty(aace::alexa::property::LOCALE, "en-CA");
+> **Note:** If the HTTP proxy requires credentials in HTTP headers to authenticate a user agent, you can [specify the header with the `PropertyManager` interface](#runtime-properties) by using the `aace.network.httpProxyHeaders` property name. You can also change the network interface at runtime with the `aace.network.networkInterface` property name.
 
-// For example, to retrieve the value of the LOCALE property:
-auto locale  = m_propertyManagerHandler->getProperty(aace::alexa::property::LOCALE);
+Auto SDK provides the [`AlexaConfiguration::createCurlConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a2012a3f45f54d16f5d8f260bb16c49c1) factory function to generate the configuration programatically. 
+
+### (Optional) AASB and MessageBroker configuration
+
+#### (Optional) Configure enabled interfaces
+
+When you use a module, the Engine services of that module enable every interface defined in the module. This means that for every interface, if your application does not subscribe to the AASB messages of the interface, the Engine performs default handling for the messages you do not handle.
+
+To disable this setting, provide the following `aace.messageBroker` configuration object in your Engine configuration:
 
 ```
-### Property Definitions
-The definitions of the properties used with the `PropertyManager::setProperty()` and `PropertyManager::getProperty()` functions are included in the [AlexaProperties.h](../alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [CoreProperties.h](./platform/include/AACE/Core/CoreProperties.h) files. For a list of the Alexa Voice Service (AVS) supported locales for the `LOCALE` property, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/docs/alexa-voice-service/system.html#locales).
+{
+    "aace.messageBroker": {
+        "autoEnableInterfaces": false
+    }
+}
+```
+
+You can also change this enablement on a per-interface basis. The `enabled` setting tells the Engine service whether to enable the interface. If you don't want the Engine to provide a default handler for a particular interface, you can disable the interface using the following configuration:
+
+```
+{
+    "aasb.<message_handler_engine_service_name>": {
+        "<interface_name>": {
+            "enabled": false
+        }
+    }
+}
+```
+For example, the below configuration disables the `TemplateRuntime` interface from the `Alexa` module and the `LocationProvider` interface from `Core` module. 
+
+```
+{
+    "aasb.alexa": {
+        "TemplateRuntime": {
+            "enabled": false
+        }
+    },
+   "aasb.location": {
+      "LocationProvider": {
+         "enabled": false
+      }
+   }
+}
+```
+
+#### (Optional) Configure the synchronous message timeout
+
+All the messages published by the Engine through MessageBroker are asynchronous; however, certain messages require your application to respond with a special synchronous-style `Reply` message. Your application must publish the reply quickly because the Engine blocks its execution thread while waiting for the response, and the MessageBroker cannot dispatch more messages while waiting. The following is an example of the `Reply` message for the [`LocationProvider.GetLocation` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#getlocation):
+```
+{
+  "header": {
+    "id": "4c4d13b6-6a8d-445b-931a-a3feb0878311",
+    "messageType": "Reply",
+    "version": "1.0",
+    "messageDescription": {
+      "replyToId": "23b578ed-6dc3-460a-998e-1647ba6cde42"
+    }
+  },
+  "payload": {
+    "location": {
+      "latitude": 37.410,
+      "longitude": -122.025
+    }
+  }
+}
+```
+If your application does not publish the reply before the message timeout expires, the relevant Engine operation won't execute properly. The AASB message documentation for each interface specifies whether the interface requires any reply messages. 
+
+The default timeout value for these messages is 500 milliseconds. In a busy system, the default timeout might not be long enough. You can configure this value by adding the optional field `defaultMessageTimeout` to the `aace.messageBroker` JSON object. The following example shows how to change the timeout to 1000 ms:
+```
+{
+    "aace.messageBroker": {
+        "defaultMessageTimeout": 1000
+    }
+}
+```
+> **Important!** Since increasing the timeout increases the Engine's message processing time, use this configuration carefully. Consult with your Amazon Solutions Architect (SA) as needed.
+
+## Understand the key core Engine services
+
+The `Core` module defines several Engine services for common functionality used by multiple Auto SDK modules. For example, the `Core`, `Alexa`, and `Alexa Comms` modules all require the application to play audio through platform-specific audio ouput channels. The `Core` module defines the core audio Engine service and corresponding `AudioOutput` AASB message interface, and all three modules use `AudioOutput` messages to request the application to play audio for their respective audio channels.
+
+The following list describes the primary core Engine services provided by the `Core` module. Each service defines to one or more important AASB message interfaces that your application is required to use.
+
+> **Note:** This is not a list of every Engine service in the `Core` module. For the most part, every AASB interface defined by `Core` also corresponds to a `Core` module Engine service that other modules might care about. The following lists the foundational core services that matter most to your application; the Engine cannot function without these.
+
+### Authorization
+
+The `Authorization` interface specifies messages for your application to initiate device authorization, terminate device authorization, or provide authorization data, such as Alexa access tokens, to the Engine. See [Alexa Auto SDK Authorization](./AUTHORIZATION.md) for more information.
+
+### Audio input and output
+
+The core audio Engine service provides a mechanism for Engine components of any module to open audio input and output channels in your application. Each component that requests an audio channel specifies its audio channel type so your application can provide different microphone and media player implementations for each channel. See [Alexa Auto SDK Audio Channels](./AUDIO.md) for more information.
+
+### Runtime properties
+
+Different Auto SDK modules define properties based on their supported features. For example, the `Alexa` module requires a locale setting to notify Alexa which language to use when interacting with the user. The `Core` module provides a mechanism for Engine services to register properties they manage and listen to changes in properties managed by other modules. The `PropertyManager` interface specifies messages for your application and the Engine to query and update these properties. See [Alexa Auto SDK Property Manager](./RUNTIME_PROPERTIES.md) for more information.
 
 
-## Managing Authorization
+## Provide core device status
 
-The Auto SDK needs access to cloud services and resources to function. Gaining access requires that the device be authorized with an authorization service such as Login With Amazon (LWA), which provides the access token. The Engine uses the token to access cloud services and resources. For example, to access Alexa APIs, the device must be authorized with LWA to obtain the access token.
+The `Core` module defines interfaces for your application to provide key "core" information about the status of the application or its runtime environment.
 
-The Auto SDK Authorization module is responsible for managing authorizations for different cloud services. For example, to use Alexa, your device must be authorized with LWA. The module provides a single platform interface for all authorizations and communicates with the engine services (referred to here as authorization services). The authorization service is responsible for carrying out the authorization method you choose. For example, for Alexa, you can use the CBL authorization or Auth Provider authorization method. The CBL or Auth Provider authorization service carries out the actual authorization process or flow.
+### Report location with LocationProvider
 
-For information on how to use the Authorization module with different authorization methods, see the Alexa module [README](../alexa/README.md#handling-authorization) and the CBL module [README](../cbl/README.md).
+Sometimes the user asks Alexa a question that requires she know the location in order to answer properly. For example, a user in San Francisco, California might say *"Alexa, what's the weather?"*. This user probably wants to hear Alexa say something like *"The weather in San Francisco is sixty-five degrees and overcast..."* rather than something like *"I can't find your exact location right now..."*. Similarly, the user might say *"Alexa, take me to the nearest Whole Foods"* and wants Alexa to start navigation to a Whole Foods that is actually nearby.
 
-### Authorization Sequence Diagrams
+To provide the user with accurate responses to local search commands, weather questions, and more, obtain the user's consent to share their location with Alexa and use the [`LocationProvider`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html) interface.
 
-#### Starting the Authorization Process
+> **Note:** For Android applications, AACS provides a default implementation of `LocationProvider`. See the [AACS Default Implementation documentation](https://alexa.github.io/alexa-auto-sdk/aacs/android#default-platform-implementation) for more information.
 
-The following sequence diagram shows the typical call sequences between platform implementation and Auto SDK to start an authorization process.
+Your application should subscribe to the [`LocationProvider.GetLocation`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#getlocation) and [`LocationProvider.GetCountry`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#getcountry) messages to provide location data, such as geocoordinates and vehicle operating country, when the Engine requests it. These messages are synchronous-style and require your application to send the corresponding reply messages right away. To avoid blocking the MessageBroker outgoing thread and delaying user requests to Alexa, your application should keep the location data in a cache that you update frequently. Pull the location from the cache when the Engine requests it.
 
-![Starting_Authorization](./assets/Authorization_start.png)
+The Engine won't publish the `GetLocation` message if it knows your application has lost access to the location data. Keep the Engine in sync with the state of your application's location provider availability by proactively publishing the [`LocationServiceAccessChanged`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/LocationProvider/index.html#locationserviceaccesschanged) message at startup and each time the state changes. For example, your application might publish this message with `access` set to `DISABLED` if the system revokes your application's access to location or if GPS turns off.
 
-#### Canceling the Authorization Process
+> **Note:** The Engine does not persist this state across device reboots. To ensure the Engine always knows the initial state of location availability, publish a `LocationServiceAccessChanged` message each time you start the Engine. This includes notifying the Engine that `access` is `ENABLED`.
 
-The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to cancel an authorization process.
-
-![Cancel_Authorization](./assets/Authorization_cancel.png)
-
-#### Logging out the Authorization
-
-The following sequence diagram shows the typical call sequence between the platform implementation and Auto SDK to log out of an authorization.
-
-![Logout_Authorization](./assets/Authorization_logout.png)
-
-### Using the Authorization Module
-
-To implement the custom `Authorization`  handler, extend the `Authorization` class as follows:
+<details markdown="1">
+<summary>Click to expand or collapse C++ example code</summary>
 
 ```cpp
-#include <AACE/Authorization/Authorization.h>
+#include <AACE/Core/MessageBroker.h>
 
-class MyAuthorizationHandler : public aace::authorization::Authorization {     
-    // There is an event from the requested authorization service.
-    void eventReceived(const std::string& service, const std::string& event) override {
-        // Take the necessary action as defined by the service protocol.
+#include <AASB/Message/Location/LocationProvider/GetCountryMessage.h>
+#include <AASB/Message/Location/LocationProvider/GetLocationMessage.h>
+#include <AASB/Message/Location/LocationProvider/LocationServiceAccessChangedMessage.h>
+
+class MyLocationProviderHandler {
+
+    // Call before you start the Engine
+    void MyLocationProviderHandler::subscribeToAASBMessages() {
+        m_messageBroker->subscribe(
+            [=](const std::string& message) { handleGetCountryMessage(message); },
+            GetCountryMessage::topic(),
+            GetCountryMessage::action());
+        m_messageBroker->subscribe(
+            [=](const std::string& message) { handleGetLocationMessage(message); },
+            GetLocationMessage::topic(),
+            GetLocationMessage::action());
     }
 
-    // Authorization service notifying the platform implementation of the state change.
-    void authorizationStateChanged(const std::string& service, AuthorizationState state) override{
-        // Handle the authorization state change as required by your application.
-    }
-    
-    // Authorization service notifies an error in the process.
-    void authorizationError(const std::string& service, const std::string& error, const std::string& message) override {
-        // Handle the authorization error as required by your application.
+    void MyLocationProviderHandler::handleGetCountryMessage(const std::string& message) {
+        GetCountryMessage msg = json::parse(message);
+
+        // Quickly publish the GetCountry reply message
+        auto country = getCountryFromCache(); // implement this stub
+        GetCountryMessageReply replyMsg;
+        replyMsg.header.messageDescription.replyToId = msg.header.id;
+        replyMsg.payload.country = country;
+        m_messageBroker->publish(replyMsg.toString());
     }
 
-    // Authorization service needs to get the authorization-related data from the platform implementation.
-    std::string getAuthorizationData(const std::string& service, const std::string& key) override {
-        // Return the data identified by key.
+    void MyLocationProviderHandler::handleGetLocationMessage(const std::string& message) {
+        GetLocationMessage msg = json::parse(message);
+
+        // Quickly publish the GetCountry reply message
+        auto location = getLocationFromCache(); // implement this stub
+        GetLocationMessageReply replyMsg;
+        replyMsg.header.messageDescription.replyToId = msg.header.id;
+
+        // parse "location" and populate the fields of the reply message
+        aasb::message::location::locationProvider::Location replyLocation;
+        replyLocation.latitude = ... ; // the latitude from "location";
+        replyLocation.longitude =  ... ; // the longitude from "location";
+        replyMsg.payload.location = replyLocation;
+        m_messageBroker->publish(replyMsg.toString());
     }
-    
-    // Authorization service requires the platform implementation to store the authorization-related data.
-    void setAuthorizationData(const std::string& service, const std::string& key, const std::string& data) override {
-        // Store/Clear the data identified by the key securely on the device.
+
+    // Call when the application access to location data changes
+    // and after starting the Engine
+    void MyLocationProviderHandler::locationServiceAccessChanged(bool hasAccess) {
+        LocationServiceAccessChangedMessage msg;
+        if (hasAccess) {
+             msg.payload.access = aasb::message::location::locationProvider::LocationServiceAccess::ENABLED;
+        } else {
+            msg.payload.access = aasb::message::location::locationProvider::LocationServiceAccess::DISABLED;
+        }
+        m_messageBroker->publish(msg.toString());
     }
 }
 
-// Register the platform interface with the Engine
-auto m_authorizationHandler = std::make_shared<MyAuthorizationHandler>();
-engine->registerPlatformInterface( m_authorizationHandler );
+```
+</details>
 
-// To notify the Engine to start authorization process represented by `service-name`
-m_authorizationHandler->startAuthorization("service-name", "data-as-defined-by-service");
+### Report network status changes with NetworkInfoProvider
 
-// To notify the Engine to cancel authorization process represented by `service-name`, which is already in progress
-m_authorizationHandler->cancelAuthorization("service-name");
+Your application should monitor the network connection and notify the Engine of changes in the status using the [`NetworkInfoProvider`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html) interface. The Engine uses this information to adjust its behavior, including tearing down the connection to Alexa cloud when your application reports that there is no internet connection. Although using `NetworkInfoProvider` is optional, you should use it so the Engine can avoid undesirable behavior; for instance, attempting to send events to Alexa when the lack of connectivity means the events are bound to fail.
 
-// To notify the Engine to log out from the authorization for the service represented by `service-name`.
-m_authorizationHandler->logout("service-name");
+>**Note:** You must use the `NetworkInfoProvider` interface if your application uses the Local Voice Control (LVC) extension.
 
-// To send events from the platform implementation to the authorization service.
-m_authorizationHandler->sendEvent("service-name", "event-data-as-defined-by-service");
+> **Note:** For Android applications, AACS provides a default implementation of `NetworkInfoProvider`. See the [AACS Default Implementation documentation](https://alexa.github.io/alexa-auto-sdk/aacs/android#default-platform-implementation) for more information.
+
+Various Engine components want the initial network status at startup so they can adapt their initial behavior accordingly. Your application should subscribe to the [`NetworkInfoProvider.GetNetworkStatus`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html#getnetworkstatus) and [`NetworkInfoProvider.GetWifiSignalStrength`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html#getwifisignalstrength) to answer the inital query from the Engine. These messages are synchronous-style and require your application to send the corresponding reply messages right away. 
+
+At runtime, publish the [`NetworkInfoProvider.NetworkStatusChanged`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/NetworkInfoProvider/index.html#networkstatuschanged) message to notify the Engine of any status changes.
+
+
+### Report data usage with DeviceUsage
+
+Periodically publish the [`DeviceUsage.ReportNetworkDataUsage`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/DeviceUsage/index.html#reportnetworkdatausage) message (for example, at five minute intervals) to report network data usage to the Engine. If your application uses the `Device Client Metrics (DCM)` extension, the Engine tracks metrics with this information.
+
+The `usage` field in the payload is a JSON object as a string. The format of the JSON is the following:
 
 ```
-
-## Providing network usage data to Auto SDK
-
-The Auto SDK exposes the `DeviceUsage` platform interface that can be used to provide network usage data of your Alexa application to Auto SDK. This data is logged as a metric and is sent to Amazon endpoints if Auto SDK is built with the `Device Client Metrics` extension.
-
-To use the `DeviceUsage` platform interface, create your custom `DeviceUsage` handler and use it as follows :
-
-```cpp
-#include <AACE/DeviceUsage/DeviceUsage.h>
-
-class MyDeviceUsageHandler : public aace::deviceUsage::DeviceUsage {  
-
-    void reportNetworkDataUsage(std::string& networkUsageData) {
-        // Reports the network usage data to Auto SDK Engine
-    }
-
+{
+  "startTimeStamp" : {{LONG}},
+  "endTimeStamp" : {{LONG}},
+  "networkInterfaceType": "{{STRING}}",
+  "dataPlanType" : "{{STRING}}",
+  "bytesUsage" :{
+       "rxBytes" : {{LONG}},
+       "txBytes" : {{LONG}}
+   }
 }
-
-// Register the platform interface with the Engine
-auto m_deviceUsageHandler = std::make_shared<MyDeviceUsageHandler>();
-engine->registerPlatformInterface( m_deviceUsageHandler );
-
-// Reference @c aace::deviceUsage::DeviceUsage for network usage data format
-std::string networkUsageData = R"({ ... })";
-
-// To provide the network usage data to the Engine, call the reportNetworkUsage API
-m_deviceUsageHandler->reportNetworkDataUsage(networkUsageData);
-
 ```
+
+The following table describes the properties in the JSON:
+
+| Property               | Type   | Required | Description                                                                                                                                                                  | Example                                   |
+| ---------------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| startTimeStamp         | long   | Yes      | The starting timestamp in milliseconds for this network usage datapoint                                                                                         | —                                         |
+| endTimeStamp           | long   | Yes     | The ending timestamp in milliseconds for this network usage datapoint                                                       | —                                         |
+| networkInterfaceType   | string | Yes      | The network interface name over which the data is recorded                                                                                                                   | "WIFI",<br>"MOBILE"                       |
+| dataPlanType           | string | No       | The type of data plan the device is subscribed to. This is an optional field and should be provided if your application uses the `AlexaConnectivity` module. | See [`AlexaConnectivity`](../connectivity/README.md) |
+| bytesUsage<br>.rxBytes | long   | Yes      | The bytes received over the network interface                                                                                                                                | —                                         |
+| bytesUsage<br>.txBytes | long   | Yes      | The bytes transmitted over the network interface                                                                                                                                | —                                         |

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,6 +35,11 @@ namespace alexa {
  * playback control buttons should be enabled on screen with a player info display card.
  *
  * @sa AudioPlayer
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class PlaybackController : public aace::core::PlatformInterface {
 protected:

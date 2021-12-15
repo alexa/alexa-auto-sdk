@@ -1,0 +1,81 @@
+topic: EqualizerController
+namespace: aasb.message.alexa.equalizerController
+path: Alexa/EqualizerController
+
+messages:
+  - action: LocalResetBands
+    direction: incoming
+    desc: >
+      Notifies the Engine that the gain levels for the equalizer bands are being reset 
+      to their defaults.
+    payload:
+      - name: bands
+        type: list:EqualizerBand
+        desc: The equalizer bands to reset. Empty @a bands resets all supported equalizer bands.
+        default: {}
+
+  - action: GetBandLevels
+    direction: outgoing
+    desc: >
+      Retrieves the current equalizer gain settings on the device for each supported band. 
+      If unsupported band levels are provided, the Engine will truncate levels to the 
+      configured range.
+    reply:
+      - name: bandLevels
+        type: list:EqualizerBandLevel
+        desc: The supported equalizer bands and their current gain settings as integer dB values.
+
+  - action: LocalSetBandLevels
+    direction: incoming
+    desc: >
+      Notifies the Engine that gain levels for one or more equalizer bands are being set directly 
+      on the device. If unsupported levels are provided, the Engine will truncate the settings to 
+      the configured range.
+    payload:
+      - name: bandLevels
+        type: list:EqualizerBandLevel
+        desc: The equalizer bands to change and their gain settings as integer dB values.
+
+  - action: SetBandLevels
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation to apply the provided gain settings to the corresponding 
+      equalizer bands.
+    payload:
+      - name: bandLevels
+        type: list:EqualizerBandLevel
+        desc: The equalizer bands and their gain settings to apply as integer dB values.
+
+  - action: LocalAdjustBandLevels
+    direction: incoming
+    desc: >
+      Notifies the Engine that relative adjustments to equalizer band gain levels are being made 
+      directly on the device. If adjustments put the band level settings beyond the configured dB 
+      range, the Engine will truncate the settings to the configured range.
+    payload:
+      - name: bandAdjustments
+        type: list:EqualizerBandLevel
+        desc: he equalizer bands to adjust and their relative gain adjustments as integer dB values.
+
+types:
+  - name: EqualizerBandLevel
+    type: struct
+    values:
+      - name: band
+        type: EqualizerBand
+        desc: >
+          Describes the equalizer bands supported by Alexa. The platform implementation may support 
+          a subset of these.
+      - name: level
+        type: int
+        desc: Describes the level of gain of a particular equalizer band as an integer dB value.
+
+  - name: EqualizerBand
+    type: enum
+    values:
+      - name: BASS
+        desc: Bass equalizer band.
+      - name: MIDRANGE
+        desc: Mid-range equalizer band.
+      - name: TREBLE
+        desc: Treble equalizer band.

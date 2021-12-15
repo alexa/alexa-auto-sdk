@@ -1,0 +1,174 @@
+topic: APL
+namespace: aasb.message.apl.apl
+path: APL/APL
+
+messages:
+  - action: ProcessActivityEvent
+    direction: incoming
+    desc: Notifies the Engine of an activity event.
+    payload:
+      - name: source
+        desc: The source value for the activity event.
+      - name: event
+        type: ActivityEvent
+        desc: The activity event type.
+
+  - action: SetAPLMaxVersion
+    direction: incoming
+    desc: Notifies the Engine of the maximum APL version supported.
+    payload:
+      - name: version
+        desc: The maximum APL version supported.
+
+  - action: DataSourceUpdate
+    direction: outgoing
+    desc: Notifies the platform implementation of a dynamic data source update.
+    payload:
+      - name: type
+        desc: The type of data source update received.
+      - name: payload
+        desc: The data source update payload in JSON format.
+      - name: token
+        desc: The presentation token associated with the APL document.
+
+  - action: SendUserEvent
+    direction: incoming
+    desc: Notifies the Engine that user generated an event.
+    payload:
+      - name: payload
+        desc: The APL user event represented as a JSON string.
+
+  - action: SendDataSourceFetchRequestEvent
+    direction: incoming
+    desc: Notifies the Engine of a data source fetch request.
+    payload:
+      - name: type
+        desc: The type of data source fetch request.
+      - name: payload
+        desc: The APL user event represented as a JSON string.
+
+  - action: SendDeviceWindowState
+    direction: incoming
+    desc: Notifies the Engine of the current window state.
+    payload:
+      - name: state
+        desc: "JSON string representing the payload of the window state https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/display-window.html#windowstate-context-object."
+
+  - action: InterruptCommandSequence
+    direction: outgoing
+    desc: Notifies the platform implementation to clear the APL document rendering.
+    payload:
+      - name: token
+        desc: The presentation token associated with the APL document.
+
+  - action: UpdateAPLRuntimeProperties
+    direction: outgoing
+    desc: Notifies the platform implementation of APL runtime properties to be used during rendering.
+    payload:
+      - name: properties
+        desc: String in JSON format containing updated APL runtime properties.
+
+  - action: SendDocumentState
+    direction: incoming
+    desc: Notifies the Engine that APL runtime generated visual document state.
+    payload:
+      - name: state
+        desc: "JSON string representing the payload of the rendered document state https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/presentation-apl.html#rendereddocumentstate."
+
+  - action: SendRuntimeErrorEvent
+    direction: incoming
+    desc: Notifies the Engine that an APL runtime error occurred.
+    payload:
+      - name: payload
+        desc: The APL runtime error event represented as a JSON string.
+
+  - action: ClearAllExecuteCommands
+    direction: incoming
+    desc: Notifies the Engine that APL render finished clearing all commands.
+
+  - action: SetPlatformProperty
+    direction: incoming
+    desc: Notifies the Engine of properties such as vehicle driving state, day/night mode, and custom theme id.
+    payload:
+      - name: name
+        desc: The name of the property to be set.
+      - name: value
+        desc: The value that the property will be set to.
+
+  - action: RenderDocument
+    direction: outgoing
+    desc: Notifies the platform implementation that an APL document needs rendering.
+    payload:
+      - name: payload
+        desc: The APL document to be rendered represented as a JSON string.
+      - name: token
+        desc: The presentation token associated with the APL document.
+      - name: windowId
+        desc: The window ID where the APL document will be rendered or empty string for default window.
+
+  - action: ExecuteCommandsResult
+    direction: incoming
+    desc: Notifies the Engine of the command execution result.
+    payload:
+      - name: token
+        desc: The token associated with the commands.
+      - name: result
+        type: bool
+        desc: True if rendering was successful, otherwise false.
+      - name: error
+        desc: Error message if rendering failed, otherwise empty.
+
+  - action: ExecuteCommands
+    direction: outgoing
+    desc: Notifies the platform implementation that an APL document needs rendering.
+    payload:
+      - name: payload
+        desc: The APL commands to be executed represented as a JSON string.
+      - name: token
+        desc: The presentation token associated with the APL document.
+
+  - action: SetDocumentIdleTimeout
+    direction: incoming
+    desc: Notifies the Engine of the idle timeout value.
+    payload:
+      - name: timeout
+        type: int64
+        desc: Idle timeout value in milliseconds.
+
+  - action: ClearDocument
+    direction: outgoing
+    desc: Notifies the platform implementation to clear the APL document rendering.
+    payload:
+      - name: token
+        desc: The presentation token associated with the APL document.
+
+  - action: RenderDocumentResult
+    direction: incoming
+    desc: Notifies the Engine of command execution result.
+    payload:
+      - name: token
+        desc: The token associated with the APL document.
+      - name: result
+        type: bool
+        desc: True if rendering was successful, otherwise false.
+      - name: error
+        desc: Error message if rendering failed, otherwise empty.
+
+  - action: ClearCard
+    direction: incoming
+    desc: Notifies the Engine that APL render finished clearing document.
+
+types:
+  - name: ActivityEvent
+    type: enum
+    values:
+      - name: ACTIVATED
+        desc: GUI switched to active state.
+      - name: DEACTIVATED
+        desc: GUI become inactive.
+      - name: ONE_TIME
+        desc: GUI processed one-time event (touch/scroll/etc).
+      - name: INTERRUPT
+        desc: Interrupt event (touch).
+      - name: UNKNOWN
+        desc: Guard option for unknown received state.

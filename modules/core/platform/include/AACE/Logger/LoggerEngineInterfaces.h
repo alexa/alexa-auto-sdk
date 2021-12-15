@@ -29,6 +29,8 @@ namespace logger {
  */
 class LoggerEngineInterface {
 public:
+    virtual ~LoggerEngineInterface() = default;
+
     /**
      * Specifies the severity level of a log message
      */

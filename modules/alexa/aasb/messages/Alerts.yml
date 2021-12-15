@@ -1,0 +1,73 @@
+topic: Alerts
+namespace: aasb.message.alexa.alerts
+path: Alexa/Alerts
+
+messages:
+  - action: AlertCreated
+    direction: outgoing
+    desc: Notifies the platform implementation of an alert created, with detailed alert info.
+    payload:
+      - name: alertToken
+        desc: The AVS token of the alert.
+      - name: detailedInfo
+        desc: The alert info payload.
+
+  - action: RemoveAllAlerts
+    direction: incoming
+    desc: > 
+      Notifies the Engine of a platform request to clear the user's pending alerts from storage. 
+      This may be useful for a scenario in which a user's pending alerts should not go off after 
+      he logs out of the application.
+
+  - action: AlertDeleted
+    direction: outgoing
+    desc: Notifies the platform implementation of an alert deleted, with the alertToken.
+    payload:
+      - name: alertToken
+        desc: The AVS token of the alert.
+
+  - action: AlertStateChanged
+    direction: outgoing
+    desc: Notifies the platform implementation of an alert state change.
+    payload:
+      - name: alertToken
+        desc: The opaque token that uniquely identifies the alert.
+      - name: state
+        type: AlertState
+        desc: The new alert state.
+      - name: reason
+        desc: The reason for the state change.
+
+  - action: LocalStop
+    direction: incoming
+    desc: > 
+      Notifies the Engine of a platform request to stop any active alert, such as when a user 
+      presses a physical 'stop' button.
+
+types:
+  - name: AlertState
+    type: enum
+    values:
+      - name: READY
+        desc: The alert is ready to activate and is waiting for channel focus.
+      - name: STARTED
+        desc: The alert is activated, and rendering is perceivable by the user.
+      - name: STOPPED
+        desc: The alert has stopped due to user or system intervention.
+      - name: SNOOZED
+        desc: The alert is active but has been snoozed.
+      - name: COMPLETED
+        desc: The alert has completed on its own, without user interaction.
+      - name: PAST_DUE
+        desc: The alert has expired and will not be rendered.
+      - name: FOCUS_ENTERED_FOREGROUND
+        desc: The alert has entered the foreground.
+      - name: FOCUS_ENTERED_BACKGROUND
+        desc: The alert has entered the background.
+      - name: ERROR
+        desc: The alert has encountered an error.
+      - name: DELETED
+        desc: The alert has been deleted.
+      - name: SCHEDULED_FOR_LATER
+        desc: The alert has been scheduled to trigger at a future time.
+

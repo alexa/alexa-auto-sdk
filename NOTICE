@@ -1,27 +1,33 @@
 Alexa Auto SDK
-Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 *************************
 ALEXA AUTO SDK COMPONENTS
 *************************
 The following Alexa Auto SDK components are licensed under the Apache License, Version 2.0 (the "License"):
 
+aacs/android/app-components
+aacs/android/assets
+aacs/android/common
+aacs/android/sample-app
+aacs/android/service
 builder
-extensions/system-audio
-extensions/loopback-detector
+modules/aasb
 modules/address-book
 modules/alexa
 modules/apl
+modules/bluetooth
 modules/car-control
 modules/cbl
-modules/contact-uploader
 modules/core
+modules/custom-domain
+modules/loopback-detector
 modules/messaging
 modules/navigation
 modules/phone-control
-platforms/android
-samples/android
-samples/android-aacs-sample-app
+modules/system-audio
+modules/text-to-speech
+modules/text-to-speech-provider
 samples/cpp
 
 You may not use this file except in compliance with the License. A copy of

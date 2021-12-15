@@ -17,6 +17,9 @@
 #include <iostream>
 #include <typeinfo>
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <acsdkShutdownManager/ShutdownManager.h>
 #include <ACL/Transport/HTTP2TransportFactory.h>
 #include <ACL/Transport/MessageRouter.h>
@@ -27,7 +30,7 @@
 #include <Audio/AudioFactory.h>
 #include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
 #include <AVSCommon/SDKInterfaces/AVSGatewayManagerInterface.h>
-#include "AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesBuilderInterface.h"
+#include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesBuilderInterface.h>
 #include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 #include <AVSCommon/SDKInterfaces/HTTPContentFetcherInterface.h>
 #include <AVSCommon/Utils/LibcurlUtils/LibcurlHTTP2ConnectionFactory.h>
@@ -41,8 +44,6 @@
 #include <PlaybackController/PlaybackRouter.h>
 #include <SpeechEncoder/OpusEncoderContext.h>
 #include <SQLiteStorage/SQLiteMiscStorage.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
 #include <SynchronizeStateSender/SynchronizeStateSenderFactory.h>
 #include <System/LocaleHandler.h>
 #include <System/ReportStateHandler.h>
@@ -52,29 +53,30 @@
 #include <Metrics/MetricRecorder.h>
 #include <Metrics/UplMetricSink.h>
 
-#include "AACE/Alexa/AlexaProperties.h"
-#include "AACE/Core/CoreProperties.h"
-#include "AACE/Engine/Alexa/AlexaAuthorizationProvider.h"
-#include "AACE/Engine/Alexa/AlexaEngineService.h"
-#include "AACE/Engine/Alexa/AuthorizationManagerStorage.h"
-#include "AACE/Engine/Alexa/VehicleData.h"
-#include "AACE/Engine/Alexa/WakewordObservableInterface.h"
-#include "AACE/Engine/Alexa/InitiatorVerifier.h"
-#include "AACE/Engine/Authorization/AuthorizationServiceInterface.h"
-#include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Network/NetworkObservableInterface.h"
-#include "AACE/Engine/Utils/JSON/JSON.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
-#include "AACE/Engine/Utils/String/StringUtils.h"
-#include "AACE/Vehicle/VehicleProperties.h"
-#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
-#include "AACE/Engine/Alexa/AudioDuckingConfig.h"
-#include "AACE/Engine/Alexa/AlexaMetricSink.h"
+#include <AACE/Alexa/AlexaProperties.h>
+#include <AACE/Core/CoreProperties.h>
+#include <AACE/Engine/Alexa/AlexaEngineService.h>
+#include <AACE/Engine/Alexa/AlexaAuthorizationProvider.h>
+#include <AACE/Engine/Alexa/AuthorizationManagerStorage.h>
+#include <AACE/Engine/Alexa/VehicleData.h>
+#include <AACE/Engine/Alexa/WakewordObservableInterface.h>
+#include <AACE/Engine/Alexa/InitiatorVerifier.h>
+#include <AACE/Engine/Authorization/AuthorizationServiceInterface.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Network/NetworkObservableInterface.h>
+#include <AACE/Engine/Utils/JSON/JSON.h>
+#include <AACE/Engine/Utils/String/StringUtils.h>
+#include <AACE/Engine/Utils/Metrics/Metrics.h>
+#include <AACE/Vehicle/VehicleProperties.h>
+#include <AACE/Engine/Vehicle/VehiclePropertyInterface.h>
+#include <AACE/Engine/Alexa/AudioDuckingConfig.h>
+#include <AACE/Engine/Alexa/AlexaMetricSink.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
+using namespace alexaClientSDK::avsCommon::sdkInterfaces;
 using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
@@ -128,7 +130,8 @@ AlexaEngineService::AlexaEngineService(const aace::engine::core::ServiceDescript
         m_encoderEnabled(false),
         m_networkStatus(NetworkInfoObserver::NetworkStatus::UNKNOWN),
         m_externalMediaPlayerAgent(""),
-        m_speakerManagerEnabled(true) {
+        m_speakerManagerEnabled(true),
+        m_duckingEnabled(false) {
     m_isShuttingDown = false;
 #ifdef DEBUG
     m_logger = AlexaEngineLogger::create(alexaClientSDK::avsCommon::utils::logger::Level::DEBUG9);
@@ -226,7 +229,8 @@ bool AlexaEngineService::registerProperties() {
 bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> configuration) {
     try {
         // configure static interrupt model with audio ducking off
-        std::shared_ptr<std::istream> duckingConfigStream = aace::engine::alexa::AudioDuckingConfig::getConfig(false);
+        std::shared_ptr<std::istream> duckingConfigStream =
+            aace::engine::alexa::AudioDuckingConfig::getConfig(m_duckingEnabled);
 
         // Initialize the Alexa Client SDK
         ThrowIfNot(
@@ -248,13 +252,14 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         ThrowIfNull(m_deviceInfo, "createDeviceInfoFailed");
 
         // create the customer data manager
-        m_customerDataManager = std::make_shared<alexaClientSDK::registrationManager::CustomerDataManager>();
-        ThrowIfNull(m_customerDataManager, "createCustomerDataManagerFailed");
+        m_customerDataManager =
+            alexaClientSDK::registrationManager::CustomerDataManagerFactory::createCustomerDataManagerInterface();
+        ThrowIfNull(m_customerDataManager, "createCustomerDataManagerInterfaceFailed");
 
         // create the authorization manager
         auto authorizationManagerStorage = AuthorizationManagerStorage::create(m_miscStorage);
         ThrowIfNull(authorizationManagerStorage, "createAuthorizationManagerStorageFailed");
-        m_authorizationManager = AuthorizationManager::create(authorizationManagerStorage, m_customerDataManager);
+        m_authorizationManager = AuthorizationManager::create(authorizationManagerStorage);
         ThrowIfNull(m_authorizationManager, "createAuthorizationManagerFailed");
         m_authorizationManager->addAuthObserver(shared_from_this());
         ThrowIfNot(
@@ -340,6 +345,10 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         ThrowIfNot(
             registerServiceInterface<LocaleAssetsManager>(m_localeAssetManager),
             "registerLocaleAssetsManagerServiceInterfaceFailed");
+
+        m_capabilityChangeNotifier = std::make_shared<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifier>();
+        ThrowIfNull(m_capabilityChangeNotifier, "couldNotCreateCapabilityChangeNotifier");
+        m_capabilityChangeNotifier->addObserver(m_localeAssetManager);
 
         // Create the playback router delegate
         m_playbackRouterDelegate = std::shared_ptr<PlaybackRouterDelegate>(new PlaybackRouterDelegate());
@@ -515,6 +524,66 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
                             .PushBack("fr-CA", allocator)
                             .PushBack("en-CA", allocator),
                         allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("en-US", allocator)
+                            .PushBack("es-ES", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("es-ES", allocator)
+                            .PushBack("en-US", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("en-US", allocator)
+                            .PushBack("de-DE", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("de-DE", allocator)
+                            .PushBack("en-US", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("en-US", allocator)
+                            .PushBack("fr-FR", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("fr-FR", allocator)
+                            .PushBack("en-US", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("en-US", allocator)
+                            .PushBack("it-IT", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("it-IT", allocator)
+                            .PushBack("en-US", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("en-US", allocator)
+                            .PushBack("ja-JP", allocator),
+                        allocator);
+                    localeCombinations.PushBack(
+                        rapidjson::Value(rapidjson::kArrayType)
+                            .Move()
+                            .PushBack("ja-JP", allocator)
+                            .PushBack("en-US", allocator),
+                        allocator);
                     deviceSDKConfigRoot["deviceSettings"].AddMember(
                         "localeCombinations", std::move(localeCombinations), allocator);
                 }
@@ -580,6 +649,37 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
                     ThrowIfNot((*itr).IsString(), "invalidProviders");
                     m_authProviderNames.push_back((*itr).GetString());
                 }
+            }
+        }
+
+        if (alexaConfigRoot.HasMember("audio") && alexaConfigRoot["audio"].IsObject()) {
+            auto audio = alexaConfigRoot["audio"].GetObject();
+            if (audio.HasMember("audioOutputType.music") && audio["audioOutputType.music"].IsObject()) {
+                auto audioOutMusic = audio["audioOutputType.music"].GetObject();
+                if (audioOutMusic.HasMember("ducking") && audioOutMusic["ducking"].IsObject()) {
+                    auto ducking = audioOutMusic["ducking"].GetObject();
+                    if (ducking.HasMember("enabled") && ducking["enabled"].IsBool()) {
+                        m_duckingEnabled = ducking["enabled"].GetBool();
+                        AACE_DEBUG(LX(TAG).d("m_duckingEnabled:", m_duckingEnabled));
+                    }
+                } else {
+                    AACE_WARN(LX(TAG, "m_duckingEnabled").d("ducking", "not found"));
+                }
+            } else {
+                AACE_WARN(LX(TAG, "m_duckingEnabled").d("audioOutputType.music", "not found"));
+            }
+        } else {
+            AACE_WARN(LX(TAG, "m_duckingEnabled")
+                          .d("audio", "not found")
+                          .d("check aace.alexa", alexaConfigRoot.HasMember("aace.alexa")));
+        }
+
+        // MediaPlaybackRequestor
+        if (alexaConfigRoot.HasMember("requestMediaPlayback") && alexaConfigRoot["requestMediaPlayback"].IsObject()) {
+            auto requestMediaPlayback = alexaConfigRoot["requestMediaPlayback"].GetObject();
+            if (requestMediaPlayback.HasMember("mediaResumeThreshold") &&
+                requestMediaPlayback["mediaResumeThreshold"].IsUint64()) {
+                m_mediaResumeThreshold = requestMediaPlayback["mediaResumeThreshold"].GetUint64();
             }
         }
 
@@ -678,11 +778,14 @@ bool AlexaEngineService::preRegister() {
         m_connectionManager->addMessageObserver(m_messageInterpreter);
 
         // create the registration manager
-        m_registrationManager = std::make_shared<alexaClientSDK::registrationManager::RegistrationManager>(
-            m_directiveSequencer, m_connectionManager, m_customerDataManager, m_metricRecorder);
-        ThrowIfNull(m_registrationManager, "createRegistrationManagerFailed");
-        m_registrationManager->addObserver(shared_from_this());
+        auto registrationManagerInterfaces = alexaClientSDK::registrationManager::createRegistrationManagerInterfaces(
+            m_customerDataManager, m_connectionManager, m_directiveSequencer, m_metricRecorder);
+        ThrowIfNot(registrationManagerInterfaces.hasValue(), "createRegistrationManagerInterfacesFailed");
+
+        m_registrationManager = registrationManagerInterfaces.value().registrationManager;
+        m_registrationManagerNotifier = registrationManagerInterfaces.value().notifier;
         m_authorizationManager->setRegistrationManager(m_registrationManager);
+        m_registrationManagerNotifier->addObserver(shared_from_this());
 
         // Create the endpoint registration manager - Registers the endpoints controllable on this client with the cloud
         m_endpointManager = alexaClientSDK::endpoints::EndpointRegistrationManager::create(
@@ -720,8 +823,8 @@ bool AlexaEngineService::preRegister() {
         m_defaultEndpointBuilder->withCapability(m_apiGatewayCapabilityAgent, m_apiGatewayCapabilityAgent);
 
         // Create the system capability provider
-        auto systemCapabilityProvider =
-            alexaClientSDK::capabilityAgents::system::SystemCapabilityProvider::create(m_localeAssetManager);
+        auto systemCapabilityProvider = alexaClientSDK::capabilityAgents::system::SystemCapabilityProvider::create(
+            m_localeAssetManager, m_capabilityChangeNotifier);
         ThrowIfNull(systemCapabilityProvider, "createSystemCapabilityProviderCapabilityAgentFailed");
         m_defaultEndpointBuilder->withCapabilityConfiguration(systemCapabilityProvider);
 
@@ -805,15 +908,16 @@ bool AlexaEngineService::preRegister() {
         }
 
         // Create interaction model capability agent
-        std::shared_ptr<alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent>
-            m_interactionModelCapabilityAgent =
-                alexaClientSDK::capabilityAgents::interactionModel::InteractionModelCapabilityAgent::create(
-                    m_directiveSequencer, m_exceptionSender);
-        ThrowIfNull(m_interactionModelCapabilityAgent, "couldNotCreateInteractionModelCapabilityAgent");
-        m_defaultEndpointBuilder->withCapability(m_interactionModelCapabilityAgent, m_interactionModelCapabilityAgent);
+        m_interactionModelCA =
+            alexaClientSDK::acsdkInteractionModel::createInteractionModelCA(m_directiveSequencer, m_exceptionSender);
+        ThrowIfNot(m_interactionModelCA.hasValue(), "couldNotCreateInteractionModelFactoryInterfaces");
+        m_defaultEndpointBuilder->withCapability(
+            m_interactionModelCA.value().capabilityConfigurationInterface,
+            m_interactionModelCA.value().directiveHandler);
+
         // Listen to when Request Processing Started (RPS) directive is received
         // to enter the THINKING mode (Interaction Model 1.1).
-        m_interactionModelCapabilityAgent->addObserver(m_dialogUXStateAggregator);
+        m_interactionModelCA.value().notifier->addObserver(m_dialogUXStateAggregator);
 
         if (!m_timezone.empty()) {
             ThrowIfNot(m_deviceSettingsDelegate->configureTimeZoneSetting(m_timezone), "createTimeZoneSettingFailed");
@@ -866,7 +970,8 @@ bool AlexaEngineService::preRegister() {
             if ((resultFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)) {
                 auto result = resultFuture.get();
                 ThrowIfNot(
-                    (result == alexaClientSDK::endpoints::EndpointRegistrationManager::RegistrationResult::SUCCEEDED),
+                    (result == alexaClientSDK::avsCommon::sdkInterfaces::endpoints::
+                                   EndpointRegistrationManagerInterface::RegistrationResult::SUCCEEDED),
                     "couldNotRegisterVehicleDataEndpoint");
             }
         } else {
@@ -995,7 +1100,8 @@ bool AlexaEngineService::start() {
             if ((resultFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)) {
                 auto result = resultFuture.get();
                 ThrowIfNot(
-                    (result == alexaClientSDK::endpoints::EndpointRegistrationManager::RegistrationResult::SUCCEEDED),
+                    (result == alexaClientSDK::avsCommon::sdkInterfaces::endpoints::
+                                   EndpointRegistrationManagerInterface::RegistrationResult::SUCCEEDED),
                     "couldNotRegisterDefaultEndpoint");
             }
             m_endpointManager->waitForPendingRegistrationsToEnqueue();
@@ -1047,10 +1153,9 @@ bool AlexaEngineService::stop() {
 
         if (m_speechRecognizerEngineImpl != nullptr &&
             aace::engine::utils::string::equal(
-                propertyManager->getProperty(aace::alexa::property::WAKEWORD_ENABLED), "true")) {
+                propertyManager->getProperty(aace::alexa::property::WAKEWORD_ENABLED), "true", false)) {
             ThrowIfNot(
-                propertyManager->setProperty(
-                    aace::alexa::property::WAKEWORD_ENABLED, aace::engine::utils::string::FALSE),
+                propertyManager->setProperty(aace::alexa::property::WAKEWORD_ENABLED, "false"),
                 "disableWakewordDetectionFailed");
         }
 
@@ -1089,12 +1194,18 @@ bool AlexaEngineService::shutdown() {
             m_connectionManager->removeConnectionStatusObserver(m_speechRecognizerEngineImpl);
             m_connectionManager->removeConnectionStatusObserver(m_alexaClientEngineImpl);
             m_connectionManager->removeConnectionStatusObserver(m_dialogUXStateAggregator);
+            m_connectionManager->removeConnectionStatusObserver(m_mediaPlaybackRequestorEngineImpl);
         }
 
         if (m_directiveSequencer != nullptr) {
             AACE_DEBUG(LX(TAG, "shutdown").m("DirectiveSequencer"));
             m_directiveSequencer->shutdown();
             m_directiveSequencer.reset();
+        }
+
+        if (m_interactionModelCA.hasValue()) {
+            m_interactionModelCA.value().notifier->removeObserver(m_dialogUXStateAggregator);
+            m_interactionModelCA.reset();
         }
 
         if (m_dialogUXStateAggregator != nullptr) {
@@ -1232,8 +1343,8 @@ bool AlexaEngineService::shutdown() {
             m_playbackRouterDelegate->setDelegate(nullptr);
         }
 
-        if (m_registrationManager != nullptr) {
-            m_registrationManager->removeObserver(shared_from_this());
+        if (m_registrationManagerNotifier != nullptr) {
+            m_registrationManagerNotifier->removeObserver(shared_from_this());
         }
 
         if (m_capabilitiesDelegate != nullptr) {
@@ -1248,10 +1359,6 @@ bool AlexaEngineService::shutdown() {
 
         if (m_postConnectSequencerFactory != nullptr) {
             m_postConnectSequencerFactory.reset();
-        }
-
-        if (m_interactionModelCapabilityAgent != nullptr) {
-            m_interactionModelCapabilityAgent.reset();
         }
 
         if (m_endpointManager != nullptr) {
@@ -1319,6 +1426,15 @@ bool AlexaEngineService::shutdown() {
             m_deviceSetupEngineImpl.reset();
         }
 
+        if (m_capabilityChangeNotifier != nullptr) {
+            m_capabilityChangeNotifier.reset();
+        }
+
+        if (m_mediaPlaybackRequestorEngineImpl != nullptr) {
+            m_mediaPlaybackRequestorEngineImpl->shutdown();
+            m_mediaPlaybackRequestorEngineImpl.reset();
+        }
+
         m_audioFocusManager.reset();
         m_visualFocusManager.reset();
         m_metricRecorder.reset();
@@ -1369,8 +1485,7 @@ std::string AlexaEngineService::getProperty_wakewordSupported() {
     try {
         AACE_INFO(LX(TAG));
         ThrowIfNull(m_speechRecognizerEngineImpl, "nullSpeechRecognizerEngineImpl");
-        return m_speechRecognizerEngineImpl->isWakewordSupported() ? aace::engine::utils::string::TRUE
-                                                                   : aace::engine::utils::string::FALSE;
+        return m_speechRecognizerEngineImpl->isWakewordSupported() ? "true" : "false";
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return "";
@@ -1619,7 +1734,7 @@ bool AlexaEngineService::setProperty_wakewordEnabled(
     try {
         AACE_INFO(LX(TAG).sensitive("value", value));
         ThrowIfNull(m_speechRecognizerEngineImpl, "nullSpeechRecognizerEngineImpl");
-        if (aace::engine::utils::string::equal(value, aace::engine::utils::string::TRUE)) {
+        if (aace::engine::utils::string::equal(value, "true", false)) {
             return m_speechRecognizerEngineImpl->isWakewordSupported() &&
                    m_speechRecognizerEngineImpl->enableWakewordDetection();
         } else {
@@ -1637,11 +1752,11 @@ std::string AlexaEngineService::getProperty_wakewordEnabled() {
         AACE_INFO(LX(TAG));
         ThrowIfNull(m_speechRecognizerEngineImpl, "nullSpeechRecognizerEngineImpl");
         return m_speechRecognizerEngineImpl->isWakewordSupported() && m_speechRecognizerEngineImpl->isWakewordEnabled()
-                   ? aace::engine::utils::string::TRUE
-                   : aace::engine::utils::string::FALSE;
+                   ? "true"
+                   : "false";
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
-        return aace::engine::utils::string::FALSE;
+        return "false";
     }
 }
 
@@ -1820,6 +1935,18 @@ void AlexaEngineService::onNetworkInterfaceChangeStatusChanged(
     }
 }
 
+void AlexaEngineService::onNetworkProxyHeadersAvailable(const std::vector<std::string>& headers) {
+    try {
+        ThrowIfNot(m_configured, "alexaServiceNotConfigured");
+
+        if (isRunning()) {
+            alexaClientSDK::avsCommon::utils::libcurlUtils::CurlEasyHandleWrapper::setProxyHeaders(headers);
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
 bool AlexaEngineService::registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
     try {
         ThrowIfNot(m_configured, "alexaServiceNotConfigured");
@@ -1833,6 +1960,7 @@ bool AlexaEngineService::registerPlatformInterface(std::shared_ptr<aace::core::P
         ReturnIf(registerPlatformInterfaceType<aace::alexa::ExternalMediaAdapter>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::GlobalPreset>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::LocalMediaSource>(platformInterface), true);
+        ReturnIf(registerPlatformInterfaceType<aace::alexa::MediaPlaybackRequestor>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::Notifications>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::PlaybackController>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::SpeechRecognizer>(platformInterface), true);
@@ -1919,6 +2047,7 @@ bool AlexaEngineService::registerPlatformInterfaceType(
             m_systemSoundPlayer,
             propertyManager,
             m_metricRecorder,
+            m_capabilityChangeNotifier,
             speechEncoder,
             wakewordEngineAdapter,
             initiatorVerifiers);
@@ -2149,7 +2278,8 @@ bool AlexaEngineService::createExternalMediaPlayerImpl() {
             m_exceptionSender,
             m_playbackRouterDelegate,
             m_audioPlayerObserverDelegate,
-            externalMediaAdapterRegistration);
+            externalMediaAdapterRegistration,
+            m_duckingEnabled);
         ThrowIfNull(m_externalMediaPlayerEngineImpl, "createExternalMediaPlayerEngineImplFailed");
 
         // external media player impl needs to observer connection manager connections status
@@ -2193,6 +2323,27 @@ bool AlexaEngineService::registerPlatformInterfaceType(
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<LocalMediaSourceAdapter>").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AlexaEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::alexa::MediaPlaybackRequestor> mediaPlaybackRequestorPlatformInterface) {
+    try {
+        ThrowIfNotNull(m_mediaPlaybackRequestorEngineImpl, "platformInterfaceAlreadyRegistered");
+
+        // create the equalizer controller engine implementation
+        m_mediaPlaybackRequestorEngineImpl = aace::engine::alexa::MediaPlaybackRequestorEngineImpl::create(
+            mediaPlaybackRequestorPlatformInterface,
+            m_defaultEndpointBuilder,
+            m_connectionManager,
+            m_exceptionSender,
+            m_mediaResumeThreshold);
+        ThrowIfNull(m_mediaPlaybackRequestorEngineImpl, "createMediaPlaybackRequestorEngineImplFailed");
+        m_connectionManager->addConnectionStatusObserver(m_mediaPlaybackRequestorEngineImpl);
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<MediaPlaybackRequestor>").d("reason", ex.what()));
         return false;
     }
 }
@@ -2361,7 +2512,8 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterfac
     return m_contextManager;
 }
 
-std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManager> AlexaEngineService::getCustomerDataManager() {
+std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> AlexaEngineService::
+    getCustomerDataManager() {
     return m_customerDataManager;
 }
 

@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            <font color=\'#33B5E5\'>%1$s</font>でサインインしてください。
+        ]]>
+    </string>
+    <string name="try_alexa_button">Alexaを試す</string>
+    <string name="privacy_notice_button">プライバシー規約</string>
+    <string name="terms_of_use_button">利用規約</string>
+    <string name="login_action_retry_button">もう一度試す</string>
+    <string name="sign_in_action_button">サインイン</string>
+    <string name="login_later_action_button">後でサインイン</string>
+    <string name="login_connect_to_aacs">AACSに接続中です。お待ちください…</string>
+    <string name="login_message">音声操作で快適にドライブ。Alexaに話しかけるだけで道案内、音楽再生、通話などを開始できます。</string>
+    <string name="enable_preview_mode_header">Alexaにサインインせずにオンにしますか?</string>
+    <string name="enable_preview_mode_action_button">同意してAlexaをオンにする</string>
+    <string name="enable_preview_mode_message">サインインしなくても、Alexaに情報や道順などを尋ねることはできます。音楽再生、天気予報、スマートホームの操作などにはサインインが必要です。</string>
+    <string name="enable_preview_mode_disclaimer">Amazonは、サービスの提供と改善のため、Amazon Alexaとの会話やその他のデータをAmazonのクラウドで処理および保存します。お客様は、「同意してAlexaをオンにする」を選択することでAmazonの<annotation placeholder="">利用規約</annotation>と<annotation placeholder="">ここ</annotation>に記載されているすべての規約に同意したものとみなされます。\n\n<annotation placeholder="">Alexaが、お客様のプライバシーを重視するためにどのように設計されているかの詳細については、こちらをご覧ください</annotation>。</string>
+    <string name="enable_preview_mode_error_message">プレビューモードをオンにできませんでした。もう一度試してください。</string>
+    <string name="login_method_or_text">または、このコードをスキャンしてください。</string>
+    <string name="login_finish_heading_text">セットアップが完了しました%1$s!</string>
+    <string name="login_finish_try_text">次のように言ってみてください。</string>
+    <string name="login_network_settings">ネットワークの設定</string>
+    <string name="login_network_error_heading_text">ネットワークエラー</string>
+    <string name="login_network_error_body_text">Alexaのセットアップを完了するには、インターネットへの接続が必要です。\nネットワークの接続を確認してもう一度試してください。</string>
+    <string name="cbl_login_title">Amazonアカウントにサインイン</string>
+    <string name="cbl_login_alexa_hint1">「アレクサ、温度を22度に設定して」</string>
+    <string name="cbl_login_alexa_hint2">「アレクサ、カフェを探して」</string>
+    <string name="cbl_login_alexa_hint3">「アレクサ、音楽をかけて」</string>
+    <string name="auth_provider_login_alexa_hint1">「アレクサ、温度を22度に設定して」</string>
+    <string name="auth_provider_login_alexa_hint2">「アレクサ、空港まで連れて行って」</string>
+    <string name="auth_provider_login_alexa_hint3">「アレクサ、92.3 FMをつけて」</string>
+    <string name="auth_provider_sign_in_hint">サインインして、音楽再生、天気予報、スマートホームの操作などをお試しください。</string>
+    <string name="login_all_done_btn_text">完了</string>
+    <string name="setting_alexa_language_title">Alexaの言語</string>
+    <string name="select_language_action_button">言語を選択</string>
+    <string name="select_language_body">Alexaは%1$sで利用できません。他の言語を選択してください。</string>
+    <string name="select_language_continue_button">次へ</string>
+    <string name="setup_not_complete_header">うまくいきませんでした</string>
+    <string name="setup_not_complete_text">Alexaをセットアップできませんでした。もう一度試してください。</string>
+    <string name="setup_not_complete_text_with_alexa_custom_assistant">セットアップできませんでした。もう一度試してください。</string>
+    <string name="cbl_login_error_message">サインインできませんでした。もう一度試してください。</string>
+    <string name="setup_not_complete_retry_button">もう一度試す</string>
+    <string name="skip_permission_button_text">スキップ</string>
+    <string name="use_location_button_text">位置情報を使用</string>
+    <string name="location_permission_header_text">ローカル検索</string>
+    <string name="location_permission_body_text">車の位置情報へのアクセスをAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
+    <string name="location_permission_body_text_with_alexa_custom_assistant">車の位置情報へのアクセスを[Brandon]とAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
+    <string name="location_permission_hint_text">「アレクサ、近くのレストランを検索して」</string>
+</resources>

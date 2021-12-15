@@ -1,0 +1,4 @@
+sources:
+  "1.18.4":
+    url: "https://gitlab.freedesktop.org/gstreamer/gst-plugins-base/-/archive/1.18.4/gst-plugins-base-1.18.4.tar.bz2"
+    sha256: "cebc505e4bc48f66d76d3c0a9faa1d662447716f9ce465eacb48145bf8b4bc03"

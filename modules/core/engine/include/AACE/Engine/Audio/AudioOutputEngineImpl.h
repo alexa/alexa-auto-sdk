@@ -38,10 +38,13 @@ public:
     // AudioOutputChannelInterface
     bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) override;
     bool prepare(const std::string& url, bool repeating) override;
+    void mayDuck() override;
     bool play() override;
     bool stop() override;
     bool pause() override;
     bool resume() override;
+    bool startDucking() override;
+    bool stopDucking() override;
     int64_t getPosition() override;
     bool setPosition(int64_t position) override;
     int64_t getDuration() override;
@@ -54,6 +57,7 @@ public:
     // aace::audio::AudioOutputEngineInterface
     void onMediaStateChanged(MediaState state) override;
     void onMediaError(MediaError error, const std::string& description = "") override;
+    void onAudioFocusEvent(FocusAction action) override;
 
 private:
     std::shared_ptr<aace::audio::AudioOutput> m_platformAudioOutput;

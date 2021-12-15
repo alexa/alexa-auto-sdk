@@ -1,0 +1,60 @@
+topic: TemplateRuntime
+namespace: aasb.message.alexa.templateRuntime
+path: Alexa/TemplateRuntime
+
+messages:
+  - action: RenderTemplate
+    direction: outgoing
+    desc: Provides visual metadata associated with a user request to Alexa.
+    payload:
+      - name: payload
+        desc: Renderable template metadata in structured JSON format.
+      - name: focusState
+        type: FocusState
+        desc: FocusState of the channel used by TemplateRuntime interface.
+
+  - action: ClearPlayerInfo
+    direction: outgoing
+    desc: Notifies the platform implementation to dismiss the player info display card.
+
+  - action: ClearTemplate
+    direction: outgoing
+    desc: Notifies the platform implementation to dismiss the template display card.
+
+  - action: RenderPlayerInfo
+    direction: outgoing
+    desc: Provides visual metadata associated with a user request to Alexa for audio playback.
+    payload:
+      - name: payload
+        desc: Renderable player info metadata in structured JSON format.
+      - name: audioPlayerState
+        type: PlayerActivity
+        desc: The state of the AudioPlayer.
+      - name: offset
+        type: int
+        desc: The offset in millisecond of the media that AudioPlayer is handling.
+      - name: focusState
+        type: FocusState
+        desc: FocusState of the channel used by TemplateRuntime interface.
+
+  - action: DisplayCardCleared
+    direction: incoming
+    desc: >
+      Notifies the Engine that a display card has been cleared from the screen. Upon getting this 
+      notification, the TemplateRuntime will release the visual channel.
+
+types:
+  - name: PlayerActivity
+    type: alias
+    alias: aasb.message.alexa.audioPlayer.PlayerActivity
+
+  - name: FocusState
+    type: enum
+    values:
+      - name: FOREGROUND
+        desc: Represents the highest focus a Channel can have.
+      - name: BACKGROUND
+        desc: Represents the intermediate level focus a Channel can have.
+      - name: NONE
+        desc: This focus is used to represent when a Channel is not being used.
+

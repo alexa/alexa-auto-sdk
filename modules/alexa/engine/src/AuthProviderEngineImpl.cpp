@@ -33,11 +33,10 @@ static const std::string TAG("aace.alexa.AuthProviderEngineImpl");
 /// Service name used to register with @c AuthorizationManager
 static const std::string SERVICE_NAME = "alexa:authProviderEngineImpl";
 
-/// Sufficiently large timeout to allow previous authorization that might involve network calls to log out.
-static const std::chrono::seconds START_AUTH_TIMEOUT(15);
-
-/// Timeout to wait for the callbacks from authorization provider.
-static const std::chrono::seconds DEFAULT_TIMEOUT(2);
+/// Timeout to wait for the callbacks from authorization provider. Timoout is set
+/// to sufficiently large value to allow any AVS cloud sync that maybe in progress
+/// when authorization or logout is triggered.
+static const std::chrono::seconds AUTHORIZATION_PROVIDER_DEFAULT_TIMEOUT(15);
 
 /// Program Name for Metrics
 static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AuthProviderEngineImpl";
@@ -118,7 +117,7 @@ void AuthProviderEngineImpl::startAuthorization() {
         }
         // Wait for confirmation callback from authorization provider before considering this synchronous event complete
         std::unique_lock<std::mutex> cv_lock(m_cvMutex);
-        if (!m_cv.wait_for(cv_lock, START_AUTH_TIMEOUT, [this]() {
+        if (!m_cv.wait_for(cv_lock, AUTHORIZATION_PROVIDER_DEFAULT_TIMEOUT, [this]() {
                 return (m_state == AuthProviderEngineState::AUTHORIZING || m_state == AuthProviderEngineState::ERROR);
             })) {
             AACE_ERROR(LX("startAuthorizationFailed").d("reason", "timeout"));
@@ -149,7 +148,7 @@ void AuthProviderEngineImpl::stopAuthorization() {
         }
         // Wait for confirmation callback from authorization provider before considering this synchronous event complete
         std::unique_lock<std::mutex> cv_lock(m_cvMutex);
-        if (!m_cv.wait_for(cv_lock, DEFAULT_TIMEOUT, [this]() {
+        if (!m_cv.wait_for(cv_lock, AUTHORIZATION_PROVIDER_DEFAULT_TIMEOUT, [this]() {
                 return (m_state == AuthProviderEngineState::UNAUTHORIZED || m_state == AuthProviderEngineState::ERROR);
             })) {
             AACE_ERROR(LX("logoutOrCancelAuthorizationFailed").d("reason", "timeout"));
@@ -194,7 +193,7 @@ void AuthProviderEngineImpl::onAuthStateChanged(AuthState authState, AuthError a
                 Throw("logoutFailed");
             }
             // Wait for confirmation callback from authorization provider before considering this synchronous event complete
-            if (!m_cv.wait_for(lock, DEFAULT_TIMEOUT, [this]() {
+            if (!m_cv.wait_for(lock, AUTHORIZATION_PROVIDER_DEFAULT_TIMEOUT, [this]() {
                     return (
                         m_state == AuthProviderEngineState::UNAUTHORIZED || m_state == AuthProviderEngineState::ERROR);
                 })) {
@@ -209,7 +208,7 @@ void AuthProviderEngineImpl::onAuthStateChanged(AuthState authState, AuthError a
             }
 
             // Wait for confirmation callback from authorization provider before considering this synchronous event complete
-            if (!m_cv.wait_for(lock, START_AUTH_TIMEOUT, [this]() {
+            if (!m_cv.wait_for(lock, AUTHORIZATION_PROVIDER_DEFAULT_TIMEOUT, [this]() {
                     return (
                         m_state == AuthProviderEngineState::AUTHORIZING || m_state == AuthProviderEngineState::ERROR);
                 })) {

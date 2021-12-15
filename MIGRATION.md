@@ -7,6 +7,8 @@ This guide outlines the changes you need to make to migrate from Auto SDK v2.0 t
 <!-- omit in toc -->
 ## Table of Contents
 
+- [Migrating from Auto SDK v3.3.0 to v4.0.0](#migrating-from-auto-sdk-v330-to-v400)
+  - [Platform Interface Deprecation](#platform-interface-deprecation)
 - [Migrating from Auto SDK v3.2.1 to v3.3.0](#migrating-from-auto-sdk-v321-to-v330)
   - [Local Media Source and Global Preset Enhancements](#local-media-source-and-global-preset-enhancements)
   - [Migrating the Local Navigation Module APIs](#migrating-the-local-navigation-module-apis)
@@ -33,6 +35,12 @@ This guide outlines the changes you need to make to migrate from Auto SDK v2.0 t
   - [Navigation Enhancements](#navigation-enhancements)
   - [Car Control Source File Relocation](#car-control-source-file-relocation)
   - [Code-Based-Linking (CBL) Handler in the Sample Apps](#code-based-linking-cbl-handler-in-the-sample-apps)
+
+## Migrating from Auto SDK v3.3.0 to v4.0.0
+This section provides the information you need to migrate from Auto SDK v3.3.0 to Auto SDK v4.0.0
+
+### Platform Interface Deprecation
+The C++ and Java platform interfaces are deprecated in favor of Alexa Auto Services Bridge (AASB). Auto SDK 4.0 replaces the platform interfaces with a new `MessageBroker` API for subscribing to and publishing AASB messages. Details to migrate your application to the `MessageBroker` API are [here.](./MIGRATION_TO_AASB_MESSAGEBROKER.md)
 
 ## Migrating from Auto SDK v3.2.1 to v3.3.0
 This section provides the information you need to migrate from Auto SDK v3.2.1 to Auto SDK v3.3.0 
@@ -171,7 +179,7 @@ The Engine notifies the application of any errors during the authorization proce
   * The `renderTemplate(const std::string& payload)` method has been removed. Use renderTemplate(const std::string& payload, FocusState focusState) instead.
   * The `renderPlayerInfo(const std::string& payload)` method has been removed. Use `renderPlayerInfo(const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState)` instead.
 * In the Alexa module, `AlexaProperties::SUPPORTED_LOCALES` has been removed. For Alexa to recognize the locale setting, specify one of these values: de-DE, en-AU, en-CA, en-GB, en-IN, en-US, es-ES, es-MX, es-US, fr-CA, fr-FR, hi-IN, it-IT, ja-JP, pt-BR.
-* `Engine::setProperty()` and `Engine::getProperty()` have been removed. Use `PropertyManager::setProperty()` and `PropertyManager::getProperty()` instead. For details about the Property Manager platform interface, see "Managing Runtime Properties with the Property Manager" ([for C++](./modules/core/README.md#managing-runtime-properties-with-the-property-manager) or [for Android](./platforms/android/modules/core/README.md#managing-runtime-properties-with-the-property-manager)).
+* `Engine::setProperty()` and `Engine::getProperty()` have been removed. Use `PropertyManager::setProperty()` and `PropertyManager::getProperty()` instead. For details about the Property Manager platform interface, see "Managing Runtime Properties with the Property Manager" ([for C++](./modules/core/README.md#managing-runtime-properties-with-the-property-manager) or [for Android](https://github.com/alexa/alexa-auto-sdk/blob/3.0/platforms/android/modules/core/README.md#managing-runtime-properties-with-the-property-manager)).
 * The `SpeechRecognizer::enableWakeWordDetection()`, `SpeechRecognizer::disableWakeWordDetection()`, and `SpeechRecognizer::isWakewordDetectionEnabled()` methods have been removed.
 * The Contact Uploader module has been removed. Use the [Address Book module](#using-the-address-book-module) instead.
 
@@ -210,7 +218,7 @@ This section outlines the changes you will need to make to migrate from Auto SDK
 
 ### Car Control Enhancements and Breaking Changes
 
-Read the updated Car Control module README (for [C++ platforms](./modules/car-control/README.md) or [Android](./platforms/android/modules/car-control/README.md)) to get a complete understanding of all supported features and the current format of the "aace.carControl" configuration schema. Read the updated API documentation for the `CarControlConfiguration` builder class (for [C++ platforms](./modules/car-control/platform/include/AACE/CarControl/CarControlConfiguration.h) or [Android](./platforms/android/modules/car-control/src/main/java/com/amazon/aace/carControl/CarControlConfiguration.java)) if you construct your configuration programmatically. The changes to the "aace.carControl" configuration for v2.3 are backward-compatible, meaning your previous configuration (regardless of whether it was file-based or built programmatically with the `CarControlConfiguration` class) will still compile and produce a valid configuration to input to Auto SDK. However, several updates are recommended to ensure expected behavior, even if you do not want new features.
+Read the updated Car Control module README (for [C++ platforms](./modules/car-control/README.md) or [Android](https://github.com/alexa/alexa-auto-sdk/blob/2.3/platforms/android/modules/car-control/README.md)) to get a complete understanding of all supported features and the current format of the "aace.carControl" configuration schema. Read the updated API documentation for the `CarControlConfiguration` builder class (for [C++ platforms](./modules/car-control/platform/include/AACE/CarControl/CarControlConfiguration.h) or [Android](./modules/car-control/android/src/main/java/com/amazon/aace/carControl/CarControlConfiguration.java)) if you construct your configuration programmatically. The changes to the "aace.carControl" configuration for v2.3 are backward-compatible, meaning your previous configuration (regardless of whether it was file-based or built programmatically with the `CarControlConfiguration` class) will still compile and produce a valid configuration to input to Auto SDK. However, several updates are recommended to ensure expected behavior, even if you do not want new features.
 
 #### 1. Zones configuration schema update 
 
@@ -402,7 +410,7 @@ This section outlines the changes you will need to make to migrate from Auto SDK
 ### Implementing the Property Manager Interface
 Auto SDK v2.2 introduces the Property Manager, a component that maintains runtime properties by storing property values and listeners and delegating the `setProperty()` and `getProperty()` calls from your application to the respective Engine services. The Engine invokes the PropertyManager platform interface method `propertyChanged()` to notify your application about property value changes originating internally. The property values may be set by Auto SDK modules that define constants (for example `FIRMWARE_VERSION` and `LOCALE`), or they may be initiated from the Alexa Voice Service (AVS), such as when the user changes the `TIMEZONE` setting in the Alexa Companion App.
 
-`PropertyManager::setProperty()` and `PropertyManager::getProperty()` replace deprecated `Engine::setProperty()` and `Engine::getProperty()`. For details about the Property Manager platform interface, see "Managing Runtime Properties with the Property Manager" ([for C++](./modules/core/README.md#managing-runtime-properties-with-the-property-manager) or [for Android](./platforms/android/modules/core/README.md#managing-runtime-properties-with-the-property-manager)).
+`PropertyManager::setProperty()` and `PropertyManager::getProperty()` replace deprecated `Engine::setProperty()` and `Engine::getProperty()`. For details about the Property Manager platform interface, see "Managing Runtime Properties with the Property Manager" ([for C++](./modules/core/README.md#managing-runtime-properties-with-the-property-manager) or [for Android](https://github.com/alexa/alexa-auto-sdk/blob/2.2/platforms/android/modules/core/README.md#managing-runtime-properties-with-the-property-manager)).
 
 ### Car Control Changes
 This section documents the changes you will need to make to migrate your Car Control implementation to Auto SDK v2.2.
@@ -445,11 +453,11 @@ The following build changes have been introduced in Auto SDK v2.1:
 
     See the [Builder README](./builder/README.md#running-builder) for details about supported platforms and targets.
 
-* For QNX targets, you must cross-compile with the QNX multimedia software for the system audio extension (which is built by default for QNX targets). This requires a QNX Multimedia Suite license. See the [System Audio extension README](./extensions/system-audio/README.md) for details.
+* For QNX targets, you must cross-compile with the QNX multimedia software for the system audio extension (which is built by default for QNX targets). This requires a QNX Multimedia Suite license. See the [System Audio extension README](https://github.com/alexa/alexa-auto-sdk/blob/2.1/extensions/experimental/system-audio/README.md) for details.
 
 ### Engine Configuration File Updates
 
-The AVS Device SDK portion of the Auto SDK Engine configuration (the `aace.alexa.avsDeviceSDK` node) has been updated. See the [`config.json.in`](./samples/cpp/assets/config.json.in) file for details.
+The AVS Device SDK portion of the Auto SDK Engine configuration (the `aace.alexa.avsDeviceSDK` node) has been updated. See the [`config.json.in`](https://github.com/alexa/alexa-auto-sdk/blob/2.1/samples/cpp/assets/config.json.in) file for details.
 
   * The `"deviceInfo"` node includes two new elements: `"manufacturerName"` and `"description"`.
   * A path to the capabilities database is now required. Use the `"capabilitiesDelegate"` element to specify this path.
@@ -462,7 +470,7 @@ The AVS Device SDK portion of the Auto SDK Engine configuration (the `aace.alexa
 
 Auto SDK v2.1 introduces additional navigation features that you can integrate in your application to enrich the user's experience: add/cancel a waypoint, show/navigate to a previous destination, turn and lane guidance, and map display control. Implementing these enhancements required deprecating the `setDestination()` interface in favor of the `startNavigation()` interface and adding several additional interfaces.
 
-To migrate from Auto SDK v2.0 to Auto SDK v2.1, you must update your platform implementation to use the `startNavigation()` method instead of the `setDestination()` method, modify the payload for the `getNavigationState()` method, and implement the new navigation methods. This guide takes you through these steps. Please see the Navigation module README for [C++](./modules/navigation/README.md) or [Android](./platforms/android/modules/navigation/README.md) for additional information and resources.
+To migrate from Auto SDK v2.0 to Auto SDK v2.1, you must update your platform implementation to use the `startNavigation()` method instead of the `setDestination()` method, modify the payload for the `getNavigationState()` method, and implement the new navigation methods. This guide takes you through these steps. Please see the Navigation module README for [C++](./modules/navigation/README.md) or [Android](https://github.com/alexa/alexa-auto-sdk/blob/2.1/platforms/android/modules/navigation/README.md) for additional information and resources.
 
 #### What's New
 
@@ -751,7 +759,7 @@ void NavigationHandler::showPreviousWaypoints() {
 
 The Auto SDK now implements version 1.2 of the TemplateRuntime interface to handle display card templates. If you support TemplateRuntime in your implementation, you must update your implementation to support the new card types.
 
-The TemplateRuntime interface remains the same, but the `LocalSearchListTemplate1` template has been deprecated in favor of the new `LocalSearchListTemplate2` template. In addition, two new templates (`TrafficDetailsTemplate` and `LocalSearchDetailTemplate1`), are now supported. The `TrafficDetailsTemplate` includes commute information to favorite destinations such as home or work. The `LocalSearchDetailTemplate1` template includes information about specific locations or information in response to users asking for details about locations presented in the `LocalSearchListTemplate2` template. For details about the TemplateRuntime interface, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html). For details about implementing TemplateRuntime in your Auto SDK implementation see the Alexa module README for [C++](./modules/alexa/README.md#handling-display-card-templates) or [Android](./platforms/android/modules/alexa/README.md#handling-display-card-templates).
+The TemplateRuntime interface remains the same, but the `LocalSearchListTemplate1` template has been deprecated in favor of the new `LocalSearchListTemplate2` template. In addition, two new templates (`TrafficDetailsTemplate` and `LocalSearchDetailTemplate1`), are now supported. The `TrafficDetailsTemplate` includes commute information to favorite destinations such as home or work. The `LocalSearchDetailTemplate1` template includes information about specific locations or information in response to users asking for details about locations presented in the `LocalSearchListTemplate2` template. For details about the TemplateRuntime interface, see the [Alexa Voice Service (AVS) documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html). For details about implementing TemplateRuntime in your Auto SDK implementation see the Alexa module README for [C++](./modules/alexa/README.md#handling-display-card-templates) or [Android](https://github.com/alexa/alexa-auto-sdk/tree/2.3/platforms/android/modules/alexa#handling-display-card-templates-).
 
 
 ### Car Control Source File Relocation
@@ -761,7 +769,7 @@ The Car Control module platform interface files and documentation are now locate
 >**Note:** In addition, if you use custom assets for car control in an implementation with the optional Local Voice Control (LVC) extension, you must specify the path to the custom assets in both the Auto SDK car control configuration and the LVC configuration, not just the LVC configuration. For details, see [Path to Custom Car Control Assets for LVC Implementations](#path-to-custom-car-control-assets-for-lvc-implementations).
 
 ### Code-Based-Linking (CBL) Handler in the Sample Apps 
-Both of the Auto SDK Sample Apps now include the Code-Based Linking (CBL) handler implementation (in favor of the `AuthProvider` handler implementation ) to handle obtaining access tokens from Login with Amazon (LWA). Changing from the `AuthProvider` handler to the CBL handler is *not a required change*, but we recommend that you use the Auto SDK CBL interface for ease of implementation. For details about the CBL handler, please see the CBL module README [for C++](./modules/cbl/README.md) or [for Android](./platforms/android/modules/cbl/README.md).
+Both of the Auto SDK Sample Apps now include the Code-Based Linking (CBL) handler implementation (in favor of the `AuthProvider` handler implementation ) to handle obtaining access tokens from Login with Amazon (LWA). Changing from the `AuthProvider` handler to the CBL handler is *not a required change*, but we recommend that you use the Auto SDK CBL interface for ease of implementation. For details about the CBL handler, please see the CBL module README [for C++](./modules/cbl/README.md) or [for Android](https://github.com/alexa/alexa-auto-sdk/blob/2.3/platforms/android/modules/cbl/README.md).
 
 If you want to continue using the `AuthProvider` interface, we recommend that you implement the new `onAuthFailure()` method that exposes 403 "unauthorized request" exceptions from Alexa Voice Service (AVS). This method may be invoked, for example, when your product makes a request to AVS using an access token obtained for a device which has been deregistered from the Alexa companion app. In the Sample Apps, you can override the  interface and unset your login credentials as if the user had done so with your GUI interface: 
 

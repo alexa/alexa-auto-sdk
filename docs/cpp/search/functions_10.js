@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['volumechanged',['volumeChanged',['../classaace_1_1alexa_1_1_local_media_source.html#aa4a2d08e30728bcfb35bcba0f4921aa1',1,'aace::alexa::LocalMediaSource::volumeChanged()'],['../classaace_1_1audio_1_1_audio_output.html#a1a6e4c80146a448b4532f80f613dba11',1,'aace::audio::AudioOutput::volumeChanged()']]]
+  ['updateaplruntimeproperties',['updateAPLRuntimeProperties',['../classaace_1_1apl_1_1_a_p_l.html#a27fad281daef252e05b857e107a74677',1,'aace::apl::APL']]]
 ];

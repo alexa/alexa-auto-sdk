@@ -1,0 +1,13 @@
+include(default)
+
+[settings]
+os=Android
+os.api_level=26
+arch=armv8
+build_type=Release
+compiler=clang
+compiler.libcxx=libc++
+compiler.version=8
+
+[build_requires]
+android-sdk-tools/4.0@aac-sdk/stable

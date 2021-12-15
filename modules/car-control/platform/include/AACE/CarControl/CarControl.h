@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,6 +40,11 @@ namespace carControl {
  *  @li Mode Controller: Controls the settings of an endpoint that can be accessed with a set of modes. Multiple
  *      Mode Controllers for unique settings are allowed per endpoint, each identified by the combination of
  *      @c endpointId and @c controllerId.
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class CarControl : public aace::core::PlatformInterface {
 public:

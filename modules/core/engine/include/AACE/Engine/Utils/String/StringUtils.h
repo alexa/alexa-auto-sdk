@@ -25,9 +25,6 @@ namespace engine {
 namespace utils {
 namespace string {
 
-static const char* TRUE = "true";
-static const char* FALSE = "false";
-
 bool equal(const std::string& str1, const std::string& str2, bool caseSensitive = true);
 std::string toLower(const std::string& str);
 std::string toUpper(const std::string& str);

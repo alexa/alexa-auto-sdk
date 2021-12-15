@@ -84,7 +84,7 @@ void AlexaMetricSink::emitAllDatapointsMetric(
                     metricEvent->addTimer(
                         name,
                         std::chrono::duration_cast<std::chrono::milliseconds>(
-                            avsMetricEvent->getSteadyTimestamp().time_since_epoch())
+                            avsMetricEvent->getTimestamp().time_since_epoch())
                             .count());
                 }
             } else {

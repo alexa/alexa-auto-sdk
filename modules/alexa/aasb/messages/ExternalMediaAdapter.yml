@@ -1,0 +1,491 @@
+topic: ExternalMediaAdapter
+namespace: aasb.message.alexa.externalMediaAdapter
+path: Alexa/ExternalMediaAdapter
+
+messages:
+  - action: PlayerEvent
+    direction: incoming
+    desc: >
+      Should be called on a local external media player event. This will sync the 
+      context with AVS.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: eventName
+        desc: Canonical event name.
+
+  - action: PlayControl
+    direction: outgoing
+    desc: >
+      Occurs during playback control via voice interaction or PlaybackController 
+      interface.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: controlType
+        type: PlayControlType
+        desc: Playback control type being invoked.
+
+  - action: LogoutComplete
+    direction: incoming
+    desc: >
+      Should be called on a local external media player logout. This will unset 
+      authorization of the app with AVS.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+
+  - action: Seek
+    direction: outgoing
+    desc: Called when the user invokes media seek via speech.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: offset
+        type: int
+        desc: Offset position within media item, in milliseconds.
+
+  - action: LoginComplete
+    direction: incoming
+    desc: >
+      Should be called on a local external media player login. This will set authorization 
+      of the app with AVS.
+    payload:
+      - name: localPlayerId
+        desc: >
+          Should be called on a local external media player login. This will set 
+          authorization of the app with AVS.
+
+  - action: SetFocus
+    direction: incoming
+    desc: >
+      Should be called on local external media player events. This will switch the media 
+      focus to that context.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+
+  - action: Logout
+    direction: outgoing
+    desc: Directive called after a discovered player initiates the logoutComplete event.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+
+  - action: ReportDiscoveredPlayers
+    direction: incoming
+    desc: >
+      Should be called on startup in order to notify AVS of the local external media 
+      players.
+    payload:
+      - name: discoveredPlayers
+        type: list:DiscoveredPlayerInfo
+        desc: The List of discovered players.
+
+  - action: Play
+    direction: outgoing
+    desc: Called when the user first calls play for the external media via voice control.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: playContextToken
+        desc: Track/playlist/album/artist/station/podcast context identifier.
+      - name: index
+        type: int
+        desc: >
+          If the playback context is an indexable container like a playlist, the index of 
+          the media item in the container.
+      - name: offset
+        type: int
+        desc: Offset position within media item, in milliseconds.
+      - name: preload
+        type: bool
+        desc: Whether the media item should preload or not.
+      - name: navigation
+        type: Navigation
+        desc: The app transition behavior.
+
+  - action: GetState
+    direction: outgoing
+    desc: >
+      Must provide the local external media player apps @PlaybackStateExternal, and 
+      @SessionStateExternal information to maintain cloud sync.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: state
+        type: ExternalMediaAdapterState
+        desc: The ExternalMediaAdapterState to be initialized by the platform.
+
+  - action: Login
+    direction: outgoing
+    desc: Directive called after a discovered player initiates the loginComplete event.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: accessToken
+        desc: The handshake token between AVS, and the external media player app session.
+      - name: userName
+        desc: The username provided by the external media player app, if available.
+      - name: forceLogin
+        type: bool
+        desc: True if no handshake is needed, and login is simply assumed.
+      - name: tokenRefreshInterval
+        type: int
+        desc: refresh interval of the accessToken, if available.
+
+  - action: AdjustSeek
+    direction: outgoing
+    desc: Called when the user invokes media seek adjustment via speech.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: deltaOffset
+        type: int
+        desc: Change in offset position within media item, in milliseconds.
+
+  - action: RemoveDiscoveredPlayer
+    direction: incoming
+    desc: RemoveDiscoveredPlayer description. #TODO
+    payload:
+      - name: localPlayerId
+        desc: localPlayerId description. # TODO
+
+  - action: MutedStateChanged
+    direction: outgoing
+    desc: Notifies the platform implementation to apply a mute state change to the output channel.
+    payload:
+      - name: state
+        type: MutedState
+        desc: >
+          The muted state to apply to the output channel. MUTED when the output channel be muted, 
+          UNMUTED when unmuted.
+
+  - action: VolumeChanged
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation to set the volume of the output channel. The volume value 
+      should be scaled to fit the needs of the platform.
+    payload:
+      - name: volume
+        type: float
+        desc: The volume to set on the output channel.    volume is in the range [0,1].
+
+  - action: RequestToken
+    direction: incoming
+    desc: >
+      The device is responsible for requesting an access token when needed. This is typically done 
+      immediately upon connection to AVS.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+
+  - action: Authorize
+    direction: outgoing
+    desc: >
+      Called after discovered media players have been reported. Returns a list of reported players 
+      and whether they have been authorized for use with Alexa.
+    payload:
+      - name: authorizedPlayers
+        type: list:AuthorizedPlayerInfo
+        desc: A list of discovered players with their status of authorization for use with Alexa.
+
+  - action: PlayerError
+    direction: incoming
+    desc: Should be called on a player error.
+    payload:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: errorName
+        desc: The name of the error.
+      - name: code
+        type: int
+        desc: The error code.
+      - name: description
+        desc: The detailed error description.
+      - name: fatal
+        type: bool
+        desc: true if the error is fatal.
+
+types:
+  - name: ExternalMediaAdapterState
+    type: struct
+    values:
+      - name: sessionState
+        type: SessionStateExternal
+        desc: Variable to hold the session state.
+      - name: playbackState
+        type: PlaybackStateExternal
+        desc: Variable to hold the playback state.
+
+  - name: SessionStateExternal
+    type: struct
+    values:
+      - name: endpointId
+        desc: The unique device endpoint.
+      - name: loggedIn
+        type: bool
+        desc: Flag that identifies if a user is currently logged in or not.
+      - name: userName
+        desc: The userName of the user currently logged in via a Login directive from the AVS.
+      - name: isGuest
+        type: bool
+        desc: Flag that identifies if the user currently logged in is a guest or not.
+      - name: launched
+        type: bool
+        desc: Flag that identifies if an application has been launched or not.
+      - name: active
+        type: bool
+        desc: >
+          Flag that identifies if the application is currently active or not. This could mean 
+          different things for different applications.
+      - name: accessToken
+        desc: >
+          The accessToken used to login a user. The access token may also be used as a bearer 
+          token if the adapter makes an authenticated Web API to the music provider.
+      - name: tokenRefreshInterval
+        type: int64
+        desc: The validity period of the token in milliseconds.
+      - name: playerCookie
+        desc: A player may declare arbitrary information for itself.
+      - name: spiVersion
+        desc: The only spiVersion that currently exists is "1.0".
+
+  - name: PlaybackStateExternal
+    type: struct
+    values:
+      - name: state
+        desc: The state of the default player - IDLE/STOPPED/PLAYING.
+      - name: supportedOperations
+        type: list:SupportedPlaybackOperation
+        desc: The set of states the default player can move into from its current state.
+      - name: trackOffset
+        type: int
+        desc: The offset of the track in milliseconds.
+      - name: shuffleEnabled
+        type: bool
+        desc: Bool to identify if shuffling is enabled or not.
+      - name: repeatEnabled
+        type: bool
+        desc: Bool to identify if looping of songs is enabled or not.
+      - name: favorites
+        type: Favorites
+        desc: The favorite status {"FAVORITED"/"UNFAVORITED"/"NOT_RATED"}.
+      - name: type
+        desc: The type of the media item. For now hard-coded to ExternalMediaAdapterMusicItem.
+      - name: playbackSource
+        desc: The display name for current playback context, e.g. playlist name.
+      - name: playbackSourceId
+        desc: >
+          An arbitrary identifier for current playback context as per the music provider, e.g. 
+          a URI that can be saved as a preset or queried to Music Service Provider services for 
+          additional info.
+      - name: trackName
+        desc: The display name for the currently playing trackname of the track.
+      - name: trackId
+        desc: >
+          The arbitrary identifier for currently playing trackid of the track as per the music 
+          provider.
+      - name: trackNumber
+        desc: >
+          The display value for the number or abstract position of the currently playing track 
+          in the album or context trackNumber of the track.
+      - name: artistName
+        desc: The display name for the currently playing artist.
+      - name: artistId
+        desc: > 
+          An arbitrary identifier for currently playing artist as per the music provider, e.g. 
+          a URI that can be queried to MSP services for additional info.
+      - name: albumName
+        desc: The display name of the currently playing album.
+      - name: albumId
+        desc: >
+          Arbitrary identifier for currently playing album specific to the music provider, e.g. 
+          a URI that can be queried to MSP services for additional info.
+      - name: tinyURL
+        desc: The URL for tiny cover art image resource.
+      - name: smallURL
+        desc: The URL for small cover art image resource.
+      - name: mediumURL
+        desc: The URL for medium cover art image resource.
+      - name: largeURL
+        desc: The URL for large cover art image resource.
+      - name: coverId
+        desc: >
+          The Arbitrary identifier for cover art image resource specific to the music provider, 
+          for retrieval from an MSP API.
+      - name: mediaProvider
+        desc: >
+          Music Service Provider name for the currently playing media item; distinct from the 
+          application identity although the two may be the same.
+      - name: mediaType
+        type: MediaType
+        desc: >
+          The Media type enum value from {TRACK, PODCAST, STATION, AD, SAMPLE, OTHER} type of 
+          the media.
+      - name: duration
+        type: int
+        desc: Media item duration in milliseconds.
+
+  - name: SupportedPlaybackOperation
+    type: enum
+    values:
+      - name: PLAY
+        desc: Play is supported (voice only).
+      - name: PAUSE
+        desc: Pause is supported.
+      - name: STOP
+        desc: Stop is supported.
+      - name: NEXT
+        desc: Next is supported.
+      - name: PREVIOUS
+        desc: Previous is supported.
+      - name: START_OVER
+        desc: Start Over is supported.
+      - name: FAST_FORWARD
+        desc: Fast Forward is supported.
+      - name: REWIND
+        desc: Rewind is supported.
+      - name: ENABLE_REPEAT
+        desc: Enable Repeat is supported.
+      - name: ENABLE_REPEAT_ONE
+        desc: Enable Repeat One is supported.
+      - name: DISABLE_REPEAT
+        desc: Disbale Repeat is supported.
+      - name: ENABLE_SHUFFLE
+        desc: Enable Shuffle is supported.
+      - name: DISABLE_SHUFFLE
+        desc: Disable Shuffle is supported.
+      - name: FAVORITE
+        desc: Favorite is supported.
+      - name: UNFAVORITE
+        desc: Unfavorite is supported.
+      - name: SEEK
+        desc: Seek is supported.
+      - name: ADJUST_SEEK
+        desc: Adjust Seek is supported.
+
+  - name: AuthorizedPlayerInfo
+    type: struct
+    values:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: authorized
+        type: bool
+        desc: Authorization status.
+
+  - name: ValidationData
+    type: struct
+    values:
+      - name: certificate
+        desc: Validation data.
+
+  - name: DiscoveredPlayerInfo
+    type: struct
+    values:
+      - name: localPlayerId
+        desc: The opaque token that uniquely identifies the local external player app.
+      - name: spiVersion
+        desc: The only spiVersion that currently exists is '1.0'.
+      - name: validationMethod
+        type: ValidationMethod
+        desc: Validation methods.
+      - name: validationData
+        type: list:ValidationData
+        desc: >
+          Validation data:
+            1. Device platform issued app signing certificate. A List of certificates may be attached. 
+            2. In some cases validation is performed locally. The certificate is trasmitted as validationData 
+               during discovery to announce the activated app's identity in order to allow app activation to  
+               be revoked. 
+            3. empty.
+
+  - name: PlayControlType
+    type: enum
+    values:
+      - name: PAUSE
+        desc: pause playback.
+      - name: RESUME
+        desc: resume playback.
+      - name: STOP
+        desc: stop playback.
+      - name: NEXT
+        desc: next song.
+      - name: PREVIOUS
+        desc: previous playback.
+      - name: START_OVER
+        desc: start playback over.
+      - name: FAST_FORWARD
+        desc: fast forward external media described time.
+      - name: REWIND
+        desc: rewind external media described time.
+      - name: ENABLE_REPEAT_ONE
+        desc: enable repeat current song.
+      - name: ENABLE_REPEAT
+        desc: enable playlist looping.
+      - name: DISABLE_REPEAT
+        desc: disable playlist looping.
+      - name: ENABLE_SHUFFLE
+        desc: enable playlist shuffling.
+      - name: DISABLE_SHUFFLE
+        desc: disable playlist shuffling.
+      - name: FAVORITE
+        desc: favorite song.
+      - name: UNFAVORITE
+        desc: unfavorite song.
+
+  - name: ValidationMethod
+    type: enum
+    values:
+      - name: SIGNING_CERTIFICATE
+        desc: description for SIGNING_CERTIFICATE.
+      - name: GENERATED_CERTIFICATE
+        desc: description for GENERATED_CERTIFICATE.
+      - name: NONE
+        desc: description for NONE.
+
+  - name: Favorites
+    type: enum
+    values:
+      - name: FAVORITED
+        desc: song is favorited.
+      - name: UNFAVORITED
+        desc: song is unfavorited.
+      - name: NOT_RATED
+        desc: song is not rated.
+
+  - name: MutedState
+    type: enum
+    values:
+      - name: MUTED
+        desc: The audio channel state id muted.
+      - name: UNMUTED
+        desc: The audio channel state id unmuted.
+
+  - name: Navigation
+    type: enum
+    values:
+      - name: DEFAULT
+        desc: Source dependant behavior.
+      - name: NONE
+        desc: No navigation should occur.
+      - name: FOREGROUND
+        desc: External app should take foreground.
+
+  - name: MediaType
+    type: enum
+    values:
+      - name: TRACK
+        desc: A single song source.
+      - name: PODCAST
+        desc: A podcast source.
+      - name: STATION
+        desc: A station source.
+      - name: AD
+        desc: An advertisement source.
+      - name: SAMPLE
+        desc: A sample source.
+      - name: OTHER
+        desc: A miscellaneous source.
+
+

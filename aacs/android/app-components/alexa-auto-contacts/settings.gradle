@@ -1,0 +1,9 @@
+rootProject.name='alexa-auto-contacts'
+include ':aacscontacts'
+gradle.ext.aacsRoot = '../..'
+include ':aacsconstants'
+project(':aacsconstants').projectDir = new File(gradle.ext.aacsRoot, '/common/constants/aacsconstants')
+include ':aacsipc'
+project(':aacsipc').projectDir = new File(gradle.ext.aacsRoot, '/common/ipc/aacsipc')
+include ':aacscommonutils'
+project(':aacscommonutils').projectDir = new File(gradle.ext.aacsRoot, '/common/commonutils/aacscommonutils')

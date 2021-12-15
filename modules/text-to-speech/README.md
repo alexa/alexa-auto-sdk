@@ -1,121 +1,179 @@
 # Text To Speech (TTS) Module
-The TTS module enables a platform implementation to synthesize Alexa speech on demand from a text or Speech Synthesis Markup Language (SSML) string. The module does not play the synthesized Alexa speech, which is played by the platform implementation. To synthesize speech, the module uses the Text To Speech provider. See the Text To Speech Provider [README](../text-to-speech-provider/README.md) for information on how the TTS provider works with this module.
+
+## Table of Contents
+- [Overview](#overview)
+- [Configuring the Text To Speech Module](#configuring-the-text-to-speech-module)
+- [Using the Text To Speech AASB Messages](#using-the-text-to-speech-aasb-messages)
+- [Integrating the Text To Speech Module Into Your Application](#integrating-the-text-to-speech-module-into-your-application)
+
+
+## Overview<a id="overview"></a>
+
+The `Text To Speech` module enables your Alexa Auto SDK client application to synthesize Alexa speech on demand from a text or Speech Synthesis Markup Language (SSML) string. To synthesize speech, this module uses the Text To Speech provider module (See [README](../text-to-speech-provider/README.md)). The Auto SDK does not provide any speech-playing APIs. Your application's TTS module integration is responsible for playing the synthesized speech to deliver a unified Alexa experience to the user.
 
 >**Note:** This feature may only be used with voice-guided turn-by-turn navigation.
 
-<!-- omit in toc -->
-## Table of Contents
-- [Overview](#overview)
-- [Features of the Text To Speech Module](#features-of-the-text-to-speech-module)
-- [Sequence Diagrams](#sequence-diagrams)
-  - [Prepare Speech](#prepare-speech)
-  - [Prepare Speech Completed](#prepare-speech-completed)
-  - [Prepare Speech Failed](#prepare-speech-failed)
-  - [Get Capabilities](#get-capabilities)
-  - [Capabilities Received](#capabilities-received)
-- [Implementing the TTS Platform Interface](#implementing-the-tts-platform-interface)
-- [Errors](#errors)
-
-## Overview
-
-The platform implementation is responsible for registering the Text To Speech Handler for the Engine to use the text to speech functionality. The platform implementation also plays the synthesized speech, delivering a unified Alexa experience to enhance the user experience. Not being responsible for playing the speech, the Auto SDK does not provide any speech-playing APIs.
-
 >**Important!** The TTS module requires the Local Voice Control extension.
 
-## Features of the Text To Speech Module
+## Configuring the Text To Speech Module<a id="configuring-the-text-to-speech-module"></a>
 
-The following list describes the APIs for supporting the text to speech features:
-​
-* The `prepareSpeech` API enables the platform implementation to request a speech synthesis.
-* The `prepareSpeechCompleted` callback API notifies the platform implementation of a successful speech synthesis request.
-* The `preparedSpeechFailed` callback API notifies the platform implementation of a failed speech synthesis request.
-* The `gettingCapabilities` API enables the platform implementation to request the capabilities of the TTS provider being used.
-* The `prepareSpeechCompleted` callback API notifies the platform implementation of a successful speech synthesis request.
+The `Text To Speech` module does not require Engine configuration.
 
-## Sequence Diagrams
-​The following sequence diagrams illustrate the flows involved in the text to speech feature.  
+## Using the Text To Speech AASB Messages<a id="using-the-text-to-speech-aasb-messages"></a>
 
 ### Prepare Speech
-The following diagram describes the flow for speech preparation.
+
+To request speech synthesis from a text or SSML input, your application must publish the [`PrepareSpeech` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/text-to-speech/aasb-docs/TextToSpeech/index.html#preparespeech). The Engine publishes either the [`PrepareSpeechCompleted` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/text-to-speech/aasb-docs/TextToSpeech/index.html#preparespeechcompleted) or [`PrepareSpeechFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/text-to-speech/aasb-docs/TextToSpeech/index.html#preparespeechfailed) to indicate success or failure, respectively.
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Prepare Speech</summary>
+<br></br>
+
 <p align="center">
 <img src="./assets/PrepareSpeech.png"/>
 </p>
 
-### Prepare Speech Completed
-The following diagram describes the flow for completing the speech preparation.
-<p align="center">
-<img src="./assets/PrepareSpeechCompleted.png"/>
-</p>
+> **Note:** The `prepareSpeechFailed` API contains the `reason` parameter that specifies the error string for failure. Refer to the [TTS provider errors](../text-to-speech-provider/README.md#errors) for more information on errors defined by the TTS provider.
+>
+> TThe TTS module defines the `REQUEST_TIMED_OUT` error that occurs when the TTS provider sends no response, causing the speech request to time out. The timeout value is 1000 milliseconds.
 
-### Prepare Speech Failed
-The following diagram describes the flow for reporting failed speech preparation.
-<p align="center">
-<img src="./assets/PrepareSpeechFailed.png"/>
-</p>
+</details>
+</br>
 
 ### Get Capabilities
-The following diagram describes the flow for getting capabilities from the TTS provider.
+
+To request the capabilities of the TTS provider being used, your application must publish the [`GetCapabilities` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/text-to-speech/aasb-docs/TextToSpeech/index.html#getcapabilities). The Engine publishes the [`GetCapabilitiesReply` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/text-to-speech/aasb-docs/TextToSpeech/index.html#getcapabilitiesreply) reply with the capabilities of the TTS provider.
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Get Capabilities</summary>
+<br></br>
+
 <p align="center">
 <img src="./assets/GetCapabilities.png"/>
 </p>
 
-### Capabilities Received
-​The following diagram describes the flow for reporting the receipt of capabilities from the TTS provider.
-<p align="center">
-<img src="./assets/CapabilitiesReceived.png"/>
-</p>
+</details>
+</br>
 
-## Implementing the TTS Platform Interface
-To implement a custom Text To Speech handler, extend the `TextToSpeech` class as follows:
+## Integrating the Text To Speech Module Into Your Application<a id="integrating-the-text-to-speech-module-into-your-application"></a>
+
+### C++ MessageBroker Integration
+
+Use the Engine's `MessageBroker` to subscribe to and publish *"TextToSpeech"* AASB messages.
+
+<details markdown="1"><summary>Click to expand or collapse C++ sample code</summary>
+
+<br></br>
 ​
 ```cpp
-#include <AACE/TextToSpeech/TextToSpeech.h>
-​
-class TextToSpeechHandler : public aace::textToSpeech::TextToSpeech {
-​
-    // The platform implementation sent a request for speech synthesis using TextToSpeech::prepareSpeech() and received a successful callback.
-    void prepareSpeechCompleted(const std::string& speechId, std::shared_ptr<AudioStream> preparedAudio, const std::string& metadata) override { 
-        // Use the speechId to correlate the synthesis request to the result. 
-        // The synthesized speech resource is available in the preparedAudio parameter and can be played immediately or later
-        // Metadata is additional information ( if any ) about the prepared audio resource. 
+#include <AACE/Core/MessageBroker.h>
+
+#include <AASB/Message/TextToSpeech/TextToSpeech/GetCapabilitiesMessage.h>
+#include <AASB/Message/TextToSpeech/TextToSpeech/PrepareSpeechCompletedMessage.h>
+#include <AASB/Message/TextToSpeech/TextToSpeech/PrepareSpeechFailedMessage.h>
+#include <AASB/Message/TextToSpeech/TextToSpeech/PrepareSpeechMessage.h>
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+class MyTextToSpeechHandler {
+
+    // Subscribe to messages from the Engine
+    void MyTextToSpeechHandler::subscribeToAASBMessages() {
+        m_messageBroker->subscribe(
+            [=](const std::string& message) { handlePrepareSpeechCompletedMessage(message); },
+            PrepareSpeechCompletedMessage::topic(),
+            PrepareSpeechCompletedMessage::action());
+        m_messageBroker->subscribe(
+            [=](const std::string& message) { handlePrepareSpeechFailedMessage(message); },
+            PrepareSpeechFailedMessage::topic(),
+            PrepareSpeechFailedMessage::action());
+        m_messageBroker->subscribe(
+            [=](const std::string& message) { handleGetCapabilitiesReplyMessage(message); },
+            GetCapabilitiesMessageReply::topic(),
+            GetCapabilitiesMessageReply::action());
     }
-​
-    // The platform implementation sent a request for speech synthesis using TextToSpeech::prepareSpeech() and received a failed callback.
-    void prepareSpeechFailed(const std::string& speechId, const std::string& reason) override { 
-        // Use the speechId to correlate the synthesis request to the result. 
-        // The reason contains the failure reason string as defined by the TTS provider. Refer to the Local TTS provider for more details on strings passed in the reason parameter.
+
+    // Handle the PrepareSpeechCompleted message from the Engine
+    void MyTextToSpeechHandler::handlePrepareSpeechCompletedMessage(const std::string& message) {
+        PrepareSpeechCompletedMessage msg = json::parse(message);
+        std::string speechId = msg.payload.speechId;
+        std::string streamId = msg.payload.streamId;
+        std::string metadata = msg.payload.metadata;
+
+        prepareSpeechCompleted(speechId, streamId, metadata);
     }
-​
-    // The platform implementation sent a request for capabilities of the TTS provider using TextToSpeech::getCapabilities() and received a callback.
-    void capabilitiesReceived(const std::string& requestId, const std::string& capabilities) override {
-        // Use the requestId to correlate the result to the request. 
-        // Access the capabilities payload of the requested TTS provider from the capabilities parameter. An empty payload denotes an error in retrieving the capabilities of the TTS provider.
+
+    // Handle the PrepareSpeechFailed message from the Engine
+    void MyTextToSpeechHandler::handlePrepareSpeechFailedMessage(const std::string& message) {
+        PrepareSpeechFailedMessage msg = json::parse(message);
+        std::string speechId = msg.payload.speechId;
+        std::string reason = msg.payload.reason;
+        
+        prepareSpeechFailed(speechId, reason);
     }
- 
-    ...
-    // Register a TextToSpeech handler with the Engine.
-    std::shared_ptr<TextToSpeech> m_textToSpeechHandler = std::make_shared<TextToSpeechHandler>();
-    engine->registerPlatformInterface(textToSpeechHandler);
-​
-    // The platform implementation can send a speech synthesis request by calling the TextToSpeech::prepareSpeech() API.
-    auto speechId = ... // A unique identifier for the speech request
-    auto text = ... // The input text or SSML string
-    // Refer to Local TTS provider for the provider identification string.
-    auto provider = ... // The identifier for the provider.
-    auto options = ... // No need to specify if using Alexa voice
-    auto requestResult = m_textToSpeechHandler->prepareSpeech(speechId, text, provider);
-​
-    // The platform implementation can send a capabilities request by calling the TextToSpeech::getCapabilities() API.
-    auto requestId = ... // A unique identifier for the request
-    // Refer to Local TTS provider for the provider identification string.
-    auto provider = ... // The identifier for the provider.
-    auto capabilitiesRequestResult = m_textToSpeechHandler->getCapabilities(requestId, provider);
-    ...
+
+    // Handle the GetCapabilities reply message from the Engine
+    void MyTextToSpeechHandler::handleGetCapabilitiesReplyMessage(const std::string& message) {
+        GetCapabilitiesMessageReply msg = json::parse(message);
+        std::string messageId = msg.header.messageDescription.replyToId;
+        std::string capabilities = msg.payload.capabilities;
+
+        // ...Handle capabilities of the TTS provider...
+    }
+
+    // To prepare speech, publish the PrepareSpeech message to the Engine
+    void MyTextToSpeechHandler::prepareSpeech(
+        const std::string& speechId,
+        const std::string& text,
+        const std::string& provider,
+        const std::string& options) {
+        PrepareSpeechMessage msg;
+        msg.payload.speechId = speechId;
+        msg.payload.text = text;
+        msg.payload.provider = provider;
+        msg.payload.options = options;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // To get capabilities, publish the GetCapabilities message to the Engine
+    std::string MyTextToSpeechHandler::getCapabilities(
+        const std::string& requestId,
+        const std::string& provider) {
+        GetCapabilitiesMessage msg;
+        msg.header.id = requestId;
+        msg.payload.provider = provider;
+        m_messageBroker->publish(msg.toString());
+
+        // The Engine will send the GetCapabilitiesReply message
+        // Return the capabilities from reply message payload
+    }
+
+    void MyTextToSpeechHandler::prepareSpeechCompleted(
+        const std::string& speechId,
+        const std::string& streamId,
+        const std::string& metadata) {
+        // Use MessageBroker openStream API to get the MessageStream
+        std::shared_ptr<MessageStream> preparedAudio = 
+                            m_messageBroker->openStream(msg.payload.streamId, MessageStream::Mode::READ);
+
+        // Follow the UX guidelines in order to play the audio stream
+    }
+
+    // Notification of a failed speech synthesis
+    void TextToSpeechHandler::prepareSpeechFailed(
+        const std::string& speechId,
+        const std::string& reason) {
+        // Use the speechId to correlate the synthesis request to the result
+        // Access the reason for failure
+    }
+
 };
-...
+
 ```
 
-## Errors
-The `prepareSpeechFailed()` API contains the `reason` parameter that specifies the error string for failure. Refer to the [TTS provider errors](../text-to-speech-provider/README.md#errors) for more information on errors defined by the TTS provider. The TTS module also defines its own errors as shown below:
+</details>
 
-The `REQUEST_TIMED_OUT` error occurs when the TTS provider sends no response, causing the speech request to time out. The timeout value is 1000 milliseconds.
+</br>
+
+### Android Integration
+
+The Alexa Auto Client Service (AACS) provides the `AACS Text-To-Speech Service` to integrate the Auto SDK `Text To Speech` module on Android. See the [AACS Text-To-Speech Service](../../aacs/android/app-components/alexa-auto-tts/README.md) documentation for more information.

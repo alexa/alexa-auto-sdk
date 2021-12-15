@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,6 +35,11 @@ namespace authorization {
  * and follows the protocol established by the service to authorize a device. For information about the protocol, 
  * see the README file appropriate to the authorization service. For example, see the README in the CBL 
  * module to see how the Authorization platform interface works with CBL.
+ * 
+ * @deprecated This platform interface is deprecated. 
+ *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class Authorization : public aace::core::PlatformInterface {
 protected:

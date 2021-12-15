@@ -96,5 +96,11 @@ void APL::sendDeviceWindowState(const std::string& state) {
     }
 }
 
+void APL::setPlatformProperty(const std::string& name, const std::string& value) {
+    if (m_aplEngineInterface != nullptr) {
+        m_aplEngineInterface->onSetPlatformProperty(name, value);
+    }
+}
+
 }  // namespace apl
 }  // namespace aace

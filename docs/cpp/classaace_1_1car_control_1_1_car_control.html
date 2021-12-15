@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">3.3.0</span>
+   &#160;<span id="projectnumber">4.0.0</span>
    </div>
   </td>
  </tr>
@@ -108,8 +108,10 @@ Public Member Functions</h2></td></tr>
 <li>Power Controller: Controls the power state of an endpoint. A maximum of one Power Controller is allowed per endpoint, identified by <code>endpointId</code>. </li>
 <li>Toggle Controller: Controls the power state of a particular setting of an endpoint. Multiple Toggle Controllers for unique settings are allowed per endpoint, each identified by the combination of <code>endpointId</code> and <code>controllerId</code>. </li>
 <li>Range Controller: Controls the settings of an endpoint that can be accessed with a range of values. Multiple Range Controllers for unique settings are allowed per endpoint, each identified by the combination of <code>endpointId</code> and <code>controllerId</code>. </li>
-<li>Mode Controller: Controls the settings of an endpoint that can be accessed with a set of modes. Multiple Mode Controllers for unique settings are allowed per endpoint, each identified by the combination of <code>endpointId</code> and <code>controllerId</code>. </li>
+<li>Mode Controller: Controls the settings of an endpoint that can be accessed with a set of modes. Multiple Mode Controllers for unique settings are allowed per endpoint, each identified by the combination of <code>endpointId</code> and <code>controllerId</code>.</li>
 </ul>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000034">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1core_1_1_message_broker.html">aace::core::MessageBroker</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a84ce7f162332e09c9e7ff35f240ca1d4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a84ce7f162332e09c9e7ff35f240ca1d4">&#9670;&nbsp;</a></span>CarControl()</h2>
@@ -752,7 +754,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 3.3.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.0.0 - Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

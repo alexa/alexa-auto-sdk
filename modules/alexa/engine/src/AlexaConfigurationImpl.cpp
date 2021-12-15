@@ -138,7 +138,8 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createCurlConfig(
     const std::string& certsPath,
-    const std::string& iface) {
+    const std::string& iface,
+    const std::string& proxy) {
     rapidjson::Document document(rapidjson::kObjectType);
     rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
     rapidjson::Value avsDeviceSDKElement(rapidjson::kObjectType);
@@ -150,6 +151,10 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     if (iface.length() > 0) {
         libcurlUtilsElement.AddMember(
             "CURLOPT_INTERFACE", rapidjson::Value().SetString(iface.c_str(), iface.length()), document.GetAllocator());
+    }
+    if (proxy.length() > 0) {
+        libcurlUtilsElement.AddMember(
+            "CURLOPT_PROXY", rapidjson::Value().SetString(proxy.c_str(), proxy.length()), document.GetAllocator());
     }
 
     avsDeviceSDKElement.AddMember("libcurlUtils", libcurlUtilsElement, document.GetAllocator());
@@ -422,6 +427,21 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
 
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDuckingConfig(bool duckingEnabled) {
+    rapidjson::Document document(rapidjson::kObjectType);
+    rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
+    rapidjson::Value audioElement(rapidjson::kObjectType);
+    rapidjson::Value outputTypeElement(rapidjson::kObjectType);
+    rapidjson::Value duckingElement(rapidjson::kObjectType);
+
+    duckingElement.AddMember("enabled", rapidjson::Value().SetBool(duckingEnabled), document.GetAllocator());
+    outputTypeElement.AddMember("ducking", duckingElement, document.GetAllocator());
+    audioElement.AddMember("audioOutputType.music", outputTypeElement, document.GetAllocator());
+    aaceAlexaElement.AddMember("audio", audioElement, document.GetAllocator());
+    document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
     return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 

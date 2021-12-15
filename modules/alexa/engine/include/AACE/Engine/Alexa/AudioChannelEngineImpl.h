@@ -32,6 +32,9 @@
 
 #include <AACE/Alexa/AlexaEngineInterfaces.h>
 #include <AACE/Engine/Audio/AudioOutputChannelInterface.h>
+#include <AACE/Engine/Audio/IStreamAudioStream.h>
+
+#include "DuckingInterface.h"
 
 namespace aace {
 namespace engine {
@@ -43,10 +46,12 @@ class AudioChannelEngineImpl
         , public alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
-        , public std::enable_shared_from_this<AudioChannelEngineImpl> {
+        , public std::enable_shared_from_this<AudioChannelEngineImpl>
+        , public DuckingInterface {
 private:
     using MediaState = aace::audio::AudioOutputEngineInterface::MediaState;
     using MediaError = aace::audio::AudioOutputEngineInterface::MediaError;
+    using MixingBehavior = alexaClientSDK::avsCommon::sdkInterfaces::audio::MixingBehavior;
 
 public:
     AudioChannelEngineImpl(
@@ -70,12 +75,18 @@ public:
     //
     void onMediaStateChanged(MediaState state) override;
     void onMediaError(MediaError error, const std::string& description) override;
+    void onAudioFocusEvent(FocusAction action) override;
 
     //
     // alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
     //
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource(
         std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
+        const alexaClientSDK::avsCommon::utils::AudioFormat* format,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config) override;
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource(
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
+        std::chrono::milliseconds offsetAdjustment,
         const alexaClientSDK::avsCommon::utils::AudioFormat* format,
         const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config) override;
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId setSource(
@@ -97,7 +108,7 @@ public:
         alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) override;
     uint64_t getNumBytesBuffered() override;
     alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState>
-    getMediaPlayerState(SourceId id) override;
+    getMediaPlayerState(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) override;
     void addObserver(
         std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) override;
     void removeObserver(
@@ -117,6 +128,12 @@ public:
     void onAuthStateChange(
         alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
         alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) override;
+
+    //
+    // aace::engine::alexa::DuckingInterface
+    //
+    bool startDucking() override;
+    bool stopDucking() override;
 
 protected:
     using SourceId = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId;
@@ -139,9 +156,13 @@ private:
 
     enum class MediaStateChangeInitiator { NONE, PLAY, PAUSE, RESUME, STOP };
 
+    enum class DuckingStates { NONE, DUCKED_BY_ALEXA, DUCKED_BY_PLATFORM };
+
     void sendPendingEvent();
     void sendEvent(PendingEventState state);
     void resetSource();
+    void handleDuckingStarted();
+    void handleDuckingStopped();
 
     //
     // MediaPlayerEngineInterface executor methods
@@ -158,6 +179,7 @@ private:
     void executeBufferRefilled(SourceId id);
 
     friend std::ostream& operator<<(std::ostream& stream, const PendingEventState& state);
+    friend std::ostream& operator<<(std::ostream& stream, const DuckingStates& state);
 
 private:
     std::string m_name;
@@ -197,6 +219,11 @@ private:
 
     // mutex for blocking setSource calls
     std::mutex m_mutex;
+
+    //variable for storing the mixability of the current stream
+    bool m_mayDuck;
+
+    DuckingStates m_duckingState;
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineImpl::PendingEventState& state) {
@@ -215,6 +242,21 @@ inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineIm
             break;
         case AudioChannelEngineImpl::PendingEventState::PLAYBACK_STOPPED:
             stream << "PLAYBACK_STOPPED";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const AudioChannelEngineImpl::DuckingStates& state) {
+    switch (state) {
+        case AudioChannelEngineImpl::DuckingStates::DUCKED_BY_ALEXA:
+            stream << "DUCKED_BY_ALEXA";
+            break;
+        case AudioChannelEngineImpl::DuckingStates::DUCKED_BY_PLATFORM:
+            stream << "DUCKED_BY_PLATFORM";
+            break;
+        default:
+            stream << "NONE";
             break;
     }
     return stream;
@@ -247,30 +289,6 @@ private:
     alexaClientSDK::avsCommon::avs::attachment::AttachmentReader::ReadStatus m_status;
     std::atomic<bool> m_closed;
     AudioFormat m_audioFormat;
-};
-
-//
-// IStreamAudioStream
-//
-
-class IStreamAudioStream : public aace::audio::AudioStream {
-private:
-    IStreamAudioStream(std::shared_ptr<std::istream> stream, MediaType mediaType);
-
-public:
-    static std::shared_ptr<IStreamAudioStream> create(
-        std::shared_ptr<std::istream> stream,
-        MediaType mediaType = MediaType::UNKNOWN);
-
-    // aace::audio::AudioStream
-    ssize_t read(char* data, const size_t size) override;
-    bool isClosed() override;
-    MediaType getMediaType() override;
-
-private:
-    std::shared_ptr<std::istream> m_stream;
-    MediaType m_mediaType;
-    bool m_closed;
 };
 
 }  // namespace alexa

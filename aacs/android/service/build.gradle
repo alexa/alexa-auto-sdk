@@ -1,0 +1,124 @@
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.versions = [
+            'kotlin': '1.4.0',
+            'androidx_core': '1.3.2',
+            'androidx_appcompat': '1.2.0',
+            'androidx_annotation': '1.1.0',
+            'androidx_media': '1.1.0',
+            'dagger': '2.22',
+            'exoplayer': '2.13.3',
+            'moshi': '1.9.3',
+
+            // Test Dependencies
+            'mockito': '3.4.0',
+    ]
+
+    ext.deps = [
+            'kotlin_stdlib': "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+
+            'androidx_core': "androidx.core:core:${versions.androidx_core}",
+            'androidx_core_ktx': "androidx.core:core-ktx:${versions.androidx_core}",
+            'androidx_appcompat': "androidx.appcompat:appcompat:${versions.androidx_appcompat}",
+            'androidx_annotation': "androidx.annotation:annotation:${versions.androidx_annotation}",
+
+            'androidx_media': "androidx.media:media:${versions.androidx_media}",
+
+            'dagger': "com.google.dagger:dagger:${versions.dagger}",
+            'dagger_compiler': "com.google.dagger:dagger-compiler:${versions.dagger}",
+
+            'moshi': "com.squareup.moshi:moshi:${versions.moshi}",
+            'moshi_codegen': "com.squareup.moshi:moshi-kotlin-codegen:${versions.moshi}",
+
+            'rxjava3': "io.reactivex.rxjava3:rxjava:3.0.4",
+            'glide': "com.github.bumptech.glide:glide:4.11.0",
+
+            'exoplayer_core': "com.google.android.exoplayer:exoplayer-core:${versions.exoplayer}",
+            'exoplayer_dash': "com.google.android.exoplayer:exoplayer-dash:${versions.exoplayer}",
+            'exoplayer_smooth': "com.google.android.exoplayer:exoplayer-smoothstreaming:${versions.exoplayer}",
+            'exoplayer_hls': "com.google.android.exoplayer:exoplayer-hls:${versions.exoplayer}",
+
+            'junit': 'junit:junit:4.12',
+            'mockito': "org.mockito:mockito-core:${versions.mockito}",
+            'mockito_inline': "org.mockito:mockito-inline:${versions.mockito}",
+            'mockito_nhaarman': 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0',
+            'androidx_test_core': 'androidx.test:core:1.3.0',
+            'roboelectric': 'org.robolectric:robolectric:4.3',
+    ]
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.0.1"
+
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+    }
+}
+
+ext.getInstallPath = { subprojectDir ->
+    def installPath = project.getProperties().getOrDefault("installPath", "${project.getRootDir()}/deploy")
+    if (installPath.contains("~")) {
+        installPath = installPath.replaceFirst("^~", System.getProperty("user.home"))
+    }
+    Path pathAbsolute = Paths.get(installPath).toAbsolutePath()
+    Path pathBase = Paths.get(subprojectDir.getCanonicalPath()).toAbsolutePath()
+    return pathBase.relativize(pathAbsolute).toString()
+}
+
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
+    }
+    if (project.name.startsWith("aacs") && !project.name.equals("aacs")) {
+        def buildTypes = ['Debug', 'Release']
+        for (buildType in buildTypes) {
+            def tasks = project.getTasksByName('assemble' + buildType, false)
+            for (task in tasks) {
+                project.task('assembleLocal' + buildType) dependsOn(task)
+                project.task('assembleRemote' + buildType) dependsOn(task)
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+    delete 'deploy'
+}
+
+subprojects {
+    def assembleTaskName  = ""
+    gradle.startParameter.getTaskNames().any {
+        if (it.toLowerCase().contains("assemble")) {
+            assembleTaskName = it
+        }
+    }
+    task copyDeps(type: Copy) {
+        from(new File(project.projectDir, 'build/outputs/aar')) include '*.aar'
+        includeEmptyDirs = false
+        into getInstallPath(project.getProjectDir())
+    }
+    if (assembleTaskName != "") {
+        copyDeps.dependsOn(assembleTaskName)
+    }
+}
+
+task installDeps(type: Copy) {
+    from(new File(project.rootDir, 'core-service/libs')) include '*.aar'
+    includeEmptyDirs = false
+    into getInstallPath(project.getRootDir())
+}
+
+installDeps.dependsOn subprojects.copyDeps
+

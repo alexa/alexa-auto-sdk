@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,6 +25,9 @@ static const std::string TAG("LocaleAssetsManager");
 namespace aace {
 namespace engine {
 namespace alexa {
+
+using namespace alexaClientSDK::avsCommon::sdkInterfaces;
+using namespace alexaClientSDK::avsCommon::utils;
 
 /// The key in our config file to find the root of settings for this database.
 static const std::string SETTING_CONFIGURATION_ROOT_KEY = "deviceSettings";
@@ -166,7 +169,46 @@ LocaleAssetsManager::Locale LocaleAssetsManager::getDefaultLocale() const {
     return m_defaultLocale;
 }
 
-LocaleAssetsManager::LocaleAssetsManager() : m_defaultLocale{DEFAULT_LOCALE_VALUE} {
+void LocaleAssetsManager::addLocaleAssetsObserver(
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsObserverInterface>& observer) {
+    if (observer == nullptr) {
+        AACE_ERROR(LX(TAG).d("reason", "nullObserver"));
+        return;
+    }
+    std::lock_guard<std::mutex> lock{m_observersMutex};
+    m_observers.insert(observer);
+}
+
+void LocaleAssetsManager::removeLocaleAssetsObserver(
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::LocaleAssetsObserverInterface>& observer) {
+    if (observer == nullptr) {
+        AACE_ERROR(LX(TAG).d("reason", "nullObserver"));
+        return;
+    }
+    std::lock_guard<std::mutex> lock{m_observersMutex};
+    m_observers.erase(observer);
+}
+
+void LocaleAssetsManager::setEndpointRegistrationManager(
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface>&
+        manager) {
+    // No-op
+}
+
+void LocaleAssetsManager::onConfigurationChanged(
+    const alexaClientSDK::avsCommon::avs::CapabilityConfiguration& configuration) {
+    // No-op
+}
+
+LocaleAssetsManager::LocaleAssetsManager() :
+        RequiresShutdown{"LocaleAssetsManager"}, m_defaultLocale{DEFAULT_LOCALE_VALUE} {
+}
+
+void LocaleAssetsManager::doShutdown() {
+    {
+        std::lock_guard<std::mutex> lock{m_observersMutex};
+        m_observers.clear();
+    }
 }
 
 }  // namespace alexa

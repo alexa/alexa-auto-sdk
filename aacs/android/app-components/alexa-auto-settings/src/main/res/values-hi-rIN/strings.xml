@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="alexa_settings_label" tools:ignore="MissingTranslation">Alexa</string>
+    <string name="setting_voice_assistance_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon] की सेटिंग</string>
+    <string name="setting_voice_assistance_alexa" tools:ignore="MissingTranslation">Amazon Alexa की सेटिंग</string>
+    <string name="setting_voice_assistance_enable_nonalexa" tools:ignore="MissingTranslation">[Acme Brandon] को चालू करें</string>
+    <string name="setting_voice_assistance_enable_alexa" tools:ignore="MissingTranslation">Amazon Alexa को चालू करें</string>
+    <string name="setting_voice_assistance_wake_word" tools:ignore="MissingTranslation">वेक वर्ड</string>
+    <string name="setting_voice_assistance_wake_word_summary" tools:ignore="MissingTranslation">सिर्फ़ \"[Brandon]\" या \"Alexa\" बोलकर मदद पाएं</string>
+    <string name="setting_voice_assistance_sounds_request_start_summary" tools:ignore="MissingTranslation">आवाज़ के बाद, [Brandon] और Alexa की ओर से सुनना शुरू किया जाता है</string>
+    <string name="setting_voice_assistance_sounds_request_end_summary" tools:ignore="MissingTranslation">आवाज़ के बाद, [Brandon] और Alexa की ओर से सुनना बंद किया जाता है</string>
+    <string name="setting_voice_assistance_language" tools:ignore="MissingTranslation">भाषा</string>
+    <string name="setting_voice_assistance_setting_push_to_talk" tools:ignore="MissingTranslation">पुश-टू-टॉक</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_alexa" tools:ignore="MissingTranslation">Amazon Alexa</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
+    <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">आस-पास के रेस्टोरेंट, स्थानीय मौसम और कई दूसरी चीज़ों के बारे में बेहतर जवाब पाने के लिए, अपनी गाड़ी की मौजूदा लोकेशन को [Brandon] और Alexa के साथ शेयर करें.</string>
+    <string name="setting_alexa_signin" tools:ignore="MissingTranslation">साइन इन करें</string>
+    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexa हैंड्स-फ़्री</string>
+    <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">रीक्वेस्ट शुरू करने की आवाज़</string>
+    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Alexa की ओर से सुनना शुरू करने पर आवाज़ चलाएं</string>
+    <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">रीक्वेस्ट पूरी होने की आवाज़</string>
+    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Alexa की ओर से सुनना बंद कर देने पर आवाज़ चलाएं</string>
+    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">आपके हर बार \"Alexa\" कहने पर Alexa की ओर से जवाब दिया जाएगा</string>
+    <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">लोकेशन शेयर करना</string>
+    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">आस-पास के रेस्टोरेंट, स्थानीय मौसम और कई दूसरी चीज़ों के बारे में बेहतर जवाब पाने के लिए, अपनी गाड़ी की मौजूदा लोकेशन को Alexa के साथ शेयर करें.</string>
+    <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">परेशान न करें (डीएनडी)</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">इससे नोटिफ़िकेशन बंद हो जाएंगे</string>
+    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">बातचीत</string>
+    <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">टोन और वॉल्यूम</string>
+    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexa की भाषा</string>
+    <string name="setting_alexa_signout" tools:ignore="MissingTranslation">साइन आउट करें</string>
+    <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Alexa को बंद करें</string>
+    <string name="setting_aacs" tools:ignore="MissingTranslation">Alexa Auto क्लाइंट सेवा</string>
+    <string name="settings_alexa" tools:ignore="MissingTranslation">सेटिंग</string>
+    <string name="logout" tools:ignore="MissingTranslation">साइन आउट करें?</string>
+    <string name="disable_alexa" tools:ignore="MissingTranslation">Alexa को बंद करना है?</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">क्या आपको Amazon Alexa से साइन आउट करना है?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">साइन आउट करें</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">कैंसिल करें</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">बंद करें</string>
+    <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">Alexa की सुविधा अब इस गाड़ी में उपलब्ध नहीं होगी.</string>
+    <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">बेस कॉन्फ़िगरेशन को ओवरराइड करें</string>
+    <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">अगर इसे चुना जाता है, तो नीचे दिए गए सभी कॉन्फ़िगरेशन लागू हो जाएंगे</string>
+    <string name="preference_category_alexa_device" tools:ignore="MissingTranslation">Alexa डिवाइस</string>
+    <string name="preference_avsdevice_clientid" tools:ignore="MissingTranslation">क्लाइंट की Id</string>
+    <string name="preference_avsdevice_productid" tools:ignore="MissingTranslation">प्रॉडक्ट की Id</string>
+    <string name="preference_avsdevice_dsn" tools:ignore="MissingTranslation">डिवाइस का सीरियल नंबर</string>
+    <string name="preference_avsdevice_manufacturer" tools:ignore="MissingTranslation">निर्माता</string>
+    <string name="preference_category_aacs_service" tools:ignore="MissingTranslation">AACS सामान्य</string>
+    <string name="preference_aacs_startonboot" tools:ignore="MissingTranslation">डिवाइस के बूटअप पर AACS शुरू करें</string>
+    <string name="preference_category_aacs_defaults" tools:ignore="MissingTranslation">AACS डिफ़ॉल्ट</string>
+    <string name="preference_aacs_use_aacs_audio_input" tools:ignore="MissingTranslation">AACS के ऑडियो इनपुट का इस्तेमाल करें</string>
+    <string name="preference_category_aacs_control" tools:ignore="MissingTranslation">AACS को कंट्रोल करें</string>
+    <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">AACS को रीबूट करें और कॉन्फ़िगरेशन लागू करें</string>
+    <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">AACS को शट डाउन करें</string>
+    <string name="preference_aacs_start" tools:ignore="MissingTranslation">AACS को शुरू करें</string>
+</resources>

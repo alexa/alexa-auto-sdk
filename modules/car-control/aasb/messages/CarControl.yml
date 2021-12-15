@@ -1,0 +1,143 @@
+topic: CarControl
+namespace: aasb.message.carControl.carControl
+path: CarControl/CarControl
+
+messages:
+  - action: AdjustControllerValue
+    direction: outgoing
+    desc: Adjusts the range setting identified by endpointId and instanceId.
+    name: AdjustRangeControllerValue
+    payload:
+      - name: controllerType
+        desc: This attribute is deprecated in 4.0. Please use capabilityType.
+        value: RANGE
+      - name: capabilityType
+        desc: Capability type.
+        value: RANGE
+      - name: endpointId
+        desc: The unique identifier of the endpoint.
+      - name: controllerId
+        desc: Controller Id. This attribute is deprecated in 4.0. Please use instanceId.
+      - name: instanceId
+        desc: The unique identifier of the setting.
+      - name: delta
+        type: double
+        desc: The delta by which to adjust the range setting.
+
+  - action: AdjustControllerValue
+    direction: outgoing
+    desc: Adjusts the mode of the setting identified by endpointId and instanceId.
+    name: AdjustModeControllerValue
+    payload:
+      - name: controllerType
+        desc: This attribute is deprecated in 4.0. Please use capabilityType.
+        value: MODE
+      - name: capabilityType
+        desc: Capability type.
+        value: MODE
+      - name: endpointId
+        desc: The unique identifier of the endpoint.
+      - name: controllerId
+        desc: Controller Id. This attribute is deprecated in 4.0. Please use instanceId.
+      - name: instanceId
+        desc: The unique identifier of the setting.
+      - name: delta
+        type: int
+        desc: The delta by which to adjust the mode.
+
+  - action: AdjustControllerValue
+    direction: incoming
+    desc: Reply for AdjustControllerValue messages. Failure to send the asynchronous reply message within 5 seconds results in a timeout.
+    messageType: reply
+    payload:
+      - name: success
+        type: bool
+        desc: Whether the requested setting was successfully adjusted.
+
+  - action: SetControllerValue
+    direction: outgoing
+    desc: Sets the power state of the endpoint identified by endpointId.
+    name: SetPowerControllerValue
+    payload:
+      - name: controllerType
+        desc: This attribute is deprecated in 4.0. Please use capabilityType.
+        value: POWER
+      - name: capabilityType
+        desc: Capability type.
+        value: POWER
+      - name: endpointId
+        desc: The unique identifier of the endpoint.
+      - name: turnOn
+        type: bool
+        desc: The power setting. True to turn on the endpoint or False to turn off.
+
+  - action: SetControllerValue
+    direction: outgoing
+    desc: Sets the range setting identified by endpointId and instanceId.
+    name: SetRangeControllerValue
+    payload:
+      - name: controllerType
+        desc: This attribute is deprecated in 4.0. Please use capabilityType.
+        value: RANGE
+      - name: capabilityType
+        desc: Capability type.
+        value: RANGE
+      - name: endpointId
+        desc: The unique identifier of the endpoint.
+      - name: controllerId
+        desc: Controller Id. This attribute is deprecated in 4.0. Please use instanceId.
+      - name: instanceId
+        desc: The unique identifier of the setting.
+      - name: value
+        type: double
+        desc: The new range setting.
+
+  - action: SetControllerValue
+    direction: outgoing
+    desc: Sets the toggle state of the setting identified by endpointId and instanceId.
+    name: SetToggleControllerValue
+    payload:
+      - name: controllerType
+        desc: This attribute is deprecated in 4.0. Please use capabilityType.
+        value: TOGGLE
+      - name: capabilityType
+        desc: Capability type.
+        value: TOGGLE
+      - name: endpointId
+        desc: The unique identifier of the endpoint.
+      - name: controllerId
+        desc: Controller Id. This attribute is deprecated in 4.0. Please use instanceId.
+      - name: instanceId
+        desc: The unique identifier of the setting.
+      - name: turnOn
+        type: bool
+        desc: The power state of the setting. True to turn on the setting or False to turn off.
+
+  - action: SetControllerValue
+    direction: outgoing
+    desc: Sets the mode of the setting identified by endpointId and instanceId.
+    name: SetModeControllerValue
+    payload:
+      - name: controllerType
+        desc: This attribute is deprecated in 4.0. Please use capabilityType.
+        value: MODE
+      - name: capabilityType
+        desc: Capability type.
+        value: MODE
+      - name: endpointId
+        desc: The unique identifier of the endpoint.
+      - name: controllerId
+        desc: Controller Id. This attribute is deprecated in 4.0. Please use instanceId.
+      - name: instanceId
+        desc: The unique identifier of the setting.
+      - name: value
+        desc: The new mode to set.
+
+  - action: SetControllerValue
+    direction: incoming
+    desc: Reply for SetControllerValue messages. Failure to send the asynchronous reply message within 5 seconds results in a timeout.
+    messageType: reply
+    payload:
+      - name: success
+        type: bool
+        desc: Whether the requested setting was updated successfully.

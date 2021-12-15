@@ -1,1 +1,0 @@
-static const char* AASB_PHONE_CONTROL_MODULE = "aasb.phoneControl";

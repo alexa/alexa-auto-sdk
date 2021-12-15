@@ -28,6 +28,8 @@ namespace location {
  */
 class LocationProviderEngineInterface {
 public:
+    virtual ~LocationProviderEngineInterface() = default;
+
     /**
      * Describes the access to the geolocation service on the device.
      */

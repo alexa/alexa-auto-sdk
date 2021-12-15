@@ -1,0 +1,41 @@
+@startuml
+
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign direction
+
+participant Application  order 30
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> order 40
+
+... Report driving state change ...
+
+Application -> AutoSDK : Publish SetPlatformProperty message ("drivingState", "moving")
+AutoSDK -> Application: Receive UpdateAPLRuntimeProperties message \n ({"drivingState", "moving"}, {"video", "disabled"}, {"theme", "light"}) 
+Application -> Application : Notify viewhost of updated APL runtime properties
+
+... Report night mode change ...
+
+Application -> AutoSDK : Publish SetPlatformProperty message ("uiMode", "night")
+AutoSDK -> Application: Receive UpdateAPLRuntimeProperties message \n ({"drivingState", "moving"}, {"video", "disabled"}, {"theme", "dark"}) 
+Application -> Application : Notify viewhost of updated APL runtime properties
+
+... Report automotive theme id change ...
+
+Application -> AutoSDK : Publish SetPlatformProperty message ("themeId", "black")
+AutoSDK -> Application: Receive UpdateAPLRuntimeProperties message \n ({"drivingState", "moving"}, {"video", "disabled"}, {"theme", "dark-black"}) 
+Application -> Application : Notify viewhost of updated APL runtime properties
+
+
+@enduml

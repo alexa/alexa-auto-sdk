@@ -32,6 +32,11 @@ namespace alexa {
 
 https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/devicesetup.html 
  * setupCompleted event is triggered.
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class DeviceSetup : public aace::core::PlatformInterface {
 protected:

@@ -17,10 +17,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include <rapidjson/document.h>
-#include <rapidjson/error/en.h>
-#include <rapidjson/istreamwrapper.h>
-
 #include "AACE/Engine/Logger/LoggerEngineService.h"
 #include "AACE/Engine/Logger/Sinks/Sink.h"
 #include "AACE/Engine/Logger/Sinks/ConsoleSink.h"
@@ -75,7 +71,7 @@ bool LoggerEngineService::configure(std::shared_ptr<std::istream> configuration)
 
         auto sinkConfigList = json::get(root, "/sinks", json::Type::array);
         if (sinkConfigList != nullptr) {
-            for (int j = 0; j < sinkConfigList.size(); j++) {
+            for (std::size_t j = 0; j < sinkConfigList.size(); j++) {
                 auto sink = createSink(sinkConfigList[j]);
                 ThrowIfNull(sink, "createSinkFailed");
                 // add the sink to the engine logger
@@ -87,7 +83,7 @@ bool LoggerEngineService::configure(std::shared_ptr<std::istream> configuration)
 
         auto rulesConfigList = json::get(root, "/rules", json::Type::array);
         if (rulesConfigList != nullptr) {
-            for (int j = 0; j < rulesConfigList.size(); j++) {
+            for (std::size_t j = 0; j < rulesConfigList.size(); j++) {
                 auto next = rulesConfigList[j];
                 auto sinkId = json::get(next, "/sink", json::Type::string);
                 if (sinkId != nullptr) {
@@ -145,7 +141,7 @@ std::shared_ptr<aace::engine::logger::sink::Sink> LoggerEngineService::createSin
 
         auto rulesConfigList = json::get(config, "/rules", json::Type::array);
         if (rulesConfigList != nullptr) {
-            for (int j = 0; j < rulesConfigList.size(); j++) {
+            for (std::size_t j = 0; j < rulesConfigList.size(); j++) {
                 auto rule = createRule(rulesConfigList[j]);
                 ThrowIfNull(rule, "createRuleFailed");
                 sink->addRule(rule);

@@ -1,103 +1,106 @@
-# Alexa Module
+# Alexa Module <!-- omit in toc -->
 
-The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features. The Engine handles some extra setup and steps to sequence events and handle directives so you can focus on using the provided API to interact with Alexa. You do this by registering platform interface implementations via the Engine object.
+**Table of Contents** <!-- omit in toc -->
 
->**Note:** If you want to enable wake word support, [contact your Amazon Solutions Architect (SA)](../../NEED_HELP.md#requesting-additional-functionality).
+- [Alexa module overview](#alexa-module-overview)
+- [Configure the Alexa module](#configure-the-alexa-module)
+- [Set up Alexa for the user](#set-up-alexa-for-the-user)
+  - [Authorize the device with Authorization](#authorize-the-device-with-authorization)
+  - [Start the out-of-box experience with DeviceSetup](#start-the-out-of-box-experience-with-devicesetup)
+  - [Update Device Settings with PropertyManager](#update-device-settings-with-propertymanager)
+- [Provide user speech input to Alexa with SpeechRecognizer <a name="speechRecognizer"></a>](#provide-user-speech-input-to-alexa-with-speechrecognizer-)
+  - [Invoke Alexa with tap-and-release](#invoke-alexa-with-tap-and-release)
+  - [Invoke Alexa with press-and-hold](#invoke-alexa-with-press-and-hold)
+  - [Invoke Alexa with voice using Amazonlite wake word engine](#invoke-alexa-with-voice-using-amazonlite-wake-word-engine)
+  - [Reduce data usage with audio encoding](#reduce-data-usage-with-audio-encoding)
+- [Play Alexa speech to the user with SpeechSynthesizer](#play-alexa-speech-to-the-user-with-speechsynthesizer)
+- [Track Alexa state changes with AlexaClient](#track-alexa-state-changes-with-alexaclient)
+  - [Render Alexa's attention state](#render-alexas-attention-state)
+  - [Monitor Alexa's connection status](#monitor-alexas-connection-status)
+  - [Monitor Alexa's authorization state](#monitor-alexas-authorization-state)
+- [Display cards on screen with TemplateRuntime](#display-cards-on-screen-with-templateruntime)
+- [Stream Alexa media content](#stream-alexa-media-content)
+  - [Play media with AudioPlayer](#play-media-with-audioplayer)
+  - [View media metadata on screen with TemplateRuntime](#view-media-metadata-on-screen-with-templateruntime)
+  - [Press media playback control buttons with PlaybackController](#press-media-playback-control-buttons-with-playbackcontroller)
+  - [Adjust equalizer settings with EqualizerController](#adjust-equalizer-settings-with-equalizercontroller)
+  - [Resume media playback at startup with MediaPlaybackRequestor](#resume-media-playback-at-startup-with-mediaplaybackrequestor)
+  - [Enable audio ducking for Alexa media content](#enable-audio-ducking-for-alexa-media-content)
+- [Control local media with LocalMediaSoure](#control-local-media-with-localmediasoure)
+  - [Starting Playback with Content Selection by Voice](#starting-playback-with-content-selection-by-voice)
+  - [Controlling Playback by Voice](#controlling-playback-by-voice)
+  - [Reporting Playback State](#reporting-playback-state)
+  - [Example Sequence Diagrams](#example-sequence-diagrams)
+- [Control external media apps with ExternalMediaAdapter <a name="externalMediaAdapter"></a>](#control-external-media-apps-with-externalmediaadapter-)
+- [Control volume with AlexaSpeaker](#control-volume-with-alexaspeaker)
+  - [Set a custom volume range](#set-a-custom-volume-range)
+- [Manage timers, alarms, and reminders with Alerts](#manage-timers-alarms-and-reminders-with-alerts)
+- [Render notification indicators with Notifications](#render-notification-indicators-with-notifications)
+- [Block notifications with DoNotDisturb](#block-notifications-with-donotdisturb)
 
-**Table of Contents**
+## Alexa module overview
 
-- [Alexa Module Sequence Diagrams](#alexa-module-sequence-diagrams)
-- [Configuring Alexa Module](#configuring-alexa-module)
-  - [Using a JSON File](#using-a-json-file)
-  - [Using Programmatic Configuration](#using-programmatic-configuration)
-- [Handling Speech Input](#handling-speech-input)
-- [Handling Speech Output](#handling-speech-output)
-- [Handling Authorization](#handling-authorization)
-  - [Using the Authorization Platform Interface to Carry out Auth Provider Authorization](#using-the-authorization-platform-interface-to-carry-out-auth-provider-authorization)
-  - [Sequence Diagrams for Auth Provider Authorization](#sequence-diagrams-for-auth-provider-authorization)
-  - [Optional Auth Provider Configuration](#optional-auth-provider-configuration)
-  - [(Deprecated) Implementing a Custom Handler for AuthProvider](#deprecated-implementing-a-custom-handler-for-authprovider)
-- [Handling Device Setup](#handling-device-setup)
-  - [Implementing Custom Handler](#implementing-custom-handler)
-  - [Handling an Event Response](#handling-an-event-response)
-- [Handling Audio Output](#handling-audio-output)
-  - [Custom Volume Control for Alexa Devices](#custom-volume-control-for-alexa-devices)
-- [Handling Alexa Speaker](#handling-alexa-speaker)
-  - [SpeakerManager Configuration](#speakermanager-configuration)
-- [Handling Audio Player](#handling-audio-player)
-- [Handling Playback Controller Events](#handling-playback-controller-events)
-- [Handling Equalizer Control](#handling-equalizer-control)
-- [Handling Display Card Templates](#handling-display-card-templates)
-- [Handling External Media Apps](#handling-external-media-apps)
-- [Handling Local Media Sources](#handling-local-media-sources)
-    - [Starting Playback with Content Selection by Voice](#starting-playback-with-content-selection-by-voice)
-    - [Controlling Playback by Voice](#controlling-playback-by-voice) 
-    - [Reporting Playback Events](#reporting-playback-events)
-    - [Reporting Playback State](#reporting-playback-state)
-    - [Example Sequence Diagrams](#example-sequence-diagrams)
-- [Handling Notifications](#handling-notifications)
-- [Handling Alerts](#handling-alerts)
-- [Handling Do Not Disturb](#handling-do-not-disturb)
-- [Handling Alexa State Changes](#handling-alexa-state-changes)
+The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features. The Engine handles steps to send events and sequence directives so you can focus on using the provided AASB messages to interact with Alexa.
 
-## Alexa Module Sequence Diagrams
+> **Important!**: If you are an Android developer, your application will use the [**Alexa Auto Client Service (AACS)**](../aacs/android/README.md) as its foundation. AACS implements much of the core Auto SDK setup, abstracting it from your application and exposing only a necessary subset of the Auto SDK API in an Android-specific way. Some of the information presented in this documentation and documentation for other SDK modules might not pertain to your application exactly as written for cases in which AACS provides the implementation or further abstracts it, so keep this in mind while reading. Use the module documentation to understand the underlying layers of Auto SDK, if interested, and to reference the Engine configuration and AASB message definitions for the features you do need to build into your application yourself. 
 
-For a view of how the Alexa Auto SDK flow works in selected use cases, see these sequence diagrams:
+> **Important!:** Not every section of this documented is updated to reflect the Auto SDK 4.0 MessageBroker message API. Some sections still include text, code samples, or diagrams that show deprecated platform intefaces rather than their corresponding AASB message interface equivalents. Your application will use the the AASB message interfaces with MessageBroker. This document will be fully updated in the next Auto SDK version. For each interface you use, refer to its individual AASB message reference documentation.
 
-* [Tap to Talk Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#tap-to-talk-sequence-diagram)
-* [Wake Word Enabled Sequence Diagram](../../SEQUENCE_DIAGRAMS.md#wake-word-enabled-sequence-diagram)
 
-## Configuring Alexa Module
+## Configure the Alexa module
 
-The Alexa module can be configured in two ways:
-* Specifying Configuration Data Using a JSON File.
-* Specifying Configuration Data Programmatically.
+The `Alexa` module defines required and optional configuration objects that you include in the Engine configuration for your application. You can define the configuration objects in a file or construct them programatically with the relevant configuration factory functions.
 
-See the [core module README](../core/README.md#configuring-the-engine) for steps to specify configuration data.
-
-### Using a JSON File
-
-Include the following structure in the JSON file:
+Your application must provide the `aace.alexa` configuration in the same format as the example specified below. Alternatively, use the [`AlexaConfiguration`](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html) factory functions to generate individual elements of this configuration.
 
 ```
-"aace.alexa": {
+{
+    "aace.alexa": {
         "avsDeviceSDK": {
             "deviceInfo": {
-                "clientId": "${YOUR_CLIENT_ID}",
-                "deviceSerialNumber": "${YOUR_DEVICE_SERIAL_NUMBER}",
-                "productId": "${YOUR_PRODUCT_ID}",
-                "manufacturerName": "${YOUR_MANUFACTURER_NAME}",
-                "description": "${YOUR_DESCRIPTION}"
+                "clientId": "${CLIENT_ID}",
+                "productId": "${PRODUCT_ID}",
+                "deviceSerialNumber": "${DEVICE_SERIAL_NUMBER}",
+                "manufacturerName": "${MANUFACTURER_NAME}",
+                "description": "${DEVICE_DESCRIPTION}"
             },
             "libcurlUtils": {
-                "CURLOPT_CAPATH" : "<CA_CERTIFICATES_FILE_PATH>"
-                "CURLOPT_INTERFACE" : "<NETWORK_INTERFACE_NAME>"
+                "CURLOPT_CAPATH": "${CERTS_PATH}"
             },
             "miscDatabase": {
-                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+                "databaseFilePath": "${DATA_PATH}/miscDatabase.db"
             },
             "certifiedSender": {
-                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+                "databaseFilePath": "${DATA_PATH}/certifiedSender.db"
             },
             "alertsCapabilityAgent": {
-                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+                "databaseFilePath": "${DATA_PATH}/alertsCapabilityAgent.db"
             },
             "notifications": {
-                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+                "databaseFilePath": "${DATA_PATH}/notifications.db"
             },
             "capabilitiesDelegate": {
-                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>"
+                "databaseFilePath": "${DATA_PATH}/capabilitiesDatabase.db"
             },
             "deviceSettings": {
-                "databaseFilePath": "<SQLITE_DATABASE_FILE_PATH>",
-                "locales": [<LIST_OF_LOCALE_STRINGS>],
-                "defaultLocale": "<DEFAULT_LOCALE_STRING>",
-                "localeCombinations": [[<LOCALE_STRING_PAIR>]],
-                "defaultTimezone": "<TIMEZONE>"
+                "databaseFilePath": "${DATA_PATH}/deviceSettings.db",
+                "defaultLocale":"en-US",
+                "defaultTimezone":"America/Vancouver"
             }
+        },
+        "requestMediaPlayback": {
+            "mediaResumeThreshold": 20000
         }
+    },
+    "aasb.alexa": {
+      "LocalMediaSource": {
+        "types": ["FM_RADIO", "AM_RADIO","BLUETOOTH", "USB", "SATELLITE_RADIO",
+                    "LINE_IN", "COMPACT_DISC", "DAB", "DEFAULT"]
+      }
     }
+}
 ```
+
 The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `alertsCapabilityAgent`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
 
 The `deviceSettings` field specifies the settings on the device. The following list describes the settings:
@@ -136,439 +139,187 @@ The `deviceSettings` field specifies the settings on the device. The following l
   
   **Note:** Dynamic Language Switching is only available in online mode. 
 
-### Using Programmatic Configuration
-You can configure programmatically all of the above specified fields using the methods provided by the AlexaConfiguration platform interface. For example, to create deviceInfo config:
+## Set up Alexa for the user
 
-```cpp
-auto deviceConfig = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig
-    ("<DEVICE_SERIAL_NUMBER>", "<CLIENT_ID>", "<PRODUCT_ID>", "<MANUFACTURER_NAME>", "<DESCRIPTION>");
-```
+### Authorize the device with Authorization
 
-```cpp
-auto deviceSettingsConfig = aace::alexa::config::AlexaConfiguration::createDeviceSettingsConfig(
-    "<SQLITE_DATABASE_FILE_PATH>", [<LIST_OF_LOCALE_STRINGS>], "<DEFAULT_LOCALE_STRING>", "<TIMEZONE>", [[<LOCALE_STRING_PAIR>]]);
-```
+In order to make requests to Alexa, your application requires a Login with Amazon (LWA) access token. The access token grants the device access to Alexa on behalf of the signed-in user. As part of the user sign-in experience for your application, obtain access tokens for Alexa and provide them to the Engine as outlined in the [`Alexa Auto SDK Authorization`](../core/AUTHORIZATION.md).
+
+### Start the out-of-box experience with DeviceSetup
+
+>**Note:** This feature requires Amazon to allowlist your device. For help, [contact your Amazon Solutions Architect or partner manager](../../NEED_HELP.md#requesting-additional-functionality).
+
+After the user signs in to your application during or after the out-of-box experience, the application starts the Engine and publishes the [`DeviceSetup.SetupCompleted` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/DeviceSetup/index.html#setupcompleted) to notify Alexa that the setup is complete. The Engine publishes the [`DeviceSetup.SetupCompletedResponse`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/DeviceSetup/index.html#setupcompletedresponse) to your application to indicate Alexa was notified successfully. In to the `SetupCompleted` event, Alexa starts an onboarding experience including a short first-time conversation with the user. 
+
+Because `SetupCompleted` triggers an onboarding experience, do not publish the message if the signed-in user has already seen the experience. The onboarding experience is for first-time users only and might differ for returning users.
+
+>**Note:** Do not publish the `SetupCompleted` message if user is in [Connectivity Mode](../connectivity/README.MD) or Preview Mode or if the user has disabled handsfree listening. Publishing `SetupCompleted` in these conditions causes undesireable user experience.
+
+### Update Device Settings with PropertyManager
+
+After starting the Engine, use the `PropertyManager` to update any Alexa properties that you need to keep in sync at startup. See [Alexa Auto SDK Property Manager](../core/RUNTIME_PROPERTIES.md) for details.
 
 
-## Handling Speech Input
+## Provide user speech input to Alexa with SpeechRecognizer <a name="speechRecognizer"></a>
 
-It is the responsibility of the `AudioInputProvider` platform implementation to supply audio data to the Engine so that Alexa can process voice input. Since the Engine does not know how audio is managed on a specific platform, the specific audio capture implementation is up to you. An audio playback sound (earcon) is played whenever speech input is invoked. The playback is handled by whichever audio channel is assigned to the EARCON type. [Read more about handling media and volume here](#handling-audio-output).
+At startup time, the `SpeechRecognizer` component in the Engine [opens an audio input channel](../core/AUDIO.md) of type `VOICE` for the application to provide the user speech to Alexa. The application subscribes to the [`AudioInput.StartAudioInput`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioInput/index.html#startaudioinput) and [`AudioInput.StopAudioInput`](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioInput/index.html#stopaudioinput) messages as outlined in [Alexa Auto SDK Audio Channels](../core/AUDIO.md). When the Engine expects to receive audio from the application, it prompts the application by publishing a `StartAudioInput` message with `audioType` `VOICE`. The application provides the voice audio input until the Engine publishes a `StopAudioInput` message.
 
-You can programmatically generate encoder configuration using the `aace::alexa::config::AlexaConfiguration::createSpeechRecognizerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+The user decides when to speak to Alexa by invoking her with a tap-to-talk GUI button press, a push-to-talk physical button press, or—in vehicles supporting voice-initiated listening—an "Alexa" utterance. 
+
+### Invoke Alexa with tap-and-release
+
+For button press-and-release Alexa invocation, the application publishes the [`SpeechRecognizer.StartCapture` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#startcapture) with `initiator` `TAP_TO_TALK` to tell the Engine that the user pressed the Alexa invocation button and wants to speak to Alexa. When requested, the application provides audio to the Engine until Alexa detects the end of the user's speech. The Engine publishes the [`SpeechRecognizer.EndOfSpeechDetected` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#endofspeechdetected) to the application and requests the application to stop providing audio if no other Engine components require it.
+
+### Invoke Alexa with press-and-hold
+
+For button press-and-hold Alexa invocation, the application publishes the [`SpeechRecognizer.StartCapture` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#startcapture) with `initiator` `HOLD_TO_TALK` to tell the Engine that the user is holding down the Alexa invocation button and wants to speak to Alexa until releasing the button. When requested, the application provides audio to the Engine. When the user finishes speaking and releases the button, the application notifies the Engine by publishing the [`SpeechRecognizer.StopCapture` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#stopcapture), and the Engine requests the application to stop providing audio if no other Engine components require it.
+
+### Invoke Alexa with voice using Amazonlite wake word engine
+
+>**Note:** To use the Amazonlite wake word engine in your application, [contact your Amazon Solutions Architect or partner manager](../../NEED_HELP.md#requesting-additional-functionality).
+
+When the application uses the `Amazonlite` Auto SDK module for wake word detection, the application notifies the Engine when the user has handsfree listening enabled (i.e., privacy mode is off) by publishing the [`PropertyManager.SetProperty` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/PropertyManager/index.html#setproperty) with `property` set to `aace.alexa.wakewordEnabled` and `value` set to `true`. The Engine enables Amazonlite wake word detection and requests audio input from the application. The application provides audio to the Engine for continuous wake word detection until the application disables handsfree listening by setting the `aace.alexa.wakewordEnabled` property to `false`. After disabling Amazonlite wake word detection, the Engine requests the application to stop providing audio if there no other Engine components require it.
+
+When Amazonlite detects the "Alexa" wake word in the continuous audio stream provided by the application, the Engine publishes the [`SpeechRecognizer.WakewordDetected` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#wakeworddetected) and starts an interaction similar to one triggered by tap-to-talk invocation. When Alexa detects the end of the user's speech, the Engine publishes the [`SpeechRecognizer.EndOfSpeechDetected` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/alexa/aasb-docs/SpeechRecognizer/index.html#endofspeechdetected) but keeps the audio input stream open for further wake word detection.
+
+
+### Reduce data usage with audio encoding
+
+To save bandwidth when the Engine sends user speech to Alexa in `SpeechRecognizer.Recognize` events, you can configure the Engine to encode the audio with the [Opus audio encoding format](https://www.opus-codec.org/docs/html_api/group__opusencoder.html) by adding the following object to your Engine configuration:
 
 ```
 {
     "aace.alexa": {
        "speechRecognizer": {
            "encoder": {
-                "name": "<ENCODER_NAME>"
+                "name": "opus"
            }
        }
     }
 }
 ```
-The only possible value for `name` is "opus". If you do not specify a value for `name`, speech is sent in PCM format, which consumes more upload bandwidth than it would if you set the value to "opus".
+When you set this configuration in your application, the Engine still expects the application to provide audio in the Linear PCM format specified in the [Alexa Auto SDK Audio Channels](../core/AUDIO.md); the Engine internally changes the encoding to Opus prior to including the audio attachment in the `Recognize` event.
 
-To implement a custom handler for speech input, extend the `SpeechRecognizer` class:
+<details markdown="1">
+<summary>Click to expand or collapse details— Generate the configuration programatically with the C++ factory function</summary>
+<br/>
 
-```
-#include <AACE/Alexa/SpeechRecognizer.h>
-class MySpeechRecognizer : public aace::alexa::SpeechRecognizer {
-    public:
-        
-        bool wakewordDetected( const std::string& wakeword ) override {
-        // called when a wake word is detected
-        }
-        ... 
-        
-        void endOfSpeechDetected() override {
-        // called to inform the platform of speech end detected
-        }
-        ...
-        
-        // To notify the Engine of speech recognize event via press-and-hold initialization.
-        // startCapture( Initiator::HOLD_TO_TALK ) is equivalent.
-        holdToTalk();
-        ...
-        
-        // To notify the Engine of a speech recognize event via tap-and-release initiation. 
-        // startCapture( Initiator::TAP_TO_TALK ) is equivalent.
-        tapToTalk(); 
-        ... 
-        
-        // Notify the engine that the wake word engine has detected the wake word. 
-        // Currently the only keyword value supported is "ALEXA".
-        startCapture( Initiator::WAKEWORD, 54500, 162000, "ALEXA" );
-        ...
-        
-        // Notify the Engine to stop speech recognition. 
-        // For example, when hold-to-talk was used and is now being ended by the button release action
-        stopCapture();
-        ...
-};
-...
-
-// Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MySpeechRecognizer>() );
-```
-
->**Note:** In the example for `startCapture()` above, 54500 is the value for `keywordBegin`, and 162000 is the value for `keywordEnd`. These parameters correspond to the wake word indexes in the audio input stream. You must increment `keywordBegin` for each subsequent wake word to match the index at which the wake word begins (for example, at 200000), making sure that there are 8000 samples preceding the wake word as pre-roll. Otherwise, Alexa would respond incorrectly. For more information about wake word indexes, see [this section on the developer portal](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/implement-ww-verification.html#indices).
-
-## Handling Speech Output
-
-The `SpeechSynthesizer` is responsible for handling Alexa's speech. In v2.0.0 and later of the Alexa Auto SDK this interface no longer has any platform-dependent implementation. You still must register it to enable the feature, however. The playback is handled by whichever audio channel is assigned to the TTS type. [Read more about handling media and volume here](#handling-audio-output).
-
-To implement a custom handler for speech output extend the `SpeechSynthesizer` class:
-
-```
-#include <AACE/Alexa/SpeechSynthesizer.h>
-class MySpeechSynthesizer : public aace::alexa::SpeechSynthesizer {
-    ...
-};
-...
-
-// Register the platform interface with the Engine
-auto mySpeechSynthesizer = std::make_shared<MySpeechSynthesizer>();
-engine->registerPlatformInterface( mySpeechSynthesizer );
-
-```
-
-
-## Handling Authorization
-
-Every request to Alexa Voice Service (AVS) requires a Login with Amazon (LWA) access token.
-Starting with Auto SDK v3.1.0, use the Authorization platform interface to start, cancel, and log out of authorization. The Auto SDK continues to support the AuthProvider platform interface, but it is on the deprecation path. For more information about how the Engine manages authorization, see the Core module [README](../core/README.md).
-
-In this document, "Auth Provider authorization" refers to the general method through which the application implements acquiring access tokens itself and provides them to the Engine.
-
->**Note**: Auth Provider authorization and other authorization methods, such as [CBL](../cbl/README.md), are mutually exclusive. For example, if the device is already registered with CBL, starting Auth Provider authorization logs out the device from the previous authorization.
-
-> **Note:** The access and refresh tokens must be cleared when the user logs out, and any time the access and refresh tokens are cleared, users must go through the authentication and authorization process again.
-
-> **Note:** Your application should stop the audio player if the user logs out of a device when music is currently playing.
-
-For more information about authorization, see the following documents:
-
-* [Authorize from a Companion App](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-companion-app.html)
-* [Authorize from an AVS Product](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-on-product.html)
-* [Authorize from a Companion Site](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/authorize-companion-site.html)
-
-### Using the Authorization Platform Interface to Carry out Auth Provider Authorization
-This section describes how an application uses the Authorization platform interface to carry out Auth Provider authorization.
-The service name used by Authorization for Auth Provider authorization is `alexa:auth-provider`.
-
-#### Starting Authorization	
-To start authorization, the application uses the `startAuthorization` API.
-The data parameter in the `startAuthorization` API is an empty string, as shown in the following example: 
-
-~~~
-startAuthorization( "alexa:auth-provider", "" )
-~~~
-
->**Note:** With the Authorization platform interface, it is the responsibility of the application to start authorization at every Engine start. Each time the Engine is restarted, it does not automatically start the authorization that was previously in effect before the Engine restart.
-
-#### Receiving Events from Engine
-This section describes the protocol for the application to receive events from the Engine. The API used is `eventReceived`. 
-The application needs to receive an event in these scenarios:
-
-* when the Engine requests the application to start authorization
-* when the application needs to log out of the authorization
-
-To request the application to start authorization, the Engine passes the request to the application by using the event parameter in the `eventReceived` API. The parameter has the following JSON structure:
-
-~~~
-{
-    "type": "requestAuthorization"
-}
-~~~
-
-The application receives the event from the Engine through the `eventReceived` API as follows:
-
-~~~
-eventReceived( "alexa:auth-provider", "{"type":"requestAuthorization"}" )
-~~~
-
-To log out, the event parameter in the `eventReceived` API has the following JSON structure:
-
-~~~
-{
-    "type": "logout"
-}
-~~~
-
-The Engine calls the `eventReceived` method to log out the device as follows:
-
-~~~
-eventReceived( "alexa:auth-provider", "{"type":"logout"}" )
-~~~
-
-#### Sending Events to Engine
-To notify the Engine of an authorization state change, the application uses the event parameter of the `sendEvent` API. The parameter has the following JSON structure:
-
-~~~
-{
-    "type":"authStateChangeEvent",
-    "payload": {
-        "state":"{STRING}"
-    }
-}
-~~~
-
-The possible state strings are AUTHORIZED and UNAUTHORIZED.
-
-The application needs to notify the Engine of an authorization state change for one of the following reasons:
-* There is a request from Engine via `eventReceived` with `type` set to `requestAuthorization`.
-* The application transitions to a new state, as shown in the following example where state transitions from `UNAUTHORIZED` to `AUTHORIZED`:
-
-~~~
-sendEvent( "alexa:auth-provider",
-    "{
-        "type":"authStateChangeEvent"
-        "payload": {
-            "state":"AUTHORIZED"
-        }  
-    }"
- )
-~~~
-
-#### Getting Access Token
-The Engine calls the application to get the access token by using the `accessToken` parameter in the `getAuthorizationData` API as follows:
-
-~~~
-getAuthorizationData("accessToken")
-~~~
-
-The application responds with an access token, as shown in the following example.
-~~~
-{
-    "accessToken":"Atza|AAAAAABBBBBBCCCCCC"
-}
-~~~
-
-#### Canceling Authorization
-To cancel authorization, the API to use is `cancelAuthorization`, as follows:
-
-~~~
-cancelAuthorization( "alexa:auth-provider" );
-~~~
-
-You may call this API to cancel the authorization that is started by calling `startAuthorization` but before sending an event via `sendEvent`. Canceling authorization does not affect the device authorization state.
-
-
-#### Logging Out
-
-The application makes the `logout` API call to the Engine to log out, as follows:
-
-~~~
-logout( "alexa:auth-provider" );
-~~~
-
-#### Handling Errors
-The Engine notifies the application about any error during the authorization process.
-
-The following list describes possible errors during authorization:
-
-* `UNKNOWN_ERROR`: An unrecoverable error happens in the authorization process.
-* `AUTH_FAILURE`: An invalid or expired access token is provided.
-* `LOGOUT_FAILED`: The application cannot complete the logout process.
-* `START_AUTHORIZATION_FAILED`: The authorization process cannot start.
-
-The following example shows how the API handles an error when the provided access token is either expired or invalid:
-~~~
-authorizationError( "alexa:auth-provider", "AUTH_FAILURE", "" )
-~~~
-
-### Sequence Diagrams for Auth Provider Authorization
-
-The following sequence diagram illustrates the flow when the Authorization platform interface starts an authorization.
-
-<p align="center">
-<img src="./assets/authprovider-start-sequence.png"/>
-</p>
-
-The following sequence diagram illustrates the flow when the Authorization platform interface cancels an authorization.
-
-<p align="center">
-<img src="./assets/authprovider-cancel-sequence.png"/>
-</p>
-
-The following sequence diagram illustrates the flow when the Authorization platform interface logs out of an authorization.
-
-<p align="center">
-<img src="./assets/authprovider-logout-sequence.png"/>
-</p>
-
-### Optional Auth Provider Configuration
-By default, the Engine supports one Auth Provider authorization. However, if your application supports more than one, provide the Engine with the following configuration. You can also build the configuration programmatically by using [`createAuthProviderConfig`](./platform/include/AACE/Alexa/AlexaConfiguration.h).
-
-```json
-{
-    "aace.alexa" : {
-        "authProvider" : {
-           "providers" : [<LIST_OF_PROVIDER_NAMES_STRINGS>]
-        }
-    }
-}
-```
-
-For example, if your application supports two Auth Provider authorizations, named "serviceA" and "serviceB," provide the following configuration:
-
-
-```json
-{
-    "aace.alexa" : {
-        "authProvider" : {
-           "providers" : ["serviceA" , "serviceB"]
-        }
-    }
-}
-```
-
-With this configuration, the Engine uses the service names "serviceA" and "serviceB" with the Authorization platform interface instead of using the default Auth Provider service name `alexa:auth-provider`.
-
-
-### (Deprecated) Implementing a Custom Handler for AuthProvider
->**Note:** The information in this section is not applicable if you use the Authorization platform interface. The AuthProvider platform interface is deprecated.
-
-To implement a custom handler for authorization, extend the `AuthProvider` class:
-
-```
-#include <AACE/Alexa/AuthProvider.h>
-class MyAuthProvider : public aace::alexa::AuthProvider {
-    public:
-        std::string getAuthToken() override {
-            // provide current access token
-        }
-        
-        AuthState getAuthState() override {
-            // provide current authentication status
-        }
-        
-        void authFailure(std::string token) override {
-            // The access token most recently provided through AuthProvider::getAuthToken() is invalid and was used in an unauthorized request to AVS. AVS responded to this request with a 403 code indicating the token was not valid. Get a new token!
-        }
-              
-};
-...
-        
-// Register the platform interface with the Engine
-auto m_authProvider = std::make_shared<MyAuthProvider>();
-engine->registerPlatformInterface( m_authProvider );
-
-...
-
-// To notify the Engine of a change in authentication state (such as when the user logs in):
-AuthState currentAuthState = AuthState::REFRESHED;
-AuthError currentAuthError = AuthError::NO_ERROR;
-
-m_authProvider->authStateChanged(currentAuthState, currentAuthError);
-```
-
-#### Switching User Account
-
-When switching from one authorized user account to another, you must call the `authStateChanged(UNINITIALIZED)` API before providing access tokens for the second user.
-
->**NOTE:** Starting with the Auto SDK 3.1, you don't have to restart the Engine after a user logs out. Immediately after the `authStateChanged(UNINITIALIZED)` API returns, you may start a fresh Auth Provider authorization by calling the `authStateChanged(REFRESHED)` API.
-
-#### AuthProvider Login/Logout Sequence Diagrams
-
-The following diagram illustrates the login sequence when using the AuthProvider platform interface to obtain access and refresh tokens.
-
-![AuthProvider_login](./assets/AuthProvider_login.png)
-
-The following diagram illustrates the logout sequence when using the AuthProvider platform interface to clear access and refresh tokens.
-
-![AuthProvider_logout](./assets/AuthProvider_logout.png)
-
-## Handling Device Setup
->**Note:** Support for device setup is only for devices allow-listed by Amazon. If you want to use this feature, contact your Solutions Architect or Partner Manager.
- 
-The `DeviceSetup` API handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, the `SetupCompleted` event is sent from the device to inform Alexa that device setup is complete. Alexa then starts the on-boarding experience, for example, by starting a short first-time conversation on the device.
-
->**Note:** Alexa provides the on-boarding experience to first-time users only. The experience might be different for returning users.
-
->**Note:** Do not call `setupCompleted()` API if user is in [Connectivity Mode](../connectivity/README.MD), or `Preview Mode`, or Alexa wake word is disabled. Calling `setupCompleted()` API in such conditions results in undesired user experience.
-
-Because `SetupCompleted` is for triggering the on-boarding experience, call the API only if login is successful. Also, if the authorization session is started with an existing refresh token, do not call the `SetupCompleted`.
-
-### Implementing Custom Handler
-To implement a custom handler for device setup, extend the `DeviceSetup` class as follows:
+If your application generates Engine configuration programmatically instead of using a JSON file, you can use the [`aace::alexa::config::AlexaConfiguration::createSpeechRecognizerConfig`](https://alexa.github.io/alexa-auto-sdk/docs/cpp/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aacb872514a75a1fdc3d54d17b64a2ec6) factory function to create the `EngineConfiguration` object.
 
 ```cpp
-#include <AACE/Alexa/DeviceSetup.h>
-class DeviceSetupHandler : public aace::alexa::DeviceSetup {
-    ...
+#include <AACE/Alexa/AlexaConfiguration.h>
+
+std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurations;
+
+auto speechRecognizerConfig = aace::alexa::config::AlexaConfiguration::createSpeechRecognizerConfig("opus");
+configurations.push_back(speechRecognizerConfig);
+
+// ... create other EngineConfiguration objects and add them to configurations...
+
+m_engine->configure(configurations);
+
+```
+
+</details>
+<br/>
+
+<details markdown="1">
+<summary>Click to expand or collapse details— Generate the configuration programatically with the Java factory method</summary>
+<br/>
+
+AACS is the recommended way to integrate Auto SDK for Android, so your application should provide the `aacs.alexa` configuration in the AACS configuration file. However, if your application does not use AACS, and it generates Engine configuration programmatically instead of using a JSON file, you can use the [`com.amazon.aace.alexa.config.AlexaConfiguration.createSpeechRecognizerConfig`](https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8d70d4b326745849824994e380d7d5f9) factory method to create the `EngineConfiguration` object.
+
+```java
+import com.amazon.aace.alexa.config.AlexaConfiguration;
+
+EngineConfifguration speechRecognizerConfig = AlexaConfiguration.createSpeechRecognizerConfig("opus");
+
+mEngine.configure(new EngineConfiguration[]{
+	// ...add other EngineConfiguration objects...
+	speechRecognizerConfig
+});
+
+```
+
+</details>
+<br/>
+
+
+## Play Alexa speech to the user with SpeechSynthesizer
+
+At startup time, the `SpeechSynthesizer` component in the Engine [opens an audio output channel](../core/AUDIO.md) of type `TTS` for the application to play Alexa speech responses to the user. `SpeechSynthesizer` has no messages of its own for the application to handle because it uses the standard audio output framework specified in the `Core` module. When Alexa responds to a user request with speech, the Engine publishes an [`AudioOutput.Prepare` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioOutput/index.html#prepare) with `audioType` `TTS`. The application uses the payload of the message to open the audio stream and buffer the audio data. The application plays the audio to the user when the Engine publishes an [`AudioOutput.Play` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/AudioOutput/index.html#play) with matching `token`.
+
+## Track Alexa state changes with AlexaClient
+
+### Render Alexa's attention state
+
+Your application can subscribe to the `AlexaClient.DialogStateChanged` message to be notified what state Alexa dialog is in (e.g., Alexa started listening to the user's speech or started speaking her response). This message helps your application render Alexa's attention state UI such as Voice Chrome and audio cues without having to derive these states by tracking your application's microphone and media player.
+
+The following diagram shows how you might use the dialog state changes to provide Alexa attention feedback during an interaction.
+
+<details markdown="1">
+<summary>Click to expand or collapse sequence diagram: Alexa invocation</summary>
+
+![TTT_interaction](./assets/diagrams/out/complete-interaction-tap-to-talk-sequence.svg)
+
+</details>
+<br/>
+
+
+### Monitor Alexa's connection status
+
+Your application can subscribe to the `AlexaClient.ConnectionStatusChanged` message to be notified when the status of the Engine's connection to Alexa has changed (e.g., the Engine lost connection to Alexa). You might use this information, for instance, to enable or disable certain functionality or display information to the user.
+
+### Monitor Alexa's authorization state
+
+Your application can subscribe to the `AlexaClient.AuthStateChanged` message to be notified what state the Engine is in with respect to the user sign in. For example, the state is `REFRESHED` when the Engine has an access token.
+
+
+## Display cards on screen with TemplateRuntime
+
+Alexa sends visual metadata (display card templates) for your device to display. When template information is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the information that is received from Alexa. There are two display card template types:
+
+* The [Template](https://alexa.design/DevDocRenderTemplate) type provides visuals associated with a user request to accompany Alexa speech.
+* The [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo) type provides visuals associated with media playing through the `AudioPlayer` interface. This includes playback control buttons, which must be used with the `PlaybackController` interface.
+
+You can programmatically generate template runtime configuration using the `aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+
+```
+{
+    "aace.alexa" {
+        "templateRuntimeCapabilityAgent": {
+            "displayCardTTSFinishedTimeout": <TIMEOUT_IN_MS>,
+            "displayCardAudioPlaybackFinishedTimeout": <TIMEOUT_IN_MS>,
+            "displayCardAudioPlaybackStoppedPausedTimeout": <TIMEOUT_IN_MS>
+        }
+}
+```
+
+To implement a custom handler for GUI templates, extend the `TemplateRuntime` class:
+
+```
+#include <AACE/Alexa/TemplateRuntime.h>
+class MyTemplateRuntime : public aace::alexa::TemplateRuntime {
+    public:
+        void renderTemplate( const std::string& payload, FocusState focusState ) override {
+        // handle rendering the template data specified in payload
+        }
+        
+        void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) override {
+        // handle rendering the player info data specified in payload
+        }
 };
 ...
 
 // Register the platform interface with the Engine
-auto deviceSetupHandler = std::make_shared<DeviceSetupHandler>();
-engine->registerPlatformInterface( deviceSetupHandler );
-
-// Call 'setupCompleted()' when the device is authenticated
-deviceSetupHandler->setupCompleted();
+engine->registerPlatformInterface( std::make_shared<MyTemplateRuntime>() );
 ```
+>**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
-### Handling an Event Response
-After calling `setupCompleted()`, implement the `setupCompletedResponse(StatusCode statusCode)` function to determine whether the event was sent successfully, as follows:
 
-```cpp
-#include <AACE/Alexa/DeviceSetup.h>
-class DeviceSetupHandler : public aace::alexa::DeviceSetup {
-    public:
-        void setupCompletedResponse(StatusCode statusCode) {
-            // Handle or log the status
-        }
-};
-```
+## Stream Alexa media content
 
-`StatusCode` is "SUCCESS" or "FAIL", depending on whether the `setupCompleted` event was sent successfully to Alexa.
-
-## Handling Audio Output
-
-When audio data is received from Alexa, it is the responsibility of the platform implementation to read the data from the Engine and play it using a platform-specific audio output channel. It is also the responsibility of the platform implementation to define how each `AudioOutput` channel is handled. Each `AudioOutput` implementation will handle one or more of the following media types depending on the behavior defined in the `AudioOutputProvider`:
-
-* TTS
-* MUSIC
-* NOTIFICATION
-* ALARM
-* EARCON
-* COMMUNICATION
-
-`AudioOutput` also has methods to control the volume of the audio channel. These methods allow the Engine to set the volume, either when the user asks Alexa to adjust it or if the Engine internally needs to adjust it during audio focus management. All local volume changes (initiated via button press or system-generated, for example) must be reported to the Engine through the `AlexaSpeaker` platform interface. For further details about the `AudioOutput` and `AudioOutputProvider` platform interfaces, please refer to the [Core module README](../core/README.md#implementing-audio).
-
-### Custom Volume Control for Alexa Devices
-
-You can use a custom volume control to support an Alexa device's native input volume range. By default, Alexa supports voice utterances that specify volume values between 0 and 10, but some devices may support a different range (i.e. 0 to 100). By placing on Amazon's allow list your Alexa device's volume range for your target platform, you can specify input volume levels per your device's range. Your device's input volume range is then mapped appropriately to the Alexa volume range.
-
-Contact your Alexa Auto Solution Architect (SA) for help with allow lists. Placing a device on the allow list requires the following parameters:
-
-* DeviceTypeID: <YOUR_DEVICE_TYPE_ID>
-* Min: <YOUR_MIN_VOLUME_VALUE>
-* Max: <YOUR_MAX_VOLUME_VALUE>
-
-This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by `AudioOutput` and `AlexaSpeaker` and map these values to the correct range in your implementation.
-
-## Handling Alexa Speaker
-
-The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `ALERTS_VOLUME`. The `aace::alexa::AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI if applicable. 
-
-### SpeakerManager Configuration
-
-`SpeakerManager` is now a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".
-
-You can programmatically generate speaker manager configuration using the `aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
-```
-{
-    "aace.alexa": {
-        "speakerManager": {
-            "enabled": false
-        }
-    }
-}
-```
-
-## Handling Audio Player
+### Play media with AudioPlayer
 
 When an audio media stream is received from Alexa, it is the responsibility of the platform implementation to play the stream in a platform-specific media player. The `aace::alexa::AudioPlayer` class informs the platform of the changes in player state being tracked by the Engine. This can be used to update the platform GUI, for example.
 
@@ -588,16 +339,20 @@ class MyAudioPlayer : public aace::alexa::AudioPlayer {
 auto myAudioPlayer = std::make_shared<MyAudioPlayer>();
 engine->registerPlatformInterface( myAudioPlayer );
 ```
- 
-## Handling Playback Controller Events
+
+### View media metadata on screen with TemplateRuntime
+
+Your application subscribes to the `TemplateRuntime.RenderPlayerInfo` AASB message to receive metadata about the active media playback for you to display. See the [TemplateRuntime AVS documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/templateruntime.html) for details about the payload. 
+
+### Press media playback control buttons with PlaybackController
 
 The Engine provides a platform interface `aace::alexa::PlaybackController` for the platform implementation to report on-device transport control button presses for media playing through Alexa. For example, if the user presses the on-screen pause button while listening to Amazon Music through Alexa's `AudioPlayer` interface, the platform implementation calls a `PlaybackController` method to report the button press to the Engine.
 
 >**Note:** `PlaybackController` method calls to manage `AudioPlayer`'s state or playback queue proactively report button presses or the equivalent so that Alexa can react; they do *not* report changes to the playback state that happen locally first. The Alexa cloud manages the playback queue for `AudioPlayer` content, so each `PlaybackController` method call is a request for Alexa to act on the user's local request. The result of the request will come as one or more method invocations on the `AudioOutput` associated with the channel used for `AudioPlayer`.
 
-> **Note:** If your implementation needs to stop `AudioPlayer` media in response to system events, such as audio focus transitions to audio playing outside the scope of the Auto SDK, use `PlaybackController` to notify the Engine of such changes. However, bear in mind that the expected usage of the interface does not change when it is used in this use case.
+> **Note:** If your implementation needs to stop `AudioPlayer` media in response to system events, such as audio focus transitions to audio playing outside the scope of the Auto SDK, use `PlaybackController` to notify the Engine of such changes. However, keep in mind that the expected usage of the interface does not change when it is used in this use case.
  
->**Note:** `PlaybackController` only controls media coming from Alexa, i.e. the `AudioPlayer`. `PlaybackController` should not be used the expectation of controlling playback for non-media Alexa audio sources like `SpeechSynthesizer` or Alexa-aware external media sources integrated with `ExternalMediaAdapter` or `LocalMediaSource`. Additionally, calling a `PlaybackController` method while audio is playing through another Alexa-aware external media source will produce unexpected results and is not recommended.
+>**Note:** `PlaybackController` only controls media coming from Alexa, i.e. the `AudioPlayer`. `PlaybackController` should not be used with the expectation of controlling playback for non-media Alexa audio sources like `SpeechSynthesizer` or Alexa-aware external media sources integrated with `ExternalMediaAdapter` or `LocalMediaSource`. Additionally, calling a `PlaybackController` method while audio is playing through another Alexa-aware external media source will produce unexpected results and is not recommended.
 
 Whenever Alexa plays media through `AudioPlayer`, the Engine calls the platform interface method `aace::alexa::TemplateRuntime::renderPlayerInfo()` to provide visual metadata associated with the media that your implementation should render for the end user. The payload of this method includes descriptions of GUI controls to be displayed and the state in which to display them. When the user interacts with these on-screen controls, your implementation must use the `PlaybackController` interface to report the button presses to the Engine.
 
@@ -647,7 +402,7 @@ class MyPlaybackController : public aace::alexa::PlaybackController {
 engine->registerPlatformInterface( std::make_shared<MyPlaybackController>() );
 ```    
 
-## Handling Equalizer Control
+### Adjust equalizer settings with EqualizerController
 
 The Equalizer Controller enables Alexa voice control of the device's audio equalizer settings, which includes making gain level adjustments to any of the supported frequency bands ("BASS", "MIDRANGE", and/or "TREBLE") using the device's onboard audio processing. 
 
@@ -740,191 +495,57 @@ m_equalizerController->localAdjustBandLevels( adjustments );
 // To reset gain levels to the configured defaults (usually 0dB)
 std::vector<EqualizerBand> bands{EqualizerBand::BASS, EqualizerBand::TREBLE}; // Resets bass and treble bands
 m_equalizerController->localResetBands( bands );
-```
-## Handling Display Card Templates
-
-Alexa sends visual metadata (display card templates) for your device to display. When template information is received from Alexa, it is the responsibility of the platform implementation to handle the rendering of any UI with the information that is received from Alexa. There are two display card template types:
-
-* The [Template](https://alexa.design/DevDocRenderTemplate) type provides visuals associated with a user request to accompany Alexa speech.
-* The [PlayerInfo](https://amzn.to/DevDocTemplatePlayerInfo) type provides visuals associated with media playing through the `AudioPlayer` interface. This includes playback control buttons, which must be used with the `PlaybackController` interface.
-
-You can programmatically generate template runtime configuration using the `aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig()` factory method, or provide the equivalent JSON values in a configuration file.
 
 ```
-{
-    "aace.alexa" {
-        "templateRuntimeCapabilityAgent": {
-            "displayCardTTSFinishedTimeout": <TIMEOUT_IN_MS>,
-            "displayCardAudioPlaybackFinishedTimeout": <TIMEOUT_IN_MS>,
-            "displayCardAudioPlaybackStoppedPausedTimeout": <TIMEOUT_IN_MS>
-        }
-}
-```
 
-To implement a custom handler for GUI templates, extend the `TemplateRuntime` class:
+### Resume media playback at startup with MediaPlaybackRequestor
+
+Alexa Media-Resume is a feature that helps Alexa play customers’ favorite content when they start their Alexa-enabled vehicles. Media-resume simplifies the content selection and playing process for customers, removing the need for them to use dash touch buttons or to ask Alexa.
+To resume the media, Alexa auto SDK needs to send `RequestMediaPlayback` event with the Invocation reason `AUTOMOTIVE_STARTUP`. To implement a handler, extend the `aace::alexa::MediaPlaybackRequestor` class:
 
 ```
-#include <AACE/Alexa/TemplateRuntime.h>
-class MyTemplateRuntime : public aace::alexa::TemplateRuntime {
+#include <AACE/Alexa/MediaPlaybackRequestor.h>
+class MediaPlaybackRequestorHandler : public aace::alexa::MediaPlaybackRequestor {
     public:
-        void renderTemplate( const std::string& payload, FocusState focusState ) override {
-        // handle rendering the template data specified in payload
-        }
-        
-        void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) override {
-        // handle rendering the player info data specified in payload
-        }
+    void mediaPlaybackResponse(MediaPlaybackRequestStatus mediaPlaybackRequestStatus) override {
+        //Handle the status change
+    }
 };
 ...
 
 // Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MyTemplateRuntime>() );
+engine->registerPlatformInterface( std::make_shared<MediaPlaybackRequestorHandler>());
 ```
->**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.
 
-## Handling External Media Apps
+`requestMediaPlayback` is the API to send the event to the cloud. This API needs `InvocationReason` and `elapsedBootTime` as input parameters.
 
-The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
+`mediaPlaybackResponse` callback receives the status of the `requestMediaPlayback` API call asynchronously.
 
-* A media connection client to interface the EMP Adapter to the external app. The Android Sample App supports an example external media connection client called the Media App Command and Control (MACC) client. Use the MACC client to interface with the Spotify app running on Android. For details about the MACC client, see the Android version of the [Alexa module README](../../platforms/android/modules/alexa#handling-external-media-adapter-with-maccandroidclient).
-* An embedded media app. For information about external embedded media app solutions, contact your SA or Partner Manager.
+`InvocationReason` enum indicates the invocation reason for calling the event. `AUTOMOTIVE_STARTUP` represents a situation where platform automatically calls `requestMediaPlayback` API to automatically resume the media after infotainment system reboot. `EXPLICIT_USER_ACTION` represents resuming the media after explicit driver action by pressing the button or switch. Music resuming on `EXPLICIT_USER_ACTION` is not yet supported and this will be enabled in the future. Please check with your partner manager before using this action.
 
->**Note:** If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement. 
+`MediaPlaybackRequestStatus` enum indicate the status of the `requestMediaPlayback` API call. `SUCCESS` means `RequestMediaPlayback` event is successfully reported to the cloud. `FAILED_CAN_RETRY` means `requestMediaPlayback` API call can not be processed because Alexa Auto SDK is not in the connected state but platform implementation can retry after some time. `FAILED_TIMEOUT` means threshold time is crossed and media can not be resumed now. Driver can play media by making a voice request. `ERROR` means API could not be called successfully and media can not be resumed.
 
-When advised by your SA or Partner Manager, configure the External Media Player Adapter to the device's capabilities. See `aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig` for details on configuring the supported agent, or provide the equivalent JSON values in a configuration file.
-
+This feature needs following configuration. Please contact to your partner manager for finalizing the threshold numbers.
 ```
-{
-    "aace.alexa": {
-        "externalMediaPlayer": {
-            "agent": "<agent>"
-     
-  }
+"aace.alexa": {
+    "requestMediaPlayback": {
+      "mediaResumeThreshold": 30000
+    }
 }
 ```
+`mediaResumeThreshold` is the maximum time in milliseconds to receive the `requestMediaPlayback` API call from the platform implementation. Platform implementation should consider their boot time, time to initialize alexa and get connected to send the `RequestMediaPlayback` event successfully. Platform team and partner manager should try to keep this time minimum for the better user experience. Delayed media resume can surprise driver and result in driver distraction.
 
-You must register and implement each ExternalMediaAdapter (along with its associated external client or library). After the engine establishes a connection to the Alexa service, you can run discovery to validate each external media application. You can report discovered external media players by calling `reportDiscoveredPlayers()` at any point during runtime. When the Alexa service recognizes the player, you will get a call to the `authorize()` method including the player's authorization status. Both the `reportDiscoveredPlayers()` method and the `authorize()` method can contain one or more players in their JSON payloads. Validating the application enables Alexa to exercise playback control over the registered source type. 
+>**Note:** This feature assumes that client platform maintains the media sessions and request individual media applications to resume playback if that media application was active and playing before the device shuts down.
 
-The `login()` and `logout()` methods inform AVS of login state changes, if applicable. If your application has the ability to handle cloud-based login and logout, you should also call the `loginComplete()` and `logoutComplete()` methods where appropriate. 
-
-When the user makes an Alexa voice request (for example, "Play Spotify"), the `play()` method is invoked. This method contains various parameters, including the player id of the player to which the playback information should be routed. 
-
-Whether through voice or GUI event, the `playControl()` method is called with the relevant `PlayControlType`. Similar to `play()` the control should be routed to the appropriate player.
-
-The `PlayControlType` is determined by player's `supportedOperations`, which are specified by your implementation in the return value of `getState()`. 
-
-The `ExternalMediaAdapter` interface provides methods `playerEvent()` and `playerError()` for your implementation to report events regarding the state of the playback session managed by your external player. Even though your player manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the `playerEvent()` and `playerError()` calls provide important information to the Engine:
-    
-1. The Engine may use calls to these methods to synchronize the state of your player’s playback session with Alexa.
-
-2. The Engine may react to these calls according to the event name specified to update its internal view of your player’s state. Particular event names indicate if the player is focused on the system (meaning it has an active playback session) or if it is un-focused (meaning it is not in use and is brought into use only by further on-device interaction by the user or a user voice request to Alexa). The Engine uses this information to sync its internal focus management.
-
-The tables below describe each supported event name and what it means to the Engine. Usage of these events depends on the particular type of player controlled by the `ExternalMediaAdapter` instance, so contact your Solutions Architect (SA) or Partner Manager for guidance regarding supported embedded and external app solutions.
-
-| playerEvent() event name | Description |
-|:--|:--|
-| "PlaybackSessionStarted" | A new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing). |
-| "PlaybackStarted" | During an active session, the player has started to play or resumed from a paused state. The Engine considers the player active and in focus. |
-| "TrackChanged" | During an active session, one track has ended and another has started. The Engine uses this primarily for state reporting.  |
-| "PlaybackNext" | During an active session, the player skipped from one track to the next track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting. |
-| "PlaybackPrevious" | During an active session, the player skipped from one track to the previous track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting. |
-| "PlayModeChanged" | During an active session, some user setting for the track or playback session changed, such as the favorite setting or the shuffle mode. The Engine uses this primarily for state reporting.|
-| "PlaybackStopped" | During an active session, the player has paused or stopped, either as a result of a GUI interaction or a user voice request to Alexa. The Engine considers the player active and in focus, just not currently playing. User voice requests to resume still control the player. |
-| "PlaybackSessionEnded" | An active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus. |
-
-| playerError() event name | Description |
-|:--|:--|
-| "INTERNAL\_ERROR" | Any fatal player error has occurred
-| "UNKNOWN\_ERROR" | An unknown error occurred
-| "UNPLAYABLE\_BY\_AUTHORIZATION" | The media couldn't be played due to an unauthorized account
-| "UNPLAYABLE\_BY\_STREAM\_CONCURRENCY" | The media couldn't be played due to the number of accounts currently streaming
-| "UNPLAYABLE\_BY\_ACCOUNT" | The media couldn't be played due to the account type
-| "UNPLAYABLE\_BY\_REGION" | The media couldn't be played due to the current region
-| "UNPLAYABLE\_BY\_PARENTAL\_CONTROL" | The media couldn't be played due to parental settings
-| "UNPLAYABLE\_BY\_SUBSCRIPTION" | The media couldn't be played due to the subscription type 
-| "OPERATION\_REJECTED\_UNINTERRUPTIBLE" | The operation could not be performed due to non interruptible media
-| "OPERATION\_REJECTED\_END\_OF\_QUEUE" | The operation could not be performed due to the end of media being reached
-| "OPERATION\_UNSUPPORTED" | The operation was not supported
-| "OPERATION\_REJECTED\_SKIP\_LIMIT" | The operation failed because a skip limit was reached 
-| "PLAYER\_UNKNOWN" | An unknown player was detected
-| "PLAYER\_NOT\_FOUND" | The player was not discovered
-| "PLAYER\_CONNECTION\_REJECTED" | The connection to the player failed
-| "PLAYER\_CONNECTION\_TIMEOUT" | The connection to the player timed out
-
-The `seek()` and `adjustSeek()` methods are invokable via Alexa if the currently in-focus external player supports them. `seek()` specifies an absolute offset, whereas `adjustSeek()` specifies a relative offset. 
-
-The `volumeChanged()` and `mutedStateChanged()` methods are invoked to change the volume and mute state of the currently-focused external player. `volumeChanged()` specifies the new volume. `mutedStateChanged()` specifies the new `MutedState`.
-
-The `getState()` method is called to synchronize the external player's state with the cloud. This method is used to maintain correct state during startup, and after every Alexa request. 
-
-You construct the `ExternalMediaAdapterState` object using the data taken from the media app connection client or embedded player app (associated via `localPlayerId`) and return the state information.
-
-The following table describes the fields comprising a `ExternalMediaAdapterState`, which includes two sub-components: `PlaybackState`, and `SessionState`.
-
-| State        | Type           | Required | Notes  |
-| :------------- |:-------------| :-----| :-----|
-| **PlaybackState**      |
-| state      | String        | Yes | "IDLE"/"STOPPED"/"PLAYING" |
-| supportedOperations | SupportedPlaybackOperation[] | Yes | see SupportedOperation |
-| trackOffset      | long  | No |  optional |
-| shuffleEnabled      | boolean       |  Yes | report shuffle status |
-| repeatEnabled      | boolean       |  Yes | report repeat status |
-| favorites      | Favorites  | No | see Favorites |
-| type      | String  |  Yes | must be set as "ExternalMediaPlayerMusicItem" |
-| playbackSource      | String       | No |   If available else use local player name |
-| playbackSourceId      | String  | No |  empty |
-| trackName      | String   | No |  If available else use local player name |
-| trackId      | String    |  No | empty |
-| trackNumber      | String   | No | optional |
-| artistName      | String    | No | optional |
-| artistId      | String   |  No | empty |
-| albumName      | String |  No | optional |
-| albumId      | String | No |  empty |
-| tinyURL      | String | No |  optional |
-| smallURL      | String | No |  optional |
-| mediumURL      | String | No |  optional |
-| largeURL      | String | No |  optional |
-| coverId      | String  |  No | empty |
-| mediaProvider      | String  | No |  optional |
-| mediaType      | MediaType | Yes |  see MediaType |
-| duration      | long  | No |  optional |
-| **SessionsState** |
-| endpointId      | String  | No |  empty |
-| loggedIn      | boolean  | No |  empty |
-| userName      | String  |  No | empty |
-| isGuest      | boolean  | No |  empty |
-| launched      | boolean  | Yes |  true if the source is enabled, false otherwise |
-| active      | boolean  | Yes |  true if the application is in an active state  |
-| accessToken      | String  |  No | empty |
-| tokenRefreshInterval      | long  | No |   empty |
-| playerCookie      | String  | No |  A player may declare arbitrary information for itself |
-| spiVersion      | String  |  Yes | must be set as "1.0" |
+>**Note:** `requestMediaPlayback` API call expects a elapsed boot time i.e. number of milliseconds elapsed from the device boot up. This feature assumes that client platform provides the correct value using their proprietary methods. The `mediaResumeThreshold` value and `elapsedBootTime` value are compared together for the guardrail condition.
 
 
-`supportedOperations` should be a list of the operations that the external media adapter supports. Below is a list of all possible `supportedOperations`.
+### Enable audio ducking for Alexa media content
 
-```
-SupportedPlaybackOperation.PLAY,
-SupportedPlaybackOperation.PAUSE,
-SupportedPlaybackOperation.STOP,
-SupportedPlaybackOperation.PREVIOUS,
-SupportedPlaybackOperation.NEXT,
-SupportedPlaybackOperation.ENABLE_SHUFFLE,
-SupportedPlaybackOperation.DISABLE_SHUFFLE,
-SupportedPlaybackOperation.ENABLE_REPEAT_ONE,
-SupportedPlaybackOperation.ENABLE_REPEAT,
-SupportedPlaybackOperation.DISABLE_REPEAT,
-SupportedPlaybackOperation.SEEK,
-SupportedPlaybackOperation.ADJUST_SEEK,
-SupportedPlaybackOperation.FAVORITE,
-SupportedPlaybackOperation.UNFAVORITE,
-SupportedPlaybackOperation.FAST_FORWARD,
-SupportedPlaybackOperation.REWIND,
-SupportedPlaybackOperation.START_OVER
-```
->**Note:** Currently PLAY/PAUSE/STOP will always be supported for a source. Passing null will allow ALL supported operations for the source. 
+Your application can configure the Engine to enable audio ducking for media that plays through `AudioPlayer`. See [Alexa Auto SDK Audio Channels](../core/AUDIO.md#enable-music-ducking) for details.
 
-## Handling Local Media Sources
+
+## Control local media with LocalMediaSoure
 
 The `LocalMediaSource` interface allows the platform to register a local media source by type (`BLUETOOTH`, `USB`, `AM_RADIO`, `FM_RADIO`, `SATELLITE_RADIO`, `LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`, and `DEFAULT`). Registering a local media source allows playback control of that source via Alexa (e.g. "Alexa, play the CD player"). It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").
 
@@ -1199,32 +820,181 @@ The following diagrams show examples of Local Media Source usage:
 <img src="./assets/DEFAULT_to_DEFAULT_Switching.png" border="1px">
 </p>
 
-## Handling Notifications
+## Control external media apps with ExternalMediaAdapter <a name="externalMediaAdapter"></a>
 
-It is the responsibility of the platform implementation to provide a visual indication to the user when notifications (for example, package shipment notifications, notifications from skills, etc.) are available from Alexa. See the [AVS Notifications interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/notifications.html) for more information about notifications. The Engine uses the registered Notifications implementation to notify you when a notification indicator should be displayed or removed. It does not give any information about the notifications. Audio playback for the notification is handled by whichever audio channel is assigned to the `NOTIFICATION` type.
+The External Media Player (EMP) Adapter allows you to declare and use external media application sources in your application. In order to interface with the EMP Adapter, you must use one of the following:
 
-To implement a custom handler for Notifications extend the `Notifications` class:
+* A media connection client to interface the EMP Adapter to the external app. AACS provides an app component called the Media App Command and Control (MACC) client that provides most of the deep-linking integration specified below. The AACS Sample App supports an example using the Media App Command and Control (MACC) client to play the Android Spotify app. 
+* 
+* An embedded media app. For information about external embedded media app solutions, contact your SA or Partner Manager.
+
+>**Note:** If the media app service requires additional customer experience details, incorporate the requirement in your implementation. For example, if the provider requires your application to show the provider's logo in a particular way, modify the implementation to meet the requirement. 
+
+When advised by your SA or Partner Manager, configure the External Media Player Adapter to the device's capabilities. See `aace::alexa::config::AlexaConfiguration::createExternalMediaPlayerConfig` for details on configuring the supported agent, or provide the equivalent JSON values in a configuration file.
 
 ```
-#include <AACE/Alexa/Notifications.h>
-using IndicatorState = aace::alexa::Notifications::IndicatorState;
-class MyNotificationsHandler : public aace::alexa::Notifications {
+{
+    "aace.alexa": {
+        "externalMediaPlayer": {
+            "agent": "<agent>"
+     
+  }
+}
+```
 
-  public:
-    void setIndicator( IndicatorState state ) override {
-        // set your notifications indicator!
+You must register and implement each ExternalMediaAdapter (along with its associated external client or library). After the engine establishes a connection to the Alexa service, you can run discovery to validate each external media application. You can report discovered external media players by calling `reportDiscoveredPlayers()` at any point during runtime. When the Alexa service recognizes the player, you will get a call to the `authorize()` method including the player's authorization status. Both the `reportDiscoveredPlayers()` method and the `authorize()` method can contain one or more players in their JSON payloads. Validating the application enables Alexa to exercise playback control over the registered source type. 
+
+The `login()` and `logout()` methods inform AVS of login state changes, if applicable. If your application has the ability to handle cloud-based login and logout, you should also call the `loginComplete()` and `logoutComplete()` methods where appropriate. 
+
+When the user makes an Alexa voice request (for example, "Play Spotify"), the `play()` method is invoked. This method contains various parameters, including the player id of the player to which the playback information should be routed. 
+
+Whether through voice or GUI event, the `playControl()` method is called with the relevant `PlayControlType`. Similar to `play()` the control should be routed to the appropriate player.
+
+The `PlayControlType` is determined by player's `supportedOperations`, which are specified by your implementation in the return value of `getState()`. 
+
+The `ExternalMediaAdapter` interface provides methods `playerEvent()` and `playerError()` for your implementation to report events regarding the state of the playback session managed by your external player. Even though your player manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the `playerEvent()` and `playerError()` calls provide important information to the Engine:
+    
+1. The Engine may use calls to these methods to synchronize the state of your player’s playback session with Alexa.
+
+2. The Engine may react to these calls according to the event name specified to update its internal view of your player’s state. Particular event names indicate if the player is focused on the system (meaning it has an active playback session) or if it is un-focused (meaning it is not in use and is brought into use only by further on-device interaction by the user or a user voice request to Alexa). The Engine uses this information to sync its internal focus management.
+
+The tables below describe each supported event name and what it means to the Engine. Usage of these events depends on the particular type of player controlled by the `ExternalMediaAdapter` instance, so contact your Solutions Architect (SA) or Partner Manager for guidance regarding supported embedded and external app solutions.
+
+| playerEvent() event name | Description |
+|:--|:--|
+| "PlaybackSessionStarted" | A new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing). |
+| "PlaybackStarted" | During an active session, the player has started to play or resumed from a paused state. The Engine considers the player active and in focus. |
+| "TrackChanged" | During an active session, one track has ended and another has started. The Engine uses this primarily for state reporting.  |
+| "PlaybackNext" | During an active session, the player skipped from one track to the next track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting. |
+| "PlaybackPrevious" | During an active session, the player skipped from one track to the previous track, either as a result of a GUI interaction or a user voice request to Alexa. The Engine uses this primarily for state reporting. |
+| "PlayModeChanged" | During an active session, some user setting for the track or playback session changed, such as the favorite setting or the shuffle mode. The Engine uses this primarily for state reporting.|
+| "PlaybackStopped" | During an active session, the player has paused or stopped, either as a result of a GUI interaction or a user voice request to Alexa. The Engine considers the player active and in focus, just not currently playing. User voice requests to resume still control the player. |
+| "PlaybackSessionEnded" | An active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus. |
+
+| playerError() event name | Description |
+|:--|:--|
+| "INTERNAL\_ERROR" | Any fatal player error has occurred
+| "UNKNOWN\_ERROR" | An unknown error occurred
+| "UNPLAYABLE\_BY\_AUTHORIZATION" | The media couldn't be played due to an unauthorized account
+| "UNPLAYABLE\_BY\_STREAM\_CONCURRENCY" | The media couldn't be played due to the number of accounts currently streaming
+| "UNPLAYABLE\_BY\_ACCOUNT" | The media couldn't be played due to the account type
+| "UNPLAYABLE\_BY\_REGION" | The media couldn't be played due to the current region
+| "UNPLAYABLE\_BY\_PARENTAL\_CONTROL" | The media couldn't be played due to parental settings
+| "UNPLAYABLE\_BY\_SUBSCRIPTION" | The media couldn't be played due to the subscription type 
+| "OPERATION\_REJECTED\_UNINTERRUPTIBLE" | The operation could not be performed due to non interruptible media
+| "OPERATION\_REJECTED\_END\_OF\_QUEUE" | The operation could not be performed due to the end of media being reached
+| "OPERATION\_UNSUPPORTED" | The operation was not supported
+| "OPERATION\_REJECTED\_SKIP\_LIMIT" | The operation failed because a skip limit was reached 
+| "PLAYER\_UNKNOWN" | An unknown player was detected
+| "PLAYER\_NOT\_FOUND" | The player was not discovered
+| "PLAYER\_CONNECTION\_REJECTED" | The connection to the player failed
+| "PLAYER\_CONNECTION\_TIMEOUT" | The connection to the player timed out
+
+The `seek()` and `adjustSeek()` methods are invokable via Alexa if the currently in-focus external player supports them. `seek()` specifies an absolute offset, whereas `adjustSeek()` specifies a relative offset. 
+
+The `volumeChanged()` and `mutedStateChanged()` methods are invoked to change the volume and mute state of the currently-focused external player. `volumeChanged()` specifies the new volume. `mutedStateChanged()` specifies the new `MutedState`.
+
+The `getState()` method is called to synchronize the external player's state with the cloud. This method is used to maintain correct state during startup, and after every Alexa request. 
+
+You construct the `ExternalMediaAdapterState` object using the data taken from the media app connection client or embedded player app (associated via `localPlayerId`) and return the state information.
+
+The following table describes the fields comprising a `ExternalMediaAdapterState`, which includes two sub-components: `PlaybackState`, and `SessionState`.
+
+| State        | Type           | Required | Notes  |
+| :------------- |:-------------| :-----| :-----|
+| **PlaybackState**      |
+| state      | String        | Yes | "IDLE"/"STOPPED"/"PLAYING" |
+| supportedOperations | SupportedPlaybackOperation[] | Yes | see SupportedOperation |
+| trackOffset      | long  | No |  optional |
+| shuffleEnabled      | boolean       |  Yes | report shuffle status |
+| repeatEnabled      | boolean       |  Yes | report repeat status |
+| favorites      | Favorites  | No | see Favorites |
+| type      | String  |  Yes | must be set as "ExternalMediaPlayerMusicItem" |
+| playbackSource      | String       | No |   If available else use local player name |
+| playbackSourceId      | String  | No |  empty |
+| trackName      | String   | No |  If available else use local player name |
+| trackId      | String    |  No | empty |
+| trackNumber      | String   | No | optional |
+| artistName      | String    | No | optional |
+| artistId      | String   |  No | empty |
+| albumName      | String |  No | optional |
+| albumId      | String | No |  empty |
+| tinyURL      | String | No |  optional |
+| smallURL      | String | No |  optional |
+| mediumURL      | String | No |  optional |
+| largeURL      | String | No |  optional |
+| coverId      | String  |  No | empty |
+| mediaProvider      | String  | No |  optional |
+| mediaType      | MediaType | Yes |  see MediaType |
+| duration      | long  | No |  optional |
+| **SessionsState** |
+| endpointId      | String  | No |  empty |
+| loggedIn      | boolean  | No |  empty |
+| userName      | String  |  No | empty |
+| isGuest      | boolean  | No |  empty |
+| launched      | boolean  | Yes |  true if the source is enabled, false otherwise |
+| active      | boolean  | Yes |  true if the application is in an active state  |
+| accessToken      | String  |  No | empty |
+| tokenRefreshInterval      | long  | No |   empty |
+| playerCookie      | String  | No |  A player may declare arbitrary information for itself |
+| spiVersion      | String  |  Yes | must be set as "1.0" |
+
+
+`supportedOperations` should be a list of the operations that the external media adapter supports. Below is a list of all possible `supportedOperations`.
+
+```
+SupportedPlaybackOperation.PLAY,
+SupportedPlaybackOperation.PAUSE,
+SupportedPlaybackOperation.STOP,
+SupportedPlaybackOperation.PREVIOUS,
+SupportedPlaybackOperation.NEXT,
+SupportedPlaybackOperation.ENABLE_SHUFFLE,
+SupportedPlaybackOperation.DISABLE_SHUFFLE,
+SupportedPlaybackOperation.ENABLE_REPEAT_ONE,
+SupportedPlaybackOperation.ENABLE_REPEAT,
+SupportedPlaybackOperation.DISABLE_REPEAT,
+SupportedPlaybackOperation.SEEK,
+SupportedPlaybackOperation.ADJUST_SEEK,
+SupportedPlaybackOperation.FAVORITE,
+SupportedPlaybackOperation.UNFAVORITE,
+SupportedPlaybackOperation.FAST_FORWARD,
+SupportedPlaybackOperation.REWIND,
+SupportedPlaybackOperation.START_OVER
+```
+>**Note:** Currently PLAY/PAUSE/STOP will always be supported for a source. Passing null will allow ALL supported operations for the source. 
+
+
+## Control volume with AlexaSpeaker
+
+The Alexa service keeps track of two device volume types: `ALEXA_VOLUME` and `ALERTS_VOLUME`. The `aace::alexa::AlexaSpeaker` class should be implemented by the platform to both set the volume and mute state of these two speaker types and allow the user to set the volume and mute state of these two speaker types locally via GUI if applicable. 
+
+`SpeakerManager` is a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".
+
+You can programmatically generate speaker manager configuration using the `aace::alexa::config::AlexaConfiguration::createSpeakerManagerConfig()` factory method, or provide the equivalent JSON values in a configuration file.
+```
+{
+    "aace.alexa": {
+        "speakerManager": {
+            "enabled": false
+        }
     }
-
-};
-...
-
-// Register the platform interface with the Engine
-auto m_notificationsHandler = std::make_shared<MyNotificationsHandler>();
-engine->registerPlatformInterface(m_notificationsHandler);
-
+}
 ```
 
-## Handling Alerts
+### Set a custom volume range
+
+You can use a custom volume control to support an Alexa device's native input volume range. By default, Alexa supports voice utterances that specify volume values between 0 and 10, but some devices may support a different range (i.e. 0 to 100). By placing on Amazon's allow list your Alexa device's volume range for your target platform, you can specify input volume levels per your device's range. Your device's input volume range is then mapped appropriately to the Alexa volume range.
+
+Contact your Alexa Auto Solution Architect (SA) for help with allow lists. Placing a device on the allow list requires the following parameters:
+
+* DeviceTypeID: <YOUR_DEVICE_TYPE_ID>
+* Min: <YOUR_MIN_VOLUME_VALUE>
+* Max: <YOUR_MAX_VOLUME_VALUE>
+
+This does not impact the range used in the directives to the device. You must continue to use the SDK 0-100 volume range used by `AudioOutput` and `AlexaSpeaker` and map these values to the correct range in your implementation.
+
+
+## Manage timers, alarms, and reminders with Alerts
 
 When an alert is received from Alexa, it is the responsibility of the platform implementation to play the alert sounds in a platform-specific media player. See the [AVS Alerts interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/alerts.html) for more information about alerts. The state of the alert is also made available for the platform to react to. The playback is handled by whichever audio channel is assigned to the `ALERT` type.
 
@@ -1263,7 +1033,34 @@ auto myAlerts = std::make_shared<MyAlerts>(myAudioPlayerMediaPlayer, myAudioPlay
 engine->registerPlatformInterface( myAlerts );
 ```
 
-## Handling Do Not Disturb
+
+## Render notification indicators with Notifications
+
+It is the responsibility of the platform implementation to provide a visual indication to the user when notifications (for example, package shipment notifications, notifications from skills, etc.) are available from Alexa. See the [AVS Notifications interface documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/notifications.html) for more information about notifications. The Engine uses the registered Notifications implementation to notify you when a notification indicator should be displayed or removed. It does not give any information about the notifications. Audio playback for the notification is handled by whichever audio channel is assigned to the `NOTIFICATION` type.
+
+To implement a custom handler for Notifications extend the `Notifications` class:
+
+```
+#include <AACE/Alexa/Notifications.h>
+using IndicatorState = aace::alexa::Notifications::IndicatorState;
+class MyNotificationsHandler : public aace::alexa::Notifications {
+
+  public:
+    void setIndicator( IndicatorState state ) override {
+        // set your notifications indicator!
+    }
+
+};
+...
+
+// Register the platform interface with the Engine
+auto m_notificationsHandler = std::make_shared<MyNotificationsHandler>();
+engine->registerPlatformInterface(m_notificationsHandler);
+
+```
+
+
+## Block notifications with DoNotDisturb
 
 The DoNotDisturb (DND) interface allows users to block all incoming notifications, announcements, and calls to their devices, and to set daily recurring schedules that turn DND off and on.  For details, see the [DND Interface documentation](https://developer.amazon.com/docs/alexa-voice-service/donotdisturb.html). The Engine uses the registered DND implementation to notify the client when DND has been set or unset. A user's voice request to change the DND state triggers audio playback, but no audio playback occurs when a user sets the DND state using the touch screen.
 
@@ -1291,28 +1088,4 @@ class MyDoNotDisturbHandler : public aace::alexa::DoNotDisturb {
 auto m_doNotDisturbHandler = std::make_shared<MyDoNotDisturbHandler>();
 engine->registerPlatformInterface(m_doNotDisturbHandler);
 
-```
-    
-## Handling Alexa State Changes
-
-The Alexa Auto SDK manages internal state information for Alexa and provides an interface for you to handle state changes in your platform implementation. The information provided by method invocations of this class might be useful, for instance, to enable or disable certain functionality or trigger state changes in your Alexa attention state UI (such as Voice Chrome). To implement a custom handler for Alexa state changes, extend the `AlexaClient` class:
-
-```
-#include <AACE/Alexa/AlexaClient.h>
-class MyAlexaClient : public aace::alexa::AlexaClient {
-    public:
-        void dialogStateChanged( DialogState state ) override {
-        // handle dialog state change!
-        }
-        void authStateChanged( AuthState state, AuthError error ) override {
-        // handle auth state change!
-        }
-        void connectionStatusChanged( ConnectionStatus status, ConnectionChangedReason reason ) override {
-        // handle connection status change!
-        }
-};
-...
-
-// Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MyAlexaClient>() );
 ```

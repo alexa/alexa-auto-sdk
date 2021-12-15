@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,6 +26,11 @@ namespace alexa {
 
 /**
  * AlexaClient should be extended to handle Alexa state changes on the platform.
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class AlexaClient : public aace::core::PlatformInterface {
 protected:

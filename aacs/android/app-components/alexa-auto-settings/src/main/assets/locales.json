@@ -1,0 +1,221 @@
+{
+  "locales": [
+    {
+      "id": "de-DE",
+      "locale": {
+        "language": "Deutsch",
+        "country": "Deutschland"
+      }
+    },
+    {
+      "id": "de-DE/en-US",
+      "locale": {
+        "language": "Deutsch / English",
+        "country": "Deutschland / United States"
+      }
+    },
+    {
+      "id": "en-AU",
+      "locale": {
+        "language": "English",
+        "country": "Australia / New Zealand"
+      }
+    },
+    {
+      "id": "en-CA",
+      "locale": {
+        "language": "English",
+        "country": "Canada"
+      }
+    },
+    {
+      "id": "en-CA/fr-CA",
+      "locale": {
+        "language": "English / Français",
+        "country": "Canada"
+      }
+    },
+    {
+      "id": "en-IN",
+      "locale": {
+        "language": "English",
+        "country": "India"
+      }
+    },
+    {
+      "id": "en-IN/hi-IN",
+      "locale": {
+        "language": "English / हिंदी",
+        "country": "India / भारत"
+      }
+    },
+    {
+      "id": "en-GB",
+      "locale": {
+        "language": "English",
+        "country": "United Kingdom"
+      }
+    },
+    {
+      "id": "en-US",
+      "locale": {
+        "language": "English",
+        "country": "United States"
+      }
+    },
+    {
+      "id": "en-US/de-DE",
+      "locale": {
+        "language": "English / Deutsch",
+        "country": "United States / Deutschland"
+      }
+    },
+    {
+      "id": "en-US/es-ES",
+      "locale": {
+        "language": "English / Español",
+        "country": "United States / España"
+      }
+    },
+    {
+      "id": "en-US/es-US",
+      "locale": {
+        "language": "English / Español",
+        "country": "United States / Estados Unidos"
+      }
+    },
+    {
+      "id": "en-US/fr-FR",
+      "locale": {
+        "language": "English / Français",
+        "country": "United States / France"
+      }
+    },
+    {
+      "id": "en-US/it-IT",
+      "locale": {
+        "language": "English / Italiano",
+        "country": "United States / Italia"
+      }
+    },
+    {
+      "id": "en-US/ja-JP",
+      "locale": {
+        "language": "English / 日本語",
+        "country": "United States / 日本"
+      }
+    },
+    {
+      "id": "es-ES",
+      "locale": {
+        "language": "Español",
+        "country": "España"
+      }
+    },
+    {
+      "id": "es-ES/en-US",
+      "locale": {
+        "language": "Español / English",
+        "country": "España / United States"
+      }
+    },
+    {
+      "id": "es-US",
+      "locale": {
+        "language": "Español",
+        "country": "Estados Unidos"
+      }
+    },
+    {
+      "id": "es-US/en-US",
+      "locale": {
+        "language": "Español / English",
+        "country": "Estados Unidos / United States"
+      }
+    },
+    {
+      "id": "es-MX",
+      "locale": {
+        "language": "Español",
+        "country": "México"
+      }
+    },
+    {
+      "id": "fr-CA",
+      "locale": {
+        "language": "Français",
+        "country": "Canada"
+      }
+    },
+    {
+      "id": "fr-CA/en-CA",
+      "locale": {
+        "language": "Français / English",
+        "country": "Canada"
+      }
+    },
+    {
+      "id": "fr-FR",
+      "locale": {
+        "language": "Français",
+        "country": "France"
+      }
+    },
+    {
+      "id": "fr-FR/en-US",
+      "locale": {
+        "language": "Français / English",
+        "country": "France / United States"
+      }
+    },
+    {
+      "id": "it-IT",
+      "locale": {
+        "language": "Italiano",
+        "country": "Italia"
+      }
+    },
+    {
+      "id": "it-IT/en-US",
+      "locale": {
+        "language": "Italiano / English",
+        "country": "Italia / United States"
+      }
+    },
+    {
+      "id": "pt-BR",
+      "locale": {
+        "language": "Português",
+        "country": "Brasil"
+      }
+    },
+    {
+      "id": "hi-IN",
+      "locale": {
+        "language": "हिंदी",
+        "country": "भारत"
+      }
+    },
+    {
+      "id": "hi-IN/en-IN",
+      "locale": {
+        "language": " हिंदी / English",
+        "country": "भारत / India"
+      }
+    },
+    {
+      "id": "ja-JP",
+      "locale": {
+        "language": "日本語",
+        "country": "日本"
+      }
+    },
+    {
+      "id": "ja-JP/en-US",
+      "locale": {
+        "language": "日本語 / English",
+        "country": "日本 / United States"
+      }
+    }
+  ]
+}

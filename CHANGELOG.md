@@ -1,19 +1,180 @@
 # Change Log
 ___
+
+## v4.0.0 released on 2021-12-15
+
+### Enhancements
+
+* Deprecated the C++ and Java platform interfaces in favor of an asynchronous message-based API. Auto SDK client applications use the new `MessageBroker` to publish and subscribe to Alexa Auto Services Bridge (AASB) messages. The C++ sample app is refactored to use the new API to provide a reference implementation for Linux platforms. The Alexa Auto Client Service (AACS) sample app provides the reference implementation for Android platforms. See the [Auto SDK Migration Guide](./MIGRATION.md) for help migrating your application to use the new API. 
+
+* Enhanced the Auto SDK build system with the Conan package manager. The new build system introduces modular builds, better dependency management, and simpler build artifacts. The Auto SDK build system includes the Auto SDK Builder Tool script, which wraps the Conan build commands with a simple interface similar to the previous version of Auto SDK Builder. See the [Build Alexa Auto SDK documentation](./BUILDING.md) for details about the build system and the [Migration Guide](./MIGRATION.md) for help migrating your build to the new version of Builder Tool.
+
+* Extended the features of Alexa Presentation Language (APL) support for automotive. The `APL` module provides messages to report vehicle properties such as the display theme, driving state, and ambient light conditions. The property settings affect how APL documents render on screen; for example, some APL content is automatically hidden when the vehicle starts moving, and the display contrast updates with the day or night mode setting. Auto SDK 4.0 supports APL 1.9. For more information about the Auto SDK `APL` interface, see the [APL module documentation.](./modules/apl/README.md)
+
+* Added the `CustomDomain` interface, which establishes a bidirectional communication channel between your Auto SDK client application and your custom cloud skill. `CustomDomain` includes messages for exchanging directives, events, and context between the vehicle and your skill, achieving a fully customizable experience. For more information about the Auto SDK `CustomDomain` interface, See the [Custom Domain module documentation.](./modules/custom-domain/README.md)
+
+* Added the `MediaPlaybackRequestor` interface, which enables Alexa to play the user’s favorite media content as soon as they start their vehicle. `MediaPlaybackRequestor` simplifies content selection for the user by removing the need for the user to use buttons or voice commands to resume the Alexa media content that was playing when they stopped the vehicle. For more information about the Auto SDK `MediaPlaybackRequestor` interface, See the [Alexa module documentation.](./modules/alexa/README.md)
+
+* Extended the `AudioOutput` interface and added configuration to allow ducking Alexa media. Your application can use this feature for enhanced control of Alexa content audio focus according to your platform requirements. For more information about audio ducking, see the [Core module documentation.](./modules/core/README.md)
+
+* Updated the Auto SDK to use AVS Device SDK Version 1.25.0. For information about this version of AVS Device SDK, see the [AVS Device SDK release notes.](https://developer.amazon.com/en-US/docs/alexa/avs-device-sdk/release-notes.html#version-1250)
+
+* Added LVC support for Alexa Custom Assistant specialized handoffs. You can configure the default fallback and self-introduction prompts for your custom assistant while offline. For more information, see the `Alexa Custom Assistant` extension documentation.
+
+* Integrated the Auto SDK Conan build system enhancements to AACS and the AACS sample app. You can use a single Gradle command to build AACS and the AACS sample app. For build instructions, see the [AACS documentation.](./aacs/android/README.md) 
+
+* Added the following enhancements to the AACS sample app:
+    
+    * **Additional languages—** The AACS sample app supports the following languages: *US English* (`en-US`), *Australian English* (`en-AU`), *Canadian English* (`en-CA`), *Indian English* (`en-IN`), *British English* (`en-GB`), *German* (d`e-DE`), *Spanish* (`es-ES`), *Mexican Spanish* (`es-MX`), *US Spanish* (`es-US`), *French* (`fr-FR`), *Canadian French* (`fr-CA`), *Hindi* (`hi-IN`), *Italian* (`it-IT`), *Japanese* (`ja-JP`), and *Brazilian Portuguese* (`pr-BR`). 
+        
+        The sample app language setting matches the device’s system language setting and syncs the with Alexa as long as the setting is in the supported language list. If Alexa does not support the system language, the sample app GUI defaults to en-US and presents a list of languages for the user to choose from. Once the user selects the language override, the system language does not sync with the sample app again until the user logs out or disables Alexa.
+    
+    * **Network error prompts—** You can configure the sample app to provide feedback to the user when Alexa cannot respond due internet connection issues. The feedback is a voice prompt or an error screen depending on the user action.
+    
+    * **Alexa app assets—** The sample app can show Alexa logos (assets) on the setup screen and display cards instead of showing placeholder assets.
+    
+    * **Comms UI improvements—** Updated the contacts uploading logic in the `Comms UI` AACS app component to ensure the sample app only uploads the contacts for the primary phone. 
+
+* Updated the AACS Telephony library to get the outgoing phone account using the Android standard API `getDefaultOutgoingPhoneAccount`. AACS Telephony no longer sends an account query intent when receiving the `PhoneCallController.Dial` message from the Auto SDK Engine.
+
+* Added a new intent `com.amazon.aacstelephony.bluetooth.connectionCheckCompleted`, which AACS Telephony service broadcasts when it finishes the initial bluetooth connection check.
+
+* Updated the `alexa-auto-lwa-auth` app component to use the `Authorization` Auto SDK interface for CBL authorization.
+
+### Other changes
+
+* Moved several source code directories within the `aac-sdk` root directory to support the enhanced build system.
+    
+    * Removed `aac-sdk/platforms/android/`. The deprecated Java platform interfaces and JNI are in their respective modules. For example, the Alexa module Java interfaces and JNI are moved from `aac-sdk/platforms/android/modules/alexa/` to `aac-sdk/modules/alexa/android/`
+    
+    * Removed `aac-sdk/extensions/aasb/` because using AASB messages with MessageBroker is the primary Auto SDK API. AASB code for each module is in the respective module directory. For example, the AASB code for the Alexa module is in `aac-sdk/modules/alexa/aasb/`. Note that the AASB message headers to include in your application are not in this directory since they are generated as part of the Auto SDK build output.
+    
+    * Moved `aac-sdk/extensions/system-audio/` to `aac-sdk/modules/system-audio/`
+    
+    * Moved `aac-sdk/extensions/bluetooth/` to `aac-sdk/modules/bluetooth/`
+    
+    * Moved `aac-sdk/extensions/loopback-detector/` to `aac-sdk/modules/loopback-detector/`
+    
+    * Moved  `aac-sdk/platforms/android/alexa-auto-client-service/` to `aac-sdk/aacs/android/`
+   
+    * Moved `aac-sdk/platforms/android/alexa-auto-client-service/app-components/` to `aac-sdk/aacs/android/app-components/`
+    
+    * Moved `aac-sdk/samples/android-aacs-sample-app/` to `aac-sdk/aacs/android/sample-app/`
+    
+    * Moved `aac-sdk/platforms/android/alexa-auto-client-service` `/commonutils/` , `/ipc/`, and `/constants/` to `aac-sdk/aacs/android/common/`
+    
+    * Moved AACS media player files to a directory `audioOutput` within `aac-sdk/platforms/android/alexa-auto-client-service/service/`
+    
+    * Moved the Media App Command and Control Android library from `aac-sdk/platforms/android/maccandroid/` to `aac-sdk/aacs/android/service/modules/maccandroid/`
+
+* In the LVC extension, the `LocalSearchProvider` AASB messages now have topic `LocalNavigation`. For example, the existing message `LocalSearchProvider.SearchRequest` in 3.3 is `LocalNavigation.SearchRequest` in 4.0. The next major release version of Auto SDK will change the topic back to `LocalSearchProvider`.
+
+* Deprecated the option to build AACS as an APK. Starting from Auto SDK 4.0, you can only build AACS as an AAR.
+
+* Removed the Android sample app based on the Java platform interfaces. The AACS sample app demonstrates using Auto SDK on Android.
+
+### Resolved issues
+
+* Fixed an issue preventing the generic `DEFAULT` type `LocalMediaSource` from working in offline mode with LVC.
+
+* Fixed a race condition in `SpeechRecognizer` in which enabling wake word detection immediately after calling `startCapture()` resulted in a missing call to `stopAudioInput()` when wake word detection was later disabled.
+
+* Fixed a deadlock that could occur in an application that uses the deprecated `AuthProvider` interface and starts, stops, and restarts the Engine in quick succession.
+
+* Fixed an issue in which Spotify playback commands were delayed on QNX.
+
+* Fixed an issue in which the Engine added malformed `PhoneCallController` context to `PhoneCallController` events sent to Alexa.
+
+* Fixed an issue in which AACS did not acquire audio focus prior to playing Alexa speech.
+
+### Known issues
+
+**General**
+
+* If you do not specify the `deviceSettings.locales` field of the Alexa module configuration, the Engine automatically declares support for the following locale combinations: ["en-US", "es-US"], ["es-US", "en-US"], ["en-IN", "hi-IN"], ["hi-IN", "en-IN"], ["fr-CA", "en-CA"], ["en-CA", "fr-CA"].
+    The Engine does not automatically declare support for default locale combinations if you assign an empty value to the `locales` field.
+
+* The Engine does not persist the `aace.alexa.wakewordEnabled` Engine property setting across device reboots. Your application has to persist the setting and set the property again at each Engine start. AACS implements persisting this property and hence does not have this issue.
+
+* If your Linux platform does not use AVX2 instructions, the Amazonlite wake word library initialization causes an illegal instruction error.
+
+* When using LVC and stopping the Engine, the `AlexaClient` connection status remains `CONNECTED` because the connection to LVC is not disabled. Your application should not accept user utterances while the Engine is stopped despite the connection status showing `CONNECTED`.
+
+* The [Alexa Automotive UX guidelines](https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards) specify when to automatically dismiss a `TemplateRuntime` display card for each template type. The Engine publishes the `TemplateRuntime` interface messages `ClearTemplate` and `ClearPlayerInfo` based on the timeouts configured in the `aace.alexa.templateRuntimeCapabilityAgent` Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., `LocalSearchListTemplate2`) with a different timeout than other templates (e.g., `WeatherTemplate`). The configuration also does not provide a way for you to specify infinite timeout for `NowPlaying` cards. You must implement your application’s dismissal logic for display cards and media info accordingly.
+
+* When the user requests to view their list of timers on an APL-enabled application, they cannot use an utterance such as “Alexa, scroll up” to scroll through the list shown on the APL card.
+
+* There is a rare race condition in which publishing the `AlexaClient.StopForegroundActivity` message does not cancel the active Alexa interaction. The race condition can happen when the application publishes the message at the beginning of the `THINKING` state `AlexaClient.DialogStateChanged` transition.
+
+* On the Poky Linux 32-bit platform, the C++ sample app shuts down with an error on launch.
+
+* In offline mode with LVC, you might not see the `AlexaClient.DialogStateChanged` `THINKING` state transition if the user invokes Alexa with hold-to-talk and your application provides the audio input data in one large chunk. 
+
+* In offline mode with LVC, Alexa gets stuck in the `THINKING` state and does not respond after changing the locale setting. The state recovers after a few minutes.
+
+* The `CBL` module uses a backoff when refreshing the access token after expiry. If the internet is disconnected when the Engine attempts the refresh, it might take up to a minute to refresh the token after the internet connection is restored.
+
+* Some `Core` module messages published by the Engine do not have a corresponding message for the application to report a handling failure. For example, if the user invokes Alexa by tap-to-talk, and the application cannot handle the `AudioInput.StartAudioInput` message, the Engine assumes the application handled the message properly and will provide audio data. As a result, the Engine state and application state might become out of sync. The affected messages are the following:
+    * `AudioInput`:
+        * `StartAudioInput`
+    * `AudioOutput`:
+        * `SetPosition`
+        * `VolumeChanged`
+        * `MutedStateChanged`
+
+**Car control**
+
+* If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in the set from Alexa. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, Alexa retains endpoint 1 from set A, which might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try.
+
+**Communications**
+
+* Alexa does not understand DTMF utterances that include letters. For example, "press A" and "dial 3*#B" do not result in the correct DTMF directives.
+
+* The user might experience unexpected results by trying to dial or place calls in the following ways:
+    * Using utterances that include “double”, “triple”, “hundred”, or “thousand.” For example, calling a number such as 1-800-xxx-xxxx by saying “Alexa call one eight *double oh*...”
+    * Pressing special characters such has “#” or “*” by saying "Alexa press * #."
+
+* The user cannot accept or reject incoming Alexa-to-Alexa calls by voice while playing a skill with extended multi-turn dialogs, such as Jeopardy or Skyrim.
+
+**Entertainment**
+
+* If the user requests Alexa to read notifications while music is playing, they might hear the music play for a split second between the end of one notification and the start of the next.
+
+* When an external media player authorization is in progress during Engine shutdown, a rare race condition might cause the Engine to crash.
+
+* If your application cancels an Alexa interaction by sending the `AlexaClient.StopForegroundActivity` message to the Engine during music playback, the Engine might erroneously request your application to dismiss the` NowPlaying` media info by publishing the `TemplateRuntime.ClearPlayerInfo` message. Your application should not dismiss the media info in this scenario.
+
+* When using the `System Audio` module, Audible and Amazon music might not play correctly on i.MX8 boards. 
+
+**Local search and navigation**
+
+* In offline mode with LVC, after the user requests a list of POIs with an utterance such as “Alexa, find a nearby Starbucks”, Alexa does not recognize followup requests such as "Alexa, select the first one" and does not display or read detailed information about the requested selection.
+
+**AACS**
+
+* If you do not use the default audio output implementation (i.e., your application handles `AudioOutput` AASB messages), your application will not receive the `AudioOutput.Stop` message if Alexa media is playing when AACS shuts down. As a workaround, your application can listen to `AASB.StopService` or adopt `AACSPinger` to listen to the `STOPPED` state of AACS and stop the media accordingly.
+
+**AACS Sample App**
+
+* The AACS Sample App does not show the language selection screen when the app is built with Preview Mode.
+
+* The AACS Sample App only shows the language selection screen if there is a language mismatch with the system language setting at the first app launch.
+
+
 ## v3.3.0 released on 2021-09-30
 ### Enhancements
-* Added the `DeviceUsage` platform interface to provide the Alexa application network usage data to the Auto SDK Engine. The Auto SDK Engine emits this data as a metric to Amazon if Auto SDK is built with the `Device Client Metrics` extension. For more information, see the Core module README for [C++](./modules/core/README.md#providing-network-usage-data-to-auto-sdk) or [Android](./platforms/android/modules/core/README.md#providing-network-usage-data-to-auto-sdk).
+* Added the `DeviceUsage` platform interface to provide the Alexa application network usage data to the Auto SDK Engine. The Auto SDK Engine emits this data as a metric to Amazon if Auto SDK is built with the `Device Client Metrics` extension. For more information, see the Core module README for [C++](./modules/core/README.md#providing-network-usage-data-to-auto-sdk) or [Android](./aacs/android/app-components/alexa-auto-device-usage/README.md).
 
 * Extended the features of the `Local Navigation` module for the `Local Voice Control (LVC)` extension. The `LocalSearchProvider` platform interface now enables you to provide customers with offline navigation to street addresses, cities, and neighborhoods in addition to the existing support for local search and navigation to points of interest. See the Local Navigation module README for information about integrating the features.
   >**Note:** There are updates to the `LocalSearchProvider` APIs. See the [Migration Guide](./MIGRATION.md) for details.
   
-* Added a new generic `DEFAULT` media source to the list of sources supported by the `LocalMediaSource` platform interface. The DEFAULT source can be used for voice playback control of any arbitrary media sources on the infotainment system outside of deep-linked MACC applications using the `ExternalMediaAdapter` interface and existing sources supported by name through the `LocalMediaSource` interface. For details about integrating a default media source, see the Alexa module README for [C++](./modules/alexa/README.md) or [Android](./platforms/android/modules/alexa/README.md).
+* Added a new generic `DEFAULT` media source to the list of sources supported by the `LocalMediaSource` platform interface. The DEFAULT source can be used for voice playback control of any arbitrary media sources on the infotainment system outside of deep-linked MACC applications using the `ExternalMediaAdapter` interface and existing sources supported by name through the `LocalMediaSource` interface. For details about integrating a default media source, see the Alexa module README for [C++](./modules/alexa/README.md) or [Android](https://github.com/alexa/alexa-auto-sdk/blob/3.3/platforms/android/modules/alexa/README.md).
 
 * Added offline LVC support for tuning to station names on terrestrial radio and SiriusXM. E.g., “Play CNN on Sirius XM” and “Play KISS FM”. This feature is already available in online mode.
 
 * Enhancements for AACS:
 
-    * Added an app component called `alexa-auto-carcontrol` that deeply integrates Auto SDK car control features into the Android Automotive OS. For more information about AACS deep integration to Car Control, please refer to this [README](./platforms/android/app-components/alexa-auto-carcontrol/README.md).
+    * Added an app component called `alexa-auto-carcontrol` that deeply integrates Auto SDK car control features into the Android Automotive OS. For more information about AACS deep integration to Car Control, please refer to this [README](https://github.com/alexa/alexa-auto-sdk/blob/3.3/platforms/android/app-components/alexa-auto-carcontrol/README.md).
 
     * Added an enhancement in which AACS can automatically sync Alexa’s timezone and locale properties with the device system settings when you set the `syncSystemPropertyChange` field to true in your AACS configuration file. If you set the field to false or omit it, you still have flexibility to change the properties in your own implementation.
     
@@ -174,7 +335,7 @@ Fixed an issue in which wake words cannot be detected correctly when using the `
 ## v3.2.0 released on 2021-05-19
 
 ### Enhancements
-* Added the `DeviceSetup` platform interface that handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, Alexa is informed that device setup is complete and starts the on-boarding experience, for example, by starting a short first-time conversation. For more information, see the Alexa module README for [C++](./modules/alexa/README.md) or [Android](./platforms/android/modules/alexa/README.md).
+* Added the `DeviceSetup` platform interface that handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, Alexa is informed that device setup is complete and starts the on-boarding experience, for example, by starting a short first-time conversation. For more information, see the Alexa module README for [C++](./modules/alexa/README.md) or [Android](https://github.com/alexa/alexa-auto-sdk/blob/3.3/platforms/android/modules/alexa/README.md).
     
 * Added support in the Connectivity module to provide the network identifier from the vehicle to Alexa, which enables automakers to offer full connectivity plans to customers. For connectivity status, the module supports sending the version of the terms and conditions through a field called `termsVersion`. Also, the `termsStatus` field accepts `DEFERRED`, which means Alexa can remind users to respond to the terms and conditions at a later time.  
 
@@ -197,7 +358,7 @@ Fixed an issue in which wake words cannot be detected correctly when using the `
   
 * Enhancements for AACS:
 
-    * Added AACS instrumentation, which enables you to better understand the interactions between your application and AACS. Through instrumentation, you log Alexa Auto Service Bridge (AASB) messages to a file, which you can review for debugging purposes. For information about AACS instrumentation, see the [README](./platforms/android/alexa-auto-client-service/android-service/service/src/debug/java/com/amazon/alexaautoclientservice/README.md).
+    * Added AACS instrumentation, which enables you to better understand the interactions between your application and AACS. Through instrumentation, you log Alexa Auto Service Bridge (AASB) messages to a file, which you can review for debugging purposes. For information about AACS instrumentation, see the [README](./aacs/android/README.md).
   
     * Added an app component called `alexa-auto-telephony`, which enables you to pre-integrate Alexa Phone Call Controller functionalities with Android Telephony.
    
@@ -205,7 +366,7 @@ Fixed an issue in which wake words cannot be detected correctly when using the `
   
     * Added the AACS AAR, which you can include in your application.
 
-    * The timeout for AASB synchronous messages is now configurable. For information about configuring the timeout, see the [README](./platforms/android/alexa-auto-client-service/android-service/README.md#auto-sdk-modules).
+    * The timeout for AASB synchronous messages is now configurable. For information about configuring the timeout, see the [README](./aacs/android/service/README.md#auto-sdk-modules).
 
 * Enhancements for AACS Sample App:
   
@@ -231,7 +392,7 @@ Fixed an issue in which wake words cannot be detected correctly when using the `
 * Improved the Auto SDK Voice Chrome extension to allow the height and width of the linear voice chrome to be controlled by the parent layout. Previously, the dimensions were fixed.
 
 ### Resolved Issues
-* Disabled APL by default in AACS to make sure utterances like "tell me a joke" work correctly without handling APL. If your platform wants to implement APL, see the AACS [Configuration README](./platforms/android/alexa-auto-client-service/android-service/README.md#aacs-module-enablement) to enable it.
+* Disabled APL by default in AACS to make sure utterances like "tell me a joke" work correctly without handling APL. If your platform wants to implement APL, see the AACS [Configuration README](./aacs/android/service/README.md#aacs-module-enablement) to enable it.
   
 * An SMS message can be sent to an Alexa contact correctly. A user request to send an SMS message to an Alexa contact no longer results in an Alexa-to-Alexa message.
   
@@ -322,7 +483,7 @@ Therefore, if the current device locale is different from the default locale, yo
 
 >**Note:** Offline search with the Local Navigation module is only supported in the en-US locale.
   
-* Added the Alexa Auto Client Service (AACS) Sample App that demonstrates how an application uses AACS. The Auto SDK includes the app components used by the AACS Sample App, which you can also use when developing an application that communicates with AACS. For information about the AACS Sample App, see the [README](./samples/android-aacs-sample-app/alexa-auto-app/README.md).
+* Added the Alexa Auto Client Service (AACS) Sample App that demonstrates how an application uses AACS. The Auto SDK includes the app components used by the AACS Sample App, which you can also use when developing an application that communicates with AACS. For information about the AACS Sample App, see the [README](./aacs/android/sample-app/README.md).
 
 * Added support for Digital Audio Broadcasting (DAB) radio. For more information about the DAB local media source, see the [Alexa module README](./modules/alexa/README.md). 
 * Enhancements for AACS:
@@ -331,13 +492,13 @@ Therefore, if the current device locale is different from the default locale, yo
 
   * Added support for the Android `ContentProvider` class, which is a standard Android mechanism for performing CRUD (Create, Read, Update, Delete) operations on stored data. By extending this class, you can use a content provider, instead of AACS messages, to manage Auto SDK properties and retrieve state information.
 
-    For information about how AACS uses `FileProvider` and `ContentProvider`, see the [README](./platforms/android/alexa-auto-client-service/README.md).
+    For information about how AACS uses `FileProvider` and `ContentProvider`, see the [README](./aacs/android/service/README.md).
 
-  * Added support for a `ping` broadcast to check the AACS connection state. For more information about how to use `ping`, see the [README](./platforms/android/alexa-auto-client-service/README.md).
+  * Added support for a `ping` broadcast to check the AACS connection state. For more information about how to use `ping`, see the [README](./aacs/android/service/README.md).
   
-  * Added support for caching AASB message intent targets based on AASB Action. This enables you to define an intent filter with a subset of the possible actions for an AASB topic. For more information on specifying intent targets, see the [README](./platforms/android/alexa-auto-client-service/README.md#specifying-the-intent-targets-for-handling-messages).
+  * Added support for caching AASB message intent targets based on AASB Action. This enables you to define an intent filter with a subset of the possible actions for an AASB topic. For more information on specifying intent targets, see the [README](./aacs/android/README.md#specifying-the-intent-targets-for-handling-messages).
 
-  * Added support for Text-to-Speech Service, which allows Android applications to interact with Android TTS APIs to convert text to speech. For information about the Text-to-Speech Service, see the [README](./platforms/android/alexa-auto-client-service/tts/README.md).
+  * Added support for Text-to-Speech Service, which allows Android applications to interact with Android TTS APIs to convert text to speech. For information about the Text-to-Speech Service, see the [README](./aacs/android/app-components/alexa-auto-tts/README.md).
   
 
 ### Resolved Issues
@@ -407,7 +568,7 @@ Therefore, if the current device locale is different from the default locale, yo
             * `setPosition(int64_t position)`
             * `volumeChanged(float volume)`
             * `mutedStateChanged(MutedState state)`  
-    * AACS enables APL by default, but it does not have a default implementation for APL. AACS expects the client application to handle the messages or directives from the Engine. If APL is not handled on the client side, utterances that trigger APL capabilities, such as "tell me a joke," fail. To disable APL, add the lines below to the AACS configuration file. See "Configuring the AASB Interface Handlers" in the [AASB README](./extensions/aasb/README.md) for more details.
+    * AACS enables APL by default, but it does not have a default implementation for APL. AACS expects the client application to handle the messages or directives from the Engine. If APL is not handled on the client side, utterances that trigger APL capabilities, such as "tell me a joke," fail. To disable APL, add the lines below to the AACS configuration [file](./aacs/android/sample-app/alexa-auto-app/src/main/assets/config/aacs_config.json).
 
 ~~~
         "aasb.apl": {
@@ -423,7 +584,7 @@ Starting with v3.1.0, the Local Voice Control (LVC) extension is no longer suppo
 ## v3.0.0 released on 2020-10-09
 
 ### Enhancements
-* Added Alexa Auto Client Service (AACS), which enables OEMs of Android-based devices to simplify the process of integrating the Auto SDK. For more information about AACS, see the AACS [README](./platforms/android/alexa-auto-client-service/README.md).
+* Added Alexa Auto Client Service (AACS), which enables OEMs of Android-based devices to simplify the process of integrating the Auto SDK. For more information about AACS, see the AACS [README](https://github.com/alexa/alexa-auto-sdk/blob/3.0/platforms/android/alexa-auto-client-service/README.md).
   
 * Added support for removing local media sources at runtime, such as a USB drive or a Bluetooth device. Previously, if a user removed a USB drive and then requested to play music from the USB drive, the Auto SDK would attempt to play and not return an appropriate error message. This feature is enabled with an existing field in the `LocalMediaSource` platform interface state. For information about the platform interface state, see the `alexa` module [README](./modules/alexa/README.md).
 
@@ -573,7 +734,7 @@ Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AG
 * Added a Car Control module to support online-only car control use cases without the optional Local Voice Control (LVC) extension. The Car Control module provides the car control functionality introduced in Auto SDK 2.0.0 but does not require the LVC extension.
 * Made various enhancements to the External Media Player (EMP) Adapter to improve EMP behavior and facilitate implementation of Alexa audio focus.
 * Introduced the Property Manager, a new platform interface that allows you to set and retrieve Engine property values and be notified of property value changes. 
-* Added support for setting the timezone of a vehicle. The [AlexaProperties.h](./modules/alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [AlexaProperties.java](./platforms/android/modules/alexa/src/main/java/com/amazon/aace/alexa/AlexaProperties.java) files now include a `TIMEZONE` property setting that is registered with the Property Manager during initialization and which you can manage using the Property Manager platform interface.
+* Added support for setting the timezone of a vehicle. The [AlexaProperties.h](./modules/alexa/platform/include/AACE/Alexa/AlexaProperties.h) and [AlexaProperties.java](./modules/alexa/android/src/main/java/com/amazon/aace/alexa/AlexaProperties.java) files now include a `TIMEZONE` property setting that is registered with the Property Manager during initialization and which you can manage using the Property Manager platform interface.
 * Added support for specifying a custom volume range for voice interactions in implementations that use the optional Local Voice Control (LVC) extension.
 * Separated the LVC language models into independent APKs rather than providing them directly in the LVC APK as was done in previous releases. One language model APK is provided for each supported locale (currently en-US, en-CA, and fr-CA).
 
@@ -584,7 +745,7 @@ Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AG
 * Fixed an issue where the Engine might hang during shutdown if it was shut down while TTS was being played or read.
 * Fixed an issue where Auto SDK initialization failed at startup when applications using the optional LVC extension didn't register a NetworkInfoProvider platform interface.
 * Fixed an issue where building the Auto SDK with sensitive logging enabled was not working as expected.
-* Added alerts error enums (`DELETED` and `SCHEDULED_FOR_LATER`) to the [`Alerts.h`](./modules/alexa/platform/include/AACE/Alexa/Alerts.h) and [`Alerts.java`](./platforms/android/modules/alexa/src/main/java/com/amazon/aace/alexa/Alerts.java) files.
+* Added alerts error enums (`DELETED` and `SCHEDULED_FOR_LATER`) to the [`Alerts.h`](./modules/alexa/platform/include/AACE/Alexa/Alerts.h) and [`Alerts.java`](./modules/alexa/android/src/main/java/com/amazon/aace/alexa/Alerts.java) files.
 * With the exception of road regulation and maneuver events, the Alexa cloud no longer returns an `INVALID_REQUEST_EXCEPTION` or `INTERNAL_SERVICE_EXCEPTION` in response to navigation events sent by the Auto SDK.
 * Alexa now prompts or notifies the clients and rejects the ping packet when the user deregisters from the companion app.
 
@@ -680,7 +841,7 @@ Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AG
 
     >**Note:** In order to make use of this functionality, you must register the Navigation platform interface for Geolocation support.
 * **Enhanced the builder scripts** to simplify the build process by removing unnecessary options and including the default components for different targets. For details see the [Builder README](builder/README.md).
-* **Refactored the Java Native Interface (JNI) code** used for Android platform interfaces for more modular deployment. In place of a single AAR including all Auto SDK native libraries, the Alexa Auto SDK now generates multiple AARs (one per module). Please see the [builder README](./builder/README.md) and the [Android Sample App README](./samples/android/README.md) for details. 
+* **Refactored the Java Native Interface (JNI) code** used for Android platform interfaces for more modular deployment. In place of a single AAR including all Auto SDK native libraries, the Alexa Auto SDK now generates multiple AARs (one per module). Please see the [builder README](./builder/README.md) and the [Android Sample App README](https://github.com/alexa/alexa-auto-sdk/blob/2.0/samples/android/README.md) for details. 
 
 ### Resolved Issues
 * Fixed an issue where music streaming from online music service providers continued to play when the user switched to a local media source.
@@ -773,7 +934,7 @@ All known issues from v1.6.0.
 ### Enhancements
 
 * Added a C++ sample application to demonstrate use cases that the Alexa Auto SDK supports. Read more about the C++ Sample App [here](./samples/cpp/README.md).
-* Released the code for the AGL Alexa Voice Agent, a binding for Automotive Grade Linux powered by Alexa Auto SDK v1.5. The software is shipped as a standard AGL binding that exposes an API for speech recognition using the Alexa Voice Service. Please refer to the [AGL Alexa Voice Agent documentation](./platforms/agl/alexa-voiceagent-service/README.md) for instructions to build, install, and test the binding on an R-Car M3 board.
+* Released the code for the AGL Alexa Voice Agent, a binding for Automotive Grade Linux powered by Alexa Auto SDK v1.5. The software is shipped as a standard AGL binding that exposes an API for speech recognition using the Alexa Voice Service. Please refer to the [AGL Alexa Voice Agent documentation](https://github.com/alexa/alexa-auto-sdk/blob/1.5/platforms/agl/alexa-voiceagent-service/README.md) for instructions to build, install, and test the binding on an R-Car M3 board.
 * Added support for runtime selection of the AmazonLite wake word locale. The AmazonLite locale will automatically switch when the AVS locale is switched.
 * Added support for optionally logging and uploading Alexa Auto SDK metrics to the Amazon cloud. Voice request metrics, for example, include start and end timestamps of user and Alexa speech and UPL between the request and Alexa’s response. Please contact your SA or Partner Manager for details or to request this package for Android.
 * Added support for an optional platform interface `EqualizerController`. The Equalizer Controller enables Alexa voice control of device audio equalizer settings by making gain adjustments to three frequency bands (“BASS”, “MIDRANGE”, and/or “TREBLE”).
@@ -847,9 +1008,9 @@ All known issues from v1.3.0.
 ### Enhancements
 
 * Android 8 and ARM v8a platform support.
-* Making calls to contacts from a locally-paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](./modules/contact-uploader/README.md).
+* Making calls to contacts from a locally-paired mobile phone as long as the Alexa Auto SDK has a valid auth token. Read more about [Contact Uploader API](https://github.com/alexa/alexa-auto-sdk/blob/1.3/modules/contact-uploader/README.md).
 * Redial, answer, terminate, and decline calls using voice. End users can also send dual-tone multi-frequency (DTMF) via voice to interact with Interactive Voice Responders (IVRs). Read more here [Phone Call Controller](./modules/phone-control/README.md).
-* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between a CD player, AM/FM player, and auxiliary input that is MACC-compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./platforms/android/modules/alexa/README.md).  
+* Switching to local media sources, generic controls and deep linking into 3rd party media applications compatible with the Amazon Media App Command and Control (MACC) specification using the External Media Player Interface 1.1. This allows customers to switch between a CD player, AM/FM player, and auxiliary input that is MACC-compliant. Read more here [Handling External Media Adapter with MACCAndroidClient](./modules/alexa/README.md).  
 * Enhancement for 3rd party wake word engine to enable cloud based verification.
 * Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the [templateRuntimeCapabilityAgent Engine configuration](https://alexa.github.io/alexa-auto-sdk/modules/core/#configuring-the-engine) values.
 
@@ -973,7 +1134,7 @@ There are no known issues in this release.
 * The Engine doesn't immediately reconnect to AVS when the **`NetworkInfoProvider`** updates network status.
 * Some shared memory objects are not freed when the Engine object is disposed.
 
-Sample App issues are documented in the [Sample App README](./samples/android/README.md).
+Sample App issues are documented in the [Sample App README](https://github.com/alexa/alexa-auto-sdk/blob/1.0/samples/android/README.md).
 
 ## v1.0.0 Beta released on 2018-04-29:
 

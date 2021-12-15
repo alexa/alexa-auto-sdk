@@ -1,150 +1,321 @@
 # Phone Call Controller Module
 
-The Alexa Auto SDK Phone Call Controller module provides the features required by a platform implementation to use the phone call control capabilities of Alexa, independent of the connection mechanism to the calling device.
-
 **Table of Contents**
 
 * [Overview](#overview)
-* [Phone Call Controller Sequence Diagrams](#phone-call-controller-sequence-diagrams)
-* [Using the Phone Call Controller Module](#using-the-phone-call-controller-module)
+* [Configuring the Phone Call Controller Module](#configuring-the-phone-call-controller-module)
+* [Using the Phone Call Controller AASB Messages](#using-the-phone-call-controller-aasb-messages)
+* [Integrating the Phone Call Controller Module Into Your Application](#integrating-the-phone-call-controller-module-into-your-application)
+
 
 ## Overview <a id="overview"></a>
 
-By registering a Phone Call Controller in your implementation, you allow the end user to interact with new or ongoing calls using Alexa, and you provide Alexa with the state of the calling device on the platform. The Phone Call Controller uses phone contacts uploaded via the [Address Book module](../address-book/README.md).
+The `Phone Call Controller` module enables your Alexa Auto SDK client application to use the phone call control capabilities of Alexa, independent of the connection mechanism to the calling device. By using this module in your application, you allow the end user to interact with new or ongoing calls using Alexa, and you provide Alexa with the state of the calling device. The Phone Call Controller uses phone contacts uploaded via the [Address Book module](../address-book/README.md).
 
-The platform implementation is responsible for managing the lifecycle of the call session, including  enhancing the end user experience by:
+Your application's `Phone Call Controller` module integration is responsible for managing the lifecycle of the call session, including enhancing the end user experience by:
 
-* Preventing Alexa TTS from being fed back into the microphone when the user triggers Alexa during a call. To accomplish this, the platform implementation should stop feeding the microphone input into the call channel until Alexa returns to the idle state, and it should also specify strong echo cancellation.
-* Lowering the audio level of previous media in response to an incoming call until the call is answered or declined (if ducking is supported on the platform) and pausing the media if the call is answered.
+* Preventing Alexa Text To Speech (TTS) from being fed back into the microphone when the user triggers Alexa during a call. To accomplish this, your implementation should stop feeding the microphone input into the call channel until Alexa returns to the idle state, and it should also specify strong echo cancellation.
+* Lowering the audio level of previous media in response to an incoming call until the call is answered or declined (if ducking is supported) and pausing the media if the call is answered.
+* Maintaining the last dialed number to support redialing.
 
-## Phone Call Controller Sequence Diagrams <a id="phone-call-controller-sequence-diagrams"></a>
 
-The following sequence diagrams provide an overview of how the Alexa Auto SDK handles inbound and outbound phone call control.
+## Configuring the Phone Call Controller Module <a id="configuring-the-phone-call-controller-module"></a>
 
-### Inbound Calling
+The `Phone Call Controller` module does not require Engine configuration.
 
-This diagram illustrates the sequence of inbound phone call control using voice.
+
+## Using the Phone Call Controller AASB Messages <a id="using-the-phone-call-controller-aasb-messages"></a>
+
+### Changing Connection State 
+
+When connection to a calling device is established or terminated, publish the [`ConnectionStateChanged` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#connectionstatechanged).
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Connection State Changed</summary>
+<br></br>
+
+![Connection State Changed](./assets/aac-pcc-connection-state-changed.png)
+</details>
+
+</br>
+
+### Updating Device Configuration
+
+To update the device configuration of the connected calling device, publish the [`DeviceConfigurationUpdated` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#deviceconfigurationupdated).
+
+> **Note:** The Auto SDK only supports updates to `DTMF_SUPPORTED` to enable or disable `SendDTMF`.
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Device Configuration Updated</summary>
+<br></br>
+
+![Device Configuration Updated](./assets/aac-pcc-device-configuration-updated.png)
+</details>
+
+</br>
+
+### Calling 
+
+Whether the call is initiated by Alexa or by the user, during the call session your application is responsible for publishing [`CallStateChanged` messages](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#callstatechanged) to inform the Engine of the progression of the call (e.g., call is answered, call ended) while the Engine publishes messages to the application in order to handle user interactions with the call (e.g., answer, dial, stop).  
+
+Regardless of whether the call is inbound or outbound:
+* During a call if the user asks Alexa to press the keypad, the Engine publishes the [`SendDTMF` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#senddtmf). Your application must handle this message and publish either the [`SendDTMFSucceeded` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#senddtmfsucceeded) or [`SendDTMFFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#senddtmffailed) to indicate its completion or failure, respectively.
+* If an error occurrs during an active call or call setup, publish the [`CallFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#callfailed) specifying the error. 
+* When the user asks Alexa to hang up a call, cancel a call setup, or decline an incoming call the Engine publishes the [`Stop` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#stop).
+
+---
+
+#### Inbound Calling
+
+When an inbound call is detected, publish the [`CreateCallId` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#createcallid). In response, the Engine will publish the `CreateCallId` reply containing a unique identifier for the call. Once an inbound call alert is received, your application must publish the `CallStateChanged` message indicating the call is now in the **CALL_RECEIVED** state. When the inbound call begins ringing, publish the `CallStateChanged` message, this time specifying the **INBOUND_RINGING** call state. 
+
+If the user asks Alexa to answer the inbound call, the Engine publishes the [`Answer` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#answer). Publish the `CallStateChanged` message indicating the call is now **ACTIVE**.
+
+Whenever the user asks Alexa to end the call, the Engine publishes the `Stop` message. Publish the `CallStateChanged` message to indicate that the call is now **IDLE**.
+
+> **Note:** When a caller id is received for an inbound call, publish the [`CallerIdReceived` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#calleridreceived). 
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Inbound Calling</summary>
+<br></br>
 
 ![Inbound Calling](./assets/aac-pcc-inbound-call.png)
+</details>
 
-### Outbound Calling
+</br>
 
-This diagram illustrates the sequence of outbound phone call control using voice.
+#### Outbound Calling
+
+When a user asks Alexa to dial a number or call an uploaded contact, the Engine publishes the [`Dial` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#dial). Alternatively, if the user asks Alexa to redial the last dialed number, the Engine publishes the [`Redial` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/phone-control/aasb-docs/PhoneCallController/index.html#redial). In both cases, your application must publish the `CallStateChanged` message indicating the call is now in the **DIALING** state. Once the outgoing call setup is complete and outbound ringing has started, publish the `CallStateChanged` message specifying the **OUTBOUND_RINGING** call state. 
+
+If the call is answered and in progress, publish the `CallStateChanged` message indicating the call is now **ACTIVE**.
+
+Whenever the user asks Alexa to end the call, the Engine publishes the `Stop` message. Publish the `CallStateChanged` message to indicate that the call is now **IDLE**.
+
+<details markdown="1"><summary>Click to expand or collapse sequence diagram: Outbound Calling</summary>
+<br></br>
 
 ![Outbound Calling](./assets/aac-pcc-outbound-call.png)
+</details>
 
-## Using the Phone Call Controller Module <a id = "using-the-phone-call-controller-module"></a>
+</br>
 
-To implement a custom `PhoneCallController` handler, extend the `PhoneCallController` class:
+## Integrating the Phone Call Controller Module Into Your Application <a id = "integrating-the-phone-call-controller-module-into-your-application"></a>
 
-```
-#include <AACE/PhoneCallController/PhoneCallController.h>
+Use the Engine's `MessageBroker` to subscribe to and publish *"PhoneCallController"* AASB messages.
 
-class MyPhoneCallController : public aace::phoneCallController::PhoneCallController {
+<details markdown="1"><summary>Click to expand or collapse C++ sample code</summary>
 
-    // The user asked Alexa to make an outbound call.
-    bool dial( const std::string& payload ) {
-        // Initiate an outbound call.
-        return true;
+<br></br>
+
+```cpp
+#include <AACE/Core/MessageBroker.h>
+
+#include <AASB/Message/PhoneCallController/PhoneCallController/CallError.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/CallState.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/CallingDeviceConfigurationProperty.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/ConnectionState.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/DTMFError.h>
+
+#include <AASB/Message/PhoneCallController/PhoneCallController/AnswerMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/CallerIdReceivedMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/CallFailedMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/CallStateChangedMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/ConnectionStateChangedMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/CreateCallIdMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/DeviceConfigurationUpdatedMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/DialMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/RedialMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/SendDTMFMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/SendDTMFFailedMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/SendDTMFSucceededMessage.h>
+#include <AASB/Message/PhoneCallController/PhoneCallController/StopMessage.h>
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+class MyPhoneCallControllerHandler {
+
+    // Subscribe to messages from the Engine
+    void MyPhoneCallControllerHandler::subscribeToAASBMessages() {
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleAnswerMessage(message); },
+        AnswerMessage::topic(),
+        AnswerMessage::action());
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleDialMessage(message); },
+        DialMessage::topic(),
+        DialMessage::action());
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleRedialMessage(message); },
+        RedialMessage::topic(),
+        RedialMessage::action());
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleSendDMTFMessage(message); },
+        SendDTMFMessage::topic(),
+        SendDTMFMessage::action());
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleStopMessage(message); },
+        StopMessage::topic(),
+        StopMessage::action());
+    m_messageBroker->subscribe(
+        [=](const std::string& message) { handleCreateCallIdReplyMessage(message); },
+        CreateCallIdMessageReply::topic(),
+        CreateCallIdMessageReply::action());
     }
 
-    // The user asked Alexa to redial a call.
-    bool redial( const std::string& payload ) {
-        // Initiate an outbound call.
-        // It is the platform's responsibility to maintain the last dialed number.
-        return true;
+    // Handle the Answer message from the Engine
+    void MyPhoneCallControllerHandler::handleAnswerMessage(const std::string& message) {
+        AnswerMessage msg = json::parse(message);
+        answer(msg.payload.payload);
     }
 
-    // The user asked Alexa to answer the inbound call.
-    void answer( const std::string& payload ) {
-        // Answer the inbound call.
+    // Handle the Dial message from the Engine
+    void MyPhoneCallControllerHandler::handleDialMessage(const std::string& message) {
+        AnswerMessage msg = json::parse(message);
+        std::string payload = msg.payload.payload;
+        dial(msg.payload.payload);
     }
 
-    // The user asked Alexa to hang up a call, cancel a call setup, or decline an incoming call
-    void stop( const std::string& payload ) {
-        // Stop the call.
+    // Handle the Redial message from the Engine
+    void MyPhoneCallControllerHandler::handleRedialMessage(const std::string& message) {
+        AnswerMessage msg = json::parse(message);
+        redial(msg.payload.payload);
     }
 
-    // The user asked Alexa to press the keypad.
-    void sendDTMF( const std::string& payload ){
-        // Send a DTMF signal.
+    // Handle the SendDTMF message from the Engine
+    void MyPhoneCallControllerHandler::handleSendDMTFMessage(const std::string& message) {
+        SendDTMFMessage msg = json::parse(message);
+        sendDTMF(msg.payload.payload);
     }
 
-    // Note: Return quickly, as handling in dial, redial, answer, stop, and sendDTMF should not block the caller.
-    
-    // Note: Alexa acts on the most recently used callId.
+    // Handle the Stop message from the Engine
+    void MyPhoneCallControllerHandler::handleStopMessage(const std::string& message) {
+        StopMessage msg = json::parse(message);
+        stop(msg.payload.payload);
+    }
 
-    ...
+    // Handle the CreateCallId reply message from the Engine
+    void MyPhoneCallControllerHandler::handleCreateCallIdReplyMessage(const std::string& message) {
+        CreateCallIdMessageReply msg = json::parse(message);
+        std::string messageId = msg.header.messageDescription.replyToId;
+        std::string callId = msg.payload.callId;
 
-    // Connection to a calling device is established or broken.
-    ConnectionState state = ...  // CONNECTED, DISCONNECTED
-    connectionStateChanged( state );
-    ...
-    
-    // Setting up an outgoing call.
-    const std::string& callId = ... // The identifier for the call.
-    callStateChanged( CallState::DIALING, callId );
-    ...
-    
-    // Outgoing call setup is complete, and outbound ringing has started.
-    const std::string&callId = ... // The identifier for the call.
-    callStateChanged( CallState::OUTBOUND_RINGING, callId );
-    ...
-    
-    // The call is answered and in progress.
-    const std::string& callId = ... // The identifier for the call.
-    callStateChanged( CallState::ACTIVE, callId);
-    ...
-    
-    // The active call ended, the outbound call setup was cancelled, or the inbound call was declined.
-    const std::string& callId = ... // The identifier for the call.
-    callStateChanged( CallState::IDLE, callId );
-    ...
-    
-    // An inbound call alert was received.
-    const std::string& callId = createCallId();
-    callStateChanged( CallState::CALL_RECEIVED, callId );
-    ...
-    
-    // The inbound call is ringing.
-    const std::string& callId ... // The identifier for the call.
-    callStateChanged( CallState::INBOUND_RINGING, callId );
-    ...
-    
-    // Generate an identifier for a call initiated outside of the scope of Alexa.
-    const std::string& callId = createCallId();
-    ...
-    
-    // A feature of the calling device changed.
-    std::unordered_map<CallingDeviceConfigurationProperty, bool> deviceConfigurationMap; // map to new configurations
-    deviceConfigurationMap[CallingDeviceConfigurationProperty::DTMF_SUPPORTED] = true; // update the configuration
-    deviceConfigurationUpdated( deviceConfigurationMap );
-    ...
-    
-    // An error occurred during an active call or call setup.
-    const std::string& callId = ... // The identifier for the call.
-    CallError code  = ... // error type
-    const std::string& message = ... // error description
-    callFailed( callId, code, message );
-    ...
-    
-    // The DTMF signal was delivered.
-    const std::string& callId = ... // The identifier for the call.
-    sendDTMFSucceeded( callId );
-    ...
-    
-    // Sending the DTMF signal failed.
-    const std::string& callId = ... // The identifier for the call.
-    DTMFError code = ... // error type
-    const std::string& message = ... // error description
-    sendDTMFFailed( callId, code, message );
-    ...
+        // ...Handle the generated call id...
+    }
+
+    // When an error occurrs during an active call or call setup, publish a CallFailed
+    // message to the Engine
+    void MyPhoneCallControllerHandler::callFailed(
+        const std::string& callId,
+        CallError code,
+        const std::string& message) {
+        CallFailedMessage msg;
+        msg.payload.callId = callId;
+        msg.payload.code = code;
+        msg.payload.message = message;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // When the call state changes, publish a CallStateChanged message to the Engine
+    void MyPhoneCallControllerHandler::callStateChanged(
+        CallState state,
+        const std::string& callId,
+        const std::string& callerId) {
+        CallStateChangedMessage msg;
+        msg.payload.state = state;
+        msg.payload.callId = callId;
+        msg.payload.callerId = callerId;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // When a caller id is received for an inbound call, publish a CallerIdReceived
+    // message to the Engine
+    void MyPhoneCallControllerHandler::callerIdReceived(const std::string& callId, const std::string& callerId) {
+        CallerIdReceivedMessage msg;
+        msg.payload.callId = callId;
+        msg.payload.callerId = callerId;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // When connection to a calling device is established or broken, publish a
+    // ConnectionStateChanged message to the Engine
+    void MyPhoneCallControllerHandler::connectionStateChanged(ConnectionState state) {
+        ConnectionStateChangedMessage msg;
+        msg.payload.state = state;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // To generate an identifier for a call, publish a CreateCallId message to the Engine
+    std::string MyPhoneCallControllerHandler::createCallId() {
+        CreateCallIdMessage msg;
+        m_messageBroker->publish(msg.toString());
+
+        // The Engine will send the CreateCallIdReply message
+        // Return the unique identifier from reply message payload
+    }
+
+    // When a feature of the calling device changes, publish a
+    // DeviceConfigurationUpdated message to the Engine
+    void MyPhoneCallControllerHandler::deviceConfigurationUpdated(
+        std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap) {
+        json configuration;
+        for (auto it: configurationMap) {
+            configuration[configurationFeatureToString(it.first)] = it.second;
+        }
+
+        DeviceConfigurationUpdatedMessage msg;
+        msg.payload.configurationMap = configuration.dump();
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // When the DTMF signal is delivered, publish a SendDTMFSucceeded message to the Engine
+    void MyPhoneCallControllerHandler::sendDTMFSucceeded(const std::string& callId) {
+        SendDTMFSucceededMessage msg;
+        msg.payload.callId = callId;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    // When sending the DTMF signal failed, publish a SendDTMFFailed message to the Engine
+    void MyPhoneCallControllerHandler::sendDTMFFailed(
+        const std::string& callId,
+        DTMFError code,
+        const std::string& message) {
+        SendDTMFFailedMessage msg;
+        msg.payload.callId = callId;
+        msg.payload.code = code;
+        msg.payload.message = message;
+        m_messageBroker->publish(msg.toString());
+    }
+
+    void MyPhoneCallControllerHandler::answer(const std::string& payload) {
+        // Answer the inbound call
+    }
+
+    void MyPhoneCallControllerHandler::dial(const std::string& payload) {
+        // Initiate an outbound call
+    }
+
+    void MyPhoneCallControllerHandler::redial(const std::string& payload) {
+        // Initiate an outbound call
+    }
+
+    void MyPhoneCallControllerHandler::stop(const std::string& payload) {
+        // Stop the call
+    }
+
+    void MyPhoneCallControllerHandler::sendDTMF(const std::string& payload) {
+        // Send a DTMF signal
+    }
+
+    // Implement to convert CallingDeviceConfigurationProperty to string 
+    std::string MyPhoneCallControllerHandler::configurationFeatureToString(CallingDeviceConfigurationProperty feature);
+
 };
-...
 
-// Register a phone call controller handler with the Engine.
-std::shared_ptr<PhoneCallController> phoneCallController = std::make_shared<MyPhoneCallController>();
-engine->registerPlatformInterface( phoneCallController );
 ```
 
+</details>
 
+</br>
+
+### Android Integration
+
+The Alexa Auto Client Service (AACS) provides the `AACS Telephony Library` to integrate the Auto SDK `Phone Call Controller` module on Android. See the [AACS Telephony Library](../../aacs/android/app-components/alexa-auto-telephony/README.md) documentation for more information.

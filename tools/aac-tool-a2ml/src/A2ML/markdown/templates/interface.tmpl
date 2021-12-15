@@ -1,0 +1,198 @@
+\# $interface.name
+
+## print the outgoing message list (from engine)
+$print_message_list($interface.get_message_names("outgoing"),"Outgoing Messages")
+
+## print the incoming message list (to engine)
+$print_message_list($interface.get_message_names("incoming"),"Incoming Messages")
+
+## print the struct typedef list
+#set $type_def_list = $interface.get_type_names("struct")
+#if $type_def_list
+\#\# Type Definitions
+#for $next_type_name in $type_def_list
+$print_struct($interface.get_type($next_type_name))
+#end for
+#end if
+
+## print the enum typedef list
+#set $type_def_list = $interface.get_type_names("enum")
+#if $type_def_list
+\#\# Enums
+#for $next_type_name in $type_def_list
+$print_enum($interface.get_type($next_type_name))
+#end for
+#end if
+
+##
+## FUNCTION: print_message_list($msg_names,$msg_list_title)
+##
+#def print_message_list($msg_names,$msg_list_title)
+#if $msg_names
+\#\# $msg_list_title
+#for $next_message_name in $msg_names
+#set $msg = $interface.get_message( $next_message_name )
+
+## print the message
+$print_message($msg,$msg.action,"Publish",$msg.payload)
+
+## print the reply
+#if $msg.reply
+$print_message($msg,$msg.action + "Reply","Reply",$msg.reply)
+#end if
+#end for
+#end if
+#end def
+
+##
+## FUNCTION: print_message($msg,$msg_name,$msg_type,$msg_params)
+##
+#def print_message($msg,$msg_name,$msg_type,$msg_params)
+<a id="$msg_name"></a>
+\#\#\# $msg_name
+#if $msg_type == "Reply"
+Reply for [$msg.action](\#$msg.action) message.
+#else
+$msg.description
+#end if
+
+\#\#\#\# JSON Structure
+
+```
+{
+    "header": {
+        "version": "$msg.version",
+        "messageType": "$msg_type",
+        "id": {{String}},
+        "messageDescription": {
+            "topic": "$msg.topic",
+            "action": "$msg.action"#slurp
+        #if $msg_type == "Reply"
+,
+            "replyToId": {{String}}        
+        #else
+
+        #end if
+        }
+    }#slurp
+#if $msg_params
+,
+    "payload": {
+        #set $idx = 1
+        #for $next in $msg_params
+        "$next.name": $print_json_value_type($next)#slurp
+        #if $idx < $len($msg_params)
+,
+        #else
+        
+        #end if
+        #set $idx = $idx + 1
+        #end for
+    }
+#else
+
+#end if
+}
+```
+
+#if $msg_params
+\#\#\#\# Payload
+
+Property | Type | Required | Description | Example
+------------ | ------------- | ------------ | ------------ | ------------
+#for $next in $msg_params
+$next.name | $print_description_value_type($next) | $print_value_required($next) | $next.description | $next.example
+#end for
+#end if
+#end def
+
+##
+## FUNCTION: print_struct($struct)
+##
+#def print_struct($struct)
+<a id="$struct.name"></a>
+\#\#\# $struct.name
+
+$struct.description
+
+\#\#\#\# JSON Structure
+
+```
+{
+#set $idx = 1
+#for $next in $struct.values
+    "$next.name": $print_json_value_type($next)#slurp
+#if $idx < $len($struct.values)
+,
+#else
+        
+#end if
+#set $idx = $idx + 1
+#end for
+}
+```
+
+\#\#\#\# Properties
+
+Property | Type | Required | Description | Example
+------------ | ------------- | ------------ | ------------ | ------------
+#for $next in $struct.values
+$next.name | $print_description_value_type($next) | $print_value_required($next) | $next.description | $next.example
+#end for
+#end def
+
+##
+## FUNCTION: print_struct($struct)
+##
+#def print_enum($enum)
+<a id="$enum.name"></a>
+\#\#\# $enum.name
+
+$enum.description
+
+\#\#\#\# Values
+
+Value | Description
+------------ | -------------
+#for $next in $enum.values
+"$next.name" | $next.description
+#end for
+#end def
+
+##
+## FUNCTION: print_json_value_type($value)
+##
+#def print_json_value_type($value)
+#if $value.is_primitive()
+{{$value.type.capitalize()}}#slurp
+#elif $value.is_list()
+[{{$value.type[5:]}}]#slurp
+#else
+{{$value.type}}#slurp
+#end if
+#end def
+
+#def print_description_value_type($value)
+#if $value.is_primitive()
+$value.type.capitalize()#slurp
+#elif $value.is_list()
+#set $list_type_def=$value.resolve_type()
+#if $list_type_def
+[$list_type_def.name](\#$list_type_def.name)\[\]#slurp
+#else
+$value.type\[\]#slurp
+#end if
+#else
+[$value.type](\#$value.type)#slurp
+#end if
+#end def
+
+#def print_value_required($value)
+#if $value.required
+Yes#slurp
+#elif $value.default
+No (default: `$value.default`)#slurp
+#else
+No#slurp
+#end if
+#end def

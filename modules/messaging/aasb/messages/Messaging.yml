@@ -1,0 +1,124 @@
+topic: Messaging
+namespace: aasb.message.messaging.messaging
+path: Messaging/Messaging
+
+messages:
+  - action: SendMessage
+    direction: outgoing
+    desc: Send SMS message.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+      - name: message
+        desc: Body of the SMS text message to be sent.
+      - name: recipients
+        desc: String in JSON format containing the recipient of the SMS message.
+
+  - action: UpdateMessagesStatus
+    direction: outgoing
+    desc: Update status of SMS messages.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+      - name: conversationId
+        desc: The id of the conversation whose messages need to be updated.
+      - name: status
+        desc: String in JSON format representing the message ids and status to be updated.
+
+  - action: UpdateMessagesStatusFailed
+    direction: incoming
+    desc: Notifies the Engine the message status update failed.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+      - name: code
+        type: ErrorCode
+        desc: The error code identifying the failure.
+      - name: message
+        desc: The message explaining the error.
+        default: ""
+
+  - action: UpdateMessagingEndpointState
+    direction: incoming
+    desc: Notifies the Engine of updates to the messaging endpoint state.
+    payload:
+      - name: connectionState
+        type: ConnectionState
+        desc: The value for the connection state.
+      - name: sendPermission
+        type: PermissionState
+        desc: The value for the send permission.
+      - name: readPermission
+        type: PermissionState
+        desc: The value for the read permission.
+
+  - action: SendMessageSucceeded
+    direction: incoming
+    desc: Notifies the Engine that message send was successful.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+
+  - action: SendMessageFailed
+    direction: incoming
+    desc: Notifies the Engine the message send failed.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+      - name: code
+        type: ErrorCode
+        desc: The error code identifying the failure.
+      - name: message
+        desc: The message explaining the error.
+        default: ""
+
+  - action: UploadConversations
+    direction: outgoing
+    desc: Upload SMS unread messages message.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+
+  - action: ConversationsReport
+    direction: incoming
+    desc: Notifies the Engine to upload conversations report to the cloud.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+      - name: conversations
+        desc: String in JSON format representing all conversations with unread SMS messages.
+
+  - action: UpdateMessagesStatusSucceeded
+    direction: incoming
+    desc: Notifies the Engine that message status was successful.
+    payload:
+      - name: token
+        desc: Token id for send message request.
+
+types:
+  - name: ConnectionState
+    type: enum
+    values:
+      - name: DISCONNECTED
+        desc: Messaging device is disconnected.
+      - name: CONNECTED
+        desc: Messaging device is connected.
+
+  - name: PermissionState
+    type: enum
+    values:
+      - name: "OFF"
+        desc: Permission is not granted.
+      - name: "ON"
+        desc: Permission is granted.
+
+  - name: ErrorCode
+    type: enum
+    values:
+      - name: GENERIC_FAILURE
+        desc: Generic error handling SMS request.
+      - name: NO_CONNECTIVITY
+        desc: Messaging device is not connected.
+      - name: NO_PERMISSION
+        desc: Permission denied.
+

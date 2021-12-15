@@ -32,10 +32,13 @@ static const std::string METRIC_AUDIOOUTPUT_PLAY = "Play";
 static const std::string METRIC_AUDIOOUTPUT_STOP = "Stop";
 static const std::string METRIC_AUDIOOUTPUT_PAUSE = "Pause";
 static const std::string METRIC_AUDIOOUTPUT_RESUME = "Resume";
+static const std::string METRIC_AUDIOOUTPUT_START_DUCKING = "StartDucking";
+static const std::string METRIC_AUDIOOUTPUT_STOP_DUCKING = "StopDucking";
 static const std::string METRIC_AUDIOOUTPUT_VOLUME_CHANGED = "VolumeChanged";
 static const std::string METRIC_AUDIOOUTPUT_MUTED_STATE_CHANGED = "MutedStateChanged";
 static const std::string METRIC_AUDIOOUTPUT_MEDIA_STATE_CHANGED = "MediaStateChanged";
 static const std::string METRIC_AUDIOOUTPUT_MEDIA_ERROR = "MediaError";
+static const std::string METRIC_AUDIOOUTPUT_AUDIO_FOCUS_EVENT = "AudioFocusEvent";
 
 namespace aace {
 namespace engine {
@@ -89,6 +92,14 @@ bool AudioOutputEngineImpl::prepare(const std::string& url, bool repeating) {
     }
 }
 
+void AudioOutputEngineImpl::mayDuck() {
+    try {
+        m_platformAudioOutput->mayDuck();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
 bool AudioOutputEngineImpl::play() {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "play", {METRIC_AUDIOOUTPUT_PLAY});
     try {
@@ -123,6 +134,26 @@ bool AudioOutputEngineImpl::resume() {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "resume", {METRIC_AUDIOOUTPUT_RESUME});
     try {
         return m_platformAudioOutput->resume();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AudioOutputEngineImpl::startDucking() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "startDucking", {METRIC_AUDIOOUTPUT_START_DUCKING});
+    try {
+        return m_platformAudioOutput->startDucking();
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AudioOutputEngineImpl::stopDucking() {
+    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "stopDucking", {METRIC_AUDIOOUTPUT_STOP_DUCKING});
+    try {
+        return m_platformAudioOutput->stopDucking();
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
@@ -213,6 +244,18 @@ void AudioOutputEngineImpl::onMediaError(MediaError error, const std::string& de
     std::stringstream mediaError;
     mediaError << error;
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onMediaError", {METRIC_AUDIOOUTPUT_MEDIA_ERROR, mediaError.str()});
+    try {
+        Throw("unhandledMethod");
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+void AudioOutputEngineImpl::onAudioFocusEvent(FocusAction action) {
+    std::stringstream focusAction;
+    focusAction << action;
+    emitCounterMetrics(
+        METRIC_PROGRAM_NAME_SUFFIX, "onAudioFocusEvent", {METRIC_AUDIOOUTPUT_AUDIO_FOCUS_EVENT, focusAction.str()});
     try {
         Throw("unhandledMethod");
     } catch (std::exception& ex) {

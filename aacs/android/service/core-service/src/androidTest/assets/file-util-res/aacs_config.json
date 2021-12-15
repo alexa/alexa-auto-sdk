@@ -1,0 +1,223 @@
+{
+  "aacs.alexa": {
+    "deviceInfo": {
+      "clientId": "",
+      "productId": "",
+      "deviceSerialNumber": "",
+      "manufacturerName": "na",
+      "description": "na"
+    },
+    "localMediaSource": {
+      "types": []
+    }
+  },
+  "aacs.carControl": {
+    "endpoints":[],
+    "zones":[]
+  },
+  "aacs.vehicle": {
+    "info": {
+      "make": "Amazon",
+      "model": "AACE",
+      "year": "2020",
+      "trim": "aac",
+      "geography": "US",
+      "version": "1.2.3",
+      "os": "Sample OS 1.0",
+      "arch": "Sample Arch 1.0",
+      "language": "en-US",
+      "microphone": "SingleArray",
+      "countries": "US,GB,IE,CA,DE,AT,IN,JP,AU,NZ,FR",
+      "vehicleIdentifier": "Sample Identifier ABC"
+    },
+    "operatingCountry": "US"
+  },
+  "aacs.cbl": {
+    "enableUserProfile": false
+  },
+  "aacs.general": {
+    "version": "1.0",
+    "persistentSystemService": false,
+    "startServiceOnBootEnabled": true,
+    "ipc": {
+      "cacheCapacity": 20
+    },
+    "intentTargets" : {
+      "AASB" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "APL" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AddressBook" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "Alerts" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AlexaClient" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AlexaComms" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AlexaSpeaker" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AudioInput" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AudioOutput" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AudioPlayer" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "AuthProvider" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "CarControl" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "CBL" : {
+        "type": ["RECEIVER", "RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1", "com.amazon.aacssampleapp2"],
+        "class": [".IntentReceiver", ".IntentReceiver"]
+      },
+      "DoNotDisturb" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "EqualizerController" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "ExternalMediaAdapter" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "GlobalPreset" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "LocalMediaSource" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "LocationProvider" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "Navigation" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "NetworkInfoProvider" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "Notifications" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "PhoneCallController" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "PlaybackController" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "PropertyManager" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "SpeechRecognizer" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      },
+      "TemplateRuntime" : {
+        "type": ["RECEIVER"],
+        "package": ["com.amazon.aacssampleapp1"],
+        "class": [".IntentReceiver"]
+      }
+    }
+  },
+  "aacs.defaultPlatformHandlers": {
+    "useDefaultLocationProvider": true,
+    "useDefaultNetworkInfoProvider": true,
+    "useDefaultExternalMediaAdapter": true,
+    "audioInput": {
+      "audioType": {
+        "VOICE": {
+          "useDefault": true,
+          "audioSource": "MediaRecorder.AudioSource.MIC",
+          "externalSource": {
+            "type": "ACTIVITY",
+            "package": "com.amazon.aacssampleapp1",
+            "class": ".MainActivity"
+          }
+        }
+      }
+    },
+    "audioOutput": {
+      "audioType": {
+        "TTS": {
+          "useDefault": true
+        },
+        "ALARM": {
+          "useDefault": true
+        },
+        "MUSIC": {
+          "useDefault": false
+        },
+        "NOTIFICATION": {
+          "useDefault": true
+        },
+        "EARCON": {
+          "useDefault": true
+        },
+        "RINGTONE": {
+          "useDefault": true
+        }
+      }
+    }
+  }
+}

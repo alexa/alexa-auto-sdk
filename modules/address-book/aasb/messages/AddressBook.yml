@@ -1,0 +1,132 @@
+topic: AddressBook
+namespace: aasb.message.addressBook.addressBook
+path: AddressBook/AddressBook
+
+messages:
+  - action: AddAddressBook
+    direction: incoming
+    desc: Notifies the engine on an availability of an address book.
+    payload:
+      - name: addressBookSourceId
+        desc: A unique identifier for an address book.
+      - name: name
+        desc: Friendly name of the address book, or an empty string if not available.
+      - name: type
+        type: AddressBookType
+        desc: Type of the address book AddressBookType.
+      - name: addressBookData
+        type: AddressBook
+        desc: A filled out AddressBook object.
+    reply:
+      - name: success
+        type: bool
+        desc: False if address book was already added or some internal error, otherwise true on successful.
+
+  - action: RemoveAddressBook
+    direction: incoming
+    desc: Notifies the engine on a non-availability of an already available address book.
+    payload:
+      - name: addressBookSourceId
+        desc: A unique identifier for an address book. Set this to empty string for engine to remove all uploaded address books.
+    reply:
+      - name: success
+        type: bool
+        desc: False if address book is not already added or some internal error, otherwise true on successful.
+
+types:
+  - name: AddressBook
+    type: struct
+    values:
+      - name: navigationNames
+        type: list:NavigationName
+        desc: List of NavigationName.
+      - name: contactNames
+        type: list:ContactName
+        desc: List of ContactName.
+      - name: phoneData
+        type: list:PhoneData
+        desc: List of PhoneData.
+      - name: postalAddresses
+        type: list:PostalAddress
+        desc: List of PostalAddresses.
+
+  - name: NavigationName
+    type: struct
+    values:
+      - name: entryId
+        desc: A unique identifier of entry in an address book.
+      - name: name
+        desc: Name of the entry, or an empty string if not available. If the name field contains Kanji characters, you must also provide the corresponding phoneticName. Alexa uses the phonetic values for entity resolution and TTS when the device locale setting is "ja-JP".
+      - name: phoneticName
+        desc: Phonetic name of the entry if available.
+        default: ""
+
+  - name: ContactName
+    type: struct
+    values:
+      - name: entryId
+        desc: A unique identifier of entry in an address book.
+      - name: firstName
+        desc: First name of the entry, or an empty string if not available. If the firstName field contains Kanji characters, you must also provide the corresponding phoneticFirstName. Alexa uses the phonetic values for entity resolution and TTS when the device locale setting is "ja-JP".
+      - name: lastName
+        desc: Last name of the entry, or an empty string if not available. If the lastName field contains Kanji characters, you must also provide the corresponding phoneticLastName. Alexa uses the phonetic values for entity resolution and TTS when the device locale setting is "ja-JP".
+      - name: nickname
+        desc: Name of the entry, or an empty string if not available.
+      - name: phoneticFirstName
+        desc: Phonetic first name of entry if available.
+        default: ""
+      - name: phoneticLastName
+        desc: Phonetic last name of entry if available.
+        default: ""
+
+  - name: PhoneData
+    type: struct
+    values:
+      - name: entryId
+        desc: A unique identifier of entry in an address book.
+      - name: label
+        desc: "Alphanumeric phone label (Example: HOME, MOBILE), or an empty string if not available. If multiple numbers are associated with a contact, Alexa will verbally ask the customer to confirm which number they want. If labels are assigned to the numbers and Alexa recognizes the types Alexa asks for confirmation; otherwise, Alexa says the last four digits of each number for the customer to select the one to call."
+      - name: number
+        desc: Numeric phone number, or an empty string if not available.
+
+  - name: PostalAddress
+    type: struct
+    values:
+      - name: entryId
+        desc: A unique identifier of entry in an address book.
+      - name: label
+        desc: "Alphanumeric phone label (Example: HOME, MOBILE), or an empty string if not available."
+      - name: addressLine1
+        desc: First line of the postal address, or an empty string if not available.
+      - name: addressLine2
+        desc: Second line of the postal address, or an empty string if not available.
+      - name: addressLine3
+        desc: addressLine3 Third line of the postal address, or an empty string if not available.
+      - name: city
+        desc: City name, or an empty string if not available.
+      - name: stateOrRegion
+        desc: State or Region name, or an empty string if not available.
+      - name: districtOrCounty
+        desc: District or County name, or an empty string if not available.
+      - name: postalCode
+        desc: Postal code or Zip code, or an empty string if not available.
+      - name: country
+        desc: Country name, or an empty string if not available.
+      - name: latitudeInDegrees
+        type: float
+        desc: Geo latitude in degrees.
+      - name: longitudeInDegrees
+        type: float
+        desc: Geo longitude in degrees.
+      - name: accuracyInMeters
+        type: float
+        desc: Accuracy in meters, or zero if not available.
+
+  - name: AddressBookType
+    type: enum
+    values:
+      - name: CONTACT
+        desc: Contacts.
+      - name: NAVIGATION
+        desc: Navigation Address.
+        

@@ -31,6 +31,11 @@ namespace location {
 
 /**
  * LocationProvider should be extended to report geolocation to the Engine.
+ * 
+ * @deprecated This platform interface is deprecated. 
+ *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
  */
 class LocationProvider : public aace::core::PlatformInterface {
 protected:

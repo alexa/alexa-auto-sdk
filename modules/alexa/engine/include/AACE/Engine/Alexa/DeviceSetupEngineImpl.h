@@ -18,9 +18,10 @@
 
 #include <memory>
 
+#include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
-#include <DeviceSetup/DeviceSetup.h>
+#include <acsdkDeviceSetupInterfaces/DeviceSetupInterface.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/DeviceSetup.h"
@@ -41,19 +42,17 @@ private:
     /**
      * Constructor.
      */
-    DeviceSetupEngineImpl(
-        std::shared_ptr<aace::alexa::DeviceSetup> deviceSetupPlatformInterface,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
+    DeviceSetupEngineImpl(std::shared_ptr<aace::alexa::DeviceSetup> deviceSetupPlatformInterface);
 
     /**
-     * Initialize the @c DeviceSetupEngineImpl and @c DeviceSetupCapabilityAgent.
+     * Initialize the @c DeviceSetupEngineImpl object.  
      */
-    bool initialize();
+    bool initialize(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
 
 public:
     /**
      * Factory method for creating instance of @c DeviceSetupEngineImpl which handles
-     * instantiation of @c DeviceSetupCapabilityAgent.
+     * instantiation of @c DeviceSetup.
      */
     static std::shared_ptr<DeviceSetupEngineImpl> create(
         std::shared_ptr<aace::alexa::DeviceSetup> deviceSetupPlatformInterface,
@@ -61,9 +60,6 @@ public:
 
     /// @name DeviceSetupEngineInterface Functions
     /// @{
-    /** 
-     * This function sends out an event sendDeviceSetupComplete() of capability agent @c DeviceSetup
-    */
     void onSetupCompleted() override;
     /// @}
 
@@ -78,9 +74,12 @@ private:
     std::shared_ptr<aace::alexa::DeviceSetup> m_deviceSetupPlatformInterface;
 
     /// The device setup capability agent
-    std::shared_ptr<alexaClientSDK::capabilityAgents::deviceSetup::DeviceSetup> m_deviceSetupCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::acsdkDeviceSetupInterfaces::DeviceSetupInterface> m_deviceSetup;
+
+    /// For sending events Alexa
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
+    /// Executor used to call @c DeviceSetup
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
 };
 

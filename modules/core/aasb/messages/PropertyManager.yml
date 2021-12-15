@@ -1,0 +1,59 @@
+topic: PropertyManager
+namespace: aasb.message.propertyManager.propertyManager
+path: PropertyManager/PropertyManager
+
+messages:
+  - action: PropertyChanged
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation about a change in a property value in the Engine that is 
+      not initiated by the platform implementation.
+    payload:
+      - name: name
+        desc: Name of the property.
+      - name: newValue
+        desc: The new value of the property.
+
+  - action: GetProperty
+    direction: incoming
+    desc: Retrieves the property setting from the Engine.
+    payload:
+      - name: name
+        desc: The property name.
+    reply:
+      - name: name
+        desc: The property name.
+      - name: value
+        desc: The property value.
+
+  - action: PropertyStateChanged
+    direction: outgoing
+    desc: >
+      Notifies the platform implementation of the status of a property change after a call to 
+      setProperty().
+    payload:
+      - name: name
+        desc: Name of the property.
+      - name: value
+        desc: The value of the property.
+      - name: state
+        type: PropertyState
+        desc: The property state.
+
+  - action: SetProperty
+    direction: incoming
+    desc: Sets the property setting in the Engine.
+    payload:
+      - name: name
+        desc: The property name.
+      - name: value
+        desc: The property value.
+
+types:
+  - name: PropertyState
+    type: enum
+    values:
+      - name: SUCCEEDED
+        desc: The property change was successful.
+      - name: FAILED
+        desc: The property change failed.

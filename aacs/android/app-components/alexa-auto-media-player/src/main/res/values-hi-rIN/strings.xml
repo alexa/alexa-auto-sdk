@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Alexa Media</string>
+    <string name="notification_channel">Alexa Music</string>
+    <string name="notification_channel_description">मीडिया कंट्रोल के साथ Alexa Music</string>
+    <string name="notification_service_title">Alexa Music</string>
+    <string name="playback_control_skip_forward">इसे छोड़कर आगे जाएं</string>
+    <string name="playback_control_skip_backward">इसे छोड़कर पीछे जाएं</string>
+    <string name="playback_control_thumbsup">पसंद है</string>
+    <string name="playback_control_thumbsdown">नापसंद</string>
+    <string name="playback_control_shuffle">शफ़ल करें</string>
+    <string name="playback_control_loop">लूप करें</string>
+    <string name="playback_control_next">आगे</string>
+    <string name="playback_control_previous">पीछे</string>
+    <string name="alexa_music_login_required">कृपया Alexa की सेटिंग में जाएं और Alexa के ज़रिए म्यूज़िक चलाने के लिए, Amazon के साथ लॉग इन करें</string>
+    <string name="alexa_music_login_text">साइन इन करें</string>
+    <string name="alexa_music_alexa_not_selected_va">Alexa के ज़रिए म्यूज़िक चलाने के लिए, असिस्ट ऐप को बदल कर Alexa चुनें</string>
+    <string name="alexa_music_select_va">Alexa को असिस्ट ऐप के रूप में चुनें</string>
+    <string name="alexa_music_hint_1">ये बोलकर देखें, \"Alexa, म्यूज़िक चलाओ.\"</string>
+    <string name="artist_msp_seperator">&#160;|&#160;</string>
+</resources>

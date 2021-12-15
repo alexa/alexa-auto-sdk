@@ -31,6 +31,8 @@ namespace location {
 */
 class LocationServiceInterface {
 public:
+    virtual ~LocationServiceInterface() = default;
+
     virtual aace::location::Location getLocation() = 0;
     virtual void addObserver(std::shared_ptr<LocationServiceObserverInterface> observer) = 0;
     virtual void removeObserver(std::shared_ptr<LocationServiceObserverInterface> observer) = 0;

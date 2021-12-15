@@ -1,0 +1,47 @@
+topic: NetworkInfoProvider
+namespace: aasb.message.network.networkInfoProvider
+path: Network/NetworkInfoProvider
+
+messages:
+  - action: GetWifiSignalStrength
+    direction: outgoing
+    desc: Requests the signal strength (RSSI) of the WiFi connection on the platform.
+    reply:
+      - name: wifiSignalStrength
+        type: int
+        desc: The RSSI of the WiFi connection.
+
+  - action: NetworkStatusChanged
+    direction: incoming
+    desc: Notifies the Engine of a network status change on the platform.
+    payload:
+      - name: status
+        type: NetworkStatus
+        desc: The connection status
+        example: "CONNECTED"
+      - name: wifiSignalStrength
+        type: int
+        desc: The RSSI of the WiFi connection.
+
+  - action: GetNetworkStatus
+    direction: outgoing
+    desc: Requests the network connection status on the platform.
+    reply:
+      - name: status
+        type: NetworkStatus
+        desc: The network connection status
+
+types:
+  - name: NetworkStatus
+    type: enum
+    values:
+      - name: UNKNOWN
+        desc: The network status is unknown
+      - name: DISCONNECTED
+        desc: The network is disconnected.
+      - name: DISCONNECTING
+        desc: The network is disconnecting
+      - name: CONNECTED
+        desc: The network is connected
+      - name: CONNECTING
+        desc: The network is connecting

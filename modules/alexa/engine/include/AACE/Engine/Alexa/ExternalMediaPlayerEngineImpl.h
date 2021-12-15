@@ -114,7 +114,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
         std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface>
-            externalMediaAdapterRegistration);
+            externalMediaAdapterRegistration,
+        bool duckingEnabled);
 
     std::shared_ptr<aace::engine::alexa::ExternalMediaPlayer> getExternalMediaPlayerCapabilityAgent();
 

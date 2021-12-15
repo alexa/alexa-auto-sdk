@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="contacts_permission_consent_title">Chiama i tuoi contatti con Alexa</string>
+    <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Configura le chiamate vocali</string>
+    <string name="contacts_permission_consent_body">Autorizza il caricamento dei contatti su %1$s nel servizio Amazon.</string>
+    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Chiama i tuoi contatti senza l\'utilizzo delle mani con [Acme Brandon] e Amazon Alexa. I tuoi contatti su %1$s saranno caricato nel servizio Amazon.</string>
+    <string name="contacts_upload_consent_title">Contatti</string>
+    <string name="contacts_upload_consent_summary">Per attivare le chiamate verso i contatti con Alexa, i contatti di questo telefono saranno caricati sul servizio Amazon.</string>
+    <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Carica i contatti nel servizio Amazon per poterli chiamare e mandargli messaggi, usando il loro nome.</string>
+    <string name="contacts_consent_yes">ATTIVA</string>
+    <string name="contacts_consent_yes_with_alexa_custom_assistant">Usa contatti</string>
+    <string name="contacts_consent_skip">SALTA</string>
+    <string name="comms_permission_status">Contatti %1$s</string>
+    <string name="comms_permission_enabled">attivato</string>
+    <string name="comms_permission_disabled">non attivo</string>
+    <string name="comms_sample_utterance">\"Alexa, chiama Luca\"</string>
+    <string name="sms_consent_title">Messaggi SMS</string>
+    <string name="sms_consent_summary">Per attivare i messaggi SMS con Alexa, gli SMS di questo telefono saranno caricati sul servizio Amazon.</string>
+    <string name="sms_consent_summary_with_alexa_custom_assistant">Carica i messaggi SMS sul servizio Amazon per farteli leggere</string>
+    <string name="pair_new_device">Associa nuovo</string>
+</resources>

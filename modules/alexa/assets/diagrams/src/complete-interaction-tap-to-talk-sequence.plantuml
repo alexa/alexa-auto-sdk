@@ -1,0 +1,160 @@
+@startuml
+
+title: Complete Alexa Interaction (Tap-to-Talk)
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+    .avs {
+        BackgroundColor TECHNOLOGY
+        BorderColor Green
+    }
+}
+</style>
+
+
+actor User Order 10
+participant Application  order 30
+participant "Auto SDK Engine" as Engine <<engine>> order 40
+participant "Alexa" as Alexa <<avs>> order 50
+
+
+note over Application
+Alexa is in an idle state
+end note
+
+== User invokes Alexa ==
+
+
+User -> Application: tap and release Alexa\ninvocation button
+Application -> Engine : SpeechRecognizer.StartCapture message\n  initiator=TAP_TO_TALK
+activate Engine
+Engine --> Application 
+deactivate Engine
+
+Engine -> Application: AudioInput.StartAudioInput message \n  audioType=SPEECH
+activate Application
+Application --> Engine
+deactivate Application
+
+
+Application -> Engine: openStream()\n  mode=WRITE
+activate Engine
+Engine --> Application: MessageStream
+deactivate Engine
+
+Engine -> Alexa: SpeechRecognizer.Recognize event \n(pt. 1 - JSON)\n  initiator.type=TAP,\n  profile=NEAR_FIELD
+
+
+Engine -> Application: AlexaClient.DialogStateChanged message \n  state=LISTENING
+activate Application
+Application --> Engine
+deactivate Application
+Application -> User : play start of listening \nearcon
+Application -> User : display listening \nvoice chrome
+
+
+== User speaks to Alexa ==
+
+User -> Application: start speaking to Alexa
+
+loop until StopAudioInput message
+  Application -> Application : record mic data
+  Application -> Engine: write data to MessageStream
+  Engine -> Alexa: SpeechRecognizer.Recognize event \n(pt. 2 - binary audio chunks)
+end
+
+Alexa -> Engine: SpeechRecognizer.StopCapture directive
+Engine -> Application: SpeechRecognizer.EndOfSpeechDetected \nmessage
+activate Application
+Application --> Engine
+deactivate Application
+Application -> User : play end of listening \nearcon
+
+
+Engine -> Application: AudioInput.StopAudioInput \nmessage
+activate Application
+Application --> Engine
+deactivate Application
+Application->Application : close mic
+
+
+== Alexa prepares response ==
+
+Alexa -> Engine: InteractionModel.RequestProcessingStarted directive
+Engine -> Application: AlexaClient.DialogStateChanged message \n  state=THINKING
+activate Application
+Application-->Engine
+deactivate Application
+Application -> User : Display thinking \nvoice chrome
+
+
+== Alexa responds to user ==
+
+Alexa -> Engine: SpeechSynthesizer.Speak directive
+Engine -> Application : AudioOutput.Prepare message\n  source=STREAM
+activate Application
+Application --> Engine
+deactivate Application
+
+Application -> Engine: openStream()\n  mode=READ
+activate Engine
+Engine --> Application: MessageStream
+deactivate Engine
+Application -> Application : buffer stream content
+
+
+Engine -> Application : AudioOutput.Play message
+activate Application
+Application --> Engine
+deactivate Application
+
+Application -> User : play Alexa speech\nfrom stream
+Application -> Engine : AudioOutput.MediaStateChanged message\n  state=PLAYING
+activate Engine
+Engine --> Application
+deactivate Engine
+Engine -> Alexa : SpeechSynthesizer.SpeechStarted event
+
+
+Engine -> Application : AlexaClient.DialogStateChanged message\n  state=SPEAKING
+activate Application
+Application --> Engine
+deactivate Application
+Application -> User : display speaking\nvoice chrome
+
+note left of Alexa
+Alexa sends additional directives depending on what the user requested
+end note
+Alexa->Engine: <<details omitted>>
+Engine->Application: <<details omitted>>
+Application->User: <<details omitted>>
+
+...
+
+== Interaction ends ==
+
+note over Application
+Alexa finishes speaking
+end note
+
+Application -> Engine : AudioOutput.MediaStateChanged message\n  state=STOPPED
+activate Engine
+Engine --> Application
+deactivate Engine
+Engine -> Alexa : SpeechSynthesizer.SpeechFinished event
+
+Engine -> Application : AlexaClient.DialogStateChanged message\n  state=IDLE
+activate Application
+Application --> Engine
+deactivate Application
+Application -> User : dismiss \nvoice chrome
+
+
+
+@enduml

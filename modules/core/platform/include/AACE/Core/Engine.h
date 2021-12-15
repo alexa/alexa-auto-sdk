@@ -21,6 +21,7 @@
 
 #include "PlatformInterface.h"
 #include "EngineConfiguration.h"
+#include "MessageBroker.h"
 
 /** @file */
 
@@ -116,6 +117,11 @@ public:
      */
     virtual bool registerPlatformInterface(
         std::initializer_list<std::shared_ptr<aace::core::PlatformInterface>> platformInterfaceList) = 0;
+
+    /**
+     * Returns the Engine's MessageBroker instance.
+     */
+    virtual std::shared_ptr<MessageBroker> getMessageBroker() = 0;
 };
 
 }  // namespace core

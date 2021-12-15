@@ -1,0 +1,12 @@
+topic: AASB
+namespace: aasb.message.aasb.service
+path: AASB/Service
+
+messages:
+  - action: StartService
+    direction: outgoing
+    desc: Notifies the platform that the AASB service has started.
+
+  - action: StopService
+    direction: outgoing
+    desc: Notifies the platform that the AASB service is about to stop.

@@ -16,7 +16,7 @@ class GlibnetworkingConan(ConanFile):
         "shared": False
     }
     generators = "pkg_config"
-    requires = ["openssl/1.1.1i"]
+    requires = ["openssl/1.1.1m"]
     build_requires = ["meson/0.56.2","pkgconf/1.7.3"]
 
     _meson = None

@@ -151,7 +151,7 @@ class LibcurlConan(ConanFile):
             if self.settings.os == "Neutrino":
                 self.requires("openssl/qnx700-1.0")
             else:
-                self.requires("openssl/1.1.1i")
+                self.requires("openssl/1.1.1m")
         if self.options.with_zlib:
             self.requires("zlib/1.2.11")
 

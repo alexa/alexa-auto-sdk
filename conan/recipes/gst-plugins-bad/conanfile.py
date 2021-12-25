@@ -22,7 +22,7 @@ class GStPluginsBadConan(ConanFile):
     options = dict({"shared": [True, False], "fPIC": [ True, False]}, **{f: _meson_feature for f in _features})
     default_options = dict({"shared": False, "fPIC": True}, **{f: "auto" for f in _features})
     exports_sources = ["patches/*.patch"]
-    requires = ["openssl/1.1.1i", "libxml2/2.9.10"]
+    requires = ["openssl/1.1.1m", "libxml2/2.9.10"]
     build_requires = ["meson/0.56.2", "bison/3.7.1", "flex/2.6.4", "pkgconf/1.7.3"]
     generators = "pkg_config"
 

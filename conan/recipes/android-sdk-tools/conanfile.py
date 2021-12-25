@@ -9,7 +9,7 @@ class AndroidSdkToolsConanFile(ConanFile):
     no_copy_source = True
     exports_sources = ["cmake-wrapper.cmd", "cmake-wrapper"]
     settings = "os", "arch", "compiler", "build_type"
-    requires = ["zulu-openjdk/11.0.8"]
+    requires = ["zulu-openjdk/11.0.12"]
 
     options = {
         "sdk_version": "ANY",

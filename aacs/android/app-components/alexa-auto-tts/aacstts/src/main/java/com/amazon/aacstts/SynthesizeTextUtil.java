@@ -277,31 +277,38 @@ public class SynthesizeTextUtil {
 
                         while (isReading && mIsStreamingEnabled) {
                             byte[] byteArray = new byte[STREAM_READ_BYTE_ARRAY_SIZE];
-                            int bytesAvailable = Math.max(1, Math.min(inputStream.available(), byteArray.length));
-                            int bytesRead = inputStream.read(byteArray, 0, bytesAvailable);
-                            Log.v(TAG, String.format(" reading [%s] bytes", bytesRead));
-                            byte[] bytesToBeWritten;
-                            if (requiresMP3Encoding) {
-                                bytesToBeWritten = decoder.decode(byteArray, bytesRead);
-                            } else {
-                                bytesToBeWritten = byteArray;
-                            }
-                            if (bytesToBeWritten != null && bytesToBeWritten.length > 0) {
-                                Log.d(TAG,
-                                        String.format("Bytes to be written: [%s], bytes read: [%s]",
-                                                bytesToBeWritten.length, bytesRead));
-                                int offset = 0;
-                                while (offset < bytesToBeWritten.length) {
-                                    int bytesToWrite = Math.min(
-                                            synthesisCallback.getMaxBufferSize(), bytesToBeWritten.length - offset);
-                                    Log.d(TAG, String.format("offset:[%s] and writing: [%s]", offset, bytesToWrite));
-                                    synthesisCallback.audioAvailable(bytesToBeWritten, offset, bytesToWrite);
-                                    offset += bytesToWrite;
-                                }
-                            }
-
+                            int totalBytesRead = 0;
+                            int bytesRead;
+                            do {
+                                bytesRead = inputStream.read(byteArray, totalBytesRead,
+                                        byteArray.length - totalBytesRead);
+                                if (bytesRead < 0) break;
+                                totalBytesRead += bytesRead;
+                            } while (totalBytesRead < byteArray.length);
                             if (bytesRead < 0) {
+                                Log.v(TAG, " no more bytes to read");
                                 isReading = false;
+                            } else {
+                                Log.v(TAG, String.format(" reading [%s] bytes", totalBytesRead));
+                                byte[] bytesToBeWritten;
+                                if (requiresMP3Encoding) {
+                                    bytesToBeWritten = decoder.decode(byteArray, totalBytesRead);
+                                } else {
+                                    bytesToBeWritten = byteArray;
+                                }
+                                if (bytesToBeWritten != null && bytesToBeWritten.length > 0) {
+                                    Log.d(TAG,
+                                            String.format("Bytes to be written: [%s], bytes read: [%s]",
+                                                    bytesToBeWritten.length, totalBytesRead));
+                                    int offset = 0;
+                                    while (offset < bytesToBeWritten.length) {
+                                        int bytesToWrite = Math.min(
+                                                synthesisCallback.getMaxBufferSize(), bytesToBeWritten.length - offset);
+                                        Log.d(TAG, String.format("offset:[%s] and writing: [%s]", offset, bytesToWrite));
+                                        synthesisCallback.audioAvailable(bytesToBeWritten, offset, bytesToWrite);
+                                        offset += bytesToWrite;
+                                    }
+                                }
                             }
 
                             // cancel fetching from the stream.

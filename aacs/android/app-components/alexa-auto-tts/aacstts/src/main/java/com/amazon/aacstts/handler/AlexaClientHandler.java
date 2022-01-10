@@ -32,6 +32,14 @@ import java.util.Optional;
  * with {@link com.amazon.aacstts.MessageHandler} and is used for handling messages with AlexaClient topic.
  */
 public class AlexaClientHandler implements IAACSMessageHandler {
+    public interface onAlexaClientConnectionStatusChangedCallback {
+        public void onAlexaClientConnected();
+    }
+    private onAlexaClientConnectionStatusChangedCallback mAlexaClientConnectionStatusChangedCallback;
+    public AlexaClientHandler(onAlexaClientConnectionStatusChangedCallback callback) {
+        mAlexaClientConnectionStatusChangedCallback = callback;
+    }
+
     private static final String TAG = AACS_TTS_LOG_PREFIX + AlexaClientHandler.class.getSimpleName();
     private Optional<Boolean> mIsAlexaClientConnected = Optional.empty();
 
@@ -70,6 +78,7 @@ public class AlexaClientHandler implements IAACSMessageHandler {
         switch (status) {
             case AASBConstants.AlexaClient.ALEXA_CLIENT_STATUS_CONNECTED:
                 mIsAlexaClientConnected = Optional.of(true);
+                mAlexaClientConnectionStatusChangedCallback.onAlexaClientConnected();
                 break;
             default:
                 mIsAlexaClientConnected = Optional.of(false);

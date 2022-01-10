@@ -163,17 +163,7 @@ public class AmazonTextToSpeechService extends TextToSpeechService {
     protected int onLoadLanguage(String lang, String country, String variant) {
         Log.d(TAG, "onLoadLanguage");
 
-        // Load the capabilities of the TextToSpeech and
-        // update the cache with the supported languages.
-        GetCapabilitiesPayload getCapabilitiesPayload = new GetCapabilitiesPayload();
-        getCapabilitiesPayload.setProvider(DEFAULT_PROVIDER);
-
-        Optional<String> message = AACSMessageBuilder.buildMessage(
-                TTSConstants.TOPIC, TTSConstants.Action.GET_CAPABILITIES, getCapabilitiesPayload.toJsonString());
-
-        if (message.isPresent()) {
-            sendMessageToAACS(message.get(), TTSConstants.Action.GET_CAPABILITIES, TTSConstants.TOPIC);
-        }
+        sendGetCapabilitiesMessageToAACS();
 
         if (onIsLanguageAvailable(lang, country, variant) == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
             return TextToSpeech.LANG_COUNTRY_AVAILABLE;
@@ -305,7 +295,7 @@ public class AmazonTextToSpeechService extends TextToSpeechService {
             return;
         }
         mMessageHandler = new MessageHandler();
-        mMessageHandler.register(Topic.ALEXA_CLIENT, mAlexaClientHandler = new AlexaClientHandler())
+        mMessageHandler.register(Topic.ALEXA_CLIENT, mAlexaClientHandler = new AlexaClientHandler(this::sendGetCapabilitiesMessageToAACS))
                 .register(Topic.AASB, mAASBHandler = new AASBHandler())
                 .register(TTSConstants.TOPIC, mTTSHandler = new TTSHandler(mSynthesizeTextUtil));
     }
@@ -335,6 +325,21 @@ public class AmazonTextToSpeechService extends TextToSpeechService {
                                 e.getMessage(), topic, action));
             }
         });
+    }
+
+    private void sendGetCapabilitiesMessageToAACS() {
+        // Load the capabilities of the TextToSpeech and
+        // update the cache with the supported languages.
+        GetCapabilitiesPayload getCapabilitiesPayload = new GetCapabilitiesPayload();
+        getCapabilitiesPayload.setProvider(DEFAULT_PROVIDER);
+
+        Optional<String> message = AACSMessageBuilder.buildMessage(
+                TTSConstants.TOPIC, TTSConstants.Action.GET_CAPABILITIES, getCapabilitiesPayload.toJsonString());
+
+        if (message.isPresent()) {
+            sendMessageToAACS(message.get(), TTSConstants.Action.GET_CAPABILITIES, TTSConstants.TOPIC);
+        }
+
     }
 
     private Optional<ProviderVoiceItem> getVoiceItem(String locale) {

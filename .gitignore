@@ -7,7 +7,7 @@
 /.idea
 /.repo
 /.vscode
-/build
+build
 # CLion build folder
 /cmake-build-*
 /extensions/*/**

@@ -34,7 +34,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        viewBinding true
     }
 
     libraryVariants.all { variant ->

@@ -27,9 +27,7 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "4.0"
-        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {

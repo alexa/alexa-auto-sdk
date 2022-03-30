@@ -64,8 +64,8 @@ dependencies {
     implementation deps.eventbus
 
     // Database
-    implementation "androidx.room:room-runtime:2.2.6"
-    annotationProcessor "androidx.room:room-compiler:2.2.6"
+    implementation "androidx.room:room-runtime:2.4.0-alpha03" // it's the latest to build with api30 and which works for arm64
+    annotationProcessor "androidx.room:room-compiler:2.4.0-alpha03"
 
     // Navigation between UI components.
     implementation deps.androidx_navigation_fragment

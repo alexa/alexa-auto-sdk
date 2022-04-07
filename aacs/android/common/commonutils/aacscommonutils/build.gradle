@@ -36,8 +36,8 @@ dependencies {
     implementation deps.androidx_annotation
 
     // JSON Parsing
-    kapt deps.moshi_codegen
-    implementation deps.moshi
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.13.0"
+    implementation "com.squareup.moshi:moshi:1.13.0"
 
     testImplementation deps.junit
     testImplementation deps.mockito

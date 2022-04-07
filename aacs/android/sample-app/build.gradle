@@ -15,7 +15,6 @@ buildscript {
         'androidx_fragment': '1.3.6',
         'dagger': '2.41',
         'exoplayer': '2.14.0',
-        'moshi': '1.9.3',
 
         // Test Dependencies
         'mockito': '3.4.0',
@@ -40,9 +39,6 @@ buildscript {
 
         'dagger': "com.google.dagger:dagger:${versions.dagger}",
         'dagger_compiler': "com.google.dagger:dagger-compiler:${versions.dagger}",
-
-        'moshi': "com.squareup.moshi:moshi:${versions.moshi}",
-        'moshi_codegen': "com.squareup.moshi:moshi-kotlin-codegen:${versions.moshi}",
 
         'rxjava3': "io.reactivex.rxjava3:rxjava:3.0.4",
         'glide': "com.github.bumptech.glide:glide:4.11.0",

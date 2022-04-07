@@ -49,7 +49,7 @@ buildscript {
         'glide_compiler': "com.github.bumptech.glide:compiler:4.11.0",
         'google_zxing': 'com.google.zxing:core:3.2.0',
         'google_guava': 'com.google.guava:guava:27.0.1-android',
-        'eventbus': 'org.greenrobot:eventbus:3.2.0',
+        'eventbus': 'org.greenrobot:eventbus:3.3.1',
         'okhttp': 'com.squareup.okhttp3:okhttp:3.9.1',
 
         'android_appcompat': 'com.android.support:appcompat-v7:28+',

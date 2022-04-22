@@ -64,7 +64,7 @@ android {
         doNotStrip '**/*.so'
     }
 
-    ndkVersion = "20.0.5594570"
+    ndkVersion = "24.0.8215888"
 }
 
 ext {

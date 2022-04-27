@@ -2,4 +2,5 @@ include(default)
 
 [settings]
 os=Macos
+arch=armv8
 os_build=Macos

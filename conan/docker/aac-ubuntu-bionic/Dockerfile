@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM arm64v8/ubuntu:bionic
 
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \

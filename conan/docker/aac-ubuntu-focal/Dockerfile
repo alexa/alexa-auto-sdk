@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM arm64v8/ubuntu:focal
 
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y \

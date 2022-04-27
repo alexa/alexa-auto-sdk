@@ -8,7 +8,7 @@ class GradleConanFile(ConanFile):
     version = "7.0"
     no_copy_source = True
     settings = "os", "arch", "compiler", "build_type"
-    requires = ["zulu-openjdk/11.0.8"]
+    requires = ["zulu-openjdk/11.0.12"]
 
     @staticmethod
     def chmod_plus_x(filename):

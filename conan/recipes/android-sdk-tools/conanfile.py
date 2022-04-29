@@ -18,7 +18,7 @@ class AndroidSdkToolsConanFile(ConanFile):
     }
     default_options = {
         "sdk_version": "7302050",
-        "ndk_version": "20.0.5594570",
+        "ndk_version": "24.0.8215888",
         "android_stl": "c++_shared"
     }
 

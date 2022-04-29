@@ -11,7 +11,6 @@ android {
         versionCode 1
         versionName "4.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -20,7 +19,6 @@ android {
         }
         debug {
             testCoverageEnabled true
-            debuggable true
         }
     }
 
@@ -46,7 +44,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        viewBinding true
     }
 
     applicationVariants.all { variant ->
@@ -66,7 +64,7 @@ android {
         doNotStrip '**/*.so'
     }
 
-    ndkVersion = "20.0.5594570"
+    ndkVersion = "24.0.8215888"
 }
 
 ext {

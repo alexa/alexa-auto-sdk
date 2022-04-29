@@ -2,7 +2,7 @@
 
 buildscript {
     ext.versions = [
-        'kotlin': '1.4.0',
+        'kotlin': '1.6.10',
         'androidx_core': '1.3.2',
         'androidx_appcompat': '1.2.0',
         'androidx_annotation': '1.1.0',
@@ -13,9 +13,8 @@ buildscript {
         'androidx_recycler_view': '1.1.0',
         'androidx_media': '1.1.0',
         'androidx_fragment': '1.3.6',
-        'dagger': '2.22',
-        'exoplayer': '2.13.3',
-        'moshi': '1.9.3',
+        'dagger': '2.41',
+        'exoplayer': '2.14.0',
 
         // Test Dependencies
         'mockito': '3.4.0',
@@ -41,15 +40,12 @@ buildscript {
         'dagger': "com.google.dagger:dagger:${versions.dagger}",
         'dagger_compiler': "com.google.dagger:dagger-compiler:${versions.dagger}",
 
-        'moshi': "com.squareup.moshi:moshi:${versions.moshi}",
-        'moshi_codegen': "com.squareup.moshi:moshi-kotlin-codegen:${versions.moshi}",
-
         'rxjava3': "io.reactivex.rxjava3:rxjava:3.0.4",
         'glide': "com.github.bumptech.glide:glide:4.11.0",
         'glide_compiler': "com.github.bumptech.glide:compiler:4.11.0",
         'google_zxing': 'com.google.zxing:core:3.2.0',
         'google_guava': 'com.google.guava:guava:27.0.1-android',
-        'eventbus': 'org.greenrobot:eventbus:3.2.0',
+        'eventbus': 'org.greenrobot:eventbus:3.3.1',
         'okhttp': 'com.squareup.okhttp3:okhttp:3.9.1',
 
         'android_appcompat': 'com.android.support:appcompat-v7:28+',
@@ -83,7 +79,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.android.tools.build:gradle:4.0.1"
+        classpath "com.android.tools.build:gradle:7.0.4"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${versions.androidx_navigation}"
     }

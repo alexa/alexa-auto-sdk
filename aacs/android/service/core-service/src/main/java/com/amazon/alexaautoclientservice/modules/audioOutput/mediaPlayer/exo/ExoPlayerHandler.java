@@ -406,7 +406,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         }
     }
 
-    private class PlayerEventListener extends Player.DefaultEventListener {
+    private class PlayerEventListener implements Player.Listener {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             switch (playbackState) {

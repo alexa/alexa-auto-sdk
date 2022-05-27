@@ -39,7 +39,8 @@ AASBTextToSpeechEngineService::AASBTextToSpeechEngineService(
 bool AASBTextToSpeechEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // TextToSpeech

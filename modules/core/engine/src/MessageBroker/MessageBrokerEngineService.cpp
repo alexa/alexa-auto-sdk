@@ -32,9 +32,8 @@ static const std::string TAG("aace.messageBroker.MessageBrokerEngineService");
 // register the service
 REGISTER_SERVICE(MessageBrokerEngineService);
 
-MessageBrokerEngineService::MessageBrokerEngineService(
-    const aace::engine::core::ServiceDescription& description) :
-    aace::engine::core::EngineService(description) {
+MessageBrokerEngineService::MessageBrokerEngineService(const aace::engine::core::ServiceDescription& description) :
+        aace::engine::core::EngineService(description) {
 #ifdef MESSAGE_VERSION
     m_currentVersion = VERSION(MESSAGE_VERSION);
 #endif
@@ -51,7 +50,8 @@ bool MessageBrokerEngineService::initialize() {
         ThrowIfNull(m_streamManager, "invalidStreamManager");
 
         ThrowIfNot(
-            registerServiceInterface<MessageBrokerServiceInterface>(shared_from_this()), "registerMessageBrokerServiceInterfaceFailed");
+            registerServiceInterface<MessageBrokerServiceInterface>(shared_from_this()),
+            "registerMessageBrokerServiceInterfaceFailed");
 
         return true;
     } catch (std::exception& ex) {
@@ -100,17 +100,16 @@ bool MessageBrokerEngineService::configure(std::shared_ptr<std::istream> configu
                 defaultMessageTimeout.is_number_integer() && defaultMessageTimeout.is_number_unsigned(),
                 "invalidConfiguration");
             m_defaultMessageTimeout = defaultMessageTimeout.get<uint16_t>();
-        }
-        else {
+        } else {
             m_defaultMessageTimeout = 500;
         }
 
         // set the configured message broker message timeout
-        m_messageBroker->setMessageTimeout( std::chrono::milliseconds(m_defaultMessageTimeout) );
+        m_messageBroker->setMessageTimeout(std::chrono::milliseconds(m_defaultMessageTimeout));
 
         auto version = root["/version"_json_pointer];
         if (version != nullptr) {
-            ThrowIfNot(version.is_string(),"invalidConfiguration");
+            ThrowIfNot(version.is_string(), "invalidConfiguration");
             m_configuredVersion = VERSION(version.get<std::string>());
         }
 

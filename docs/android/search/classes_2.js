@@ -1,7 +1,0 @@
-var searchData=
-[
-  ['devicesetup',['DeviceSetup',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_device_setup.html',1,'com::amazon::aace::alexa']]],
-  ['deviceusage',['DeviceUsage',['../classcom_1_1amazon_1_1aace_1_1device_usage_1_1_device_usage.html',1,'com::amazon::aace::deviceUsage']]],
-  ['dialogstate',['DialogState',['../enumcom_1_1amazon_1_1aace_1_1alexa_1_1_alexa_client_1_1_dialog_state.html',1,'com::amazon::aace::alexa::AlexaClient']]],
-  ['donotdisturb',['DoNotDisturb',['../classcom_1_1amazon_1_1aace_1_1alexa_1_1_do_not_disturb.html',1,'com::amazon::aace::alexa']]]
-];

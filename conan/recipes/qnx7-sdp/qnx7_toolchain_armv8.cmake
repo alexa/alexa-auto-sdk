@@ -3,7 +3,7 @@ set(CMAKE_SYSTEM_NAME QNX)
 
 set(CMAKE_C_COMPILER qcc)
 set(CMAKE_C_COMPILER_TARGET gcc_ntoaarch64le)
-set(CMAKE_CXX_COMPILER QCC)
+set(CMAKE_CXX_COMPILER q++)
 set(CMAKE_CXX_COMPILER_TARGET gcc_ntoaarch64le)
 
 set(CMAKE_AR ntoaarch64-ar CACHE FILEPATH "Archiver")

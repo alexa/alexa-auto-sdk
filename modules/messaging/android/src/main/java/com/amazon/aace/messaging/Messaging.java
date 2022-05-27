@@ -32,8 +32,8 @@ import java.util.HashMap;
  * for sending messages, updating message status, and providing the messaging endpoint
  * connection state and permissions.
  *
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

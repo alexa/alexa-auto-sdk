@@ -156,7 +156,8 @@ std::shared_ptr<AASBExternalMediaAdapter> AASBExternalMediaAdapter::create(
     }
 }
 
-bool AASBExternalMediaAdapter::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBExternalMediaAdapter::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
         m_messageBroker = messageBroker;
@@ -178,7 +179,8 @@ bool AASBExternalMediaAdapter::initialize(std::shared_ptr<aace::engine::messageB
                         aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo discoveredPlayer;
                         discoveredPlayer.localPlayerId = player.localPlayerId;
                         discoveredPlayer.spiVersion = player.spiVersion;
-                        discoveredPlayer.validationMethod = aasb::message::alexa::externalMediaAdapter::toString(player.validationMethod);
+                        discoveredPlayer.validationMethod =
+                            aasb::message::alexa::externalMediaAdapter::toString(player.validationMethod);
 
                         std::vector<std::string> validationDataVector;
                         for (auto data : player.validationData) {
@@ -410,7 +412,8 @@ bool AASBExternalMediaAdapter::playControl(const std::string& localPlayerId, Pla
         aasb::message::alexa::externalMediaAdapter::PlayControlMessage message;
 
         message.payload.localPlayerId = localPlayerId;
-        message.payload.controlType = static_cast<aasb::message::alexa::externalMediaAdapter::PlayControlType>(controlType);
+        message.payload.controlType =
+            static_cast<aasb::message::alexa::externalMediaAdapter::PlayControlType>(controlType);
 
         m_messageBroker_lock->publish(message.toString()).send();
         return true;
@@ -518,14 +521,16 @@ bool AASBExternalMediaAdapter::getState(
 
         std::vector<aasb::message::alexa::externalMediaAdapter::SupportedPlaybackOperation> supportedOperations;
         for (auto operation : state.playbackState.supportedOperations) {
-            supportedOperations.push_back(static_cast<aasb::message::alexa::externalMediaAdapter::SupportedPlaybackOperation>(operation));
+            supportedOperations.push_back(
+                static_cast<aasb::message::alexa::externalMediaAdapter::SupportedPlaybackOperation>(operation));
         }
         playbackState.supportedOperations = supportedOperations;
 
         playbackState.trackOffset = state.playbackState.trackOffset.count();
         playbackState.shuffleEnabled = state.playbackState.shuffleEnabled;
         playbackState.repeatEnabled = state.playbackState.repeatEnabled;
-        playbackState.favorites = static_cast<aasb::message::alexa::externalMediaAdapter::Favorites>(state.playbackState.favorites);
+        playbackState.favorites =
+            static_cast<aasb::message::alexa::externalMediaAdapter::Favorites>(state.playbackState.favorites);
         playbackState.type = state.playbackState.type;
         playbackState.playbackSource = state.playbackState.playbackSource;
         playbackState.playbackSourceId = state.playbackState.playbackSourceId;
@@ -542,7 +547,8 @@ bool AASBExternalMediaAdapter::getState(
         playbackState.largeURL = state.playbackState.largeURL;
         playbackState.coverId = state.playbackState.coverId;
         playbackState.mediaProvider = state.playbackState.mediaProvider;
-        playbackState.mediaType = static_cast<aasb::message::alexa::externalMediaAdapter::MediaType>(state.playbackState.mediaType);
+        playbackState.mediaType =
+            static_cast<aasb::message::alexa::externalMediaAdapter::MediaType>(state.playbackState.mediaType);
         playbackState.duration = state.playbackState.duration.count();
         externalMediaAdapterState.playbackState = playbackState;
 

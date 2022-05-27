@@ -24,7 +24,7 @@ def imports(obj):
         if "message_dir" in obj.deps_user_info[next].vars:
             if os.path.exists( obj.deps_user_info[next].message_dir ):
                 message_dependencies.append( obj.deps_user_info[next].message_dir )
-    
+
     message_input_dirs = []
     message_source_folder = obj.build_folder if obj.in_local_cache else obj.recipe_folder
     for next in [os.path.join(message_source_folder,next) for next in obj._module_message_directories]:
@@ -34,7 +34,7 @@ def imports(obj):
         builder = A2MLProcessor({
             "input": message_input_dirs,
             "dependencies": message_dependencies,
-            "output": os.path.join( obj.install_folder, "aasb-message-headers" ),
+            "output": os.path.join( obj.install_folder, "aasb-messages" ),
             "parser": "a2ml",
             "generator": "aasb",
             "message_version": str(obj.options.message_version)

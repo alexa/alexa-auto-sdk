@@ -55,4 +55,4 @@ private:
 }  // namespace engine
 }  // namespace aace
 
-#endif // AACE_ENGINE_MESSAGE_BROKER_STREAM_MANAGER_IMPL_H
+#endif  // AACE_ENGINE_MESSAGE_BROKER_STREAM_MANAGER_IMPL_H

@@ -5,62 +5,94 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/two_choice_dialog"
     android:theme="@style/Theme.Alexa.Standard"
-    android:background="?attr/android:colorBackgroundFloating"
+    android:background="?android:attr/colorBackgroundFloating"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <!--Next 4 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/top_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/popup_top_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/popup_bottom_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
+    <!--Title-->
     <TextView
         android:id="@+id/header_text"
-        android:textAppearance="@style/Alexa.Heading2Text"
-        android:layout_width="match_parent"
+        style="@style/Alexa.TitleText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="@dimen/margin_vertical_double"
-        android:layout_marginStart="@dimen/margin_horizontal_double"
-        android:layout_marginEnd="@dimen/margin_horizontal_double"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintTop_toTopOf="@id/top_guideline"
         app:layout_constraintBottom_toTopOf="@id/content_text"
         app:layout_constraintHorizontal_weight="2"
         tools:text="Dialog Header">
     </TextView>
 
+    <!--Body-->
     <TextView
         android:id="@+id/content_text"
-        android:textAppearance="@style/Alexa.Heading3Text"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="@dimen/margin_vertical_double"
-        android:layout_marginStart="@dimen/margin_horizontal_double"
-        android:layout_marginEnd="@dimen/margin_horizontal_double"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/Alexa.SubtitleText"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
         app:layout_constraintTop_toBottomOf="@id/header_text"
         tools:text="Dialog Content" />
 
+    <!--Left button-->
     <TextView
         android:id="@+id/btn1"
         style="@style/Alexa.DarkButtonRoundSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_vertical_octuple"
-        android:layout_marginBottom="@dimen/margin_vertical_double"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/content_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="64dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_guideline"
         app:layout_constraintEnd_toStartOf="@id/btn2"
-        tools:text="Button 1"/>
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/content_text"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="Button 1" />
 
+
+    <!--Right button-->
     <TextView
         android:id="@+id/btn2"
         style="@style/Alexa.LightButtonRoundSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/bottom_guideline"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toEndOf="@id/btn1"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/btn1"
-        tools:text="Button 2"/>
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="Button 2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

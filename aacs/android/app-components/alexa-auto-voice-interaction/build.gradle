@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -8,7 +7,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -64,6 +63,9 @@ dependencies {
 
     // Eventbus
     implementation deps.eventbus
+
+    implementation project(path: ':aacs-annotation-api')
+    annotationProcessor project(path: ':aacs-annotation-processor')
 
     // Test Dependencies
     testImplementation deps.junit

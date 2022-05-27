@@ -27,12 +27,14 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
-import com.amazon.aace.aasb.AASB;
+import com.amazon.aace.core.MessageBroker;
+import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.AASBConstants.AudioInput;
 import com.amazon.aacsconstants.AASBConstants.AudioOutput;
 import com.amazon.aacsconstants.Action;
+import com.amazon.aacsconstants.MediaConstants;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.aacsipc.TargetComponent;
@@ -54,10 +56,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 
-public class AASBHandler extends AASB {
+public class AASBHandler {
     private static final String TAG = AACSConstants.AACS + "-" + AASBHandler.class.getSimpleName();
     private Context mContext;
 
+    private MessageBroker mMessageBroker;
     private AACSSender mAACSSender;
     private AudioOutputMessageHandler mAudioOutput;
     private AudioInputMessageHandler mAudioInput;
@@ -68,11 +71,14 @@ public class AASBHandler extends AASB {
     private long mCachedBufferedBytes;
     private static AACSMessageLogger mAACSMessageLogger;
 
-    public AASBHandler(@NonNull Context context) {
+    public AASBHandler(@NonNull Context context, @NonNull MessageBroker messageBroker) {
         mContext = context;
         int cacheCapacity = FileUtil.getIPCCacheCapacity();
-        mAACSSender = new AACSSender(cacheCapacity);
 
+        mMessageBroker = messageBroker;
+        mMessageBroker.subscribe(this::messageReceived, "*", "*");
+
+        mAACSSender = new AACSSender(cacheCapacity);
         mAlexaClient = new AlexaClientMessageHandler();
         mAudioInputFocusManager = new AudioInputFocusManager(context, mAlexaClient);
         mAudioOutput = new AudioOutputMessageHandler(context, mAlexaClient);
@@ -88,9 +94,12 @@ public class AASBHandler extends AASB {
         mCachedBufferedBytes = 0;
     }
 
-    @Override
     public void messageReceived(String message) {
         handleMessage(false, message);
+    }
+
+    public MessageStream openStream(String streamId, MessageStream.Mode mode) {
+        return mMessageBroker.openStream(streamId, mode);
     }
 
     public void handleMessage(boolean isToEngine, String message) {
@@ -134,14 +143,28 @@ public class AASBHandler extends AASB {
                 }
             }
             if (isToEngine) {
-                publish(message);
+                publishMessage(messageId, topic, action, payload, message);
             } else {
                 sendDirective(messageId, topic, action, payload, message);
             }
 
         } catch (Exception e) {
-            Log.e(TAG, String.format("Failed to parse AASB message: %s", message));
+            Log.e(TAG, String.format("Failed to handle AASB message: %s. Exception: %s", message, e.getMessage()));
         }
+    }
+
+    private void publishMessage(String messageId, String topic, String action, String payload, String message) {
+        if (Topic.AUDIO_OUTPUT.equals(topic) && Action.AudioOutput.MEDIA_STATE_CHANGED.equals(action)) {
+            try {
+                JSONObject jsonPayload = new JSONObject(payload);
+                String channel = jsonPayload.optString(MediaConstants.CHANNEL);
+                String state = jsonPayload.optString(MediaConstants.STATE);
+                mAudioInputFocusManager.setMediaState(channel, state);
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+        mMessageBroker.publish(message);
     }
 
     private void sendDirective(String messageId, String topic, String action, String payload, String message) {
@@ -247,7 +270,7 @@ public class AASBHandler extends AASB {
                 }
             }
 
-            publish(message);
+            mMessageBroker.publish(message);
         } else {
             Log.e(TAG, "Failed to publish AASB message");
         }

@@ -46,7 +46,7 @@ private:
 
 protected:
     NetworkInfoProviderHandler(
-        std::weak_ptr<Activity> activity, 
+        std::weak_ptr<Activity> activity,
         std::weak_ptr<logger::LoggerHandler> loggerHandler,
         std::shared_ptr<aace::core::MessageBroker> messageBroker);
 
@@ -81,7 +81,9 @@ private:
      * @param [in] status The connection status of the WiFi network
      * @param [in] wifiSignalStrength The RSSI of the WiFi connection
      */
-    void networkStatusChanged(aasb::message::network::networkInfoProvider::NetworkStatus status, int wifiSignalStrength);
+    void networkStatusChanged(
+        aasb::message::network::networkInfoProvider::NetworkStatus status,
+        int wifiSignalStrength);
 
     /**
      * Handles the implementation of the getNetworkStatus message

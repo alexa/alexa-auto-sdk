@@ -75,19 +75,19 @@ void AlexaClientHandler::subscribeToAASBMessages() {
 }
 
 void AlexaClientHandler::handleDialogStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received DialogStateChangedMessage");
     DialogStateChangedMessage msg = json::parse(message);
     dialogStateChanged(msg.payload.state);
 }
 
 void AlexaClientHandler::handleAuthStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AuthStateChangedMessage");
     AuthStateChangedMessage msg = json::parse(message);
     authStateChanged(msg.payload.state, msg.payload.error);
 }
 
 void AlexaClientHandler::handleConnectionStatusChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ConnectionStatusChangedMessage");
     ConnectionStatusChangedMessage msg = json::parse(message);
     connectionStatusChanged(msg.payload.status, msg.payload.reason);
 }

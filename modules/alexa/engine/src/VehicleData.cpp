@@ -35,7 +35,7 @@ static const char VEHICLEDATA_ATTRIBUTE_INTERFACE_TYPE[] = "AlexaInterface";
 /// VehicleData interface name
 static const char VEHICLEDATA_ATTRIBUTE_INTERFACE_NAME[] = "Alexa.Automotive.VehicleData";
 /// VehicleData interface version
-static const char VEHICLEDATA_ATTRIBUTE_INTERFACE_VERSION[] = "1.0";
+static const char VEHICLEDATA_ATTRIBUTE_INTERFACE_VERSION[] = "1.2";
 /// VehicleData capability analytics attribute: operating system
 static const char VEHICLEDATA_ATTRIBUTE_OS[] = "OPERATING_SYSTEM";
 /// VehicleData capability analytics attribute: hardware architecture
@@ -54,6 +54,12 @@ static const char VEHICLEDATA_ATTRIBUTE_MODEL[] = "model";
 static const char VEHICLEDATA_ATTRIBUTE_TRIM[] = "trim";
 /// VehicleData capability attribute: year
 static const char VEHICLEDATA_ATTRIBUTE_YEAR[] = "year";
+/// VehicleData capability attribute: engineType
+static const char VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE[] = "engineType";
+/// VehicleData capability attribute: vehicleIdentifier
+static const char VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER[] = "vehicleIdentifier";
+/// VehicleData capability attribute: rseEmbeddedFireTvs
+static const char VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS[] = "rseEmbeddedFireTvs";
 
 /// Map from a capability attribute string to its corresponding @c VehiclePropertyType
 static std::unordered_map<std::string, VehicleData::VehiclePropertyType> s_attributeToVehiclePropertyMap = {
@@ -65,7 +71,11 @@ static std::unordered_map<std::string, VehicleData::VehiclePropertyType> s_attri
     {VEHICLEDATA_ATTRIBUTE_MAKE, VehicleData::VehiclePropertyType::MAKE},
     {VEHICLEDATA_ATTRIBUTE_MODEL, VehicleData::VehiclePropertyType::MODEL},
     {VEHICLEDATA_ATTRIBUTE_TRIM, VehicleData::VehiclePropertyType::TRIM},
-    {VEHICLEDATA_ATTRIBUTE_YEAR, VehicleData::VehiclePropertyType::YEAR}};
+    {VEHICLEDATA_ATTRIBUTE_YEAR, VehicleData::VehiclePropertyType::YEAR},
+    {VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, VehicleData::VehiclePropertyType::ENGINE_TYPE},
+    {VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, VehicleData::VehiclePropertyType::VEHICLE_IDENTIFIER},
+    {VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, VehicleData::VehiclePropertyType::RSE_EMBEDDED_FIRETVS},
+};
 
 std::shared_ptr<VehicleData> VehicleData::create(const VehiclePropertyMap& vehiclePropertyMap) {
     try {
@@ -133,6 +143,29 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> Vehicle
         ThrowIfNot(year.hasValue(), "missingRequiredYearAttribute");
         ThrowIf(year.value() == "", "yearAttributeIsEmpty");
         payload.AddMember(VEHICLEDATA_ATTRIBUTE_YEAR, (int64_t)std::stol(year.value()), allocator);
+
+        auto engineType = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, vehiclePropertyMap);
+        if (engineType.hasValue()) {
+            payload.AddMember(VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, engineType.value(), allocator);
+        } else {
+            AACE_DEBUG(LX(TAG, "skippingEmptyEngineType"));
+        }
+
+        auto vehicleIdentifier = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, vehiclePropertyMap);
+        if (vehicleIdentifier.hasValue()) {
+            payload.AddMember(VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, vehicleIdentifier.value(), allocator);
+        } else {
+            AACE_DEBUG(LX(TAG, "skippingEmptyVehicleIdentifier"));
+        }
+
+        auto rseEmbeddedFireTvs =
+            getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, vehiclePropertyMap);
+        if (rseEmbeddedFireTvs.hasValue()) {
+            payload.AddMember(
+                VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, (int64_t)std::stol(rseEmbeddedFireTvs.value()), allocator);
+        } else {
+            AACE_DEBUG(LX(TAG, "skippingEmptyRseEmbeddedFireTvs"));
+        }
 
         bool includeAnalyticsSegments = false;
         rapidjson::Value analyticsObject(rapidjson::kObjectType);

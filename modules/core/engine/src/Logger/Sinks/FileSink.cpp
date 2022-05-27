@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ namespace sink {
 static const std::string TAG("aace.logger.sink.FileSink");
 
 FileSink::FileSink(const std::string& id) : Sink(id) {
+    m_formatter = aace::engine::logger::LogFormatter::createPlainText();
 }
 
 std::shared_ptr<FileSink> FileSink::create(
@@ -85,11 +86,12 @@ std::shared_ptr<FileSink> FileSink::create(
 void FileSink::log(
     Level level,
     std::chrono::system_clock::time_point time,
+    const char* source,
     const char* threadMoniker,
     const char* text) {
     if (m_enabled) {
         try {
-            std::string log = aace::engine::logger::LogFormatter::format(level, time, threadMoniker, text);
+            std::string log = m_formatter->format(level, time, source, threadMoniker, text);
 
             // check if the log file needs to be rotated
             if ((long)m_stream->tellp() + log.length() + 1 > m_maxSize) {
@@ -111,6 +113,11 @@ void FileSink::log(
 
 void FileSink::flush() {
     m_stream->flush();
+}
+
+bool exists(const std::string& filename) {
+    struct stat info;
+    return stat(filename.c_str(), &info) == 0 && (info.st_mode & S_IFDIR) == 0;
 }
 
 bool FileSink::rotateLog() {
@@ -146,12 +153,6 @@ bool FileSink::rotateLog() {
 
         return false;
     }
-}
-
-bool FileSink::exists(const std::string& filename) {
-    struct stat info;
-
-    return stat(filename.c_str(), &info) == 0 && (info.st_mode & S_IFDIR) == 0;
 }
 
 }  // namespace sink

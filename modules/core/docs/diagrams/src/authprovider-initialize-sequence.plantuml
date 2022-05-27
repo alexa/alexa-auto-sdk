@@ -1,0 +1,225 @@
+@startuml
+skinparam sequenceMessageAlign direction
+skinparam lifelineStrategy nosolid
+
+<style>
+sequenceDiagram {
+	.alexa {
+    	RoundCorner 5
+        BackgroundColor #E2F5FA
+        LineColor #05A0D1
+    }
+    .engine {
+    	RoundCorner 5
+        BackgroundColor #E1E6EC
+        LineColor #232F3E
+    }
+    .client {
+    	RoundCorner 5
+    	BackgroundColor WhiteSmoke
+        LineColor DarkGrey
+    }
+    .amazonservice {
+    	RoundCorner 5
+    	BackgroundColor #FFEBCC
+        LineColor #FF9900
+    }
+    actor {
+    	BackgroundColor White
+    	LineColor Black
+    }
+    arrow {
+    	LineColor Black
+    }
+    lifeline {
+    	LineColor Grey
+        LineStyle 4
+    }
+    .message {
+    	BackgroundColor Ivory
+        LineColor Wheat
+        RoundCorner 5
+    }
+    .callout {
+    	BackgroundColor Linen
+        LineColor Tan
+        RoundCorner 5
+    }
+}
+</style>
+
+
+actor User Order 10
+participant Application <<client>> order 30
+participant "Login with Amazon \nauthorization service" as LWA <<amazonservice>> order 35
+participant MessageBroker <<engine>> order 40
+participant Engine as Engine <<engine>> order 45
+
+Title: Initialize an application-provided authorization session
+
+User -> Application: launch\n(details omitted)
+
+ref over Application, Engine: Set up and start the Engine
+
+== Get an initial access token ==
+
+note <<callout>> over Application
+Note: You can do this in parallel with StartAuthorization
+end note
+
+alt User has not signed in
+Application -> User: display sign in UI\n(details omitted)
+User -> Application: start sign in\n(details omitted)
+Application -> LWA: fetch tokens\n(details omitted)
+activate LWA
+LWA --> Application: tokens
+deactivate LWA
+Application -> Application: cache access token
+Application -> Application: store refresh token
+else User has already signed in
+Application -> Application: retrieve stored refresh token
+Application -> LWA: refresh the access token\n(details omitted)
+activate LWA
+LWA --> Application: access token
+deactivate LWA
+Application -> Application: cache access token
+end
+
+== Initialize the auth provider ==
+
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic: Authorization
+action: StartAuthorization
+service: alexa:auth-provider
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+
+alt Previous authorization provider is different
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationStateChanged
+service: <previous provider name>
+state: UNAUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+end
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationStateChanged
+service: alexa:auth-provider
+state: AUTHORIZING
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+== Provide the initial auth state ==
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: EventReceived
+service: alexa:auth-provider
+type: requestAuthorization
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+alt Application has a valid access token
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic: Authorization
+action: SendEvent
+service: alexa:auth-provider
+type: authStateChangeEvent
+state: AUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationStateChanged
+service: alexa:auth-provider
+state: AUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+else Application does not yet have an access token
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic: Authorization
+action: SendEvent
+service: alexa:auth-provider
+type: authStateChangeEvent
+state: UNAUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationStateChanged
+service: alexa:auth-provider
+state: UNAUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+end
+@enduml

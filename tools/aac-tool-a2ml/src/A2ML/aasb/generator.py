@@ -80,26 +80,28 @@ class Generator:
         return include_path
 
     def generate_type( self, type_def ):
+        self._generate_type( type_def, "header.h.tmpl", "footer.h.tmpl", f"{type_def.type}.h.tmpl", "include", f"{type_def.name}.h" )
+        self._generate_type( type_def, "header.cpp.tmpl", "footer.cpp.tmpl", f"{type_def.type}.cpp.tmpl", "src", f"{type_def.name}.cpp" )
+
+    def _generate_type( self, type_def, header_tmpl, footer_tmpl, type_tmpl, output_subfolder, output_filename ):
         args = {
             "generator": self,
             "type": type_def,
         }
-        header_template = Template( file=os.path.join( self.template_path, "header.tmpl" ), searchList=[args] )
-        footer_template = Template( file=os.path.join( self.template_path, "footer.tmpl" ), searchList=[args] )
-        type_header_template = Template( file=os.path.join( self.template_path, "%s.tmpl" % type_def.type ), 
+        header_template = Template( file=os.path.join( self.template_path, header_tmpl ), searchList=[args] )
+        footer_template = Template( file=os.path.join( self.template_path, footer_tmpl ), searchList=[args] )
+        type_template = Template( file=os.path.join( self.template_path, type_tmpl ),
             searchList=[args,{ "header": header_template, "footer": footer_template }] )
         # write the output file
         relative_path = self.get_message_relative_path( type_def )
         # message versioning not supported yet!
         if type_def.interface.version != self.model.version:
             raise Exception( f"Interface version does not match expected message version: specified={type_def.interface.version}, expected={self.model.version}" )
-            #output_file_path = os.path.join( self.output_folder, self.message_include_path_root, type_def.interface.version, relative_path )
-        else:
-            output_file_path = os.path.join( self.output_folder, self.message_include_path_root, relative_path )
 
+        output_file_path = os.path.join( self.output_folder, output_subfolder, self.message_include_path_root, relative_path )
         os.makedirs( output_file_path, exist_ok=True )
-        with open( os.path.join( output_file_path, "%s.h" % type_def.name ), "w" ) as file:
-            file.write( str( type_header_template ) )
+        with open( os.path.join( output_file_path, output_filename ), "w" ) as file:
+            file.write( str( type_template ) )
 
     def get_header_guard( self, message ):
         return ("%s_H" % message.symbol.replace(".","_")).upper()
@@ -119,10 +121,10 @@ class Generator:
         # check for list type
         elif value_def.type.startswith( "list:" ):
             iface_type = value_def.type.split(":",1)[1]
-            return "std::vector<%s>" % self.get_inteface_type( iface_type, value_def.interface )
-        # check if type is specifed in the model
+            return "std::vector<%s>" % self.get_interface_type( iface_type, value_def.interface )
+        # check if type is specified in the model
         else:
-            return self.get_inteface_type( value_def.type, value_def.interface )
+            return self.get_interface_type( value_def.type, value_def.interface )
 
     def get_value( self, value_def, value ):
         if value_def.type == "string":
@@ -130,17 +132,12 @@ class Generator:
         else:
             return value
 
-    def get_inteface_type( self, name, interface ):
+    def get_interface_type( self, name, interface ):
         iface_ns, iface_name = self.split_namespace_name( name )
         return iface_name if not iface_ns or iface_ns == interface.namespace else name.replace(".","::")
 
-    def get_includes( self, type_def, full_path = False ):
-        includes = { "<string>", "<nlohmann/json.hpp>" }
-        # specifal includes for specifi types
-        if type_def.type == "message":
-            includes.add("<AASB/Utils/UUID.h>")
-        elif type_def.type == "enum":
-            includes.add("<AASB/Utils/StringUtils.h>")
+    def get_header_includes( self, type_def, full_path = False ):
+        includes = set()
         # create the type list from the values using comprehension
         type_list = [next.type for next in type_def.values]
         # iterate over the payload arguments to check if type is defined
@@ -166,11 +163,16 @@ class Generator:
                     for next_iface in self.model.interfaces.values():
                         if next_iface.has_type( next ):
                             includes.add( "<%s/%s.h>" % (self.get_message_include_path(next_iface),name))
-                            #includes.add( "<%s/%s.h>" % (next_iface.path,name))
         # sort the includes list
         include_list = list(includes)
         include_list.sort()
         return include_list
+
+    def get_cpp_includes( self, type_def, full_path = False ):
+        type_header = os.path.join( self.message_include_path_root, self.get_message_relative_path(type_def), '%s.h' % type_def.name )
+        return [
+            f"<{type_header}>",
+        ]
 
     def get_aliases( self, type_def ):
         alias_map = {}

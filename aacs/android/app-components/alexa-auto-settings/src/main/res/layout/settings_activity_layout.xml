@@ -10,6 +10,7 @@
 
         <LinearLayout
             android:id="@+id/navigation_bar_fragment"
+            android:tag="navbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/navigation_horizontal_margin">
@@ -25,7 +26,5 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_marginTop="@dimen/item_vertical_margin"
-            app:navGraph="@navigation/settings_navigation"
             app:defaultNavHost="true" />
-
 </LinearLayout>

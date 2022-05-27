@@ -57,7 +57,8 @@ public class CarControlHelper {
                     carControlJSON = CarControlUtil.readConfig(new FileInputStream(customConfigFile));
                     Log.i(TAG, "Custom endpoint mapping created");
                 } else {
-                    carControlJSON = CarControlUtil.readConfig(mContext.getAssets().open(CarControlConstants.AACS_CC_ConfigMapping));
+                    carControlJSON = CarControlUtil.readConfig(
+                            mContext.getAssets().open(CarControlConstants.AACS_CC_ConfigMapping));
                     Log.i(TAG, "Default endpoint mapping created");
                 }
 
@@ -68,10 +69,16 @@ public class CarControlHelper {
                 if (carControlJSON.has(CarControlConstants.AACS_CARCONTROL)) {
                     JSONArray ccMap = carControlJSON.getJSONArray(CarControlConstants.AACS_CARCONTROL);
                     for (int i = 0; i < ccMap.length(); i++) {
-                        capabilityMapping.putString(ccMap.getJSONObject(i).getString(CarControlConstants.ENDPOINT_ID),
-                                ccMap.getJSONObject(i).getJSONArray(CarControlConstants.CAPABILITIES).toString()).apply();
-                        areaMapping.putString(ccMap.getJSONObject(i).getString(CarControlConstants.ENDPOINT_ID),
-                                ccMap.getJSONObject(i).getString(CarControlConstants.AREA_ID)).apply();
+                        capabilityMapping
+                                .putString(ccMap.getJSONObject(i).getString(CarControlConstants.ENDPOINT_ID),
+                                        ccMap.getJSONObject(i)
+                                                .getJSONArray(CarControlConstants.CAPABILITIES)
+                                                .toString())
+                                .apply();
+                        areaMapping
+                                .putString(ccMap.getJSONObject(i).getString(CarControlConstants.ENDPOINT_ID),
+                                        ccMap.getJSONObject(i).getString(CarControlConstants.AREA_ID))
+                                .apply();
                     }
                     // Flag storing mapping to SharedPreference is finished
                     capabilityMapping.putBoolean(AACS_CC_MAPPING, true).apply();
@@ -96,28 +103,34 @@ public class CarControlHelper {
      * Capability - ControllerType
      * Instance - ControllerId
      */
-     protected PropertySetting getPropertySetting(String endpointId, String capability, String instance) {
+    protected PropertySetting getPropertySetting(String endpointId, String capability, String instance) {
         PropertySetting propertySetting = null;
         if (mCapabilityPref.getBoolean(AACS_CC_MAPPING, false)) {
             try {
                 JSONArray capabilitiesArray = new JSONArray(mCapabilityPref.getString(endpointId, ""));
                 for (int i = 0; i < capabilitiesArray.length(); i++) {
                     if (capability.equals(capabilitiesArray.getJSONObject(i).getString(CarControlConstants.INTERFACE))
-                            && (!capabilitiesArray.getJSONObject(i).has(CarControlConstants.INSTANCE) ||
-                            instance.equals(capabilitiesArray.getJSONObject(i).getString(CarControlConstants.INSTANCE)))) {
+                            && (!capabilitiesArray.getJSONObject(i).has(CarControlConstants.INSTANCE)
+                                    || instance.equals(capabilitiesArray.getJSONObject(i).getString(
+                                            CarControlConstants.INSTANCE)))) {
                         int areaId = getAreaId(endpointId);
                         if (capabilitiesArray.getJSONObject(i)
-                                .getJSONObject(CarControlConstants.CONFIGURATION).has(CarControlConstants.AREA_ID)) {
+                                        .getJSONObject(CarControlConstants.CONFIGURATION)
+                                        .has(CarControlConstants.AREA_ID)) {
                             areaId = Integer.decode(capabilitiesArray.getJSONObject(i)
-                                    .getJSONObject(CarControlConstants.CONFIGURATION).getString(CarControlConstants.AREA_ID));
+                                                            .getJSONObject(CarControlConstants.CONFIGURATION)
+                                                            .getString(CarControlConstants.AREA_ID));
                         }
-                        int propertyId = (int) VehiclePropertyIds.class.getField(capabilitiesArray.getJSONObject(i)
-                                .getJSONObject(CarControlConstants.CONFIGURATION)
-                                .getString(CarControlConstants.PROPERTY_ID)).get(null);
-                        CarControlConstants.DataType dataType = CarControlUtil.getDataType(capabilitiesArray.getJSONObject(i)
-                                .getJSONObject(CarControlConstants.CONFIGURATION).getString(CarControlConstants.DATA_TYPE));
+                        int propertyId = (int) VehiclePropertyIds.class
+                                                 .getField(capabilitiesArray.getJSONObject(i)
+                                                                   .getJSONObject(CarControlConstants.CONFIGURATION)
+                                                                   .getString(CarControlConstants.PROPERTY_ID))
+                                                 .get(null);
+                        CarControlConstants.DataType dataType =
+                                CarControlUtil.getDataType(capabilitiesArray.getJSONObject(i)
+                                                                   .getJSONObject(CarControlConstants.CONFIGURATION)
+                                                                   .getString(CarControlConstants.DATA_TYPE));
                         propertySetting = new PropertySetting(propertyId, areaId, dataType, "");
-
                     }
                 }
             } catch (JSONException | NoSuchFieldException | IllegalAccessException e) {
@@ -140,24 +153,30 @@ public class CarControlHelper {
      * Capability - ControllerType
      * Instance - ControllerId
      */
-    protected List<PropertySetting> getPropertySettings(String endpointId, String capability, String instance, String value) {
+    protected List<PropertySetting> getPropertySettings(
+            String endpointId, String capability, String instance, String value) {
         List<PropertySetting> propertySettings = new ArrayList<>();
         if (mCapabilityPref.getBoolean(AACS_CC_MAPPING, false)) {
             try {
                 JSONArray supportedModes = getSupportedMode(endpointId, capability, instance);
                 for (int i = 0; i < supportedModes.length(); i++) {
                     if (value.equals(supportedModes.getJSONObject(i).getString(CarControlConstants.VALUE))) {
-                        JSONArray propertySettingsJson = supportedModes.getJSONObject(i).getJSONArray(CarControlConstants.MODE_SETTINGS);
+                        JSONArray propertySettingsJson =
+                                supportedModes.getJSONObject(i).getJSONArray(CarControlConstants.MODE_SETTINGS);
                         for (int j = 0; j < propertySettingsJson.length(); j++) {
-                            int propertyId = (int) VehiclePropertyIds.class.getField(propertySettingsJson
-                                    .getJSONObject(j).getString(CarControlConstants.PROPERTY_ID)).get(null);
+                            int propertyId = (int) VehiclePropertyIds.class
+                                                     .getField(propertySettingsJson.getJSONObject(j).getString(
+                                                             CarControlConstants.PROPERTY_ID))
+                                                     .get(null);
                             int areaId = getAreaId(endpointId);
                             if (propertySettingsJson.getJSONObject(j).has(CarControlConstants.AREA_ID)) {
-                                areaId = Integer.decode(propertySettingsJson.getJSONObject(j).getString(CarControlConstants.AREA_ID));
+                                areaId = Integer.decode(
+                                        propertySettingsJson.getJSONObject(j).getString(CarControlConstants.AREA_ID));
                             }
-                            CarControlConstants.DataType dataType = CarControlUtil.getDataType(propertySettingsJson.getJSONObject(j)
-                                    .getString(CarControlConstants.DATA_TYPE));
-                            String setValue = propertySettingsJson.getJSONObject(j).getString(CarControlConstants.VALUE);
+                            CarControlConstants.DataType dataType = CarControlUtil.getDataType(
+                                    propertySettingsJson.getJSONObject(j).getString(CarControlConstants.DATA_TYPE));
+                            String setValue =
+                                    propertySettingsJson.getJSONObject(j).getString(CarControlConstants.VALUE);
                             propertySettings.add(new PropertySetting(propertyId, areaId, dataType, setValue));
                         }
                     }
@@ -175,8 +194,10 @@ public class CarControlHelper {
                 JSONArray capabilitiesArray = new JSONArray(mCapabilityPref.getString(endpointId, ""));
                 for (int i = 0; i < capabilitiesArray.length(); i++) {
                     if (capability.equals(capabilitiesArray.getJSONObject(i).getString(CarControlConstants.INTERFACE))
-                            && instance.equals(capabilitiesArray.getJSONObject(i).getString(CarControlConstants.INSTANCE))) {
-                        return capabilitiesArray.getJSONObject(i).getJSONObject(CarControlConstants.CONFIGURATION)
+                            && instance.equals(
+                                    capabilitiesArray.getJSONObject(i).getString(CarControlConstants.INSTANCE))) {
+                        return capabilitiesArray.getJSONObject(i)
+                                .getJSONObject(CarControlConstants.CONFIGURATION)
                                 .getJSONArray(CarControlConstants.SUPPORTED_MODE);
                     }
                 }
@@ -219,7 +240,7 @@ public class CarControlHelper {
         public CarControlConstants.DataType dataType;
         public String value;
 
-        public PropertySetting (int propertyId, int areaId, CarControlConstants.DataType dataType, String value) {
+        public PropertySetting(int propertyId, int areaId, CarControlConstants.DataType dataType, String value) {
             this.propertyId = propertyId;
             this.areaId = areaId;
             this.dataType = dataType;

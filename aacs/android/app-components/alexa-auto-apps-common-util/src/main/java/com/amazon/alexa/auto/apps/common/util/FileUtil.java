@@ -1,4 +1,20 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apps.common.util;
+
+import static com.amazon.alexa.auto.apps.common.Constants.MODELS;
 
 import android.content.Context;
 import android.content.res.AssetManager;
@@ -18,8 +34,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import io.reactivex.rxjava3.core.Single;
-
-import static com.amazon.alexa.auto.apps.common.Constants.MODELS;
 
 /**
  * Alexa auto app file util class.
@@ -125,7 +139,9 @@ public class FileUtil {
                     }
                 }
             } catch (IOException e) {
-                Log.e(TAG, String.format("Error while copying models from assets into filesDir. Error: %s", e.getMessage()));
+                Log.e(TAG,
+                        String.format(
+                                "Error while copying models from assets into filesDir. Error: %s", e.getMessage()));
             }
         } else {
             Log.i(TAG, "Models directory already exists");
@@ -177,22 +193,35 @@ public class FileUtil {
     private static String readAACSConfiguration(@NonNull Context context, @NonNull String externalStorageDir)
             throws IOException {
         String configFilePath = "";
-        if (BuildConfig.DEBUG && android.os.Build.VERSION.SDK_INT >= 30) {
-            // Check if current build is Debug build and runtime Android API level is 30 or above so the application
-            // can read aacs_config.json from the scoped storage location
-            Log.d(TAG, "Reading from scoped storage");
-            configFilePath = context.getExternalFilesDir(null) + "/" + AACS_CONFIG_FILE;
-        } else if (BuildConfig.DEBUG) {
-            // Check if current build is Debug build and installed at runtime Android API level below 30
-            // so that AACS Sample Application can still maintain the legacy storage for aacs_config.json from /sdcard/
-            Log.d(TAG, "Reading from legacy storage");
-            configFilePath = externalStorageDir + "/" + AACS_CONFIG_FILE;
+
+        Log.d(TAG,
+                "MODEL = " + android.os.Build.MODEL + "HARDWARE" + android.os.Build.HARDWARE + "PRODUCT"
+                        + android.os.Build.PRODUCT);
+
+        if (BuildConfig.DEBUG) {
+            if (android.os.Build.PRODUCT.contains("car")) {
+                // for AAOS 10 and 12 across all devices unable to access
+                // scoped and legacy storage so picking up from /sdcard directly
+                Log.d(TAG, "Reading from  /sdcard");
+                configFilePath = "/sdcard"
+                        + "/" + AACS_CONFIG_FILE;
+            } else if (android.os.Build.VERSION.SDK_INT >= 30) {
+                // Check if current build is Debug build and runtime Android API level is 30 or above so the application
+                // can read aacs_config.json from the scoped storage location
+                Log.d(TAG, "Reading from scoped storage");
+                configFilePath = context.getExternalFilesDir(null) + "/" + AACS_CONFIG_FILE;
+            } else {
+                // Check if current build is Debug build and installed at runtime Android API level below 30
+                // so that AACS Sample Application can still maintain the legacy storage for aacs_config.json from
+                // /sdcard/
+                Log.d(TAG, "Reading from legacy storage");
+                configFilePath = externalStorageDir + "/" + AACS_CONFIG_FILE;
+            }
         }
 
         try {
             File fullPath = new File(configFilePath);
-            Log.d(TAG,
-                    String.format("Reading %s from external storage.", configFilePath));
+            Log.d(TAG, String.format("Reading %s from external storage.", configFilePath));
             return readStream(new FileInputStream(fullPath));
         } catch (Exception e) {
             Log.w(TAG,

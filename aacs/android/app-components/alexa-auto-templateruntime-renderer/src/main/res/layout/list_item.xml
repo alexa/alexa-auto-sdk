@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/list_template_card_list_item_height"
+    android:id="@+id/listRow">
+
+    <TextView
+        android:id="@+id/leftTextField"
+        style="@style/DisplayCardsText"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/list_template_card_list_item_layout_height"
+        android:layout_marginTop="@dimen/list_template_card_list_item_marginTop"
+        android:textSize="@dimen/list_template_card_list_item_textSize"
+        android:singleLine="true"
+        android:textAlignment="textEnd" />
+
+
+    <TextView
+        android:id="@+id/rightTextField"
+        style="@style/DisplayCardsText"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/list_template_card_list_item_layout_height"
+        android:textSize="@dimen/list_template_card_list_item_textSize"
+        android:layout_marginStart="@dimen/list_template_card_list_item_margin_left_right"
+        android:layout_marginTop="@dimen/list_template_card_list_item_marginTop"
+        android:layout_weight="1"
+        android:singleLine="true"
+        android:gravity="start" />
+
+</LinearLayout>

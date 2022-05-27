@@ -1,4 +1,20 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings;
+
+import static com.amazon.aacsconstants.AACSConstants.IntentAction.GET_SERVICE_METADATA_REPLY;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,8 +27,6 @@ import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static com.amazon.aacsconstants.AACSConstants.IntentAction.GET_SERVICE_METADATA_REPLY;
 
 /**
  * Receives intents broadcasted by AACS containing Service Metadata
@@ -47,12 +61,13 @@ public class AACSMetadataReceiver extends BroadcastReceiver {
 
                 try {
                     JSONObject payloadJSON = new JSONObject(payload);
-                    if (!payloadJSON.has(AACSConstants.ServiceMetadata.METADATA)) return;
-                    JSONObject metaDataJSON =
-                            payloadJSON.getJSONObject(AACSConstants.ServiceMetadata.METADATA);
-                    if (!metaDataJSON.has(AACSConstants.ServiceMetadata.EXTRA_MODULE_LIST)) return;
-                    JSONArray extrasModuleListJSON = metaDataJSON
-                            .getJSONArray(AACSConstants.ServiceMetadata.EXTRA_MODULE_LIST);
+                    if (!payloadJSON.has(AACSConstants.ServiceMetadata.METADATA))
+                        return;
+                    JSONObject metaDataJSON = payloadJSON.getJSONObject(AACSConstants.ServiceMetadata.METADATA);
+                    if (!metaDataJSON.has(AACSConstants.ServiceMetadata.EXTRA_MODULE_LIST))
+                        return;
+                    JSONArray extrasModuleListJSON =
+                            metaDataJSON.getJSONArray(AACSConstants.ServiceMetadata.EXTRA_MODULE_LIST);
                     for (int i = 0; i < extrasModuleListJSON.length(); i++) {
                         if (AACS_MODULE_GEOLOCATION.equals(extrasModuleListJSON.get(i).toString())) {
                             ModuleProvider.addModule(context, ModuleProvider.ModuleName.GEOLOCATION.name());
@@ -62,7 +77,6 @@ public class AACSMetadataReceiver extends BroadcastReceiver {
                             ModuleProvider.addModule(context, ModuleProvider.ModuleName.LVC.name());
                             Log.d(TAG, "Added AACS LVC module to list of extra modules");
                         }
-
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, "Error while parsing aacs metadata reply intent" + e);
@@ -70,6 +84,6 @@ public class AACSMetadataReceiver extends BroadcastReceiver {
                 break;
             default:
                 Log.d(TAG, "Intent action not handled. Action:" + intent.getAction());
-            }
+        }
     }
 }

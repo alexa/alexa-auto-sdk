@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.navigation.receiver;
 
 import android.content.BroadcastReceiver;
@@ -10,7 +24,7 @@ import com.amazon.aacsconstants.TemplateRuntimeConstants;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
 import com.amazon.alexa.auto.navigation.dependencies.AndroidModule;
-import com.amazon.alexa.auto.navigation.dependencies.DaggerNavigationComponent;
+import com.amazon.alexa.auto.navigation.dependencies.DaggerNaviComponent;
 import com.amazon.alexa.auto.navigation.handlers.LocalSearchDirectiveHandler;
 
 import javax.inject.Inject;
@@ -29,10 +43,7 @@ public class LocalSearchTemplateRuntimeReceiver extends BroadcastReceiver {
         Log.i(TAG, this + " | onReceive: intent: " + intent);
         if (mLocalSearchDirectiveHandler == null) {
             Log.i(TAG, this + " | first onReceive so doing injection");
-            DaggerNavigationComponent.builder()
-                    .androidModule(new AndroidModule(context))
-                    .build()
-                    .injectPOIReceiver(this);
+            DaggerNaviComponent.builder().androidModule(new AndroidModule(context)).build().injectPOIReceiver(this);
         }
 
         if (intent != null && intent.getExtras() != null) {
@@ -50,7 +61,7 @@ public class LocalSearchTemplateRuntimeReceiver extends BroadcastReceiver {
                         }
                     });
                 } else if (message.action.equals(Action.TemplateRuntime.CLEAR_TEMPLATE)) {
-                   mLocalSearchDirectiveHandler.clearLocalSearchTemplate();
+                    mLocalSearchDirectiveHandler.clearLocalSearchTemplate();
                 }
             });
         }

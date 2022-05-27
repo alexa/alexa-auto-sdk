@@ -8,11 +8,11 @@ import android.widget.LinearLayout;
 
 import com.amazon.alexa.auto.aacs.common.Image;
 import com.amazon.alexa.auto.aacs.common.POIImage;
-import com.amazon.alexa.auto.aacs.common.PointOfInterest;
 import com.amazon.alexa.auto.aacs.common.Rating;
 import com.amazon.alexa.auto.aacs.common.Title;
+import com.amazon.alexa.auto.aacs.common.navi.PointOfInterest;
 import com.amazon.alexa.auto.navigation.handlers.LocalSearchDirectiveHandler;
-import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
+import com.amazon.alexa.auto.navigation.providers.NaviProvider;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,7 +27,6 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 @RunWith(RobolectricTestRunner.class)
 public class LocalSearchListAdapterTest {
@@ -40,7 +39,7 @@ public class LocalSearchListAdapterTest {
     private LocalSearchListAdapter mLocalSearchListAdapter;
 
     @Mock
-    private NavigationProvider mNavigationProvider;
+    private NaviProvider mNaviProvider;
     @Mock
     private PointOfInterest mPointOfInterest;
     @Mock
@@ -58,8 +57,8 @@ public class LocalSearchListAdapterTest {
 
         mActivity = Robolectric.buildActivity(Activity.class).create().resume().get();
         mContext = mActivity.getApplicationContext();
-        mLocalSearchListAdapter = new LocalSearchListAdapter(
-                mNavigationProvider, new WeakReference<>(mLocalSearchDirectiveHandler), mContext);
+        mLocalSearchListAdapter =
+                new LocalSearchListAdapter(mNaviProvider, new WeakReference<>(mLocalSearchDirectiveHandler), mContext);
 
         setupTestPOI();
     }
@@ -110,7 +109,7 @@ public class LocalSearchListAdapterTest {
         poiViewHolder.mPoiRoot.callOnClick();
 
         ArgumentCaptor<PointOfInterest> pointOfInterestArgumentCaptor = ArgumentCaptor.forClass(PointOfInterest.class);
-        Mockito.verify(mNavigationProvider).startNavigation(pointOfInterestArgumentCaptor.capture());
+        Mockito.verify(mNaviProvider).startNavigation(pointOfInterestArgumentCaptor.capture());
         Mockito.verify(mLocalSearchDirectiveHandler).clearTemplate();
 
         PointOfInterest capturedPointOfInterest = pointOfInterestArgumentCaptor.getValue();

@@ -52,9 +52,11 @@
             "arch": "${VEHICLE_ARCH}",
             "language": "${VEHICLE_LANGUAGE}",
             "microphone": "${VEHICLE_MICROPHONE}",
-            "vehicleIdentifier": "${VEHICLE_IDENTIFIER}"
+            "vehicleIdentifier": "${VEHICLE_IDENTIFIER}",
+            "engineType": "${VEHICLE_ENGINE_TYPE}",
+            "rseEmbeddedFireTvs": "${VEHICLE_RSE_EMBEDDED_FIRETVS}"
         },
-        "operatingCountry": "${VEHICLE_COUNTRTY}"
+        "operatingCountry": "${VEHICLE_COUNTRY}"
     },
     "aace.cbl" : {
         "enableUserProfile": false

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -337,14 +337,19 @@ public:
         NO_PREVIOUS_WAYPOINTS,
 
         /**
-         * The operation requested is not supported or implemented
+         * The requested operation is not supported.
          */
         NOT_SUPPORTED,
 
         /**
-         * The operation requested can't be performed now
+         * The requested operation is not allowed right now.
          */
-        NOT_ALLOWED
+        NOT_ALLOWED,
+
+        /**
+         * The requested operation can't be performed because the vehicle is not navigating.
+         */
+        NOT_NAVIGATING
     };
 
     // user requested alternate route

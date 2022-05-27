@@ -25,7 +25,6 @@ public class NetworkProperties {
      */
     public static final String NETWORK_INTERFACE = "aace.network.networkInterface";
 
-
     /**
      * This property is used with aace::propertyManager::PropertyManager::setProperty()
      * to set the custom HTTP header to pass in the HTTP request sent to a proxy. The headers

@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="contacts_permission_consent_title">Appelez vos contacts avec Alexa</string>
+    <string name="contacts_permission_consent_title">Autoriser l\'accès aux contacts à partir de %1$s?</string>
     <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Configurer les appels vocaux</string>
-    <string name="contacts_permission_consent_body">Autoriser le téléversement des contacts sur %1$s vers le service Amazon.</string>
+    <string name="contacts_permission_consent_body">Les contacts seront périodiquement téléversés vers le nuage Amazon afin de faciliter la recherche d\'amis ou de membres de la famille ainsi que les appels.</string>
     <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Appelez les contacts de votre téléphone mains libres avec [Acme Brandon] et Amazon Alexa. Vos contacts sur %1$s seront téléversés vers le service Amazon.</string>
     <string name="contacts_upload_consent_title">Contacts</string>
     <string name="contacts_upload_consent_summary">Pour permettre d\'appeler des contacts avec Alexa, les contacts sur ce téléphone seront téléversés vers le service Amazon.</string>
     <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Téléversez les contacts vers le service Amazon pour les appeler et leur envoyer un message par leur nom</string>
-    <string name="contacts_consent_yes">ACTIVER</string>
+    <string name="contacts_consent_yes">ACCEPTER ET AUTORISER</string>
     <string name="contacts_consent_yes_with_alexa_custom_assistant">Utiliser les contacts</string>
     <string name="contacts_consent_skip">IGNORER</string>
     <string name="comms_permission_status">Contacts %1$s</string>

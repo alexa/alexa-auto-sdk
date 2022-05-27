@@ -11,8 +11,8 @@ import androidx.fragment.app.FragmentFactory;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.navigation.NavController;
 
+import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 import com.amazon.alexa.auto.setup.R;
 
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class LanguageSelectionFragmentTest {
     @Mock
     AlexaPropertyManager mMockPropManager;
     @Mock
-    LocalesProvider mMockLocalesProvider;
+    AlexaLocalesProvider mMockLocalesProvider;
     @Mock
     NavController mMockNavController;
 

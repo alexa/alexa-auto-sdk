@@ -8,5 +8,4 @@ settings that are available to users.
 * The following features have not been developed on the settings screen yet
     * Navigation favorites permission
     * Push to talk
-    * Things to try
 * Communication settings do not satisfy CX requirements. Refer to the HMI Guidelines - Communications section for guidance or work with your Amazon partner manager

@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="contacts_permission_consent_title">連絡先とAlexaで通話</string>
+    <string name="contacts_permission_consent_title">%1$sから連絡先へのアクセスを許可しますか?</string>
     <string name="contacts_permission_consent_title_with_alexa_custom_assistant">音声通話をセットアップ</string>
-    <string name="contacts_permission_consent_body">%1$sの連絡先をAmazonのサービスにアップロードすることを許可します。</string>
+    <string name="contacts_permission_consent_body">連絡先は、Amazonクラウドに定期的にアップロードされます。これにより、簡単に友達や家族を検索したり、通話を開始したりすることができます。</string>
     <string name="contacts_permission_consent_body_with_alexa_custom_assistant">[Acme Brandon]で、スマートフォンの連絡先にハンズフリーで通話を開始できます。%1$sの連絡先がAmazonのサービスにアップロードされます。</string>
     <string name="contacts_upload_consent_title">連絡先</string>
     <string name="contacts_upload_consent_summary">Alexaによる通話機能をオンにすると、このスマートフォンの連絡先がAmazonサービスにアップロードされます。</string>
     <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Amazonのサービスに連絡先をアップロードすると、名前を言うだけで通話・メッセージ送信ができるようになります</string>
-    <string name="contacts_consent_yes">オンにする</string>
+    <string name="contacts_consent_yes">同意して許可</string>
     <string name="contacts_consent_yes_with_alexa_custom_assistant">連絡先を使用</string>
     <string name="contacts_consent_skip">スキップ</string>
     <string name="comms_permission_status">連絡先%1$s</string>

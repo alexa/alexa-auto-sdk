@@ -1,9 +1,9 @@
-From ba4cbfa02d9740ee6f8f9cffca203a086d45c726 Mon Sep 17 00:00:00 2001
+From fad6bcfc499c34d7283f97f7dc23328db2f70ad3 Mon Sep 17 00:00:00 2001
 From: Muni Sakkuru <muni.sakkuru@gmail.com>
-Date: Tue, 16 Nov 2021 17:39:32 -0800
+Date: Wed, 4 May 2022 17:38:30 -0700
 Subject: [PATCH] Alexa Auto SDK Changes for v1.25.0 AVS SDK
 
-For internal reference: da97912c
+For internal reference: c45a534d
 ---
  .../AVS/AVSDiscoveryEndpointAttributes.h      |   4 +
  .../AVSCommon/AVS/DialogUXStateAggregator.h   |   5 +
@@ -47,6 +47,9 @@ For internal reference: da97912c
  .../src/MessagingCapabilityAgent.cpp          | 697 ++++++++++++++++++
  .../Messaging/test/CMakeLists.txt             |   8 +
  .../TemplateRuntime/src/TemplateRuntime.cpp   |   2 +-
+ CertifiedSender/src/CertifiedSender.cpp       |  12 +-
+ .../include/ContextManager/ContextManager.h   |   3 +
+ ContextManager/src/ContextManager.cpp         |  63 +-
  .../Endpoints/DefaultEndpointBuilder.h        |   1 +
  .../Endpoints/EndpointAttributeValidation.h   |   8 +
  Endpoints/include/Endpoints/EndpointBuilder.h |   5 +
@@ -59,6 +62,7 @@ For internal reference: da97912c
  .../UplCalculator/src/MediaUplCalculator.cpp  |  10 +-
  .../UplCalculator/src/TtsUplCalculator.cpp    |  10 +-
  Metrics/UplCalculator/src/UplMetricSink.cpp   |  18 +-
+ PlaylistParser/src/PlaylistUtils.cpp          |   2 -
  .../include/Settings/DeviceSettingsManager.h  |  14 +-
  .../Settings/Types/GeolocationEnablement.h    | 146 ++++
  .../OpusEncoderContext/src/CMakeLists.txt     |  11 +-
@@ -70,15 +74,17 @@ For internal reference: da97912c
  .../acsdkDeviceSetup/DeviceSetupFactory.h     |  49 ++
  .../acsdkDeviceSetup/src/CMakeLists.txt       |   1 +
  .../src/DeviceSetupFactory.cpp                |  38 +
+ .../src/DNDSettingProtocol.cpp                |   8 +-
  .../NotificationsCapabilityAgent.h            |  23 +
  .../src/NotificationsCapabilityAgent.cpp      |  49 ++
  cmakeBuild/BuildDefaults.cmake                |   5 +
+ cmakeBuild/cmake/BuildOptions.cmake           |  30 +-
  cmakeBuild/cmake/Crypto.cmake                 |   7 +-
  cmakeBuild/cmake/Sqlite.cmake                 |   7 +-
  .../RegistrationManagerFactory.h              |  57 ++
  .../src/CMakeLists.txt                        |   1 +
  .../src/RegistrationManagerFactory.cpp        |  51 ++
- 73 files changed, 3444 insertions(+), 176 deletions(-)
+ 79 files changed, 3521 insertions(+), 217 deletions(-)
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/EndpointResources.h
  create mode 100644 AVSCommon/AVS/include/AVSCommon/AVS/Locale.h
  create mode 100644 AVSCommon/AVS/src/EndpointResources.cpp
@@ -3810,6 +3816,147 @@ index 5a19ef69..ad6e0984 100644
  
  /// String to identify log entries originating from this file.
  static const std::string TAG{"TemplateRuntime"};
+diff --git a/CertifiedSender/src/CertifiedSender.cpp b/CertifiedSender/src/CertifiedSender.cpp
+index 840d3147..e5f9b5d8 100644
+--- a/CertifiedSender/src/CertifiedSender.cpp
++++ b/CertifiedSender/src/CertifiedSender.cpp
+@@ -265,6 +265,14 @@ void CertifiedSender::mainloop() {
+             // ACL to continue interacting with the old instance (for example, if it is involved in a complex flow
+             // of exception / onCompleted handling), and allows us to safely try sending the new instance.
+             lock.lock();
++            if (m_messagesToSend.empty()) {  // Queue might have got cleared on a separate thread.
++                lock.unlock();
++                ACSDK_DEBUG9(LX(__func__).m("retryingNotRequiredDueToLogout"));
++
++                // Resetting the fail count.
++                failedSendRetryCount = 0;
++                continue; // m_currentMessage get resets at the beining of the while loop
++            }
+             m_messagesToSend.pop_front();
+             m_messagesToSend.push_front(std::make_shared<CertifiedMessageRequest>(
+                 m_currentMessage->getJsonContent(),
+@@ -298,7 +306,9 @@ void CertifiedSender::mainloop() {
+                 ACSDK_ERROR(LX("mainloop : could not erase message from storage."));
+             }
+ 
+-            m_messagesToSend.pop_front();
++            if (!m_messagesToSend.empty()) {  // Queue might have got cleared on a separate thread.
++                m_messagesToSend.pop_front();
++            }
+             lock.unlock();
+             // Resetting the fail count.
+             failedSendRetryCount = 0;
+diff --git a/ContextManager/include/ContextManager/ContextManager.h b/ContextManager/include/ContextManager/ContextManager.h
+index a00d0592..12513669 100644
+--- a/ContextManager/include/ContextManager/ContextManager.h
++++ b/ContextManager/include/ContextManager/ContextManager.h
+@@ -269,6 +269,9 @@ private:  // Private method declarations.
+      * This method returns a callback which should be invoked once the context is ready.
+      * If the context is not ready, this method will return a no-op function.
+      *
++     * @note The calling thread must hold @c m_requestsMutex over the call to this method. The calling thread must
++     * not be holding @c m_endpointsStateMutex.
++     *
+      * @note The callback method that is returned should only be called outside of a lock to prevent deadlock scenarios.
+      *
+      * @note If the context is ready, the method also removes the request from the pending requests map.
+diff --git a/ContextManager/src/ContextManager.cpp b/ContextManager/src/ContextManager.cpp
+index 2a517aa5..e700d78c 100644
+--- a/ContextManager/src/ContextManager.cpp
++++ b/ContextManager/src/ContextManager.cpp
+@@ -298,9 +298,14 @@ void ContextManager::provideStateUnavailableResponse(
+             }
+ 
+             if (!isEndpointUnreachable) {
+-                auto& endpointState = m_endpointsState[capabilityIdentifier.endpointId];
+-                auto cachedState = endpointState.find(capabilityIdentifier);
+-                if ((cachedState != endpointState.end()) && cachedState->second.capabilityState.hasValue()) {
++                bool hasCachedState = false;
++                {
++                    std::lock_guard<std::mutex> statesLock{m_endpointsStateMutex};
++                    auto& endpointState = m_endpointsState[capabilityIdentifier.endpointId];
++                    auto cachedState = endpointState.find(capabilityIdentifier);
++                    hasCachedState = (cachedState != endpointState.end()) && cachedState->second.capabilityState.hasValue();
++                }
++                if (hasCachedState) {
+                     if (requestIt != m_pendingStateRequest.end()) {
+                         requestIt->second.erase(capabilityIdentifier);
+                     }
+@@ -374,41 +379,40 @@ ContextRequestToken ContextManager::getContextInternal(
+                 contextFailureCallback();
+             });
+         });
+-
+-        std::lock_guard<std::mutex> requestsLock{m_requestsMutex};
+-        auto& requestEndpointId = endpointId.empty() ? m_defaultEndpointId : endpointId;
+-        m_pendingRequests.emplace(token, RequestTracker(timerToken, contextRequester, bSkipReportableStateProperties));
+-
+         std::function<void()> contextAvailableCallback = NoopCallback;
+         {
+-            std::lock_guard<std::mutex> statesLock{m_endpointsStateMutex};
+-
+-            for (auto& capability : m_endpointsState[requestEndpointId]) {
+-                auto stateInfo = capability.second;
+-                auto stateProvider = capability.second.stateProvider;
+-
+-                if (stateProvider) {
+-                    bool requestState = false;
+-                    if (stateInfo.legacyCapability && stateInfo.refreshPolicy != StateRefreshPolicy::NEVER) {
+-                        requestState = true;
+-                    } else if (!stateInfo.legacyCapability && stateProvider->canStateBeRetrieved()) {
+-                        if (stateProvider->hasReportableStateProperties()) {
+-                            /// Check if the reportable state properties should be skipped.
+-                            if (!bSkipReportableStateProperties) {
++            std::lock_guard<std::mutex> requestsLock{m_requestsMutex};
++            auto& requestEndpointId = endpointId.empty() ? m_defaultEndpointId : endpointId;
++            m_pendingRequests.emplace(token, RequestTracker(timerToken, contextRequester, bSkipReportableStateProperties));
++            {
++                std::lock_guard<std::mutex> statesLock{m_endpointsStateMutex};
++
++                for (auto& capability : m_endpointsState[requestEndpointId]) {
++                    auto stateInfo = capability.second;
++                    auto stateProvider = capability.second.stateProvider;
++
++                    if (stateProvider) {
++                        bool requestState = false;
++                        if (stateInfo.legacyCapability && stateInfo.refreshPolicy != StateRefreshPolicy::NEVER) {
++                            requestState = true;
++                        } else if (!stateInfo.legacyCapability && stateProvider->canStateBeRetrieved()) {
++                            if (stateProvider->hasReportableStateProperties()) {
++                                /// Check if the reportable state properties should be skipped.
++                                if (!bSkipReportableStateProperties) {
++                                    requestState = true;
++                                }
++                            } else {
+                                 requestState = true;
+                             }
+-                        } else {
+-                            requestState = true;
+                         }
+-                    }
+ 
+-                    if (requestState) {
+-                        stateProvider->provideState(capability.first, token);
+-                        m_pendingStateRequest[token].emplace(capability.first);
++                        if (requestState) {
++                            stateProvider->provideState(capability.first, token);
++                            m_pendingStateRequest[token].emplace(capability.first);
++                        }
+                     }
+                 }
+             }
+-
+             contextAvailableCallback = getContextAvailableCallbackIfReadyLocked(token, requestEndpointId);
+         }
+         /// Callback method should be called outside the lock.
+@@ -487,6 +491,7 @@ std::function<void()> ContextManager::getContextAvailableCallbackIfReadyLocked(
+ 
+     AVSContext context;
+     auto& requestEndpointId = endpointId.empty() ? m_defaultEndpointId : endpointId;
++    std::lock_guard<std::mutex> stateProviderLock(m_endpointsStateMutex);
+     for (auto& capability : m_endpointsState[requestEndpointId]) {
+         auto stateProvider = capability.second.stateProvider;
+         auto stateInfo = capability.second;
 diff --git a/Endpoints/include/Endpoints/DefaultEndpointBuilder.h b/Endpoints/include/Endpoints/DefaultEndpointBuilder.h
 index be67cc1e..f56454b4 100644
 --- a/Endpoints/include/Endpoints/DefaultEndpointBuilder.h
@@ -4088,6 +4235,22 @@ index 00e2da68..2193a609 100644
 -}  // namespace alexaClientSDK
 \ No newline at end of file
 +}  // namespace alexaClientSDK
+diff --git a/PlaylistParser/src/PlaylistUtils.cpp b/PlaylistParser/src/PlaylistUtils.cpp
+index 35c437fb..0683e7c4 100644
+--- a/PlaylistParser/src/PlaylistUtils.cpp
++++ b/PlaylistParser/src/PlaylistUtils.cpp
+@@ -143,11 +143,9 @@ bool readFromContentFetcher(
+     std::vector<char> buffer(CHUNK_SIZE, 0);
+     bool streamClosed = false;
+     AttachmentReader::ReadStatus previousStatus = AttachmentReader::ReadStatus::OK_TIMEDOUT;
+-    ssize_t bytesReadSoFar = 0;
+     size_t bytesRead = -1;
+     while (!streamClosed && bytesRead != 0) {
+         bytesRead = reader->read(buffer.data(), buffer.size(), &readStatus);
+-        bytesReadSoFar += bytesRead;
+         if (previousStatus != readStatus) {
+             ACSDK_DEBUG9(LX(__func__).d("readStatus", readStatus));
+             previousStatus = readStatus;
 diff --git a/Settings/include/Settings/DeviceSettingsManager.h b/Settings/include/Settings/DeviceSettingsManager.h
 index 5a815b81..b58b6568 100644
 --- a/Settings/include/Settings/DeviceSettingsManager.h
@@ -4770,6 +4933,36 @@ index 00000000..4516a871
 +}  // namespace acsdkDeviceSetup
 +}  // namespace alexaClientSDK
 \ No newline at end of file
+diff --git a/capabilities/DoNotDisturb/acsdkDoNotDisturb/src/DNDSettingProtocol.cpp b/capabilities/DoNotDisturb/acsdkDoNotDisturb/src/DNDSettingProtocol.cpp
+index 82222807..035ea063 100644
+--- a/capabilities/DoNotDisturb/acsdkDoNotDisturb/src/DNDSettingProtocol.cpp
++++ b/capabilities/DoNotDisturb/acsdkDoNotDisturb/src/DNDSettingProtocol.cpp
+@@ -179,15 +179,11 @@ bool DNDSettingProtocol::avsChange(
+         return false;
+     }
+ 
+-    std::promise<bool> requestSaved;
+-    auto future = requestSaved.get_future();
+-    m_executor.submit([this, applyChange, revertChange, notifyObservers, &requestSaved]() {
++    m_executor.submit([this, applyChange, revertChange, notifyObservers]() {
+         // Log request before setting the value for recovery.
+         if (!m_storage->updateSettingStatus(m_key, SettingStatus::AVS_CHANGE_IN_PROGRESS)) {
+-            requestSaved.set_value(false);
+             return;
+         }
+-        requestSaved.set_value(true);
+ 
+         notifyObservers(SettingNotifications::AVS_CHANGE_IN_PROGRESS);
+ 
+@@ -217,7 +213,7 @@ bool DNDSettingProtocol::avsChange(
+             ACSDK_ERROR(LX("avsChangeFailed").d("reason", "cannotUpdateStatus"));
+         }
+     });
+-    return future.get();
++    return true;
+ }
+ 
+ bool DNDSettingProtocol::restoreValue(ApplyDbChangeFunction applyChange, SettingNotificationFunction notifyObservers) {
 diff --git a/capabilities/Notifications/acsdkNotifications/include/acsdkNotifications/NotificationsCapabilityAgent.h b/capabilities/Notifications/acsdkNotifications/include/acsdkNotifications/NotificationsCapabilityAgent.h
 index ed94f6d7..cb9a4101 100644
 --- a/capabilities/Notifications/acsdkNotifications/include/acsdkNotifications/NotificationsCapabilityAgent.h
@@ -4880,6 +5073,96 @@ index 4e4375a7..186a8a59 100644
  # Disallow out-of-source-builds.
  include_once(DisallowOutOfSourceBuilds)
  
+diff --git a/cmakeBuild/cmake/BuildOptions.cmake b/cmakeBuild/cmake/BuildOptions.cmake
+index 28faebe1..070b5a02 100644
+--- a/cmakeBuild/cmake/BuildOptions.cmake
++++ b/cmakeBuild/cmake/BuildOptions.cmake
+@@ -12,7 +12,7 @@ if(NOT CMAKE_BUILD_TYPE)
+ endif()
+ 
+ # Verify the build type is valid.
+-set(buildTypes DEBUG RELEASE MINSIZEREL)
++set(buildTypes DEBUG RELEASE MINSIZEREL RELWITHDEBINFO)
+ 
+ string(TOUPPER "${CMAKE_BUILD_TYPE}" buildType)
+ 
+@@ -27,8 +27,8 @@ if (buildTypeFound EQUAL -1)
+     message("###############################################################################")
+     message("#                                                                             #")
+     message("# ERROR:                                                                      #")
+-    message("# Unknown build type selected. Please select from DEBUG, RELEASE, or          #")
+-    message("# MINSIZEREL.                                                                 #")
++    message("# Unknown build type selected. Please select from DEBUG, RELEASE, MINSIZEREL, #")
++    message("# or RELWITHDEBINFO.                                                          #")
+     message("#                                                                             #")
+     message("# Build Type:                                                                 #")
+     message("#     ${buildType}${buildTypePad}#")
+@@ -56,26 +56,36 @@ if (NOT MSVC)
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG      "-DDEBUG -DACSDK_LOG_ENABLED -DACSDK_DEBUG_LOG_ENABLED -Wall -Werror -Wsign-compare -g")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE    "-DNDEBUG -Wall -Werror -O2")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "-DNDEBUG -Wall -Werror -Os")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "-DNDEBUG -Wall -Werror -O2 -g")
+     if (CMAKE_COMPILER_IS_GNUCXX AND (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0")))
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -Wno-error=class-memaccess")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -Wno-error=class-memaccess")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -Wno-error=class-memaccess")
++        set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -Wno-error=class-memaccess")
+     endif()
+     if (CMAKE_COMPILER_IS_GNUCXX AND (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")))
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -Wno-error=deprecated-copy")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -Wno-error=deprecated-copy")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -Wno-error=deprecated-copy")
++        set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -Wno-error=deprecated-copy")
+     endif()
+     if (MINGW)
+         # Debug build on MinGW needs O1 optimzation to reduce the code size. This is to get around GCC's string table overflow issue on MinGW.
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -O1 -fuse-ld=lld")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -fuse-ld=lld")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -fuse-ld=lld")
++        set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -fuse-ld=lld")
+     endif()
++    # Security flags
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2")
+ else()
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG      "/DDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING -DACSDK_LOG_ENABLED -DACSDK_DEBUG_LOG_ENABLED /W4 /Zi /VZ /ZW /Od /MDd")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE    "/DNDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /W4 /O2 /VZ /ZW /MD")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "/DNDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /W4 /O1 /VZ /ZW /MD")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO    "/DNDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /W4 /O2 /VZ /ZW /MD /Zi")
+     add_definitions("-DNOMINMAX")
+     add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+@@ -85,10 +95,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -Wconditional-uninitialized -Wsometimes-uninitialized -Wuninitialized")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -Wconditional-uninitialized -Wsometimes-uninitialized -Wuninitialized")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -Wconditional-uninitialized -Wsometimes-uninitialized -Wuninitialized")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -Wconditional-uninitialized -Wsometimes-uninitialized -Wuninitialized")
+     if (MINGW)
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -Wno-error=sentinel")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -Wno-error=sentinel")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -Wno-error=sentinel")
++        set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -Wno-error=sentinel")
+     endif()
+ endif()
+ # Debug build, default.
+@@ -102,3 +114,15 @@ set(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE INTERNAL "Flags used
+ # Minimum sized release build.
+ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -DRAPIDJSON_HAS_STDSTRING" CACHE INTERNAL "Flags used for minimum sized RELEASE builds" FORCE)
+ set(CMAKE_C_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_RELEASE} CACHE INTERNAL "Flags used for minimum sized RELEASE builds" FORCE)
++
++# Release build with debug info.
++set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -DRAPIDJSON_HAS_STDSTRING" CACHE INTERNAL "Flags used for RELWITHDEBINFO builds" FORCE)
++set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -g" CACHE INTERNAL "Flags used for RELWITHDEBINFO builds" FORCE)
++
++# Linker flags
++if(CMAKE_SYSTEM_NAME MATCHES "^(Linux|Android|QNX)$")
++    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
++    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
++    set(CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
++    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
++endif()
 diff --git a/cmakeBuild/cmake/Crypto.cmake b/cmakeBuild/cmake/Crypto.cmake
 index 5f995d66..81e0c7a2 100644
 --- a/cmakeBuild/cmake/Crypto.cmake
@@ -5049,5 +5332,5 @@ index 00000000..8544b878
 +}  // namespace registrationManager
 +}  // namespace alexaClientSDK
 -- 
-2.33.0
+2.36.0
 

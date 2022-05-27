@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.comms.ui.db;
 
 import android.content.Context;
@@ -8,6 +22,8 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
+
+import com.amazon.alexa.auto.comms.ui.Constants;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -46,7 +62,6 @@ public class ConnectedBTDeviceRepository {
         return connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedDevices();
     }
 
-
     public List<ConnectedBTDevice> getConnectedDevicesSync() {
         return connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedDevicesSync();
     }
@@ -68,9 +83,12 @@ public class ConnectedBTDeviceRepository {
                     connectedBTDevice.setDeviceAddress(previousRecord.getDeviceAddress());
                     connectedBTDevice.setDeviceName(previousRecord.getDeviceName());
                     connectedBTDevice.setContactsUploadPermission(previousRecord.getContactsUploadPermission());
+                    String permission = btDeviceDatabase.btDeviceDao()
+                                                .getBTDeviceByAddressSync(deviceAddress)
+                                                .getContactsUploadPermission();
                     Log.i(TAG, "Inserting bt connected device entry: " + connectedBTDevice.getDeviceAddress());
                     connectedBTDeviceDatabase.connectedBTDeviceDao().insertConnectedBTDevice(connectedBTDevice);
-                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(connectedBTDevice, false));
+                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(connectedBTDevice, false, permission));
                 }
                 return null;
             }
@@ -94,14 +112,14 @@ public class ConnectedBTDeviceRepository {
                 }
 
                 BTDevice btDevice = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(device.getDeviceAddress());
-
+                String permission = btDevice.getContactsUploadPermission();
                 ConnectedBTDevice connectedBTDevice = new ConnectedBTDevice();
                 connectedBTDevice.setDeviceAddress(btDevice.getDeviceAddress());
                 connectedBTDevice.setDeviceName(btDevice.getDeviceName());
                 connectedBTDevice.setContactsUploadPermission(btDevice.getContactsUploadPermission());
                 Log.i(TAG, "Inserting bt connected device entry: " + connectedBTDevice.getDeviceAddress());
                 connectedBTDeviceDatabase.connectedBTDeviceDao().insertConnectedBTDevice(connectedBTDevice);
-                EventBus.getDefault().post(new PrimaryPhoneChangeMessage(connectedBTDevice, isNewDevice));
+                EventBus.getDefault().post(new PrimaryPhoneChangeMessage(connectedBTDevice, isNewDevice, permission));
                 return null;
             }
         }.execute();
@@ -115,9 +133,13 @@ public class ConnectedBTDeviceRepository {
                 List<ConnectedBTDevice> listData = getConnectedDevicesSync();
                 if (listData != null && listData.size() > 0) {
                     int index = listData.size() - 1;
-                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(listData.get(index), false));
+                    BTDevice btDevice = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(
+                            listData.get(index).getDeviceAddress());
+                    String permission = btDevice.getContactsUploadPermission();
+                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(listData.get(index), false, permission));
                 } else {
-                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(null, false));
+                    EventBus.getDefault().post(
+                            new PrimaryPhoneChangeMessage(null, false, Constants.CONTACTS_PERMISSION_NO));
                 }
                 return null;
             }
@@ -130,8 +152,12 @@ public class ConnectedBTDeviceRepository {
             protected Void doInBackground(Void... voids) {
                 ConnectedBTDevice device =
                         connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedDeviceByAddress(deviceAddress);
-                device.setContactsUploadPermission(permission);
-                connectedBTDeviceDatabase.connectedBTDeviceDao().updateConnectedBTDevice(device);
+                if (device != null) {
+                    device.setContactsUploadPermission(permission);
+                    connectedBTDeviceDatabase.connectedBTDeviceDao().updateConnectedBTDevice(device);
+                } else {
+                    Log.e(TAG, "Device not found in ConnectedBTDeviceRepository");
+                }
                 return null;
             }
         }.execute();
@@ -186,13 +212,20 @@ public class ConnectedBTDeviceRepository {
     public static class PrimaryPhoneChangeMessage {
         private ConnectedBTDevice device;
         private boolean isNewDevice;
-        public PrimaryPhoneChangeMessage(ConnectedBTDevice device, boolean newDevice) {
+        private String contactsPermission;
+        public PrimaryPhoneChangeMessage(ConnectedBTDevice device, boolean newDevice, String contactsPermission) {
             this.isNewDevice = newDevice;
             this.device = device;
+            this.contactsPermission = contactsPermission;
         }
         public ConnectedBTDevice getConnectedBTDevice() {
             return this.device;
         }
-        public boolean getIsNewDevice() {return this.isNewDevice;}
+        public boolean getIsNewDevice() {
+            return this.isNewDevice;
+        }
+        public String getContactsPermission() {
+            return this.contactsPermission;
+        }
     }
 }

@@ -1,4 +1,23 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
+
+import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.resetDNDSetting;
+import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.resetEarconSettings;
+import static com.amazon.alexa.auto.apps.common.util.FeatureDiscoveryUtil.clearDiscoveredFeatures;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.DISABLED;
 
 import android.app.Application;
 import android.content.Context;
@@ -18,6 +37,7 @@ import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthState;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
 import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
+import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
@@ -28,10 +48,6 @@ import javax.inject.Inject;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
-import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.resetDNDSetting;
-import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.resetEarconSettings;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.DISABLED;
-
 /**
  * ViewModel for @{link CBLFragment}
  */
@@ -41,6 +57,7 @@ public class CBLViewModel extends AndroidViewModel {
     public final static int WAIT_FOR_LOGIN_START_MS = 5000;
 
     private final @NonNull AuthController mAuthController;
+    private final @NonNull AlexaSetupController mAlexaSetupController;
     private final @Nullable LoginUIEventListener mUIEventListener;
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
@@ -63,6 +80,7 @@ public class CBLViewModel extends AndroidViewModel {
         AlexaApp app = AlexaApp.from(application);
 
         mAuthController = app.getRootComponent().getAuthController();
+        mAlexaSetupController = app.getRootComponent().getAlexaSetupController();
         mUIEventListener = app.getRootComponent().getComponent(LoginUIEventListener.class).orElse(null);
         DaggerSetupComponent.builder().androidModule(new AndroidModule(application)).build().injectCBLViewModel(this);
 
@@ -95,12 +113,13 @@ public class CBLViewModel extends AndroidViewModel {
     public void startLogin() {
         Log.d(TAG, "CBL Workflow starting");
 
+        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
+
         // Resetting the current user's preferences to clear out existing state (e.g. it's possible
         // that previously the user had enabled preview mode and enabled location consent)
         resetUserPreferences(getApplication().getApplicationContext());
         // Make sure to cancel the login with auth provider, before we start CBL login flow.
         mAuthController.cancelLogin(AuthMode.AUTH_PROVIDER_AUTHORIZATION);
-
         mAuthController.setAuthMode(AuthMode.CBL_AUTHORIZATION);
         this.mLoginWorkflowSubscription = this.mAuthController.newAuthenticationWorkflow().subscribe(loginData -> {
             Log.d(TAG, "Login Workflow state changed: " + loginData.getAuthState());
@@ -119,9 +138,15 @@ public class CBLViewModel extends AndroidViewModel {
      * @param context
      */
     private void resetUserPreferences(Context context) {
-        resetEarconSettings(context);
-        resetLocationConsent(context);
-        resetDNDSetting(context);
+        mAlexaSetupController.observeAACSReadiness().subscribe(isAACSReady -> {
+            if (isAACSReady) {
+                Log.i(TAG, "AACS is ready. Resetting user preferences.");
+                resetEarconSettings(context);
+                resetLocationConsent(context);
+                resetDNDSetting(context);
+                clearDiscoveredFeatures(context);
+            }
+        });
     }
 
     /**
@@ -138,13 +163,10 @@ public class CBLViewModel extends AndroidViewModel {
                             Log.e(TAG, "Failed to reset geolocation value to: " + DISABLED.getValue());
                         }
                     })
-                    .doOnError(throwable -> {
-                        Log.e(TAG, "Failed to reset geolocation to: " + DISABLED.getValue());
-                    })
+                    .doOnError(throwable -> { Log.e(TAG, "Failed to reset geolocation to: " + DISABLED.getValue()); })
                     .subscribe();
         }
     }
-
 
     /**
      * Create a runnable to wait for login workflow get started within the timeout,

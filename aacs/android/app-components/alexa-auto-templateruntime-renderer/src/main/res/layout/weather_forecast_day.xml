@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/weather_card_forecast_day"
-        style="@style/WeatherText"
+        style="@style/DisplayCardsText"
         android:layout_width="@dimen/weather_forecast_day_text_width"
         android:layout_height="@dimen/weather_forecast_day_text_height"
         android:layout_marginStart="@dimen/weather_forecast_day_text_marginStart"
@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/weather_card_forecast_temp_high"
-        style="@style/WeatherText"
+        style="@style/DisplayCardsText"
         android:layout_width="@dimen/weather_forecast_day_highlow_text_width"
         android:layout_height="@dimen/weather_forecast_day_highlow_text_height"
         android:layout_marginStart="@dimen/weather_forecast_day_high_text_marginStart"
@@ -43,7 +43,7 @@
 
     <TextView
         android:id="@+id/weather_card_forecast_temp_low"
-        style="@style/WeatherText"
+        style="@style/DisplayCardsText"
         android:layout_width="@dimen/weather_forecast_day_highlow_text_width"
         android:layout_height="@dimen/weather_forecast_day_highlow_text_height"
         android:layout_marginStart="@dimen/weather_forecast_day_low_text_marginStart"

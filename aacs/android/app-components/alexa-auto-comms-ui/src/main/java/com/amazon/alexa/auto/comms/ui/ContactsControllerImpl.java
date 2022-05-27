@@ -1,4 +1,21 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.comms.ui;
+
+import static com.amazon.alexa.auto.comms.ui.Constants.CONTACTS_PERMISSION_NO;
+import static com.amazon.alexa.auto.comms.ui.Constants.CONTACTS_PERMISSION_YES;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -6,17 +23,14 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
-import android.os.Handler;
-import android.os.Looper;
-import android.telecom.PhoneAccount;
-import android.telecom.PhoneAccountHandle;
-import android.telecom.TelecomManager;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 
 import com.amazon.aacsconstants.AACSConstants;
+import com.amazon.alexa.auto.apis.app.AlexaApp;
+import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.communication.ContactsController;
 import com.amazon.alexa.auto.comms.ui.db.BTDevice;
 import com.amazon.alexa.auto.comms.ui.db.BTDeviceRepository;
@@ -27,17 +41,13 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-
-import static com.amazon.alexa.auto.comms.ui.Constants.CONTACTS_PERMISSION_NO;
-import static com.amazon.alexa.auto.comms.ui.Constants.CONTACTS_PERMISSION_YES;
 
 public class ContactsControllerImpl implements ContactsController {
     private static final String TAG = ContactsControllerImpl.class.getSimpleName();
@@ -64,6 +74,7 @@ public class ContactsControllerImpl implements ContactsController {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
+        resetContactPermissionsWhenLogOut();
     }
 
     @Override
@@ -72,8 +83,9 @@ public class ContactsControllerImpl implements ContactsController {
         if (aacsContactsPackageName == null) {
             Log.e(TAG, "AACS contacts service is not available, skip to upload contacts.");
         } else if (!mPrimaryDeviceAddress.equals(deviceAddress)) {
-            Log.i(TAG, "The device provided is not set to primary, skip to upload contacts. " +
-                    "The current primary device is " + mPrimaryDeviceAddress);
+            Log.i(TAG,
+                    "The device provided is not set to primary, skip to upload contacts. "
+                            + "The current primary device is " + mPrimaryDeviceAddress);
         } else {
             Log.d(TAG, "Uploading contacts...");
             Intent intentStartService = new Intent();
@@ -116,13 +128,25 @@ public class ContactsControllerImpl implements ContactsController {
         return mContactsUploadConsentSubject;
     }
 
+    /**
+     * This method checks if a device is currently being paired and if the contacts
+     * consent had not been previously granted, it starts a new Contacts Activity. Once the
+     * contacts screen pops up, the bondState is reset so it only is shown once per pairing.
+     * It is also called by the OOBE flow for contacts consent.
+     */
     @Subscribe
     public void onBTDeviceDiscoveryChange(BTDeviceRepository.BTDeviceDiscoveryMessage message) {
+        Boolean isLoggedIn = AlexaApp.from(mContextWk.get()).getRootComponent().getAuthController().isAuthenticated();
+        if (message.getFirstPair() == true && isLoggedIn) {
+            Log.d(TAG, "Contacts consent not granted, popping up consent screen");
+            Intent intent = new Intent(mContextWk.get(), RequestContactsConsentActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            mContextWk.get().startActivity(intent);
+        }
         if (message.isFound()) {
-            Log.d(TAG, "Bluetooth device is found.");
-
             BTDevice device = message.getBTDevice();
-            if (message.getBTDevice().getContactsUploadPermission().equals(Constants.CONTACTS_PERMISSION_NO)) {
+            if (device.getContactsUploadPermission().equals(Constants.CONTACTS_PERMISSION_NO)) {
                 mContactsUploadConsentSubject.onNext(true);
             } else {
                 mContactsUploadConsentSubject.onNext(false);
@@ -147,9 +171,15 @@ public class ContactsControllerImpl implements ContactsController {
     }
 
     @Subscribe
-    public void onPrimaryPhoneChange(
-            ConnectedBTDeviceRepository.PrimaryPhoneChangeMessage primaryPhoneChangeMessage) {
-        updatePrimaryDeviceAddress(primaryPhoneChangeMessage.getConnectedBTDevice(), primaryPhoneChangeMessage.getIsNewDevice());
+    public void onPrimaryPhoneChange(ConnectedBTDeviceRepository.PrimaryPhoneChangeMessage primaryPhoneChangeMessage) {
+        ConnectedBTDevice connectedBTDevice = primaryPhoneChangeMessage.getConnectedBTDevice();
+
+        if (connectedBTDevice != null) {
+            String permission = primaryPhoneChangeMessage.getContactsPermission();
+            mConnectedBTDeviceRepository.updateContactsPermission(connectedBTDevice.getDeviceAddress(), permission);
+        }
+        updatePrimaryDeviceAddress(
+                primaryPhoneChangeMessage.getConnectedBTDevice(), primaryPhoneChangeMessage.getIsNewDevice());
     }
 
     /**
@@ -198,6 +228,7 @@ public class ContactsControllerImpl implements ContactsController {
     private void updatePrimaryDeviceAddress(ConnectedBTDevice device, boolean isNewDevice) {
         String deviceAddress = device == null ? "" : device.getDeviceAddress();
         String permission = device == null ? CONTACTS_PERMISSION_NO : device.getContactsUploadPermission();
+        Log.d(TAG, "Contacts upload permission:  " + permission);
 
         if (mPrimaryDeviceAddress.equals(deviceAddress)) {
             Log.d(TAG, "The primary phone has not changed: " + mPrimaryDeviceAddress);
@@ -221,9 +252,10 @@ public class ContactsControllerImpl implements ContactsController {
                 mExecutor.schedule(() -> {
                     // check the permission again before uploading the contacts
                     Log.d(TAG, "start uploading address book from the primary phone " + deviceAddress);
-                    ConnectedBTDevice primaryDevice = mConnectedBTDeviceRepository.getConnectedDeviceByAddressSync(deviceAddress);
-                    if (primaryDevice != null &&
-                            CONTACTS_PERMISSION_YES.equals(primaryDevice.getContactsUploadPermission())) {
+                    ConnectedBTDevice primaryDevice =
+                            mConnectedBTDeviceRepository.getConnectedDeviceByAddressSync(deviceAddress);
+                    if (primaryDevice != null
+                            && CONTACTS_PERMISSION_YES.equals(primaryDevice.getContactsUploadPermission())) {
                         Log.d(TAG, "Uploading the address book from the primary phone " + deviceAddress);
                         uploadContacts(deviceAddress);
                     } else {
@@ -232,5 +264,35 @@ public class ContactsControllerImpl implements ContactsController {
                 }, 30, TimeUnit.SECONDS);
             }
         }
+    }
+
+    /**
+     * Reset the contact sync permissions
+     * logout event was detected.
+     */
+    private void resetContactPermissionsWhenLogOut() {
+        @NonNull
+        AuthController authController = AlexaApp.from(mContextWk.get()).getRootComponent().getAuthController();
+
+        authController.observeAuthChangeOrLogOut().subscribe(authStatus -> {
+            if (!authStatus.getLoggedIn()) {
+                Log.i(TAG, "Resetting contact sync permissions to " + CONTACTS_PERMISSION_NO);
+
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        List<BTDevice> btDeviceList = mBTDeviceRepository.getBTDevices();
+                        if (btDeviceList != null && btDeviceList.size() > 0) {
+                            for (BTDevice btDevice : btDeviceList) {
+                                String address = btDevice.getDeviceAddress();
+                                mBTDeviceRepository.updateContactsPermission(address, CONTACTS_PERMISSION_NO);
+                                mConnectedBTDeviceRepository.updateContactsPermission(address, CONTACTS_PERMISSION_NO);
+                            }
+                        }
+                        return null;
+                    }
+                }.execute();
+            }
+        });
     }
 }

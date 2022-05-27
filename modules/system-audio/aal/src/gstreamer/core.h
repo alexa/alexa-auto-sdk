@@ -34,6 +34,7 @@ typedef struct {
 #ifdef USE_FAKEMUTE
     double saved_volume;
 #endif
+    bool thread_running;
     pthread_t thread_id;
     GMainLoop* main_loop;
     GMainContext* worker_context;

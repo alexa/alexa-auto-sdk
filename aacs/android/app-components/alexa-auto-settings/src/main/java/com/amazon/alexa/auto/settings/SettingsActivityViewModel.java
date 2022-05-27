@@ -1,4 +1,23 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings;
+
+import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
+import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.resetDNDSetting;
+import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.resetEarconSettings;
+import static com.amazon.alexa.auto.apps.common.util.FeatureDiscoveryUtil.clearDiscoveredFeatures;
 
 import android.app.Application;
 import android.content.Context;
@@ -18,18 +37,15 @@ import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthStatus;
 import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
+import com.amazon.alexa.auto.apps.common.util.LocaleUtil;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 import com.amazon.alexa.auto.settings.dependencies.AndroidModule;
 import com.amazon.alexa.auto.settings.dependencies.DaggerSettingsComponent;
 
 import javax.inject.Inject;
 
 import io.reactivex.rxjava3.disposables.Disposable;
-
-import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
-import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.resetDNDSetting;
-import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.resetEarconSettings;
 
 /**
  * ViewModel for {@link SettingsActivity}.
@@ -38,7 +54,6 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
     private static final String TAG = SettingsActivityViewModel.class.getSimpleName();
 
     public enum AuthState { LOGGED_OUT, LOGGED_IN, CBL_START }
-
     @NonNull
     private final AlexaAppRootComponent mAppRootComponent;
     @NonNull
@@ -54,7 +69,7 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
     @Inject
-    LocalesProvider mLocalesProvider;
+    AlexaLocalesProvider mAlexaLocalesProvider;
 
     /**
      * Creates an instance of {@link SettingsActivityViewModel}.
@@ -84,7 +99,7 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
 
     public void transitionToSwitchCBLStartState() {
         Log.i(TAG, "Transitioning to CBL start state.");
-
+        mAlexaSetupController.setSetupCompleteStatus(false);
         mAuthState.setValue(AuthState.CBL_START);
     }
 
@@ -143,8 +158,14 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
      * @param context
      */
     private void resetUserPreferences(Context context) {
-        resetEarconSettings(context);
-        resetDNDSetting(context);
+        mAlexaSetupController.observeAACSReadiness().subscribe(isAACSReady -> {
+            if (isAACSReady) {
+                Log.i(TAG, "AACS is ready. Resetting user preferences.");
+                resetEarconSettings(context);
+                resetDNDSetting(context);
+                clearDiscoveredFeatures(context);
+            }
+        });
     }
 
     /**
@@ -159,9 +180,9 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
      * Alexa Locale property setting, otherwise, we have set the locale based on user's choice in the setup.
      */
     private void applyLocalePropertyToAACS() {
-        String currentLocale = mLocalesProvider.getCurrentDeviceLocale();
+        String currentLocale = LocaleUtil.getCurrentDeviceLocale(getApplication().getApplicationContext());
 
-        mLocalesProvider.isCurrentLocaleSupportedByAlexa(currentLocale).subscribe(localeSupported -> {
+        mAlexaLocalesProvider.isCurrentLocaleSupportedByAlexa(currentLocale).subscribe(localeSupported -> {
             if (localeSupported) {
                 Log.d(TAG, "Update Alexa locale to " + currentLocale);
                 mAlexaPropertyManager.updateAlexaProperty(AACSPropertyConstants.LOCALE, currentLocale);

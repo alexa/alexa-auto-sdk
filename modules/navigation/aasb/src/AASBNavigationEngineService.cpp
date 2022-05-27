@@ -38,7 +38,8 @@ AASBNavigationEngineService::AASBNavigationEngineService(const aace::engine::cor
 bool AASBNavigationEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // Navigation

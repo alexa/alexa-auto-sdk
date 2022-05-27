@@ -28,21 +28,22 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.amazon.aace.aasb.AASBStream;
+import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.AASBConstants.AudioOutput.MutedState;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.MediaConstants;
 import com.amazon.aacsconstants.Topic;
-import com.amazon.alexaautoclientservice.mediaPlayer.AACSMediaPlayer;
-import com.amazon.alexaautoclientservice.mediaPlayer.AudioFocusAttributes;
-import com.amazon.alexaautoclientservice.mediaPlayer.EventReceiver;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AuthStateObserver;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.AACSMediaPlayer;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.AudioFocusAttributes;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.EventReceiver;
 import com.amazon.alexaautoclientservice.util.MediaPlayerUtil;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Format;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -157,9 +158,9 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
     //
 
     @Override
-    public void prepare(AASBStream stream, boolean repeating, String token) {
+    public void prepare(MessageStream stream, boolean repeating, String token) {
         Log.v(TAG,
-                String.format("(%s) Handling prepare() given AASBStream. WillPauseWhenDucked= %b", mChannel,
+                String.format("(%s) Handling prepare() given MessageStream. WillPauseWhenDucked= %b", mChannel,
                         mAudioFocusAttributes.mWillPauseWhenDucked));
         resetPlayer();
         mRepeating = repeating;
@@ -220,10 +221,13 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         int result = mAudioManager.requestAudioFocus(mExoPlayerAudioFocusRequest);
         synchronized (focusLock) {
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                AudioFocusStatus.setAudioFocusStatus(mType, true);
                 mPlayer.setPlayWhenReady(true);
             } else if (result == AudioManager.AUDIOFOCUS_REQUEST_DELAYED) {
+                AudioFocusStatus.setAudioFocusStatus(mType, false);
                 playbackDelayed = true;
             } else if (result == AudioManager.AUDIOFOCUS_REQUEST_FAILED) {
+                AudioFocusStatus.setAudioFocusStatus(mType, false);
                 String message = "Audio focus request failed.";
                 MediaPlayerUtil.sendMediaErrorMessage(mEventReceiver, mCurrentToken,
                         MediaConstants.MediaError.MEDIA_ERROR_INTERNAL_DEVICE_ERROR, message, mChannel);
@@ -406,7 +410,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         }
     }
 
-    private class PlayerEventListener extends Player.DefaultEventListener {
+    private class PlayerEventListener implements Player.Listener {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             switch (playbackState) {
@@ -431,20 +435,10 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         }
 
         @Override
-        public void onPlayerError(ExoPlaybackException e) {
-            String message;
-            if (e.type == ExoPlaybackException.TYPE_SOURCE) {
-                message = "ExoPlayer Source Error: " + e.getSourceException().getMessage();
-            } else if (e.type == ExoPlaybackException.TYPE_RENDERER) {
-                message = "ExoPlayer Renderer Error: " + e.getRendererException().getMessage();
-            } else if (e.type == ExoPlaybackException.TYPE_UNEXPECTED) {
-                message = "ExoPlayer Unexpected Error: " + e.getUnexpectedException().getMessage();
-            } else {
-                message = e.getMessage();
-            }
-            Log.e(TAG, "PLAYER ERROR: " + message);
+        public void onPlayerError(PlaybackException e) {
+            Log.e(TAG, "PLAYER ERROR: " + e.getMessage());
             MediaPlayerUtil.sendMediaErrorMessage(mEventReceiver, mCurrentToken,
-                    MediaConstants.MediaError.MEDIA_ERROR_INTERNAL_DEVICE_ERROR, message, mChannel);
+                    MediaConstants.MediaError.MEDIA_ERROR_INTERNAL_DEVICE_ERROR, e.getMessage(), mChannel);
         }
     }
 
@@ -473,22 +467,8 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         }
     }
 
-    private void handleTransientDucking() {
-        if (mType.equals(AASBConstants.AudioOutput.AudioType.TTS)) {
-            MediaPlayerUtil.sendEvent(
-                    mEventReceiver, "", Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "", mChannel);
-        } else if (!mMutedState.equals(MutedState.MUTED)) {
-            if (mMayDuck || AASBConstants.AudioOutput.AudioType.ALARM.equals(mType)) {
-                mPlayer.setVolume(mVolume * DUCKING_FACTOR);
-                isVolumeDucked = true;
-                MediaPlayerUtil.sendAudioFocusEvent(mEventReceiver, mChannel, mCurrentToken, true);
-            } else {
-                handleTransientFocusLoss();
-            }
-        }
-    }
-
     private void handleFocusGain() {
+        AudioFocusStatus.setAudioFocusStatus(mType, true);
         if (playbackDelayed || resumeOnFocusGain) {
             synchronized (focusLock) {
                 playbackDelayed = false;
@@ -506,6 +486,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
     }
 
     private void handleFocusLoss() {
+        AudioFocusStatus.setAudioFocusStatus(mType, false);
         synchronized (focusLock) {
             resumeOnFocusGain = false;
             playbackDelayed = false;
@@ -525,7 +506,34 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
         }
     }
 
+    private void handleTransientDucking() {
+        AudioFocusStatus.setAudioFocusStatus(mType, false);
+        synchronized (focusLock) {
+            resumeOnFocusGain = true;
+            playbackDelayed = false;
+        }
+        if (mType.equals(AASBConstants.AudioOutput.AudioType.TTS)) {
+            if (AudioFocusStatus.getAudioFocusStatus(AASBConstants.AudioOutput.AudioType.NOTIFICATION)
+                    || AudioFocusStatus.getAudioFocusStatus(AASBConstants.AudioOutput.AudioType.EARCON)) {
+                // Need not to stop TTS for EARCON
+                return;
+            } else {
+                MediaPlayerUtil.sendEvent(mEventReceiver, "", Topic.ALEXA_CLIENT,
+                        Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "", mChannel);
+            }
+        } else if (!mMutedState.equals(MutedState.MUTED)) {
+            if (mMayDuck || AASBConstants.AudioOutput.AudioType.ALARM.equals(mType)) {
+                mPlayer.setVolume(mVolume * DUCKING_FACTOR);
+                isVolumeDucked = true;
+                MediaPlayerUtil.sendAudioFocusEvent(mEventReceiver, mChannel, mCurrentToken, true);
+            } else {
+                handleTransientFocusLoss();
+            }
+        }
+    }
+
     private void handleTransientFocusLoss() {
+        AudioFocusStatus.setAudioFocusStatus(mType, false);
         synchronized (focusLock) {
             resumeOnFocusGain = true;
             playbackDelayed = false;

@@ -1,0 +1,14 @@
+[settings]
+os=Neutrino
+os.version=7.1
+compiler=qcc
+compiler.version=8.3
+compiler.libcxx=cxx
+compiler.cppstd=None
+
+[build_requires]
+qnx7-sdp/7.x
+
+[options]
+
+[env]

@@ -42,7 +42,8 @@ AASBAudioEngineService::AASBAudioEngineService(const aace::engine::core::Service
 bool AASBAudioEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // AudioInputProvider

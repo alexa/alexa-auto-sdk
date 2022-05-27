@@ -10,14 +10,15 @@ as a reference when implementing IPC for your app.
 **NOTE**: This section assumes that you have completed the steps for building and installing AACS.
 
 To build the IPC library, follow these steps:
-1) Enter the following commands:
-   ~~~
-   cd $AACS_HOME/common/ipc
-   gradle assembleDebug
-   ~~~
-   The `aacsipc-debug.aar` file is built.
 
-1) Copy `aacsipc-debug.aar` to the `libs` folder of your app.
+1. Enter the following commands:
+    ~~~
+    cd $AACS_HOME/common/ipc
+    gradle assembleDebug
+    ~~~
+    The `aacsipc-debug.aar` file is built.
+
+2. Copy `aacsipc-debug.aar` to the `libs` folder of your app.
 
 ## API Usage Guide
 

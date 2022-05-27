@@ -51,6 +51,8 @@
             <intent-filter>
                 <category android:name="com.amazon.aacs.aasb.AlexaClient" />
                 <action android:name="com.amazon.aacs.aasb.ConnectionStatusChanged"/>
+                <category android:name="com.amazon.aacs.aasb.AuthProvider" />
+                <action android:name="com.amazon.aacs.aasb.AuthStateChanged"/>
             </intent-filter>
         </receiver>
 

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_description">Alexa ऑटो क्लाइंट सेवा आपको अपने वाहन में Alexa से बात करने की सुविधा देती है.</string>
+    <string name="aacs_initializing">चालू किया जा रहा है..</string>
+    <string name="aacs_ready">चालू हो गया है.</string>
+    <string name="aacs_title">AACS</string>
+    <string name="component_registry_key">%1$s + %2$s</string>
+</resources>

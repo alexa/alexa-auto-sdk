@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_telephony_description">Androidデバイスで通話機能を提供する</string>
+    <string name="aacs_telephony_title">AACS電話サービス</string>
+</resources>

@@ -234,6 +234,8 @@ public class Action {
         public static final String START = "Start";
     }
 
+    public static class FeatureDiscovery { public static final String GET_FEATURES = "GetFeatures"; }
+
     public static class LocationProvider {
         public static final String GET_COUNTRY = "GetCountry";
         public static final String GET_LOCATION = "GetLocation";

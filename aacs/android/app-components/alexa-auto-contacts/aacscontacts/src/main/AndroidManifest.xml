@@ -7,8 +7,7 @@
     <permission android:name="com.amazon.aacscontacts" android:protectionLevel= "signature|privileged"/>
     <application
     android:allowBackup="true"
-    android:supportsRtl="true"
-    android:extractNativeLibs="true">
+    android:supportsRtl="true">
 
         <service
             android:name=".AACSContactsService"

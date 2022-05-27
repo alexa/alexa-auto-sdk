@@ -83,7 +83,7 @@ void AudioPlayerHandler::subscribeToAASBMessages() {
 }
 
 void AudioPlayerHandler::handlePlayerActivityChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PlayerActivityChangedMessage");
     PlayerActivityChangedMessage msg = json::parse(message);
     playerActivityChanged(msg.payload.state);
 }
@@ -124,7 +124,7 @@ int64_t AudioPlayerHandler::getPlayerPosition() {
 }
 
 void AudioPlayerHandler::handleGetPlayerDurationMessageReply(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetPlayerDurationMessageReply");
     GetPlayerDurationMessageReply msg = json::parse(message);
 
     // set the value in the promise
@@ -134,7 +134,7 @@ void AudioPlayerHandler::handleGetPlayerDurationMessageReply(const std::string& 
 }
 
 void AudioPlayerHandler::handleGetPlayerPositionMessageReply(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetPlayerPositionMessageReply");
     GetPlayerPositionMessageReply msg = json::parse(message);
 
     // set the value in the promise

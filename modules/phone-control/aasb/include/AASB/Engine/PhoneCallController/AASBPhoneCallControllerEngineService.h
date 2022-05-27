@@ -25,7 +25,10 @@ namespace phoneCallController {
 
 class AASBPhoneCallControllerEngineService : public aace::engine::messageBroker::MessageHandlerEngineService {
 public:
-    DESCRIBE("aasb.phoneCallController", VERSION("1.0"), DEPENDS(aace::engine::messageBroker::MessageBrokerEngineService))
+    DESCRIBE(
+        "aasb.phoneCallController",
+        VERSION("1.0"),
+        DEPENDS(aace::engine::messageBroker::MessageBrokerEngineService))
 
 private:
     AASBPhoneCallControllerEngineService(const aace::engine::core::ServiceDescription& description);

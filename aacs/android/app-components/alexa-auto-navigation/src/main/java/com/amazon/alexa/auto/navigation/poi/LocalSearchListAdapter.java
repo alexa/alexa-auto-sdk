@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.navigation.poi;
 
 import android.annotation.SuppressLint;
@@ -11,10 +25,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.amazon.alexa.auto.aacs.common.PointOfInterest;
+import com.amazon.alexa.auto.aacs.common.navi.PointOfInterest;
 import com.amazon.alexa.auto.navigation.R;
 import com.amazon.alexa.auto.navigation.handlers.LocalSearchDirectiveHandler;
-import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
+import com.amazon.alexa.auto.navigation.providers.NaviProvider;
 import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
@@ -29,14 +43,14 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
 
     public static final String POI_PROVIDER_YELP = "Yelp";
 
-    private final NavigationProvider mNavigationProvider;
+    private final NaviProvider mNaviProvider;
     private final List<PointOfInterest> mPOIs = new ArrayList<>();
     private final WeakReference<LocalSearchDirectiveHandler> mDirectiveHandlerWeakReference;
     private final Context mContext;
 
-    public LocalSearchListAdapter(NavigationProvider navigationProvider,
+    public LocalSearchListAdapter(NaviProvider naviProvider,
             WeakReference<LocalSearchDirectiveHandler> directiveHandlerWeakReference, Context context) {
-        mNavigationProvider = navigationProvider;
+        mNaviProvider = naviProvider;
         mDirectiveHandlerWeakReference = directiveHandlerWeakReference;
         mContext = context;
     }
@@ -74,7 +88,7 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
         holder.mPOIAddress.setText(poi.getAddress());
         holder.mEta.setText(poi.getTravelTime());
         holder.mPoiRoot.setOnClickListener(poiNameView -> {
-            mNavigationProvider.startNavigation(poi);
+            mNaviProvider.startNavigation(poi);
             if (mDirectiveHandlerWeakReference.get() != null) {
                 mDirectiveHandlerWeakReference.get().clearTemplate();
             }

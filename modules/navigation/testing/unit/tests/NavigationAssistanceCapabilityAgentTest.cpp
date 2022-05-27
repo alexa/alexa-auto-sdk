@@ -194,8 +194,7 @@ TEST_F(NavigationAssistanceCapabilityAgentTest, createWithNullContextManager) {
 }
 
 TEST_F(NavigationAssistanceCapabilityAgentTest, testUnknownDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(NAMESPACE, UNKNOWN_DIRECTIVE, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -207,8 +206,7 @@ TEST_F(NavigationAssistanceCapabilityAgentTest, testUnknownDirective) {
 }
 
 TEST_F(NavigationAssistanceCapabilityAgentTest, testAnnounceManeuverDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
         ANNOUNCE_MANEUVER.nameSpace, ANNOUNCE_MANEUVER.name, MESSAGE_ID);
     std::string MockPayload = generateAnnounceManeuverPayload(
@@ -224,8 +222,7 @@ TEST_F(NavigationAssistanceCapabilityAgentTest, testAnnounceManeuverDirective) {
 }
 
 TEST_F(NavigationAssistanceCapabilityAgentTest, testAnnounceRoadRegulationDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
         ANNOUNCE_ROAD_REGULATION.nameSpace, ANNOUNCE_ROAD_REGULATION.name, MESSAGE_ID);
     std::string MockPayload = generateAnnounceRoadRegulationPayload("SPEED_LIMIT");

@@ -21,8 +21,8 @@ import com.amazon.aace.core.PlatformInterface;
  * AlexaConnectivity should be extended to send network connectivity status and data plan status to Alexa.
  * The information sent determines what Alexa features are available to the device.
  *
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

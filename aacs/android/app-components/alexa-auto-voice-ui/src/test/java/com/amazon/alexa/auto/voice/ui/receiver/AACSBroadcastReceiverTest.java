@@ -53,8 +53,8 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedListening.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION,
-                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_LISTENING);
+                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED,
+                        AASBConstants.AlexaClient.DIALOG_STATE_LISTENING);
         Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
         Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
         Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_LISTENING);
@@ -65,8 +65,8 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedThinking.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION,
-                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_THINKING);
+                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED,
+                        AASBConstants.AlexaClient.DIALOG_STATE_THINKING);
         Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
         Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
         Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_THINKING);
@@ -77,8 +77,8 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedSpeaking.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION,
-                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_SPEAKING);
+                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED,
+                        AASBConstants.AlexaClient.DIALOG_STATE_SPEAKING);
         Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
         Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
         Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_SPEAKING);
@@ -89,8 +89,8 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/DialogStateChangedIdle.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION,
-                        Action.AlexaClient.DIALOG_STATE_CHANGED, AASBConstants.AlexaClient.DIALOG_STATE_IDLE);
+                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED,
+                        AASBConstants.AlexaClient.DIALOG_STATE_IDLE);
         Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
         Assert.assertEquals(receiveMessageAction, Action.AlexaClient.DIALOG_STATE_CHANGED);
         Assert.assertEquals(receiveMessagePayload, AASBConstants.AlexaClient.DIALOG_STATE_IDLE);
@@ -101,8 +101,8 @@ public class AACSBroadcastReceiverTest {
         generateIntent("aacs/WakewordDetected.json");
         aacsBroadcastReceiver.onReceive(context, mIntent);
         verify(aacsBroadcastReceiver, times(1))
-                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION,
-                        Action.SpeechRecognizer.WAKEWORD_DETECTED, "wakeword-SampleText");
+                .sendAutoVoiceUIMessage(Constants.TOPIC_VOICE_ANIMATION, Action.SpeechRecognizer.WAKEWORD_DETECTED,
+                        "wakeword-SampleText");
         Assert.assertEquals(receiveMessageTopic, Constants.TOPIC_VOICE_ANIMATION);
         Assert.assertEquals(receiveMessageAction, Action.SpeechRecognizer.WAKEWORD_DETECTED);
         Assert.assertEquals(receiveMessagePayload, "wakeword-SampleText");

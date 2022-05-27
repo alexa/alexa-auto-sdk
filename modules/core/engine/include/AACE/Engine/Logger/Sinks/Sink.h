@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public:
     using Level = aace::logger::LoggerEngineInterface::Level;
 
 protected:
-    Sink(const std::string& id);
+    explicit Sink(std::string id);
 
 public:
     virtual ~Sink() = default;
@@ -46,6 +46,7 @@ public:
     virtual void log(
         Level level,
         std::chrono::system_clock::time_point time,
+        const char* source,
         const char* threadMoniker,
         const char* text) = 0;
     virtual void flush();

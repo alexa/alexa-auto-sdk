@@ -91,7 +91,6 @@ class SampleApp(ConanFile):
         self.replace_token( config_file, "DEVICE_SERIAL_NUMBER" )
         self.replace_token( config_file, "MANUFACTURER_NAME" )
         self.replace_token( config_file, "DEVICE_DESCRIPTION" )
-        self.replace_token( config_file, "DEVICE_SERIAL_NUMBER" )
         # vehicle info config
         self.replace_token( config_file, "VEHICLE_OS", self.settings.os )
         self.replace_token( config_file, "VEHICLE_ARCH", self.settings.arch )
@@ -104,7 +103,9 @@ class SampleApp(ConanFile):
         self.replace_token( config_file, "VEHICLE_LANGUAGE" )
         self.replace_token( config_file, "VEHICLE_MICROPHONE" )
         self.replace_token( config_file, "VEHICLE_IDENTIFIER" )
-        self.replace_token( config_file, "VEHICLE_COUNTRTY" )
+        self.replace_token( config_file, "VEHICLE_COUNTRY" )
+        self.replace_token( config_file, "VEHICLE_ENGINE_TYPE" )
+        self.replace_token( config_file, "VEHICLE_RSE_EMBEDDED_FIRETVS" )
 
     def imports(self):
         if not self.in_local_cache:
@@ -132,4 +133,3 @@ class SampleApp(ConanFile):
             "src": os.path.abspath("share"),
             "dst": "sampleapp",
         }])
-

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
+#include <cstdlib>
 #include <iostream>
-#include <sstream>
 
 #include "AACE/Engine/Logger/EngineLogger.h"
 #include "AACE/Engine/Logger/LogFormatter.h"
@@ -25,7 +25,6 @@
 #ifdef AAC_DEFAULT_LOGGER_SINK_SYSLOG
 #include "AACE/Engine/Logger/Sinks/SyslogSink.h"
 #endif
-#include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
@@ -118,6 +117,12 @@ void EngineLogger::log(Level level, const LogEntry& entry) {
         std::chrono::system_clock::now(),
         ThreadMoniker::getThisThreadMoniker(),
         entry.c_str());
+#ifndef NDEBUG
+    // Abort the execution for DEBUG build
+    if (entry.shouldAbortAfterEmission()) {
+        std::abort();
+    }
+#endif
 }
 
 void EngineLogger::log(const std::string& source, Level level, const LogEntry& entry) {
@@ -128,6 +133,12 @@ void EngineLogger::log(const std::string& source, Level level, const LogEntry& e
         std::chrono::system_clock::now(),
         ThreadMoniker::getThisThreadMoniker(),
         entry.c_str());
+#ifndef NDEBUG
+    // Abort the execution for DEBUG build
+    if (entry.shouldAbortAfterEmission()) {
+        std::abort();
+    }
+#endif
 }
 
 void EngineLogger::log(

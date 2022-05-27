@@ -1,5 +1,12 @@
 package com.amazon.alexa.auto.settings;
 
+import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS;
+import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS_END;
+import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS_START;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -21,15 +28,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 
-import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS;
-import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS_END;
-import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS_START;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class AlexaSoundPreferencesFragmentTest {
-
     @Mock
     private Context mMockContext;
     @Mock
@@ -50,10 +50,10 @@ public class AlexaSoundPreferencesFragmentTest {
         when(mMockSharedPrefs.getBoolean(EARCON_SETTINGS_END, true)).thenReturn(true);
 
         launchFragment().onFragment(fragment -> {
-            SwitchPreferenceCompat soundStartPreference = fragment.getPreferenceScreen()
-                    .findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_START);
-            SwitchPreferenceCompat soundEndPreference = fragment.getPreferenceScreen()
-                    .findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_END);
+            SwitchPreferenceCompat soundStartPreference =
+                    fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_START);
+            SwitchPreferenceCompat soundEndPreference =
+                    fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_END);
             Assert.assertNotNull(soundStartPreference);
             Assert.assertNotNull(soundEndPreference);
 
@@ -66,32 +66,32 @@ public class AlexaSoundPreferencesFragmentTest {
 
     @Test
     public void testOnEarconSettingDisableEnable_appropriateMethodIsInvoked() {
-            launchFragment().onFragment(fragment -> {
-                Preference preference =
-                        fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_START);
-                Assert.assertNotNull(preference);
+        launchFragment().onFragment(fragment -> {
+            Preference preference =
+                    fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_START);
+            Assert.assertNotNull(preference);
 
-                preference.performClick();
-                Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_START, true);
+            preference.performClick();
+            Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_START, true);
 
-                preference.performClick();
-                Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_START, false);
+            preference.performClick();
+            Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_START, false);
 
-                preference = fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_END);
-                Assert.assertNotNull(preference);
+            preference = fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUND_END);
+            Assert.assertNotNull(preference);
 
-                preference.performClick();
-                Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_END, true);
+            preference.performClick();
+            Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_END, true);
 
-                preference.performClick();
-                Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_END, false);
+            preference.performClick();
+            Mockito.verify(mMockEditor).putBoolean(EARCON_SETTINGS_END, false);
         });
     }
 
     private FragmentScenario<AlexaSoundPreferencesFragmentOverride> launchFragment() {
-         return FragmentScenario.launchInContainer(AlexaSoundPreferencesFragmentOverride.class, null,
-                        com.amazon.alexa.auto.apps.common.ui.R.style.Theme_Alexa_Standard,
-                        new AlexaSoundPreferencesFragmentTest.AlexaSoundPreferencesFragmentFactory());
+        return FragmentScenario.launchInContainer(AlexaSoundPreferencesFragmentOverride.class, null,
+                com.amazon.alexa.auto.apps.common.ui.R.style.Theme_Alexa_Standard,
+                new AlexaSoundPreferencesFragmentTest.AlexaSoundPreferencesFragmentFactory());
     }
 
     /**
@@ -101,7 +101,7 @@ public class AlexaSoundPreferencesFragmentTest {
     public static class AlexaSoundPreferencesFragmentOverride extends AlexaSoundPreferencesFragment {
         @Override
         void setDefaultPreferences() {
-            //Do nothing
+            // Do nothing
         }
     }
 

@@ -44,9 +44,10 @@ private:
     std::shared_ptr<aace::core::MessageBroker> m_messageBroker;
 
 protected:
-    LocationProviderHandler(std::weak_ptr<Activity> activity, 
-                            std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                            std::shared_ptr<aace::core::MessageBroker> messageBroker);
+    LocationProviderHandler(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        std::shared_ptr<aace::core::MessageBroker> messageBroker);
 
 public:
     template <typename... Args>

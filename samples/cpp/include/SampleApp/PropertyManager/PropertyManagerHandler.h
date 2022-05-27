@@ -45,8 +45,9 @@ private:
     std::shared_ptr<aace::core::MessageBroker> m_messageBroker;
 
 protected:
-    PropertyManagerHandler(std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                           std::shared_ptr<aace::core::MessageBroker> messageBroker);
+    PropertyManagerHandler(
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        std::shared_ptr<aace::core::MessageBroker> messageBroker);
 
 public:
     template <typename... Args>
@@ -104,7 +105,10 @@ private:
     /**
      * Handles the implementation of the PropertyStateChanged message
      */
-    void propertyStateChanged(const std::string& name, const std::string& value, const aasb::message::propertyManager::propertyManager::PropertyState state);
+    void propertyStateChanged(
+        const std::string& name,
+        const std::string& value,
+        const aasb::message::propertyManager::propertyManager::PropertyState state);
 
     using PropertyManagerPromise = std::promise<std::string>;
     std::mutex m_promise_map_access_mutex;

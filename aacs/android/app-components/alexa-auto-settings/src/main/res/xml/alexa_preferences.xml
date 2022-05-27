@@ -30,7 +30,7 @@
     <Preference
         app:key="alexa-signin"
         app:title="@string/setting_alexa_signin"
-        app:layout="@layout/alexa_preference_layout"/>
+        app:layout="@layout/alexa_no_summary_preference_layout"/>
     <SwitchPreferenceCompat
         app:key="alexa-hands-free-settings"
         app:title="@string/setting_alexa_hands_free_title"
@@ -53,6 +53,12 @@
         app:summary="@string/setting_location_sharing_summary"
         app:defaultValue="false"
         app:layout="@layout/alexa_preference_layout" />
+    <SwitchPreferenceCompat
+        app:key="alexa-nav_favorite-consent-setting"
+        app:title="@string/setting_navigation_favorites_title"
+        app:summary="@string/setting_navigation_favorites_summary"
+        app:defaultValue="false"
+        app:layout="@layout/alexa_preference_layout" />
     <Preference
         app:key="alexa-communication"
         app:title="@string/setting_alexa_communication"
@@ -60,17 +66,22 @@
     <Preference
         app:key="alexa-sounds"
         app:title="@string/setting_alexa_sounds"
-        app:layout="@layout/alexa_preference_layout"/>
+        app:layout="@layout/alexa_no_summary_preference_layout"/>
     <Preference
         app:key="alexa-languages-settings"
         app:title="@string/setting_alexa_language_title"
         app:layout="@layout/alexa_preference_layout"/>
 
+    <Preference
+        app:key="alexa-things-to-try"
+        app:title="@string/setting_alexa_things_to_try"
+        app:layout="@layout/alexa_no_summary_preference_layout"/>
+
     <!-- General Debug Settings -->
     <Preference
         app:key="alexa-auto-client-service-settings"
         app:title="@string/setting_aacs"
-        app:layout="@layout/alexa_preference_layout"/>
+        app:layout="@layout/alexa_preference_layout" />
 
     <!-- Sign Out/ Disable -->
     <Preference

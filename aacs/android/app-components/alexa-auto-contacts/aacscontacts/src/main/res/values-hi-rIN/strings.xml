@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_contacts_description">अपने Android डिवाइस पर फ़ोन बुक कॉन्टैक्ट सेवा उपलब्ध कराना</string>
+    <string name="aacs_contacts_title">AACS कॉन्टैक्ट सेवा</string>
+</resources>

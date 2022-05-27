@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.templateruntime.weather;
 
 import android.graphics.Color;
@@ -23,12 +37,9 @@ import java.util.List;
 
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
     private static final String TAG = WeatherAdapter.class.getSimpleName();
-    static final List<Integer> weatherForecastLayouts = Arrays.asList(
-            R.id.weather_card_forecast_day1_layout,
-            R.id.weather_card_forecast_day2_layout,
-            R.id.weather_card_forecast_day3_layout,
-            R.id.weather_card_forecast_day4_layout
-    );
+    static final List<Integer> weatherForecastLayouts =
+            Arrays.asList(R.id.weather_card_forecast_day1_layout, R.id.weather_card_forecast_day2_layout,
+                    R.id.weather_card_forecast_day3_layout, R.id.weather_card_forecast_day4_layout);
     public static final int TOTAL_PAGES = 2;
     public static final int WEATHER_CURRENT_INDEX = 0;
     public static final int WEATHER_FORECAST_INDEX = 1;
@@ -46,8 +57,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(viewType, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
         return new ViewHolder(view);
     }
 
@@ -84,25 +94,39 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     }
 
     private void populateCurrentWeatherData(@NotNull ViewHolder holder) {
-        String weatherIconUrl = weatherTemplate.getCurrentWeatherIcon().getSources().stream()
-                .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
-                .findFirst().get().getDarkBackgroundUrl();
+        String weatherIconUrl = weatherTemplate.getCurrentWeatherIcon()
+                                        .getSources()
+                                        .stream()
+                                        .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
+                                        .findFirst()
+                                        .get()
+                                        .getDarkBackgroundUrl();
         Picasso.get().load(weatherIconUrl).into(holder.weatherIconView);
         holder.weatherIconView.setColorFilter(COLOR_WHITE);
 
         holder.currentTempText.setText(weatherTemplate.getCurrentWeather());
 
-        String arrowUpUrl = weatherTemplate.getHighTemperature().getArrow().getSources().stream()
-                .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
-                .findFirst().get().getDarkBackgroundUrl();
+        String arrowUpUrl = weatherTemplate.getHighTemperature()
+                                    .getArrow()
+                                    .getSources()
+                                    .stream()
+                                    .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
+                                    .findFirst()
+                                    .get()
+                                    .getDarkBackgroundUrl();
         Picasso.get().load(arrowUpUrl).into(holder.weatherArrowUpIconView);
         holder.weatherArrowUpIconView.setColorFilter(COLOR_WHITE);
 
         holder.highTempText.setText(weatherTemplate.getHighTemperature().getValue());
 
-        String arrowDownUrl = weatherTemplate.getLowTemperature().getArrow().getSources().stream()
-                .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
-                .findFirst().get().getDarkBackgroundUrl();
+        String arrowDownUrl = weatherTemplate.getLowTemperature()
+                                      .getArrow()
+                                      .getSources()
+                                      .stream()
+                                      .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
+                                      .findFirst()
+                                      .get()
+                                      .getDarkBackgroundUrl();
         Picasso.get().load(arrowDownUrl).into(holder.weatherArrowDownIconView);
         holder.weatherArrowDownIconView.setColorFilter(COLOR_WHITE);
 
@@ -114,9 +138,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             View view = holder.itemView.findViewById(weatherForecastLayouts.get(i));
             List<WeatherForecast> weatherForecastList = weatherTemplate.getWeatherForecast();
             ImageView weatherForecastIconView = view.findViewById(R.id.weather_card_forecast_icon);
-            String weatherForecastIconUrl = weatherForecastList.get(i).getImage().getSources().stream()
-                    .filter(source -> source.getSize().equals(IMAGE_SIZE_XL))
-                    .findFirst().get().getDarkBackgroundUrl();
+            String weatherForecastIconUrl = weatherForecastList.get(i)
+                                                    .getImage()
+                                                    .getSources()
+                                                    .stream()
+                                                    .filter(source -> source.getSize().equals(IMAGE_SIZE_XL))
+                                                    .findFirst()
+                                                    .get()
+                                                    .getDarkBackgroundUrl();
             Picasso.get().load(weatherForecastIconUrl).into(weatherForecastIconView);
             weatherForecastIconView.setColorFilter(COLOR_WHITE);
 

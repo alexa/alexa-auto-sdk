@@ -3,6 +3,7 @@
     <!-- Communication setup dimensions -->
     <dimen name="contacts_permission_alexa_image_width">150dp</dimen>
     <dimen name="contacts_permission_alexa_image_height">108dp</dimen>
+    <dimen name="contacts_permission_alexa_image_topMargin">200dp</dimen>
     <dimen name="contacts_permission_item_margin_top">50dp</dimen>
     <dimen name="contacts_permission_hint_margin_start">32dp</dimen>
     <dimen name="contacts_permission_action_item_margin_top">220dp</dimen>

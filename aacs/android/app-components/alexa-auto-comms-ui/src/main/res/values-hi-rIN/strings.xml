@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="contacts_permission_consent_title">Alexa के ज़रिए अपने कॉन्टैक्ट में शामिल लोगों को कॉल करें</string>
+    <string name="contacts_permission_consent_title">क्या %1$s से कॉन्टैक्ट ऐक्सेस करने की अनुमति देनी है?</string>
     <string name="contacts_permission_consent_title_with_alexa_custom_assistant">वॉइस कॉलिंग सेट अप करें</string>
-    <string name="contacts_permission_consent_body">%1$s पर मौजूद कॉन्टैक्ट को Amazon सेवा पर अपलोड करने की अनुमति दें.</string>
+    <string name="contacts_permission_consent_body">दोस्तों और परिवार को ढूंढना और कॉल करना आसान बनाने के लिए कॉन्टैक्ट समय-समय पर Amazon क्लाउड पर अपलोड किए जाएंगे.</string>
     <string name="contacts_permission_consent_body_with_alexa_custom_assistant">[Acme Brandon] और Amazon Alexa के साथ अपने फ़ोन में मौजूद कॉन्टैक्ट को हैंड्स-फ़्री कॉलिंग करें. %1$s पर मौजूद आपके कॉन्टैक्ट को Amazon सेवा पर अपलोड किया जाएगा.</string>
     <string name="contacts_upload_consent_title">कॉन्टैक्ट</string>
     <string name="contacts_upload_consent_summary">Alexa के ज़रिए कॉन्टैक्ट के साथ कॉलिंग चालू करने के लिए, इस फ़ोन पर मौजूद कॉन्टैक्ट को Amazon सेवा पर अपलोड किया जाएगा.</string>
     <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">उन्हें नाम से कॉल और मैसेज करने के लिए Amazon सेवा पर कॉन्टैक्ट अपलोड करें</string>
-    <string name="contacts_consent_yes">चालू करें</string>
+    <string name="contacts_consent_yes">सहमति है और अनुमति है</string>
     <string name="contacts_consent_yes_with_alexa_custom_assistant">कॉन्टैक्ट का इस्तेमाल करें</string>
     <string name="contacts_consent_skip">छोड़ें</string>
     <string name="comms_permission_status">कॉन्टैक्ट %1$s</string>

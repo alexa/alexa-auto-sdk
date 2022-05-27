@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -449,6 +449,10 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
 
             if (endpoints.HasMember("acms") && endpoints["acms"].IsString()) {
                 m_acmsEndpoint = endpoints["acms"].GetString();
+            }
+
+            if (endpoints.HasMember("featureDiscovery") && endpoints["featureDiscovery"].IsString()) {
+                m_featureDiscoveryEndpoint = endpoints["featureDiscovery"].GetString();
             }
         }
 
@@ -1435,6 +1439,11 @@ bool AlexaEngineService::shutdown() {
             m_mediaPlaybackRequestorEngineImpl.reset();
         }
 
+        if (m_featureDiscoveryEngineImpl != nullptr) {
+            m_featureDiscoveryEngineImpl->shutdown();
+            m_featureDiscoveryEngineImpl.reset();
+        }
+
         m_audioFocusManager.reset();
         m_visualFocusManager.reset();
         m_metricRecorder.reset();
@@ -1958,6 +1967,7 @@ bool AlexaEngineService::registerPlatformInterface(std::shared_ptr<aace::core::P
         ReturnIf(registerPlatformInterfaceType<aace::alexa::DoNotDisturb>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::EqualizerController>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::ExternalMediaAdapter>(platformInterface), true);
+        ReturnIf(registerPlatformInterfaceType<aace::alexa::FeatureDiscovery>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::GlobalPreset>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::LocalMediaSource>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::MediaPlaybackRequestor>(platformInterface), true);
@@ -2469,6 +2479,24 @@ bool AlexaEngineService::registerPlatformInterfaceType(
     }
 }
 
+bool AlexaEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::alexa::FeatureDiscovery> featureDiscoveryPlatformInterface) {
+    AACE_INFO(LX(TAG).m("Registering FeatureDiscovery platform interface"));
+    try {
+        ThrowIfNotNull(m_featureDiscoveryEngineImpl, "platformInterfaceAlreadyRegistered");
+
+        m_featureDiscoveryEngineImpl =
+            aace::engine::alexa::FeatureDiscoveryEngineImpl::create(featureDiscoveryPlatformInterface, getContext());
+        ThrowIfNull(m_featureDiscoveryEngineImpl, "createFeatureDiscoveryEngineImplFailed");
+
+        featureDiscoveryPlatformInterface->setEngineInterface(m_featureDiscoveryEngineImpl);
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<FeatureDiscovery>").d("reason", ex.what()));
+        return false;
+    }
+}
+
 //
 // AlexaComponentInterface
 //
@@ -2630,6 +2658,10 @@ std::string AlexaEngineService::getLWAEndpoint() {
 
 std::string AlexaEngineService::getACMSEndpoint() {
     return m_acmsEndpoint;
+}
+
+std::string AlexaEngineService::getFeatureDiscoveryEndpoint() {
+    return m_featureDiscoveryEndpoint;
 }
 
 //

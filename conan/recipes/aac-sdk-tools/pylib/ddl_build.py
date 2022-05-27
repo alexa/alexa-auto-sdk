@@ -5,4 +5,4 @@ def build(obj):
     if os.path.exists( ddl_source ):
         from buildconfig import run
         logging.info( "Building AASB message headers..." )
-        run.start( ddl_source, os.path.join( obj.build_folder, "aasb-message-headers" ) )
+        run.start( ddl_source, os.path.join( obj.build_folder, "aasb-messages", "include" ) )

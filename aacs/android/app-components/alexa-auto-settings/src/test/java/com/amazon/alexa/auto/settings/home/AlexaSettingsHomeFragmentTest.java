@@ -5,8 +5,9 @@ import static com.amazon.aacsconstants.AACSPropertyConstants.LOCALE;
 import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
 import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_SUPPORTED;
 import static com.amazon.alexa.auto.apps.common.util.ModuleProvider.ModuleName.GEOLOCATION;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.DISABLED;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.ENABLED;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.DISABLED;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.ENABLED;
+
 import static org.mockito.ArgumentMatchers.any;
 
 import android.content.Context;
@@ -25,15 +26,14 @@ import androidx.preference.Preference;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 import com.amazon.alexa.auto.settings.R;
 import com.amazon.alexa.auto.settings.config.PreferenceKeys;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.DisableOnDebug;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -52,7 +52,7 @@ public class AlexaSettingsHomeFragmentTest {
     @Mock
     AlexaPropertyManager mMockPropManager;
     @Mock
-    LocalesProvider mMockLocalesProvider;
+    AlexaLocalesProvider mMockLocalesProvider;
     @Mock
     NavController mMockNavController;
     @Mock
@@ -115,8 +115,7 @@ public class AlexaSettingsHomeFragmentTest {
 
         fragmentScenario.onFragment(fragment -> {
             Mockito.verify(mMockSettingsScreenBuilder1, Mockito.times(1)).addRemovePreferences(any());
-            Mockito.verify(mMockSettingsScreenBuilder1, Mockito.times(1))
-                    .installEventHandlers(any(), any());
+            Mockito.verify(mMockSettingsScreenBuilder1, Mockito.times(1)).installEventHandlers(any(), any());
             Mockito.verify(mMockSettingsScreenBuilder1, Mockito.times(0)).dispose();
 
             fragmentScenario.moveToState(Lifecycle.State.DESTROYED);
@@ -190,8 +189,7 @@ public class AlexaSettingsHomeFragmentTest {
         setupPropMocks(true, true, null, null);
 
         launchFragment().onFragment(fragment -> {
-            Preference preference =
-                    fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUNDS);
+            Preference preference = fragment.getPreferenceScreen().findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUNDS);
             Assert.assertNotNull(preference);
 
             preference.performClick();
@@ -239,10 +237,12 @@ public class AlexaSettingsHomeFragmentTest {
                 Assert.assertNotNull(preference);
 
                 preference.performClick();
-                Mockito.verify(mMockPropManager, Mockito.times(1)).updateAlexaProperty(GEOLOCATION_ENABLED, ENABLED.getValue());
+                Mockito.verify(mMockPropManager, Mockito.times(1))
+                        .updateAlexaProperty(GEOLOCATION_ENABLED, ENABLED.getValue());
 
                 preference.performClick();
-                Mockito.verify(mMockPropManager, Mockito.times(1)).updateAlexaProperty(GEOLOCATION_ENABLED, DISABLED.getValue());
+                Mockito.verify(mMockPropManager, Mockito.times(1))
+                        .updateAlexaProperty(GEOLOCATION_ENABLED, DISABLED.getValue());
             });
         }
     }
@@ -253,8 +253,8 @@ public class AlexaSettingsHomeFragmentTest {
                 new AlexaSettingsHomeFragmentFactory());
     }
 
-    private void setupPropMocks(boolean wakewordSupported, boolean wakewordEnabled,
-                                String geolocation, @Nullable String locale) {
+    private void setupPropMocks(
+            boolean wakewordSupported, boolean wakewordEnabled, String geolocation, @Nullable String locale) {
         Mockito.when(mMockPropManager.getAlexaPropertyBoolean(WAKEWORD_SUPPORTED))
                 .thenReturn(Single.just(Optional.of(wakewordSupported)));
         Mockito.when(mMockPropManager.getAlexaPropertyBoolean(WAKEWORD_ENABLED))

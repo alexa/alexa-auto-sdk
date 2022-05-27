@@ -1,5 +1,9 @@
 package com.amazon.alexa.auto.apl.receiver;
 
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.spy;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,10 +20,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
-
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricTestRunner.class)
 public class APLThemeReceiverTest {
@@ -52,8 +52,7 @@ public class APLThemeReceiverTest {
     public void handleValidAPLDarkThemeUpdateTest() {
         String themeId = "gray";
         Mockito.when(mSharedPrefs.getString("com.amazon.alexa.auto.uiMode", "")).thenReturn("dark");
-        Intent getAPLThemeUpdateIntent =
-                generateIntent(themeId);
+        Intent getAPLThemeUpdateIntent = generateIntent(themeId);
         mClassUnderTest.onReceive(mContext, getAPLThemeUpdateIntent);
         Assert.assertNotNull(mClassUnderTest.mPayload);
         Assert.assertEquals(receiveThemePayload, mClassUnderTest.generateAPLThemePayload(themeId));
@@ -62,8 +61,7 @@ public class APLThemeReceiverTest {
     @Test
     public void handleInvalidAPLDarkThemeUpdateTest() {
         Mockito.when(mSharedPrefs.getString("com.amazon.alexa.auto.uiMode", "")).thenReturn("dark");
-        Intent getAPLThemeUpdateIntent =
-                generateIntent("gray1");
+        Intent getAPLThemeUpdateIntent = generateIntent("gray1");
         mClassUnderTest.onReceive(mContext, getAPLThemeUpdateIntent);
         Assert.assertNull(mClassUnderTest.mPayload);
     }
@@ -72,8 +70,7 @@ public class APLThemeReceiverTest {
     public void handleValidAPLLightThemeUpdateTest() {
         String themeId = "gray1";
         Mockito.when(mSharedPrefs.getString("com.amazon.alexa.auto.uiMode", "")).thenReturn("light");
-        Intent getAPLThemeUpdateIntent =
-                generateIntent(themeId);
+        Intent getAPLThemeUpdateIntent = generateIntent(themeId);
         mClassUnderTest.onReceive(mContext, getAPLThemeUpdateIntent);
         Assert.assertNotNull(mClassUnderTest.mPayload);
         Assert.assertEquals(receiveThemePayload, mClassUnderTest.generateAPLThemePayload(themeId));
@@ -82,8 +79,7 @@ public class APLThemeReceiverTest {
     @Test
     public void handleInvalidAPLLightThemeUpdateTest() {
         Mockito.when(mSharedPrefs.getString("com.amazon.alexa.auto.uiMode", "")).thenReturn("light");
-        Intent getAPLThemeUpdateIntent =
-                generateIntent("black");
+        Intent getAPLThemeUpdateIntent = generateIntent("black");
         mClassUnderTest.onReceive(mContext, getAPLThemeUpdateIntent);
         Assert.assertNull(mClassUnderTest.mPayload);
     }

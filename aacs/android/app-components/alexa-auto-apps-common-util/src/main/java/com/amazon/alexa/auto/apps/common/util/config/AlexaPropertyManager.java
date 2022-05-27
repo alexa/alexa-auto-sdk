@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apps.common.util.config;
 
 import android.content.ContentValues;
@@ -6,10 +20,15 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
+import com.amazon.aacsconstants.AACSPropertyConstants;
+import com.amazon.aacsconstants.FeatureDiscoveryConstants;
+import com.amazon.alexa.auto.apps.common.util.FeatureDiscoveryUtil;
+import com.amazon.alexa.auto.apps.common.util.LocaleUtil;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 
 import java.lang.ref.WeakReference;
@@ -85,6 +104,39 @@ public class AlexaPropertyManager {
      */
     public Single<Boolean> updateAlexaPropertyBoolean(String propName, boolean value) {
         return updateAlexaProperty(propName, String.valueOf(value));
+    }
+
+    /**
+     * Update Alexa locale with the persistent locale config.
+     * Persistent Alexa locale is preferable to use if it exists, otherwise, use persistent system locale.
+     */
+    public void updateAlexaLocaleWithPersistentConfig() {
+        Context context = mContextWk.get();
+        Preconditions.checkNotNull(context);
+
+        String alexaLocale = LocaleUtil.getPersistentAlexaLocale(context);
+
+        String systemLocale = LocaleUtil.getPersistentSystemLocale(context);
+        if (systemLocale.isEmpty()) {
+            systemLocale = LocaleUtil.getCurrentDeviceLocale(context);
+        }
+
+        String locale;
+        if (!alexaLocale.isEmpty())
+            locale = alexaLocale;
+        else
+            locale = systemLocale;
+
+        Log.d(TAG, "Updating Alexa locale with persistent locale config " + locale);
+        updateAlexaProperty(AACSPropertyConstants.LOCALE, locale).subscribe((succeeded) -> {
+            if (!succeeded) {
+                Log.w(TAG, "Failed to update locale");
+            } else {
+                Log.d(TAG, "Locale changed. Updating things to try local cache.");
+                FeatureDiscoveryUtil.checkNetworkAndPublishGetFeaturesMessage(context,
+                        FeatureDiscoveryUtil.SUPPORTED_DOMAINS, FeatureDiscoveryConstants.EventType.THINGS_TO_TRY);
+            }
+        });
     }
 
     private Optional<String> getAlexaPropertySync(String name) {

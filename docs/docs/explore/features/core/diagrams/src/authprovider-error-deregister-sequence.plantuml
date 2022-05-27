@@ -1,0 +1,174 @@
+@startuml
+skinparam sequenceMessageAlign direction
+skinparam lifelineStrategy nosolid
+
+<style>
+sequenceDiagram {
+	.alexa {
+    	RoundCorner 5
+        BackgroundColor #E2F5FA
+        LineColor #05A0D1
+    }
+    .engine {
+    	RoundCorner 5
+        BackgroundColor #E1E6EC
+        LineColor #232F3E
+    }
+    .client {
+    	RoundCorner 5
+    	BackgroundColor WhiteSmoke
+        LineColor DarkGrey
+    }
+    .amazonservice {
+    	RoundCorner 5
+    	BackgroundColor #FFEBCC
+        LineColor #FF9900
+    }
+    actor {
+    	BackgroundColor White
+    	LineColor Black
+    }
+    arrow {
+    	LineColor Black
+    }
+    lifeline {
+    	LineColor Grey
+        LineStyle 4
+    }
+    .message {
+    	BackgroundColor Ivory
+        LineColor Wheat
+        RoundCorner 5
+    }
+    .callout {
+    	BackgroundColor Linen
+        LineColor Tan
+        RoundCorner 5
+    }
+}
+</style>
+
+
+actor User Order 10
+participant "Application \n (vehicle head unit)" as Application <<client>> order 30
+participant MessageBroker <<engine>> order 35
+participant Engine as Engine <<engine>> order 40
+participant "Alexa companion app" as AlexaApp <<alexa>> order 42
+participant Alexa as Alexa <<alexa>> order 45
+participant "Login with Amazon \nauthorization service" as LWA <<amazonservice>> order 50
+
+
+Title: Error: Access token invalidated by de-registration
+
+ref over Application, Engine: Initialize an application-provided authorization session
+ref over Application, Engine: Provide an access token to the Engine
+
+...
+...
+
+User -> AlexaApp: deregister car from Alexa account
+AlexaApp -> Alexa: device deregistered \n(details omitted)
+Alexa -> LWA: device deregistered \n(details omitted)
+
+...
+
+note <<callout>> over Application
+Note: The user's next Alexa interaction from the car will fail
+end note
+
+User -> Application: tap and release Alexa\ninvocation button
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic=SpeechRecognizer
+action=StartCapture
+initiator=TAP_TO_TALK
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+
+ref over Application, Engine:  Provide an access token to the Engine
+
+Engine -> Alexa: SpeechRecognizer.Recognize event \n(pt. 1 - JSON)
+Alexa -> LWA: validate access token\n(details omitted)
+activate LWA
+LWA --> Alexa: invalid credentials\n(details omitted)
+deactivate LWA
+
+Alexa -> Engine: System.Exception message
+note <<message>> left
+**message**
+code=UNAUTHORIZED_REQUEST_EXCEPTION
+description: The request was not authorized
+end note
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationError
+service: alexa:auth-provider
+error: AUTH_FAILURE
+message: <the invalid access token>  
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+Application -> Application: delete invalid cached access token
+Application -> Application: retrieve stored refresh token
+Application -> LWA: refresh access token
+activate LWA
+LWA --> Application: error
+note <<message>> right
+**message**
+code=400
+error: invalid_grant
+end note
+deactivate LWA
+Application -> Application: delete stored refresh token
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic: Authorization
+action: SendEvent
+service: alexa:auth-provider
+type: authStateChangeEvent
+state: UNAUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+
+Application -> User: display sign in UI\n(details omitted)
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationStateChanged
+service: alexa:auth-provider
+state: UNAUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+@enduml

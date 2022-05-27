@@ -50,8 +50,7 @@ std::shared_ptr<AlexaAuthorizationProvider> AlexaAuthorizationProvider::create(
 }
 
 AlexaAuthorizationProvider::AlexaAuthorizationProvider(const std::string& service) :
-        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-        m_service(service) {
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG), m_service(service) {
 }
 
 bool AlexaAuthorizationProvider::initialize(

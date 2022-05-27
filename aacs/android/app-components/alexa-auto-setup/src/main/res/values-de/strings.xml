@@ -1,51 +1,66 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="login_qr_code_message">
-        <![CDATA[
-            Melden Sie sich unter <font color=\'#33B5E5\'>%1$s</font> an. Geben Sie dann folgenden Code ein:
-        ]]>
-    </string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+     <string name="login_qr_code_message">
+         <![CDATA[
+             Melde dich unter <font color=\'#33B5E5\'>%1$s</font> an. Gib dann folgenden Code ein:
+         ]]>
+     </string>
+    <string name="confirm_yes_button">Ja</string>
+    <string name="confirm_exit_button">Beenden</string>
+    <string name="settings_button">Einstellungen</string>
     <string name="try_alexa_button">ALEXA AUSPROBIEREN</string>
     <string name="privacy_notice_button">Datenschutzerklärung</string>
     <string name="terms_of_use_button">Nutzungsbedingungen</string>
     <string name="login_action_retry_button">Erneut versuchen</string>
     <string name="sign_in_action_button">ANMELDEN</string>
     <string name="login_later_action_button">SPÄTER ANMELDEN</string>
-    <string name="login_connect_to_aacs">Bitte warten Sie, bis die Verbindung mit AACS hergestellt wurde&#160;…</string>
-    <string name="login_message">Machen Sie das Beste aus Ihrer Autofahrt – ganz einfach per Sprachbefehl. Alexa liefert Wegbeschreibungen, spielt Musik, tätigt Anrufe und vieles mehr.</string>
+    <string name="login_connect_to_aacs">Bitte warte, bis die Verbindung mit AACS hergestellt wurde&#160;…</string>
+    <string name="login_message">Mach das Beste aus deiner Autofahrt – ganz einfach per Sprachbefehl. Alexa liefert Wegbeschreibungen, spielt Musik, tätigt Anrufe und vieles mehr.</string>
     <string name="enable_preview_mode_header">Alexa ohne Anmeldung aktivieren?</string>
     <string name="enable_preview_mode_action_button">ZUSTIMMEN UND ALEXA AKTIVIEREN</string>
-    <string name="enable_preview_mode_message">Sie können Alexa trotzdem für Dinge wie Informationen und Wegbeschreibungen verwenden. Melden sie sich an, um Musik zu hören und Wettervorhersagen, Smart&#160;Home-Funktionen und vieles mehr zu nutzen.</string>
-    <string name="enable_preview_mode_disclaimer">Amazon verarbeitet und speichert Alexa-Interaktionen und andere Daten in der Cloud, um Dienste bereitzustellen und zu verbessern.&#160;Durch die Auswahl von „Zustimmen und aktivieren“ stimmen Sie den <annotation placeholder="">Nutzungsbedingungen</annotation> von Amazon sowie <annotation placeholder="">allen hier aufgeführten Bestimmungen</annotation> zu. \n\n<annotation placeholder=""> Erfahren Sie, wie Alexa Datenschutz gewährleistet</annotation>.</string>
-    <string name="enable_preview_mode_error_message">Bei der Aktivierung des Vorschaumodus ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</string>
-    <string name="login_method_or_text">Oder scannen Sie diesen Code:</string>
+    <string name="enable_preview_mode_message">Du kannst Alexa trotzdem für Dinge wie Informationen und Wegbeschreibungen verwenden. Melde dich an, um Musik zu hören und Wettervorhersagen, Smart&#160;Home-Funktionen und vieles mehr zu nutzen.</string>
+    <string name="enable_preview_mode_disclaimer">Amazon verarbeitet und speichert Alexa-Interaktionen und andere Daten in der Cloud, um Dienste bereitzustellen und zu verbessern.&#160;Durch die Auswahl von „Zustimmen und aktivieren“ stimmst du den <annotation placeholder="">Nutzungsbedingungen</annotation> von Amazon sowie <annotation placeholder="">allen hier aufgeführten Bestimmungen</annotation> zu. \n\n<annotation placeholder=""> Erfahre, wie Alexa Datenschutz gewährleistet</annotation>.</string>
+    <string name="enable_preview_mode_error_message">Bei der Aktivierung des Vorschaumodus ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
+    <string name="login_method_or_text">Oder scanne diesen Code:</string>
     <string name="login_finish_heading_text">Fertig, %1$s!</string>
-    <string name="login_finish_try_text">Versuchen Sie Folgendes:</string>
+    <string name="login_finish_try_text">Versuche Folgendes:</string>
     <string name="login_network_settings">NETZWERKEINSTELLUNGEN</string>
     <string name="login_network_error_heading_text">Netzwerkfehler</string>
-    <string name="login_network_error_body_text">Alexa muss auf das Internet zugreifen können, um die Einrichtung abzuschließen. \n Überprüfen Sie bitte Ihre Netzwerkverbindung und versuchen Sie es dann erneut.</string>
-    <string name="cbl_login_title">Melden Sie sich bei Ihrem Amazon-Konto an</string>
-    <string name="cbl_login_alexa_hint1">„Alexa, stell die Temperatur auf 22 Grad.“</string>
-    <string name="cbl_login_alexa_hint2">„Alexa, such ein Café.“</string>
-    <string name="cbl_login_alexa_hint3">„Alexa, spiel Musik.“</string>
-    <string name="auth_provider_login_alexa_hint1">„Alexa, stell die Temperatur auf 22 Grad.“</string>
-    <string name="auth_provider_login_alexa_hint2">„Alexa, bring mich zum Flughafen.“</string>
-    <string name="auth_provider_login_alexa_hint3">„Alexa, schalte auf 88,5&#160;FM.“</string>
-    <string name="auth_provider_sign_in_hint">Melden Sie sich für Musik, Wettervorhersagen, Smart Home-Funktionen und vieles mehr an.</string>
+    <string name="login_network_error_body_text">Alexa muss auf das Internet zugreifen können, um die Einrichtung abzuschließen. \n Überprüfe bitte deine Netzwerkverbindung und versuche es dann erneut.</string>
+    <string name="cbl_login_title">Melde dich bei deinem Amazon-Konto an</string>
     <string name="login_all_done_btn_text">FERTIG</string>
     <string name="setting_alexa_language_title">Alexas Sprache</string>
     <string name="select_language_action_button">SPRACHE AUSWÄHLEN</string>
-    <string name="select_language_body">Alexa ist nicht auf %1$s verfügbar. Wählen Sie eine Sprache für Alexa.</string>
+    <string name="select_language_body">Alexa ist nicht auf %1$s verfügbar. Wähle eine Sprache für Alexa.</string>
     <string name="select_language_continue_button">WEITER</string>
     <string name="setup_not_complete_header">Etwas ist schiefgelaufen</string>
-    <string name="setup_not_complete_text">Bei der Einrichtung von Alexa ist ein Problem aufgetreten. Bitte versuchen Sie es erneut.</string>
-    <string name="setup_not_complete_text_with_alexa_custom_assistant">Bei der Einrichtung ist ein Problem aufgetreten. Bitte versuchen Sie es erneut.</string>
-    <string name="cbl_login_error_message">Bei der Anmeldung ist ein Problem aufgetreten. Bitte versuchen Sie es erneut.</string>
+    <string name="setup_not_complete_text">Bei der Einrichtung von Alexa ist ein Problem aufgetreten. Bitte versuche es erneut.</string>
+    <string name="setup_not_complete_text_with_alexa_custom_assistant">Bei der Einrichtung ist ein Problem aufgetreten. Bitte versuche es erneut.</string>
+    <string name="cbl_login_error_message">Bei der Anmeldung ist ein Problem aufgetreten. Bitte versuche es erneut.</string>
     <string name="setup_not_complete_retry_button">ERNEUT VERSUCHEN</string>
     <string name="skip_permission_button_text">ÜBERSPRINGEN</string>
+    <string name="back_button_text">ZURÜCK</string>
     <string name="use_location_button_text">STANDORT VERWENDEN</string>
     <string name="location_permission_header_text">Was ist in der Nähe?</string>
-    <string name="location_permission_body_text">Teilen Sie den aktuellen Standort Ihres Fahrzeugs mit Alexa, um so bessere Ergebnisse für Restaurants in der Nähe, das lokale Wetter und andere Anfragen zu erhalten.</string>
-    <string name="location_permission_body_text_with_alexa_custom_assistant">Teilen Sie den aktuellen Standort Ihres Fahrzeugs mit [Brandon] und Alexa, um so bessere Ergebnisse für Restaurants in der Nähe, das lokale Wetter und andere Anfragen zu erhalten.</string>
-    <string name="location_permission_hint_text">„Alexa, finde Restaurants in der Nähe.“</string>
+    <string name="location_permission_body_text">Teile den aktuellen Standort deines Fahrzeugs mit Alexa, um so bessere Ergebnisse für Restaurants in der Nähe, das lokale Wetter und andere Anfragen zu erhalten.</string>
+    <string name="location_permission_body_text_with_alexa_custom_assistant">Teile den aktuellen Standort deines Fahrzeugs mit [Brandon] und Alexa, um so bessere Ergebnisse für Restaurants in der Nähe, das lokale Wetter und andere Anfragen zu erhalten.</string>
+    <string name="nav_favorites_permission_header_text">Wegbeschreibungen zu deinen Lieblingsorten</string>
+    <string name="nav_favorites_permission_body_text">Alexa kann dir mit Wegbeschreibungen zu den in deinem Auto gespeicherten Lieblingsorten weiterhelfen. Favoriten werden auf den Amazon-Dienst hochgeladen.</string>
+    <string name="consent_agree_text">ZUSTIMMEN UND FORTFAHREN</string>
+    <string name="assist_selection_title">Lege Alexa als Standardassistenten fest</string>
+    <string name="assist_selection_in_app">Um Alexa verwenden zu können, musst du Alexa als standardmäßige Assistent-App festlegen. Dies wird deinen derzeitigen Assistenten ersetzen.</string>
+    <string name="assist_selection_in_system_settings">Um Alexa verwenden zu können, musst du Alexa in den Einstellungen als standardmäßige Assistent-App festlegen. \n Tippe unten auf <b>„Einstellungen“</b> und wähle anschließend <b>„Assistent-App“</b> und dann <b>„Alexa“</b> aus.</string>
+    <string name="block_setup_on_drive_text">Das Fahrzeug muss geparkt sein, um Alexa einzurichten.</string>
+    <string name="alexa_logo_content_description">Alexa-Smile-Logo</string>
+
+    <!-- translatable="false" tag is used for things-to-try (hint) strings only. These strings need to be localized based on the country and region -->
+    <string name="cbl_login_alexa_hint1" translatable="false">„Alexa, stell die Temperatur auf 22 Grad.“</string>
+    <string name="cbl_login_alexa_hint2" translatable="false">„Alexa, such ein Café.“</string>
+    <string name="cbl_login_alexa_hint3" translatable="false">„Alexa, spiel Musik.“</string>
+    <string name="auth_provider_login_alexa_hint1" translatable="false">„Alexa, stell die Temperatur auf 22 Grad.“</string>
+    <string name="auth_provider_login_alexa_hint2" translatable="false">„Alexa, bring mich zum Flughafen.“</string>
+    <string name="auth_provider_login_alexa_hint3" translatable="false"></string>
+    <string name="auth_provider_sign_in_hint" translatable="false">Melde dich für Musik, Wettervorhersagen, Smart Home-Funktionen und vieles mehr an.</string>
+    <string name="location_permission_hint_text" translatable="false">„Alexa, finde Restaurants in der Nähe.“</string>
+    <string name="nav_favorites_permission_hint_text" translatable="false">„Alexa, bring mich nach Hause.“</string>
 </resources>

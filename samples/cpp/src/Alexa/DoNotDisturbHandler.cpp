@@ -67,7 +67,7 @@ void DoNotDisturbHandler::subscribeToAASBMessages() {
 }
 
 void DoNotDisturbHandler::handleSetDoNotDisturbMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetDoNotDisturbMessage");
     SetDoNotDisturbMessage msg = json::parse(message);
     setDoNotDisturb(msg.payload.doNotDisturb);
 }

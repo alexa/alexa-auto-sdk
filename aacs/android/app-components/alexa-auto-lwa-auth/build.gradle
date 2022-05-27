@@ -6,7 +6,7 @@ android {
     defaultConfig {
         minSdkVersion 25
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -56,6 +56,8 @@ dependencies {
     implementation deps.androidx_annotation
     implementation deps.rxjava3
     implementation deps.eventbus
+
+    implementation deps.androidx_navigation_fragment
 
     implementation deps.androidx_security_crypto
     implementation deps.androidx_identity_credential

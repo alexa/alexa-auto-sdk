@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -495,7 +495,7 @@ public:
     /**
      * @internal
      * Notifies the Engine that A DND change has been initiated by the client
-     * 
+     *
      * @param [in] doNotDisturb The DND Setting value
      * @return true if successful, false if change was rejected
      */
@@ -529,20 +529,20 @@ public:
 
     /**
      * @internal
-     * Notifies the Engine that gain levels for one or more equalizer bands are being set directly on the device. If 
+     * Notifies the Engine that gain levels for one or more equalizer bands are being set directly on the device. If
      * unsupported levels are provided, the Engine should truncate the settings to the configured range.
-     * 
+     *
      * @param [in] bandLevels The equalizer bands to change and their gain settings as integer dB values.
      */
     virtual void onLocalSetBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) = 0;
 
     /**
      * @internal
-     * Notifies the Engine that relative adjustments to equalizer band gain levels are being made directly on the 
-     * device. If adjustments put the band level settings beyond the configured dB range, the Engine should truncate 
+     * Notifies the Engine that relative adjustments to equalizer band gain levels are being made directly on the
+     * device. If adjustments put the band level settings beyond the configured dB range, the Engine should truncate
      * the settings to the configured range.
-     * 
-     * @param [in] bandAdjustments The equalizer bands to adjust and their relative gain adjustments as integer dB 
+     *
+     * @param [in] bandAdjustments The equalizer bands to adjust and their relative gain adjustments as integer dB
      *             values.
      */
     virtual void onLocalAdjustBandLevels(const std::vector<EqualizerBandLevel>& bandAdjustments) = 0;
@@ -550,7 +550,7 @@ public:
     /**
      * @internal
      * Notifies the Engine that the gain levels for the equalizer bands are being reset to their defaults.
-     * 
+     *
      * @param [in] bands The equalizer bands to reset. Empty @a bands resets all supported equalizer bands.
      */
     virtual void onLocalResetBands(const std::vector<EqualizerBand>& bands) = 0;
@@ -662,8 +662,8 @@ public:
 
         /**
          * @note: This reason is not accepted yet.
-         * 
-         * Initiating the media resume by the driver through physical button. 
+         *
+         * Initiating the media resume by the driver through physical button.
          */
         EXPLICIT_USER_ACTION
     };
@@ -677,15 +677,15 @@ public:
          */
         SUCCESS,
         /**
-         * Event call is failed because Alexa is not connected, please retry. 
+         * Event call is failed because Alexa is not connected, please retry.
          */
         FAILED_CAN_RETRY,
         /**
-         * Event call is failed because of the threshold timeout. 
+         * Event call is failed because of the threshold timeout.
          */
         FAILED_TIMEOUT,
         /**
-         * Event call is failed because of an error. 
+         * Event call is failed because of an error.
          */
         ERROR
     };
@@ -724,6 +724,16 @@ inline std::ostream& operator<<(
     stream << invocationReasonToString(invocationReason);
     return stream;
 }
+
+/**
+ * FeatureDiscoveryEngineInterface
+ */
+class FeatureDiscoveryEngineInterface {
+public:
+    virtual ~FeatureDiscoveryEngineInterface() = default;
+
+    virtual bool onGetFeatures(const std::string& requestId, const std::string& discoveryRequests) = 0;
+};
 
 }  // namespace alexa
 }  // namespace aace

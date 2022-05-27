@@ -10,7 +10,7 @@ class LibcurlConan(ConanFile):
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
 
     name = "libcurl"
-    version = "7.70.0"
+    version = "7.81.0"
 
     description = "command line tool and library for transferring data with URLs"
     topics = ("conan", "curl", "libcurl", "data-transfer")
@@ -41,6 +41,7 @@ class LibcurlConan(ConanFile):
         "with_brotli": [True, False],
         "with_zstd": [True, False],
         "with_c_ares": [True, False],
+        "openssl_version": ["1.0", "1.1", None],
     }
     default_options = {
         "shared": False,
@@ -62,6 +63,7 @@ class LibcurlConan(ConanFile):
         "with_brotli": False,
         "with_zstd": False,
         "with_c_ares": False,
+        "openssl_version": None,
     }
 
     _autotools = None
@@ -106,6 +108,10 @@ class LibcurlConan(ConanFile):
         del self.settings.compiler.libcxx
         del self.settings.compiler.cppstd
 
+        if self.options.openssl_version:
+            self.options["libnghttp2"].openssl_version = self.options.openssl_version
+            self.options["openssl"].openssl_version = self.options.openssl_version
+
         # Deprecated options
         # ===============================
         if (any(deprecated_option != "deprecated" for deprecated_option in [self.options.with_openssl, self.options.with_wolfssl, self.options.with_winssl, self.options.darwin_ssl])):
@@ -149,11 +155,11 @@ class LibcurlConan(ConanFile):
             self.requires("libnghttp2/1.42.0@aac-sdk/%s" % self.channel)
         if self.options.with_ssl == "openssl":
             if self.settings.os == "Neutrino":
-                self.requires("openssl/qnx700-1.0")
+                self.requires("openssl/qnx7")
             else:
-                self.requires("openssl/1.1.1i")
+                self.requires("openssl/1.1.1i#b843148d42054bebfdca6e9561a35d77")
         if self.options.with_zlib:
-            self.requires("zlib/1.2.11")
+            self.requires("zlib/1.2.11#95482d4fb614fadd27775f2def0a5323")
 
     def package_id(self):
         # Deprecated options
@@ -421,19 +427,23 @@ class LibcurlConan(ConanFile):
         self._cmake.definitions["BUILD_SHARED_LIBS"] = self.options.shared
         self._cmake.definitions["CURL_STATICLIB"] = not self.options.shared
         self._cmake.definitions["CMAKE_DEBUG_POSTFIX"] = ""
+
+        # For https://github.com/curl/curl/commit/9108da2c26d18e927b91e33d3729d9cf0f3eb8fa starting from 7.81.0
+        use = lambda feature: f"CURL_USE_{feature}" if tools.Version(self.version) >= "7.81.0" else f"CMAKE_USE_{feature}"
+
         if tools.Version(self.version) >= "7.72.0":
-            self._cmake.definitions["CMAKE_USE_SCHANNEL"] = self.options.with_ssl == "schannel"
+            self._cmake.definitions[use("SCHANNEL")] = self.options.with_ssl == "schannel"
         else:
             self._cmake.definitions["CMAKE_USE_WINSSL"] = self.options.with_ssl == "schannel"
-        self._cmake.definitions["CMAKE_USE_OPENSSL"] = self.options.with_ssl == "openssl"
+        self._cmake.definitions[use("OPENSSL")] = self.options.with_ssl == "openssl"
         if tools.Version(self.version) >= "7.70.0":
-            self._cmake.definitions["CMAKE_USE_WOLFSSL"] = self.options.with_ssl == "wolfssl"
+            self._cmake.definitions[use("WOLFSSL")] = self.options.with_ssl == "wolfssl"
         self._cmake.definitions["USE_NGHTTP2"] = self.options.with_nghttp2
         self._cmake.definitions["CURL_ZLIB"] = self.options.with_zlib
         self._cmake.definitions["CURL_BROTLI"] = self.options.with_brotli
         if self._has_zstd_option:
             self._cmake.definitions["CURL_ZSTD"] = self.options.with_zstd
-        self._cmake.definitions["CMAKE_USE_LIBSSH2"] = self.options.with_libssh2
+        self._cmake.definitions[use("LIBSSH2")] = self.options.with_libssh2
         self._cmake.definitions["ENABLE_ARES"] = self.options.with_c_ares
 
         # To fix the following CMake build error with QNX toolchain on macOS:
@@ -451,6 +461,10 @@ class LibcurlConan(ConanFile):
         # during run time.
         self._cmake.definitions["CURL_CA_BUNDLE"] = "none"
         self._cmake.definitions["CURL_CA_PATH"] = "none"
+
+        soversion = self.conan_data["so-versions"].get(self.version)
+        if soversion:
+            self._cmake.definitions["CURL_SOVERSION"] = soversion
 
         self._cmake.configure(build_folder=self._build_subfolder)
         return self._cmake

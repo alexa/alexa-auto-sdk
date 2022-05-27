@@ -38,11 +38,11 @@ CustomDomainHandler::CustomDomainHandler(jobject obj) : m_obj(obj, "com/amazon/a
 }
 
 void CustomDomainHandler::handleDirective(
-        const std::string& directiveNamespace,
-        const std::string& name,
-        const std::string& payload,
-        const std::string& correlationToken,
-        const std::string& messageId) {
+    const std::string& directiveNamespace,
+    const std::string& name,
+    const std::string& payload,
+    const std::string& correlationToken,
+    const std::string& messageId) {
     try_with_context {
         ThrowIfNot(
             m_obj.invoke<void>(
@@ -62,10 +62,10 @@ void CustomDomainHandler::handleDirective(
 }
 
 void CustomDomainHandler::cancelDirective(
-        const std::string& directiveNamespace,
-        const std::string& name,
-        const std::string& correlationToken,
-        const std::string& messageId) {
+    const std::string& directiveNamespace,
+    const std::string& name,
+    const std::string& correlationToken,
+    const std::string& messageId) {
     try_with_context {
         ThrowIfNot(
             m_obj.invoke<void>(
@@ -87,7 +87,10 @@ std::string CustomDomainHandler::getContext(const std::string& contextNamespace)
     try_with_context {
         jstring result;
 
-        ThrowIfNot(m_obj.invoke("getContext", "(Ljava/lang/String;)Ljava/lang/String;", &result, JString(contextNamespace).get()), "invokeMethodFailed");
+        ThrowIfNot(
+            m_obj.invoke(
+                "getContext", "(Ljava/lang/String;)Ljava/lang/String;", &result, JString(contextNamespace).get()),
+            "invokeMethodFailed");
 
         return JString(result).toStdStr();
     }
@@ -125,39 +128,38 @@ Java_com_amazon_aace_customDomain_CustomDomain_disposeBinder(JNIEnv* env, jobjec
     }
 }
 
-JNIEXPORT void JNICALL 
-Java_com_amazon_aace_customDomain_CustomDomain_sendEvent(
+JNIEXPORT void JNICALL Java_com_amazon_aace_customDomain_CustomDomain_sendEvent(
     JNIEnv* env,
     jobject /* this */,
     jlong ref,
-    jstring eventNamespace, 
-    jstring name, 
-    jstring payload, 
-    jboolean requiresContext, 
-    jstring correlationToken, 
+    jstring eventNamespace,
+    jstring name,
+    jstring payload,
+    jboolean requiresContext,
+    jstring correlationToken,
     jstring customContext) {
     try {
         auto customDomainBinder = CUSTOM_DOMAIN_BINDER(ref);
         ThrowIfNull(customDomainBinder, "invalidCustomDomainBinder");
 
-        customDomainBinder->getCustomDomain()->sendEvent(JString(eventNamespace).toStdStr(), 
-                                                         JString(name).toStdStr(), 
-                                                         JString(payload).toStdStr(),
-                                                         requiresContext,
-                                                         JString(correlationToken).toStdStr(),
-                                                         JString(customContext).toStdStr());
+        customDomainBinder->getCustomDomain()->sendEvent(
+            JString(eventNamespace).toStdStr(),
+            JString(name).toStdStr(),
+            JString(payload).toStdStr(),
+            requiresContext,
+            JString(correlationToken).toStdStr(),
+            JString(customContext).toStdStr());
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
-JNIEXPORT void JNICALL 
-Java_com_amazon_aace_customDomain_CustomDomain_reportDirectiveHandlingResult(
+JNIEXPORT void JNICALL Java_com_amazon_aace_customDomain_CustomDomain_reportDirectiveHandlingResult(
     JNIEnv* env,
     jobject /* this */,
     jlong ref,
-    jstring directiveNamespace, 
-    jstring messageId, 
+    jstring directiveNamespace,
+    jstring messageId,
     jobject result) {
     try {
         auto customDomainBinder = CUSTOM_DOMAIN_BINDER(ref);
@@ -166,12 +168,10 @@ Java_com_amazon_aace_customDomain_CustomDomain_reportDirectiveHandlingResult(
         aace::jni::customDomain::CustomDomainHandler::ResultType resultType;
         ThrowIfNot(aace::jni::customDomain::JResultType::checkType(result, &resultType), "invalidResultType");
 
-        customDomainBinder->getCustomDomain()->reportDirectiveHandlingResult(JString(directiveNamespace).toStdStr(), 
-                                                         JString(messageId).toStdStr(),
-                                                         resultType);
+        customDomainBinder->getCustomDomain()->reportDirectiveHandlingResult(
+            JString(directiveNamespace).toStdStr(), JString(messageId).toStdStr(), resultType);
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 }
-

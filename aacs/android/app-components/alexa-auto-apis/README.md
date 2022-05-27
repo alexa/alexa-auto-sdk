@@ -1,10 +1,11 @@
 # Alexa Auto API
 
 This Alexa Auto API package provides:
+
 * Types that are used across multiple Java packages. A Java package is a collection of related types, which is created to avoid type name collisions. 
 * Interfaces that allow packages to communicate with each other by using standard Java, as long as the consumer and provider of the interface meet these requirements:
-  * They are in the same Android Package (APK).
-  * They are loaded and used in the same process.
+    * They are in the same Android Package (APK).
+    * They are loaded and used in the same process.
 
 ## Component Registry (Service Locator)
 To enable a package to locate the implementation of an API, the Alexa Auto API Package defines the component registry interfaces and the mechanism to obtain the component registry (also called the service locator).  
@@ -12,6 +13,7 @@ To enable a package to locate the implementation of an API, the Alexa Auto API P
 ### Consuming Implementations from Other Packages
 
 The following list explains the component registry interfaces:
+
 * `AlexaAppRootComponent` is a component registry interface with an application scope. It provides interfaces that are in scope for the lifetime of the app. This interface provides access to `AlexaAppScopedComponents`, among other interfaces. 
 * `AlexaAppScopedComponents` provides interfaces that are available for a limited scope. For example, when an app is in logged-off state,  `AlexaAppLoggedOutScopedComponent` can be queried by using `AlexaAppScopedComponents`.
 

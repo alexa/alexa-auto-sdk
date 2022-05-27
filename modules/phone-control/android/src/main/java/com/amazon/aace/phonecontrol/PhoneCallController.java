@@ -28,8 +28,8 @@ import java.util.HashMap;
  * The platform implementation is responsible for managing the lifecycle and user experience of a call session
  * and connection to the calling device.
  *
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

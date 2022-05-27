@@ -1,5 +1,12 @@
 package com.amazon.alexa.auto.setup.workflow.command;
 
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.CBL_FLOW_SETUP_COMPLETED;
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.PREVIEW_MODE_FLOW_SETUP_COMPLETED;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
 
 import com.amazon.alexa.auto.apis.auth.AuthController;
@@ -19,15 +26,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Field;
 
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.CBL_FLOW_SETUP_COMPLETED;
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.PREVIEW_MODE_FLOW_SETUP_COMPLETED;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class SetupCompleteCommandTest {
-
     @Mock
     Context mMockContext;
     @Mock
@@ -35,13 +35,13 @@ public class SetupCompleteCommandTest {
     @Captor
     ArgumentCaptor<WorkflowMessage> workflowMessageArgumentCaptor;
 
-
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.openMocks(this);
 
         Field field = EventBus.class.getDeclaredField("defaultInstance");
-        if (!field.isAccessible()) field.setAccessible(true);
+        if (!field.isAccessible())
+            field.setAccessible(true);
         field.set(null, Mockito.mock(EventBus.class));
     }
 
@@ -64,7 +64,6 @@ public class SetupCompleteCommandTest {
         command.execute();
 
         verify(EventBus.getDefault()).post(workflowMessageArgumentCaptor.capture());
-        assertEquals(workflowMessageArgumentCaptor.getValue().getWorkflowEvent(),
-                PREVIEW_MODE_FLOW_SETUP_COMPLETED);
+        assertEquals(workflowMessageArgumentCaptor.getValue().getWorkflowEvent(), PREVIEW_MODE_FLOW_SETUP_COMPLETED);
     }
 }

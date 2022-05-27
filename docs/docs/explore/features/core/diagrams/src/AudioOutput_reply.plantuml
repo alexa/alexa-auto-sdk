@@ -1,0 +1,34 @@
+@startuml
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+}
+</style>
+
+participant Application 
+participant "Auto SDK Engine" as AutoSDK <<engine>> 
+
+==  ==
+
+AutoSDK->Application : Receive GetDuration Message
+...
+Application->AutoSDK : Publish GetDuration reply
+
+== ==
+    
+AutoSDK->Application : Receive GetNumBytesBuffered Message
+...
+Application->AutoSDK : Publish GetNumBytesBuffered reply
+
+==  ==
+
+AutoSDK->Application : Receive GetPosition Message
+...
+Application->AutoSDK : Publish GetPosition reply
+
+@enduml

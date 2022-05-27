@@ -38,7 +38,8 @@ AASBCBLEngineService::AASBCBLEngineService(const aace::engine::core::ServiceDesc
 bool AASBCBLEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // CBL

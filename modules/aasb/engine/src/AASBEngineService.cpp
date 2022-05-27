@@ -53,7 +53,8 @@ bool AASBEngineService::start() {
     try {
 #ifdef HAS_AASB_MESSAGES
         auto messageBrokerServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(messageBrokerServiceInterface, "invalidMessageBrokerServiceInterface");
 
         ::aasb::message::aasb::service::StartServiceMessage message;
@@ -70,7 +71,8 @@ bool AASBEngineService::stop() {
     try {
 #ifdef HAS_AASB_MESSAGES
         auto messageBrokerServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(messageBrokerServiceInterface, "invalidMessageBrokerServiceInterface");
 
         ::aasb::message::aasb::service::StopServiceMessage message;
@@ -98,10 +100,12 @@ bool AASBEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::aasb
         ThrowIfNotNull(m_aasbEngineImpl, "platformInterfaceAlreadyRegistered");
 
         auto messageBrokerServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(messageBrokerServiceInterface, "invalidMessageBrokerServiceInterface");
 
-        m_aasbEngineImpl = AASBEngineImpl::create(aasb, messageBrokerServiceInterface->getMessageBroker(), messageBrokerServiceInterface->getStreamManager());
+        m_aasbEngineImpl = AASBEngineImpl::create(
+            aasb, messageBrokerServiceInterface->getMessageBroker(), messageBrokerServiceInterface->getStreamManager());
         ThrowIfNull(m_aasbEngineImpl, "createAASBEngineImplFailed");
 
         return true;

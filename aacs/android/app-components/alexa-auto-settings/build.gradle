@@ -7,7 +7,7 @@ android {
     defaultConfig {
         minSdkVersion 26
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -63,6 +63,7 @@ dependencies {
     implementation deps.kotlin_stdlib
     implementation deps.androidx_appcompat
     implementation deps.androidx_constraint
+    implementation deps.androidx_gridlayout
     implementation deps.androidx_preference
 
     // RX

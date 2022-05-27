@@ -143,7 +143,10 @@ enum class Event {
     onGetCapabilities,
 
     // MediaPlaybackCompleted
-    onMediaPlaybackRequested
+    onMediaPlaybackRequested,
+
+    // Things to Try
+    onGetFeatures,
 };
 
 static const std::map<std::string, Event> EventEnumerator{
@@ -251,8 +254,10 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onLogoutCBLAuthorization", Event::onLogoutCBLAuthorization},
     {"onStartAuthProviderAuthorization", Event::onStartAuthProviderAuthorization},
     {"onCancelAuthProviderAuthorization", Event::onCancelAuthProviderAuthorization},
-    {"onLogoutAuthProviderAuthorization", Event::onLogoutAuthProviderAuthorization}
+    {"onLogoutAuthProviderAuthorization", Event::onLogoutAuthProviderAuthorization},
 
+    // Feature Discovery
+    {"onGetFeatures", Event::onGetFeatures},
 };
 }  // namespace sampleApp
 

@@ -372,7 +372,7 @@ public class AACSSender {
                 context.startActivity(intent, null);
                 break;
             case SERVICE:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !IPCUtils.getInstance(context).isSystemApp()) {
                     context.startForegroundService(intent);
                 } else {
                     context.startService(intent);

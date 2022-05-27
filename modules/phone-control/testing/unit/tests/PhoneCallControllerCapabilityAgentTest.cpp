@@ -379,7 +379,8 @@ MATCHER_P(matchMessage, expected, "") {
 
         nlohmann::json expectedHeader = expected["event"]["header"];
         nlohmann::json actualHeader = actual["event"]["header"];
-        if (expectedHeader["namespace"] != actualHeader["namespace"] || expectedHeader["name"] != actualHeader["name"]) {
+        if (expectedHeader["namespace"] != actualHeader["namespace"] ||
+            expectedHeader["name"] != actualHeader["name"]) {
             return false;
         }
 
@@ -508,7 +509,7 @@ std::string PhoneCallControllerCapabilityAgentTest::getContextWithHeader(const s
                 "payload": <payload>
             }]
         )";
-    contextWithHeader = std::regex_replace( contextWithHeader, std::regex( "<payload>" ), pccContextPayload );
+    contextWithHeader = std::regex_replace(contextWithHeader, std::regex("<payload>"), pccContextPayload);
     return contextWithHeader;
 }
 
@@ -517,8 +518,8 @@ void PhoneCallControllerCapabilityAgentTest::setupExpectedSendMessage(
     const std::string& expectedEvent,
     const std::string& eventName,
     int times) {
-    auto expectedJsonEventString =
-        alexaClientSDK::avsCommon::avs::buildJsonEventString(NAMESPACE, eventName, "", expectedEvent, getContextWithHeader(expectedContext));
+    auto expectedJsonEventString = alexaClientSDK::avsCommon::avs::buildJsonEventString(
+        NAMESPACE, eventName, "", expectedEvent, getContextWithHeader(expectedContext));
     auto expectedMessageRequest =
         std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(expectedJsonEventString.second);
     EXPECT_CALL(*m_mockMessageSender, sendMessage(matchMessage(expectedMessageRequest))).Times(times);
@@ -560,8 +561,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, createWithNullMessageSender) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testUnknownDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(NAMESPACE, UNKNOWN_DIRECTIVE, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -576,8 +576,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testUnknownDirective) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(DIAL.nameSpace, DIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -600,8 +599,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirective) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveReturnFalse) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(DIAL.nameSpace, DIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -621,8 +619,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveReturnFalse) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveNoCallId) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(DIAL.nameSpace, DIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -644,8 +641,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveNoCallId) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveBadFormat) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(DIAL.nameSpace, DIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -663,8 +659,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testDialDirectiveBadFormat) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testRedialDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(REDIAL.nameSpace, REDIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -688,8 +683,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testRedialDirective) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testRedialDirectiveReturnFalse) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(REDIAL.nameSpace, REDIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -710,8 +704,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testRedialDirectiveReturnFalse) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testAnswerDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(ANSWER.nameSpace, ANSWER.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -730,8 +723,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testAnswerDirective) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testStopDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(STOP.nameSpace, STOP.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -749,8 +741,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testStopDirective) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testSENDDTMFDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
         SENDDTMF.nameSpace, SENDDTMF.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -781,8 +772,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailedInvalidCallId) {
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailedNoAnswer) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(DIAL.nameSpace, DIAL.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -790,7 +780,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallFailedNoAnswer) {
             "", avsMessageHeader, generatePayload(TEST_CALL_ID), attachmentManager, "");
 
     EXPECT_CALL(*m_mockGui, dial(testing::_)).Times(testing::Exactly(1)).WillOnce(testing::Return(true));
-    setupExpectedContextUpdate(PHONE_CONNECTED_CONTEXT, 3); // One expect is for callFailed
+    setupExpectedContextUpdate(PHONE_CONNECTED_CONTEXT, 3);  // One expect is for callFailed
     setupExpectedContextUpdate(DIAL_STARTED_CONTEXT, 1);
     EXPECT_CALL(*m_mockFocusManager, acquireChannel(testing::_, testing::_, testing::_))
         .Times(testing::Exactly(1))
@@ -821,7 +811,7 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testConnectionStateChangedConnect
 }
 
 TEST_F(PhoneCallControllerCapabilityAgentTest, testGUIStopActiveCall) {
-    setupExpectedContextUpdate(PHONE_CONNECTED_CONTEXT, 2); // One expect is for callTerminated
+    setupExpectedContextUpdate(PHONE_CONNECTED_CONTEXT, 2);  // One expect is for callTerminated
     setupExpectedSendMessage(CALL_TERMINATED_CONTEXT, CALL_TERMINATED_EVENT_PAYLOAD, CALL_TERMINATED_EVENT_NAME, 1);
 
     m_capAgent->connectionStateChanged(
@@ -857,7 +847,10 @@ TEST_F(PhoneCallControllerCapabilityAgentTest, testCallStateChangedOutboundRingi
     setupExpectedContextUpdate(PHONE_CONNECTED_CONTEXT, 1);
     setupExpectedContextUpdate(OUTBOUND_RINGING_STARTED_CONTEXT, 1);
     setupExpectedSendMessage(
-        OUTBOUND_RINGING_STARTED_CONTEXT, OUTBOUND_RINGING_STARTED_EVENT_PAYLOAD, OUTBOUND_RINGING_STARTED_EVENT_NAME, 1);
+        OUTBOUND_RINGING_STARTED_CONTEXT,
+        OUTBOUND_RINGING_STARTED_EVENT_PAYLOAD,
+        OUTBOUND_RINGING_STARTED_EVENT_NAME,
+        1);
     EXPECT_CALL(*m_mockFocusManager, acquireChannel(testing::_, testing::_, testing::_))
         .Times(testing::Exactly(1))
         .WillOnce(testing::Return(true));

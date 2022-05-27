@@ -129,7 +129,7 @@ void AddressBookHandler::subscribeToAASBMessages() {
 }
 
 void AddressBookHandler::handleAddAddressBookReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AddAddressBookReplyMessage");
     AddAddressBookMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);
@@ -141,7 +141,7 @@ void AddressBookHandler::handleAddAddressBookReplyMessage(const std::string& mes
 }
 
 void AddressBookHandler::handleRemoveAddressBookReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received RemoveAddressBookReplyMessage");
     RemoveAddressBookMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);
@@ -207,8 +207,7 @@ void AddressBookHandler::setupUI() {
         if (!LoadNavigationFavoritesData(value)) {
             return false;
         }
-        return addAddressBook(
-            NAVIGATION_FAVORITES_ID, "AutoBook", AddressBookType::NAVIGATION);
+        return addAddressBook(NAVIGATION_FAVORITES_ID, "AutoBook", AddressBookType::NAVIGATION);
     });
 
     activity->registerObserver(Event::onRemoveAddressBookAuto, [=](const std::string&) {
@@ -285,7 +284,7 @@ bool AddressBookHandler::LoadNavigationFavoritesData(const std::string& filepath
 AddressBook AddressBookHandler::populateAddressBook(AddressBookType type) {
     AddressBook addressBook;
     if (type == AddressBookType::CONTACT) {
-        for (Contact contact: m_contacts) {
+        for (Contact contact : m_contacts) {
             ContactName contactName;
             contactName.entryId = contact.id;
             contactName.firstName = contact.name.firstName;
@@ -296,7 +295,7 @@ AddressBook AddressBookHandler::populateAddressBook(AddressBookType type) {
             addressBook.contactNames.push_back(contactName);
 
             PhoneData phoneData;
-            for (Phone phone: contact.phoneNumbers) {
+            for (Phone phone : contact.phoneNumbers) {
                 phoneData.entryId = contact.id;
                 phoneData.label = phone.label;
                 phoneData.number = phone.number;
@@ -304,7 +303,7 @@ AddressBook AddressBookHandler::populateAddressBook(AddressBookType type) {
             addressBook.phoneData.push_back(phoneData);
         }
     } else if (type == AddressBookType::NAVIGATION) {
-        for (NavigationFavorite navigationFavorite: m_navigationFavorites) {
+        for (NavigationFavorite navigationFavorite : m_navigationFavorites) {
             NavigationName navigationName;
             navigationName.entryId = navigationFavorite.id;
             navigationName.name = navigationFavorite.name.firstName;

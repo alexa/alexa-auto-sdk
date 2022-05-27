@@ -17,6 +17,7 @@
 #define AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_SERVICE_INTERFACE_H
 
 #include <AACE/AddressBook/AddressBook.h>
+#include "AddressBookDelegateInterface.h"
 #include "AddressBookObserver.h"
 
 namespace aace {
@@ -28,7 +29,7 @@ public:
     virtual ~AddressBookServiceInterface() = default;
 
     // Subscribe to AddressBook Engine
-    virtual void addObserver(std::shared_ptr<AddressBookObserver> observer) = 0;
+    virtual void addObserver(std::shared_ptr<AddressBookObserver> observer, const std::string& serviceType) = 0;
 
     // Remove observer to AddressBook Engine
     virtual void removeObserver(std::shared_ptr<AddressBookObserver> observer) = 0;
@@ -37,6 +38,13 @@ public:
     virtual bool getEntries(
         const std::string& addressBookSourceId,
         std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) = 0;
+
+    // Set delegate to validate service usage for an address book type.
+    // If no delegate is set, all services can be used (default)
+    virtual void setDelegate(std::shared_ptr<AddressBookDelegateInterface> delegate) = 0;
+
+    // Service usage changed
+    virtual void servicesEnablementChanged() = 0;
 };
 
 }  // namespace addressBook

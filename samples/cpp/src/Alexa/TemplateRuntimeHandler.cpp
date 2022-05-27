@@ -88,17 +88,17 @@ void TemplateRuntimeHandler::subscribeToAASBMessages() {
 }
 
 void TemplateRuntimeHandler::handleClearPlayerInfoMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ClearPlayerInfoMessage");
     clearPlayerInfo();
 }
 
 void TemplateRuntimeHandler::handleClearTemplateMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ClearTemplateMessage");
     clearTemplate();
 }
 
 void TemplateRuntimeHandler::handleRenderPlayerInfoMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received RenderPlayerInfoMessage");
     RenderPlayerInfoMessage msg = json::parse(message);
     renderPlayerInfo(
         msg.payload.payload,
@@ -108,7 +108,7 @@ void TemplateRuntimeHandler::handleRenderPlayerInfoMessage(const std::string& me
 }
 
 void TemplateRuntimeHandler::handleRenderTemplateMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received RenderTemplateMessage");
     RenderTemplateMessage msg = json::parse(message);
     renderTemplate(msg.payload.payload, msg.payload.focusState);
 }

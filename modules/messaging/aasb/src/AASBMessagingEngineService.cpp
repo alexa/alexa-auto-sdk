@@ -38,7 +38,8 @@ AASBMessagingEngineService::AASBMessagingEngineService(const aace::engine::core:
 bool AASBMessagingEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // Messaging

@@ -32,6 +32,8 @@
 #include <AACE/Engine/Authorization/AuthorizationProvider.h>
 #include <AACE/Engine/Alexa/AuthorizationAdapterInterface.h>
 #include <AACE/Engine/Alexa/AuthorizationManagerInterface.h>
+#include <AACE/Engine/Network/NetworkInfoObserver.h>
+#include <AACE/Engine/Network/NetworkObservableInterface.h>
 #include <AACE/Engine/PropertyManager/PropertyListenerInterface.h>
 #include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
 #include <AACE/Engine/Utils/Threading/Executor.h>
@@ -46,6 +48,7 @@ namespace cbl {
 class CBLAuthorizationProvider
         : public aace::engine::authorization::AuthorizationProvider
         , public aace::engine::alexa::AuthorizationAdapterInterface
+        , public aace::engine::network::NetworkInfoObserver
         , public aace::engine::propertyManager::PropertyListenerInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<CBLAuthorizationProvider> {
@@ -63,13 +66,16 @@ private:
     /**
      * Initializes the object.
      */
-    bool initialize(std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager);
+    bool initialize(
+        std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver);
 
 public:
     static std::shared_ptr<CBLAuthorizationProvider> create(
         const std::string& service,
         std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface,
         std::shared_ptr<CBLConfigurationInterface> configuration,
+        std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         bool enableUserProfile = false,
         std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier = nullptr);
@@ -103,6 +109,12 @@ public:
      * @param explicitStart Indicates an explicit call to @c CBL::start()
      */
     void startAuthorizationLegacy(const std::string& data, bool explicitStart);
+
+    // aace::engine::network::NetworkInfoObserver
+    void onNetworkInfoChanged(NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength) override;
+    void onNetworkInterfaceChangeStatusChanged(
+        const std::string& networkInterface,
+        NetworkInfoObserver::NetworkInterfaceChangeStatus status) override;
 
 protected:
     /// @name RequiresShutdown
@@ -163,6 +175,7 @@ private:
 
     bool m_isStopping;
     bool m_authFailureReported;
+    bool m_networkWakeup;
     bool m_explicitAuthorizationRequest;
 
     /// Represents the call to `CBL::start()` to start the authorization
@@ -211,6 +224,9 @@ private:
 
     /// This is the worker thread for the @c CBLAuthorizationProvider.
     aace::engine::utils::threading::Executor m_executor;
+
+    /// Reference to the @c NetworkObservableInterface to register the observer
+    std::shared_ptr<aace::engine::network::NetworkObservableInterface> m_networkObserver;
 };
 
 }  // namespace cbl

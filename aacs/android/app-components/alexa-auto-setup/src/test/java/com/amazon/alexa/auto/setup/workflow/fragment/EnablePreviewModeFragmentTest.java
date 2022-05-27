@@ -2,6 +2,7 @@ package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.PREVIEW_MODE_ENABLED;
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
@@ -61,14 +62,15 @@ public class EnablePreviewModeFragmentTest {
         when(mMockViewModel.loginWorkflowState()).thenReturn(mAuthWorkflowData);
 
         Field field = EventBus.class.getDeclaredField("defaultInstance");
-        if (!field.isAccessible()) field.setAccessible(true);
+        if (!field.isAccessible())
+            field.setAccessible(true);
         field.set(null, Mockito.mock(EventBus.class));
     }
 
     @Test
     public void testOnFragmentStart_enablePreviewModeScreenIsDisplayed() {
-        FragmentScenario<EnablePreviewModeFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
+        FragmentScenario<EnablePreviewModeFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -82,11 +84,10 @@ public class EnablePreviewModeFragmentTest {
 
     @Test
     public void testOnAuthStart_showsSpinnerAndHidesButton() {
-        FragmentScenario<EnablePreviewModeFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
+        FragmentScenario<EnablePreviewModeFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
 
-        AuthWorkflowData authStarted =
-                new AuthWorkflowData(AuthState.Auth_Provider_Auth_Started, null, null);
+        AuthWorkflowData authStarted = new AuthWorkflowData(AuthState.Auth_Provider_Auth_Started, null, null);
         mAuthWorkflowData.setValue(authStarted);
 
         fragmentScenario.onFragment(fragment -> {
@@ -100,11 +101,10 @@ public class EnablePreviewModeFragmentTest {
 
     @Test
     public void testOnAuthSuccess_postsPreviewModeEnabledEvent() {
-        FragmentScenario<EnablePreviewModeFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
+        FragmentScenario<EnablePreviewModeFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
 
-        AuthWorkflowData authWorkflowData =
-                new AuthWorkflowData(AuthState.Auth_Provider_Authorized, null, null);
+        AuthWorkflowData authWorkflowData = new AuthWorkflowData(AuthState.Auth_Provider_Authorized, null, null);
         mAuthWorkflowData.setValue(authWorkflowData);
 
         fragmentScenario.onFragment(fragment -> {
@@ -118,8 +118,8 @@ public class EnablePreviewModeFragmentTest {
 
     @Test
     public void testOnAuthError_postsErrorEvent() {
-        FragmentScenario<EnablePreviewModeFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
+        FragmentScenario<EnablePreviewModeFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
 
         AuthWorkflowData authWorkflowData =
                 new AuthWorkflowData(AuthState.Auth_Provider_Authorization_Error, null, null);
@@ -136,8 +136,8 @@ public class EnablePreviewModeFragmentTest {
 
     @Test
     public void testOnEnablePreviewModeClick_AuthIsStarted() {
-        FragmentScenario<EnablePreviewModeFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
+        FragmentScenario<EnablePreviewModeFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                EnablePreviewModeFragment.class, null, new EnablePreviewModeFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -157,7 +157,6 @@ public class EnablePreviewModeFragmentTest {
         @NonNull
         @Override
         public Fragment instantiate(@NonNull ClassLoader classLoader, @NonNull String className) {
-
             try (MockedStatic<AlexaApp> staticMock = Mockito.mockStatic(AlexaApp.class)) {
                 staticMock.when(() -> AlexaApp.from(mMockApplication)).thenReturn(mMockAlexaApp);
                 when(mMockAlexaApp.getRootComponent()).thenReturn(mMockRootComponent);

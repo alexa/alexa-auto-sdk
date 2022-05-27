@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -390,6 +391,7 @@ public class FileUtil {
                                 && !key.contains("defaultPlatformHandlers"))) {
                     if (key.contains("alexa")) {
                         JSONObject aacsAlexaConfig = config.getJSONObject("aacs.alexa");
+                        populateDSN(context, aacsAlexaConfig);
                         JSONObject lmsConfig = (JSONObject) aacsAlexaConfig.remove("localMediaSource");
                         JSONObject mediaResumeConfig = (JSONObject) aacsAlexaConfig.remove("requestMediaPlayback");
                         JSONObject aasbAlexaConfig = new JSONObject();
@@ -433,6 +435,16 @@ public class FileUtil {
 
         Log.d(TAG, "Configuration successfully translated");
         return translatedConfig;
+    }
+
+    private static void populateDSN(Context context, JSONObject aacsAlexaConfig) throws JSONException {
+        if (aacsAlexaConfig.has("deviceInfo")) {
+            JSONObject deviceInfo = aacsAlexaConfig.getJSONObject("deviceInfo");
+            if (!deviceInfo.has("deviceSerialNumber") || "".equals(deviceInfo.optString("deviceSerialNumber"))) {
+                String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+                deviceInfo.put("deviceSerialNumber", androidId);
+            }
+        }
     }
 
     public static JSONObject removeExtrasModuleConfiguration(@NonNull Context context, @NonNull String configKey) {
@@ -669,6 +681,10 @@ public class FileUtil {
     }
 
     public static Object getLeafNodeValueFromJson(@NonNull JSONObject root, @NonNull String... jsonObjectTree) {
+        if (root == null) {
+            Log.w(TAG, "getLeafNodeValueFromJson: root is null.");
+            return null;
+        }
         JSONObject node = root;
         for (String key : jsonObjectTree) {
             Object nextNode = node.opt(key);
@@ -811,7 +827,8 @@ public class FileUtil {
         }
     }
 
-    private static void checkEnablementForAASBModulesDisabledByDefault(@NonNull JSONObject fullConfig, String module, String interfaceName) {
+    private static void checkEnablementForAASBModulesDisabledByDefault(
+            @NonNull JSONObject fullConfig, String module, String interfaceName) {
         try {
             Object isModuleEnabled = getLeafNodeValueFromJson(fullConfig, "aasb." + module, interfaceName, "enabled");
             if (isModuleEnabled instanceof Boolean) {
@@ -820,12 +837,16 @@ public class FileUtil {
                     return;
                 }
             } else {
-                Log.e(TAG, String.format("invalid AASB module enablement configuration. %s will be disabled by default.", interfaceName));
+                Log.e(TAG,
+                        String.format("invalid AASB module enablement configuration. %s will be disabled by default.",
+                                interfaceName));
             }
             // Adding config for disabling AASB module by default
             deregisterAASBPlatformInterface(module, interfaceName);
         } catch (Exception e) {
-            Log.e(TAG, String.format("Error while checking AASB %s module configuration. Error: %s", interfaceName, e.getMessage()));
+            Log.e(TAG,
+                    String.format("Error while checking AASB %s module configuration. Error: %s", interfaceName,
+                            e.getMessage()));
         }
     }
 

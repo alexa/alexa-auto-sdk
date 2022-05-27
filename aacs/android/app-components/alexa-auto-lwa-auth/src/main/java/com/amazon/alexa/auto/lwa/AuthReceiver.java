@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.lwa;
 
 import android.content.BroadcastReceiver;
@@ -25,43 +39,40 @@ public class AuthReceiver extends BroadcastReceiver {
         }
 
         AACSMessageBuilder.parseEmbeddedIntent(intent).ifPresent(message -> {
+            try {
+                JSONObject obj = new JSONObject(message.payload);
+                String service = obj.getString(LWAAuthConstants.AUTH_SERVICE);
 
-        try{
-              JSONObject obj = new JSONObject(message.payload);
-              String service = obj.getString(LWAAuthConstants.AUTH_SERVICE);
-
-              if(service.equals(LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME)) {
-                  switch (message.action) {
-                      case Action.Authorization.EVENT_RECEIVED:
-                           handleAuthorizationEvent(obj);
-                           break;
-                      case Action.Authorization.GET_AUTHORIZATION_DATA:
-                          EventBus.getDefault().post(new AuthWorkflowData(
-                                   AuthState.Auth_Provider_Authorization_Get_Data, null, message.messageId));
-                          break;
-                      case Action.Authorization.AUTHORIZATION_STATE_CHANGED:
-                          handleAuthorizationStateChanged(obj);
-                          break;
-                      case Action.Authorization.AUTHORIZATION_ERROR:
-                          handleAuthorizationError(obj);
-                          break;
-                  }
-              }
-        }
-        catch (JSONException e) {
-            Log.e(TAG, "Authorization event JSON cannot be parsed.");
-        }
+                if (service.equals(LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME)) {
+                    switch (message.action) {
+                        case Action.Authorization.EVENT_RECEIVED:
+                            handleAuthorizationEvent(obj);
+                            break;
+                        case Action.Authorization.GET_AUTHORIZATION_DATA:
+                            EventBus.getDefault().post(new AuthWorkflowData(
+                                    AuthState.Auth_Provider_Authorization_Get_Data, null, message.messageId));
+                            break;
+                        case Action.Authorization.AUTHORIZATION_STATE_CHANGED:
+                            handleAuthorizationStateChanged(obj);
+                            break;
+                        case Action.Authorization.AUTHORIZATION_ERROR:
+                            handleAuthorizationError(obj);
+                            break;
+                    }
+                }
+            } catch (JSONException e) {
+                Log.e(TAG, "Authorization event JSON cannot be parsed.");
+            }
         });
     }
 
     private void handleAuthorizationEvent(JSONObject obj) {
-
-        try{
+        try {
             String event = obj.getString("event");
 
             if (event.contains("requestAuthorization")) {
                 EventBus.getDefault().post(
-                         new AuthWorkflowData(AuthState.Auth_Provider_Request_Authorization, null, null));
+                        new AuthWorkflowData(AuthState.Auth_Provider_Request_Authorization, null, null));
             } else if (event.contains("logout")) {
                 EventBus.getDefault().post(new AuthWorkflowData(AuthState.Auth_Provider_Logout, null, null));
             }
@@ -71,9 +82,7 @@ public class AuthReceiver extends BroadcastReceiver {
     }
 
     private void handleAuthorizationStateChanged(JSONObject obj) {
-
-        try{
-
+        try {
             String authState = obj.getString("state");
 
             switch (authState) {
@@ -89,14 +98,12 @@ public class AuthReceiver extends BroadcastReceiver {
                     EventBus.getDefault().post(new AuthWorkflowData(AuthState.Auth_Provider_Authorizing, null, null));
                     break;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.e(TAG, "Authorization event JSON cannot be parsed.");
         }
     }
     private void handleAuthorizationError(JSONObject obj) {
-
-        try{
-
+        try {
             String error = obj.getString("error");
 
             switch (error) {
@@ -116,7 +123,7 @@ public class AuthReceiver extends BroadcastReceiver {
                     break;
             }
         } catch (Exception e) {
-                Log.e(TAG, "Authorization event JSON cannot be parsed.");
+            Log.e(TAG, "Authorization event JSON cannot be parsed.");
         }
     }
 }

@@ -61,7 +61,8 @@ std::shared_ptr<AASBLocalMediaSource> AASBLocalMediaSource::create(
     }
 }
 
-bool AASBLocalMediaSource::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBLocalMediaSource::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
         m_messageBroker = messageBroker;

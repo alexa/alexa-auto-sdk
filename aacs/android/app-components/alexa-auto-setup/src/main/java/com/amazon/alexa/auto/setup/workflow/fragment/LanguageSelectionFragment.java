@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import android.os.Bundle;
@@ -13,7 +27,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
+import com.amazon.alexa.auto.apps.common.util.LocaleUtil;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.setup.R;
 import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
 import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
@@ -27,7 +42,7 @@ public class LanguageSelectionFragment extends Fragment {
     private static final String TAG = LanguageSelectionFragment.class.getSimpleName();
 
     @Inject
-    LocalesProvider mLocalesProvider;
+    AlexaLocalesProvider mLocalesProvider;
 
     private NavController mController;
 
@@ -69,7 +84,7 @@ public class LanguageSelectionFragment extends Fragment {
         View fragmentView = requireView();
         mController = findNavController(fragmentView);
 
-        String currentLocale = mLocalesProvider.getCurrentDeviceLocaleDisplayName();
+        String currentLocale = LocaleUtil.getCurrentDeviceLocaleDisplayName(getContext());
         TextView languageSelectionBodyText = fragmentView.findViewById(R.id.language_selection_body_text_view);
         String format = getResources().getString(R.string.select_language_body);
         String bodyString = String.format(format, currentLocale);

@@ -1,0 +1,109 @@
+@startuml
+skinparam sequenceMessageAlign direction
+skinparam lifelineStrategy nosolid
+
+<style>
+sequenceDiagram {
+	.alexa {
+    	RoundCorner 5
+        BackgroundColor #E2F5FA
+        LineColor #05A0D1
+    }
+    .engine {
+    	RoundCorner 5
+        BackgroundColor #E1E6EC
+        LineColor #232F3E
+    }
+    .client {
+    	RoundCorner 5
+    	BackgroundColor WhiteSmoke
+        LineColor DarkGrey
+    }
+    .amazonservice {
+    	RoundCorner 5
+    	BackgroundColor #FFEBCC
+        LineColor #FF9900
+    }
+    actor {
+    	BackgroundColor White
+    	LineColor Black
+    }
+    arrow {
+    	LineColor Black
+    }
+    lifeline {
+    	LineColor Grey
+        LineStyle 4
+    }
+    .message {
+    	BackgroundColor Ivory
+        LineColor Wheat
+        RoundCorner 5
+    }
+    .callout {
+    	BackgroundColor Linen
+        LineColor Tan
+        RoundCorner 5
+    }
+}
+</style>
+
+actor User order 20
+participant Application <<client>> order 30
+participant MessageBroker <<engine>> order 40
+participant Engine as Engine <<engine>> order 45
+
+Title: Log out
+
+User -> Application : sign out\n(details omitted)
+Application -> Application: Delete stored tokens
+
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic: Authorization
+action: Logout
+service: alexa:auth-provider
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: EventReceived
+service: alexa:auth-provider
+type: logout
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: AuthorizationStateChanged
+service: alexa:auth-provider
+state: UNAUTHORIZED
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine 
+deactivate MessageBroker
+
+Application -> User: display sign in UI\n (details omitted)
+@enduml

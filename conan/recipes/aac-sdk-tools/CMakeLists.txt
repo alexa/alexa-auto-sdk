@@ -34,7 +34,25 @@ target_link_libraries(AutoSdkModule
     ${AAC_SYSTEM_LIBS}
     ${MODULE_FRAMEWORKS}
     PRIVATE
-    $<$<CONFIG:Release>:-Wl,-S>
+    $<$<CONFIG:Release>:-Wl,-s> # Strip symbols
+    $<$<CONFIG:MinSizeRef>:-Wl,-s> # Strip symbols
+    $<$<PLATFORM_ID:Linux>:-Wl,-z,relro,-z,now> # Full RELRO
+    $<$<PLATFORM_ID:Android>:-Wl,-z,relro,-z,now> # Full RELRO
+    $<$<PLATFORM_ID:QNX>:-Wl,-z,relro,-z,now> # Full RELRO
+    $<$<PLATFORM_ID:Linux>:-Wl,-z,noexecstack>
+    $<$<PLATFORM_ID:Android>:-Wl,-z,noexecstack>
+    $<$<PLATFORM_ID:QNX>:-Wl,-z,noexecstack>
+)
+
+target_compile_options(AutoSdkModule PRIVATE
+    # stack protection
+    -fstack-protector-strong
+
+    # string format
+    -Wformat -Wformat-security -Werror=format-security
+
+    # _FORTIFY_SOURCE requires -O1 or higher, so enable it only for release build.
+    $<$<NOT:$<CONFIG:Debug>>:-D_FORTIFY_SOURCE=2>
 )
 
 # build unit tests

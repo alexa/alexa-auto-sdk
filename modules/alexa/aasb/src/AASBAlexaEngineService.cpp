@@ -25,6 +25,7 @@
 #include <AASB/Engine/Alexa/AASBDoNotDisturb.h>
 #include <AASB/Engine/Alexa/AASBEqualizerController.h>
 #include <AASB/Engine/Alexa/AASBExternalMediaAdapter.h>
+#include <AASB/Engine/Alexa/AASBFeatureDiscovery.h>
 #include <AASB/Engine/Alexa/AASBMediaPlaybackRequestor.h>
 #include <AASB/Engine/Alexa/AASBNotifications.h>
 #include <AASB/Engine/Alexa/AASBPlaybackController.h>
@@ -66,6 +67,7 @@ AASBAlexaEngineService::AASBAlexaEngineService(const aace::engine::core::Service
              "DoNotDisturb",
              "EqualizerController",
              "ExternalMediaAdapter",
+             "FeatureDiscovery",
              "GlobalPreset",
              "LocalMediaSource",
              "MediaPlaybackRequestor",
@@ -255,6 +257,13 @@ bool AASBAlexaEngineService::postRegister() {
             auto templateRuntime = AASBTemplateRuntime::create(aasbServiceInterface->getMessageBroker());
             ThrowIfNull(templateRuntime, "invalidTemplateRuntimeHandler");
             context->registerPlatformInterface(templateRuntime);
+        }
+
+        // FeatureDiscovery
+        if (isInterfaceEnabled("FeatureDiscovery")) {
+            auto featureDiscovery = AASBFeatureDiscovery::create(aasbServiceInterface->getMessageBroker());
+            ThrowIfNull(featureDiscovery, "invalidFeatureDiscoveryHandler");
+            context->registerPlatformInterface(featureDiscovery);
         }
 
         return true;

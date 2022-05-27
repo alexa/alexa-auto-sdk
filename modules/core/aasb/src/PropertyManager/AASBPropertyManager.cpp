@@ -49,7 +49,8 @@ std::shared_ptr<AASBPropertyManager> AASBPropertyManager::create(
     }
 }
 
-bool AASBPropertyManager::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBPropertyManager::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         m_messageBroker = messageBroker;
 

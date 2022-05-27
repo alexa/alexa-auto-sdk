@@ -46,8 +46,7 @@ static const uint32_t ASYNC_REPLY_TIMEOUT = 1000;
 PropertyManagerHandler::PropertyManagerHandler(
     std::weak_ptr<logger::LoggerHandler> loggerHandler,
     std::shared_ptr<MessageBroker> messageBroker) :
-        m_loggerHandler{std::move(loggerHandler)},
-        m_messageBroker{std::move(messageBroker)} {
+        m_loggerHandler{std::move(loggerHandler)}, m_messageBroker{std::move(messageBroker)} {
     subscribeToAASBMessages();
 }
 
@@ -76,19 +75,19 @@ void PropertyManagerHandler::subscribeToAASBMessages() {
 }
 
 void PropertyManagerHandler::handlePropertyChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PropertyChangedMessage");
     PropertyChangedMessage msg = json::parse(message);
     propertyChanged(msg.payload.name, msg.payload.newValue);
 }
 
 void PropertyManagerHandler::handlePropertyStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PropertyStateChangedMessage");
     PropertyStateChangedMessage msg = json::parse(message);
     propertyStateChanged(msg.payload.name, msg.payload.value, msg.payload.state);
 }
 
 void PropertyManagerHandler::handleGetPropertyReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetPropertyReplyMessage");
     GetPropertyMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);
@@ -104,7 +103,7 @@ bool PropertyManagerHandler::setProperty(const std::string& name, const std::str
 
     m_messageBroker->publish(msg.toString());
 
-    // True is returned since the SetPropertyMesssage is always published. 
+    // True is returned since the SetPropertyMesssage is always published.
     // PropertyStateChangedMessage will notify if the property change was a success or a failure.
     return true;
 }
@@ -173,7 +172,9 @@ std::string PropertyManagerHandler::waitForAsyncReply(const std::string& message
     return success;
 }
 
-void PropertyManagerHandler::addReplyMessagePromise(const std::string& messageId, std::shared_ptr<PropertyManagerPromise> promise) {
+void PropertyManagerHandler::addReplyMessagePromise(
+    const std::string& messageId,
+    std::shared_ptr<PropertyManagerPromise> promise) {
     try {
         std::lock_guard<std::mutex> lock(m_promise_map_access_mutex);
 
@@ -200,7 +201,8 @@ void PropertyManagerHandler::removeReplyMessagePromise(const std::string& messag
     }
 }
 
-std::shared_ptr<PropertyManagerHandler::PropertyManagerPromise> PropertyManagerHandler::getReplyMessagePromise(const std::string& messageId) {
+std::shared_ptr<PropertyManagerHandler::PropertyManagerPromise> PropertyManagerHandler::getReplyMessagePromise(
+    const std::string& messageId) {
     try {
         std::lock_guard<std::mutex> lock(m_promise_map_access_mutex);
 

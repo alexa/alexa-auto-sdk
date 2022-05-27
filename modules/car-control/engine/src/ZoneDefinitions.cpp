@@ -52,9 +52,14 @@ std::shared_ptr<ZoneDefinitions> ZoneDefinitions::create(
 
         json zonesArray = configuration.at("zones");
         for (auto& zone : zonesArray) {
-            ThrowIfNot(zone.contains("zoneId") && zone.at("zoneId").is_string(), "invalidZoneId");
+            ThrowIfNot(
+                zone.contains("zoneId") && zone.at("zoneId").is_string() && std::string(zone.at("zoneId")).size() > 0,
+                "invalidZoneId");
             ThrowIfNot(zone.contains("zoneResources") && zone.at("zoneResources").is_object(), "invalidZoneResources");
-            ThrowIfNot(zone.contains("members") && zone.at("members").is_array(), "invalidMembers");
+            ThrowIfNot(
+                zone.contains("members") && zone.at("members").is_array() && !zone.at("members").empty(),
+                "invalidMembers");
+
             std::string zoneId = zone.at("zoneId");
 
             // clang-format off
@@ -68,7 +73,8 @@ std::shared_ptr<ZoneDefinitions> ZoneDefinitions::create(
             // Translate assets in zone resources to text
             json zoneResources = zone.at("zoneResources");
             ThrowIfNot(
-                zoneResources.contains("friendlyNames") && zoneResources.at("friendlyNames").is_array(),
+                zoneResources.contains("friendlyNames") && zoneResources.at("friendlyNames").is_array() &&
+                    !zoneResources.at("friendlyNames").empty(),
                 "invalidFriendlyNames");
             json friendlyNames = zoneResources.at("friendlyNames");
             json translatedNames = json::array();

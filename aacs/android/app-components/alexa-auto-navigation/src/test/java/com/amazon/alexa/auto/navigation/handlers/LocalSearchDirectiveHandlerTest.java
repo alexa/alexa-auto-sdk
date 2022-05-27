@@ -13,13 +13,13 @@ import android.widget.TextView;
 
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
-import com.amazon.alexa.auto.aacs.common.LocalSearchDetailTemplate;
-import com.amazon.alexa.auto.aacs.common.LocalSearchListTemplate;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
+import com.amazon.alexa.auto.aacs.common.navi.LocalSearchDetailTemplate;
+import com.amazon.alexa.auto.aacs.common.navi.LocalSearchListTemplate;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.apis.session.SessionViewController;
-import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
+import com.amazon.alexa.auto.navigation.providers.NaviProvider;
 import com.amazon.alexa.auto.navigation.receiver.TestResourceFileReader;
 
 import org.junit.Assert;
@@ -39,7 +39,7 @@ import java.util.Optional;
 @RunWith(RobolectricTestRunner.class)
 public class LocalSearchDirectiveHandlerTest {
     @Mock
-    private NavigationProvider mNavigationProvider;
+    private NaviProvider mNaviProvider;
     @Mock
     private Context mContext;
     @Mock
@@ -61,7 +61,7 @@ public class LocalSearchDirectiveHandlerTest {
         when(mMockRootComponent.getComponent(SessionViewController.class))
                 .thenReturn(Optional.of(mMockSessionController));
         when(mMockSessionController.getTemplateRuntimeViewContainer()).thenReturn(Optional.of(mViewGroup));
-        mClassUnderTest = new LocalSearchDirectiveHandler(new WeakReference<>(mContext), mNavigationProvider);
+        mClassUnderTest = new LocalSearchDirectiveHandler(new WeakReference<>(mContext), mNaviProvider);
     }
 
     @Test

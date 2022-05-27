@@ -10,7 +10,7 @@ buildscript {
             'androidx_annotation': '1.1.0',
             'androidx_media': '1.1.0',
             'dagger': '2.22',
-            'exoplayer': '2.13.3',
+            'exoplayer': '2.15.1',
             'moshi': '1.9.3',
 
             // Test Dependencies

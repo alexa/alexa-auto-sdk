@@ -29,6 +29,7 @@ public class Topic {
     public static final String DO_NOT_DISTURB = "DoNotDisturb";
     public static final String EQUALIZER_CONTROLLER = "EqualizerController";
     public static final String EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
+    public static final String FEATURE_DISCOVERY = "FeatureDiscovery";
     public static final String GLOBAL_PRESET = "GlobalPreset";
     public static final String LOCAL_MEDIA_SOURCE = "LocalMediaSource";
     public static final String NOTIFICATIONS = "Notifications";

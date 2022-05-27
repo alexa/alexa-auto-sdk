@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  */
 
 #include <iostream>
+#include <utility>
 
 #include "AACE/Engine/Logger/Sinks/Sink.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -26,7 +27,7 @@ namespace sink {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.logger.sink.Sink");
 
-Sink::Sink(const std::string& id) : m_id(id) {
+Sink::Sink(std::string id) : m_id(std::move(id)) {
 }
 
 bool Sink::addRule(std::shared_ptr<Rule> rule, bool replace) {
@@ -68,9 +69,9 @@ void Sink::emit(
     std::chrono::system_clock::time_point time,
     const char* threadMoniker,
     const char* text) {
-    for (auto next : m_rules) {
+    for (const auto& next : m_rules) {
         if (next->match(level, source, tag, text)) {
-            log(level, time, source.c_str(), text);
+            log(level, time, source.c_str(), threadMoniker, text);
             break;
         }
     }
@@ -117,15 +118,15 @@ std::shared_ptr<Rule> Rule::create(
     });
     Level lv;
 
-    if (lvlUp.compare("CRITICAL") == 0) {
+    if (lvlUp == "CRITICAL") {
         lv = Level::CRITICAL;
-    } else if (lvlUp.compare("ERROR") == 0) {
+    } else if (lvlUp == "ERROR") {
         lv = Level::ERROR;
-    } else if (lvlUp.compare("WARN") == 0) {
+    } else if (lvlUp == "WARN") {
         lv = Level::WARN;
-    } else if (lvlUp.compare("INFO") == 0) {
+    } else if (lvlUp == "INFO") {
         lv = Level::INFO;
-    } else if (lvlUp.compare("METRIC") == 0) {
+    } else if (lvlUp == "METRIC") {
         lv = Level::METRIC;
     } else {
         lv = Level::VERBOSE;
@@ -135,8 +136,7 @@ std::shared_ptr<Rule> Rule::create(
 }
 
 bool Rule::equals(const Rule& rule) {
-    return m_source.compare(rule.m_source) == 0 && m_tag.compare(rule.m_tag) == 0 &&
-           m_message.compare(rule.m_message) == 0;
+    return m_source == rule.m_source && m_tag == rule.m_tag && m_message == rule.m_message;
 }
 
 bool Rule::match(Level level, const std::string& source, const std::string& tag, const char* text) {

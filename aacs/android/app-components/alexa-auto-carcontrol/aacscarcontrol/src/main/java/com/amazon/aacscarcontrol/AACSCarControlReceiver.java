@@ -75,7 +75,9 @@ public class AACSCarControlReceiver extends BroadcastReceiver {
      * Instance - ControllerId
      */
     private static void setControllerValue(Context context, String payload, String messageId) {
-        if (mCarControlHandler == null) { mCarControlHandler = new CarControlHandler(context); }
+        if (mCarControlHandler == null) {
+            mCarControlHandler = new CarControlHandler(context);
+        }
         JSONObject reply = new JSONObject();
         boolean isSuccessful = false;
         String endpointId = "";
@@ -148,7 +150,9 @@ public class AACSCarControlReceiver extends BroadcastReceiver {
      */
     private static void adjustControllerValue(Context context, String payload, String messageId) {
         // Initialize Car Control Handler for making call to AAOS Car API
-        if (mCarControlHandler == null) { mCarControlHandler = new CarControlHandler(context); }
+        if (mCarControlHandler == null) {
+            mCarControlHandler = new CarControlHandler(context);
+        }
         boolean isSuccessful = false;
         String endpointId = "";
         String capability = "";
@@ -175,8 +179,8 @@ public class AACSCarControlReceiver extends BroadcastReceiver {
                             mCarControlHandler.adjustModeControllerValue(endpointId, instance, Integer.parseInt(delta));
                     break;
                 case CarControlConstants.RANGE:
-                    isSuccessful =
-                            mCarControlHandler.adjustRangeControllerValue(endpointId, instance, Double.parseDouble(delta));
+                    isSuccessful = mCarControlHandler.adjustRangeControllerValue(
+                            endpointId, instance, Double.parseDouble(delta));
                     break;
                 default:
                     Log.e(TAG, "Unsupported ControllerType/Capability caught in adjustControllerValue: " + capability);

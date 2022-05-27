@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import android.app.Application;
@@ -30,8 +44,7 @@ public class CBLLoginErrorFragment extends Fragment {
     /**
      * Constructs an instance of CBLLoginErrorFragment.
      */
-    public CBLLoginErrorFragment() {
-    }
+    public CBLLoginErrorFragment() {}
 
     @VisibleForTesting
     CBLLoginErrorFragment(@NonNull NavController navController, @NonNull Application application) {
@@ -70,8 +83,7 @@ public class CBLLoginErrorFragment extends Fragment {
                     .getComponent(AlexaSetupWorkflowController.class)
                     .ifPresent(alexaSetupWorkflowController -> {
                         alexaSetupWorkflowController.stopSetupWorkflow();
-                        alexaSetupWorkflowController.startSetupWorkflow(getContext(),
-                                mNavController, null);
+                        alexaSetupWorkflowController.startSetupWorkflow(getContext(), mNavController, null);
                     });
         });
     }
@@ -80,5 +92,4 @@ public class CBLLoginErrorFragment extends Fragment {
     NavController findNavController(@NonNull View view) {
         return Navigation.findNavController(view);
     }
-
 }

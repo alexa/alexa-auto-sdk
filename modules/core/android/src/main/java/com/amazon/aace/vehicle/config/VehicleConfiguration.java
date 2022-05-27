@@ -112,7 +112,23 @@ public class VehicleConfiguration {
          *
          * @hideinitializer
          */
-        VEHICLE_IDENTIFIER("VEHICLE_IDENTIFIER", "vehicleIdentifier");
+        VEHICLE_IDENTIFIER("VEHICLE_IDENTIFIER", "vehicleIdentifier"),
+
+        /**
+         * The engine type of the vehicle.
+         * Example values: "GAS", "ELECTRIC", "HYBRID"
+         *
+         * @hideinitializer
+         */
+        ENGINE_TYPE("ENGINE_TYPE", "engineType"),
+
+        /**
+         * The number of RSE embedded FireTVs installed in the vehicle.
+         * Example values: "1"
+         *
+         * @hideinitializer
+         */
+        RSE_EMBEDDED_FIRETVS("RSE_EMBEDDED_FIRETVS", "rseEmbeddedFireTvs");
 
         /**
          * @internal
@@ -184,7 +200,9 @@ public class VehicleConfiguration {
      *          "arch": "<HARDWARE_ARCH>",
      *          "language": "<LANGUAGE>",
      *          "microphone": "<MICROPHONE>",
-     *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
+     *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>",
+     *          "engineType": "<ENGINE_TYPE>",
+     *          "rseEmbeddedFireTvs": "<RSE_EMBEDDED_FIRETVS>"
      *      }
      *   }
      * }

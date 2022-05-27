@@ -105,37 +105,37 @@ void PhoneCallControllerHandler::subscribeToAASBMessages() {
 }
 
 void PhoneCallControllerHandler::handleAnswerMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AnswerMessage");
     AnswerMessage msg = json::parse(message);
     answer(msg.payload.payload);
 }
 
 void PhoneCallControllerHandler::handleDialMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received DialMessage");
     AnswerMessage msg = json::parse(message);
     dial(msg.payload.payload);
 }
 
 void PhoneCallControllerHandler::handleRedialMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received RedialMessage");
     AnswerMessage msg = json::parse(message);
     redial(msg.payload.payload);
 }
 
 void PhoneCallControllerHandler::handleSendDMTFMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SendDMTFMessage");
     SendDTMFMessage msg = json::parse(message);
     sendDTMF(msg.payload.payload);
 }
 
 void PhoneCallControllerHandler::handleStopMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StopMessage");
     StopMessage msg = json::parse(message);
     stop(msg.payload.payload);
 }
 
 void PhoneCallControllerHandler::handleCreateCallIdReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received CreateCallIdReplyMessage");
     CreateCallIdMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);
@@ -189,7 +189,7 @@ std::string PhoneCallControllerHandler::createCallId() {
 void PhoneCallControllerHandler::deviceConfigurationUpdated(
     std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap) {
     json configuration;
-    for (auto it: configurationMap) {
+    for (auto it : configurationMap) {
         configuration[configurationFeatureToString(it.first)] = it.second;
     }
 
@@ -669,13 +669,12 @@ std::string PhoneCallControllerHandler::configurationFeatureToString(CallingDevi
 }
 
 std::string PhoneCallControllerHandler::callStateToString() {
-    static const std::map<CallState, std::string> callStateMap{
-        {CallState::IDLE, "IDLE"},
-        {CallState::DIALING, "DIALING"},
-        {CallState::OUTBOUND_RINGING, "OUTBOUND_RINGING"},
-        {CallState::ACTIVE, "ACTIVE"},
-        {CallState::CALL_RECEIVED, "CALL_RECEIVED"},
-        {CallState::INBOUND_RINGING, "INBOUND_RINGING"}};
+    static const std::map<CallState, std::string> callStateMap{{CallState::IDLE, "IDLE"},
+                                                               {CallState::DIALING, "DIALING"},
+                                                               {CallState::OUTBOUND_RINGING, "OUTBOUND_RINGING"},
+                                                               {CallState::ACTIVE, "ACTIVE"},
+                                                               {CallState::CALL_RECEIVED, "CALL_RECEIVED"},
+                                                               {CallState::INBOUND_RINGING, "INBOUND_RINGING"}};
 
     return callStateMap.at(m_callState);
 }

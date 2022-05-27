@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="com.amazon.AlexaAutoUserId"
     package="com.amazon.alexaautoclientservice">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -12,7 +11,7 @@
     <uses-permission android:name="android.permission.SET_TIME_ZONE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="com.amazon.alexaauto.lvc" />
+    <uses-permission android:name="com.amazon.alexa.auto.lvc" />
     <uses-permission android:name="com.amazon.aacscontacts" />
     <uses-permission android:name="com.amazon.aacstelephony" />
 
@@ -31,7 +30,8 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:persistent="true"
-        android:extractNativeLibs="true">
+        android:extractNativeLibs="false">
+        <!--<meta-data android:name="com.amazon.alexaautoclientservice.receiver" android:value="package"/>-->
         <service
             android:name=".NotificationListener"
             android:label="@string/aacs_title"

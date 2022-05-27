@@ -42,6 +42,7 @@ if(AAC_ALEXA)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/LocalMediaSourceHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/MediaPlaybackRequestorHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/NotificationsHandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/FeatureDiscoveryHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/PlaybackControllerHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/SpeechRecognizerHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/SpeechSynthesizerHandler.cpp

@@ -1,6 +1,9 @@
 package com.amazon.alexa.auto.settings.config
 
 import android.content.Context
+import android.provider.Settings
+import android.provider.Settings.Secure
+import android.util.Log
 import androidx.preference.PreferenceManager
 import com.amazon.alexa.auto.settings.config.PreferenceKeys.AACS_CONFIG_AACS_START_ON_BOOT
 import com.amazon.alexa.auto.settings.config.PreferenceKeys.AACS_CONFIG_AVS_DEVICE_CLIENT_ID
@@ -108,13 +111,23 @@ class AACSConfigurationPreferences(val contextWk: WeakReference<Context>) {
         if (!mSharedPreference.contains(AACS_CONFIG_AVS_DEVICE_CLIENT_ID) ||
             mSharedPreference.getString(AACS_CONFIG_AVS_DEVICE_CLIENT_ID, "")?.isEmpty() == true) {
             val deviceInfo = config.deviceInfo
+
             mSharedPreference.edit()
                 .putString(AACS_CONFIG_AVS_DEVICE_CLIENT_ID, deviceInfo.clientId)
-                .putString(AACS_CONFIG_AVS_DEVICE_DSN, deviceInfo.deviceSerialNumber)
+                .putString(AACS_CONFIG_AVS_DEVICE_DSN, getDeviceSerialNumber(deviceInfo))
                 .putString(AACS_CONFIG_AVS_DEVICE_PRODUCT_ID, deviceInfo.productId)
                 .putString(AACS_CONFIG_AVS_DEVICE_MANUFACTURER, deviceInfo.manufacturerName)
                 .apply()
         }
+    }
+
+    private fun getDeviceSerialNumber(deviceInfo: AACSConfigurationDeviceInfo): String? {
+        var dsn = deviceInfo.deviceSerialNumber;
+        if(dsn == null || "" == dsn) {
+            dsn = Secure.getString(contextWk.get()?.contentResolver, Secure.ANDROID_ID)
+            Log.i(TAG, "dsn is null or empty, setting android id as DSN")
+        }
+        return dsn
     }
 
     private fun updateAACSGeneralConfig(config: AACSConfiguration) {
@@ -181,7 +194,7 @@ class AACSConfigurationPreferences(val contextWk: WeakReference<Context>) {
         return AACSConfigurationDeviceInfo(
             deviceInfo.getString(CLIENT_ID),
             deviceInfo.getString(PRODUCT_ID),
-            deviceInfo.getString(DEVICE_SERIAL_NUMBER),
+            deviceInfo.optString(DEVICE_SERIAL_NUMBER),
             deviceInfo.getString(DEVICE_MANUFACTURER),
             deviceInfo.getString(DEVICE_DESCRIPTION)
         )
@@ -193,7 +206,7 @@ class AACSConfigurationPreferences(val contextWk: WeakReference<Context>) {
 
         deviceInfoObj.put(CLIENT_ID, aacsConfig.deviceInfo.clientId)
             .put(PRODUCT_ID, aacsConfig.deviceInfo.productId)
-            .put(DEVICE_SERIAL_NUMBER, aacsConfig.deviceInfo.deviceSerialNumber)
+            .put(DEVICE_SERIAL_NUMBER, getDeviceSerialNumber(aacsConfig.deviceInfo))
             .put(DEVICE_MANUFACTURER, aacsConfig.deviceInfo.manufacturerName)
             .put(DEVICE_DESCRIPTION, aacsConfig.deviceInfo.description);
     }

@@ -1,7 +1,22 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apl.handler;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -9,10 +24,13 @@ import androidx.annotation.VisibleForTesting;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
+import com.amazon.alexa.auto.apis.apl.APLVisualController;
 import com.amazon.alexa.auto.apl.Constants;
+import com.amazon.alexa.auto.apps.common.util.FileUtil;
 import com.amazon.apl.android.APLLayout;
 import com.amazon.apl.android.render.APLPresenter;
 import com.amazon.apl.android.render.interfaces.IAPLEventSender;
+import com.amazon.apl.android.render.interfaces.IDismissible;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +43,7 @@ import java.util.HashMap;
 /**
  * This class provides the functionality to handle AACS APL events.
  */
-public class APLHandler implements IAPLEventSender {
+public class APLHandler implements APLVisualController, IAPLEventSender, IDismissible {
     private static final String TAG = APLHandler.class.getSimpleName();
 
     @NonNull
@@ -33,7 +51,8 @@ public class APLHandler implements IAPLEventSender {
     @NonNull
     private AACSMessageSender mAACSSender;
 
-    private APLLayout mAplLayout;
+    private JSONArray mVisualConfig;
+    private String mDefaultWindowId;
 
     private String mToken;
     private String mVersion;
@@ -41,20 +60,17 @@ public class APLHandler implements IAPLEventSender {
     @VisibleForTesting
     APLPresenter mPresenter;
 
-    public APLHandler(@NonNull WeakReference<Context> contextWk, @NonNull AACSMessageSender aacsSender,
-            @NonNull APLLayout aplLayout) {
+    public APLHandler(@NonNull WeakReference<Context> contextWk, @NonNull AACSMessageSender aacsSender) {
         mContextWk = contextWk;
         mAACSSender = aacsSender;
-        mAplLayout = aplLayout;
+
+        Log.d(TAG, "Initializing APL presenter.");
+        APLPresenter.initialize(contextWk.get());
+        FileUtil.readAACSConfigurationAsync(contextWk.get())
+                .subscribe(configs -> initializeAPLPresenter(contextWk.get(), configs));
     }
 
-    public void buildAPLPresenter(JSONArray visualCharacteristics, String defaultWindowId) {
-        HashMap aplLayouts = new HashMap<String, APLLayout>();
-        aplLayouts.put(defaultWindowId, mAplLayout);
-
-        mPresenter = new APLPresenter(aplLayouts, visualCharacteristics, defaultWindowId, this);
-    }
-
+    @Override
     public void renderDocument(String jsonPayload, String token, String windowId) {
         try {
             // Extract document and data
@@ -73,11 +89,13 @@ public class APLHandler implements IAPLEventSender {
         mPresenter.onRenderDocument(jsonPayload, token, windowId);
     }
 
+    @Override
     public void clearDocument(String token) {
         Log.i(TAG, "clearDocument and visual context");
         mPresenter.onClearDocument(token);
     }
 
+    @Override
     public void executeCommands(String payload, String token) {
         Log.v(TAG, "executeCommands: token: " + token);
         mToken = token;
@@ -85,11 +103,19 @@ public class APLHandler implements IAPLEventSender {
         mPresenter.onExecuteCommands(payload, token);
     }
 
+    @Override
     public void handleAPLRuntimeProperties(String aplRuntimeProperties) {
         Log.v(TAG, "handleAPLRuntimeProperties: aplRuntimeProperties: " + aplRuntimeProperties);
         mPresenter.onAPLRuntimeProperties(aplRuntimeProperties);
     }
 
+    @Override
+    public void handleAPLDataSourceUpdate(String dataType, String payload, String token) {
+        Log.v(TAG, "handleAPLDataSourceUpdate");
+        mPresenter.onDataSourceUpdate(dataType, payload, token);
+    }
+
+    @Override
     public void interruptCommandSequence(String token) {
         Log.v(TAG, "interruptCommandSequence: token: " + token);
         mPresenter.onInterruptCommandSequence(token);
@@ -248,6 +274,7 @@ public class APLHandler implements IAPLEventSender {
      * Cancel execution of APL commands. Should be called
      * on a barge in.
      */
+    @Override
     public void cancelExecution() {
         if (mPresenter != null) {
             mPresenter.cancelExecution();
@@ -269,5 +296,46 @@ public class APLHandler implements IAPLEventSender {
         }
 
         return Constants.APL_EVENT_STATE_UNKNOWN;
+    }
+
+    @Override
+    public void onDismiss() {
+        Log.d(TAG, "onDismiss");
+        clearDocument(mToken);
+    }
+
+    @Override
+    public void initializeAPLPresenter(Context context, String configs) {
+        try {
+            JSONObject config = new JSONObject(configs);
+            mVisualConfig =
+                    config.getJSONObject("aacs.alexa").getJSONObject("gui").getJSONArray("visualCharacteristics");
+
+            if (mVisualConfig.length() > 0) {
+                for (int i = 0; i < mVisualConfig.length(); i++) {
+                    JSONObject currentElement = mVisualConfig.getJSONObject(i);
+                    if ("Alexa.Display.Window".equals(currentElement.getString("interface"))) {
+                        JSONArray templates = currentElement.getJSONObject("configurations").getJSONArray("templates");
+                        JSONObject template = templates.getJSONObject(0);
+                        mDefaultWindowId = template.getString("id");
+                    }
+                }
+            }
+        } catch (JSONException e) {
+            Log.w(TAG, "Failed to parse APL visual characteristics" + e);
+        }
+
+        mPresenter = new APLPresenter(mVisualConfig, mDefaultWindowId, this);
+
+        mPresenter.setDismissibleCallback(this);
+    }
+
+    @Override
+    public void setAPLLayout(View view) {
+        Log.d(TAG, "Setting APL layout");
+        HashMap aplLayouts = new HashMap<String, APLLayout>();
+        aplLayouts.put(mDefaultWindowId, (APLLayout) view);
+
+        mPresenter.setAPLLayout(aplLayouts);
     }
 }

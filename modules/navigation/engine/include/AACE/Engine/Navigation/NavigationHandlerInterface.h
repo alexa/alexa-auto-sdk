@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
  * permissions and limitations under the License.
  */
 
-#ifndef AACE_ENGINE_NAVIGATION_NAVIGATION_OBSERVER_INTERFACE_H
-#define AACE_ENGINE_NAVIGATION_NAVIGATION_OBSERVER_INTERFACE_H
+#ifndef AACE_ENGINE_NAVIGATION_NAVIGATION_HANDLER_INTERFACE_H
+#define AACE_ENGINE_NAVIGATION_NAVIGATION_HANDLER_INTERFACE_H
 
 #include <AACE/Navigation/Navigation.h>
 
@@ -27,8 +27,6 @@ public:
     virtual ~NavigationHandlerInterface() = default;
     virtual void showPreviousWaypoints() = 0;
     virtual void navigateToPreviousWaypoint() = 0;
-    virtual void showAlternativeRoutes(aace::navigation::Navigation::AlternateRouteType alternateRouteType) = 0;
-    virtual void controlDisplay(aace::navigation::Navigation::ControlDisplay controlDisplay) = 0;
     virtual void startNavigation(const std::string& payload) = 0;
     virtual void announceManeuver(const std::string& payload) = 0;
     virtual void announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) = 0;
@@ -40,4 +38,4 @@ public:
 }  // namespace engine
 }  // namespace aace
 
-#endif  // AACE_ENGINE_NAVIGATION_NAVIGATION_OBSERVER_INTERFACE_H
+#endif  // AACE_ENGINE_NAVIGATION_NAVIGATION_HANDLER_INTERFACE_H

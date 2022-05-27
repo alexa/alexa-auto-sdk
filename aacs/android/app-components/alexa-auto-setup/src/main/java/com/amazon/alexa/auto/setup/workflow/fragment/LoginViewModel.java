@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import android.app.Application;
@@ -20,10 +34,15 @@ import com.amazon.alexa.auto.apis.auth.UserIdentity;
 import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
+import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
+import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
 import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
 import com.amazon.alexa.auto.setup.workflow.event.LoginEvent;
 
 import org.greenrobot.eventbus.EventBus;
+
+import javax.inject.Inject;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -38,6 +57,8 @@ public class LoginViewModel extends AndroidViewModel {
     private final @NonNull AuthController mAuthController;
     private final @NonNull AlexaSetupController mAlexaSetupController;
     private final @Nullable LoginUIEventListener mUIEventListener;
+    @Inject
+    AlexaPropertyManager mAlexaPropertyManager;
 
     private MutableLiveData<AuthWorkflowData> mAuthWorkflowState = new MutableLiveData<>();
     private Disposable mLoginWorkflowSubscription;
@@ -61,6 +82,7 @@ public class LoginViewModel extends AndroidViewModel {
         mAuthController = app.getRootComponent().getAuthController();
         mAlexaSetupController = app.getRootComponent().getAlexaSetupController();
         mUIEventListener = app.getRootComponent().getComponent(LoginUIEventListener.class).orElse(null);
+        DaggerSetupComponent.builder().androidModule(new AndroidModule(application)).build().injectLoginViewModel(this);
 
         mWaitForStartLogin = new WaitForStartLoginRunnable();
     }
@@ -96,6 +118,8 @@ public class LoginViewModel extends AndroidViewModel {
     public void startLogin() {
         Log.d(TAG, "Authorization Login Workflow starting");
 
+        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
+
         if (!this.mAuthController.isAuthenticated()) {
             // Why not expose the RX stream directly to the UI instead of transforming
             // it to LiveData? The reason is that ViewModel can survive configuration
@@ -128,7 +152,7 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     /**
-     * User expressed her/his intent to finish the login process.
+     * User expressed their  intent to finish the login process.
      */
     public void userFinishedLogin() {
         Log.d(TAG, "Login Workflow finished");
@@ -139,10 +163,10 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     /**
-     * User expressed her/his intent to switch the login process.
+     * User expressed their intent to switch the login process.
      */
     public void userSwitchedLogin(AuthMode authMode) {
-        Log.d(TAG, "Login Workflow finished");
+        Log.d(TAG, "User switched login authmode: " + authMode.toString());
 
         if (mUIEventListener != null) {
             mUIEventListener.loginSwitched(authMode);

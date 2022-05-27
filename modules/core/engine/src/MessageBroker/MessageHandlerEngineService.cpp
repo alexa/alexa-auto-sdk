@@ -33,9 +33,7 @@ MessageHandlerEngineService::MessageHandlerEngineService(
     const aace::engine::core::Version minRequiredVersion,
     std::initializer_list<std::string> interfaceList,
     std::initializer_list<std::string> defaultEnabledInterfaceList) :
-        aace::engine::core::EngineService(description),
-        m_minRequiredVersion( minRequiredVersion ) {
-
+        aace::engine::core::EngineService(description), m_minRequiredVersion(minRequiredVersion) {
     // legacy aasb interfaces should default to message broker auto enablement configuration
     for (auto& next : interfaceList) {
         m_interfaceMap[next] = Enablement::DEFAULT;
@@ -54,13 +52,14 @@ bool MessageHandlerEngineService::isInterfaceEnabled(const std::string& name) {
         ThrowIf(it == m_interfaceMap.end(), "invalidInterfaceName");
 
         auto messageServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(messageServiceInterface, "invalidMessageBrokerServiceInterface");
 
         bool enabled = false;
 
         // get the interface enablement based on configured settings
-        switch( it->second ) {
+        switch (it->second) {
             case Enablement::DEFAULT:
                 enabled = messageServiceInterface->getAutoEnableInterfaces();
                 break;
@@ -73,7 +72,7 @@ bool MessageHandlerEngineService::isInterfaceEnabled(const std::string& name) {
                 break;
         }
 
-        AACE_DEBUG(LX(TAG).d("interface", name).d("enabled",enabled).d("enablementConfiguration",it->second));
+        AACE_DEBUG(LX(TAG).d("interface", name).d("enabled", enabled).d("enablementConfiguration", it->second));
 
         return enabled;
 
@@ -86,7 +85,8 @@ bool MessageHandlerEngineService::isInterfaceEnabled(const std::string& name) {
 bool MessageHandlerEngineService::configure() {
     try {
         auto messageServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(messageServiceInterface, "invalidMessageBrokerServiceInterface");
 
         // get the  current and configured versions from the message service interface
@@ -95,14 +95,14 @@ bool MessageHandlerEngineService::configure() {
 
         // validate the configured version is greater than the min required version and is
         // less than or equal to the current aasb message version
-        ReturnIfNot( configuredVersion < m_minRequiredVersion || configuredVersion > currentVersion, true );
+        ReturnIfNot(configuredVersion < m_minRequiredVersion || configuredVersion > currentVersion, true);
 
         // log the version error message
         AACE_ERROR(LX(TAG)
-            .d("reason","invalidConfiguredVersion")
-            .d("required",m_minRequiredVersion.toString())
-            .d("configured",configuredVersion.toString())
-            .d("current",currentVersion.toString()));
+                       .d("reason", "invalidConfiguredVersion")
+                       .d("required", m_minRequiredVersion.toString())
+                       .d("configured", configuredVersion.toString())
+                       .d("current", currentVersion.toString()));
 
         return false;
 

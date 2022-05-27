@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include <string>
 #include <chrono>
+#include <memory>
 
 #include "AACE/Logger/LoggerEngineInterfaces.h"
 
@@ -27,14 +28,41 @@ namespace logger {
 
 class LogFormatter {
 public:
+    virtual ~LogFormatter() = default;
+
+    static std::unique_ptr<LogFormatter> createPlainText();
+    static std::unique_ptr<LogFormatter> createColor();
+
     // EngineLogger::Level alias
     using Level = aace::logger::LoggerEngineInterface::Level;
 
-    static std::string format(
+    std::string format(
         Level level,
         std::chrono::system_clock::time_point time,
+        const char* source,
         const char* threadMoniker,
         const char* text);
+
+    virtual void formatWithTime(
+        std::stringstream& stringToEmit,
+        bool dateTimeFailure,
+        const char* dateTimeString,
+        bool millisecondFailure,
+        const char* millisString,
+        const char* source,
+        const char* threadMoniker,
+        LogFormatter::Level level,
+        const char* text) = 0;
+
+    virtual void formatWithoutTime(
+        std::stringstream& stringToEmit,
+        const char* source,
+        const char* threadMoniker,
+        LogFormatter::Level level,
+        const char* text) = 0;
+
+protected:
+    char getLevelCh(const Level& level) const;
 };
 
 }  // namespace logger

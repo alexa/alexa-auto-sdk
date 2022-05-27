@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -458,7 +458,7 @@ void ExternalMediaPlayer::addAdapterHandler(
         return;
     }
     m_executor.submit([this, adapterHandler]() {
-        AACE_VERBOSE(LX(TAG));
+        AACE_VERBOSE(LX(TAG, "addAdapterHandlerInExecutor"));
         if (!m_adapterHandlers.insert(adapterHandler).second) {
             AACE_ERROR(LX(TAG, "addAdapterHandlerInExecutor").m("Duplicate adapter handler."));
         }
@@ -692,7 +692,7 @@ void ExternalMediaPlayer::onFocusChanged(FocusState newFocus, MixingBehavior beh
 void ExternalMediaPlayer::onContextAvailable(const std::string& jsonContext) {
     // Send Message happens on the calling thread. Do not block the ContextManager thread.
     m_executor.submit([this, jsonContext] {
-        AACE_VERBOSE(LX(TAG));
+        AACE_VERBOSE(LX(TAG, "onContextAvailableInExecutor"));
 
         while (!m_eventQueue.empty()) {
             std::pair<std::string, std::string> nameAndPayload = m_eventQueue.front();
@@ -823,9 +823,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
         return;
     }
 
-    // If a player fails to parse, make note but continue to parse the rest.
-    bool parseAllSucceeded = true;
-
     std::vector<aace::engine::alexa::PlayerInfo> playerInfoList;
 
     rapidjson::Value::ConstMemberIterator playersIt;
@@ -839,7 +836,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
 
             if (!(*playerIt).IsObject()) {
                 AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed").d("reason", "unexpectedFormat"));
-                parseAllSucceeded = false;
                 continue;
             }
 
@@ -847,7 +843,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                 AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                .d("reason", "missingAttribute")
                                .d("attribute", LOCAL_PLAYER_ID));
-                parseAllSucceeded = false;
                 continue;
             } else
                 playerInfo.localPlayerId = localPlayerId;
@@ -856,7 +851,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                 AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                .d("reason", "missingAttribute")
                                .d("attribute", AUTHORIZED));
-                parseAllSucceeded = false;
                 continue;
             } else
                 playerInfo.authorized = authorized;
@@ -868,7 +862,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                     AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                    .d("reason", "missingAttribute")
                                    .d("attribute", METADATA));
-                    parseAllSucceeded = false;
                     continue;
                 }
 
@@ -876,7 +869,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                     AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                    .d("reason", "missingAttribute")
                                    .d("attribute", PLAYER_ID));
-                    parseAllSucceeded = false;
                     continue;
                 } else
                     playerInfo.playerId = playerId;
@@ -884,7 +876,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                     AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                    .d("reason", "missingAttribute")
                                    .d("attribute", SKILL_TOKEN));
-                    parseAllSucceeded = false;
                     continue;
                 } else
                     playerInfo.skillToken = defaultSkillToken;
@@ -897,31 +888,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                            .d("defaultSkillToken", defaultSkillToken));
 
             playerInfoList.push_back(playerInfo);
-            /*
-            auto it = m_adapters.find(localPlayerId);
-            if (m_adapters.end() != it) {
-                m_executor.submit([it, localPlayerId, authorized, playerId, defaultSkillToken]() {
-                    it->second->handleAuthorized(authorized, playerId, defaultSkillToken);
-                });
-
-                if (authorized) {
-                    if (newAuthorizedAdapters.count(playerId) > 0) {
-                        AACE_WARN(LX(TAG,"duplicatePlayerIdFound")
-                                       .d("playerId", playerId)
-                                       .d("priorSkillToken", authorizedForJson[playerId])
-                                       .d("newSkillToken", defaultSkillToken)
-                                       .m("Overwriting prior entry"));
-                    }
-
-                    authorizedForJson[playerId] = defaultSkillToken;
-                    newAuthorizedAdapters[playerId] = localPlayerId;
-                    newAuthorizedAdaptersKeys.insert(playerId);
-                }
-
-            } else {
-                AACE_ERROR(LX(TAG,"handleAuthorizeDiscoveredPlayersFailed").d("reason", "adapterNotFound"));
-                parseAllSucceeded = false;
-            }*/
         }
     }
 

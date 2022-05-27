@@ -52,7 +52,8 @@ std::shared_ptr<AASBAlexaConnectivity> AASBAlexaConnectivity::create(
     }
 }
 
-bool AASBAlexaConnectivity::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBAlexaConnectivity::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         AACE_VERBOSE(LX(TAG));
 

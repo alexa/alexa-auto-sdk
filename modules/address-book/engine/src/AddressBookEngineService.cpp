@@ -40,8 +40,7 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AddressBookEngineService"
 REGISTER_SERVICE(AddressBookEngineService);
 
 AddressBookEngineService::AddressBookEngineService(const aace::engine::core::ServiceDescription& description) :
-        aace::engine::core::EngineService(description),
-        m_cleanAllAddressBooksAtStart(true) {
+        aace::engine::core::EngineService(description), m_cleanAllAddressBooksAtStart(true) {
 }
 
 AddressBookEngineService::~AddressBookEngineService() = default;

@@ -5,39 +5,65 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/two_choice_dialog"
     android:theme="@style/Theme.Alexa.Standard"
-    android:background="?attr/android:colorBackgroundFloating"
+    android:background="?android:attr/colorBackgroundFloating"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <!--Next 4 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/top_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/popup_top_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/popup_bottom_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
+    <!--Title-->
     <TextView
         android:id="@+id/header_text"
-        android:textAppearance="@style/Alexa.Heading2Text"
-        android:layout_width="match_parent"
+        style="@style/Alexa.TitleText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="@dimen/margin_vertical_double"
-        android:layout_marginStart="@dimen/margin_horizontal_double"
-        android:layout_marginEnd="@dimen/margin_horizontal_double"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintTop_toTopOf="@id/top_guideline"
         app:layout_constraintBottom_toTopOf="@id/content_text"
         app:layout_constraintHorizontal_weight="2"
         tools:text="Dialog Header">
     </TextView>
 
+    <!--Body-->
     <TextView
         android:id="@+id/content_text"
-        android:textAppearance="@style/Alexa.Heading3Text"
-        android:layout_width="match_parent"
+        style="@style/Alexa.SubtitleText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:layout_marginTop="@dimen/margin_vertical_double"
-        android:layout_marginStart="@dimen/margin_horizontal_double"
-        android:layout_marginEnd="@dimen/margin_horizontal_double"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
         app:layout_constraintTop_toBottomOf="@id/header_text"
         tools:text="Dialog Content" />
 
@@ -46,11 +72,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_vertical_octuple"
-        android:layout_marginBottom="@dimen/margin_vertical_double"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@+id/content_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/content_text"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintBottom_toTopOf="@id/bottom_guideline" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

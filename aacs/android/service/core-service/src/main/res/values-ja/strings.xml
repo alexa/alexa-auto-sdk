@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_description">Alexa Autoクライアントサービスにより、車内でAlexaと会話できます。</string>
+    <string name="aacs_initializing">初期化中..</string>
+    <string name="aacs_ready">初期化が完了しました。</string>
+    <string name="aacs_title">AACS</string>
+    <string name="component_registry_key">%1$s + %2$s</string>
+</resources>

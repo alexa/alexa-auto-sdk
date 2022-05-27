@@ -39,11 +39,11 @@ public class CarControlUtil {
 
     public static CarControlConstants.DataType getDataType(String dataType) {
         switch (dataType) {
-            case "int" :
+            case "int":
                 return CarControlConstants.DataType.INT;
-            case "boolean" :
+            case "boolean":
                 return CarControlConstants.DataType.BOOLEAN;
-            case "float" :
+            case "float":
                 return CarControlConstants.DataType.FLOAT;
             default:
                 return CarControlConstants.DataType.UNKNOWN;
@@ -95,7 +95,7 @@ public class CarControlUtil {
         // Copy contents of file descriptor to copy file
         try {
             FileDescriptor fd = Objects.requireNonNull(context.getContentResolver().openFileDescriptor(fileUri, "r"))
-                    .getFileDescriptor();
+                                        .getFileDescriptor();
             InputStream inputStream = new FileInputStream(fd);
             OutputStream outputStream = new FileOutputStream(externalFileCopy);
             byte[] buf = new byte[1024];
@@ -119,6 +119,6 @@ public class CarControlUtil {
     }
 
     public static float celcius(float f) {
-        return (float)((f - 32)/1.8);
+        return (float) ((f - 32) / 1.8);
     }
 }

@@ -1,4 +1,7 @@
 sources:
+  "7.81.0":
+    sha256: ac8e1087711084548d788ef18b9b732c8de887457b81f616fc681d1044b32f98
+    url: https://curl.haxx.se/download/curl-7.81.0.tar.gz
   "7.74.0":
     sha256: e56b3921eeb7a2951959c02db0912b5fcd5fdba5aca071da819e1accf338bbd7
     url: https://curl.haxx.se/download/curl-7.74.0.tar.gz
@@ -33,11 +36,18 @@ sources:
     sha256: 432d3f466644b9416bc5b649d344116a753aeaa520c8beaf024a90cba9d3d35d
     url: https://curl.haxx.se/download/curl-7.64.1.tar.gz
 patches:
+  "7.81.0":
+    - patch_file: "patches/7.81.0/0001-Fix-linker-error-of-_getpid-for-QNX.patch"
+      base_path: "source_subfolder"
+    - patch_file: "patches/7.81.0/0002-Specify-SOVERSION-property-by-CURL_SOVERSION.patch"
+      base_path: "source_subfolder"
   "7.72.0":
     - patch_file: "patches/002-add-missing-file-FindZstd.patch"
       base_path: "source_subfolder"
   "7.70.0":
-    - patch_file: "patches/003-Fix-linker-error-of-_getpid-for-QNX.patch"
+    - patch_file: "patches/7.70.0/0001-Fix-linker-error-of-_getpid-for-QNX.patch"
+      base_path: "source_subfolder"
+    - patch_file: "patches/7.70.0/0002-Specify-SOVERSION-property-by-CURL_SOVERSION.patch"
       base_path: "source_subfolder"
   "7.67.0":
     - patch_file: "patches/001-Update-FindLibSSH2.cmake-add-libssh2-as-possible-nam.patch"
@@ -48,3 +58,6 @@ patches:
   "7.64.1":
     - patch_file: "patches/001-Update-FindLibSSH2.cmake-add-libssh2-as-possible-nam.patch"
       base_path: "source_subfolder"
+so-versions:
+  "7.81.0": 10
+  "7.70.0": 10

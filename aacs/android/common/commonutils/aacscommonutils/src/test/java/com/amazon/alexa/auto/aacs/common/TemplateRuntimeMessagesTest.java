@@ -2,6 +2,9 @@ package com.amazon.alexa.auto.aacs.common;
 
 import static org.junit.Assert.assertTrue;
 
+import com.amazon.alexa.auto.aacs.common.navi.LocalSearchDetailTemplate;
+import com.amazon.alexa.auto.aacs.common.navi.LocalSearchListTemplate;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

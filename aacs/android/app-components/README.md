@@ -1,0 +1,3 @@
+# AACS App Components
+
+The AACS App Components are modularized, pre-made Android implementation libraries for Auto SDK features. The AACS Sample App uses the AACS App Components, but they are decoupled from the sample app and build independently into standalone AARs for use in any AACS client application. You can speed up your integration by reusing the App Components in your own application. See the documentation of each App Component library for its respective build and usage instructions.

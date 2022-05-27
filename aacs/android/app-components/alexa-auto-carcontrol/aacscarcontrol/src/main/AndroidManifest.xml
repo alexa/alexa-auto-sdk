@@ -23,8 +23,7 @@
     <permission android:name="com.amazon.aacscarcontrol" android:protectionLevel= "signature|privileged"/>
     <application
         android:allowBackup="true"
-        android:supportsRtl="true"
-        android:extractNativeLibs="true">
+        android:supportsRtl="true">
 
         <receiver
             android:name="com.amazon.aacscarcontrol.AACSCarControlReceiver"

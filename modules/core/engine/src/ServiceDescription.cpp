@@ -20,10 +20,10 @@
 #include "AACE/Engine/Core/ServiceDescription.h"
 
 #ifndef SCNd8
-  #define SCNd8 "hhd"
+#define SCNd8 "hhd"
 #endif
 #ifndef SCNu8
-  #define SCNu8 "hhu"
+#define SCNu8 "hhu"
 #endif
 
 namespace aace {
@@ -115,11 +115,15 @@ bool Version::operator==(const Version& other) {
 }
 
 bool Version::operator<(const Version& other) {
-    return m_major < other.m_major || (m_major == other.m_major && (m_minor < other.m_minor || (m_minor == other.m_minor && m_revision < other.m_revision)));
+    return m_major < other.m_major ||
+           (m_major == other.m_major &&
+            (m_minor < other.m_minor || (m_minor == other.m_minor && m_revision < other.m_revision)));
 }
 
 bool Version::operator>(const Version& other) {
-    return m_major > other.m_major || (m_major == other.m_major && (m_minor > other.m_minor || (m_minor == other.m_minor && m_revision > other.m_revision)));
+    return m_major > other.m_major ||
+           (m_major == other.m_major &&
+            (m_minor > other.m_minor || (m_minor == other.m_minor && m_revision > other.m_revision)));
 }
 
 std::ostream& operator<<(std::ostream& stream, const Version& version) {

@@ -1,29 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
+    <!--Next 2 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
     <LinearLayout
         android:id="@+id/preference_host_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintWidth_percent="0.75"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/continueButtonLayout"
+        app:layout_constraintEnd_toStartOf="@id/continueButtonLayout"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/setting_item_horizontal_margin_start"
                 android:layout_marginEnd="@dimen/setting_item_horizontal_margin"
                 android:orientation="vertical">
 
@@ -72,6 +87,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -119,6 +142,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -166,6 +197,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -213,6 +252,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -260,6 +307,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -308,6 +363,14 @@
                             android:textAppearance="@style/Alexa.HintText">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -356,6 +419,14 @@
                             android:textAppearance="@style/Alexa.HintText">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -403,6 +474,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -450,7 +529,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -498,7 +584,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -546,7 +639,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -594,7 +694,22 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="fill_parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -642,7 +757,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -690,7 +812,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -738,7 +867,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -786,6 +922,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -833,6 +977,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -880,7 +1032,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -928,7 +1087,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -976,6 +1142,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1023,6 +1197,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1070,6 +1252,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1117,6 +1307,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1164,7 +1362,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
-
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1212,6 +1417,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1259,6 +1472,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1306,6 +1527,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1353,6 +1582,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1400,6 +1637,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1447,6 +1692,14 @@
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
+                    <View
+                        android:background="?attr/dividerColorOnBackground"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -1517,16 +1770,15 @@
         app:layout_constraintWidth_percent="0.25"
         android:clickable="true"
         android:gravity="bottom"
-        android:layout_marginLeft="@dimen/login_item_margin_bottom"
+        android:layout_marginStart="@dimen/login_item_margin_bottom"
         android:layout_marginBottom="@dimen/login_margin_start_double"
-        app:layout_constraintTop_toTopOf="@+id/preference_host_layout"
-        app:layout_constraintStart_toEndOf="@+id/preference_host_layout"
+        app:layout_constraintTop_toTopOf="@id/preference_host_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <TextView
             android:id="@+id/continueButton"
-            style="@style/Alexa.Button"
+            style="@style/Alexa.Button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/select_language_continue_button"

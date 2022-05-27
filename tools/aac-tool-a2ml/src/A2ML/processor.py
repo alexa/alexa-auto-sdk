@@ -20,7 +20,7 @@ class A2MLProcessor:
         # initialize logger
         logging.basicConfig( level=logging.DEBUG if self.verbose else logging.INFO,format="\033[0;37m[A2DL] %(levelname)s: %(message)s" )
         logging.info( "Python version: %s" % platform.python_version() )
-    
+
     def run( self ):
         # initialize the builder
         self.initialize_configuration()
@@ -58,7 +58,7 @@ class A2MLProcessor:
         if not arg_parser:
             raise Exception("Invalid parser argument: %s" % arg_parser)
         self.parser_module = importlib.import_module( "A2ML.%s.parser" % arg_parser.lower() )
-        
+
         #dynamically load generator module
         arg_generator = self.get_arg( "generator" )
         if not arg_generator:

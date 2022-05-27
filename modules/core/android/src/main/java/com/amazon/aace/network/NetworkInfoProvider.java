@@ -19,9 +19,9 @@ import com.amazon.aace.core.*;
 
 /**
  * NetworkInfoProvider should be extended to report network connectivity events to the Engine.
- * 
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

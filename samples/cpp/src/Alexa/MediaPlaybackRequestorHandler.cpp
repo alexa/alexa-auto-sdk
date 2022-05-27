@@ -64,9 +64,7 @@ void MediaPlaybackRequestorHandler::subscribeToAASBMessages() {
 }
 
 void MediaPlaybackRequestorHandler::handleMediaPlaybackResponseMessage(const std::string& message) {
-    std::stringstream ss;
-    ss << "MediaPlaybackRequestStatus " << message;
-    log(logger::LoggerHandler::Level::INFO, ss.str());
+    log(logger::LoggerHandler::Level::INFO, "Received MediaPlaybackResponseMessage");
 }
 
 void MediaPlaybackRequestorHandler::log(logger::LoggerHandler::Level level, const std::string& message) {

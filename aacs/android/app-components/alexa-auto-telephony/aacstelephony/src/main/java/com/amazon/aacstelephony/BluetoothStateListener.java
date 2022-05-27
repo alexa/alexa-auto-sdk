@@ -15,6 +15,9 @@
 
 package com.amazon.aacstelephony;
 
+import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
+import static com.amazon.aacstelephony.Constants.PBAP_CLIENT_PROFILE_ID;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
@@ -29,9 +32,6 @@ import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 
 import java.util.Set;
-
-import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
-import static com.amazon.aacstelephony.Constants.PBAP_CLIENT_PROFILE_ID;
 
 public class BluetoothStateListener extends BroadcastReceiver {
     private static final String TAG = AACSConstants.AACS + "-" + BluetoothStateListener.class.getSimpleName();
@@ -49,6 +49,13 @@ public class BluetoothStateListener extends BroadcastReceiver {
                     "Could not get the default Bluetooth adapter. Please check if Bluetooth is supported on your device.");
             return;
         }
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                Log.i(TAG, "Adding devices paired before initial check to database");
+                Util.broadcastPairedDevices(context, device.getName(), device.getAddress());
+            }
+        }
 
         if (bluetoothAdapter.getProfileConnectionState(HEADSET_CLIENT_PROFILE_ID) == BluetoothAdapter.STATE_CONNECTED) {
             Log.i(TAG, "Bluetooth connected on AACS boot up, sending ConnectionStateChanged message to AACS");
@@ -56,7 +63,6 @@ public class BluetoothStateListener extends BroadcastReceiver {
         }
 
         if (bluetoothAdapter.getProfileConnectionState(PBAP_CLIENT_PROFILE_ID) == BluetoothAdapter.STATE_CONNECTED) {
-            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
             if (pairedDevices.size() == 0)
                 Log.i(TAG, "No devices connected/paired");
 
@@ -70,6 +76,12 @@ public class BluetoothStateListener extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        Log.d(TAG, "action: " + action);
+        if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
+            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            Log.d(TAG, "bonded state: " + device.getBondState());
+            Util.broadcastBondState(context, device.getName(), device.getAddress(), device.getBondState());
+        }
 
         if (Constants.ACTION_BLUETOOTH_PBAP_CLIENT_STATE_CHANGED.equals(action)) {
             // report PBAP connection state changes to listeners

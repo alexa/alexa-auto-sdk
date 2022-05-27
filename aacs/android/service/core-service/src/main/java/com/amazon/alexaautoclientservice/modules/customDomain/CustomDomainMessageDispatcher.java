@@ -44,9 +44,8 @@ public class CustomDomainMessageDispatcher {
         mContext = context;
     }
 
-    public void handleCustomDomainMessage(
-            @NonNull String aasbMessage, @NonNull String messageId, @NonNull String topic, @NonNull String action, @NonNull String payload) {
-
+    public void handleCustomDomainMessage(@NonNull String aasbMessage, @NonNull String messageId, @NonNull String topic,
+            @NonNull String action, @NonNull String payload) {
         JSONObject payloadJson;
         try {
             payloadJson = new JSONObject(payload);
@@ -83,7 +82,8 @@ public class CustomDomainMessageDispatcher {
 
             List<TargetComponent> targets = ComponentRegistry.getInstance().findTargets(
                     mContext, directiveNamespace, directiveName, CUSTOM_DOMAIN_INTENT_PREFIX);
-            dispatchMessage(aasbMessage, targets, CUSTOM_DOMAIN_INTENT_PREFIX + directiveName, CUSTOM_DOMAIN_INTENT_PREFIX + directiveNamespace);
+            dispatchMessage(aasbMessage, targets, CUSTOM_DOMAIN_INTENT_PREFIX + directiveName,
+                    CUSTOM_DOMAIN_INTENT_PREFIX + directiveNamespace);
         } catch (JSONException ex) {
             Log.e(TAG, "Exception occurred while parsing the HandleDirective message payload: " + ex.getMessage());
         }
@@ -102,7 +102,8 @@ public class CustomDomainMessageDispatcher {
 
             List<TargetComponent> targets = ComponentRegistry.getInstance().findTargets(
                     mContext, directiveNamespace, Action.CustomDomain.CANCEL_DIRECTIVE, CUSTOM_DOMAIN_INTENT_PREFIX);
-            dispatchMessage(aasbMessage, targets, CUSTOM_DOMAIN_INTENT_PREFIX + directiveName, CUSTOM_DOMAIN_INTENT_PREFIX + directiveNamespace);
+            dispatchMessage(aasbMessage, targets, CUSTOM_DOMAIN_INTENT_PREFIX + directiveName,
+                    CUSTOM_DOMAIN_INTENT_PREFIX + directiveNamespace);
         } catch (JSONException ex) {
             Log.e(TAG, "Exception occurred while parsing the CancelDirective message payload: " + ex.getMessage());
         }
@@ -117,18 +118,19 @@ public class CustomDomainMessageDispatcher {
 
             List<TargetComponent> targets = ComponentRegistry.getInstance().findTargets(
                     mContext, contextNamespace, Action.CustomDomain.GET_CONTEXT, CUSTOM_DOMAIN_INTENT_PREFIX);
-            dispatchMessage(aasbMessage, targets, CUSTOM_DOMAIN_INTENT_PREFIX + Action.CustomDomain.GET_CONTEXT, CUSTOM_DOMAIN_INTENT_PREFIX + contextNamespace);
+            dispatchMessage(aasbMessage, targets, CUSTOM_DOMAIN_INTENT_PREFIX + Action.CustomDomain.GET_CONTEXT,
+                    CUSTOM_DOMAIN_INTENT_PREFIX + contextNamespace);
         } catch (JSONException ex) {
             Log.e(TAG, "Exception occurred while parsing the GetContext message payload: " + ex.getMessage());
         }
     }
 
-    private void dispatchMessage(String aasbMessage, List<TargetComponent> targets, String intentAction, String intentCategory) {
+    private void dispatchMessage(
+            String aasbMessage, List<TargetComponent> targets, String intentAction, String intentCategory) {
         if (targets != null && !targets.isEmpty()) {
             // Since the custom directive payload is opaque, use sendCustomDomainMessageAnySize() to send it with
             // arbitrary size
-            mAACSSender.sendMessageAnySize(aasbMessage,
-                    intentAction, intentCategory, targets, mContext);
+            mAACSSender.sendMessageAnySize(aasbMessage, intentAction, intentCategory, targets, mContext);
         }
     }
 }

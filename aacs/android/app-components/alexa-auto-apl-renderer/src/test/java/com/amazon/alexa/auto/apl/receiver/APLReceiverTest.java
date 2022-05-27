@@ -70,12 +70,12 @@ public class APLReceiverTest {
 
     @Test
     public void handleUpdateAPLRuntimePropertiesTest() {
-        Intent getClearDocumentIntent = generateIntent("aacs/UpdateAPLRuntimeProperties.json", "com.amazon.aacs.aasb.UpdateAPLRuntimeProperties");
+        Intent getClearDocumentIntent = generateIntent(
+                "aacs/UpdateAPLRuntimeProperties.json", "com.amazon.aacs.aasb.UpdateAPLRuntimeProperties");
         mClassUnderTest.onReceive(mContext, getClearDocumentIntent);
         Assert.assertEquals(receiveMessageTopic, Topic.APL);
         Assert.assertEquals(receiveMessageAction, Action.APL.UPDATE_APL_RUNTIME_PROPERTIES);
     }
-
 
     private Intent generateIntent(String resPath, String action) {
         Intent intent = new Intent(action);

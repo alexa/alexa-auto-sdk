@@ -13,6 +13,10 @@ include ':aacsipc'
 project(':aacsipc').projectDir = new File(gradle.ext.aacsRoot, '/common/ipc/aacsipc')
 include ':aacscommonutils'
 project(':aacscommonutils').projectDir = new File(gradle.ext.aacsRoot, '/common/commonutils/aacscommonutils')
+include ':aacs-annotation-api'
+project(':aacs-annotation-api').projectDir = new File(gradle.ext.aacsRoot, '/common/annotations/aacs-annotation-api')
+include ':aacs-annotation-processor'
+project(':aacs-annotation-processor').projectDir = new File(gradle.ext.aacsRoot, '/common/annotations/aacs-annotation-processor')
 
 // Extra modules for AACS
 gradle.ext.extra_module_paths = []

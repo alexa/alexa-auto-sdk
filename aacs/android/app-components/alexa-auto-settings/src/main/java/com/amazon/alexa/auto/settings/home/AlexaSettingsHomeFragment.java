@@ -1,4 +1,26 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings.home;
+
+import static com.amazon.aacsconstants.AACSPropertyConstants.GEOLOCATION_ENABLED;
+import static com.amazon.aacsconstants.AACSPropertyConstants.LOCALE;
+import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
+import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_SUPPORTED;
+import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.updateDNDInPreferences;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.DISABLED;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.ENABLED;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -23,8 +45,8 @@ import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 import com.amazon.alexa.auto.comms.ui.db.BTDevice;
 import com.amazon.alexa.auto.comms.ui.db.BTDeviceRepository;
 import com.amazon.alexa.auto.comms.ui.db.ConnectedBTDevice;
@@ -34,7 +56,7 @@ import com.amazon.alexa.auto.settings.R;
 import com.amazon.alexa.auto.settings.config.PreferenceKeys;
 import com.amazon.alexa.auto.settings.dependencies.AndroidModule;
 import com.amazon.alexa.auto.settings.dependencies.DaggerSettingsComponent;
-import com.amazon.alexa.auto.setup.workflow.model.LocationConsent;
+import com.amazon.alexa.auto.setup.workflow.model.UserConsent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,14 +68,6 @@ import javax.inject.Inject;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 
-import static com.amazon.aacsconstants.AACSPropertyConstants.GEOLOCATION_ENABLED;
-import static com.amazon.aacsconstants.AACSPropertyConstants.LOCALE;
-import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
-import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_SUPPORTED;
-import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.updateDNDInPreferences;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.DISABLED;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.ENABLED;
-
 /**
  * Settings fragment for Alexa menu home screen.
  */
@@ -63,7 +77,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
     @Inject
-    LocalesProvider mLocalesProvider;
+    AlexaLocalesProvider mLocalesProvider;
     @Inject
     List<AlexaSettingsScreenBuilder> mScreenBuilders;
 
@@ -104,6 +118,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
         installLocationConsentHandler();
         installLanguageEventHandler();
         installSoundsEventHandler();
+        installThingsToTryEventHandler();
 
         if (!isPreviewMode() || ModuleProvider.isAlexaCustomAssistantEnabled(view.getContext())) {
             installCommunicationsEventHandler();
@@ -169,11 +184,9 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
     }
 
     private void installLocationConsentHandler() {
-        SwitchPreferenceCompat defaultLocationConsent =
-                findPreference(PreferenceKeys.ALEXA_SETTINGS_LOCATION_CONSENT);
+        SwitchPreferenceCompat defaultLocationConsent = findPreference(PreferenceKeys.ALEXA_SETTINGS_LOCATION_CONSENT);
         String extraModules = ModuleProvider.getModules(getContext());
-        if (defaultLocationConsent != null &&
-                !extraModules.contains(ModuleProvider.ModuleName.GEOLOCATION.name())) {
+        if (defaultLocationConsent != null && !extraModules.contains(ModuleProvider.ModuleName.GEOLOCATION.name())) {
             getPreferenceScreen().removePreference(defaultLocationConsent);
             return;
         }
@@ -189,14 +202,18 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
                             defaultLocationConsent.setChecked(currentConsent.equals(ENABLED.getValue()));
 
                             defaultLocationConsent.setOnPreferenceChangeListener((preference, newValue) -> {
-                                LocationConsent newConsent = (boolean) newValue ? ENABLED : DISABLED;
+                                UserConsent newConsent = (boolean) newValue ? ENABLED : DISABLED;
                                 Log.d(TAG, "Changing geolocation value to: " + newConsent.getValue());
                                 mAlexaPropertyManager.updateAlexaProperty(GEOLOCATION_ENABLED, newConsent.getValue())
                                         .doOnSuccess((succeeded) -> {
                                             if (succeeded) {
-                                                Log.d(TAG, "Successfully updated geolocation value to: " + newConsent.getValue());
+                                                Log.d(TAG,
+                                                        "Successfully updated geolocation value to: "
+                                                                + newConsent.getValue());
                                             } else {
-                                                Log.e(TAG, "Failed to update geolocation value to: " + newConsent.getValue());
+                                                Log.e(TAG,
+                                                        "Failed to update geolocation value to: "
+                                                                + newConsent.getValue());
                                             }
                                         })
                                         .doOnError(throwable -> {
@@ -209,6 +226,8 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
     }
 
     private void installLanguageEventHandler() {
+        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
+
         Preference defaultAlexaLanguages = findPreference(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES);
         Preconditions.checkNotNull(defaultAlexaLanguages);
 
@@ -236,10 +255,25 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
         });
     }
 
+    private void installThingsToTryEventHandler() {
+        Preference defaultTTT = findPreference(PreferenceKeys.ALEXA_SETTINGS_THINGS_TO_TRY);
+        if (defaultTTT != null) {
+            defaultTTT.setOnPreferenceClickListener(preference -> {
+                View view = getView();
+                if (view != null) {
+                    NavController navController = findNavController(view);
+                    navController.navigate(R.id.navigation_fragment_alexa_settings_things_to_try);
+                }
+                return false;
+            });
+        } else {
+            Log.i(TAG, "defaultTTT is null");
+        }
+    }
+
     private void installSoundsEventHandler() {
         Preference defaultAlexaSounds = findPreference(PreferenceKeys.ALEXA_SETTINGS_SOUNDS);
         Preconditions.checkNotNull(defaultAlexaSounds);
-
         defaultAlexaSounds.setOnPreferenceClickListener(preference -> {
             View view = getView();
             if (view != null) {
@@ -287,8 +321,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
 
     @Subscribe
     public void onDNDChangedEvent(@NonNull DNDChangeMessage message) {
-        SwitchPreferenceCompat defaultAlexaDNDSetting =
-                findPreference(PreferenceKeys.ALEXA_SETTINGS_DO_NOT_DISTURB);
+        SwitchPreferenceCompat defaultAlexaDNDSetting = findPreference(PreferenceKeys.ALEXA_SETTINGS_DO_NOT_DISTURB);
         if (defaultAlexaDNDSetting != null) {
             if (defaultAlexaDNDSetting.isChecked() != message.isChecked()) {
                 defaultAlexaDNDSetting.setChecked(message.isChecked());

@@ -62,6 +62,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
+    std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
     bool enableUserProfile) {
     std::shared_ptr<CBLEngineImpl> cblEngineImpl = nullptr;
@@ -78,6 +79,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
                 codePairRequestTimeout,
                 alexaEndpoints,
                 localeAssetManager,
+                networkObserver,
                 propertyManager,
                 enableUserProfile),
             "initializeCBLEngineImplFailed");
@@ -101,6 +103,7 @@ bool CBLEngineImpl::initialize(
     std::chrono::seconds codePairRequestTimeout,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
+    std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
     bool enableUserProfile) {
     try {
@@ -115,6 +118,7 @@ bool CBLEngineImpl::initialize(
             SERVICE_NAME,
             authorizationManagerInterface,
             configuration,
+            networkObserver,
             propertyManager,
             enableUserProfile,
             shared_from_this());

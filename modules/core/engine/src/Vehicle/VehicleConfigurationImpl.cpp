@@ -54,6 +54,10 @@ std::string getVehiclePropertyAttribute(VehiclePropertyType property) {
             return "microphone";
         case VehiclePropertyType::VEHICLE_IDENTIFIER:
             return "vehicleIdentifier";
+        case VehiclePropertyType::ENGINE_TYPE:
+            return "engineType";
+        case VehiclePropertyType::RSE_EMBEDDED_FIRETVS:
+            return "rseEmbeddedFireTvs";
     }
 
     return "";

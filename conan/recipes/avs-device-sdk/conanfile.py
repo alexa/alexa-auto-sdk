@@ -3,7 +3,7 @@ from conans import ConanFile, CMake, tools
 
 
 class AvsDeviceSdkConan(ConanFile):
-    
+
     python_requires = "aac-sdk-tools/1.0"
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
 
@@ -12,7 +12,10 @@ class AvsDeviceSdkConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "cmake_find_package"
     exports_sources = "CMakeLists.txt", "patches/*"
-    requires = ["sqlite3/3.32.3","opus/1.3.1"]
+    requires = [
+        "sqlite3/3.37.2#8e4989a1ee5d3237a25a911fbcb19097",
+        "opus/1.3.1",
+    ]
 
     options = {
         "with_opus": [True, False],
@@ -40,13 +43,13 @@ class AvsDeviceSdkConan(ConanFile):
         "openssl:shared": True,
         "opus:shared": False,
         "sqlite3:build_executable": False,
-        "with_curl_http_version_2_prior_knowledge": False
+        "with_curl_http_version_2_prior_knowledge": False,
     }
 
     _source_subfolder = "source_subfolder"
 
     def requirements(self):
-        self.requires(f"libcurl/7.70.0@{self.user}/{self.channel}")
+        self.requires(f"libcurl/7.81.0@{self.user}/{self.channel}")
 
     def source(self):
         tools.get(f"https://github.com/alexa/avs-device-sdk/archive/v{self.version}.tar.gz")
@@ -57,7 +60,12 @@ class AvsDeviceSdkConan(ConanFile):
         if self.settings.os == "Android":
             # Android does not support libraries with version extension (libssl.so.1.1)
             # so used static version off openssl for Android
-            self.options["openssl"].shared = False 
+            self.options["openssl"].shared = False
+        if self.settings.os == "Macos":
+            # Prevent conflict with CoreData framework
+            self.options["sqlite3"].shared = False
+        else:
+            self.options["sqlite3"].shared = True
 
     def _configure_cmake(self):
         cmake = CMake(self)
@@ -76,9 +84,15 @@ class AvsDeviceSdkConan(ConanFile):
         return cmake
 
     def _apply_patches(self):
-        for filename in sorted(glob.glob("patches/*.patch")):
-            logging.info(f"applying patch: {filename}")
-            tools.patch(base_path=self._source_subfolder, patch_file=filename)
+        for pattern in [
+            "patches/*.patch",
+            f"patches/{self.settings.os}/*.patch",  # OS-specific patches
+            f"patches/{self.settings.arch}/*.patch",  # Arch-specific patches
+            f"patches/{self.settings.os}/{self.settings.arch}/*.patch",  # OS-and-arch-specific
+        ]:
+            for filename in sorted(glob.glob(pattern)):
+                logging.info(f"applying patch: {filename}")
+                tools.patch(base_path=self._source_subfolder, patch_file=filename)
 
     def build(self):
         self._apply_patches()

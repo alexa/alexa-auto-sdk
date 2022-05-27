@@ -1,5 +1,7 @@
 package com.amazon.alexaautoclientservice.instrumentedtest;
 
+import static com.amazon.aacsconstants.Action.LAUNCH_SERVICE;
+
 import static org.junit.Assert.assertTrue;
 
 import android.app.Notification;
@@ -18,7 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ServiceTestRule;
 
-import com.amazon.aace.aasb.AASBStream;
+import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.Action;
@@ -41,6 +43,7 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 import java.lang.annotation.Target;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,10 +64,10 @@ public class TestAlexaAutoClientService {
         mContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         mTestContext = InstrumentationRegistry.getInstrumentation().getContext();
         mServiceStarted = false;
-        mTarget = TargetComponent.withComponent(new ComponentName("com.amazon.alexaautoclientservice",
-                                                        "com.amazon.alexaautoclientservice.AlexaAutoClientService"),
+        mTarget = TargetComponent.withComponent(
+                new ComponentName(AACSConstants.getAACSPackageName(new WeakReference<>(mContext)),
+                        AlexaAutoClientService.class.getCanonicalName()),
                 TargetComponent.Type.SERVICE);
-
         initIPC();
     }
 
@@ -75,24 +78,30 @@ public class TestAlexaAutoClientService {
         mTestContext.startForegroundService(startServiceIntent);
 
         // Test that sending message does not cause any errors
-        String cblStartMessage = AASBUtil.constructAASBMessage("", Topic.CBL, Action.CBL_START, "");
-        TargetComponent target =
-                TargetComponent.withComponent(new ComponentName("com.amazon.alexaautoclientservice",
-                                                      "com.amazon.alexaautoclientservice.AlexaAutoClientService"),
-                        TargetComponent.Type.SERVICE);
-        mAACSSender.sendAASBMessageEmbedded(cblStartMessage, Action.CBL_START, Topic.CBL, target, mContext);
+        String cblStartMessage =
+                AASBUtil.constructAASBMessage("", Topic.AUTHORIZATION, Action.Authorization.START_AUTHORIZATION, "");
+        mAACSSender.sendAASBMessageEmbedded(
+                cblStartMessage, Action.Authorization.START_AUTHORIZATION, Topic.AUTHORIZATION, mTarget, mTestContext);
     }
 
     @Test
     public void testStartAACSWithConfiguration() throws Exception {
         Intent startServiceIntent = new Intent(mContext, AlexaAutoClientService.class);
+        startServiceIntent.setAction(LAUNCH_SERVICE);
         startServiceIntent.putExtra(AACSConstants.NEW_CONFIG, true);
         mTestContext.startForegroundService(startServiceIntent);
 
         sendConfig(mTestContext, TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE);
 
-        SharedPreferences sp = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        assertTrue(sp.contains(FileUtil.CONFIG_KEY));
+        // it takes a few seconds for AACS to receive and process the configuration intent.
+        TimeUnit.SECONDS.sleep(6);
+        Intent stopServiceIntent = new Intent(mContext, AlexaAutoClientService.class);
+        mTestContext.stopService(stopServiceIntent);
+
+        // it takes a few seconds for AACS to clean up the resources and write the cached
+        // config to the shared preference after getting the stop intent.
+        TimeUnit.SECONDS.sleep(3);
+        assertTrue(FileUtil.isConfigurationSaved(mContext));
     }
 
     private void initIPC() {
@@ -109,7 +118,7 @@ public class TestAlexaAutoClientService {
                                             .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
                                             .getString(AASBConstants.ACTION);
 
-                    if (topic.equals(Topic.AASB) && action.equals(Action.START_SERVICE)) {
+                    if (topic.equals(Topic.AASB) && action.equals(Action.AASB.START_SERVICE)) {
                         mServiceStarted = true;
                     }
                 } catch (JSONException e) {
@@ -119,16 +128,16 @@ public class TestAlexaAutoClientService {
 
         AACSReceiver.FetchStreamCallback fetchCallback = new AACSReceiver.FetchStreamCallback() {
             @Override
-            public void onStreamRequested(String streamId, ParcelFileDescriptor.AutoCloseOutputStream stream) {}
+            public void onStreamRequested(String streamId, ParcelFileDescriptor writePipe) {}
+
             @Override
-            public void onStreamFetchCancelled() {}
+            public void onStreamFetchCancelled(String streamId) {}
         };
 
         AACSReceiver.StreamPushedFromSenderCallback streamPushedCallback =
                 new AACSReceiver.StreamPushedFromSenderCallback() {
                     @Override
-                    public void onStreamPushedFromSenderCallback(
-                            String streamId, ParcelFileDescriptor.AutoCloseInputStream stream) {}
+                    public void onStreamPushedFromSenderCallback(String streamId, ParcelFileDescriptor readPipe) {}
                 };
         AACSReceiver.Builder builder = new AACSReceiver.Builder();
         mAACSReceiver = builder.withAASBCallback(messageReceivedCallback)
@@ -142,10 +151,6 @@ public class TestAlexaAutoClientService {
         TestUtil.addDeviceInfoToConfig(configJson, TestUtil.CLIENT_ID, TestUtil.PRODUCT_ID, TestUtil.DSN);
         JSONObject configMessage = TestUtil.constructOEMConfigMessage(
                 new String[] {}, new String[] {TestUtil.escapeJsonString(configJson)});
-        TargetComponent target =
-                TargetComponent.withComponent(new ComponentName("com.amazon.alexaautoclientservice",
-                                                      "com.amazon.alexaautoclientservice.AlexaAutoClientService"),
-                        TargetComponent.Type.SERVICE);
-        mAACSSender.sendConfigMessageEmbedded(configMessage.toString(), target, mContext);
+        mAACSSender.sendConfigMessageEmbedded(configMessage.toString(), mTarget, context);
     }
 }

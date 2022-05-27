@@ -5,7 +5,7 @@
     <dimen name="login_alexa_image_height">108dp</dimen>
     <dimen name="login_alexa_image_width_trim">200dp</dimen>
     <dimen name="login_alexa_image_height_trim">130dp</dimen>
-    <dimen name="login_item_margin_top">8dp</dimen>
+    <dimen name="login_item_margin_top">25dp</dimen>
     <dimen name="login_action_item_margin_top">50dp</dimen>
     <dimen name="login_item_margin_bottom">8dp</dimen>
     <dimen name="login_item_margin_start">100dp</dimen>
@@ -25,4 +25,11 @@
 
     <dimen name="action_button_space_between">5dp</dimen>
     <dimen name="action_button_margin_bottom">35dp</dimen>
+
+    <!--4.1 General UI Guideline dimensions-->
+    <!--subject to change for 4.2-->
+    <!--setup-->
+    <dimen name="setup_top_margin_percentage">.02</dimen>
+    <dimen name="title_to_subtitle_margin">15dp</dimen>
+
 </resources>

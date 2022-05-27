@@ -11,7 +11,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -52,8 +52,13 @@ android {
     }
 }
 
+configurations {
+    testImplementation.extendsFrom compileOnly
+    androidTestImplementation.extendsFrom compileOnly
+}
+
 ext {
-    remoteLibVersion = "4.0+"
+    remoteLibVersion = "4.1+"
 }
 
 dependencies {
@@ -65,6 +70,8 @@ dependencies {
         compileOnly project(':aacsconstants')
         compileOnly project(':aacsipc')
         compileOnly project(':aacscommonutils')
+        compileOnly project(':aacs-annotation-api')
+        annotationProcessor project(':aacs-annotation-processor')
     } else if (tasks.any { it.toLowerCase().contains("remote") }) {
         remoteCompileOnly "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
         remoteCompileOnly "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
@@ -75,13 +82,14 @@ dependencies {
         remoteCompileOnly "com.amazon.alexa.aacs:aacsconstants:${remoteLibVersion}@aar"
         remoteCompileOnly "com.amazon.alexa.aacs:aacscommonutils:${remoteLibVersion}@aar"
         remoteCompileOnly "com.amazon.alexa.aace:bluetooth:${remoteLibVersion}@aar"
+        remoteCompileOnly "com.amazon.alexa.aacs:aacs_annotation_api:${remoteLibVersion}@jar"
+        remoteAnnotationProcessor "com.amazon.alexa.aacs:aacs_annotation_processor:${remoteLibVersion}@jar"
     }
 
     // AACS module factories.
     for (extra_module_factory_name in gradle.ext.extra_module_factory_names) {
         implementation project(':' + extra_module_factory_name)
     }
-
     implementation deps.androidx_core
     implementation deps.androidx_media
     implementation deps.androidx_annotation
@@ -162,7 +170,7 @@ task buildDeps(type: Exec) {
             }
         }
 
-        executeConan(['conan', 'config', 'init', '-f'])
+        executeConan(['conan', 'config', 'init'])
         executeConan(['conan', 'config', 'install', '-t', 'dir', conan_config_home])
 
         // always export aac-sdk-tools first

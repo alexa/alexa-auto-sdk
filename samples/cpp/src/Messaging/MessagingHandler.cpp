@@ -90,19 +90,19 @@ void MessagingHandler::subscribeToAASBMessages() {
 }
 
 void MessagingHandler::handleSendMessageMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SendMessageMessage");
     SendMessageMessage msg = json::parse(message);
     sendMessage(msg.payload.token, msg.payload.message, msg.payload.recipients);
 }
 
 void MessagingHandler::handleUpdateMessagesStatusMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received UpdateMessagesStatusMessage");
     UpdateMessagesStatusMessage msg = json::parse(message);
     updateMessagesStatus(msg.payload.token, msg.payload.conversationId, msg.payload.status);
 }
 
 void MessagingHandler::handleUploadConversationsMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received UploadConversationsMessage");
     UploadConversationsMessage msg = json::parse(message);
     uploadConversations(msg.payload.token);
 }
@@ -288,10 +288,9 @@ void MessagingHandler::log(logger::LoggerHandler::Level level, const std::string
 }
 
 // Error code
-static const std::map<std::string, ErrorCode> ErrorCodeEnumerator{
-    {"GENERIC_FAILURE", ErrorCode::GENERIC_FAILURE},
-    {"NO_CONNECTIVITY", ErrorCode::NO_CONNECTIVITY},
-    {"NO_PERMISSION", ErrorCode::NO_PERMISSION}};
+static const std::map<std::string, ErrorCode> ErrorCodeEnumerator{{"GENERIC_FAILURE", ErrorCode::GENERIC_FAILURE},
+                                                                  {"NO_CONNECTIVITY", ErrorCode::NO_CONNECTIVITY},
+                                                                  {"NO_PERMISSION", ErrorCode::NO_PERMISSION}};
 
 void MessagingHandler::setupUI() {
     auto activity = m_activity.lock();
@@ -344,8 +343,8 @@ void MessagingHandler::setupUI() {
         // Permission type
         static const std::map<std::string, bool> PermissionTypeEnumerator{{"SEND", true}, {"READ", false}};
         // Permission value
-        static const std::map<std::string, PermissionState> PermissionStateEnumerator{
-            {"ON", PermissionState::ON}, {"OFF", PermissionState::OFF}};
+        static const std::map<std::string, PermissionState> PermissionStateEnumerator{{"ON", PermissionState::ON},
+                                                                                      {"OFF", PermissionState::OFF}};
 
         // Check that SEND or READ was provided
         if (PermissionTypeEnumerator.count(sm[1]) == 0) {

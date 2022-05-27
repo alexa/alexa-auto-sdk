@@ -237,7 +237,7 @@ class BuilderConfiguration(BuilderSettingsFile):
     def configure(self,include_paths = []):
         # initialize the conan configuration data
         self._handler.log_info("Configuring Conan...")
-        subprocess.run( ["conan", "config", "init", "-f"], env=self._handler.conan_env, capture_output=not self.verbose, check=True )
+        subprocess.run( ["conan", "config", "init"], env=self._handler.conan_env, capture_output=not self.verbose, check=True )
         # if os is linux then force compiler.libcxx to libstdc++11
         if sys.platform.startswith("linux"):
             subprocess.run( ["conan", "profile", "update", "settings.compiler.libcxx=libstdc++11", "default"], env=self._handler.conan_env, capture_output=not self.verbose, check=True )

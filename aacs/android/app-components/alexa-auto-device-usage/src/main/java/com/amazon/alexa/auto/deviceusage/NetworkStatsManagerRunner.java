@@ -80,8 +80,9 @@ public class NetworkStatsManagerRunner implements Runnable {
         if (ConnectivityManager.TYPE_MOBILE == mNetworkType) {
             TelephonyManager manager = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && !checkForReadPhoneStatePermission()) {
-                Log.e(TAG, "READ_PHONE_STATE permission is required for device on API 28 and lower. " +
-                        "Device on API 29 and higher requires READ_PRIVILEGED_PHONE_STATE");
+                Log.e(TAG,
+                        "READ_PHONE_STATE permission is required for device on API 28 and lower. "
+                                + "Device on API 29 and higher requires READ_PRIVILEGED_PHONE_STATE");
                 return "";
             }
             return manager.getSubscriberId();
@@ -150,7 +151,10 @@ public class NetworkStatsManagerRunner implements Runnable {
                     try {
                         mSubscriberId = getSubscriberId();
                     } catch (SecurityException e) {
-                        Log.e(TAG, String.format("calculateNetworkStatsUsage: Device on API level 29 or higher requires privileged permission to access subscriber Id. Exception encountered: %s", e.getMessage()));
+                        Log.e(TAG,
+                                String.format(
+                                        "calculateNetworkStatsUsage: Device on API level 29 or higher requires privileged permission to access subscriber Id. Exception encountered: %s",
+                                        e.getMessage()));
                         return;
                     }
                     if (mSubscriberId == null) {

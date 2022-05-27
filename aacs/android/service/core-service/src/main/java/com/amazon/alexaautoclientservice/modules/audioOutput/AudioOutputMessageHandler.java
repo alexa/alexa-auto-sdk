@@ -25,15 +25,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.amazon.aace.aasb.AASBStream;
+import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.alexaautoclientservice.AASBHandler;
-import com.amazon.alexaautoclientservice.mediaPlayer.AACSMediaPlayer;
-import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.exo.ExoPlayerHandler;
-import com.amazon.alexaautoclientservice.mediaPlayer.raw.RawAudioOutputHandler;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AlexaClientMessageHandler;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AuthStateObserver;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.AACSMediaPlayer;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.exo.ExoPlayerHandler;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.raw.RawAudioOutputHandler;
 
 import org.json.JSONObject;
 
@@ -187,7 +187,7 @@ public class AudioOutputMessageHandler {
             if (payloadJson.has(AudioOutput.STREAM_ID)) {
                 String streamId = payloadJson.getString(AudioOutput.STREAM_ID);
                 if (!streamId.isEmpty()) {
-                    AASBStream currentOutputStream = aasbHandler.openStream(streamId, AASBStream.Mode.READ);
+                    MessageStream currentOutputStream = aasbHandler.openStream(streamId, MessageStream.Mode.READ);
                     mCurrentMediaPlayer.prepare(currentOutputStream, repeating, token);
                 }
             } else {

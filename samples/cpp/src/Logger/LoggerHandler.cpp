@@ -85,8 +85,8 @@ std::string LoggerHandler::formatTime() {
 
     // Format string using sprintf() to produce milliseconds in the format "nnn".
     char millisString[4];
-    auto timeMillisPart = static_cast<int>(
-        std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() % 1000);
+    auto timeMillisPart =
+        static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() % 1000);
     std::snprintf(millisString, sizeof(millisString), "%03d", timeMillisPart);
 
     stringToEmit << dateTimeString << '.' << millisString;

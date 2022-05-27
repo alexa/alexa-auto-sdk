@@ -1,0 +1,85 @@
+@startuml
+skinparam sequenceMessageAlign direction
+skinparam lifelineStrategy nosolid
+
+<style>
+sequenceDiagram {
+	.alexa {
+    	RoundCorner 5
+        BackgroundColor #E2F5FA
+        LineColor #05A0D1
+    }
+    .engine {
+    	RoundCorner 5
+        BackgroundColor #E1E6EC
+        LineColor #232F3E
+    }
+    .client {
+    	RoundCorner 5
+    	BackgroundColor WhiteSmoke
+        LineColor DarkGrey
+    }
+    .amazonservice {
+    	RoundCorner 5
+    	BackgroundColor #FFEBCC
+        LineColor #FF9900
+    }
+    actor {
+    	BackgroundColor White
+    	LineColor Black
+    }
+    arrow {
+    	LineColor Black
+    }
+    lifeline {
+    	LineColor Grey
+        LineStyle 4
+    }
+    .message {
+    	BackgroundColor Ivory
+        LineColor Wheat
+        RoundCorner 5
+    }
+    .callout {
+    	BackgroundColor Linen
+        LineColor Tan
+        RoundCorner 5
+    }
+}
+</style>
+
+participant Application <<client>> order 30
+participant MessageBroker <<engine>> order 40
+participant Engine as Engine <<engine>> order 45
+
+Title: Provide an access token to the Engine
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic: Authorization
+action: GetAuthorizationData
+service: alexa:auth-provider
+key: accessToken
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+
+Application -> Application: retrieve cached access token
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message (reply)**
+topic: Authorization
+action: GetAuthorizationData
+service: alexa:auth-provider
+accessToken: Atza...
+end note
+activate MessageBroker
+MessageBroker --> Application
+deactivate MessageBroker
+MessageBroker --> Engine: access token
+deactivate MessageBroker
+@enduml

@@ -25,9 +25,9 @@ import androidx.annotation.Nullable;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.Format;
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.LoadEventInfo;
+import com.google.android.exoplayer2.source.MediaLoadData;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MediaSourceEventListener;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
@@ -38,8 +38,6 @@ import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.*;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.source.LoadEventInfo;
-import com.google.android.exoplayer2.source.MediaLoadData;
 
 import java.io.IOException;
 
@@ -54,7 +52,7 @@ class MediaSourceFactory {
     private final Handler mMainHandler;
     private final PlaylistParser mPlaylistParser = new PlaylistParser();
     private final MediaSourceListener mMediaSourceListener = new MediaSourceListener();
-    private final DataSource.Factory mFileDataSourceFactory = new FileDataSourceFactory(null);
+    private final DataSource.Factory mFileDataSourceFactory = new FileDataSource.Factory();
     private final DataSource.Factory mHttpDataSourceFactory;
 
     MediaSourceFactory(@NonNull Context context, @NonNull String name, @NonNull Handler handler) {
@@ -66,7 +64,12 @@ class MediaSourceFactory {
 
     private HttpDataSource.Factory buildHttpDataSourceFactory(Context context) {
         String userAgent = Util.getUserAgent(context, USER_AGENT_NAME);
-        return new DefaultHttpDataSourceFactory(userAgent, null, CONNECTION_TIMEOUT_MS, READ_TIMEOUT_MS, true);
+        DefaultHttpDataSource.Factory factory = new DefaultHttpDataSource.Factory();
+        factory.setUserAgent(userAgent);
+        factory.setConnectTimeoutMs(CONNECTION_TIMEOUT_MS);
+        factory.setReadTimeoutMs(READ_TIMEOUT_MS);
+        factory.setAllowCrossProtocolRedirects(true);
+        return factory;
     }
 
     MediaSource createFileMediaSource(@NonNull final Uri uri) throws Exception {
@@ -86,21 +89,22 @@ class MediaSourceFactory {
         MediaItem mediaItem = MediaItem.fromUri(uri);
         switch (type) {
             case DASH:
-                DashMediaSource dashMediaSource = new DashMediaSource
-                        .Factory(new DefaultDashChunkSource.Factory(dataSourceFactory), dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                DashMediaSource dashMediaSource =
+                        new DashMediaSource
+                                .Factory(new DefaultDashChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+                                .createMediaSource(mediaItem);
                 dashMediaSource.addEventListener(handler, mediaSourceListener);
                 return dashMediaSource;
             case SMOOTH_STREAMING:
-                SsMediaSource ssMediaSource = new SsMediaSource
-                        .Factory(new DefaultSsChunkSource.Factory(dataSourceFactory), dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                SsMediaSource ssMediaSource =
+                        new SsMediaSource
+                                .Factory(new DefaultSsChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+                                .createMediaSource(mediaItem);
                 ssMediaSource.addEventListener(handler, mediaSourceListener);
                 return ssMediaSource;
             case HLS:
-                HlsMediaSource hlsMediaSource = new HlsMediaSource
-                        .Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                HlsMediaSource hlsMediaSource =
+                        new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem);
                 hlsMediaSource.addEventListener(handler, mediaSourceListener);
                 return hlsMediaSource;
             case M3U:
@@ -108,9 +112,8 @@ class MediaSourceFactory {
                 Uri parsedUri = playlistParser.parseUri(uri);
                 return createMediaSource(parsedUri, dataSourceFactory, mediaSourceListener, handler, playlistParser);
             case OTHER:
-                ProgressiveMediaSource progressiveMediaSource = new ProgressiveMediaSource
-                        .Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                ProgressiveMediaSource progressiveMediaSource =
+                        new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem);
                 progressiveMediaSource.addEventListener(handler, mediaSourceListener);
                 return progressiveMediaSource;
             default:

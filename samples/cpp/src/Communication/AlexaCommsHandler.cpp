@@ -94,13 +94,13 @@ void AlexaCommsHandler::subscribeToAASBMessages() {
 }
 
 void AlexaCommsHandler::handleCallDisplayInfoMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received CallDisplayInfoMessage");
     CallDisplayInfoMessage msg = json::parse(message);
     callDisplayInfo(msg.payload.displayInfo);
 }
 
 void AlexaCommsHandler::handleCallStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received CallStateChangedMessage");
     CallStateChangedMessage msg = json::parse(message);
     callStateChanged(msg.payload.state);
 }

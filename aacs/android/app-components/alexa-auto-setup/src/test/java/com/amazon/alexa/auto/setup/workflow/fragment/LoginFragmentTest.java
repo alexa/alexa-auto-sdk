@@ -2,6 +2,7 @@ package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.CBL_AUTH_FINISHED;
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -79,7 +80,8 @@ public class LoginFragmentTest {
         when(mMockQRCodeGenerator.generateQRCode(anyString())).thenReturn(mMockQRCodeBitmap);
 
         Field field = EventBus.class.getDeclaredField("defaultInstance");
-        if (!field.isAccessible()) field.setAccessible(true);
+        if (!field.isAccessible())
+            field.setAccessible(true);
         field.set(null, Mockito.mock(EventBus.class));
     }
 
@@ -97,17 +99,14 @@ public class LoginFragmentTest {
 
             assertEquals(View.VISIBLE, view.findViewById(R.id.sign_in_action_button).getVisibility());
             assertEquals(View.VISIBLE, view.findViewById(R.id.try_alexa_action_button).getVisibility());
-
         });
     }
-
 
     @Test
     public void testWhenPreviewModeIsDisabled_LoginScreenDoesNotContainTryAlexaButton() {
         mPreviewModeEnabled = false;
         FragmentScenario<LoginFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(LoginFragment.class, null,
-                        new LoginFragmentFactory());
+                FragmentScenario.launchInContainer(LoginFragment.class, null, new LoginFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -279,7 +278,6 @@ public class LoginFragmentTest {
         boolean isPreviewModeEnabled(@NonNull Context context) {
             return mPreviewModeEnabled;
         }
-
     }
 
     /**
@@ -289,7 +287,6 @@ public class LoginFragmentTest {
         @NonNull
         @Override
         public Fragment instantiate(@NonNull ClassLoader classLoader, @NonNull String className) {
-
             try (MockedStatic<AlexaApp> staticMock = Mockito.mockStatic(AlexaApp.class)) {
                 staticMock.when(() -> AlexaApp.from(mMockApplication)).thenReturn(mMockAlexaApp);
                 when(mMockAlexaApp.getRootComponent()).thenReturn(mMockRootComponent);

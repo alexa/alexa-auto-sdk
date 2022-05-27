@@ -251,8 +251,7 @@ void CustomDomainEngineImpl::onSendEvent(
         AACE_ERROR(LX(TAG).d("reason", "invalidNamespace").d("namespace", eventNamespace));
         return;
     }
-    m_capabilityAgentMap[eventNamespace]->sendEvent(
-        name, payload, requiresContext, correlationToken, customContext);
+    m_capabilityAgentMap[eventNamespace]->sendEvent(name, payload, requiresContext, correlationToken, customContext);
 }
 
 }  // namespace customDomain

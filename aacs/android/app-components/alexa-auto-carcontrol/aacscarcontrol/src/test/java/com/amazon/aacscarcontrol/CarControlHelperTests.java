@@ -65,19 +65,22 @@ public class CarControlHelperTests {
     @Test
     public void testGetPropertySettingWithValidParam() {
         // Power Controller Type
-        CarControlHelper.PropertySetting setting1 = mHelper.getPropertySetting(DEFAULT_FAN_ENDPOINT, CarControlConstants.POWER_CONTROLLER, "");
+        CarControlHelper.PropertySetting setting1 =
+                mHelper.getPropertySetting(DEFAULT_FAN_ENDPOINT, CarControlConstants.POWER_CONTROLLER, "");
         Assert.assertEquals(setting1.propertyId, PROPERTY_ID_HVAC_POWER_ON);
         Assert.assertEquals(setting1.areaId, AREA_ID_FULL);
         Assert.assertEquals(setting1.dataType, CarControlConstants.DataType.BOOLEAN);
 
         // Range Controller Type
-        CarControlHelper.PropertySetting setting2 = mHelper.getPropertySetting(DEFAULT_FAN_ENDPOINT, CarControlConstants.RANGE_CONTROLLER, SPEED_INSTANCE);
+        CarControlHelper.PropertySetting setting2 =
+                mHelper.getPropertySetting(DEFAULT_FAN_ENDPOINT, CarControlConstants.RANGE_CONTROLLER, SPEED_INSTANCE);
         Assert.assertEquals(setting2.propertyId, PROPERTY_ID_HVAC_FAN_SPEED);
         Assert.assertEquals(setting2.areaId, AREA_ID_FULL);
         Assert.assertEquals(setting2.dataType, CarControlConstants.DataType.INT);
 
         // Toggle Controller Type
-        CarControlHelper.PropertySetting setting3 = mHelper.getPropertySetting(CAR_ENDPOINT, CarControlConstants.TOGGLE_CONTROLLER, RECIR_INSTANCE);
+        CarControlHelper.PropertySetting setting3 =
+                mHelper.getPropertySetting(CAR_ENDPOINT, CarControlConstants.TOGGLE_CONTROLLER, RECIR_INSTANCE);
         Assert.assertEquals(setting3.propertyId, PROPERTY_ID_HVAC_RECIRC_ON);
         Assert.assertEquals(setting3.areaId, AREA_ID_FULL);
         Assert.assertEquals(setting3.dataType, CarControlConstants.DataType.BOOLEAN);
@@ -86,7 +89,8 @@ public class CarControlHelperTests {
     @Test
     public void testGetPropertySettingsWithValidParam() {
         // Mode Controller Type
-        List<CarControlHelper.PropertySetting> settingList = mHelper.getPropertySettings(DEFAULT_AC_ENDPOINT, CarControlConstants.MODE_CONTROLLER, INTENSITY_INSTANCE, HIGH_VALUE);
+        List<CarControlHelper.PropertySetting> settingList = mHelper.getPropertySettings(
+                DEFAULT_AC_ENDPOINT, CarControlConstants.MODE_CONTROLLER, INTENSITY_INSTANCE, HIGH_VALUE);
         Assert.assertEquals(settingList.get(0).propertyId, PROPERTY_ID_HVAC_MAX_AC_ON);
         Assert.assertEquals(settingList.get(0).areaId, AREA_ID_FULL);
         Assert.assertEquals(settingList.get(0).dataType, CarControlConstants.DataType.BOOLEAN);
@@ -111,19 +115,23 @@ public class CarControlHelperTests {
     @Test
     public void testGetPropertySettingWithInvalidParam() {
         // Power Controller Type
-        Assert.assertNull(mHelper.getPropertySetting(INVALID_DEFAULT_FAN_ENDPOINT, CarControlConstants.POWER_CONTROLLER, ""));
+        Assert.assertNull(
+                mHelper.getPropertySetting(INVALID_DEFAULT_FAN_ENDPOINT, CarControlConstants.POWER_CONTROLLER, ""));
 
         // Toggle Controller Type
-        Assert.assertNull(mHelper.getPropertySetting(DEFAULT_FAN_ENDPOINT, CarControlConstants.TOGGLE_CONTROLLER, INVALID_SPEED_INSTANCE));
+        Assert.assertNull(mHelper.getPropertySetting(
+                DEFAULT_FAN_ENDPOINT, CarControlConstants.TOGGLE_CONTROLLER, INVALID_SPEED_INSTANCE));
 
         // Range Controller Type
-        Assert.assertNull(mHelper.getPropertySetting(INVALID_CAR_ENDPOINT, CarControlConstants.RANGE_CONTROLLER, INVALID_INTENSITY_INSTANCE));
+        Assert.assertNull(mHelper.getPropertySetting(
+                INVALID_CAR_ENDPOINT, CarControlConstants.RANGE_CONTROLLER, INVALID_INTENSITY_INSTANCE));
     }
 
     @Test
     public void testGetPropertySettingsWithInvalidParam() {
         // Mode Controller Type
-        List<CarControlHelper.PropertySetting> settingList = mHelper.getPropertySettings(DEFAULT_AC_ENDPOINT, CarControlConstants.MODE_CONTROLLER, INTENSITY_INSTANCE, SUPERHIGH_VALUE);
+        List<CarControlHelper.PropertySetting> settingList = mHelper.getPropertySettings(
+                DEFAULT_AC_ENDPOINT, CarControlConstants.MODE_CONTROLLER, INTENSITY_INSTANCE, SUPERHIGH_VALUE);
         Assert.assertEquals(settingList.size(), 0);
     }
 }

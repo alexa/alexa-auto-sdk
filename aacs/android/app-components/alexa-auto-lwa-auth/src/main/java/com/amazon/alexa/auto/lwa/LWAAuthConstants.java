@@ -16,11 +16,8 @@
 package com.amazon.alexa.auto.lwa;
 
 public class LWAAuthConstants {
-	
     public static final String AUTH_PROVIDER_SERVICE_NAME = "alexa:auth-provider";
     public static final String AUTH_CBL_SERVICE_NAME = "alexa:cbl";
     public static final String AUTH_SERVICE = "service";
     public static final String AUTH_DATA = "data";
-
 }
-

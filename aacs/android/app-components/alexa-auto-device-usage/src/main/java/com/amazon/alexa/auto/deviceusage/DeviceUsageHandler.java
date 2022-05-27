@@ -197,7 +197,8 @@ public class DeviceUsageHandler {
             JSONObject payload = new JSONObject();
             payload.put("usage", dataUsage.toString());
             Log.v(TAG, "reportNetworkDataUsage:" + payload.toString());
-            new AACSMessageSender(new WeakReference<>(mContext), new AACSSender()).sendMessage(Topic.DEVICE_USAGE, Action.DeviceUsage.REPORT_NETWORK_DATA_USAGE, payload.toString());
+            new AACSMessageSender(new WeakReference<>(mContext), new AACSSender())
+                    .sendMessage(Topic.DEVICE_USAGE, Action.DeviceUsage.REPORT_NETWORK_DATA_USAGE, payload.toString());
         } catch (JSONException e) {
             Log.e(TAG, String.format("reportNetworkDataUsage: failed to create usage json because %s", e.getMessage()));
         }

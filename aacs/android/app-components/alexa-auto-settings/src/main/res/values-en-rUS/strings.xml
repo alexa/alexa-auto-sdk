@@ -68,4 +68,79 @@
     <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">REBOOT AACS &amp; APPLY CONFIGURATION</string>
     <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">SHUTDOWN AACS</string>
     <string name="preference_aacs_start" tools:ignore="MissingTranslation">START AACS</string>
+    <string name="setting_navigation_favorites_title">Sync navigation favorites</string>
+    <string name="setting_navigation_favorites_summary">Alexa can help you navigate to the favorite locations stored in your vehicle. Favorites will be uploaded to the Amazon service.</string>
+    <string name="setting_alexa_things_to_try">Things to try</string>
+    <string name="ttt_preview_mode_note">Note: some features require signing in with Amazon Alexa.</string>
+
+    <!-- translatable="false" tag is used for things-to-try strings only. These strings need to be localized based on the country and region -->
+    <string name="ttt_getting_started" translatable="false">Getting Started</string>
+    <string name="ttt_alexa_s_talents" translatable="false">Alexa\'s Talents</string>
+    <string name="ttt_entertainment" translatable="false">Entertainment</string>
+    <string name="ttt_communication" translatable="false">Communication</string>
+    <string name="ttt_weather" translatable="false">Weather</string>
+    <string name="ttt_smart_home" translatable="false">Smart Home</string>
+    <string name="ttt_news_and_information" translatable="false">News and Information</string>
+    <string name="ttt_navigation" translatable="false">Navigation</string>
+    <string name="ttt_traffic_information" translatable="false">Traffic Information</string>
+    <string name="ttt_skills" translatable="false">Skills</string>
+    <string name="ttt_lists" translatable="false">Lists</string>
+    <string name="ttt_shopping" translatable="false">Shopping</string>
+    <string name="ttt_questions_and_answers" translatable="false">Questions and Answers</string>
+    <string name="ttt_sports" translatable="false">Sports</string>
+    <string name="ttt_calendar" translatable="false">Calendar</string>
+    <string name="ttt_getting_started_text1" translatable="false">\"Alexa, find a nearby petrol station.\"</string>
+    <string name="ttt_getting_started_text2" translatable="false">\"Alexa, play music.\"</string>
+    <string name="ttt_getting_started_text3" translatable="false">\"Alexa, what\'s the weather?\"</string>
+    <string name="ttt_getting_started_text4" translatable="false">\"Alexa, how\'s my commute?\"</string>
+    <string name="ttt_getting_started_text5" translatable="false">\"Alexa, what\'s my Flash Briefing?\"</string>
+    <string name="ttt_alexa_s_talents_text1" translatable="false">\"Alexa, good morning.\"</string>
+    <string name="ttt_alexa_s_talents_text2" translatable="false">\"Alexa, tell me a story.\"</string>
+    <string name="ttt_alexa_s_talents_text3" translatable="false">\"Alexa, what can you remember?\"</string>
+    <string name="ttt_entertainment_text1" translatable="false">\"Alexa, play music.\"</string>
+    <string name="ttt_entertainment_text2" translatable="false">\"Alexa, play rock music from the 70s.\"</string>
+    <string name="ttt_entertainment_text3" translatable="false">\"Alexa, play the latest Bruno Mars album.\"</string>
+    <string name="ttt_entertainment_text4" translatable="false">\"Alexa, resume my Audible book.\"</string>
+    <string name="ttt_communication_text1" translatable="false">\"Alexa, send a message to John.\"</string>
+    <string name="ttt_communication_text2" translatable="false">\"Alexa, how do I send a message?\"</string>
+    <string name="ttt_communication_text3" translatable="false">\"Alexa, call Erin\'s mobile.\"</string>
+    <string name="ttt_communication_text4" translatable="false">\"Alexa, call 8445825393.\"</string>
+    <string name="ttt_weather_text1" translatable="false">\"Alexa, how\'s the weather?\"</string>
+    <string name="ttt_weather_text2" translatable="false">\"Alexa, will it rain today?\"</string>
+    <string name="ttt_weather_text3" translatable="false">\"Alexa, what\'s the weather in Honolulu?\"</string>
+    <string name="ttt_smart_home_text1" translatable="false">\"Alexa, turn on the porch lights.\"</string>
+    <string name="ttt_smart_home_text2" translatable="false">\"Alexa, lock the front door.\"</string>
+    <string name="ttt_smart_home_text3" translatable="false">\"Alexa, set my house to 70 degrees.\"</string>
+    <string name="ttt_smart_home_text4" translatable="false">\"Alexa, close the garage door.\"</string>
+    <string name="ttt_news_and_information_text1" translatable="false">\"Alexa, what\'s the news?\"</string>
+    <string name="ttt_news_and_information_text2" translatable="false">\"Alexa, what\'s my sports update?\"</string>
+    <string name="ttt_news_and_information_text3" translatable="false">\"Alexa, play NPR.\"</string>
+    <string name="ttt_news_and_information_text4" translatable="false">\"Alexa, play BBC.\"</string>
+    <string name="ttt_navigation_text1" translatable="false">\"Alexa, find a top-rated Thai restaurant nearby.\"</string>
+    <string name="ttt_navigation_text2" translatable="false">\"Alexa, take me to the airport.\"</string>
+    <string name="ttt_navigation_text3" translatable="false">\"Alexa, take me to the train station.\"</string>
+    <string name="ttt_traffic_information_text1" translatable="false">\"Alexa, what\'s my commute to work like?\"</string>
+    <string name="ttt_traffic_information_text2" translatable="false">\"Alexa, how\'s the traffic to the airport?\"</string>
+    <string name="ttt_skills_text1" translatable="false">\"Alexa, what new skills do you have?\"</string>
+    <string name="ttt_lists_text1" translatable="false">\"Alexa, what\'s on my to-do list?\"</string>
+    <string name="ttt_lists_text2" translatable="false">\"Alexa, add milk to my shopping list\"</string>
+    <string name="ttt_lists_text3" translatable="false">\"Alexa, what\'s on my shopping list?\"</string>
+    <string name="ttt_lists_text4" translatable="false">\"Alexa, create a packing list.\"</string>
+    <string name="ttt_shopping_text1" translatable="false">\"Alexa, where\'s my stuff?\"</string>
+    <string name="ttt_shopping_text2" translatable="false">\"Alexa, buy air freshener for my car.\"</string>
+    <string name="ttt_shopping_text3" translatable="false">\"Alexa, reorder toothpaste.\"</string>
+    <string name="ttt_questions_and_answers_text1" translatable="false">\"Alexa, what time is it in Tokyo?\"</string>
+    <string name="ttt_questions_and_answers_text2" translatable="false">\"Alexa, how far away is the moon?\"</string>
+    <string name="ttt_questions_and_answers_text3" translatable="false">\"Alexa, when is the World Cup?\"</string>
+    <string name="ttt_sports_text1" translatable="false">\"Alexa, what\'s my sports update?\"</string>
+    <string name="ttt_sports_text2" translatable="false">\"Alexa, when is the Champions League final?\"</string>
+    <string name="ttt_sports_text3" translatable="false">\"Alexa, when\'s the next Houston Rockets game?\"</string>
+    <string name="ttt_sports_text4" translatable="false">\"Alexa, when is the cricket world cup?\"</string>
+    <string name="ttt_sports_text5" translatable="false">\"Alexa, when is Wimbledon?\"</string>
+    <string name="ttt_sports_text6" translatable="false">\"Alexa, when is the Monaco Grand Prix?\"</string>
+    <string name="ttt_sports_text7" translatable="false">\"Alexa, what was the score of Seattle Seahawks game last night?\"</string>
+    <string name="ttt_sports_text8" translatable="false">\"Alexa, how many Super Bowls have the 49ers won?\"</string>
+    <string name="ttt_calendar_text1" translatable="false">\"Alexa, how does my day look?\"</string>
+    <string name="ttt_calendar_text2" translatable="false">\"Alexa, what\'s my next appointment?\"</string>
+    <string name="ttt_calendar_text3" translatable="false">\"Alexa, add a 2.00 pm coffee chat to my calendar.\"</string>
 </resources>

@@ -6,7 +6,7 @@ from conans.errors import ConanInvalidConfiguration
 
 class QNX7SDPConan(ConanFile):
     name = "qnx7-sdp"
-    version = "7.0.0"
+    version = "7.x"
     description = "Cross-compiling with QNX 7 SDP"
 
     settings = {
@@ -14,12 +14,8 @@ class QNX7SDPConan(ConanFile):
         "arch": ["x86_64", "armv8"]
     }
 
-    options = {
-        "qnx7sdp_path": "ANY"
-    }
-    default_options = {
-        "qnx7sdp_path": ""
-    }
+    options = {"qnx7sdp_path": "ANY"}
+    default_options = {"qnx7sdp_path": ""}
 
     exports = "*.cmake"
 
@@ -34,13 +30,23 @@ class QNX7SDPConan(ConanFile):
                 "Linux": "linux"}.get(str(self._build_os))
 
     @property
+    def _qnx_version(self):
+        if self.settings_target.os.version == "7.0":
+            return "700"
+        elif self.settings_target.os.version == "7.1":
+            return "710"
+        raise ConanInvalidConfiguration(
+            f"Unsupported QNX version: {self.settings_target.os.version}"
+        )
+
+    @property
     def _qnx_base(self):
-        if self.options.qnx7sdp_path != "" :
+        if self.options.qnx7sdp_path != "":
             print("Using QNX SDP from %s" % self.options.qnx7sdp_path)
             return str(self.options.qnx7sdp_path)
         else:
-            qnx_folder_name = "qnx" + self.version.replace('.', '')
-            return os.path.join(os.getenv('HOME'), qnx_folder_name)
+            qnx_folder_name = "qnx" + self._qnx_version
+            return os.path.join(os.getenv("HOME"), qnx_folder_name)
 
     @property
     def _qnx_host(self):
@@ -85,7 +91,7 @@ class QNX7SDPConan(ConanFile):
 
         self.env_info.CC = f"qcc -Vgcc_nto{self._qnx_arch}"
         self.env_info.CFLAGS = "-D_QNX_SOURCE"
-        self.env_info.CXX = f"QCC -Vgcc_nto{self._qnx_arch}"
+        self.env_info.CXX = f"q++ -Vgcc_nto{self._qnx_arch}"
         self.env_info.CXXFLAGS = f"{self.env_info.CFLAGS} -Y_cxx"
         self.env_info.CPP = f"{toolchain_prefix}-cpp"
         self.env_info.AR = f"{toolchain_prefix}-ar"
@@ -100,5 +106,8 @@ class QNX7SDPConan(ConanFile):
         self.env_info.NM = f"{toolchain_prefix}-nm"
 
         self.env_info.CMAKE_TOOLCHAIN_FILE = os.path.join(self.package_folder, f"qnx7_toolchain_{self.settings_target.arch}.cmake")
+
+        self.env_info.QNX_HOST = self._qnx_host
+        self.env_info.QNX_TARGET = self._qnx_target
 
         self.output.info(f"Done setting up cross-compiling with {self.env_info.QNX_HOST}")

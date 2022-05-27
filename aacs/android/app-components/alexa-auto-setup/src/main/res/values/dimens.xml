@@ -31,4 +31,13 @@
 
     <dimen name="action_button_space_between">2dp</dimen>
     <dimen name="action_button_margin_bottom">50dp</dimen>
+
+    <!--4.1 General UI Guideline dimensions-->
+    <!--subject to change for 4.2-->
+    <!--setup-->
+    <dimen name="setup_top_margin_percentage">.02</dimen>
+    <dimen name="setup_bottom_margin_percentage">.95</dimen>
+    <dimen name="setup_qr_code_bottom_margin">20dp</dimen>
+    <dimen name="title_to_subtitle_margin">40dp</dimen>
+
 </resources>

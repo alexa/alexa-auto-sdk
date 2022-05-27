@@ -1,5 +1,5 @@
 The contents of this repository are distributed under several different license agreements. Please refer to LICENSE file in the corresponding folder before using. 
 
-If the license is not specified in the folder, the Apache 2.0 License applies. The Apache 2.0 license can be found at “./LICENSE_APACHE_V2”. 
+If the license is not specified in the folder, the Apache 2.0 License applies. The Apache 2.0 license can be found at ./LICENSE_APACHE_V2. 
 
 The resources under ./aacs/android/restrictedAssets are licensed under the Amazon Program Materials License Agreement (the “PMLA”). Please refer to ./aacs/android/restrictedAssets/LICENSE_PMLA file for more information.

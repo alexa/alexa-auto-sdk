@@ -23,7 +23,9 @@ namespace audio {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.audio.IStreamAudioStream");
 
-IStreamAudioStream::IStreamAudioStream(std::shared_ptr<std::istream> stream, const aace::audio::AudioFormat& audioFormat) :
+IStreamAudioStream::IStreamAudioStream(
+    std::shared_ptr<std::istream> stream,
+    const aace::audio::AudioFormat& audioFormat) :
         m_stream(stream), m_audioFormat(audioFormat), m_closed(false) {
 }
 

@@ -263,14 +263,14 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
     rapidjson::Value avsDeviceSDKElement(rapidjson::kObjectType);
 
-    rapidjson::Value certifiedSenderElement(rapidjson::kObjectType);
+    rapidjson::Value miscDatabaseElement(rapidjson::kObjectType);
 
-    certifiedSenderElement.AddMember(
+    miscDatabaseElement.AddMember(
         "databaseFilePath",
         rapidjson::Value().SetString(databaseFilePath.c_str(), databaseFilePath.length()),
         document.GetAllocator());
 
-    avsDeviceSDKElement.AddMember("miscDatabase", certifiedSenderElement, document.GetAllocator());
+    avsDeviceSDKElement.AddMember("miscDatabase", miscDatabaseElement, document.GetAllocator());
 
     aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());

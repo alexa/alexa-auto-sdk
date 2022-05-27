@@ -189,28 +189,28 @@ void AudioOutputProviderHandler::subscribeToAASBMessages() {
 }
 
 void AudioOutputProviderHandler::handleMutedStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received MutedStateChangedMessage");
 
     MutedStateChangedMessage msg = json::parse(message);
     mutedStateChanged(msg.payload.state);
 }
 
 void AudioOutputProviderHandler::handlePauseMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PauseMessage");
 
     PauseMessage msg = json::parse(message);
     pause(msg.payload.channel, msg.payload.token);
 }
 
 void AudioOutputProviderHandler::handlePlayMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PlayMessage");
 
     PlayMessage msg = json::parse(message);
     play(msg.payload.channel, msg.payload.token);
 }
 
 void AudioOutputProviderHandler::handlePrepareStreamMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PrepareStreamMessage");
 
     PrepareStreamMessage msg = json::parse(message);
     auto stream = m_messageBroker->openStream(msg.payload.streamId, MessageStream::Mode::READ);
@@ -218,61 +218,61 @@ void AudioOutputProviderHandler::handlePrepareStreamMessage(const std::string& m
 }
 
 void AudioOutputProviderHandler::handlePrepareURLMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PrepareURLMessage");
 
     PrepareURLMessage msg = json::parse(message);
     prepareURL(msg.payload.channel, msg.payload.audioType, msg.payload.url, msg.payload.repeating);
 }
 
 void AudioOutputProviderHandler::handleMayDuckMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received MayDuckMessage");
     mayDuck();
 }
 
 void AudioOutputProviderHandler::handleResumeMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ResumeMessage");
 
     ResumeMessage msg = json::parse(message);
     resume(msg.payload.channel, msg.payload.token);
 }
 
 void AudioOutputProviderHandler::handleSetPositionMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetPositionMessage");
 
     SetPositionMessage msg = json::parse(message);
     setPosition(msg.payload.position);
 }
 
 void AudioOutputProviderHandler::handleStopMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StopMessage");
 
     StopMessage msg = json::parse(message);
     stop(msg.payload.channel, msg.payload.token);
 }
 
 void AudioOutputProviderHandler::handleVolumeChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received VolumeChangedMessage");
 
     VolumeChangedMessage msg = json::parse(message);
     volumeChanged(msg.payload.volume);
 }
 
 void AudioOutputProviderHandler::handleStartDuckingMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StartDuckingMessage");
 
     StartDuckingMessage msg = json::parse(message);
     startDucking(msg.payload.channel, msg.payload.token);
 }
 
 void AudioOutputProviderHandler::handleStopDuckingMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StopDuckingMessage");
 
     StopDuckingMessage msg = json::parse(message);
     stopDucking(msg.payload.channel, msg.payload.token);
 }
 
 void AudioOutputProviderHandler::handleGetDurationMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetDurationMessage");
     GetDurationMessage msg = json::parse(message);
 
     // Publish the reply message for getDuration.
@@ -284,7 +284,7 @@ void AudioOutputProviderHandler::handleGetDurationMessage(const std::string& mes
 }
 
 void AudioOutputProviderHandler::handleGetNumBytesBufferedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetNumBytesBufferedMessage");
     GetNumBytesBufferedMessage msg = json::parse(message);
 
     // Publish the reply message for getNumBytesBuffered.
@@ -296,7 +296,7 @@ void AudioOutputProviderHandler::handleGetNumBytesBufferedMessage(const std::str
 }
 
 void AudioOutputProviderHandler::handleGetPositionMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetPositionMessage");
     GetPositionMessage msg = json::parse(message);
 
     // Publish the reply message for getPosition.

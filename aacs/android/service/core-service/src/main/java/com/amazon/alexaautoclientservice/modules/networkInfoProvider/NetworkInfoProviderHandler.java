@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
@@ -79,9 +80,13 @@ public class NetworkInfoProviderHandler extends NetworkInfoProvider {
     }
 
     private void updateNetworkStatus() {
-        NetworkInfo activeNetwork = mConnectivityManager.getActiveNetworkInfo();
-        if (activeNetwork != null) {
-            NetworkInfo.State state = activeNetwork.getState();
+        NetworkInfo activeNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+        if (activeNetworkInfo == null) {
+            Network activeNetwork = mConnectivityManager.getActiveNetwork();
+            activeNetworkInfo = mConnectivityManager.getNetworkInfo(activeNetwork);
+        }
+        if (activeNetworkInfo != null) {
+            NetworkInfo.State state = activeNetworkInfo.getState();
             switch (state) {
                 case CONNECTED:
                     mStatus = NetworkStatus.CONNECTED;

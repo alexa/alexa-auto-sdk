@@ -39,14 +39,13 @@ public:
 
 public:
     AudioFormat(
-        Encoding encoding  = Encoding::UNKNOWN,
+        Encoding encoding = Encoding::UNKNOWN,
         SampleFormat sampleFormat = SampleFormat::UNKNOWN,
         Layout layout = Layout::UNKNOWN,
         Endianness endianness = Endianness::UNKNOWN,
         uint32_t sampleRate = 0,
         uint8_t sampleSize = 0,
-        uint8_t channels = 0
-    );
+        uint8_t channels = 0);
 
     /**
      * Returns the encoding for the @c AudioFormat. If the encoding is not known

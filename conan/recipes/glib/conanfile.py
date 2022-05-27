@@ -36,7 +36,7 @@ class GLibConan(ConanFile):
     _build_subfolder = "build_subfolder"
     short_paths = True
     generators = "pkg_config"
-    requires = ["zlib/1.2.11", "libffi/3.3"]
+    requires = ["libffi/3.3"]
     build_requires = ["meson/0.56.2", "pkgconf/1.7.3"]
 
     @property
@@ -66,7 +66,7 @@ class GLibConan(ConanFile):
 
     def requirements(self):
         if self.options.with_pcre:
-            self.requires("pcre/8.44")
+            self.requires("pcre/8.44#50abeceaacae2133e3ce9e340e714976")
         if self.options.with_elf:
             self.requires("libelf/0.8.13")
         if self.options.get_safe("with_mount"):
@@ -252,7 +252,7 @@ class GLibConan(ConanFile):
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.components["gio-2.0"].system_libs.append("dl")
         self.cpp_info.components["gio-2.0"].requires.extend(
-            ["glib-2.0", "gobject-2.0", "gmodule-2.0", "zlib::zlib"]
+            ["glib-2.0", "gobject-2.0", "gmodule-2.0"]
         )
         if self.settings.os == "Macos":
             self.cpp_info.components["gio-2.0"].frameworks.append("AppKit")
@@ -296,4 +296,3 @@ class GLibConan(ConanFile):
         bin_path = os.path.join(self.package_folder, "bin")
         self.output.info("Appending PATH env var with: {}".format(bin_path))
         self.env_info.PATH.append(bin_path)
-

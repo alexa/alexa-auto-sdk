@@ -98,38 +98,58 @@ void AlexaClientEngineImpl::onConnectionStatusChanged(
         alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
         engineStatuses) {
     std::ostringstream log;
+    std::vector<aace::alexa::AlexaClient::ConnectionStatusInfo> detailed;
     log << "aggregateStatus=" << status;
     for (auto engineStatus : engineStatuses) {
         log << ";"
             << "engineType=" << engineStatus.engineType << ",";
         log << "status=" << engineStatus.status << ",";
         log << "reason=" << engineStatus.reason;
+
+        aace::alexa::AlexaClient::ConnectionType connectionType;
+
+        try {
+            connectionType = convertConnectionType(engineStatus.engineType);
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG).d("reason", ex.what()));
+            continue;
+        }
+
+        detailed.emplace_back(
+            connectionType, convertConnectionStatus(engineStatus.status), convertReason(engineStatus.reason));
     }
     AACE_INFO(LX(TAG).m(log.str()));
+
+    alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason =
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::NONE;
+    // Choose the first reason that matches the current status
+    // If more connection types are supported in the future, make sure the aggregated status only reflects
+    // the recognized types and drop the reason for unrecognized ones.
+    for (const auto& engineStatus : engineStatuses) {
+        if (engineStatus.status == status) {
+            AACE_VERBOSE(LX(TAG).d("Using status from engine type", engineStatus.engineType));
+            reason = engineStatus.reason;
+            break;
+        }
+    }
+    std::stringstream connectionStatus;
+    std::stringstream changedReason;
+    connectionStatus << status;
+    changedReason << reason;
+
     if (status != m_connectionStatus) {
         m_connectionStatus = status;
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason =
-            alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason::NONE;
-        // Choose the first reason that matches the current status
-        for (const auto& engineStatus : engineStatuses) {
-            if (engineStatus.status == status) {
-                AACE_VERBOSE(LX(TAG).d("Using status from engine type", engineStatus.engineType));
-                reason = engineStatus.reason;
-                break;
-            }
-        }
-        std::stringstream connectionStatus;
-        std::stringstream changedReason;
-        connectionStatus << status;
-        changedReason << reason;
+
         emitCounterMetrics(
             METRIC_PROGRAM_NAME_SUFFIX,
             "onConnectionStatusChanged",
             {METRIC_ALEXA_CLIENT_CONNECTION_STATUS_CHANGED, connectionStatus.str(), changedReason.str()});
-        m_alexaClientPlatformInterface->connectionStatusChanged(
-            static_cast<aace::alexa::AlexaClient::ConnectionStatus>(status),
-            static_cast<aace::alexa::AlexaClient::ConnectionChangedReason>(reason));
+        m_alexaClientPlatformInterface->connectionStatusChanged(convertConnectionStatus(status), convertReason(reason));
     }
+
+    // Provide separate engine statuses irrespective of the current aggregated status
+    m_alexaClientPlatformInterface->connectionStatusChanged(
+        convertConnectionStatus(status), convertReason(reason), detailed);
 }
 
 // DialogUXStateObserverInterface

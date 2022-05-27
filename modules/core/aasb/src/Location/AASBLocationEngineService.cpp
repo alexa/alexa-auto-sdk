@@ -32,13 +32,17 @@ static const aace::engine::core::Version minRequiredVersion = VERSION("4.0");
 REGISTER_SERVICE(AASBLocationEngineService);
 
 AASBLocationEngineService::AASBLocationEngineService(const aace::engine::core::ServiceDescription& description) :
-        aace::engine::messageBroker::MessageHandlerEngineService(description, minRequiredVersion, {"LocationProvider"}) {
+        aace::engine::messageBroker::MessageHandlerEngineService(
+            description,
+            minRequiredVersion,
+            {"LocationProvider"}) {
 }
 
 bool AASBLocationEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // LocationProvider

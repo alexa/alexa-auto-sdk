@@ -27,7 +27,9 @@ namespace messageBroker {
 
 class StreamManagerInterface {
 public:
-    virtual bool registerStreamHandler(const std::string& streamId, std::shared_ptr<aace::core::MessageStream> stream) = 0;
+    virtual bool registerStreamHandler(
+        const std::string& streamId,
+        std::shared_ptr<aace::core::MessageStream> stream) = 0;
 
     virtual std::shared_ptr<aace::core::MessageStream> requestStreamHandler(
         const std::string& streamId,

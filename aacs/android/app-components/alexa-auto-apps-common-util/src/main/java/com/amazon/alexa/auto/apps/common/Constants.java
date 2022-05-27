@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apps.common;
 
 public class Constants {
@@ -11,6 +25,7 @@ public class Constants {
     public static final String SETUP_DONE = "SETUP_DONE";
     public static final String PUSH_TO_TALK = "PUSH_TO_TALK";
     public static final String CBL_START = "CBL_START";
+    public static final String WORK_TOGETHER = "WORK_TOGETHER";
 
     public static final String UPDATE_ASSISTANT_STATUS = "UPDATE_ASSISTANT_STATUS";
     public static final String UPDATE_ASSISTANT_GESTURE = "UPDATE_ASSISTANT_GESTURE";
@@ -41,4 +56,11 @@ public class Constants {
     public static final String APL_RUNTIME_PROPERTY_THEME_NAME = "theme";
     public static final String APL_RUNTIME_PROPERTY_DRIVING_STATE_VALUE_MOVING = "moving";
     public static final String APL_RUNTIME_PROPERTY_DRIVING_STATE_VALUE_PARKED = "parked";
+
+    // Car UX Restrictions
+    public static final String CAR_UX_RESTRICTIONS_DRIVING_STATE_ACTION =
+            "com.amazon.alexa.auto.uxrestrictions.drivingStateChanged";
+    public static final String CAR_UX_RESTRICTIONS_DRIVING_STATE_ACTION_EXTRA_KEY = "drivingState";
+    public static final String CAR_UX_RESTRICTIONS_DRIVING_STATE_VALUE_MOVING = "moving";
+    public static final String CAR_UX_RESTRICTIONS_DRIVING_STATE_VALUE_PARKED = "parked";
 }

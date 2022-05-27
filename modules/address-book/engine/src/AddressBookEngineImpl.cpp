@@ -57,27 +57,70 @@ AddressBookEngineImpl::AddressBookEngineImpl(std::shared_ptr<aace::addressBook::
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG), m_platformInterface(platformInterface) {
 }
 
-void AddressBookEngineImpl::addObserver(std::shared_ptr<AddressBookObserver> observer) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_observers.insert(observer);
+void AddressBookEngineImpl::addObserver(std::shared_ptr<AddressBookObserver> observer, const std::string& serviceType) {
+    try {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        ThrowIfNot(m_observers.find(serviceType) == m_observers.end(), "serviceTypeFound");
 
-    for (auto& pair : m_addressBookEntities) {
-        auto addressBookEntity = pair.second;
-        observer->addressBookAdded(addressBookEntity);
+        m_observers[serviceType] = observer;
+
+        for (auto& pair : m_addressBookEntities) {
+            auto addressBookEntity = pair.second;
+            if (!m_addressBookDelegate ||
+                m_addressBookDelegate->isAddressBookServiceEnabled(serviceType, addressBookEntity->getType())) {
+                observer->addressBookAdded(addressBookEntity);
+            }
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "addObserver").d("reason", ex.what()));
     }
 }
 
 void AddressBookEngineImpl::doShutdown() {
-    for (auto observer : m_observers) {
-        observer.reset();
-    }
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_observers.clear();
     m_addressBookEntities.clear();
+    m_addressBookDelegate.reset();
     m_platformInterface.reset();
 }
 
 void AddressBookEngineImpl::removeObserver(std::shared_ptr<AddressBookObserver> observer) {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_observers.erase(observer);
+    auto itr = m_observers.begin();
+    while (itr != m_observers.end()) {
+        if (itr->second == observer) {
+            itr = m_observers.erase(itr);
+            return;
+        } else {
+            ++itr;
+        }
+    }
+    AACE_ERROR(LX(TAG, "removeObserver").d("reason", "observerNotFound"));
+}
+
+void AddressBookEngineImpl::setDelegate(std::shared_ptr<AddressBookDelegateInterface> delegate) {
+    try {
+        ThrowIfNull(delegate, "nullAddressBookDelegate");
+        m_addressBookDelegate = delegate;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "setDelegate").d("reason", ex.what()));
+    }
+}
+
+void AddressBookEngineImpl::servicesEnablementChanged() {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_addressBookDelegate != nullptr) {
+        for (auto& pair : m_addressBookEntities) {
+            auto addressBookEntity = pair.second;
+            for (auto& observer : m_observers) {
+                if (m_addressBookDelegate->isAddressBookServiceEnabled(observer.first, addressBookEntity->getType())) {
+                    observer.second->addressBookAdded(addressBookEntity);
+                } else {
+                    observer.second->addressBookRemoved(addressBookEntity);
+                }
+            }
+        }
+    }
 }
 
 bool AddressBookEngineImpl::onAddAddressBook(
@@ -96,7 +139,9 @@ bool AddressBookEngineImpl::onAddAddressBook(
         m_addressBookEntities[addressBookSourceId] = addressBookEntity;
 
         for (auto& observer : m_observers) {
-            ThrowIfNot(observer->addressBookAdded(addressBookEntity), "addressBookAddedFailed");
+            if (!m_addressBookDelegate || m_addressBookDelegate->isAddressBookServiceEnabled(observer.first, type)) {
+                ThrowIfNot(observer.second->addressBookAdded(addressBookEntity), "addressBookAddedFailed");
+            }
         }
 
         return true;
@@ -120,7 +165,10 @@ bool AddressBookEngineImpl::onRemoveAddressBook(const std::string& addressBookSo
             m_addressBookEntities.erase(it);
 
             for (auto observer : m_observers) {
-                ThrowIfNot(observer->addressBookRemoved(addressBookEntity), "addressBookRemovedFailed");
+                if (!m_addressBookDelegate ||
+                    m_addressBookDelegate->isAddressBookServiceEnabled(observer.first, addressBookEntity->getType())) {
+                    ThrowIfNot(observer.second->addressBookRemoved(addressBookEntity), "addressBookRemovedFailed");
+                }
             }
         } else {
             m_addressBookEntities.clear();
@@ -131,13 +179,13 @@ bool AddressBookEngineImpl::onRemoveAddressBook(const std::string& addressBookSo
             // the corresponding address book on the cloud by specified address book type.
             auto phoneBookEntity = std::make_shared<AddressBookEntity>("", "", AddressBookType::CONTACT);
             for (auto observer : m_observers) {
-                ThrowIfNot(observer->addressBookRemoved(phoneBookEntity), "addressBookRemovedFailed");
+                ThrowIfNot(observer.second->addressBookRemoved(phoneBookEntity), "addressBookRemovedFailed");
             }
 
             // Do the same for the uploaded navigation books
             auto navigationBookEntity = std::make_shared<AddressBookEntity>("", "", AddressBookType::NAVIGATION);
             for (auto observer : m_observers) {
-                ThrowIfNot(observer->addressBookRemoved(navigationBookEntity), "addressBookRemovedFailed");
+                ThrowIfNot(observer.second->addressBookRemoved(navigationBookEntity), "addressBookRemovedFailed");
             }
         }
 

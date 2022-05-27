@@ -1,9 +1,23 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.dependencies;
 
 import android.content.Context;
 
+import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import com.amazon.alexa.auto.apps.common.util.config.LocalesProvider;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
@@ -34,14 +48,14 @@ public class ConfigModule {
     }
 
     /**
-     * Provides instance of {@link LocalesProvider}.
+     * Provides instance of {@link AlexaLocalesProvider}.
      *
      * @param context Android Context.
      */
     @Provides
     @Singleton
-    public LocalesProvider provideLocalesProvider(
+    public AlexaLocalesProvider provideLocalesProvider(
             WeakReference<Context> context, @Named(CONFIG_EXECUTOR_SERVICE) ExecutorService executorService) {
-        return new LocalesProvider(context, executorService);
+        return new AlexaLocalesProvider(context, executorService);
     }
 }

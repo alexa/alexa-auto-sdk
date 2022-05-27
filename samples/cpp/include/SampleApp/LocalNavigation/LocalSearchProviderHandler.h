@@ -35,6 +35,7 @@ namespace localNavigation {
 class LocalSearchProviderHandler : public extension::Extension {
     // Enable extension for dynamic loading
     ENABLE_EXTENSION;
+
 private:
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler;
     std::shared_ptr<aace::core::MessageBroker> m_messageBroker;
@@ -61,7 +62,7 @@ private:
      * @param [in] message The message received from the Engine
      */
     void handleSearchRequestMessage(const std::string& message);
-    
+
     /**
      * Handles a LookupRequestMessage received from the Engine.
      *

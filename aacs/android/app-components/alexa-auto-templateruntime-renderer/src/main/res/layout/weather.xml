@@ -3,7 +3,7 @@
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent_black">
+    android:background="@android:color/transparent">
 
     <LinearLayout
         android:id="@+id/close_weather_card_layout"
@@ -37,7 +37,7 @@
 
             <TextView
                 android:id="@+id/weather_card_mainTitle"
-                style="@style/WeatherText"
+                style="@style/DisplayCardsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/weather_card_title_textSize"
@@ -49,7 +49,7 @@
 
             <TextView
                 android:id="@+id/weather_card_subTitle"
-                style="@style/WeatherText"
+                style="@style/DisplayCardsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/weather_card_title_marginStart"

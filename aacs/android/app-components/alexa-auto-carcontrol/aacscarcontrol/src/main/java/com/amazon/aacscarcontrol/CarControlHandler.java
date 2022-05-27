@@ -42,7 +42,9 @@ public class CarControlHandler {
             mCarManager = null;
         } else {
             mCarManager = (CarPropertyManager) car.getCarManager(Car.PROPERTY_SERVICE);
-            if (mHelper == null) { mHelper = new CarControlHelper(context); }
+            if (mHelper == null) {
+                mHelper = new CarControlHelper(context);
+            }
         }
     }
 
@@ -57,14 +59,17 @@ public class CarControlHandler {
             Log.e(TAG, "Car Property Manager is null");
             return false;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.POWER_CONTROLLER, "");
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.POWER_CONTROLLER, "");
         if (setting == null) {
             Log.e(TAG, String.format("Property setting %s cannot be found from Car Control configuration", endpointId));
             return false;
         }
         try {
             mCarManager.setBooleanProperty(setting.propertyId, setting.areaId, turnOn);
-            Log.d(TAG, String.format("Turn Power Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, turnOn));
+            Log.d(TAG,
+                    String.format("Turn Power Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId,
+                            setting.areaId, turnOn));
             return true;
         } catch (SecurityException | IllegalArgumentException e) {
             Log.e(TAG, String.format("Error when change Power controller %s with exception %s", endpointId, e));
@@ -77,7 +82,8 @@ public class CarControlHandler {
             Log.e(TAG, "Car Property Manager is null");
             return false;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.POWER_CONTROLLER, "");
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.POWER_CONTROLLER, "");
         if (setting == null) {
             Log.e(TAG, String.format("Property setting %s cannot be found from Car Control configuration", endpointId));
             return false;
@@ -95,9 +101,12 @@ public class CarControlHandler {
             Log.e(TAG, "Car Property Manager is null");
             return false;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.TOGGLE_CONTROLLER, instance);
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.TOGGLE_CONTROLLER, instance);
         if (setting == null) {
-            Log.e(TAG, String.format("Property setting combination %s, %s cannot be found from Car Control configuration", endpointId, instance));
+            Log.e(TAG,
+                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
+                            endpointId, instance));
             return false;
         }
         try {
@@ -108,11 +117,15 @@ public class CarControlHandler {
                     } else {
                         mCarManager.setIntProperty(setting.propertyId, setting.areaId, 0);
                     }
-                    Log.d(TAG, String.format("Turn Toggle Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, turnOn));
+                    Log.d(TAG,
+                            String.format("Turn Toggle Controller for PropertyID: %s at AreaID: %s to %s",
+                                    setting.propertyId, setting.areaId, turnOn));
                     return true;
                 case BOOLEAN:
                     mCarManager.setBooleanProperty(setting.propertyId, setting.areaId, turnOn);
-                    Log.d(TAG, String.format("Turn Toggle Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, turnOn));
+                    Log.d(TAG,
+                            String.format("Turn Toggle Controller for PropertyID: %s at AreaID: %s to %s",
+                                    setting.propertyId, setting.areaId, turnOn));
                     return true;
                 default:
                     Log.e(TAG, "Configuration Setting Type not correct when changeToggleController");
@@ -129,16 +142,20 @@ public class CarControlHandler {
             Log.e(TAG, "Car Property Manager is null");
             return false;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.TOGGLE_CONTROLLER, instance);
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.TOGGLE_CONTROLLER, instance);
         if (setting == null) {
-            Log.e(TAG, String.format("Property setting combination %s, %s cannot be found from Car Control configuration", endpointId, instance));
+            Log.e(TAG,
+                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
+                            endpointId, instance));
             return false;
         }
         try {
             return mCarManager.getBooleanProperty(setting.propertyId, setting.areaId);
         } catch (SecurityException | IllegalArgumentException e) {
-            Log.e(TAG, String.format("Error when change Toggle controller %s for instance %s with exception %s",
-                    endpointId, instance, e));
+            Log.e(TAG,
+                    String.format("Error when change Toggle controller %s for instance %s with exception %s",
+                            endpointId, instance, e));
             return false;
         }
     }
@@ -148,27 +165,37 @@ public class CarControlHandler {
             Log.e(TAG, "Car Property Manager is null");
             return false;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
         if (setting == null) {
-            Log.e(TAG, String.format("Property setting combination %s, %s cannot be found from Car Control configuration", endpointId, instance));
+            Log.e(TAG,
+                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
+                            endpointId, instance));
             return false;
         }
         try {
             switch (setting.dataType) {
                 case INT:
                     mCarManager.setIntProperty(setting.propertyId, setting.areaId, (int) value);
-                    Log.d(TAG, String.format("Set Range Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, value));
+                    Log.d(TAG,
+                            String.format("Set Range Controller for PropertyID: %s at AreaID: %s to %s",
+                                    setting.propertyId, setting.areaId, value));
                     return true;
                 case FLOAT:
-                    if (mCarManager.getIntProperty(VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS,
-                            CarControlConstants.AREA_GLOBAL) == CarControlConstants.CELSIUS_UNIT) {
+                    if (mCarManager.getIntProperty(
+                                VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS, CarControlConstants.AREA_GLOBAL)
+                            == CarControlConstants.CELSIUS_UNIT) {
                         mCarManager.setFloatProperty(setting.propertyId, setting.areaId, (float) value);
                     } else if (mCarManager.getIntProperty(VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS,
-                            CarControlConstants.AREA_GLOBAL) == CarControlConstants.FAHRENHEIT_UNIT) {
+                                       CarControlConstants.AREA_GLOBAL)
+                            == CarControlConstants.FAHRENHEIT_UNIT) {
                         // Need to do conversion here since Android internally uses Celsius
-                        mCarManager.setFloatProperty(setting.propertyId, setting.areaId, CarControlUtil.celcius((float) value));
+                        mCarManager.setFloatProperty(
+                                setting.propertyId, setting.areaId, CarControlUtil.celcius((float) value));
                     }
-                    Log.d(TAG, String.format("Set Range Controller for PropertyID: %s at AreaID: %s to %f", setting.propertyId, setting.areaId, value));
+                    Log.d(TAG,
+                            String.format("Set Range Controller for PropertyID: %s at AreaID: %s to %f",
+                                    setting.propertyId, setting.areaId, value));
                     return true;
                 default:
                     Log.e(TAG, "Configuration Setting Type not correct when setRangeControllerValue");
@@ -190,20 +217,29 @@ public class CarControlHandler {
             Log.e(TAG, "Invalid Current Range Value");
             return false;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
         if (setting == null) {
-            Log.e(TAG, String.format("Property setting combination %s, %s cannot be found from Car Control configuration", endpointId, instance));
+            Log.e(TAG,
+                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
+                            endpointId, instance));
             return false;
         }
         try {
             switch (setting.dataType) {
                 case INT:
-                    mCarManager.setIntProperty(setting.propertyId, setting.areaId, (int) (currentRangeControllerValue + delta));
-                    Log.d(TAG, String.format("Adjust Range Controller for PropertyID: %s at AreaID: %s by %s", setting.propertyId, setting.areaId, delta));
+                    mCarManager.setIntProperty(
+                            setting.propertyId, setting.areaId, (int) (currentRangeControllerValue + delta));
+                    Log.d(TAG,
+                            String.format("Adjust Range Controller for PropertyID: %s at AreaID: %s by %s",
+                                    setting.propertyId, setting.areaId, delta));
                     return true;
                 case FLOAT:
-                    mCarManager.setFloatProperty(setting.propertyId, setting.areaId, ((float)currentRangeControllerValue + (float)delta));
-                    Log.d(TAG, String.format("Adjust Range Controller for PropertyID: %s at AreaID: %s by %s", setting.propertyId, setting.areaId, delta));
+                    mCarManager.setFloatProperty(
+                            setting.propertyId, setting.areaId, ((float) currentRangeControllerValue + (float) delta));
+                    Log.d(TAG,
+                            String.format("Adjust Range Controller for PropertyID: %s at AreaID: %s by %s",
+                                    setting.propertyId, setting.areaId, delta));
                     return true;
                 default:
                     Log.e(TAG, "Configuration Setting Type not correct when adjustRangeControllerValue");
@@ -222,9 +258,12 @@ public class CarControlHandler {
             Log.e(TAG, "Car Property Manager is null");
             return -1.0;
         }
-        CarControlHelper.PropertySetting setting = mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
+        CarControlHelper.PropertySetting setting =
+                mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
         if (setting == null) {
-            Log.e(TAG, String.format("Property setting combination %s, %s cannot be found from Car Control configuration", endpointId, instance));
+            Log.e(TAG,
+                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
+                            endpointId, instance));
             return -1.0;
         }
         try {
@@ -238,7 +277,8 @@ public class CarControlHandler {
                     return -1.0;
             }
         } catch (SecurityException | IllegalArgumentException e) {
-            Log.e(TAG, String.format("Error when getting value for Range controller %s with exception %s", endpointId, e));
+            Log.e(TAG,
+                    String.format("Error when getting value for Range controller %s with exception %s", endpointId, e));
             return -1.0;
         }
     }
@@ -251,7 +291,10 @@ public class CarControlHandler {
         List<CarControlHelper.PropertySetting> settings =
                 mHelper.getPropertySettings(endpointId, CarControlConstants.MODE_CONTROLLER, instance, value);
         if (settings == null || settings.size() == 0) {
-            Log.e(TAG, String.format("Property setting combination %s, %s, %s cannot be found from Car Control configuration", endpointId, instance, value));
+            Log.e(TAG,
+                    String.format(
+                            "Property setting combination %s, %s, %s cannot be found from Car Control configuration",
+                            endpointId, instance, value));
             return false;
         }
         try {
@@ -259,25 +302,33 @@ public class CarControlHandler {
                 switch (setting.dataType) {
                     case INT:
                         mCarManager.setIntProperty(setting.propertyId, setting.areaId, Integer.parseInt(setting.value));
-                        Log.d(TAG, String.format("Set Mode Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, setting.value));
+                        Log.d(TAG,
+                                String.format("Set Mode Controller for PropertyID: %s at AreaID: %s to %s",
+                                        setting.propertyId, setting.areaId, setting.value));
                         continue;
                     case BOOLEAN:
-                        mCarManager.setBooleanProperty(setting.propertyId, setting.areaId,
-                                Boolean.parseBoolean(setting.value));
-                        Log.d(TAG, String.format("Set Mode Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, setting.value));
+                        mCarManager.setBooleanProperty(
+                                setting.propertyId, setting.areaId, Boolean.parseBoolean(setting.value));
+                        Log.d(TAG,
+                                String.format("Set Mode Controller for PropertyID: %s at AreaID: %s to %s",
+                                        setting.propertyId, setting.areaId, setting.value));
                         continue;
                     case FLOAT:
-                        if (mCarManager.getIntProperty(VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS,
-                                CarControlConstants.AREA_GLOBAL) == CarControlConstants.CELSIUS_UNIT) {
-                            mCarManager.setFloatProperty(setting.propertyId, setting.areaId,
-                                    Float.parseFloat(setting.value));
+                        if (mCarManager.getIntProperty(
+                                    VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS, CarControlConstants.AREA_GLOBAL)
+                                == CarControlConstants.CELSIUS_UNIT) {
+                            mCarManager.setFloatProperty(
+                                    setting.propertyId, setting.areaId, Float.parseFloat(setting.value));
                         } else if (mCarManager.getIntProperty(VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS,
-                                CarControlConstants.AREA_GLOBAL) == CarControlConstants.FAHRENHEIT_UNIT) {
+                                           CarControlConstants.AREA_GLOBAL)
+                                == CarControlConstants.FAHRENHEIT_UNIT) {
                             // Need to do conversion here since Android internally uses Celsius
                             mCarManager.setFloatProperty(setting.propertyId, setting.areaId,
                                     CarControlUtil.celcius(Float.parseFloat(setting.value)));
                         }
-                        Log.d(TAG, String.format("Set Mode Controller for PropertyID: %s at AreaID: %s to %s", setting.propertyId, setting.areaId, setting.value));
+                        Log.d(TAG,
+                                String.format("Set Mode Controller for PropertyID: %s at AreaID: %s to %s",
+                                        setting.propertyId, setting.areaId, setting.value));
                         continue;
                     default:
                         Log.e(TAG, "Configuration Setting Type not correct when setModeControllerValue");
@@ -309,16 +360,17 @@ public class CarControlHandler {
             for (int i = 0; i < supportedModes.length(); i++) {
                 if (supportedModes.getJSONObject(i).getString(CarControlConstants.VALUE).equals(curMode)) {
                     if (i + delta > supportedModes.length() - 1) {
-                        setModeControllerValue(endpointId, instance, supportedModes
-                                .getJSONObject(supportedModes.length() - 1).getString(CarControlConstants.VALUE));
+                        setModeControllerValue(endpointId, instance,
+                                supportedModes.getJSONObject(supportedModes.length() - 1)
+                                        .getString(CarControlConstants.VALUE));
                         break;
                     } else if (i + delta < 0) {
-                        setModeControllerValue(endpointId, instance, supportedModes.getJSONObject(0)
-                                .getString(CarControlConstants.VALUE));
+                        setModeControllerValue(endpointId, instance,
+                                supportedModes.getJSONObject(0).getString(CarControlConstants.VALUE));
                         break;
                     } else {
-                        setModeControllerValue(endpointId, instance, supportedModes.getJSONObject(i + delta)
-                                .getString(CarControlConstants.VALUE));
+                        setModeControllerValue(endpointId, instance,
+                                supportedModes.getJSONObject(i + delta).getString(CarControlConstants.VALUE));
                         break;
                     }
                 }

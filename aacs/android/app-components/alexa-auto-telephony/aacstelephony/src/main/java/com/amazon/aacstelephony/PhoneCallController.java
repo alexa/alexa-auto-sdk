@@ -277,26 +277,31 @@ public class PhoneCallController extends InCallService {
     }
 
     public PhoneAccountHandle getPhoneAccount() {
-        if (mTelephonyServiceContext.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Log.e(TAG,"Failed to get the outgoing phone account due to missing READ_PHONE_STATE permission");
+        if (mTelephonyServiceContext.checkSelfPermission(android.Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "Failed to get the outgoing phone account due to missing READ_PHONE_STATE permission");
             return null;
         }
         PhoneAccountHandle selectedHandle = mTelecomManager.getDefaultOutgoingPhoneAccount(PhoneAccount.SCHEME_TEL);
 
-        // if getDefaultOutgoingPhoneAccount returns null, call getCallCapablePhoneAccounts to get all the valid phone accounts.
-        // if there is only one valid account, then return the handle for that account. Otherwise, return null.
+        // if getDefaultOutgoingPhoneAccount returns null, call getCallCapablePhoneAccounts to get all the valid phone
+        // accounts. if there is only one valid account, then return the handle for that account. Otherwise, return
+        // null.
         if (selectedHandle == null) {
             Log.i(TAG, "getDefaultOutgoingAccount returns null, calling getCallCapablePhoneAccounts");
             List<PhoneAccountHandle> validHandles = new ArrayList<>();
             for (PhoneAccountHandle handle : mTelecomManager.getCallCapablePhoneAccounts()) {
                 PhoneAccount phoneAccount = mTelecomManager.getPhoneAccount(handle);
-                if (phoneAccount == null) continue;
+                if (phoneAccount == null)
+                    continue;
                 // verify the phone account is not an emergency account
-                if (phoneAccount.getShortDescription() == null || !phoneAccount.getShortDescription().toString().contains("Emergency")) {
+                if (phoneAccount.getShortDescription() == null
+                        || !phoneAccount.getShortDescription().toString().contains("Emergency")) {
                     validHandles.add(handle);
                 }
             }
-            if (validHandles.size() == 1) selectedHandle = validHandles.get(0);
+            if (validHandles.size() == 1)
+                selectedHandle = validHandles.get(0);
         }
         return selectedHandle;
     }

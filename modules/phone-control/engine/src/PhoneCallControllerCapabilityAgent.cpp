@@ -421,6 +421,9 @@ void PhoneCallControllerCapabilityAgent::callStateChanged(
         case aace::phoneCallController::PhoneCallControllerEngineInterface::CallState::CALL_RECEIVED:
             internalState = CallState::INVITED;
             break;
+        default:
+            AACE_ERROR(LX(TAG).d("reason", "unknownState").d("state", (int)state));
+            return;
     }
 
     m_executor.submit(
@@ -477,7 +480,9 @@ std::string PhoneCallControllerCapabilityAgent::getContextString() {
 
         rapidjson::Value device(rapidjson::kObjectType);
         device.AddMember(
-            "connectionState", rapidjson::Value(connectionStateToString(m_connectionState).c_str(), allocator), allocator);
+            "connectionState",
+            rapidjson::Value(connectionStateToString(m_connectionState).c_str(), allocator),
+            allocator);
         document.AddMember("device", device, allocator);
 
         rapidjson::Value configuration(rapidjson::kObjectType);
@@ -504,7 +509,8 @@ std::string PhoneCallControllerCapabilityAgent::getContextString() {
             }
             rapidjson::Value tempCall(rapidjson::kObjectType);
             tempCall.AddMember("callId", rapidjson::Value(it.first.c_str(), allocator), allocator);
-            tempCall.AddMember("callState", rapidjson::Value(callStateToString(it.second).c_str(), allocator), allocator);
+            tempCall.AddMember(
+                "callState", rapidjson::Value(callStateToString(it.second).c_str(), allocator), allocator);
             allCalls.PushBack(tempCall, allocator);
         }
         document.AddMember("allCalls", allCalls, allocator);
@@ -524,15 +530,15 @@ std::string PhoneCallControllerCapabilityAgent::getContextString() {
 }
 
 const std::pair<std::string, std::string> PhoneCallControllerCapabilityAgent::buildEventAndUpdateContext(
-        const std::string& eventName,
-        const std::string& payload) {
+    const std::string& eventName,
+    const std::string& payload) {
     const std::pair<std::string, std::string> emptyPair;
     std::string context = getContextString();
     rapidjson::Document contextPayload;
     if (contextPayload.Parse(context.c_str()).HasParseError()) {
         AACE_ERROR(LX(TAG).d("reason", "failedToParseContextPayload"));
         return emptyPair;
-    } 
+    }
     rapidjson::Document document(rapidjson::kArrayType);
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);

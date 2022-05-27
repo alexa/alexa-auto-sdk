@@ -73,7 +73,7 @@ void NotificationsHandler::subscribeToAASBMessages() {
 }
 
 void NotificationsHandler::handleSetIndicatorMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetIndicatorMessage");
     SetIndicatorMessage msg = json::parse(message);
     setIndicator(msg.payload.state);
 }
@@ -108,7 +108,7 @@ void NotificationsHandler::setIndicator(IndicatorState state) {
 }
 
 void NotificationsHandler::handleOnNotificationReceived(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received OnNotificationReceived");
 }
 
 void NotificationsHandler::log(logger::LoggerHandler::Level level, const std::string& message) {

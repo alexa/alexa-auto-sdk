@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.amazon.aacsconstants.AACSConstants;
+import com.amazon.aacsipc.IPCUtils;
 import com.amazon.alexaautoclientservice.AlexaAutoClientService;
 import com.amazon.alexaautoclientservice.util.FileUtil;
 
@@ -39,7 +40,8 @@ public class StartOnBootReceiver extends BroadcastReceiver {
 
             Intent startIntent = new Intent(context, AlexaAutoClientService.class);
             startIntent.putExtra(AACSConstants.NEW_CONFIG, false);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+                    && !IPCUtils.getInstance(context).isSystemApp()) {
                 context.startForegroundService(startIntent);
             } else {
                 context.startService(startIntent);

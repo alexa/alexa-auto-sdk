@@ -30,11 +30,7 @@ class AASBEngineService
         : public aace::engine::core::EngineService
         , public std::enable_shared_from_this<AASBEngineService> {
 public:
-    DESCRIBE(
-        "aace.aasb", 
-        VERSION("1.0"),
-        DEPENDS(aace::engine::messageBroker::MessageBrokerEngineService)
-    )
+    DESCRIBE("aace.aasb", VERSION("1.0"), DEPENDS(aace::engine::messageBroker::MessageBrokerEngineService))
 
 private:
     AASBEngineService(const aace::engine::core::ServiceDescription& description);

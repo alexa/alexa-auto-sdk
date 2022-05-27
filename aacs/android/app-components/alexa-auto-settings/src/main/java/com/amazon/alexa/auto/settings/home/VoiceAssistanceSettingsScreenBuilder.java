@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings.home;
 
 import static com.amazon.alexa.auto.apps.common.Constants.ALEXA;
@@ -22,10 +36,10 @@ import androidx.navigation.Navigation;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 
-import com.amazon.alexa.auto.apis.alexaCustomAssistant.SettingsProvider;
-import com.amazon.alexa.auto.apis.alexaCustomAssistant.SetupProvider;
 import com.amazon.alexa.auto.apis.alexaCustomAssistant.AssistantManager;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.SettingsProvider;
 import com.amazon.alexa.auto.apis.alexaCustomAssistant.SetupController;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.SetupProvider;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.auth.AuthMode;
@@ -114,6 +128,9 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
             Preference signOutPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_SIGNOUT);
             if (signOutPref != null)
                 screen.removePreference(signOutPref);
+            Preference thingsToTryPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_THINGS_TO_TRY);
+            if (thingsToTryPref != null)
+                screen.removePreference(thingsToTryPref);
 
             if (mApp == null) {
                 mApp = fetchAlexaApp(screen.getContext());
@@ -234,11 +251,10 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onAssistantMessage(AssistantMessage message) {
-        Log.d(TAG,
-                "Receiving assistant message, action: " + message.getAction());
+        Log.d(TAG, "Receiving assistant message, action: " + message.getAction());
         String action = message.getAction();
 
-        switch(action) {
+        switch (action) {
             case ASSISTANTS_GESTURE_CHANGED:
                 updatePTTPreference(message.getAssistantName());
                 break;
@@ -250,11 +266,9 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
 
     private void updatePTTPreference(String defaultPTTAssistant) {
         if (mPushToTalkPref != null) {
-            mPushToTalkPref.setSummary(
-                    ALEXA.equals(defaultPTTAssistant) ?
-                            R.string.setting_voice_assistance_setting_push_to_talk_alexa :
-                            R.string.setting_voice_assistance_setting_push_to_talk_non_alexa
-            );
+            mPushToTalkPref.setSummary(ALEXA.equals(defaultPTTAssistant)
+                            ? R.string.setting_voice_assistance_setting_push_to_talk_alexa
+                            : R.string.setting_voice_assistance_setting_push_to_talk_non_alexa);
         }
     }
 
@@ -277,7 +291,7 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
             screen.removePreference(mNonAlexaEnablePref);
         }
 
-        switch(assistantState) {
+        switch (assistantState) {
             case ALEXA_DISABLED:
                 screen.addPreference(mAlexaEnablePref);
                 screen.addPreference(mNonAlexaPref);
@@ -307,8 +321,7 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
             Log.i(TAG, "Switching navigation graph's destination to alexa-only view");
             NavController controller = findNavController(view);
 
-            SetupProvider setupProvider =
-                    mApp.getRootComponent().getComponent(SetupProvider.class).get();
+            SetupProvider setupProvider = mApp.getRootComponent().getComponent(SetupProvider.class).get();
             NavGraph graph = controller.getNavInflater().inflate(setupProvider.getCustomSetupNavigationGraph());
             graph.setStartDestination(setupProvider.getSetupWorkflowStartDestinationByKey(ALEXA));
 
@@ -319,7 +332,8 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
             mApp.getRootComponent()
                     .getComponent(AlexaSetupWorkflowController.class)
                     .ifPresent(alexaSetupWorkflowController -> {
-                        alexaSetupWorkflowController.startSetupWorkflow(view.getContext(), controller, VoiceAssistanceEvent.ALEXA_ONLY);
+                        alexaSetupWorkflowController.startSetupWorkflow(
+                                view.getContext(), controller, VoiceAssistanceEvent.ALEXA_ONLY);
                     });
         }
     }
@@ -333,8 +347,7 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
         if (mApp.getRootComponent().getComponent(SetupProvider.class).isPresent()) {
             Log.i(TAG, "Switching navigation graph's destination to non-alexa-only view");
             NavController controller = findNavController(view);
-            SetupProvider setupProvider =
-                    mApp.getRootComponent().getComponent(SetupProvider.class).get();
+            SetupProvider setupProvider = mApp.getRootComponent().getComponent(SetupProvider.class).get();
             NavGraph graph = controller.getNavInflater().inflate(setupProvider.getCustomSetupNavigationGraph());
             graph.setStartDestination(setupProvider.getSetupWorkflowStartDestinationByKey(NONALEXA));
 
@@ -345,7 +358,8 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
             mApp.getRootComponent()
                     .getComponent(AlexaSetupWorkflowController.class)
                     .ifPresent(alexaSetupWorkflowController -> {
-                        alexaSetupWorkflowController.startSetupWorkflow(view.getContext(), controller, VoiceAssistanceEvent.NON_ALEXA_ONLY);
+                        alexaSetupWorkflowController.startSetupWorkflow(
+                                view.getContext(), controller, VoiceAssistanceEvent.NON_ALEXA_ONLY);
                     });
         }
     }
@@ -376,16 +390,14 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
     @VisibleForTesting
     SettingsProvider fetchSettingsProvider(@NonNull Context context) {
         AlexaApp app = AlexaApp.from(context);
-        Optional<SettingsProvider> settingsProvider =
-                app.getRootComponent().getComponent(SettingsProvider.class);
+        Optional<SettingsProvider> settingsProvider = app.getRootComponent().getComponent(SettingsProvider.class);
         return settingsProvider.orElse(null);
     }
 
     @VisibleForTesting
     AssistantManager fetchAssistantManager(@NonNull Context context) {
         AlexaApp app = AlexaApp.from(context);
-        Optional<AssistantManager> assistantManager =
-                app.getRootComponent().getComponent(AssistantManager.class);
+        Optional<AssistantManager> assistantManager = app.getRootComponent().getComponent(AssistantManager.class);
         return assistantManager.orElse(null);
     }
 

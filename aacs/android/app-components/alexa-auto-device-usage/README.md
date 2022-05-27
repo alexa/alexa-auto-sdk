@@ -3,8 +3,9 @@ Alexa Auto Device Usage library provides an implementation that enables the AACS
 
 ## Overview
 The library consists of the following components:
-*  `AASBReceiver`. This Android BroadcastReceiver subsribes to [AASB StartService message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/aasb/aasb-docs/AASB/index.html#startservice) and [AASB StopService message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/aasb/aasb-docs/AASB/index.html#stopservice) to get the current AACS running status, based on which the `DeviceUsageHandler` can start or stop the network data recording.
-*  `DeviceUsageHandler`. The handler is responsible for starting and stopping the `NetworkStatsManagerRunner` according to the AACS running status. It starts the `NetworkStatsManagerRunner` in an executor thread which queries the network usage every 5 minutes and publishes the data via [DeviceUsage `ReportNetworkDataUsageMessage` message](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/core/aasb-docs/DeviceUsage/index.html#reportnetworkdatausage) to the Auto SDK engine.
+
+*  `AASBReceiver`. This Android BroadcastReceiver subsribes to [AASB StartService message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/aasb/AASB/index.html#startservice) and [AASB StopService message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/aasb/AASB/index.html#stopservice) to get the current AACS running status, based on which the `DeviceUsageHandler` can start or stop the network data recording.
+*  `DeviceUsageHandler`. The handler is responsible for starting and stopping the `NetworkStatsManagerRunner` according to the AACS running status. It starts the `NetworkStatsManagerRunner` in an executor thread which queries the network usage every 5 minutes and publishes the data via [DeviceUsage `ReportNetworkDataUsageMessage` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/DeviceUsage/index.html#reportnetworkdatausage) to the Auto SDK engine.
 *  `NetworkStatsManagerRunner`. This class captures the network usage data using `NetworkStatsManager` APIs and calls the `DeviceUsageHandler` to report the data.
 
 ## Providing Permissions for Alexa Auto Device Usage Library

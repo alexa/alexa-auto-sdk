@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ private:
 
     MessageBrokerImpl() = default;
 
-    std::string getMessageType(
+    static std::string getMessageType(
         Message::Direction direction,
         const std::string& topic = "*",
         const std::string& action = "*");
@@ -47,7 +47,24 @@ private:
     Message publishSync(const PublishMessage& pm, aace::engine::utils::threading::Executor& executor);
     void reply(const PublishMessage& pm);
 
-    void notifySubscribers(const std::string& type, const Message& message);
+    /**
+     * Notifies subscribers of the specified type about a message.
+     *
+     * @param type a string containing message direction, topic, and action, e.g. "OUTGOING:LocationProvider:*"
+     * @param message the message to notify about
+     *
+     * @return the number of subscribers notified
+     */
+    size_t notifySubscribers(const std::string& type, const Message& message);
+
+    /**
+     * Notifies all subscribers interested in the specified message.
+     *
+     * @param message the message to notify about
+     *
+     * @return the number of subscriber notified
+     */
+    size_t notifySubscribers(const Message& message);
 
     void addSyncMessagePromise(const std::string& messageId, std::shared_ptr<SyncPromiseType> promise);
     void removeSyncMessagePromise(const std::string& messageId);
@@ -76,6 +93,8 @@ public:
         override;
 
 private:
+    bool m_isShutdown = false;
+
     // executor for deferred asynchronous message sending
     aace::engine::utils::threading::Executor m_incomingMessageExecutor;
     aace::engine::utils::threading::Executor m_outgoingMessageExecutor;
@@ -86,8 +105,9 @@ private:
     // mutex and map for handling synchronous messages
     std::mutex m_pub_sub_mutex;
     std::mutex m_promise_map_access_mutex;
+    std::mutex m_wait_for_sync_response_mutex;
     std::unordered_map<std::string, std::shared_ptr<SyncPromiseType>> m_syncMessagePromiseMap;
-    
+
     // message time out
     std::chrono::milliseconds m_timeout = std::chrono::milliseconds(500);
 };
@@ -96,4 +116,4 @@ private:
 }  // namespace engine
 }  // namespace aace
 
-#endif // AACE_ENGINE_MESSAGE_BROKER_MESSAGE_BROKER_IMPL_H
+#endif  // AACE_ENGINE_MESSAGE_BROKER_MESSAGE_BROKER_IMPL_H

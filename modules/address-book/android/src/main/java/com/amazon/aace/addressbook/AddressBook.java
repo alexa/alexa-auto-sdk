@@ -18,8 +18,8 @@ package com.amazon.aace.addressbook;
 import com.amazon.aace.core.PlatformInterface;
 
 /**
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */
@@ -71,7 +71,8 @@ abstract public class AddressBook extends PlatformInterface {
     /**
      * Notifies the engine on a non-availability of an already available address book.
      *
-     * @param [in] addressBookSourceId A unique identifier for an address book. Set this to empty string for engine to remove all uploaded address books.
+     * @param [in] addressBookSourceId A unique identifier for an address book. Set this to empty string for engine to
+     *         remove all uploaded address books.
      * @return @c false if address book does not already added or some internal error otherwise @c true on successful.
      */
     final public boolean removeAddressBook(String addressBookSourceId) {

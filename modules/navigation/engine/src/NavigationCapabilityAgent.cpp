@@ -106,13 +106,13 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterfac
         ThrowIfNull( exceptionSender, "nullExceptionSender" );
         ThrowIfNull( messageSender, "nullMessageSender" );
         ThrowIfNull( contextManager, "nullContextManager" );
-        
+
         auto navigationCapabilityAgent = std::shared_ptr<NavigationCapabilityAgent>( new NavigationCapabilityAgent( navigationHandler, exceptionSender, contextManager, messageSender, navigationProviderName ) );
 
         ThrowIfNull( navigationCapabilityAgent, "nullNavigationCapabilityAgent" );
 
         contextManager->setStateProvider( NAVIGATION_STATE, navigationCapabilityAgent );
-        
+
         return navigationCapabilityAgent;
     }
     catch( std::exception& ex ) {
@@ -212,11 +212,11 @@ void NavigationCapabilityAgent::doShutdown() {
 void NavigationCapabilityAgent::sendExceptionEncounteredAndReportFailed( std::shared_ptr<DirectiveInfo> info, const std::string& message, alexaClientSDK::avsCommon::avs::ExceptionErrorType type )
 {
     m_exceptionEncounteredSender->sendExceptionEncountered( info->directive->getUnparsedDirective(), type, message );
-    
+
     if( info && info->result ) {
         info->result->setFailed( message );
     }
-    
+
     removeDirective( info );
 }
 
@@ -235,7 +235,7 @@ void NavigationCapabilityAgent::setHandlingCompleted( std::shared_ptr<DirectiveI
     if( info && info->result ) {
         info->result->setCompleted();
     }
-    
+
     removeDirective( info );
 }
 
@@ -254,7 +254,7 @@ void NavigationCapabilityAgent::handleStartNavigationDirective( std::shared_ptr<
         sendExceptionEncounteredAndReportFailed( info, "Missing waypoints list", alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
         return;
     }
-    
+
     m_executor.submit([this, info]() {
         m_navigationHandler->startNavigation( info->directive->getPayload() );
         setHandlingCompleted( info );
@@ -312,7 +312,7 @@ void NavigationCapabilityAgent::navigationEvent( aace::navigation::NavigationEng
         executeNavigationEvent( event );
     });
 }
-    
+
 void NavigationCapabilityAgent::navigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description )
 {
     m_executor.submit( [this, type, code, description] {
@@ -325,7 +325,7 @@ void NavigationCapabilityAgent::executeProvideState( const alexaClientSDK::avsCo
     try
     {
         ThrowIfNull( m_contextManager, "contextManagerIsNull" );
-        bool payloadChanged = false; 
+        bool payloadChanged = false;
         std::string payload;
 
         payload = m_navigationHandler->getNavigationState();
@@ -421,14 +421,14 @@ std::string NavigationCapabilityAgent::getWaypointErrorCode( aace::navigation::N
 //
 // Navigation success event handling
 //
-    
+
 void NavigationCapabilityAgent::startNavigationSuccess() {
     std::string navigationState;
     navigationState = m_navigationHandler->getNavigationState();
     rapidjson::Document context( rapidjson::kObjectType );
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
-    
+
     context.Parse( navigationState.c_str() );
 
     rapidjson::Document waypointsArray( rapidjson::kArrayType );
@@ -496,18 +496,14 @@ void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess()
 //
 // Navigation fail event handling
 //
-    
+
 void NavigationCapabilityAgent::startNavigationError( std::string code, std::string description)
 {
-
     rapidjson::Document payload( rapidjson::kObjectType );
-    rapidjson::Document errorPayload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
 
-    errorPayload.AddMember( "code", rapidjson::Value( code.c_str(), allocator ), allocator );
-    errorPayload.AddMember( "description", rapidjson::Value( description.c_str(), allocator ), allocator );
-
-    payload.AddMember( "payload", errorPayload, payload.GetAllocator());
+    payload.AddMember( "code", rapidjson::Value( code.c_str(), allocator ), allocator );
+    payload.AddMember( "description", rapidjson::Value( description.c_str(), allocator ), allocator );
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
@@ -557,15 +553,15 @@ bool NavigationCapabilityAgent::isNavigationStateValid( std::string navigationSt
     {
         rapidjson::Document document;
         document.Parse<0>( navigationState.c_str() );
-        
+
         if( document.HasParseError() ) {
             rapidjson::ParseErrorCode ok = document.GetParseError();
             AACE_ERROR(LX(TAG).d( "HasParseError", GetParseError_En(ok) ) );
             Throw( "parseError" );
         }
-        
+
         ThrowIfNot( document.HasMember("state"), "stateKeyMissing");
-        
+
         if( document[ "state" ].IsNull() || !document[ "state" ].IsString() ) {
             Throw( "stateNotValid" );
         }
@@ -579,12 +575,12 @@ bool NavigationCapabilityAgent::isNavigationStateValid( std::string navigationSt
             if( !document[ "waypoints" ].IsArray() ) {
                 Throw( "waypointsArrayNotValid" );
             }
-            
+
             auto waypoints = document["waypoints"].GetArray();
-            for ( int i = 0; i < waypoints.Size() ; i++ ) {
+            for ( size_t i = 0; i < waypoints.Size() ; i++ ) {
                 auto waypoint  = waypoints[i].GetObject();
                 ThrowIfNot( waypoint.HasMember("type"), "waypointTypeMissing");
-                
+
                 std::string waypointType = waypoint["type"].GetString();
                 if( waypoint[ "type" ].IsNull() || !waypoint[ "type" ].IsString() ) {
                     Throw( "waypointTypeNotValid" );
@@ -599,7 +595,7 @@ bool NavigationCapabilityAgent::isNavigationStateValid( std::string navigationSt
                     ThrowIfNot( estimatedTimeOfArrival.HasMember("predicted"), "predictedTimeOfArrivalMissing");
                     if ( ( estimatedTimeOfArrival.HasMember("ideal") && !estimatedTimeOfArrival["ideal"].IsString() ) ||
                          ( estimatedTimeOfArrival.HasMember("predicted") && !estimatedTimeOfArrival["predicted"].IsString() ) ) {
-                        
+
                         Throw( "estimatedTimeOfArrivalNotString" );
                     }
                 }
@@ -622,7 +618,7 @@ bool NavigationCapabilityAgent::isNavigationStateValid( std::string navigationSt
                         Throw( "waypointNameNotValid" );
                     }
                 }
-                
+
                 ThrowIfNot( waypoint.HasMember("coordinate"), "waypointcoordinateMissing");
                 auto coordinate = waypoint["coordinate"].GetArray();
                 if ( coordinate[0].IsNull() ) {
@@ -656,7 +652,7 @@ bool NavigationCapabilityAgent::isNavigationStateValid( std::string navigationSt
         rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
         document.Accept( writer );
         navigationState = buffer.GetString();
-        
+
         // set current navigation state payload
         m_navigationStatePayload = navigationState;
         return true;

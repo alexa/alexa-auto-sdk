@@ -14,6 +14,7 @@
  */
 
 #include <AASB/Engine/TextToSpeech/AASBTextToSpeech.h>
+#include <AACE/Engine/Utils/UUID/UUID.h>
 #include <AACE/Engine/Core/EngineMacros.h>
 
 #include <AASB/Message/TextToSpeech/TextToSpeech/GetCapabilitiesMessage.h>
@@ -120,7 +121,8 @@ void AASBTextToSpeech::prepareSpeechCompleted(
         aasb::message::textToSpeech::textToSpeech::PrepareSpeechCompletedMessage message;
         message.payload.streamId = streamId;
         message.payload.token = m_currentToken;
-        message.payload.encoding = static_cast<aasb::message::textToSpeech::textToSpeech::AudioStreamEncoding>(preparedAudio->getEncoding());
+        message.payload.encoding =
+            static_cast<aasb::message::textToSpeech::textToSpeech::AudioStreamEncoding>(preparedAudio->getEncoding());
         message.payload.properties = {};
 
         // add the properties to the map

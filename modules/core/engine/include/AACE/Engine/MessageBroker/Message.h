@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -36,13 +36,14 @@ public:
 
     Message(const std::string& msg, Direction direction);
 
-    const bool valid() const;
+    bool valid() const;
 
-    const Direction& direction() const;
+    Direction direction() const;
+    Direction replyDirection() const;
 
     // header
     const std::string& messageId() const;
-    const MessageType& messageType() const;
+    MessageType messageType() const;
 
     // message description
     const std::string& topic() const;
@@ -50,10 +51,10 @@ public:
     const std::string& replyTo() const;
 
     // payload
-    const std::string payload() const;
+    std::string payload() const;
 
     // serialize
-    const std::string str() const;
+    std::string str() const;
 
     // symbolic constants
     static const Message INVALID;
@@ -82,6 +83,9 @@ inline std::ostream& operator<<(std::ostream& stream, const Message::Direction& 
         case Message::Direction::OUTGOING:
             stream << "OUTGOING";
             break;
+        default:
+            stream << "INVALID";
+            break;
     }
     return stream;
 }
@@ -93,6 +97,9 @@ inline std::ostream& operator<<(std::ostream& stream, const Message::MessageType
             break;
         case Message::MessageType::REPLY:
             stream << "REPLY";
+            break;
+        default:
+            stream << "INVALID";
             break;
     }
     return stream;

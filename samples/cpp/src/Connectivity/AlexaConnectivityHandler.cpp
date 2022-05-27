@@ -107,7 +107,7 @@ void AlexaConnectivityHandler::subscribeToAASBMessages() {
 }
 
 void AlexaConnectivityHandler::handleGetConnectivityStateMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetConnectivityStateMessage");
 
     // Publish the "GetConnectivityStateReply" message
     GetConnectivityStateMessage msg = json::parse(message);
@@ -118,7 +118,7 @@ void AlexaConnectivityHandler::handleGetConnectivityStateMessage(const std::stri
 }
 
 void AlexaConnectivityHandler::handleGetIdentifierMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetIdentifierMessage");
 
     // Publish the "GetIdentifierReply" message
     GetIdentifierMessage msg = json::parse(message);
@@ -129,7 +129,7 @@ void AlexaConnectivityHandler::handleGetIdentifierMessage(const std::string& mes
 }
 
 void AlexaConnectivityHandler::handleConnectivityStateChangeReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ConnectivityStateChangeReplyMessage");
     ConnectivityStateChangeMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);
@@ -141,7 +141,7 @@ void AlexaConnectivityHandler::handleConnectivityStateChangeReplyMessage(const s
 }
 
 void AlexaConnectivityHandler::handleSendConnectivityEventReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SendConnectivityEventReplyMessage");
     SendConnectivityEventMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);

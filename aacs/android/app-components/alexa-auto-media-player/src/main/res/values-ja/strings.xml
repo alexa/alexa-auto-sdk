@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Alexaメディア</string>
+    <string name="app_name">Alexa Media</string>
     <string name="notification_channel">Alexaミュージック</string>
     <string name="notification_channel_description">Alexaミュージック（メディアコントロール）</string>
     <string name="notification_service_title">Alexaミュージック</string>

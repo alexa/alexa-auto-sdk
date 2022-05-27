@@ -1,0 +1,75 @@
+From 29a6c4cf58e335d6f053460c869c45b3eacaa89b Mon Sep 17 00:00:00 2001
+From: Patrick Tsai <yingtsai@amazon.com>
+Date: Tue, 15 Feb 2022 23:17:37 +0000
+Subject: [PATCH] Add RELWITHDEBINFO build type
+
+---
+ modules/Alexa/build/cmake/BuildOptions.cmake | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/modules/Alexa/build/cmake/BuildOptions.cmake b/modules/Alexa/build/cmake/BuildOptions.cmake
+index 4cf9fa6..bee2e4c 100644
+--- a/modules/Alexa/build/cmake/BuildOptions.cmake
++++ b/modules/Alexa/build/cmake/BuildOptions.cmake
+@@ -12,7 +12,7 @@ if(NOT CMAKE_BUILD_TYPE)
+ endif()
+ 
+ # Verify the build type is valid.
+-set(buildTypes DEBUG RELEASE MINSIZEREL)
++set(buildTypes DEBUG RELEASE MINSIZEREL RELWITHDEBINFO)
+ 
+ string(TOUPPER "${CMAKE_BUILD_TYPE}" buildType)
+ 
+@@ -27,8 +27,8 @@ if (buildTypeFound EQUAL -1)
+     message("###############################################################################")
+     message("#                                                                             #")
+     message("# ERROR:                                                                      #")
+-    message("# Unknown build type selected. Please select from DEBUG, RELEASE, or          #")
+-    message("# MINSIZEREL.                                                                 #")
++    message("# Unknown build type selected. Please select from DEBUG, RELEASE, MINSIZEREL, #")
++    message("# or RELWITHDEBINFO.                                                          #")
+     message("#                                                                             #")
+     message("# Build Type:                                                                 #")
+     message("#     ${buildType}${buildTypePad}#")
+@@ -60,19 +60,23 @@ if (UNIX OR CMAKE_COMPILER_IS_GNUCXX)
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG      "-DDEBUG -DACSDK_LOG_ENABLED -DACSDK_DEBUG_LOG_ENABLED -Wall -Wsign-compare -g")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE    "-DNDEBUG -Wall -O2")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "-DNDEBUG -Wall -Os")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO    "-DNDEBUG -Wall -O2 -g")
+     if (CMAKE_COMPILER_IS_GNUCXX AND (NOT (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "8.0")))
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -Wno-error=class-memaccess")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -Wno-error=class-memaccess")
+         set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -Wno-error=class-memaccess")
++        set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -Wno-error=class-memaccess")
+     endif()
+     # Security flags
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG "${CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE} -fstack-protector-strong -Wformat -Wformat-security -Werror=format-security -D_FORTIFY_SOURCE=2")
+ elseif(MSVC)
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_DEBUG      "/DDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /DACSDK_LOG_ENABLED /DACSDK_DEBUG_LOG_ENABLED /W4 /Zi /VZ /ZW /Od /MDd")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_RELEASE    "/DNDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /W4 /O2 /VZ /ZW /MD")
+     set(CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL "/DNDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /W4 /O1 /VZ /ZW /MD")
++    set(CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO    "/DNDEBUG /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING /W4 /O2 /VZ /ZW /MD /Zi")
+ 	add_definitions("-DNOMINMAX")
+ 	add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+ 
+@@ -102,9 +106,14 @@ set(CMAKE_C_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE} CACHE INTERNAL "Flags used
+ set(CMAKE_CXX_FLAGS_MINSIZEREL "${CXX_PLATFORM_DEPENDENT_FLAGS_MINSIZEREL} -DRAPIDJSON_HAS_STDSTRING" CACHE INTERNAL "Flags used for minimum sized RELEASE builds" FORCE)
+ set(CMAKE_C_FLAGS_MINSIZEREL ${CMAKE_CXX_FLAGS_RELEASE} CACHE INTERNAL "Flags used for minimum sized RELEASE builds" FORCE)
+ 
++# Release build with debug info
++set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CXX_PLATFORM_DEPENDENT_FLAGS_RELWITHDEBINFO} -DRAPIDJSON_HAS_STDSTRING" CACHE INTERNAL "Flags used for RELWITHDEBINFO builds" FORCE)
++set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -g" CACHE INTERNAL  "Flags used for RELWITHDEBINFO builds" FORCE)
++
+ # Linker flags
+ if(CMAKE_SYSTEM_NAME MATCHES "^(Linux|Android|QNX)$")
+     set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
+     set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
+     set(CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
++    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
+ endif()
+-- 
+2.35.1
+

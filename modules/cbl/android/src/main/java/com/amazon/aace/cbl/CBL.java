@@ -20,8 +20,8 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * CBL should be extended to perform CBL authentication.
  *
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

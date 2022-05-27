@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation project(path: ':aacs-annotation-api')
+    implementation project(path: ':aacs-annotation-api')
+    implementation 'com.squareup:javapoet:1.12.1'
+}

@@ -83,7 +83,7 @@
         ThreadContext context;                           \
         ThrowIfNot(context.isValid(), "invalidContext"); \
         JNIEnv* env = context.getEnv();                  \
-        ThrowIfNot(env,"invalidJavaEnv");
+        ThrowIfNot(env, "invalidJavaEnv");
 
 #define catch_with_ex \
     }                 \

@@ -85,13 +85,13 @@ std::shared_ptr<TextToSpeechSynthesizerInterface> TextToSpeechEngineService::get
     const std::string& name) {
     try {
         std::lock_guard<std::mutex> lock(m_textToSpeechProviderMutex);
-        ThrowIf(m_registeredTextToSpeechProviders.empty(),"noTextToSpeechProvidersRegistered");
+        ThrowIf(m_registeredTextToSpeechProviders.empty(), "noTextToSpeechProvidersRegistered");
         // look for the specified provider - or default if empty
         auto it = m_registeredTextToSpeechProviders.find(name.empty() ? m_preferedProvider : name);
         ThrowIf(it == m_registeredTextToSpeechProviders.end(), "invalidTextToSpeechProvider");
         return it->second;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason",ex.what()).d("name",name));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("name", name));
         return nullptr;
     }
 }
@@ -107,7 +107,7 @@ void TextToSpeechEngineService::registerTextToSpeechProvider(
             m_registeredTextToSpeechProviders.find(textToSpeechProviderName) != m_registeredTextToSpeechProviders.end(),
             "textToSpeechProviderAlreadyRegistered");
         m_registeredTextToSpeechProviders[textToSpeechProviderName] = textToSpeechProvider;
-        if( m_preferedProvider.empty() ) {
+        if (m_preferedProvider.empty()) {
             m_preferedProvider = textToSpeechProviderName;
         }
     } catch (std::exception& ex) {

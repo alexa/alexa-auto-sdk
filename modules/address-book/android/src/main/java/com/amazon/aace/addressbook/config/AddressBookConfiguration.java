@@ -35,10 +35,10 @@ public class AddressBookConfiguration {
      * }
      * @endcode
      *
-     * @param [in] cleanAllAddressBooksAtStart indicates whether to clean all address books at start. The default value is @c true.
+     * @param [in] cleanAllAddressBooksAtStart indicates whether to clean all address books at start. The default value
+     *         is @c true.
      */
-    public static EngineConfiguration createAddressBookConfig(
-            final boolean cleanAllAddressBooksAtStart) {
+    public static EngineConfiguration createAddressBookConfig(final boolean cleanAllAddressBooksAtStart) {
         return new EngineConfiguration() {
             @Override
             protected long createNativeRef() {

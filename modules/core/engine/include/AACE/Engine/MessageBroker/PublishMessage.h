@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -35,13 +35,13 @@ public:
     using InvokeHandler = std::function<Message(const PublishMessage& pm, bool sync)>;
 
     PublishMessage(
-        Message::Direction direction, 
-        const std::string& message, 
-        const std::chrono::milliseconds& timeout,
+        Message::Direction direction,
+        const std::string& message,
+        std::chrono::milliseconds timeout,
         InvokeHandler invokeHandler);
     PublishMessage(const PublishMessage& pm);
 
-    PublishMessage& timeout(const std::chrono::milliseconds& duration);
+    PublishMessage& timeout(std::chrono::milliseconds duration);
     PublishMessage& success(SuccessHandler handler);
     PublishMessage& error(ErrorHandler handler);
 
@@ -49,14 +49,14 @@ public:
     Message get();
 
     // accessor methods
-    const Message::Direction direction() const;
-    const std::string msg() const;
-    const std::chrono::milliseconds timeout() const;
-    const SuccessHandler successHandler() const;
-    const ErrorHandler errorHandler() const;
+    Message::Direction direction() const;
+    std::string msg() const;
+    std::chrono::milliseconds timeout() const;
+    SuccessHandler successHandler() const;
+    ErrorHandler errorHandler() const;
 
-    const Message message() const;
-    const bool valid() const;
+    Message message() const;
+    bool valid() const;
 
 protected:
     Message::Direction m_direction;

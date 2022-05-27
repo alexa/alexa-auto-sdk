@@ -51,7 +51,8 @@ std::shared_ptr<AASBEqualizerController> AASBEqualizerController::create(
     }
 }
 
-bool AASBEqualizerController::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBEqualizerController::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         m_messageBroker = messageBroker;
 

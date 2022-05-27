@@ -123,6 +123,8 @@ public class APLPresenter implements IPresenter, ISendEventCallback, IDataSource
     }
 
     /**
+     * @deprecated
+     *
      * Constructs the APLPresenter object.
      *
      * @param aplLayouts A map of windows ids to the corresponding APL layouts.
@@ -164,6 +166,51 @@ public class APLPresenter implements IPresenter, ISendEventCallback, IDataSource
         sendDeviceWindowState();
 
         // Listen for touch events
+        setupTouchListener();
+    }
+
+    /**
+     * Constructs the APLPresenter object.
+     *
+     * @param visualCharacteristics The array of defined visual characteristics for the device.
+     * @param defaultWindowId The Id of the window where APL will be rendered if one is not specified in the render
+     *         document request.
+     * @param aplEventSender The object used to send events back to the cloud.
+     */
+    public APLPresenter(@NonNull JSONArray visualCharacteristics, @NonNull String defaultWindowId,
+            @NonNull final IAPLEventSender aplEventSender) throws IllegalStateException {
+        // Initialize must be called prior to instantiation of this class.
+        if (mContext == null) {
+            throw new IllegalStateException("Context is null. Make sure initialize() is called with non null context.");
+        }
+
+        Preconditions.checkNotNull(visualCharacteristics);
+        Preconditions.checkNotNull(defaultWindowId);
+        Preconditions.checkState(!defaultWindowId.isEmpty());
+        Preconditions.checkNotNull(aplEventSender);
+
+        mVisualCharacteristics = visualCharacteristics;
+        mAplEventSender = aplEventSender;
+        mDefaultWindowId = defaultWindowId;
+        APLSingleton.getInstance().init(mContext, mAplEventSender, this);
+        mApplicationComponent = APLSingleton.getInstance().getApplicationComponent();
+        mActivityComponent = initActivityComponent(mContext);
+        mBackStack = new BackStack();
+
+        // Default property values
+        mRuntimeProperties = new Hashtable<>();
+        mRuntimeProperties.put("drivingState", "moving");
+        mRuntimeProperties.put("theme", "dark");
+        mRuntimeProperties.put("video", "disabled");
+
+        // Initial window state
+        sendDeviceWindowState();
+    }
+
+    public void setAPLLayout(@NonNull final Map<String, APLLayout> aplLayouts) {
+        Preconditions.checkNotNull(aplLayouts);
+        mAplLayouts = aplLayouts;
+
         setupTouchListener();
     }
 

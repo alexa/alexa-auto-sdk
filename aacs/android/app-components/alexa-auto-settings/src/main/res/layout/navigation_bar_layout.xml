@@ -11,6 +11,7 @@
 
     <ImageView
         android:id="@+id/navigate_back_button"
+        android:tag="nav_back_button"
         android:layout_width="@dimen/nav_bar_icon_height_width"
         android:layout_height="@dimen/nav_bar_icon_height_width"
         android:src="@drawable/ic_arrow_back"
@@ -26,7 +27,7 @@
 
     <TextView
         android:id="@+id/navigation_title_txtview"
-        android:textAppearance="@style/Alexa.Heading2Text"
+        android:textAppearance="@style/Alexa.TitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"

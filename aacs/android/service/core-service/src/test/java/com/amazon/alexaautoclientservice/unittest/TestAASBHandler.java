@@ -1,6 +1,7 @@
 package com.amazon.alexaautoclientservice.unittest;
 
 import android.content.Context;
+import android.os.Build;
 
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
@@ -13,10 +14,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.UUID;
 
 @RunWith(RobolectricTestRunner.class)
+@Config(sdk = {Build.VERSION_CODES.P})
 public class TestAASBHandler {
     private AASBHandler mAASBHandler;
 
@@ -27,7 +30,8 @@ public class TestAASBHandler {
 
     @Test
     public void testMessageReceived() {
-        String message = AASBUtil.constructAASBMessage("", Topic.SPEECH_RECOGNIZER, Action.WAKE_WORD_DETECTED, "");
+        String message = AASBUtil.constructAASBMessage(
+                "", Topic.SPEECH_RECOGNIZER, Action.SpeechRecognizer.WAKEWORD_DETECTED, "");
         mAASBHandler.messageReceived(message);
     }
 

@@ -17,6 +17,21 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_fragment_alexa_settings_things_to_try"
+        android:name="com.amazon.alexa.auto.settings.ThingsToTryFragment"
+        android:label="@string/setting_alexa_things_to_try">
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_fragment_alexa_settings_things_to_try_details"
+        android:name="com.amazon.alexa.auto.settings.ThingsToTryDetailsFragment"
+        android:label="Title:{title}">
+    <argument
+        android:name="title"
+        app:argType="string" />
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_fragment_alexa_settings_sounds"
         android:name="com.amazon.alexa.auto.settings.AlexaSoundPreferencesFragment"
         android:label="@string/setting_alexa_sounds">
@@ -38,6 +53,10 @@
         android:id="@+id/navigation_fragment_communication_consent"
         android:name="com.amazon.alexa.auto.comms.ui.fragment.settings.CommunicationPreferenceFragment"
         android:label="@string/setting_alexa_communication"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_assistAppSelection"
+        android:name="com.amazon.alexa.auto.settings.AssistAppSelectionFragment" />
 
     <action
         android:id="@+id/action_navigate_to_setup"

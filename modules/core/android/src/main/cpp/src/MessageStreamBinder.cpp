@@ -37,7 +37,8 @@ MessageStreamBinder::MessageStreamBinder(std::shared_ptr<aace::core::MessageStre
 #define Message_STREAM_BINDER(ref) reinterpret_cast<aace::jni::core::MessageStreamBinder*>(ref)
 
 extern "C" {
-JNIEXPORT void JNICALL Java_com_amazon_aace_core_MessageStream_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_core_MessageStream_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
     try {
         auto messageStreamBinder = Message_STREAM_BINDER(ref);
         ThrowIfNull(messageStreamBinder, "invalidMessageStreamBinder");
@@ -47,7 +48,8 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_core_MessageStream_disposeBinder(JNI
     }
 }
 
-JNIEXPORT jboolean JNICALL Java_com_amazon_aace_core_MessageStream_isClosed(JNIEnv* env, jobject /* this */, jlong ref) {
+JNIEXPORT jboolean JNICALL
+Java_com_amazon_aace_core_MessageStream_isClosed(JNIEnv* env, jobject /* this */, jlong ref) {
     try {
         auto messageStreamBinder = Message_STREAM_BINDER(ref);
         ThrowIfNull(messageStreamBinder, "invalidMessageStreamBinder");
@@ -104,7 +106,8 @@ JNIEXPORT jobject JNICALL Java_com_amazon_aace_core_MessageStream_getMode(JNIEnv
 
         jobject modeObj;
         ThrowIfNot(
-            aace::jni::core::JMode::checkType(messageStreamBinder->getMessageStream()->getMode(), &modeObj), "invalidMode");
+            aace::jni::core::JMode::checkType(messageStreamBinder->getMessageStream()->getMode(), &modeObj),
+            "invalidMode");
 
         return modeObj;
     } catch (const std::exception& ex) {

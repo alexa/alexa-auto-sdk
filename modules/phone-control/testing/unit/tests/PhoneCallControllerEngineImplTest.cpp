@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ public:
     MOCK_METHOD1( deviceConfigurationUpdated, void(std::unordered_map<aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap) );
     MOCK_METHOD0( createCallId, void() );
 };
-    
+
 class MockAuthDelegateInterface : public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface {
 public:
     MOCK_METHOD1( addAuthObserver, void(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface> observer) );
@@ -84,6 +84,9 @@ public:
     }
     std::string getACMSEndpoint() override {
         return "https://alexa-comms-mobile-service-na.amazon.com";
+    }
+    std::string getFeatureDiscoveryEndpoint() override {
+        return "";
     }
 };
 
@@ -132,7 +135,7 @@ public:
             alexaClientSDK::avsCommon::avs::initialization::AlexaClientSDKInit::uninitialize();
         }
     }
-    
+
     std::promise<bool> m_releaseChannelPromise;
     std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> m_engineImpl;
     std::shared_ptr<aace::phoneCallController::PhoneCallController> m_mockPlatformInterface;
@@ -151,7 +154,7 @@ TEST_F( PhoneCallControllerEngineImplTest, create ) {
 }
 
 TEST_F( PhoneCallControllerEngineImplTest, createWithNullPlatform ) {
-    std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl; 
+    std::shared_ptr<aace::engine::phoneCallController::PhoneCallControllerEngineImpl> engineImpl;
     engineImpl = aace::engine::phoneCallController::PhoneCallControllerEngineImpl::create(
         nullptr, m_alexaMockFactory->getEndpointBuilderMock(), m_mockContextManager, m_mockExceptionSender, m_mockMessageSender, m_mockFocusManager, m_mockAuthDelegate, m_deviceInfo, m_alexaEndpointInterface );
     EXPECT_EQ(nullptr, engineImpl);

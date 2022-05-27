@@ -25,9 +25,9 @@ import com.amazon.aace.core.PlatformInterface;
  * @sa com.amazon.aace.alexa.CoreProperties.java
  * @sa com.amazon.aace.alexa.NetworkProperties.java
  * @sa com.amazon.aace.alexa.VehicleProperties.java
- * 
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

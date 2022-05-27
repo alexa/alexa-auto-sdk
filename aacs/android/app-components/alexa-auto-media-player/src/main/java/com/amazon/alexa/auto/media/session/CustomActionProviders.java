@@ -1,13 +1,27 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.media.session;
 
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_LOOP;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_NEXT;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_PREVIOUS;
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SHUFFLE;
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SKIP_BACKWARD;
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SKIP_FORWARD;
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_THUMBS_DOWN;
 import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_THUMBS_UP;
-import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_NEXT;
-import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_PREVIOUS;
-import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_SHUFFLE;
-import static com.amazon.aacsconstants.TemplateRuntimeConstants.CONTROL_NAME_LOOP;
 
 import android.content.Context;
 
@@ -73,43 +87,34 @@ public class CustomActionProviders {
                 PlaybackConstants.PlaybackButton.SKIP_BACKWARD, false, false, false);
         mThumbsUpSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_like_selected, context.getString(R.string.playback_control_thumbsup),
-                PlaybackConstants.ToggleButton.THUMBS_UP, true,
-                false, false); // On click un-select thumbs up
+                PlaybackConstants.ToggleButton.THUMBS_UP, true, false, false); // On click un-select thumbs up
         mThumbsUpNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender, R.drawable.media_like,
                 context.getString(R.string.playback_control_thumbsup), PlaybackConstants.ToggleButton.THUMBS_UP, true,
                 true, false); // On click select thumbs up
         mThumbsDownSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_dislike_selected, context.getString(R.string.playback_control_thumbsdown),
-                PlaybackConstants.ToggleButton.THUMBS_DOWN, true,
-                false, false); // On click un-select thumbs down
+                PlaybackConstants.ToggleButton.THUMBS_DOWN, true, false, false); // On click un-select thumbs down
         mThumbsDownNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_dislike, context.getString(R.string.playback_control_thumbsdown),
-                PlaybackConstants.ToggleButton.THUMBS_DOWN, true,
-                true, false); // On click select thumbs down
+                PlaybackConstants.ToggleButton.THUMBS_DOWN, true, true, false); // On click select thumbs down
         mShuffleSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_shuffle_selected, context.getString(R.string.playback_control_shuffle),
-                PlaybackConstants.ToggleButton.SHUFFLE, true,
-                false, false); // On click un-select shuffle
-        mShuffleNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
-                R.drawable.media_shuffle, context.getString(R.string.playback_control_shuffle),
-                PlaybackConstants.ToggleButton.SHUFFLE, true,
+                PlaybackConstants.ToggleButton.SHUFFLE, true, false, false); // On click un-select shuffle
+        mShuffleNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender, R.drawable.media_shuffle,
+                context.getString(R.string.playback_control_shuffle), PlaybackConstants.ToggleButton.SHUFFLE, true,
                 true, false); // On click select shuffle
-        mLoopSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
-                R.drawable.media_repeat_selected, context.getString(R.string.playback_control_loop),
-                PlaybackConstants.ToggleButton.LOOP, true,
-                false, false); // On click un-select loop
-        mLoopNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender,
-                R.drawable.media_repeat, context.getString(R.string.playback_control_loop),
-                PlaybackConstants.ToggleButton.LOOP, true,
-                true, false); // On click select loop
+        mLoopSelectedProvider = new PlaybackControlButtonActionProvider(messageSender, R.drawable.media_repeat_selected,
+                context.getString(R.string.playback_control_loop), PlaybackConstants.ToggleButton.LOOP, true, false,
+                false); // On click un-select loop
+        mLoopNotSelectedProvider = new PlaybackControlButtonActionProvider(messageSender, R.drawable.media_repeat,
+                context.getString(R.string.playback_control_loop), PlaybackConstants.ToggleButton.LOOP, true, true,
+                false); // On click select loop
         mPreviousDisabledProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_skip_previous_disabled, context.getString(R.string.playback_control_previous),
-                PlaybackConstants.PlaybackButton.NEXT, false,
-                false, true);
+                PlaybackConstants.PlaybackButton.NEXT, false, false, true);
         mNextDisabledProvider = new PlaybackControlButtonActionProvider(messageSender,
                 R.drawable.media_skip_next_disabled, context.getString(R.string.playback_control_next),
-                PlaybackConstants.PlaybackButton.PREVIOUS, false,
-                false, true);
+                PlaybackConstants.PlaybackButton.PREVIOUS, false, false, true);
     }
 
     /**

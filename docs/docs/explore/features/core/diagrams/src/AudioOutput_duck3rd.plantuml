@@ -1,0 +1,49 @@
+@startuml
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+}
+</style>
+
+participant Application order 10
+participant "Auto SDK Engine" as AutoSDK <<engine>> order 20
+
+== New playback started ==
+
+AutoSDK->Application : Receive PrepareStream or PrepareURL Message
+...
+AutoSDK->Application : Receive MayDuck message
+note left of Application
+    This media is allowed to duck.
+    So whenever focus is lost temporarily 
+    due to high priority audio event,
+    Application can duck the volume
+end note
+...
+AutoSDK->Application : Receive Play message
+
+== Content volume ducked due to 3rd party audio ==
+
+note left of Application
+    Event like
+    AudioFocusChanged: Transient Loss
+end note
+Application->Application : Reduce Volume
+Application->AutoSDK : Publish AudioFocusEvent Message with "REPORT_DUCKING_STARTED" FocusAction
+
+== Content volume restored ==
+
+note left of Application
+    Event like
+    AudioFocusChanged: Gain
+end note
+Application->Application : Restore Volume
+Application->AutoSDK : Publish AudioFocusEvent Message with "REPORT_DUCKING_STOPPED" FocusAction
+
+
+@enduml

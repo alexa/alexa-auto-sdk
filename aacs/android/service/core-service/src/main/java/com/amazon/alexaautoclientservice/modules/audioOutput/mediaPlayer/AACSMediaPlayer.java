@@ -13,15 +13,15 @@
  * permissions and limitations under the License.
  */
 
-package com.amazon.alexaautoclientservice.mediaPlayer;
+package com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer;
 
-import com.amazon.aace.aasb.AASBStream;
+import com.amazon.aace.core.MessageStream;
 
 /**
  * interface used for playing TTS
  */
 public interface AACSMediaPlayer {
-    void prepare(AASBStream mediaStream, boolean repeating, String token);
+    void prepare(MessageStream mediaStream, boolean repeating, String token);
 
     void prepare(String url, boolean repeating, String token);
 

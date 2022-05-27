@@ -1,5 +1,13 @@
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
 import android.view.View;
 import android.widget.TextView;
@@ -27,14 +35,6 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class SetupNotCompleteFragmentTest {
     @Mock
@@ -55,8 +55,8 @@ public class SetupNotCompleteFragmentTest {
 
     @Test
     public void testOnFragmentLoad_inflatesSetupNotCompleteView() {
-        FragmentScenario<SetupNotCompleteFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(SetupNotCompleteFragment.class, null, new SetupNotCompleteFragmentFactory());
+        FragmentScenario<SetupNotCompleteFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                SetupNotCompleteFragment.class, null, new SetupNotCompleteFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -68,8 +68,8 @@ public class SetupNotCompleteFragmentTest {
 
     @Test
     public void testOnClickTryAgain_resetsSetupWorkflow() {
-        FragmentScenario<SetupNotCompleteFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(SetupNotCompleteFragment.class, null, new SetupNotCompleteFragmentFactory());
+        FragmentScenario<SetupNotCompleteFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                SetupNotCompleteFragment.class, null, new SetupNotCompleteFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -111,7 +111,8 @@ public class SetupNotCompleteFragmentTest {
             try (MockedStatic<AlexaApp> staticMock = Mockito.mockStatic(AlexaApp.class)) {
                 staticMock.when(() -> AlexaApp.from(mMockApplication)).thenReturn(mMockAlexaApp);
                 when(mMockAlexaApp.getRootComponent()).thenReturn(mMockRootComponent);
-                when(mMockRootComponent.getComponent(AlexaSetupWorkflowController.class)).thenReturn(Optional.of(alexaSetupWorkflowController));
+                when(mMockRootComponent.getComponent(AlexaSetupWorkflowController.class))
+                        .thenReturn(Optional.of(alexaSetupWorkflowController));
                 return new SetupNotCompleteFragmentOverride(mMockNavController, mMockApplication);
             }
         }

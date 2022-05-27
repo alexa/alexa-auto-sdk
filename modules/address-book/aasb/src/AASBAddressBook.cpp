@@ -91,8 +91,13 @@ bool AASBAddressBook::initialize(std::shared_ptr<aace::engine::messageBroker::Me
                     ThrowIfNull(sp, "invalidWeakPtrReference");
                     aasb::message::addressBook::addressBook::RemoveAddressBookMessage::Payload payload =
                         nlohmann::json::parse(message.payload());
-                    sp->m_addressBookCache.erase(payload.addressBookSourceId);
-                    bool success = sp->removeAddressBook(payload.addressBookSourceId);
+                    auto addressBookSourceId = payload.addressBookSourceId;
+                    if (!addressBookSourceId.empty()) {
+                        sp->m_addressBookCache.erase(addressBookSourceId);
+                    } else {
+                        sp->m_addressBookCache.clear();
+                    }
+                    bool success = sp->removeAddressBook(addressBookSourceId);
 
                     auto m_messageBroker_lock = sp->m_messageBroker.lock();
                     ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");

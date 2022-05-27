@@ -227,7 +227,8 @@ private:
     std::vector<int> m_currentConnectedEngineTypes;
 
     /**
-     * Serializes access to @c m_pendingDiscoveredPlayerMap and @c m_authorizationStateMap
+     * Serializes access to @c m_pendingDiscoveredPlayerMap, @c m_authorizationStateMap,
+     * @c m_defaultExternalMediaAdapter, @c m_externalMediaAdapterList, and @c m_externalMediaAdapterMap.
      */
     std::mutex m_playersMutex;
     /**

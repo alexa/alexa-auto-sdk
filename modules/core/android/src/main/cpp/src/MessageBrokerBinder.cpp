@@ -23,31 +23,29 @@ namespace aace {
 namespace jni {
 namespace core {
 
-MessageBrokerBinder::MessageBrokerBinder(
-    std::shared_ptr<aace::core::MessageBroker> messageBroker) : 
-    m_messageBroker(messageBroker) {
+MessageBrokerBinder::MessageBrokerBinder(std::shared_ptr<aace::core::MessageBroker> messageBroker) :
+        m_messageBroker(messageBroker) {
 }
 
-void MessageBrokerBinder::subscribe( jobject handler, const std::string& topic, const std::string& action )
-{
-    try_with_context 
-    {
+void MessageBrokerBinder::subscribe(jobject handler, const std::string& topic, const std::string& action) {
+    try_with_context {
         // create a JObject ptr to manage the callback interface reference
-        auto handler_ptr = std::shared_ptr<JObject>( new JObject( handler, "com/amazon/aace/core/MessageBroker$MessageHandler" ) );
+        auto handler_ptr =
+            std::shared_ptr<JObject>(new JObject(handler, "com/amazon/aace/core/MessageBroker$MessageHandler"));
         // add the handler to a subscription handler list so we can manager the reference
-        m_subscriptionHandlers.push_back( handler_ptr );
+        m_subscriptionHandlers.push_back(handler_ptr);
 
-        getMessageBroker()->subscribe( [this,handler_ptr](const std::string& message) {
-            invokeCallbackMethod( handler_ptr, message );
-        }, topic, action );
+        getMessageBroker()->subscribe(
+            [this, handler_ptr](const std::string& message) { invokeCallbackMethod(handler_ptr, message); },
+            topic,
+            action);
     }
     catch_with_ex {
         AACE_JNI_ERROR(TAG, "subscribe", ex.what());
     }
 }
 
-void MessageBrokerBinder::invokeCallbackMethod( std::shared_ptr<JObject> handler, const std::string& message )
-{
+void MessageBrokerBinder::invokeCallbackMethod(std::shared_ptr<JObject> handler, const std::string& message) {
     try_with_context {
         handler->invoke<void>("messageReceived", "(Ljava/lang/String;)V", nullptr, JString(message).get());
     }
@@ -63,7 +61,8 @@ void MessageBrokerBinder::invokeCallbackMethod( std::shared_ptr<JObject> handler
 #define MESSAGE_BROKER_BINDER(ref) reinterpret_cast<aace::jni::core::MessageBrokerBinder*>(ref)
 
 extern "C" {
-JNIEXPORT void JNICALL Java_com_amazon_aace_core_MessageBroker_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
+JNIEXPORT void JNICALL
+Java_com_amazon_aace_core_MessageBroker_disposeBinder(JNIEnv* env, jobject /* this */, jlong ref) {
     try {
         auto messageBrokerBinder = MESSAGE_BROKER_BINDER(ref);
         ThrowIfNull(messageBrokerBinder, "invalidMessageBrokerBinder");
@@ -73,12 +72,17 @@ JNIEXPORT void JNICALL Java_com_amazon_aace_core_MessageBroker_disposeBinder(JNI
     }
 }
 
-JNIEXPORT void JNICALL
-Java_com_amazon_aace_core_MessageBroker_subscribe(JNIEnv* env, jobject /* this */, jlong ref, jobject handler, jstring topic, jstring action) {
+JNIEXPORT void JNICALL Java_com_amazon_aace_core_MessageBroker_subscribe(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jobject handler,
+    jstring topic,
+    jstring action) {
     try {
         auto messageBrokerBinder = MESSAGE_BROKER_BINDER(ref);
         ThrowIfNull(messageBrokerBinder, "invalidMessageBrokerBinder");
-        messageBrokerBinder->subscribe( handler, JString(topic).toStdStr(), JString(action).toStdStr() );
+        messageBrokerBinder->subscribe(handler, JString(topic).toStdStr(), JString(action).toStdStr());
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_MessageBroker_publish", ex.what());
     }
@@ -99,8 +103,12 @@ Java_com_amazon_aace_core_MessageBroker_publish(JNIEnv* env, jobject /* this */,
     }
 }
 
-JNIEXPORT jobject JNICALL
-Java_com_amazon_aace_core_MessageBroker_openStream(JNIEnv* env, jobject /* this */, jlong ref, jstring streamId, jobject mode) {
+JNIEXPORT jobject JNICALL Java_com_amazon_aace_core_MessageBroker_openStream(
+    JNIEnv* env,
+    jobject /* this */,
+    jlong ref,
+    jstring streamId,
+    jobject mode) {
     try {
         auto messageBrokerBinder = MESSAGE_BROKER_BINDER(ref);
         ThrowIfNull(messageBrokerBinder, "invalidMessageBrokerBinder");

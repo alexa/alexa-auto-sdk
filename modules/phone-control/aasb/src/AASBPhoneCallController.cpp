@@ -101,7 +101,8 @@ static const std::unordered_map<std::string, DTMFError> DTMFErrorEnumerator{
 static const std::unordered_map<std::string, CallingDeviceConfigurationProperty> ConfigPropertyEnumerator{
     {"DTMF_SUPPORTED", CallingDeviceConfigurationProperty::DTMF_SUPPORTED}};
 
-bool AASBPhoneCallController::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBPhoneCallController::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
 
@@ -219,10 +220,10 @@ bool AASBPhoneCallController::initialize(std::shared_ptr<aace::engine::messageBr
                     std::unordered_map<CallingDeviceConfigurationProperty, bool> configurationMap;
 
                     for (auto it = configurationMapString.begin(); it != configurationMapString.end(); ++it) {
-                        configurationMap.insert(
-                            {static_cast<CallingDeviceConfigurationProperty>(
-                                 aasb::message::phoneCallController::phoneCallController::toCallingDeviceConfigurationProperty(it.key())),
-                             it.value()});
+                        configurationMap.insert({static_cast<CallingDeviceConfigurationProperty>(
+                                                     aasb::message::phoneCallController::phoneCallController::
+                                                         toCallingDeviceConfigurationProperty(it.key())),
+                                                 it.value()});
                     }
 
                     sp->deviceConfigurationUpdated(configurationMap);

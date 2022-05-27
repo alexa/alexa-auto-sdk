@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ std::shared_ptr<MessageBrokerImpl> MessageBrokerImpl::create() {
 }
 
 void MessageBrokerImpl::shutdown() {
+    std::lock_guard<std::mutex> lock(m_wait_for_sync_response_mutex);
+    m_isShutdown = true;
     m_outgoingMessageExecutor.waitForSubmittedTasks();
     m_incomingMessageExecutor.waitForSubmittedTasks();
 
@@ -140,14 +142,7 @@ void MessageBrokerImpl::publishAsync(const PublishMessage& pm, aace::engine::uti
     // additional asynchronous message behavior.
     executor.submit([wp, message]() {
         if (auto sp = wp.lock()) {
-            // publish message to listeners interested in this specific message first (topic:action)
-            sp->notifySubscribers(sp->getMessageType(message.direction(), message.topic(), message.action()), message);
-
-            // publish message to listeners interested in all actions for this topic (topic:*)
-            sp->notifySubscribers(sp->getMessageType(message.direction(), message.topic()), message);
-
-            // publish message to listeners interested in all topics and actions (*:*)
-            sp->notifySubscribers(sp->getMessageType(message.direction()), message);
+            sp->notifySubscribers(message);
         } else {
             AACE_ERROR(LX(TAG).d("reason", "invalidWeakPtrReference"));
         }
@@ -155,68 +150,53 @@ void MessageBrokerImpl::publishAsync(const PublishMessage& pm, aace::engine::uti
 }
 
 Message MessageBrokerImpl::publishSync(const PublishMessage& pm, aace::engine::utils::threading::Executor& executor) {
+    AACE_DEBUG(LX(TAG).sensitive("message", pm.msg()));
+    std::lock_guard<std::mutex> lock(m_wait_for_sync_response_mutex);
+    if (m_isShutdown) {
+        AACE_WARN(LX(TAG).m("Discarding message since MessageBroker is shutdown."));
+        return Message::INVALID;
+    }
+
+    // capture the message and timeout
+    auto message = pm.message();
+    auto timeout = pm.timeout();
+
+    auto reply = executor.submit([this, &message, timeout]() -> std::string {
+        try {
+            // create the promise for the reply message to fulfill
+            std::shared_ptr<SyncPromiseType> promise = std::make_shared<SyncPromiseType>();
+
+            // create a future to receive the promised reply message when it is received
+            auto future = promise->get_future();
+
+            // add the promise to the message sync map
+            addSyncMessagePromise(message.messageId(), promise);
+
+            size_t numSubscribersNotified = notifySubscribers(message);
+
+            // don't wait if there is no subscriber
+            ThrowIf(numSubscribersNotified == 0, "noSubscribers");
+
+            // wait for the future
+            ThrowIfNot(future.wait_for(timeout) == std::future_status::ready, "syncMessageTimeout");
+
+            removeSyncMessagePromise(message.messageId());
+            return future.get();
+        } catch (std::exception& ex) {
+            AACE_ERROR(LX(TAG)
+                           .d("reason", ex.what())
+                           .d("topic", message.topic())
+                           .d("action", message.action())
+                           .sensitive("message", message.str()));
+            removeSyncMessagePromise(message.messageId());
+
+            throw;  // Rethrows the currently handled exception.
+        }
+    });
+
     try {
-        AACE_DEBUG(LX(TAG).sensitive("message", pm.msg()));
-
-        // capture the message and timeout
-        auto message = pm.message();
-        auto timeout = pm.timeout();
-
-        // create the promise for the reply message to fulfill
-        std::shared_ptr<SyncPromiseType> promise = std::make_shared<SyncPromiseType>();
-
-        // create a future to receive the promised reply message when it is received
-        std::shared_future<std::string> future(promise->get_future());
-
-        // capture weak ptr reference in callback
-        std::weak_ptr<MessageBrokerImpl> wp = shared_from_this();
-
-        auto task = executor.submit([wp, message, timeout, promise, future]() {
-            auto sp = wp.lock();
-
-            try {
-                ThrowIfNull(sp, "invalidWeakPtrReference");
-
-                // add the promise to the message sync map
-                sp->addSyncMessagePromise(message.messageId(), promise);
-
-                // notify the subscribers that are interested in this specific message (topic:action)
-                sp->notifySubscribers(
-                    sp->getMessageType(message.direction(), message.topic(), message.action()), message);
-
-                // notify the subscribers that are interested in all actions for this topic (topic:*)
-                sp->notifySubscribers(sp->getMessageType(message.direction(), message.topic()), message);
-
-                // notify the subscribers that are interested in all topics and actions (*:*)
-                sp->notifySubscribers(sp->getMessageType(message.direction()), message);
-
-                // wait for the future
-                ThrowIfNot(future.wait_for(timeout) == std::future_status::ready, "syncMessageTimeout");
-            } catch (std::exception& ex) {
-                // TODO: should we consider the message sensitive if there is an error?!
-                AACE_ERROR(LX(TAG).d("reason", ex.what()).d("message",message.str()));
-                promise->set_exception(std::current_exception());
-            }
-
-            // if we have a valid message broker then remove the sync message
-            if (sp != nullptr) {
-                sp->removeSyncMessagePromise(message.messageId());
-            }
-        });
-
-        // wait for the task to complete
-        task.wait();
-
-        // make sure the response was valid
-        ThrowIfNot(future.valid(), "invalidMessageResponse");
-
-        // return the response message
-        return Message(
-            future.get(),
-            message.direction() == Message::Direction::INCOMING ? Message::Direction::OUTGOING
-                                                                : Message::Direction::INCOMING);
+        return Message(reply.get(), message.replyDirection());
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return Message::INVALID;
     }
 }
@@ -242,16 +222,37 @@ void MessageBrokerImpl::reply(const PublishMessage& pm) {
     }
 }
 
-void MessageBrokerImpl::notifySubscribers(const std::string& type, const Message& message) {
+size_t MessageBrokerImpl::notifySubscribers(const std::string& type, const Message& message) {
     AACE_DEBUG(LX(TAG).d("type", type).sensitive("message", message));
 
-    //std::lock_guard<std::mutex> pub_sub_lock( m_pub_sub_mutex );
-    auto it = m_subscriberMap.find(type);
-    if (it != m_subscriberMap.end()) {
-        for (auto& next : it->second) {
-            next(message);
+    std::vector<MessageHandler> handlers;
+    {
+        std::lock_guard<std::mutex> pub_sub_lock(m_pub_sub_mutex);
+        auto it = m_subscriberMap.find(type);
+        if (it != m_subscriberMap.end()) {
+            handlers = it->second;
         }
     }
+    for (auto& next : handlers) {
+        next(message);
+    }
+    return handlers.size();
+}
+
+size_t MessageBrokerImpl::notifySubscribers(const Message& message) {
+    size_t numSubscribersNotified = 0;
+
+    // notify the subscribers that are interested in this specific message (topic:action)
+    numSubscribersNotified +=
+        notifySubscribers(getMessageType(message.direction(), message.topic(), message.action()), message);
+
+    // notify the subscribers that are interested in all actions for this topic (topic:*)
+    numSubscribersNotified += notifySubscribers(getMessageType(message.direction(), message.topic()), message);
+
+    // notify the subscribers that are interested in all topics and actions (*:*)
+    numSubscribersNotified += notifySubscribers(getMessageType(message.direction()), message);
+
+    return numSubscribersNotified;
 }
 
 void MessageBrokerImpl::addSyncMessagePromise(const std::string& messageId, std::shared_ptr<SyncPromiseType> promise) {
@@ -281,7 +282,8 @@ void MessageBrokerImpl::removeSyncMessagePromise(const std::string& messageId) {
     }
 }
 
-std::shared_ptr<MessageBrokerImpl::SyncPromiseType> MessageBrokerImpl::getSyncMessagePromise(const std::string& messageId) {
+std::shared_ptr<MessageBrokerImpl::SyncPromiseType> MessageBrokerImpl::getSyncMessagePromise(
+    const std::string& messageId) {
     try {
         std::lock_guard<std::mutex> lock(m_promise_map_access_mutex);
 

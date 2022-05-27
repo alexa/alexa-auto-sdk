@@ -14,6 +14,21 @@ messages:
         type: ConnectionChangedReason
         desc: The reason for the status change.
 
+  - action: ConnectionStatusChanged
+    direction: outgoing
+    desc: Notifies a listener about changes in connection status for multiple Alexa endpoints. There are multiple connections when using Local Voice Control.
+    name: ConnectionStatusChangedDetailed
+    payload:
+      - name: status
+        type: ConnectionStatus
+        desc: The Alexa connection status. This is an aggregated status for the multiple connections.
+      - name: reason
+        type: ConnectionChangedReason
+        desc: The reason for the status change.
+      - name: detailed
+        type: ConnectionStatusDetails
+        desc: A detailed breakdown of connection status info per connection type.
+
   - action: DialogStateChanged
     direction: outgoing
     desc: Notifies the platform implementation of an Alexa dialog state change.
@@ -107,3 +122,26 @@ types:
         desc: The server asked the client to reconnect.
       - name: SERVER_ENDPOINT_CHANGED
         desc: The server endpoint has changed.
+
+  - name: ConnectionStatusInfo
+    type: struct
+    values:
+      - name: status
+        type: ConnectionStatus
+        desc: The connection status.
+        default: ConnectionStatus::DISCONNECTED
+      - name: reason
+        type: ConnectionChangedReason
+        desc: The reason for the connection status change.
+        default: ConnectionChangedReason::NONE
+
+  - name: ConnectionStatusDetails
+    type: struct
+    values: 
+      - name: avs
+        type: ConnectionStatusInfo
+        desc: Describes the connection to the Alexa Voice Service.
+      - name: local
+        type: ConnectionStatusInfo
+        desc: Describes the connection to the local endpoint.
+        

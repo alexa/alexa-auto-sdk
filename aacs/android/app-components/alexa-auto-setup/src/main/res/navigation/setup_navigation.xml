@@ -5,6 +5,10 @@
     app:startDestination="@id/navigation_fragment_login">
 
     <fragment
+        android:id="@+id/navigation_fragment_assistAppSelection"
+        android:name="com.amazon.alexa.auto.settings.AssistAppSelectionFragment" />
+
+    <fragment
         android:id="@+id/navigation_fragment_login"
         android:name="com.amazon.alexa.auto.setup.workflow.fragment.LoginFragment"/>
 
@@ -30,6 +34,10 @@
         android:name="com.amazon.alexa.auto.setup.workflow.fragment.LocationConsentFragment"/>
 
     <fragment
+        android:id="@+id/navigation_fragment_naviFavoritesConsent"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.NaviFavoritesConsentFragment"/>
+
+    <fragment
         android:id="@+id/navigation_fragment_cblLoginFinish"
         android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLLoginFinishFragment"/>
 
@@ -52,4 +60,8 @@
     <fragment
         android:id="@+id/navigation_fragment_cblLoginError"
         android:name="com.amazon.alexa.auto.setup.workflow.fragment.CBLLoginErrorFragment"/>
+
+    <fragment
+        android:id="@+id/navigation_fragment_blockSetupDrive"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.DriveBlockSetupFragment" />
 </navigation>

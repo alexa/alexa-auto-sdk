@@ -29,6 +29,9 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
+static const int ENGINE_TYPE_AVS_INT = 1;
+static const int ENGINE_TYPE_LOCAL_INT = 2;
+
 class AlexaClientEngineImpl
         : public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
@@ -74,6 +77,102 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_audioFocusManager;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_visualFocusManager;
     alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status m_connectionStatus;
+
+    static inline aace::alexa::AlexaClient::ConnectionType convertConnectionType(int connectionType) {
+        switch (connectionType) {
+            case ENGINE_TYPE_AVS_INT:
+                return aace::alexa::AlexaClient::ConnectionType::AVS;
+                break;
+            case ENGINE_TYPE_LOCAL_INT:
+                return aace::alexa::AlexaClient::ConnectionType::LOCAL;
+                break;
+            default:
+                throw("Unknown connection type.");
+        }
+    }
+
+    static inline aace::alexa::AlexaClient::ConnectionStatus convertConnectionStatus(
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status connectionStatus) {
+        using Status = alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status;
+
+        switch (connectionStatus) {
+            case Status::DISCONNECTED:
+                return aace::alexa::AlexaClient::ConnectionStatus::DISCONNECTED;
+                break;
+            case Status::PENDING:
+                return aace::alexa::AlexaClient::ConnectionStatus::PENDING;
+                break;
+            case Status::CONNECTED:
+                return aace::alexa::AlexaClient::ConnectionStatus::CONNECTED;
+                break;
+            default:
+                return aace::alexa::AlexaClient::ConnectionStatus::DISCONNECTED;
+                break;
+        }
+    }
+
+    static inline aace::alexa::AlexaClient::ConnectionChangedReason convertReason(
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason) {
+        using ChangedReason =
+            alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason;
+
+        switch (reason) {
+            case ChangedReason::NONE:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::NONE;
+                break;
+            case ChangedReason::SUCCESS:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::SUCCESS;
+                break;
+            case ChangedReason::UNRECOVERABLE_ERROR:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::UNRECOVERABLE_ERROR;
+                break;
+            case ChangedReason::ACL_CLIENT_REQUEST:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::ACL_CLIENT_REQUEST;
+                break;
+            case ChangedReason::ACL_DISABLED:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::ACL_DISABLED;
+                break;
+            case ChangedReason::DNS_TIMEDOUT:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::DNS_TIMEDOUT;
+                break;
+            case ChangedReason::CONNECTION_TIMEDOUT:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::CONNECTION_TIMEDOUT;
+                break;
+            case ChangedReason::CONNECTION_THROTTLED:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::CONNECTION_THROTTLED;
+                break;
+            case ChangedReason::INVALID_AUTH:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::INVALID_AUTH;
+                break;
+            case ChangedReason::PING_TIMEDOUT:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::PING_TIMEDOUT;
+                break;
+            case ChangedReason::WRITE_TIMEDOUT:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::WRITE_TIMEDOUT;
+                break;
+            case ChangedReason::READ_TIMEDOUT:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::READ_TIMEDOUT;
+                break;
+            case ChangedReason::FAILURE_PROTOCOL_ERROR:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::FAILURE_PROTOCOL_ERROR;
+                break;
+            case ChangedReason::INTERNAL_ERROR:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::INTERNAL_ERROR;
+                break;
+            case ChangedReason::SERVER_INTERNAL_ERROR:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_INTERNAL_ERROR;
+                break;
+            case ChangedReason::SERVER_SIDE_DISCONNECT:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_SIDE_DISCONNECT;
+                break;
+            case ChangedReason::SERVER_ENDPOINT_CHANGED:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::SERVER_ENDPOINT_CHANGED;
+                break;
+            default:
+                return aace::alexa::AlexaClient::ConnectionChangedReason::NONE;
+                break;
+        }
+    }
 };
 
 }  // namespace alexa

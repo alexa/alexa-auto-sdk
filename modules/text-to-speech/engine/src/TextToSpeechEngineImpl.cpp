@@ -141,8 +141,7 @@ bool TextToSpeechEngineImpl::executeOnPrepareSpeech(
             nlohmann::json optionsPayload = nlohmann::json::parse(options);
             if (optionsPayload.contains(REQUEST_PAYLOAD_KEY)) {
                 requestPayload = optionsPayload.at(REQUEST_PAYLOAD_KEY).dump();
-            }
-            else {
+            } else {
                 requestPayload = options;
             }
         }

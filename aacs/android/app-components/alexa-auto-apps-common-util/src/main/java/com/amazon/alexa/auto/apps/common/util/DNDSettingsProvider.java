@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apps.common.util;
 
 import android.content.Context;
@@ -28,7 +42,6 @@ public class DNDSettingsProvider {
     public static final String DO_NOT_DISTURB_JSON_KEY = "doNotDisturb";
     public static final boolean DEFAULT_DND_PREFERENCE = false;
 
-
     public static boolean updateDNDSetting(@NonNull Context context, boolean value) {
         try {
             updateDNDSettingInAACS(context, value);
@@ -56,14 +69,8 @@ public class DNDSettingsProvider {
     }
 
     private static void updateDNDSettingInAACS(@NotNull Context context, boolean value) throws JSONException {
-        String payload = new JSONStringer()
-                .object()
-                .key(DO_NOT_DISTURB_JSON_KEY)
-                .value(value)
-                .endObject()
-                .toString();
-        new AACSMessageSender(
-                new WeakReference<>(context), new AACSSender())
+        String payload = new JSONStringer().object().key(DO_NOT_DISTURB_JSON_KEY).value(value).endObject().toString();
+        new AACSMessageSender(new WeakReference<>(context), new AACSSender())
                 .sendMessage(Topic.DO_NOT_DISTURB, Action.DoNotDisturb.DO_NOT_DISTURB_CHANGED, payload);
     }
 }

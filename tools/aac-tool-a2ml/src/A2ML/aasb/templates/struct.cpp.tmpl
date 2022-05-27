@@ -1,0 +1,37 @@
+$header
+
+//
+// Type definition:
+//    $type.symbol
+//
+
+//
+// JSON serialization
+//
+
+void to_json(nlohmann::json &j, const $type.name &c) {
+    j = nlohmann::json {
+        #for $next in $type.get_value_names():
+        { "$next", c.$next },
+        #end for
+    };
+}
+
+void from_json(const nlohmann::json &j, $type.name &c) {
+    #for $next in $type.values:
+    #if $next.optional
+    if( j.contains("$next.name") ) {
+        j.at("$next.name").get_to(c.$next.name);
+    }
+    #else
+    j.at("$next.name").get_to(c.$next.name);
+    #end if
+    #end for
+}
+
+std::string $type.name::toString() const {
+    nlohmann::json j = *this;
+    return j.dump(3);
+}
+
+$footer

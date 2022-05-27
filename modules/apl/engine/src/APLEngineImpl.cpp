@@ -75,21 +75,10 @@ bool APLEngineImpl::initialize(
                 contextManager);
         ThrowIfNull(m_visualCharacteristics, "couldNotCreateVisualCharacteristicsCapabilityAgent");
 
-        std::string deviceWindowState = R"(
-            {
-                "defaultWindowId" : "", 
-                "instances" : [ 
-                ]
-            }
-        )";
-
         // Initialize Audio Focus Manager
         ThrowIfNull(audioFocusManager, "nullAudioFocusManager");
         m_audioFocusManager = audioFocusManager;
         m_audioFocusManager->addObserver(shared_from_this());
-
-        AACE_DEBUG(LX(TAG).d("deviceWindowState", deviceWindowState));
-        m_visualCharacteristics->setDeviceWindowState(deviceWindowState);
 
         // Register capability with the default endpoint
         capabilitiesRegistrar->withCapabilityConfiguration(m_visualCharacteristics);

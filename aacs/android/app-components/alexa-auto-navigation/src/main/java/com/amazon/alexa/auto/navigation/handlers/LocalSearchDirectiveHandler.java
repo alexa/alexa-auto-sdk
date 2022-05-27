@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.navigation.handlers;
 
 import android.content.Context;
@@ -15,14 +29,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.HourOfOperation;
-import com.amazon.alexa.auto.aacs.common.LocalSearchDetailTemplate;
-import com.amazon.alexa.auto.aacs.common.LocalSearchListTemplate;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
+import com.amazon.alexa.auto.aacs.common.navi.LocalSearchDetailTemplate;
+import com.amazon.alexa.auto.aacs.common.navi.LocalSearchListTemplate;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.navigation.R;
 import com.amazon.alexa.auto.navigation.poi.LocalSearchListAdapter;
-import com.amazon.alexa.auto.navigation.providers.NavigationProvider;
+import com.amazon.alexa.auto.navigation.providers.NaviProvider;
 import com.bumptech.glide.Glide;
 
 import java.lang.ref.WeakReference;
@@ -32,15 +46,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-
 public class LocalSearchDirectiveHandler {
     private static final String TAG = LocalSearchDirectiveHandler.class.getSimpleName();
     private final WeakReference<Context> mContext;
-    private final NavigationProvider mNavigationProvider;
+    private final NaviProvider mNaviProvider;
 
-    public LocalSearchDirectiveHandler(WeakReference<Context> context, NavigationProvider navigationProvider) {
+    public LocalSearchDirectiveHandler(WeakReference<Context> context, NaviProvider naviProvider) {
         mContext = context;
-        mNavigationProvider = navigationProvider;
+        mNaviProvider = naviProvider;
     }
 
     /**
@@ -98,8 +111,8 @@ public class LocalSearchDirectiveHandler {
                 .getComponent(SessionViewController.class)
                 .ifPresent(sessionViewController -> {
                     sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
-                        if (viewGroup.findViewById(R.id.template_local_search_list_view) != null ||
-                                viewGroup.findViewById(R.id.template_local_search_detail_view) != null) {
+                        if (viewGroup.findViewById(R.id.template_local_search_list_view) != null
+                                || viewGroup.findViewById(R.id.template_local_search_detail_view) != null) {
                             Log.i(TAG, "clearLocalSearchTemplate");
                             sessionViewController.clearTemplate();
                         }
@@ -127,8 +140,8 @@ public class LocalSearchDirectiveHandler {
         viewContainer.addView(
                 inflatedView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
         LocalSearchListAdapter adapter =
-                new LocalSearchListAdapter(mNavigationProvider, new WeakReference<>(this), mContext.get());
-        String title = localSearchListTemplate.getTitle();
+                new LocalSearchListAdapter(mNaviProvider, new WeakReference<>(this), mContext.get());
+        String title = localSearchListTemplate.getTitle() != null ? localSearchListTemplate.getTitle() : "";
         TextView titleText = inflatedView.findViewById(R.id.poi_card_title_text);
         titleText.setText(title.toUpperCase());
 
@@ -177,7 +190,7 @@ public class LocalSearchDirectiveHandler {
 
         TextView navigateButton = inflatedView.findViewById(R.id.navigate_button);
         navigateButton.setOnClickListener(view -> {
-            mNavigationProvider.startNavigation(localSearchDetailTemplate.getCoordinate());
+            mNaviProvider.startNavigation(localSearchDetailTemplate.getCoordinate());
             clearTemplate();
         });
 

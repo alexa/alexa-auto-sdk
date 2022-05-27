@@ -1,5 +1,16 @@
 package com.amazon.alexa.auto.apps.common.util;
 
+import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.THEME_ID;
+import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.THEME_VALUE_BLACK;
+import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.THEME_VALUE_GRAY_ONE;
+import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.UI_DARK_THEME;
+import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.UI_LIGHT_THEME;
+import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.UI_MODE;
+
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.spy;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.SensorManager;
@@ -16,16 +27,6 @@ import org.robolectric.RobolectricTestRunner;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.observers.TestObserver;
-
-import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.THEME_ID;
-import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.THEME_VALUE_BLACK;
-import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.THEME_VALUE_GRAY_ONE;
-import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.UI_DARK_THEME;
-import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.UI_LIGHT_THEME;
-import static com.amazon.alexa.auto.apps.common.util.UiThemeManager.UI_MODE;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.spy;
 
 @RunWith(RobolectricTestRunner.class)
 public class UiThemeManagerTest {
@@ -53,7 +54,8 @@ public class UiThemeManagerTest {
         mEditor = Mockito.mock(SharedPreferences.Editor.class);
         Mockito.when(mockContext.getSharedPreferences(eq(UI_MODE), anyInt())).thenReturn(mUIModeSharedPrefs);
         Mockito.when(mockContext.getSharedPreferences(eq(UI_LIGHT_THEME), anyInt())).thenReturn(mLightModeSharedPrefs);
-        Mockito.when(mockContext.getSharedPreferences(eq(UI_DARK_THEME), anyInt())).thenReturn(mDarkModeModeSharedPrefs);
+        Mockito.when(mockContext.getSharedPreferences(eq(UI_DARK_THEME), anyInt()))
+                .thenReturn(mDarkModeModeSharedPrefs);
         Mockito.when(mLightModeSharedPrefs.edit()).thenReturn(mEditor);
         Mockito.when(mDarkModeModeSharedPrefs.edit()).thenReturn(mEditor);
         Mockito.when(mUIModeSharedPrefs.edit()).thenReturn(mEditor);
@@ -65,10 +67,10 @@ public class UiThemeManagerTest {
     public void test_handle_ui_mode_light() {
         uiThemeManager.init(mockSensorManager);
 
-        //Act
+        // Act
         uiThemeManager.handleAlsUpdate(UiThemeManager.UiModeType.LIGHT);
 
-        //Verify
+        // Verify
         Assert.assertEquals(UiThemeManager.UiModeType.LIGHT, uiThemeManager.getCurrentUIMode());
     }
 
@@ -76,10 +78,10 @@ public class UiThemeManagerTest {
     public void test_handle_ui_mode_dark() {
         uiThemeManager.init(mockSensorManager);
 
-        //Act
+        // Act
         uiThemeManager.handleAlsUpdate(UiThemeManager.UiModeType.DARK);
 
-        //Verify
+        // Verify
         Assert.assertEquals(UiThemeManager.UiModeType.DARK, uiThemeManager.getCurrentUIMode());
     }
 
@@ -88,10 +90,10 @@ public class UiThemeManagerTest {
         uiThemeManager.init(mockSensorManager);
         Mockito.when(mDarkModeModeSharedPrefs.getString(THEME_ID, "")).thenReturn(THEME_VALUE_BLACK);
 
-        //Act
+        // Act
         uiThemeManager.handleAlsUpdate(UiThemeManager.UiModeType.DARK);
 
-        //Verify
+        // Verify
         Assert.assertEquals(THEME_VALUE_BLACK, uiThemeManager.getSavedThemeId(UiThemeManager.UiModeType.DARK));
     }
 
@@ -100,10 +102,10 @@ public class UiThemeManagerTest {
         uiThemeManager.init(mockSensorManager);
         Mockito.when(mLightModeSharedPrefs.getString(THEME_ID, "")).thenReturn(THEME_VALUE_GRAY_ONE);
 
-        //Act
+        // Act
         uiThemeManager.handleAlsUpdate(UiThemeManager.UiModeType.LIGHT);
 
-        //Verify
+        // Verify
         Assert.assertEquals(THEME_VALUE_GRAY_ONE, uiThemeManager.getSavedThemeId(UiThemeManager.UiModeType.LIGHT));
     }
 
@@ -116,10 +118,10 @@ public class UiThemeManagerTest {
         uiModeUpdatedObservable.subscribe(testObserver);
         testObserver.assertValue(UiThemeManager.UiModeType.DARK);
 
-        //Act
+        // Act
         uiThemeManager.handleAlsUpdate(UiThemeManager.UiModeType.LIGHT);
 
-        //Verify
+        // Verify
         testObserver = TestObserver.create();
         uiModeUpdatedObservable.subscribe(testObserver);
         testObserver.assertValue(UiThemeManager.UiModeType.LIGHT);

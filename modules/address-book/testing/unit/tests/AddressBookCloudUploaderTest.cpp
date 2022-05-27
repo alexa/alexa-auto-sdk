@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -64,11 +64,15 @@ public:
 
 class MockAddressBookServiceInterface : public aace::engine::addressBook::AddressBookServiceInterface {
 public:
-    MOCK_METHOD1(addObserver, void(std::shared_ptr<aace::engine::addressBook::AddressBookObserver> observer));
+    MOCK_METHOD2(
+        addObserver,
+        void(std::shared_ptr<aace::engine::addressBook::AddressBookObserver> observer, const std::string& serviceType));
     MOCK_METHOD1(removeObserver, void(std::shared_ptr<aace::engine::addressBook::AddressBookObserver> observer));
     MOCK_METHOD2(
         getEntries,
         bool(const std::string& id, std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory));
+    MOCK_METHOD1(setDelegate, void(std::shared_ptr<aace::engine::addressBook::AddressBookDelegateInterface> delegate));
+    MOCK_METHOD0(servicesEnablementChanged, void());
 };
 
 class DummyAlexaEndpointInterface : public aace::engine::alexa::AlexaEndpointInterface {
@@ -83,6 +87,10 @@ public:
     }
     std::string getACMSEndpoint() override {
         return "https://alexa-comms-mobile-service-na.amazon.com";
+    }
+
+    std::string getFeatureDiscoveryEndpoint() override {
+        return "";
     }
 };
 
@@ -218,7 +226,7 @@ public:
         EXPECT_CALL(*m_mockAuthDelegate, removeAuthObserver(testing::_)).WillOnce(testing::Return());
         EXPECT_CALL(*m_mockNetworkObservableInterface, addObserver(testing::_)).WillOnce(testing::Return());
         EXPECT_CALL(*m_mockNetworkObservableInterface, removeObserver(testing::_)).WillOnce(testing::Return());
-        EXPECT_CALL(*m_mockAddressBookServiceInterface, addObserver(testing::_)).WillOnce(testing::Return());
+        EXPECT_CALL(*m_mockAddressBookServiceInterface, addObserver(testing::_, "AVS")).WillOnce(testing::Return());
         EXPECT_CALL(*m_mockAddressBookServiceInterface, removeObserver(testing::_)).WillOnce(testing::Return());
 
         m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create(

@@ -50,8 +50,9 @@ public:
 
     // aace::aasb::AASBEngineInterface
     void onPublish(const std::string& message) override;
-    std::shared_ptr<aace::aasb::AASBStream> onOpenStream(const std::string& streamId, aace::core::MessageStream::Mode mode)
-        override;
+    std::shared_ptr<aace::aasb::AASBStream> onOpenStream(
+        const std::string& streamId,
+        aace::core::MessageStream::Mode mode) override;
 
 private:
     std::shared_ptr<aace::aasb::AASB> m_aasbPlatformInterface;

@@ -5,7 +5,7 @@ android {
     defaultConfig {
         minSdkVersion 26
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -58,6 +58,7 @@ dependencies {
 
     // Dagger
     implementation deps.dagger
+    implementation project(path: ':aacsipc')
     annotationProcessor 'com.google.dagger:dagger-compiler:2.22'
 
     //Eventbus

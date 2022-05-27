@@ -49,10 +49,10 @@ class BuilderHandler(BaseHandler):
             if not os.path.exists( parent_dir ):
                 raise Exception( f"Output file path doesn't exist! {parent_dir}" )
             if not (self.output_file.endswith( ".tgz" ) or self.output_file.endswith( ".tar.gz" )):
-                self.output_file = f"{self.output_file}.tgz" 
+                self.output_file = f"{self.output_file}.tgz"
         else:
             self.output_file = None
-            
+
         # validate sensitive latentcy logs options with debug
         if self.get_arg("with_sensitive_logs") and not self.get_arg("debug"):
             raise Exception( "Invalid sensitive logs option with release build (must specify debug option)" )
@@ -69,16 +69,16 @@ class BuilderHandler(BaseHandler):
         })
 
     def build( self, forced_packages = [] ):
-        
+
         build_modules = []
-        
+
         # get the target config
         target_platform = self.get_arg("platform")
         target_arch = self.get_arg("arch")
 
         # create the module list from the builder args
         module_list = self.join_arg_list( "modules" )
-    
+
         # validate the module list
         if module_list:
             for next in module_list:
@@ -90,21 +90,11 @@ class BuilderHandler(BaseHandler):
         else:
             build_modules.extend( self.builder_configuration.find_packages( "aac-module-*" ) )
 
-        # get the target plaform to be used for checking module compatibility
-        if target_platform:
-            if target_platform == "android": 
-                check_platform = "Android"
-            elif target_platform == "qnx": 
-                check_platform = "Neutrino"
-            elif target_platform == "poky": 
-                check_platform = "Linux"
-            else:
-                self.log_warning(f"Unknown target platform: {target_platform}. Compatibility check for modules will be disabled.")
-                check_platform = None
-        else:
-            check_platform = platform.system()
-            if check_platform == "Darwin":
-                check_platform = "Macos"
+        # get the target platform to be used for checking module compatibility
+        check_platform = subprocess.run(
+            ["conan", "profile", "get", "settings.os", f"aac-{target_platform}" if target_platform else "default"],
+            stdout=subprocess.PIPE,
+        ).stdout.decode('utf-8').strip()
 
         # remove modules that are not supported for the target platform
         if check_platform:
@@ -117,17 +107,20 @@ class BuilderHandler(BaseHandler):
         if not build_modules:
             raise Exception( "No modules to build!" )
 
+        thirdparty_includes = ["include/nlohmann/json_fwd.hpp"]
+
         # create the temp directory
         self.install_folder = tempfile.TemporaryDirectory().name
 
         # create the conan installed command options
         build_args = [
-            "conan", 
-            "install", 
-            os.path.join( self.sdk_root, "conan", "recipes", "aac-sdk-tools" ), 
-            f"-if={self.install_folder}", 
+            "conan",
+            "install",
+            os.path.join( self.sdk_root, "conan", "recipes", "aac-sdk-tools" ),
+            f"-if={self.install_folder}",
             "-b", "outdated",
             "-o", f"pkg_modules={','.join(build_modules)}",
+            "-o", f"thirdparty_includes={','.join(thirdparty_includes)}",
             "-o", f"aac_version={self.get_arg('version','dev')}",
             "-o", f"with_aasb={self.get_arg('with_aasb',False)}",
             "-o", f"with_unit_tests={self.get_arg('with_unit_tests',False)}",
@@ -146,14 +139,14 @@ class BuilderHandler(BaseHandler):
         # set the target arch options if specified
         if target_arch:
             build_args.extend( ["-s:h", "arch=%s" % target_arch] )
-            if not target_platform == "android" or target_platform == "qnx":
+            if not target_platform == "android" or target_platform.startswith("qnx"):
                 build_args.extend( ["-s:b", "arch=x86_64"] )
 
         # set the target platform options if specified
         if target_platform:
             build_args.append( f"-pr:h=aac-{target_platform}" )
             build_args.append( "-pr:b=default" )
-            
+
         # set the conan options if specified
         option_list = self.get_arg( "conan_option" )
         if option_list:

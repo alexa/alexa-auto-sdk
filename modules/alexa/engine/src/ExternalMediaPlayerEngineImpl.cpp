@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ bool ExternalMediaPlayerEngineImpl::initialize(
 
         ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(messageSender, "invalidMessageSender");
+        ThrowIfNull(audioPlayerObserverDelegate, "invalidAudioPlayerObserverDelegate");
 
         m_externalMediaPlayerCapabilityAgent = aace::engine::alexa::ExternalMediaPlayer::create(
             m_agent,
@@ -166,6 +167,7 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformMediaAdapter(
         ThrowIfNull(externalMediaAdapterEngineImpl, "invalidExternalMediaAdapterEngineImpl");
 
         // add the ExternalMediaAdapterEngineImpl to the ExternalMediaAdapterEngineImpl list
+        std::lock_guard<std::mutex> lock(m_playersMutex);
         m_externalMediaAdapterList.push_back(externalMediaAdapterEngineImpl);
 
         return true;
@@ -207,6 +209,7 @@ bool ExternalMediaPlayerEngineImpl::registerPlatformMediaAdapter(
             m_speakerManager.lock());
         ThrowIfNull(localMediaSourceEngineImpl, "invalidExternalMediaAdapterEngineImpl");
 
+        std::lock_guard<std::mutex> lock(m_playersMutex);
         if (source == aace::alexa::LocalMediaSource::Source::DEFAULT) {
             AACE_VERBOSE(LX(TAG).d("platformMediaAdapter", "DEFAULT"));
             m_defaultExternalMediaAdapter = localMediaSourceEngineImpl;
@@ -298,10 +301,11 @@ std::vector<aace::engine::alexa::PlayerInfo> ExternalMediaPlayerEngineImpl::auth
         auto event = createAuthorizationCompleteEventLocked();
         auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
         lock.unlock();
+
         AACE_VERBOSE(LX(TAG).m("sendingAuthorizationCompleteEvent"));
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-        m_messageSender_lock->sendMessage(request);
+        auto messageSender = m_messageSender.lock();
+        ThrowIfNull(messageSender, "invalidMessageSender");
+        messageSender->sendMessage(request);
         return acknowledgedPlayerList;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -455,6 +459,7 @@ std::vector<aace::engine::alexa::AdapterState> ExternalMediaPlayerEngineImpl::ge
     try {
         AACE_VERBOSE(LX(TAG));
 
+        std::lock_guard<std::mutex> lock(m_playersMutex);
         std::vector<aace::engine::alexa::AdapterState> adapterStateList;
 
         // iterate through the media adapter list and add all of the adapter states
@@ -818,25 +823,29 @@ void ExternalMediaPlayerEngineImpl::onConnectionStatusChanged(
 void ExternalMediaPlayerEngineImpl::doShutdown() {
     AACE_INFO(LX(TAG));
 
-    m_registeredLocalMediaSources.clear();
-    m_globalPresetHandler.reset();
+    m_executor.waitForSubmittedTasks();
     m_executor.shutdown();
 
-    // shut down external media adapters
-    for (auto& adapter : m_externalMediaAdapterList) {
-        adapter->shutdown();
-        adapter.reset();
-    }
-    if (m_defaultExternalMediaAdapter != nullptr) {
-        m_defaultExternalMediaAdapter->shutdown();
-        m_defaultExternalMediaAdapter.reset();
-        m_defaultExternalMediaAdapter = nullptr;
-    }
-    // clear the external media adapter list
-    m_externalMediaAdapterList.clear();
+    m_registeredLocalMediaSources.clear();
+    m_globalPresetHandler.reset();
 
-    // clear the media adapter player id map
-    m_externalMediaAdapterMap.clear();
+    // shut down external media adapters
+    {
+        std::lock_guard<std::mutex> lock(m_playersMutex);
+
+        for (auto& adapter : m_externalMediaAdapterList) {
+            adapter->shutdown();
+        }
+        if (m_defaultExternalMediaAdapter != nullptr) {
+            m_defaultExternalMediaAdapter->shutdown();
+            m_defaultExternalMediaAdapter.reset();
+        }
+        // clear the external media adapter list
+        m_externalMediaAdapterList.clear();
+
+        // clear the media adapter player id map
+        m_externalMediaAdapterMap.clear();
+    }
 
     // shutdown the capability agent
     if (m_externalMediaPlayerCapabilityAgent != nullptr) {

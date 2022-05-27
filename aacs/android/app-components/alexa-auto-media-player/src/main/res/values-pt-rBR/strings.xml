@@ -4,10 +4,10 @@
     <string name="notification_channel">Alexa Music</string>
     <string name="notification_channel_description">Alexa Music com controle de mídia</string>
     <string name="notification_service_title">Alexa Music</string>
-    <string name="playback_control_skip_forward">Próxima faixa</string>
-    <string name="playback_control_skip_backward">Faixa anterior</string>
-    <string name="playback_control_thumbsup">Sinal de positivo</string>
-    <string name="playback_control_thumbsdown">Sinal de negativo</string>
+    <string name="playback_control_skip_forward">Próxima música</string>
+    <string name="playback_control_skip_backward">Música anterior</string>
+    <string name="playback_control_thumbsup">Curti</string>
+    <string name="playback_control_thumbsdown">Não curti</string>
     <string name="playback_control_shuffle">Ordem aleatória</string>
     <string name="playback_control_loop">Repetir</string>
     <string name="playback_control_next">Avançar</string>
@@ -16,6 +16,6 @@
     <string name="alexa_music_login_text">Iniciar sessão</string>
     <string name="alexa_music_alexa_not_selected_va">Altere o aplicativo de assistência para a Alexa para reproduzir músicas com a Alexa</string>
     <string name="alexa_music_select_va">Selecione a Alexa como aplicativo de assistência</string>
-    <string name="alexa_music_hint_1">Diga, \"Alexa, toque música.\"</string>
+    <string name="alexa_music_hint_1">Diga: \"Alexa, toque música.\"</string>
     <string name="artist_msp_seperator">&#160;|&#160;</string>
 </resources>

@@ -1,0 +1,172 @@
+$header
+
+#if $type.messageType == "publish"
+//
+// Message definition:
+//    $type.symbol
+//
+
+struct $type.name {
+    ${type.name}();
+    explicit ${type.name}(const std::string& message);
+
+    struct Header {
+        Header();
+        explicit Header(const std::string& header);
+
+        struct MessageDescription {
+            static std::string topic() {
+                return "$type.topic";
+            }
+            static std::string action() {
+                return "$type.action";
+            }
+        };
+        static std::string version() {
+            return "$type.version";
+        }
+        static std::string messageType() {
+            return "Publish";
+        }
+        std::string id;
+        MessageDescription messageDescription;
+    };
+    struct Payload {
+        Payload();
+        explicit Payload(const std::string& payload);
+
+        #for $next in $type.payload:
+        #if $next.optional
+        $generator.get_type( $next ) $next.name = $generator.get_value( $next, $next.default );
+        #elif $next.value
+        $generator.get_type( $next ) $next.name = $generator.get_value( $next, $next.value );
+        #else
+        $generator.get_type( $next ) $next.name;
+        #end if
+        #end for
+    };
+    static std::string topic() {
+        return "$type.topic";
+    }
+    static std::string action() {
+        return "$type.action";
+    }
+    static std::string version() {
+        return "$type.version";
+    }
+    static std::string messageType() {
+        return "Publish";
+    }
+    std::string toString() const;
+    operator std::string() const {
+        return toString();
+    }
+
+    Header header;
+    Payload payload;
+};
+
+// $type.name::Payload
+void to_json(nlohmann::json &j, const $type.name::Payload &c);
+void from_json(const nlohmann::json &j, $type.name::Payload &c);
+
+// $type.name::Header::MessageDescription
+void to_json(nlohmann::json &j, const $type.name::Header::MessageDescription &c);
+void from_json(const nlohmann::json &j, $type.name::Header::MessageDescription &c);
+
+// $type.name::Header
+void to_json(nlohmann::json &j, const $type.name::Header &c);
+void from_json(const nlohmann::json &j, $type.name::Header &c);
+
+// $type.name
+void to_json(nlohmann::json &j, const $type.name &c);
+void from_json(const nlohmann::json &j, $type.name &c);
+
+#end if
+
+#if $type.reply
+//
+// Message reply definition:
+//    ${type.symbol}Reply
+//
+
+struct ${type.name}Reply {
+    ${type.name}Reply();
+    explicit ${type.name}Reply(const std::string& message);
+
+    struct Header {
+        Header();
+        explicit Header(const std::string& header);
+
+        struct MessageDescription {
+            static std::string topic() {
+                return "$type.topic";
+            }
+            static std::string action() {
+                return "$type.action";
+            }
+            std::string replyToId;
+        };
+        static std::string version() {
+            return "$type.version";
+        }
+        static std::string messageType() {
+            return "Reply";
+        }
+        std::string id;
+        MessageDescription messageDescription;
+    };
+    struct Payload {
+        Payload();
+        explicit Payload(const std::string& payload);
+
+        #for $next in $type.reply:
+        #if $next.default
+        $generator.get_type( $next ) $next.name = $generator.get_value( $next, $next.default );
+        #elif $next.value
+        $generator.get_type( $next ) $next.name = $generator.get_value( $next, $next.value );
+        #else
+        $generator.get_type( $next ) $next.name;
+        #end if
+        #end for
+    };
+    static std::string topic() {
+        return "$type.topic";
+    }
+    static std::string action() {
+        return "$type.action";
+    }
+    static std::string version() {
+        return "$type.version";
+    }
+    static std::string messageType() {
+        return "Reply";
+    }
+    std::string toString() const;
+    operator std::string() const {
+        return toString();
+    }
+
+    Header header;
+    Payload payload;
+};
+
+// ${type.name}Reply::Payload
+void to_json(nlohmann::json &j, const ${type.name}Reply::Payload &c);
+void from_json(const nlohmann::json &j, ${type.name}Reply::Payload &c);
+
+// ${type.name}Reply::Header::MessageDescription
+void to_json(nlohmann::json &j, const ${type.name}Reply::Header::MessageDescription &c);
+void from_json(const nlohmann::json &j, ${type.name}Reply::Header::MessageDescription &c);
+
+// ${type.name}Reply::Header
+void to_json(nlohmann::json &j, const ${type.name}Reply::Header &c);
+void from_json(const nlohmann::json &j, ${type.name}Reply::Header &c);
+
+// ${type.name}Reply
+void to_json(nlohmann::json &j, const ${type.name}Reply &c);
+void from_json(const nlohmann::json &j, ${type.name}Reply &c);
+
+#end if
+
+$footer

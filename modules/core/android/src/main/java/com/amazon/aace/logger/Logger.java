@@ -21,9 +21,9 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Logger should be extended handle log events from the AAC SDK.
- * 
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

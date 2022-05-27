@@ -180,7 +180,8 @@ private:
     std::shared_ptr<aace::test::unit::avs::MockWakeWordConfirmationSetting> m_mockWakeWordConfirmationSetting;
     std::shared_ptr<aace::test::unit::avs::MockSpeechConfirmationSetting> m_mockSpeechConfirmationSetting;
     std::shared_ptr<aace::test::unit::avs::MockSystemSoundPlayerInterface> m_mockSystemSoundPlayerInterface;
-    std::shared_ptr<aace::test::unit::avs::MockInternetConnectionMonitorInterface> m_mockInternetConnectionMonitorInterface;
+    std::shared_ptr<aace::test::unit::avs::MockInternetConnectionMonitorInterface>
+        m_mockInternetConnectionMonitorInterface;
     std::shared_ptr<aace::test::unit::avs::MockWakeWordsSetting> m_mockWakeWordsSetting;
     std::shared_ptr<aace::test::unit::avs::MockSpeechEncoder> m_mockSpeechEncoder;
     std::shared_ptr<aace::test::unit::avs::MockRenderPlayerInfoCardsProviderInterface>
@@ -202,7 +203,8 @@ private:
     std::shared_ptr<aace::test::unit::avs::MockCustomerDataManager> m_mockCustomerDataManager;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::audio::test::MockAlertsAudioFactory>
         m_mockAlertsAudioFactory;
-    std::shared_ptr<aace::test::unit::avs::MockNotificationsAudioFactoryInterface> m_mockNotificationsAudioFactoryInterface;
+    std::shared_ptr<aace::test::unit::avs::MockNotificationsAudioFactoryInterface>
+        m_mockNotificationsAudioFactoryInterface;
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> m_mockCertifiedSender;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager>
         m_mockAVSConnectionManagerInterface;

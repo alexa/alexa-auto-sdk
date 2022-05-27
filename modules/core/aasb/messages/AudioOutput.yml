@@ -177,7 +177,7 @@ messages:
         desc: Name of the channel that is providing audio.
       - name: volume
         type: float
-        desc: The playback position in milliseconds to set in the platform media player.
+        desc: The volume to set on the audio source. The volume is in the range [0,1].
 
   - action: MayDuck
     direction: outgoing

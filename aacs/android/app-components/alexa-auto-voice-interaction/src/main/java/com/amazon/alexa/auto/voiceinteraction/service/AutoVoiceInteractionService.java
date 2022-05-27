@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.voiceinteraction.service;
 
 import android.content.Context;
@@ -6,37 +20,31 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.service.voice.VoiceInteractionService;
+import android.service.voice.VoiceInteractionSession;
 import android.util.Log;
 
+import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
-import com.amazon.alexa.auto.apis.module.ModuleInterface;
+import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.apps.common.aacs.AACSServiceController;
 import com.amazon.alexa.auto.apps.common.util.UiThemeManager;
 import com.amazon.alexa.auto.settings.config.AACSConfigurationPreferences;
 import com.amazon.alexa.auto.settings.config.AACSConfigurator;
-import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
-import com.amazon.alexa.auto.voiceinteraction.common.Constants;
+import com.amazon.alexa.auto.voice.ui.VoiceActivity;
 import com.amazon.alexa.auto.voice.ui.session.SessionActivityControllerImpl;
 import com.amazon.alexa.auto.voice.ui.session.SessionViewControllerImpl;
+import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
+import com.amazon.alexa.auto.voiceinteraction.common.Constants;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import io.reactivex.rxjava3.core.Single;
 
 /**
  * Alexa Auto Voice Interaction Service, extends top-level service of the current global voice interactor,
@@ -44,16 +52,13 @@ import io.reactivex.rxjava3.core.Single;
  */
 public class AutoVoiceInteractionService extends VoiceInteractionService {
     private static final String TAG = AutoVoiceInteractionService.class.getCanonicalName();
-    private static final int FLAG_SHOW_WITH_ASSIST = 1;
 
     AuthController mAuthController;
+    AlexaSetupController mAlexaSetupController;
     AACSConfigurator mAACSConfigurator;
     UiThemeManager mUiThemeManager;
     AACSSender mAACSSender;
     AACSMessageSender mMessageSender;
-
-    private ExecutorService mExecutorService;
-    private Handler mMainThreadHandler;
 
     private boolean isAlexaConnected;
 
@@ -65,26 +70,16 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
         super.onCreate();
         EventBus.getDefault().register(this);
 
-        mExecutorService = Executors.newSingleThreadExecutor();
-        mMainThreadHandler = new Handler(Looper.getMainLooper());
-
         AlexaApp mApp = AlexaApp.from(this);
         mApp.getRootComponent().activateScope(new SessionViewControllerImpl());
         mApp.getRootComponent().activateScope(new SessionActivityControllerImpl());
 
-        // Initializing extra modules
-        getModuleAsync().filter(Optional::isPresent).map(Optional::get).subscribe((modules) -> {
-            for (ModuleInterface moduleInterface : modules) {
-                moduleInterface.initialize(this.getApplicationContext());
-            }
-        });
-
         mAuthController = mApp.getRootComponent().getAuthController();
+        mAlexaSetupController = mApp.getRootComponent().getAlexaSetupController();
         mAACSSender = new AACSSender();
 
         WeakReference<Context> ContextWk = new WeakReference<>(this.getApplicationContext());
-        mAACSConfigurator =
-                new AACSConfigurator(ContextWk, mAACSSender, new AACSConfigurationPreferences(ContextWk));
+        mAACSConfigurator = new AACSConfigurator(ContextWk, mAACSSender, new AACSConfigurationPreferences(ContextWk));
         mMessageSender = new AACSMessageSender(ContextWk, mAACSSender);
         mUiThemeManager = new UiThemeManager(getApplicationContext(), mMessageSender);
     }
@@ -130,14 +125,6 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
         super.onShutdown();
 
         AACSServiceController.stopAACS(this);
-
-        // Un-initializing extra modules
-        getModuleAsync().filter(Optional::isPresent).map(Optional::get).subscribe((modules) -> {
-            for (ModuleInterface moduleInterface : modules) {
-                moduleInterface.uninitialize(this.getApplicationContext());
-            }
-        });
-
         mUiThemeManager.destroy();
     }
 
@@ -147,66 +134,19 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
             isAlexaConnected = message.getAction().equals(Constants.CONNECTION_STATUS_CONNECTED);
         }
 
-        if (message.getAction().equals(Action.SpeechRecognizer.WAKEWORD_DETECTED)
-                || message.getAction().equals(Action.SpeechRecognizer.START_CAPTURE)) {
+        if (message.getAction().equals(Action.SpeechRecognizer.WAKEWORD_DETECTED)) {
             final Bundle args = new Bundle();
             if (isAlexaConnected) {
-                if (message.getAction().equals(Action.SpeechRecognizer.START_CAPTURE)) {
-                    Log.d(TAG, "SpeechRecognizer: Start capture...");
-                    args.putString(Topic.SPEECH_RECOGNIZER, Action.SpeechRecognizer.START_CAPTURE);
-                } else if (message.getAction().equals(Action.SpeechRecognizer.WAKEWORD_DETECTED)) {
-                    Log.d(TAG, "SpeechRecognizer: Wake word is detected...");
-                    args.putString(Topic.SPEECH_RECOGNIZER, Action.SpeechRecognizer.WAKEWORD_DETECTED);
-                    args.putString(Action.SpeechRecognizer.WAKEWORD_DETECTED, message.getPayload());
-                }
-                showSession(args, FLAG_SHOW_WITH_ASSIST);
+                Log.d(TAG, "SpeechRecognizer: Wake word is detected...");
+                args.putString(AASBConstants.TOPIC, Topic.SPEECH_RECOGNIZER);
+                args.putString(AASBConstants.ACTION, Action.SpeechRecognizer.WAKEWORD_DETECTED);
             } else {
                 Log.d(TAG, "Alexa is not connected!");
-                args.putString(Constants.TOPIC_ALEXA_CONNECTION, Constants.ACTION_ALEXA_NOT_CONNECTED);
-                showSession(args, FLAG_SHOW_WITH_ASSIST);
+                args.putString(AASBConstants.TOPIC, Constants.TOPIC_ALEXA_CONNECTION);
+                args.putString(AASBConstants.ACTION, Constants.ACTION_ALEXA_NOT_CONNECTED);
             }
+            args.putString(AASBConstants.PAYLOAD, message.getPayload());
+            showSession(args, VoiceInteractionSession.SHOW_WITH_ASSIST);
         }
-    }
-
-    private Single<Optional<List<ModuleInterface>>> getModuleAsync() {
-        return Single.create(emitter -> {
-            mExecutorService.submit(() -> {
-                Optional<List<ModuleInterface>> handlerModuleOptional = getModuleSync(this.getApplicationContext());
-                mMainThreadHandler.post(() -> emitter.onSuccess(handlerModuleOptional));
-            });
-        });
-    }
-
-    private Optional<List<ModuleInterface>> getModuleSync(Context context) {
-        List<ModuleInterface> modules = new ArrayList<>();
-        try {
-            String folderName = "aacs-sample-app";
-            String moduleKey = "module";
-            String category = "name";
-            String[] fileList = context.getAssets().list(folderName);
-            for (String f : fileList) {
-                InputStream is = context.getAssets().open(folderName + "/" + f);
-                byte[] buffer = new byte[is.available()];
-                is.read(buffer);
-                String json = new String(buffer, "UTF-8");
-                JSONObject obj = new JSONObject(json);
-                if (obj != null) {
-                    JSONObject moduleKeyObj = obj.optJSONObject(moduleKey);
-                    if (moduleKeyObj == null) {
-                        Log.w(TAG, "module key is missing");
-                        continue;
-                    }
-                    String moduleName = moduleKeyObj.getString(category);
-                    ModuleInterface instance = (ModuleInterface) Class.forName(moduleName).newInstance();
-                    modules.add(instance);
-                    Log.i(TAG, "getModule: load extra module:" + moduleName);
-                }
-                is.close();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "getModule: " + e.getMessage());
-            return Optional.empty();
-        }
-        return Optional.of(modules);
     }
 }

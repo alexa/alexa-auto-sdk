@@ -24,6 +24,7 @@
 #include <AACE/AddressBook/AddressBookEngineInterface.h>
 
 #include "AddressBookServiceInterface.h"
+#include "AddressBookDelegateInterface.h"
 #include "AddressBookObserver.h"
 
 namespace aace {
@@ -54,11 +55,13 @@ private:
 
 public:
     //AddressBookServiceInterface
-    void addObserver(std::shared_ptr<AddressBookObserver> observer) override;
+    void addObserver(std::shared_ptr<AddressBookObserver> observer, const std::string& serviceType) override;
     void removeObserver(std::shared_ptr<AddressBookObserver> observer) override;
     bool getEntries(
         const std::string& addressBookSourceId,
         std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) override;
+    void setDelegate(std::shared_ptr<AddressBookDelegateInterface> delegate) override;
+    void servicesEnablementChanged() override;
 
     // AddressBookEngineInterface
     bool onAddAddressBook(const std::string& addressBookSourceId, const std::string& name, const AddressBookType type)
@@ -68,7 +71,8 @@ public:
 private:
     std::mutex m_mutex;
     std::unordered_map<std::string, std::shared_ptr<AddressBookEntity>> m_addressBookEntities;
-    std::unordered_set<std::shared_ptr<AddressBookObserver>> m_observers;
+    std::unordered_map<std::string, std::shared_ptr<AddressBookObserver>> m_observers;
+    std::shared_ptr<AddressBookDelegateInterface> m_addressBookDelegate;
 };
 
 }  // namespace addressBook

@@ -1,4 +1,18 @@
-package com.amazon.alexaautoclientservice.mediaPlayer.raw;
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+package com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.raw;
 
 import android.content.Context;
 import android.media.AudioAttributes;
@@ -10,15 +24,15 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.amazon.aace.aasb.AASBStream;
+import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants.AudioOutput.MutedState;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.MediaConstants;
 import com.amazon.aacsconstants.Topic;
-import com.amazon.alexaautoclientservice.mediaPlayer.AACSMediaPlayer;
-import com.amazon.alexaautoclientservice.mediaPlayer.AudioFocusAttributes;
-import com.amazon.alexaautoclientservice.mediaPlayer.EventReceiver;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.AACSMediaPlayer;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.AudioFocusAttributes;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.EventReceiver;
 import com.amazon.alexaautoclientservice.util.MediaPlayerUtil;
 
 import org.json.JSONObject;
@@ -37,7 +51,7 @@ public class RawAudioOutputHandler implements AACSMediaPlayer, AudioManager.OnAu
     private int mSampleRateInHzz;
     private int mAudioFormat;
     private int mStreamType;
-    private AASBStream mMediaStream;
+    private MessageStream mMediaStream;
     private String mCurrentToken = "";
     private AtomicLong mBytesWritten = new AtomicLong(0);
     private boolean mStopped = false;
@@ -104,8 +118,8 @@ public class RawAudioOutputHandler implements AACSMediaPlayer, AudioManager.OnAu
     }
 
     @Override
-    public void prepare(AASBStream mediaStream, boolean repeating, String token) {
-        Log.v(TAG, String.format("(%s) Handling prepare() given AASBStream.", mChannel));
+    public void prepare(MessageStream mediaStream, boolean repeating, String token) {
+        Log.v(TAG, String.format("(%s) Handling prepare() given MessageStream.", mChannel));
         mCurrentToken = token;
         mMediaStream = mediaStream;
         resetPlayer();

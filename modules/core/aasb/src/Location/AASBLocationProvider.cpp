@@ -46,7 +46,8 @@ std::shared_ptr<AASBLocationProvider> AASBLocationProvider::create(
     }
 }
 
-bool AASBLocationProvider::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBLocationProvider::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         // save the message broker reference
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");

@@ -46,13 +46,11 @@ messages:
         desc: The delta by which to adjust the mode.
 
   - action: AdjustControllerValue
-    direction: incoming
-    desc: Reply for AdjustControllerValue messages. Failure to send the asynchronous reply message within 5 seconds results in a timeout.
-    messageType: reply
-    payload:
+    direction: outgoing
+    reply:
       - name: success
         type: bool
-        desc: Whether the requested setting was successfully adjusted.
+        desc: Whether the requested setting was successfully adjusted. Failure to send the asynchronous reply message within 5 seconds results in a timeout.
 
   - action: SetControllerValue
     direction: outgoing
@@ -134,10 +132,8 @@ messages:
         desc: The new mode to set.
 
   - action: SetControllerValue
-    direction: incoming
-    desc: Reply for SetControllerValue messages. Failure to send the asynchronous reply message within 5 seconds results in a timeout.
-    messageType: reply
-    payload:
+    direction: outgoing
+    reply:
       - name: success
         type: bool
-        desc: Whether the requested setting was updated successfully.
+        desc: Whether the requested setting was updated successfully. Failure to send the asynchronous reply message within 5 seconds results in a timeout.

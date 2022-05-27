@@ -8,8 +8,7 @@
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:extractNativeLibs="true">
+        android:usesCleartextTraffic="true">
 
         <receiver
             android:name=".receiver.APLReceiver"
@@ -25,6 +24,7 @@
                 <action android:name="com.amazon.aacs.aasb.InterruptCommandSequence" />
                 <action android:name="com.amazon.aacs.aasb.SetDocumentIdleTimeout" />
                 <action android:name="com.amazon.aacs.aasb.UpdateAPLRuntimeProperties" />
+                <action android:name="com.amazon.aacs.aasb.DataSourceUpdate" />
                 <category android:name="com.amazon.aacs.aasb.AlexaClient" />
                 <action android:name="com.amazon.aacs.aasb.DialogStateChanged"/>
             </intent-filter>

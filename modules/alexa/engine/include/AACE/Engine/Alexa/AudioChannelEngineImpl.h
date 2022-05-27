@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -144,11 +144,6 @@ protected:
 
     bool validateSource(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
 
-    virtual void handlePrePlaybackStarted(SourceId id);
-    virtual void handlePostPlaybackStarted(SourceId id);
-    virtual void handlePrePlaybackFinished(SourceId id);
-    virtual void handlePostPlaybackFinished(SourceId id);
-
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface> getChannelVolumeInterface();
 
 private:
@@ -161,8 +156,9 @@ private:
     void sendPendingEvent();
     void sendEvent(PendingEventState state);
     void resetSource();
-    void handleDuckingStarted();
-    void handleDuckingStopped();
+    void execDuckingStarted();
+    void execDuckingStopped();
+    void setMediaStateChangeInitiator(MediaStateChangeInitiator initiator);
 
     //
     // MediaPlayerEngineInterface executor methods
@@ -181,6 +177,42 @@ private:
     friend std::ostream& operator<<(std::ostream& stream, const PendingEventState& state);
     friend std::ostream& operator<<(std::ostream& stream, const DuckingStates& state);
 
+    //
+    // MediaPlayerInterface implementation in executor
+    //
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId execSetSource(
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
+        const alexaClientSDK::avsCommon::utils::AudioFormat* format,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config);
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId execSetSource(
+        std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
+        std::chrono::milliseconds offsetAdjustment,
+        const alexaClientSDK::avsCommon::utils::AudioFormat* format,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config);
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId execSetSource(
+        std::shared_ptr<std::istream> stream,
+        bool repeat,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config,
+        alexaClientSDK::avsCommon::utils::MediaType format);
+    alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId execSetSource(
+        const std::string& url,
+        std::chrono::milliseconds offset,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config,
+        bool repeat,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::PlaybackContext& playbackContext);
+    bool execPlay(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
+    bool execStop(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
+    bool execPause(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
+    bool execResume(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
+    std::chrono::milliseconds execGetOffset(
+        alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
+    uint64_t execGetNumBytesBuffered();
+    alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState>
+    execGetMediaPlayerState(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id);
+
+    bool execStartDucking();
+    bool execStopDucking();
+
 private:
     std::string m_name;
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
@@ -190,10 +222,7 @@ private:
 
     std::weak_ptr<class AttachmentReaderAudioStream> m_attachmentReader;
 
-    // mutex to serialize access to m_mediaPlayerObservers
-    std::mutex m_mediaPlayerObserverMutex;
-
-    // access to m_mediaPlayerObservers is protected by m_mediaPlayerObserverMutex
+    // access to m_mediaPlayerObservers is serialized by @c m_callbackExecutor
     using MediaPlayerObserverInterface = alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface;
     std::set<std::weak_ptr<MediaPlayerObserverInterface>, std::owner_less<std::weak_ptr<MediaPlayerObserverInterface>>>
         m_mediaPlayerObservers;
@@ -211,14 +240,13 @@ private:
     MediaState m_currentMediaState;
     MediaStateChangeInitiator m_mediaStateChangeInitiator;
 
-    // executor used to send asynchronous events back to observer
+    // executor used to synchronize external requests and notifications
     alexaClientSDK::avsCommon::utils::threading::Executor m_executor;
+    // executor used to send asynchronous events back to observer
+    alexaClientSDK::avsCommon::utils::threading::Executor m_callbackExecutor;
 
     // global counter for media source id
     static SourceId s_nextId;
-
-    // mutex for blocking setSource calls
-    std::mutex m_mutex;
 
     //variable for storing the mixability of the current stream
     bool m_mayDuck;

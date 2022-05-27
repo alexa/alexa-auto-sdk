@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,14 +25,11 @@ namespace messageBroker {
 static const std::string TAG("aace.messageBroker.PublishMessage");
 
 PublishMessage::PublishMessage(
-    Message::Direction direction, 
-    const std::string& message, 
-    const std::chrono::milliseconds& timeout,
+    Message::Direction direction,
+    const std::string& message,
+    std::chrono::milliseconds timeout,
     InvokeHandler invokeHandler) :
-        m_direction(direction), 
-        m_message(message), 
-        m_timeout(timeout), 
-        m_invokeHandler(invokeHandler) {
+        m_direction(direction), m_message(message), m_timeout(timeout), m_invokeHandler(invokeHandler) {
 }
 
 PublishMessage::PublishMessage(const PublishMessage& pm) {
@@ -44,7 +41,7 @@ PublishMessage::PublishMessage(const PublishMessage& pm) {
     m_invokeHandler = pm.m_invokeHandler;
 }
 
-PublishMessage& PublishMessage::timeout(const std::chrono::milliseconds& value) {
+PublishMessage& PublishMessage::timeout(std::chrono::milliseconds value) {
     m_timeout = value;
     return *this;
 }
@@ -84,31 +81,31 @@ Message PublishMessage::get() {
     }
 }
 
-const std::string PublishMessage::msg() const {
+std::string PublishMessage::msg() const {
     return m_message;
 }
 
-const Message::Direction PublishMessage::direction() const {
+Message::Direction PublishMessage::direction() const {
     return m_direction;
 }
 
-const std::chrono::milliseconds PublishMessage::timeout() const {
+std::chrono::milliseconds PublishMessage::timeout() const {
     return m_timeout;
 }
 
-const PublishMessage::SuccessHandler PublishMessage::successHandler() const {
+PublishMessage::SuccessHandler PublishMessage::successHandler() const {
     return m_successHandler;
 }
 
-const PublishMessage::ErrorHandler PublishMessage::errorHandler() const {
+PublishMessage::ErrorHandler PublishMessage::errorHandler() const {
     return m_errorHandler;
 }
 
-const Message PublishMessage::message() const {
+Message PublishMessage::message() const {
     return Message(m_message, m_direction);
 }
 
-const bool PublishMessage::valid() const {
+bool PublishMessage::valid() const {
     return m_invokeHandler != nullptr && m_message.empty() == false;
 }
 

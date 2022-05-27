@@ -1,4 +1,4 @@
-# APL Render Module 
+# APL Render Module <!-- omit in toc -->
 
 The APL Render module is an Android library that enables Alexa Presentation Language (APL) rendering capabilities in an Android application. For detailed information about APL, see the [APL documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-presentation-language/understand-apl.html).
 
@@ -8,15 +8,22 @@ The APL Render module is an Android library that enables Alexa Presentation Lang
 - [Understanding Android View Host](#understanding-android-view-host)
 - [APL Render Module Functionality](#apl-render-module-functionality)
 - [How to use the APL Render Module](#how-to-use-the-apl-render-module)
-  - [Defining the APL Layout](#defining-the-apl-layout)
-  - [Initializing the APL Runtime](#initializing-the-apl-runtime)
-  - [Implementing the Event Interface](#implementing-the-event-interface)
-  - [Instantiating APLPresenter](#instantiating-aplpresenter)
+    - [Defining the APL Layout](#defining-the-apl-layout)
+    - [Initializing the APL Runtime](#initializing-the-apl-runtime)
+    - [Implementing the Event Interface](#implementing-the-event-interface)
+    - [Instantiating APLPresenter](#instantiating-aplpresenter)
 - [Rendering an APL Document](#rendering-an-apl-document)
-- [Building the APL Render Library](#building-the-apl-render-library)
 - [Overriding Android View Host Options](#overriding-android-view-host-options)
-  - [Using APLOptions.Builder](#using-aploptionsbuilder)
+    - [Using APLOptions.Builder](#using-aploptionsbuilder)
+- [APL Runtime Properties](#apl-runtime-properties)
+    - [Driving State](#driving-state)
+    - [Theme](#theme)
 - [APL Extensions](#apl-extensions)
+    - [Backstack](#backstack)
+    - [Local Information Data](#local-information-data)
+        - [ILocalInfoDataConsumer](#ilocalinfodataconsumer)
+        - [ILocalInfoDataReporter](#ilocalinfodatareporter)
+- [Building the APL Render Library](#building-the-apl-render-library)
 
 ## Overview
 Rendering an APL document on a device requires the implementation of various components and the logic that makes the components work together. To handle APL-related directives and events, the device must support APL interfaces. It needs integration of the [APL Core Library](https://github.com/alexa/apl-core-library) to manage the document parsing and rendering workflow. 
@@ -45,10 +52,10 @@ The APL Render module provides all the functionality needed for enabling APL ren
 
 To use the APL Render module without customization, follow these steps:
 
-1) Define the APL layout.
-2) Initialize the APL runtime.
-3) Implement the event interface.
-4) Instantiate `APLPresenter`.
+1. Define the APL layout.
+2. Initialize the APL runtime.
+3. Implement the event interface.
+4. Instantiate `APLPresenter`.
 
 ### Defining the APL Layout
 
@@ -99,7 +106,7 @@ onCreate() {
 
 ### Implementing the Event Interface 
 
-The application must implement the `com.amazon.apl.android.render.interfaces.IAPLEventSender` interface. The `IAPLEventSender` interface provides the APIs to allow the APL Render module to report events to Alexa or the capability agent. You can integrate the event interface into the APL handler that implements the [Auto SDK APL platform interface](../../../../../../modules/apl/android/src/main/java/com/amazon/aace/apl/APL.java). The following code shows how to do the integration:
+The application must implement the `com.amazon.apl.android.render.interfaces.IAPLEventSender` interface. The `IAPLEventSender` interface provides the APIs to allow the APL Render module to report events to Alexa or the capability agent. You can integrate the event interface into the APL handler that implements the Auto SDK `APL` AASB message interface. The following code shows how to do the integration:
 
 ```java
 import com.amazon.aace.apl.APL;
@@ -164,7 +171,7 @@ The following list describes the parameters to `APLPresenter`:
 
 * The first parameter is a map of the `APLLayout` objects. Each `APLLayout` is identified by a window ID, which specifies the window where the APL document is rendered. Typically, there is one `APLLayout` defined for the window where all the APL documents are rendered, but you can build skills that support rendering in multiple windows. 
 
-* The second parameter is a JSON array`  pointing to the visual characteristics defined by the device. For more information about visual characteristics, see the [APL module README](../../../../../../modules/apl/README.md#visual-characteristics) and the [Smart Screen SDK documentation](https://github.com/alexa/alexa-smart-screen-sdk/blob/master/modules/GUI/config/SmartScreenSDKConfig.md#visual-characteristics-parameters). 
+* The second parameter is a JSON array`  pointing to the visual characteristics defined by the device. For more information about visual characteristics, see the Auto SDK APL module documentation and the [Smart Screen SDK documentation](https://github.com/alexa/alexa-smart-screen-sdk/blob/master/modules/GUI/config/SmartScreenSDKConfig.md#visual-characteristics-parameters). 
   
 * The third parameter is the default window ID, specifying the window where APL documents are rendered if Alexa does not provide a window ID. 
   
@@ -204,8 +211,8 @@ Rendering an APL document requires the APL Render module to set up an `APLOption
 
 * Callbacks are interfaces used by the view host to report events, such as:
 
-  * user events (e.g., button clicks) 
-  * document lifecycle events (e.g., completion of document rendering)  
+    * user events (e.g., button clicks) 
+    * document lifecycle events (e.g., completion of document rendering)  
 
 * Listeners are interfaces for reporting the APL rendered document state or screen lock events. 
 
@@ -235,7 +242,7 @@ class MyAPLPresenter extends APLPresenter {
 ```
 ## APL Runtime Properties
 
-The [IAPLContentListener](src/main/java/com/amazon/apl/android/render/interfaces/IAPLContentListener.java) exposes an interface to control some APL runtime properties that affect how APL documents are rendered. The `onAPLRuntimeProperties` API takes in a JSON string that contains one or more properties to update.
+The [`IAPLContentListener`](https://github.com/alexa/alexa-auto-sdk/blob/master/aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/src/main/java/com/amazon/apl/android/render/interfaces/IAPLContentListener.java) exposes an interface to control some APL runtime properties that affect how APL documents are rendered. The `onAPLRuntimeProperties` API takes in a JSON string that contains one or more properties to update.
 
 ### Driving State
 
@@ -253,11 +260,11 @@ This library supports the [Backstack](https://developer.amazon.com/en-US/docs/al
 
 This library contains a custom APL extension that is used by the `APLPresenter` to expose point of interest data to the application. This data can be used to drop corresponding pins on the head unit's integrated map. Two way communication is also provided so that the application or AP runtime can notify each other when a specific data point is active or selected.
 
-There are two interfaces that the application can use to interact with Local infomation data: [ILocalInfoDataConsumer](https://github.com/alexa/alexa-auto-sdk/tree/4.0/aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/src/main/java/com/amazon/apl/android/render/interfaces/ILocalInfoDataConsumer.java) and [ILocalInfoDataReporter](https://github.com/alexa/alexa-auto-sdk/tree/4.0/aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/src/main/java/com/amazon/apl/android/render/interfaces/ILocalInfoDataReporter.java).
+There are two interfaces that the application can use to interact with Local information data: [ILocalInfoDataConsumer](https://github.com/alexa/alexa-auto-sdk/tree/4.0/aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/src/main/java/com/amazon/apl/android/render/interfaces/ILocalInfoDataConsumer.java) and [ILocalInfoDataReporter](https://github.com/alexa/alexa-auto-sdk/tree/4.0/aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/src/main/java/com/amazon/apl/android/render/interfaces/ILocalInfoDataReporter.java).
 
 #### ILocalInfoDataConsumer
 
-The [IPresenter](src/main/java/com/amazon/apl/android/render/interfaces/IPresenter.java) interace exposes a method to set the data consumer, which must be set by the application:
+The `IPresenter` (`https://github.com/alexa/alexa-auto-sdk/blob/master/aacs/android/app-components/alexa-auto-apl-renderer/modules/apl-render/src/main/java/com/amazon/apl/android/render/interfaces/IPresenter.java`) interface exposes a method to set the data consumer, which must be set by the application:
 
 ```
     /**

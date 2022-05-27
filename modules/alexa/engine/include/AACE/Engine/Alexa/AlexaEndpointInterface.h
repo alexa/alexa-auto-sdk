@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -29,24 +29,31 @@ public:
 public:
     /**
      * Gets the AVS gateway from the engine configuration.
-     * 
+     *
      * @return Returns the AVS endpoint from engine configuration if provided, otherwise default AVS gateway.
      **/
     virtual std::string getAVSGateway() = 0;
 
     /**
      * Gets the LWA endpoint from the engine configuration.
-     * 
+     *
      * @return Returns the LWA endpoint from engine configuration if provided, otherwise default LWA gateway.
      **/
     virtual std::string getLWAEndpoint() = 0;
 
     /**
      * Gets the ACMS endpoint from the engine configuration.
-     * 
+     *
      * @return Returns the ACMS endpoint from engine configuration if provided, otherwise an empty string.
      **/
     virtual std::string getACMSEndpoint() = 0;
+
+    /**
+     * Gets the endpoint for feature discovery from the engine configuration.
+     *
+     * @return Returns the feature discovery endpoint from engine configuration if provided, otherwise using the default gateway.
+     **/
+    virtual std::string getFeatureDiscoveryEndpoint() = 0;
 };
 
 }  // namespace alexa

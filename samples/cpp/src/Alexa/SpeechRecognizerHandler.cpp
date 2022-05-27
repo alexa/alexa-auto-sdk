@@ -78,12 +78,12 @@ void SpeechRecognizerHandler::subscribeToAASBMessages() {
 }
 
 void SpeechRecognizerHandler::handleEndOfSpeechDetectedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received EndOfSpeechDetectedMessage");
     endOfSpeechDetected();
 }
 
 void SpeechRecognizerHandler::handleWakewordDetectedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received WakewordDetectedMessage");
     WakewordDetectedMessage msg = json::parse(message);
     wakewordDetected(msg.payload.wakeword);
 }

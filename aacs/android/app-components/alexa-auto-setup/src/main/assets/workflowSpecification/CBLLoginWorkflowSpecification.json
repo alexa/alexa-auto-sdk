@@ -8,10 +8,24 @@
       }
     },
     {
-      "event": "Network_Connected",
+      "event": "Alexa_Not_Selected_Default",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_assistAppSelection"
+      }
+    },
+    {
+      "event": "Alexa_Is_Selected_Default",
       "next": {
         "type": "action",
         "resource": "CheckLanguageCommand"
+      }
+    },
+    {
+      "event": "Network_Connected",
+      "next": {
+        "type": "action",
+        "resource": "CheckDrivingStatusCommand"
       }
     },
     {
@@ -19,6 +33,20 @@
       "next": {
         "type": "view",
         "resource": "navigation_fragment_network"
+      }
+    },
+    {
+      "event": "Car_State_Drive",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_blockSetupDrive"
+      }
+    },
+    {
+      "event": "Car_State_Park",
+      "next": {
+        "type": "action",
+        "resource": "CheckDefaultAssistAppCommand"
       }
     },
     {
@@ -45,7 +73,7 @@
     {
       "event": "Language_Selection_Is_Complete",
       "next": {
-        "type": "view",
+        "type": "action",
         "resource": "CheckLoginRequiredCommand"
       }
     },
@@ -57,14 +85,27 @@
       }
     },
     {
-      "event": "Location_Consent",
+      "event": "Location_Consent_Not_Completed",
       "next": {
         "type": "view",
         "resource": "navigation_fragment_locationConsent"
       }
     },
     {
+      "event": "Navi_Favorites_Consent_Not_Completed",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_naviFavoritesConsent"
+      }
+    },
+    {
       "event": "Location_Consent_Completed",
+      "next": {
+        "type": "action",
+        "resource": "CheckNaviFavoriteCommand"
+      }
+    },{
+      "event": "Navi_Favorites_Consent_Completed",
       "next": {
         "type": "action",
         "resource": "CheckContactsConsentStatusCommand"

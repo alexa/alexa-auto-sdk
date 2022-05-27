@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,16 +26,16 @@ namespace logger {
 static const char* RESERVED_METADATA_CHARS = R"(\,=:)";
 
 /// Escape sequence for '\'.
-static const std::string ESCAPED_METADATA_ESCAPE = R"(\\)";
+static const char* ESCAPED_METADATA_ESCAPE = R"(\\)";
 
 /// Escape sequence for ','.
-static const std::string ESCAPED_PAIR_SEPARATOR = R"(\,)";
+static const char* ESCAPED_PAIR_SEPARATOR = R"(\,)";
 
 /// Escape sequence for ':'.
-static const std::string ESCAPED_SECTION_SEPARATOR = R"(\:)";
+static const char* ESCAPED_SECTION_SEPARATOR = R"(\:)";
 
 /// Escape sequence for '='.
-static const std::string ESCAPED_KEY_VALUE_SEPARATOR = R"(\=)";
+static const char* ESCAPED_KEY_VALUE_SEPARATOR = R"(\=)";
 
 /// Reserved in metadata sequences for escaping other reserved values.
 static const char METADATA_ESCAPE = '\\';
@@ -47,16 +47,18 @@ static const char PAIR_SEPARATOR = ',';
 static const char SECTION_SEPARATOR = ':';
 
 /// String for boolean TRUE
-static const std::string BOOL_TRUE = "true";
+static const char* BOOL_TRUE = "true";
 
 /// String for boolean FALSE
-static const std::string BOOL_FALSE = "false";
+static const char* BOOL_FALSE = "false";
 
-LogEntry::LogEntry(const std::string& tag, const char* event) : m_tag(tag), m_hasMetadata(false) {
+LogEntry::LogEntry(const std::string& tag, const char* event) :
+        m_tag(tag), m_hasMetadata(false), m_abortAfterEmission(false) {
     m_stream << tag << SECTION_SEPARATOR << event;
 }
 
-LogEntry::LogEntry(const std::string& tag, const std::string& event) : m_tag(tag), m_hasMetadata(false) {
+LogEntry::LogEntry(const std::string& tag, const std::string& event) :
+        m_tag(tag), m_hasMetadata(false), m_abortAfterEmission(false) {
     m_stream << tag << SECTION_SEPARATOR << event;
 }
 
@@ -139,6 +141,15 @@ void LogEntry::appendEscapedString(const char* in) {
             return;
         }
     }
+}
+
+LogEntry& LogEntry::abortAfterEmission() {
+    m_abortAfterEmission = true;
+    return *this;
+}
+
+bool LogEntry::shouldAbortAfterEmission() const {
+    return m_abortAfterEmission;
 }
 
 }  // namespace logger

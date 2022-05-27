@@ -532,6 +532,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Alexa Speaker
     auto alexaSpeakerHandler = alexa::AlexaSpeakerHandler::create(activity, loggerHandler, messageBroker);
     Ensures(alexaSpeakerHandler != nullptr);
+
+    // Feature Discovery
+    auto featureDiscoveryHandler = alexa::FeatureDiscoveryHandler::create(activity, loggerHandler, messageBroker);
+    Ensures(featureDiscoveryHandler != nullptr);
 #endif
 
     // Text To Speech Handler
@@ -611,7 +615,7 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     monitorAirplaneModeEventsThread.detach();
 #endif  // MONITORAIRPLANEMODEEVENTS
 
-#ifdef AAC_ALEXACOMMS
+#if defined(AAC_ALEXACOMMS) && defined(AAC_PHONE_CONTROL)
     // Workaround: Enable Phone Connection since it is needed by Alexa Comms. This limitation will go away in the future. Refer to
     // Alexa Comms README for more information.
     phoneCallControllerHandler->connectionStateChanged(

@@ -53,7 +53,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
                 {"arch","x86_64"},
                 {"language","en_US"},
                 {"microphone","SingleArray"},
-                {"vehicleIdentifier","123456789a"}
+                {"vehicleIdentifier","123456789a"},
+                {"engineType","GAS"},
+                {"rseEmbeddedFireTvs","1"}
             }}
         }}
     };
@@ -70,7 +72,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfig) {
          {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
          {VehiclePropertyType::LANGUAGE, "en_US"},
          {VehiclePropertyType::MICROPHONE, "SingleArray"},
-         {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
+         {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"},
+         {VehiclePropertyType::ENGINE_TYPE, "GAS"},
+         {VehiclePropertyType::RSE_EMBEDDED_FIRETVS, "1"}});
 
     // Convert to JSON for object comparison
     configStr << testConfiguration->getStream()->rdbuf();
@@ -121,7 +125,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
                 {"arch","x86_64"},
                 {"language","en_US"},
                 {"microphone","SingleArray"},
-                {"vehicleIdentifier","123456789a"}
+                {"vehicleIdentifier","123456789a"},
+                {"engineType","GAS"},
+                {"rseEmbeddedFireTvs","1"}
             }}
         }}
     };
@@ -138,7 +144,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithEmptyValueString
          {VehiclePropertyType::HARDWARE_ARCH, "x86_64"},
          {VehiclePropertyType::LANGUAGE, "en_US"},
          {VehiclePropertyType::MICROPHONE, "SingleArray"},
-         {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"}});
+         {VehiclePropertyType::VEHICLE_IDENTIFIER, "123456789a"},
+         {VehiclePropertyType::ENGINE_TYPE, "GAS"},
+         {VehiclePropertyType::RSE_EMBEDDED_FIRETVS, "1"}});
 
     // Convert to JSON for object comparison
     configStr << testConfiguration->getStream()->rdbuf();
@@ -167,7 +175,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinV
                 {"arch","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
                 {"language","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
                 {"microphone","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-                {"vehicleIdentifier","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}
+                {"vehicleIdentifier","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"engineType","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+                {"rseEmbeddedFireTvs","ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}
             }}
         }}
     };
@@ -184,7 +194,9 @@ TEST_F(VehicleConfigurationImplTest, createVehicleInfoConfigWithPossibleCharsinV
          {VehiclePropertyType::HARDWARE_ARCH, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::LANGUAGE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
          {VehiclePropertyType::MICROPHONE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
-         {VehiclePropertyType::VEHICLE_IDENTIFIER, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}});
+         {VehiclePropertyType::VEHICLE_IDENTIFIER, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::ENGINE_TYPE, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"},
+         {VehiclePropertyType::RSE_EMBEDDED_FIRETVS, "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890=~`!@#$%^&*()_+-=<>/?"}});
 
     // Convert to JSON for object comparison
     configStr << testConfiguration->getStream()->rdbuf();

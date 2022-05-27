@@ -51,7 +51,8 @@ public class PropertyUtil {
             try {
                 ai = pm.getApplicationInfo(context.getPackageName(), 0);
             } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, String.format("Package with name %s not found by Package Manager", context.getPackageName()));
+                Log.e(TAG,
+                        String.format("Package with name %s not found by Package Manager", context.getPackageName()));
                 return;
             }
 

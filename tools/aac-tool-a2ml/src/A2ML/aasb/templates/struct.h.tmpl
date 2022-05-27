@@ -1,0 +1,26 @@
+$header
+
+//
+// Type definition:
+//    $type.symbol
+//
+
+struct $type.name {
+    #for $next in $type.values
+    #if $next.optional
+    $generator.get_type( $next ) $next.name = $generator.get_value( $next, $next.default );
+    #else
+    $generator.get_type( $next ) $next.name;
+    #end if
+    #end for
+    std::string toString() const;
+};
+
+//
+// JSON serialization
+//
+
+void to_json(nlohmann::json &j, const $type.name &c);
+void from_json(const nlohmann::json &j, $type.name &c);
+
+$footer

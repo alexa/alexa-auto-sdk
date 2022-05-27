@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,12 +27,11 @@
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 
-#include "NavigationHandlerInterface.h"
+#include "DisplayHandlerInterface.h"
 
 namespace aace {
 namespace engine {
 namespace navigation {
-namespace displaymanager {
 
 class DisplayManagerCapabilityAgent
         : public alexaClientSDK::avsCommon::avs::CapabilityAgent
@@ -41,7 +40,7 @@ class DisplayManagerCapabilityAgent
         , public std::enable_shared_from_this<DisplayManagerCapabilityAgent> {
 public:
     static std::shared_ptr<DisplayManagerCapabilityAgent> create(
-        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
+        std::shared_ptr<aace::engine::navigation::DisplayHandlerInterface> displayHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
@@ -51,47 +50,65 @@ public:
      */
     virtual ~DisplayManagerCapabilityAgent() = default;
 
-    /// @name CapabilityAgent/DirectiveHandlerInterface Functions
+    /// @name CapabilityAgent functions.
     /// @{
     void handleDirectiveImmediately(std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive) override;
     void preHandleDirective(std::shared_ptr<DirectiveInfo> info) override;
     void handleDirective(std::shared_ptr<DirectiveInfo> info) override;
     void cancelDirective(std::shared_ptr<DirectiveInfo> info) override;
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration getConfiguration() const override;
-    /// @}};
+    /// @};
 
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
     getCapabilityConfigurations() override;
 
     /**
-     * Send success event corresponding to the @c EventName
-     *
-     * @param [in] event The @c EventName corresponding to the type of event to be sent.
+     * @c DisplayHandlerInterface successfully handled @c controlDisplay(). Send a @c ControlDisplaySucceeded event to
+     * AVS.
+     * 
+     * @param displayMode The requested display control action that was completed on the device.
      */
-    void navigationEvent(aace::navigation::NavigationEngineInterface::EventName event);
+    void controlDisplaySucceeded(aace::engine::navigation::DisplayMode displayMode);
 
     /**
-     * Send failure event corresponding to the @c ErrorType
+     * @c DisplayHandlerInterface failed to handle @c controlDisplay(). Send a @c ControlDisplayFailed event to AVS.
      *
-     * @param [in] type The @c ErrorType corresponding to the type of error to be sent.
-     * @param [in] code The @c ErrorCode corresponding to the code of error to be sent.
-     * @param [in] description The @c string corresponding to the description of error to be sent.
+     * @param displayMode The requested display control action that could not be completed on the device.
+     * @param error The reason the requested action was not completed.
+     * @param description An optional description of the error.
      */
-    void navigationError(
-        aace::navigation::NavigationEngineInterface::ErrorType type,
-        aace::navigation::NavigationEngineInterface::ErrorCode code,
-        const std::string& description);
+    void controlDisplayFailed(
+        aace::engine::navigation::DisplayMode displayMode,
+        aace::engine::navigation::DisplayControlError error,
+        const std::string& description = "");
 
     /**
-     * Send success event after the @c ShowAlternativeRoute directive is handled successfully by the platform interface.
+     * @c DisplayHandlerInterface successfully handled @c showAlternativeRoutes(). Send a
+     * @c ShowAlternativeRoutesSucceeded event to AVS.
      *
-     * @param [in] payload The payload to be sent in the event.
+     * @param queryType The type of alternate route that was requested and displayed to the user.
+     * @param route Details of the displayed alternate route. Alexa may speak the route details to the user.
      */
-    void showAlternativeRoutesSucceeded(const std::string& payload);
+    void showAlternativeRoutesSucceeded(
+        aace::engine::navigation::AlternativeRoutesQueryType queryType,
+        const aace::engine::navigation::AlternateRoute& route);
+
+    /**
+     * @c DisplayHandlerInterface failed to handle @c showAlternativeRoutes(). Send a @c ShowAlternativeRoutesFailed
+     * event to AVS.
+     *
+     * @param queryType The type of alternate route that was requested but not displayed to the user.
+     * @param error The reason the requested alternate route was not shown.
+     * @param description An optional description of the error.
+     */
+    void showAlternativeRoutesFailed(
+        aace::engine::navigation::AlternativeRoutesQueryType queryType,
+        aace::engine::navigation::AlternativeRoutesQueryError error,
+        const std::string& description = "");
 
 private:
     DisplayManagerCapabilityAgent(
-        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
+        std::shared_ptr<aace::engine::navigation::DisplayHandlerInterface> displayHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
@@ -100,19 +117,6 @@ private:
     /// @{
     void doShutdown() override;
     /// @}
-
-    /**
-     * Send @c ExceptionEncountered and report a failure to handle the @c AVSDirective.
-     *
-     * @param [in] info The @c AVSDirective that encountered the error and ancillary information.
-     * @param [in] type The type of Exception that was encountered.
-     * @param [in] message The error message to include in the ExceptionEncountered message.
-     */
-    void sendExceptionEncounteredAndReportFailed(
-        std::shared_ptr<DirectiveInfo> info,
-        const std::string& message,
-        alexaClientSDK::avsCommon::avs::ExceptionErrorType type =
-            alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
 
     /**
      * Remove a directive from the map of message IDs to @c DirectiveInfo instances.
@@ -149,28 +153,6 @@ private:
      */
     void handleUnknownDirective(std::shared_ptr<DirectiveInfo> info);
 
-    // Executor functions for sending navigation success and failure events.
-    void executeNavigationEvent(aace::navigation::NavigationEngineInterface::EventName event);
-    void executeNavigationError(
-        aace::navigation::NavigationEngineInterface::ErrorType type,
-        aace::navigation::NavigationEngineInterface::ErrorCode code,
-        const std::string& description);
-
-    // Executor function for sending successful handling of @c ShowAlternativeRoutes directive by the platform interface.
-    void executeShowAlternativeRoutesSucceeded(const std::string& payload);
-
-    // Send a success event to notify AVS of successful handling of @c ControlDisplay directive by the platform interface.
-    void controlDisplaySucceeded(std::string mode);
-
-    // Send a failure event to notify AVS of failed handling of @c ControlDisplay, @c ShowAlternativeRoutes directives by the platform interface.
-    void showAlternativeRoutesFailed(std::string code, std::string description, std::string mode);
-    void controlDisplayFailed(std::string code, std::string description, std::string mode);
-
-    // Helper functions to convert from navigation enum to string
-    std::string getErrorCode(aace::navigation::NavigationEngineInterface::ErrorCode code);
-    std::string getMode(aace::navigation::NavigationEngineInterface::EventName event);
-    std::string getMode(aace::navigation::NavigationEngineInterface::ErrorType type);
-
     /**
      * @name Executor Thread Variables
      *
@@ -178,8 +160,8 @@ private:
      * synchronization.
      */
     /// @{
-    /// A handler to be notified when a @c ControlDisplay, @ ShowAlternativeRoutes directive is received
-    std::shared_ptr<NavigationHandlerInterface> m_navigationHandler;
+    /// A handler to be notified when a @c ControlDisplay or @c ShowAlternativeRoutes directive is received.
+    std::shared_ptr<DisplayHandlerInterface> m_displayHandler;
     /// @}
 
     /// Set of capability configurations that will get published using the Capabilities API
@@ -194,7 +176,7 @@ private:
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 };
-}  // namespace displaymanager
+
 }  // namespace navigation
 }  // namespace engine
 }  // namespace aace

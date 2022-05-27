@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="contacts_permission_consent_title">Faça chamadas para seus contatos com a Alexa</string>
+    <string name="contacts_permission_consent_title">Permitir acesso aos contatos de %1$s?</string>
     <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Configurar chamadas de voz</string>
-    <string name="contacts_permission_consent_body">Permitir que contatos no %1$s sejam carregados no serviço da Amazon.</string>
-    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Faça chamadas sem usar as mãos para os contatos do seu telefone com o [Acme Brandon] e o Amazon Alexa. Seus contatos no %1$s serão carregados no serviço da Amazon.</string>
+    <string name="contacts_permission_consent_body">Os contatos serão carregados periodicamente na nuvem da Amazon para fazer chamadas e facilitar a localização de amigos e familiares.</string>
+    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Faça chamadas para os contatos do seu telefone sem usar as mãos com o [Acme Brandon] e o Amazon Alexa. Seus contatos no %1$s serão carregados no serviço da Amazon.</string>
     <string name="contacts_upload_consent_title">Contatos</string>
     <string name="contacts_upload_consent_summary">Para ativar chamadas para os contatos com a Alexa, os contatos neste telefone serão carregados no serviço da Amazon.</string>
     <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Carregue os contatos no serviço da Amazon para fazer chamadas e enviar mensagem para eles por nome</string>
-    <string name="contacts_consent_yes">ATIVAR</string>
+    <string name="contacts_consent_yes">CONCORDAR E PERMITIR</string>
     <string name="contacts_consent_yes_with_alexa_custom_assistant">Usar contatos</string>
     <string name="contacts_consent_skip">PULAR</string>
     <string name="comms_permission_status">Contatos %1$s</string>

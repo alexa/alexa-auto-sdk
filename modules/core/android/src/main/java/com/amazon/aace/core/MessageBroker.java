@@ -16,13 +16,11 @@
 package com.amazon.aace.core;
 
 import com.amazon.aace.core.NativeRef;
+
 import java.util.function.Function;
 
-final public class MessageBroker extends NativeRef 
-{
-    public interface MessageHandler {
-        public void messageReceived( String message );
-    }
+final public class MessageBroker extends NativeRef {
+    public interface MessageHandler { public void messageReceived(String message); }
 
     public final void subscribe(MessageHandler handler, String topic, String action) {
         subscribe(getNativeRef(), handler, topic, action);

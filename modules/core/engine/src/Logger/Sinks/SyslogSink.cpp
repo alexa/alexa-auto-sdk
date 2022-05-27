@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,13 +27,11 @@ namespace engine {
 namespace logger {
 namespace sink {
 
-// String to identify log entries originating from this file.
-static const std::string TAG("aace.logger.sink.SyslogSink");
-
 SyslogSink::SyslogSink(const std::string& id) : Sink(id) {
 #ifndef NO_SYSLOG
     openlog(nullptr, 0, LOG_USER);
     setlogmask(LOG_UPTO(LOG_DEBUG));
+    m_formatter = aace::engine::logger::LogFormatter::createPlainText();
 #else
     AACE_WARN(LX(TAG).m("Syslog support is not enabled!"));
 #endif
@@ -52,10 +50,11 @@ std::shared_ptr<SyslogSink> SyslogSink::create(const std::string& id) {
 void SyslogSink::log(
     Level level,
     std::chrono::system_clock::time_point time,
+    const char* source,
     const char* threadMoniker,
     const char* text) {
 #ifndef NO_SYSLOG
-    int syslogLevel;
+    int syslogLevel = LOG_ERR;
 
     switch (level) {
         case Level::VERBOSE:
@@ -81,12 +80,16 @@ void SyslogSink::log(
         case Level::METRIC:
             syslogLevel = LOG_INFO;
             break;
+
+        default:
+            syslogLevel = LOG_ERR;
+            AACE_NOT_REACHED;
     }
 
     syslog(
         syslogLevel,
         "%s",
-        LogFormatter::format(level, std::chrono::system_clock::time_point(), threadMoniker, text).c_str());
+        m_formatter->format(level, std::chrono::system_clock::time_point(), source, threadMoniker, text).c_str());
 #endif
 }
 

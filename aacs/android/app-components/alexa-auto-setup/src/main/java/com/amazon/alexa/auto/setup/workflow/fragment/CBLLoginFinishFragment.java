@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import android.app.Application;
@@ -18,9 +32,18 @@ import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
+import com.amazon.alexa.auto.apps.common.util.FeatureDiscoveryUtil;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
 import com.amazon.alexa.auto.setup.R;
+import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
+import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 /**
  * Fragment for displaying CBL login finish screen.
@@ -30,6 +53,9 @@ public class CBLLoginFinishFragment extends Fragment {
 
     private LoginViewModel mViewModel;
     private AlexaApp mApp;
+
+    @Inject
+    AlexaPropertyManager mAlexaPropertyManager;
 
     /**
      * Constructs an instance of CBLLoginFinishFragment.
@@ -52,6 +78,13 @@ public class CBLLoginFinishFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (mAlexaPropertyManager == null) {
+            DaggerSetupComponent.builder()
+                    .androidModule(new AndroidModule(getContext()))
+                    .build()
+                    .injectCBLLoginFinishFragment(this);
+        }
 
         if (mViewModel == null) { // It would be non-null for test injected dependencies.
             mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -95,6 +128,12 @@ public class CBLLoginFinishFragment extends Fragment {
 
         TextView loginCompletedButton = fragmentView.findViewById(R.id.cbl_login_finished_btn);
         loginCompletedButton.setOnClickListener(view -> { mViewModel.userFinishedLogin(); });
+
+        List<TextView> viewList = Arrays.asList(R.id.alexa_hint1, R.id.alexa_hint2, R.id.alexa_hint3)
+                                          .stream()
+                                          .map(integer -> (TextView) fragmentView.findViewById(integer))
+                                          .collect(Collectors.toList());
+        FeatureDiscoveryUtil.setFeaturesInSetupFlow(viewList, mAlexaPropertyManager, getContext());
 
         // Setup steps are completed and sending setup complete event.
         mViewModel.setupCompleted();

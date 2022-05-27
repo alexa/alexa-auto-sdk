@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_description">Mit Alexa Auto Client Service kannst du in deinem Fahrzeug mit Alexa sprechen.</string>
+    <string name="aacs_initializing">Initialisierung läuft&#160;..</string>
+    <string name="aacs_ready">Die Initialisierung ist abgeschlossen.</string>
+    <string name="aacs_title">AACS</string>
+    <string name="component_registry_key">%1$s + %2$s</string>
+</resources>

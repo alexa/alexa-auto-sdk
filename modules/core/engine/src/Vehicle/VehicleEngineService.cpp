@@ -74,6 +74,10 @@ std::string VehicleEngineService::getPropertyAttributeForMetric(VehiclePropertyT
             return "Microphone";
         case VehiclePropertyType::VEHICLE_IDENTIFIER:
             return "VehicleIdentifier";
+        case VehiclePropertyType::ENGINE_TYPE:
+            return "engineType";
+        case VehiclePropertyType::RSE_EMBEDDED_FIRETVS:
+            return "rseEmbeddedFireTvs";
     }
     return "";
 }
@@ -174,6 +178,9 @@ bool VehicleEngineService::configure(std::shared_ptr<std::istream> configuration
             getVehicleConfigProperty(info, "microphone", VehiclePropertyType::MICROPHONE, m_vehiclePropertyMap);
             getVehicleConfigProperty(
                 info, "vehicleIdentifier", VehiclePropertyType::VEHICLE_IDENTIFIER, m_vehiclePropertyMap);
+            getVehicleConfigProperty(info, "engineType", VehiclePropertyType::ENGINE_TYPE, m_vehiclePropertyMap);
+            getVehicleConfigProperty(
+                info, "rseEmbeddedFireTvs", VehiclePropertyType::RSE_EMBEDDED_FIRETVS, m_vehiclePropertyMap);
             m_vehicleInfoConfigured = true;
         }
 

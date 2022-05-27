@@ -9,7 +9,7 @@ def imports( obj, dest_folder ):
 
     # copy cmake files from tools package
     dest_cmake_path = os.path.join( dest_folder, "cmake" )
-    
+
     # create the cmake directory
     os.makedirs( dest_cmake_path, exist_ok=True )
 
@@ -32,20 +32,25 @@ def imports( obj, dest_folder ):
 
     with open( aac_build_info_path, "w" ) as out:
         cmake_file_path_sep = "\n    "
+        system_libs = []
         # write engine sources cmake variable list
         if obj.options.get_safe( "with_engine", default=False ):
             out.write( f"set(AAC_ENGINE_SOURCES{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in utils.list_files( source_path, "engine/src", "cpp", False )] ) )
+            out.writelines( cmake_file_path_sep.join( utils.list_files( source_path, "engine/src", "cpp", False ) ) )
             out.write( ")\n" )
         # write platform sources cmake variable list
         if obj.options.get_safe( "with_platform", default=False ):
             out.write( f"set(AAC_PLATFORM_SOURCES{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in utils.list_files( source_path, "platform/src", "cpp", False )] ) )
+            out.writelines( cmake_file_path_sep.join( utils.list_files( source_path, "platform/src", "cpp", False ) ) )
             out.write( ")\n" )
         # write aasb sources cmake variable list
         if obj.options.get_safe( "with_aasb", default=False ):
             out.write( f"set(AAC_AASB_SOURCES{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in utils.list_files( source_path, "aasb/src", "cpp", False )] ) )
+            aasb_sources = utils.list_files( source_path, "aasb/src", "cpp", False )
+            logging.info( f"Listing AASB message sources in {dest_folder}" )
+            aasb_message_sources = utils.list_files( dest_folder, "aasb-messages/src", "cpp", False )
+            logging.info( f"AASB message sources: {aasb_message_sources}" )
+            out.writelines( cmake_file_path_sep.join( aasb_sources + aasb_message_sources ) )
             out.write( ")\n" )
         # write messages cmake definitions
         if obj.options.get_safe( "with_messages", default=False ):
@@ -55,41 +60,47 @@ def imports( obj, dest_folder ):
         # write jni sources cmake variable list
         if obj.options.get_safe( "with_jni", default=False ):
             out.write( f"set(AAC_JNI_SOURCES{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in utils.list_files( source_path, "android/src/main/cpp/src", "cpp", False )] ) )
+            out.writelines( cmake_file_path_sep.join( utils.list_files( source_path, "android/src/main/cpp/src", "cpp", False ) ) )
             out.write( ")\n" )
-            out.write( "set(AAC_SYSTEM_LIBS android;log)\n" )
-        # write extra sources from recip
+            system_libs.extend( ["android", "log"] )
+
+        # Write system libs
+        system_libs.extend( obj._required_system_libs )
+        if system_libs:
+            out.write( f"set(AAC_SYSTEM_LIBS {';'.join(system_libs)})\n" )
+
+        # write extra sources from recipe
         module_sources = obj._module_sources
         if module_sources:
             out.write( f"set(AAC_MODULE_SOURCES{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in module_sources] ) )
+            out.writelines( cmake_file_path_sep.join( module_sources ) )
             out.write( ")\n" )
         # write unit test sources cmake variable list
         if obj.options.get_safe( "with_unit_tests", default=False ):
             out.write( f"set(AAC_UNIT_TEST_FRAMEWORK_SOURCES{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in utils.list_files( source_path, "testing/unit/framework/src", "cpp", False )] ) )
+            out.writelines( cmake_file_path_sep.join( utils.list_files( source_path, "testing/unit/framework/src", "cpp", False ) ) )
             out.write( ")\n" )
             out.write( f"set(AAC_UNIT_TEST_FRAMEWORK_INCLUDES{cmake_file_path_sep}" )
             out.writelines( os.path.join( source_path, "testing/unit/framework/include" ) )
             out.write( ")\n" )
             out.write( f"set(AAC_UNIT_TESTS{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in utils.list_files( source_path, "testing/unit/tests", "cpp", False, False )] ) )
+            out.writelines( cmake_file_path_sep.join( utils.list_files( source_path, "testing/unit/tests", "cpp", False, False ) ) )
             out.write( ")\n" )
 
         # write includes cmake variable list
         out.write( f"set(AAC_INCLUDES{cmake_file_path_sep}" )
-        out.writelines( cmake_file_path_sep.join( [next for next in obj.get_include_directories( source_path, False )] ) )
+        out.writelines( cmake_file_path_sep.join( obj.get_include_directories( source_path, False ) ) )
         out.write( ")\n" )
 
         # write all sources cmake variable list
         out.write( f"set(AAC_SOURCES{cmake_file_path_sep}" )
-        out.writelines( cmake_file_path_sep.join( [next for next in [
+        out.writelines( cmake_file_path_sep.join( [
             "${AAC_ENGINE_SOURCES}",
             "${AAC_PLATFORM_SOURCES}",
             "${AAC_AASB_SOURCES}",
             "${AAC_JNI_SOURCES}",
             "${AAC_MODULE_SOURCES}"
-        ]]))
+        ]))
         out.write( ")\n" )
 
         # write module specific cmake variables
@@ -119,7 +130,7 @@ def imports( obj, dest_folder ):
                 module_headers.extend( utils.list_files( source_path, next, "h", False ) )
             # write the headers
             out.write( f"set(AAC_HEADERS{cmake_file_path_sep}" )
-            out.writelines( cmake_file_path_sep.join( [next for next in module_headers] ) )
+            out.writelines( cmake_file_path_sep.join( module_headers ) )
             out.write( ")\n" )
             out.write( "source_group(\"Headers\" FILES ${AAC_HEADERS})\n" )
             # add headers to AAC_SOURCES
@@ -150,8 +161,9 @@ def build(obj):
         test_env["LD_LIBRARY_PATH"].append( os.path.join( obj.build_folder, "lib" ) )
         test_env["GTEST_OUTPUT"] = f"xml:{os.path.join(obj.build_folder,'test_results',obj.module_name)}/"
         logging.info( "Running tests..." )
+        ctest_count = tools.get_env("CTEST_REPEAT", 1)
         with tools.environment_append(test_env):
-            obj.run( f"ctest --output-on-failure {'-VV' if obj.verbose else ''}", run_environment=True, cwd=obj.build_folder )
+            obj.run( f"ctest --repeat until-fail:{ctest_count} --output-on-failure {'-VV' if obj.verbose else ''}", run_environment=True, cwd=obj.build_folder )
 
 def package(obj):
     logging.info( "Packaging native libraries..." )

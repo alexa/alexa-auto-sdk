@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.media.browse;
 
 import android.app.Notification;
@@ -37,6 +51,7 @@ import com.amazon.alexa.auto.media.player.MediaState;
 import com.amazon.alexa.auto.media.player.NotificationController;
 import com.amazon.alexa.auto.media.session.MediaSessionManager;
 import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 
 import org.json.JSONException;
@@ -361,7 +376,7 @@ public class AlexaMediaBrowseService extends MediaBrowserServiceCompat {
         }
 
         @Override
-        public void onPlayerError(ExoPlaybackException error) {
+        public void onPlayerError(PlaybackException error) {
             String message = error.toString();
             Log.w(TAG, "PLAYER ERROR: " + message);
             mAudioPlayerHandler.processMediaError(message);

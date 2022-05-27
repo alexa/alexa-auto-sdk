@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="InconsistentArrays">
+    <integer-array name="things_to_try_domains">
+        <item>@string/ttt_getting_started</item>
+        <item>@string/ttt_alexa_s_talents</item>
+        <item>@string/ttt_entertainment</item>
+        <item>@string/ttt_communication</item>
+        <item>@string/ttt_weather</item>
+        <item>@string/ttt_smart_home</item>
+        <item>@string/ttt_news_and_information</item>
+        <item>@string/ttt_navigation</item>
+        <item>@string/ttt_skills</item>
+        <item>@string/ttt_lists</item>
+        <item>@string/ttt_shopping</item>
+        <item>@string/ttt_questions_and_answers</item>
+        <item>@string/ttt_sports</item>
+        <item>@string/ttt_calendar</item>
+    </integer-array>
+
+    <integer-array name="things_to_try_drawables">
+        <item>@drawable/ttt_begin_with_alexa</item>
+        <item>@drawable/ttt_alexa_s_talents</item>
+        <item>@drawable/ttt_entertainment</item>
+        <item>@drawable/ttt_communication</item>
+        <item>@drawable/ttt_weather</item>
+        <item>@drawable/ttt_smart_home</item>
+        <item>@drawable/ttt_news_and_information</item>
+        <item>@drawable/ttt_navigation</item>
+        <item>@drawable/ttt_skills</item>
+        <item>@drawable/ttt_lists</item>
+        <item>@drawable/ttt_shopping</item>
+        <item>@drawable/ttt_questions_and_answers</item>
+        <item>@drawable/ttt_sports</item>
+        <item>@drawable/ttt_calendar</item>
+    </integer-array>
+
+    <array name="things_to_try_utterances">
+        <item>@array/ttt_getting_started</item>
+        <item>@array/ttt_alexa_s_talents</item>
+        <item>@array/ttt_entertainment</item>
+        <item>@array/ttt_communication</item>
+        <item>@array/ttt_weather</item>
+        <item>@array/ttt_smart_home</item>
+        <item>@array/ttt_news_and_information</item>
+        <item>@array/ttt_navigation</item>
+        <item>@array/ttt_skills</item>
+        <item>@array/ttt_lists</item>
+        <item>@array/ttt_shopping</item>
+        <item>@array/ttt_questions_and_answers</item>
+        <item>@array/ttt_sports</item>
+        <item>@array/ttt_calendar</item>
+    </array>
+
+    <integer-array name="ttt_getting_started">
+        <item>@string/ttt_getting_started_text1</item>
+        <item>@string/ttt_getting_started_text2</item>
+        <item>@string/ttt_getting_started_text3</item>
+        <item>@string/ttt_getting_started_text4</item>
+    </integer-array>
+
+    <integer-array name="ttt_alexa_s_talents">
+        <item>@string/ttt_alexa_s_talents_text1</item>
+        <item>@string/ttt_alexa_s_talents_text2</item>
+    </integer-array>
+
+    <integer-array name="ttt_communication">
+        <item>@string/ttt_communication_text1</item>
+        <item>@string/ttt_communication_text2</item>
+        <item>@string/ttt_communication_text3</item>
+    </integer-array>
+</resources>

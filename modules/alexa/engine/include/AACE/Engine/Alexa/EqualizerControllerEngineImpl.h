@@ -196,14 +196,15 @@ private:
             case alexaClientSDK::acsdkEqualizerInterfaces::EqualizerBand::MIDRANGE:
                 return EqualizerControllerEngineInterface::EqualizerBand::MIDRANGE;
             case alexaClientSDK::acsdkEqualizerInterfaces::EqualizerBand::TREBLE:
+            default:
                 return EqualizerControllerEngineInterface::EqualizerBand::TREBLE;
         }
     }
 
     /**
-     * Convert @c EqualizerControllerEngineInterface::EqualizerBand to 
+     * Convert @c EqualizerControllerEngineInterface::EqualizerBand to
      * @c alexaClientSDK::acsdkEqualizerInterfaces::EqualizerBand
-     * 
+     *
      * @param [in] band The band to convert
      * @return The converted band
      */
@@ -215,13 +216,14 @@ private:
             case EqualizerControllerEngineInterface::EqualizerBand::MIDRANGE:
                 return alexaClientSDK::acsdkEqualizerInterfaces::EqualizerBand::MIDRANGE;
             case EqualizerControllerEngineInterface::EqualizerBand::TREBLE:
+            default:
                 return alexaClientSDK::acsdkEqualizerInterfaces::EqualizerBand::TREBLE;
         }
     }
 
     /**
      * Provides a string representation for an @c std::vector<EqualizerBandLevel>
-     * 
+     *
      * @param bandLevels The band level vector
      * @return A string representation of the band levels
      */

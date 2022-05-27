@@ -1,0 +1,24 @@
+$header
+
+//
+// Enum definition:
+//    $type.symbol
+//
+
+enum class $type.name {
+    #for $next in $type.get_value_names()
+    $next,
+    #end for
+};
+
+std::string toString($type.name value);
+$type.name to${type.name}(const std::string& value);
+
+//
+// JSON serialization
+//
+
+void to_json(nlohmann::json& j, const $type.name& c);
+void from_json(const nlohmann::json& j, $type.name& c);
+
+$footer

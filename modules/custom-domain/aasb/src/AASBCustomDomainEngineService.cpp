@@ -33,13 +33,18 @@ REGISTER_SERVICE(AASBCustomDomainEngineService);
 
 AASBCustomDomainEngineService::AASBCustomDomainEngineService(
     const aace::engine::core::ServiceDescription& description) :
-        aace::engine::messageBroker::MessageHandlerEngineService(description, minRequiredVersion, {}, {"CustomDomain"}) {
+        aace::engine::messageBroker::MessageHandlerEngineService(
+            description,
+            minRequiredVersion,
+            {},
+            {"CustomDomain"}) {
 }
 
 bool AASBCustomDomainEngineService::postRegister() {
     try {
         auto messageBrokerServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(messageBrokerServiceInterface, "invalidMessageBrokerServiceInterface");
 
         // CustomDomain

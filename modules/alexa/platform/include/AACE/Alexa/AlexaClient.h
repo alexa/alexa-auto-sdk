@@ -208,12 +208,57 @@ public:
     };
 
     /**
+     * Describes the connection type. 
+     */
+    enum class ConnectionType {
+        /**
+         * Connection to Alexa Voice Service. 
+         */
+        AVS,
+
+        /**
+         * Connection to local endpoint. 
+         */
+        LOCAL
+    };
+
+    /**
+     * The struct containing connection status for a specific connection type.
+     */
+    struct ConnectionStatusInfo {
+        // Constructor
+        ConnectionStatusInfo(
+            ConnectionType connectionType,
+            ConnectionStatus connectStatus,
+            ConnectionChangedReason connectReason) :
+                type{connectionType}, status{connectStatus}, reason{connectReason} {
+        }
+
+        ConnectionType type;
+        ConnectionStatus status;
+        ConnectionChangedReason reason;
+    };
+
+    /**
      * Notifies the platform implementation of an AVS connection status change
      *
      * @param [in] status The new AVS connection status
      * @param [in] reason The reason for the AVS connection status change
      */
     virtual void connectionStatusChanged(ConnectionStatus status, ConnectionChangedReason reason) {
+    }
+
+    /**
+    * Notifies the platform implementation of both aggregated and detailed connection status changes.
+    *
+    * @param [in] status The aggregated connection status
+    * @param [in] reason The reason for the aggregated connection status change
+    * @param [in] detailed A vector of @c ConnectionStatusInfo details for each connection
+    */
+    virtual void connectionStatusChanged(
+        ConnectionStatus status,
+        ConnectionChangedReason reason,
+        std::vector<ConnectionStatusInfo> detailed) {
     }
 
     /**
@@ -326,6 +371,13 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::Connect
             break;
     }
     return stream;
+}
+
+inline bool operator==(
+    const AlexaClient::ConnectionStatusInfo& connectionStatus1,
+    const AlexaClient::ConnectionStatusInfo& connectionStatus2) {
+    return connectionStatus1.type == connectionStatus2.type && connectionStatus1.status == connectionStatus2.status &&
+           connectionStatus1.reason == connectionStatus2.reason;
 }
 
 }  // namespace alexa

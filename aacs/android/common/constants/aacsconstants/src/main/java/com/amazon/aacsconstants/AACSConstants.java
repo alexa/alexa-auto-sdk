@@ -59,8 +59,10 @@ public class AACSConstants {
     public static class IntentAction {
         public static final String GET_SERVICE_METADATA = "GetServiceMetadata";
         public static final String GET_SERVICE_METADATA_REPLY = "GetServiceMetadataReply";
-        public static final String ENABLE_SYNC_SYSTEM_PROPERTY_CHANGE = "com.amazon.aacs.syncSystemPropertyChange.enable";
-        public static final String DISABLE_SYNC_SYSTEM_PROPERTY_CHANGE = "com.amazon.aacs.syncSystemPropertyChange.disable";
+        public static final String ENABLE_SYNC_SYSTEM_PROPERTY_CHANGE =
+                "com.amazon.aacs.syncSystemPropertyChange.enable";
+        public static final String DISABLE_SYNC_SYSTEM_PROPERTY_CHANGE =
+                "com.amazon.aacs.syncSystemPropertyChange.disable";
     }
 
     public static class IntentCategory {
@@ -73,7 +75,7 @@ public class AACSConstants {
         public static final String METADATA = "metaData";
     }
 
-    //AACS State 
+    // AACS State
     public enum State { STARTED, WAIT_FOR_LVC_CONFIG, CONFIGURED, ENGINE_INITIALIZED, STOPPED }
     public static final String ACTION_STATE_CHANGE = "com.amazon.aacs.service.statechanged";
 

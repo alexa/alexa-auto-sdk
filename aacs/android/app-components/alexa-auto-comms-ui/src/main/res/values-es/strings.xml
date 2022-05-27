@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="contacts_permission_consent_title">Llamar a tus contactos con Alexa</string>
+    <string name="contacts_permission_consent_title">¿Permitir acceso a los contactos de %1$s?</string>
     <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Configurar llamadas de voz</string>
-    <string name="contacts_permission_consent_body">Permite que tus contactos de %1$s se carguen periódicamente al servicio de Amazon.</string>
+    <string name="contacts_permission_consent_body">Los contactos se cargarán periódicamente en la nube de Amazon para que te resulte más fácil buscar a tus amigos y familiares y hacer llamadas.</string>
     <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Llama a los contactos de tu teléfono con [Acme Brandon] y Amazon Alexa. Tus contactos de %1$s se cargarán al servicio de Amazon.</string>
     <string name="contacts_upload_consent_title">Contactos</string>
     <string name="contacts_upload_consent_summary">Para activar las llamadas con Alexa a contactos, se cargarán los contactos de este teléfono en el servicio de Amazon.</string>
     <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Cargar contactos al servicio de Amazon para llamarles y mandarles mensajes usando su nombre</string>
-    <string name="contacts_consent_yes">ACTIVAR</string>
+    <string name="contacts_consent_yes">ACEPTAR Y PERMITIR</string>
     <string name="contacts_consent_yes_with_alexa_custom_assistant">Usar contactos</string>
     <string name="contacts_consent_skip">OMITIR</string>
     <string name="comms_permission_status">Contactos de %1$s</string>

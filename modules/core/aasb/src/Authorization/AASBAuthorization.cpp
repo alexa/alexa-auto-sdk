@@ -57,8 +57,8 @@ bool AASBAuthorization::initialize(std::shared_ptr<aace::engine::messageBroker::
                     aasb::message::authorization::authorization::StartAuthorizationMessage::Payload payload =
                         nlohmann::json::parse(message.payload());
                     //extract the refreshtoken and cache if non empty
-                    if(!(payload.data).empty() ){
-                        sp->setCachedRefreshToken( payload.data);
+                    if (!(payload.data).empty()) {
+                        sp->setCachedRefreshToken(payload.data);
                     }
                     sp->startAuthorization(payload.service, payload.data);
                 } catch (std::exception& ex) {
@@ -197,16 +197,16 @@ std::string AASBAuthorization::getAuthorizationData(const std::string& service, 
     try {
         AACE_VERBOSE(LX(TAG));
 
-        if(m_cachedRefreshTokenData.empty() || service != "alexa:cbl"){
+        if (m_cachedRefreshTokenData.empty() || service != "alexa:cbl") {
             auto m_messageBroker_lock = m_messageBroker.lock();
             ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
-    
+
             aasb::message::authorization::authorization::GetAuthorizationDataMessage message;
             message.payload.service = service;
             message.payload.key = key;
-    
+
             auto result = m_messageBroker_lock->publish(message.toString()).get();
-    
+
             if (result.valid()) {
                 std::string payload = result.payload();
                 aasb::message::authorization::authorization::GetAuthorizationDataMessageReply::Payload replyPayload =
@@ -216,9 +216,9 @@ std::string AASBAuthorization::getAuthorizationData(const std::string& service, 
             } else {
                 AACE_ERROR(LX(TAG).d("reason", "Failed to receive response").d("service", service).d("key", key));
             }
-	 }else {
+        } else {
             return m_cachedRefreshTokenData;
-	 }
+        }
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("service", service).d("key", key));
     }
@@ -241,7 +241,7 @@ void AASBAuthorization::setAuthorizationData(
         message.payload.key = key;
         message.payload.data = data;
 
-        if(service == "alexa:cbl") {
+        if (service == "alexa:cbl") {
             m_cachedRefreshTokenData = data;
         }
 

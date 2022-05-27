@@ -32,6 +32,9 @@
 #include <AACE/Engine/Authorization/AuthorizationProviderListenerInterface.h>
 #include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
 
+#include <AACE/Engine/Network/NetworkInfoObserver.h>
+#include <AACE/Engine/Network/NetworkObservableInterface.h>
+
 #include "CBLAuthorizationProvider.h"
 #include "CBLConfiguration.h"
 #include "CBLEventListenerInterface.h"
@@ -56,6 +59,7 @@ private:
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
+        std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         bool enableUserProfile);
 
@@ -67,6 +71,7 @@ public:
         std::chrono::seconds codePairRequestTimeout,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
+        std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
         bool enableUserProfile);
 

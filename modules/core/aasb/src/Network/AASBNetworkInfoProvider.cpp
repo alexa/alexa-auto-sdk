@@ -49,7 +49,8 @@ std::shared_ptr<AASBNetworkInfoProvider> AASBNetworkInfoProvider::create(
     }
 }
 
-bool AASBNetworkInfoProvider::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBNetworkInfoProvider::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         // save the message broker reference
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");

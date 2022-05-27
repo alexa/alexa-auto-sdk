@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,37 +52,85 @@ public:
 
     enum class ControlDisplay {
 
+        /**
+         * A zoomed-out route overview for the active route.
+         */
         SHOW_ROUTE_OVERVIEW,
 
+        /**
+         * A list of directions for the active route.
+         */
         SHOW_DIRECTIONS_LIST,
 
+        /**
+         * Zoom in the map view.
+         */
         ZOOM_IN,
 
+        /**
+         * Zoom out the map view.
+         */
         ZOOM_OUT,
 
+        /**
+         * Center the map on the user's current location.
+         */
         CENTER_MAP_ON_CURRENT_LOCATION,
 
+        /**
+         * Rotate the map to align the north cardinal direction up.
+         */
         ORIENT_NORTH,
 
+        /**
+         * Scroll the map in the north cardinal direction.
+         */
         SCROLL_NORTH,
 
+        /**
+         * Scroll the map up, relative to the orientation shown on screen.
+         */
         SCROLL_UP,
 
+        /**
+         * Scroll the map in the east cardinal direction.
+         */
         SCROLL_EAST,
 
+        /**
+         * Scroll the map right, relative to the orientation shown on screen.
+         */
         SCROLL_RIGHT,
 
+        /**
+         * Scroll the map in the south cardinal direction.
+         */
         SCROLL_SOUTH,
 
+        /**
+         * Scroll the map down, relative to the orientation shown on screen.
+         */
         SCROLL_DOWN,
 
+        /**
+         * Scroll the map in the west cardinal direction.
+         */
         SCROLL_WEST,
 
+        /**
+         * Scroll the map left, relative to the orientation shown on screen.
+         */
         SCROLL_LEFT,
 
-        MUTE_ROUTE_GUIDANCE,  // navigation sounds off
+        /**
+         * Mute the route guidance voice.
+         */
+        MUTE_ROUTE_GUIDANCE,
 
-        UNMUTE_ROUTE_GUIDANCE,  // navigation sounds on
+        /**
+         * Un-mute the route guidance voice.
+         */
+        UNMUTE_ROUTE_GUIDANCE,
     };
 
     // user requested road regulation type
@@ -290,7 +338,6 @@ public:
      * @li hoursOfOperation.type (required) : Indicates whether the location is open on this day or not (Values: OPEN_DURING_HOURS, OPEN_24_HOURS, CLOSED, UNKNOWN, HOLIDAY)
      * @li metadata.phoneNumber (optional) : The phone number of the location in E.164 format
      */
-
     virtual void startNavigation(const std::string& payload) = 0;
 
     /**
@@ -368,7 +415,7 @@ public:
      * @li showAlternativeRoutes(): DEFAULT_ALTERNATE_ROUTES_FAILED, SHORTER_TIME_ROUTES_FAILED, SHORTER_DISTANCE_ROUTES_FAILED,
      * @li announceManeuver(): TURN_GUIDANCE_FAILED, EXIT_GUIDANCE_FAILED, ENTER_GUIDANCE_FAILED, MERGE_GUIDANCE_FAILED, LANE_GUIDANCE_FAILED,
      * @li announceRoadRegulation(): SPEED_LIMIT_REGULATION_FAILED, CARPOOL_RULES_REGULATION_FAILED
-     * @param code ErrorCode describing the type of failure. (Values: INTERNAL_SERVICE_ERROR, ROUTE_NOT_FOUND, NO_PREVIOUS_WAYPOINTS, NOT_SUPPORTED, NOT_ALLOWED)
+     * @param code ErrorCode describing the type of failure. (Values: INTERNAL_SERVICE_ERROR, ROUTE_NOT_FOUND, NO_PREVIOUS_WAYPOINTS, NOT_SUPPORTED, NOT_ALLOWED, NOT_NAVIGATING)
      * @param description String providing additional information.
      */
     void navigationError(ErrorType type, ErrorCode code, const std::string& description);
@@ -385,7 +432,7 @@ public:
      *       "savings": [
      *           {
      *               "type": "{{STRING}}", // DISTANCE, TIME
-     *               "amount": "{{FLOAT}}",
+     *               "amount": {{FLOAT}},
      *               "unit": "{{STRING}}" // MINUTE, HOUR, YARD, FOOT, MILE, METER, KILOMETER
      *           }
      *       ]              
@@ -609,6 +656,9 @@ inline std::ostream& operator<<(std::ostream& stream, const Navigation::ErrorCod
             break;
         case NavigationEngineInterface::ErrorCode::NOT_ALLOWED:
             stream << "NOT_ALLOWED";
+            break;
+        case NavigationEngineInterface::ErrorCode::NOT_NAVIGATING:
+            stream << "NOT_NAVIGATING";
             break;
     }
     return stream;

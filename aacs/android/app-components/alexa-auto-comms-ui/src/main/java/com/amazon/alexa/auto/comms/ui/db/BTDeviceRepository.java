@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.comms.ui.db;
 
 import android.content.Context;
@@ -8,6 +22,8 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
+
+import com.amazon.alexa.auto.comms.ui.Constants;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -48,6 +64,36 @@ public class BTDeviceRepository {
 
     public LiveData<BTDevice> getBTDeviceByAddress(String deviceAddress) {
         return btDeviceDatabase.btDeviceDao().getBTDeviceByAddress(deviceAddress);
+    }
+
+    public List<BTDevice> getBTDevices() {
+        return btDeviceDatabase.btDeviceDao().getDevicesSync();
+    }
+
+    public void shouldRequestContactsConsent(final BTDevice entry) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                BTDevice device = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(entry.getDeviceAddress());
+                if (device != null) {
+                    Log.i(TAG, "Device is paired, checking contacts consent permission");
+                    String permission = device.getContactsUploadPermission();
+                    Boolean firstPair = device.getFirstPair();
+                    if (permission.equals(Constants.CONTACTS_PERMISSION_NO) && firstPair == true) {
+                        Log.d(TAG, "Contacts consent not granted, popping up contacts consent screen");
+                        mHandler.post(
+                                () -> EventBus.getDefault().post(new BTDeviceDiscoveryMessage(device, true, true)));
+                        device.setFirstPair(false);
+                        btDeviceDatabase.btDeviceDao().updateBTDevice(device);
+                    }
+                } else {
+                    Log.w(TAG,
+                            String.format("BTDevice with address=%s does not exist in the database",
+                                    entry.getDeviceAddress()));
+                }
+                return null;
+            }
+        }.execute();
     }
 
     public void insertEntry(final BTDevice entry) {
@@ -98,6 +144,20 @@ public class BTDeviceRepository {
         }.execute();
     }
 
+    public void updateFirstPair(final String deviceAddress, final Boolean firstPair) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                BTDevice device = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(deviceAddress);
+                if (device != null) {
+                    device.setFirstPair(firstPair);
+                    btDeviceDatabase.btDeviceDao().updateBTDevice(device);
+                }
+                return null;
+            }
+        }.execute();
+    }
+
     public void findPrimaryBTDeviceEntry() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -108,17 +168,14 @@ public class BTDeviceRepository {
                     // Getting last connected device.
                     BTDevice targetDevice = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(
                             connectedDeviceList.get(connectedDeviceList.size() - 1).getDeviceAddress());
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (targetDevice != null) {
-                                EventBus.getDefault().post(new BTDeviceDiscoveryMessage(targetDevice, true));
-                            }
+                    mHandler.post(() -> {
+                        if (targetDevice != null) {
+                            EventBus.getDefault().post(new BTDeviceDiscoveryMessage(targetDevice, true, false));
                         }
                     });
                 } else {
                     Log.d(TAG, "There is no connected device.");
-                    EventBus.getDefault().post(new BTDeviceDiscoveryMessage(null, false));
+                    mHandler.post(() -> EventBus.getDefault().post(new BTDeviceDiscoveryMessage(null, false, false)));
                 }
                 return null;
             }
@@ -131,10 +188,16 @@ public class BTDeviceRepository {
     public static class BTDeviceDiscoveryMessage {
         private BTDevice device;
         private boolean isFound;
+        private boolean firstPair;
 
-        public BTDeviceDiscoveryMessage(BTDevice device, boolean isFound) {
+        public BTDeviceDiscoveryMessage(BTDevice device, boolean isFound, boolean firstPair) {
             this.device = device;
             this.isFound = isFound;
+            this.firstPair = firstPair;
+        }
+
+        public Boolean getFirstPair() {
+            return this.firstPair;
         }
 
         public BTDevice getBTDevice() {

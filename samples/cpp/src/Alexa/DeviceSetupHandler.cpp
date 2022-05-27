@@ -67,7 +67,7 @@ void DeviceSetupHandler::subscribeToAASBMessages() {
 }
 
 void DeviceSetupHandler::handleSetupCompletedResponseMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetupCompletedResponseMessage");
     SetupCompletedResponseMessage msg = json::parse(message);
     setupCompletedResponse(msg.payload.statusCode);
 }

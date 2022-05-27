@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <AACE/Navigation/Navigation.h>
 #include <AACE/Navigation/NavigationEngineInterfaces.h>
 
+#include "DisplayHandlerInterface.h"
 #include "NavigationCapabilityAgent.h"
 #include "NavigationHandlerInterface.h"
 #include "DisplayManagerCapabilityAgent.h"
@@ -32,6 +33,7 @@ namespace navigation {
 
 class NavigationEngineImpl
         : public NavigationHandlerInterface
+        , public DisplayHandlerInterface
         , public aace::navigation::NavigationEngineInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<NavigationEngineImpl> {
@@ -48,6 +50,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
 
 public:
+    ~NavigationEngineImpl() = default;
+
     static std::shared_ptr<NavigationEngineImpl> create(
         std::shared_ptr<aace::navigation::Navigation> navigationPlatformInterface,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
@@ -57,32 +61,52 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         const std::string& navigationProviderName);
 
-    // NavigationHandlerInterface
+    /// @name @c NavigationHandlerInterface functions.
+    /// @{
     void showPreviousWaypoints() override;
     void navigateToPreviousWaypoint() override;
-    void showAlternativeRoutes(aace::navigation::Navigation::AlternateRouteType alternateRouteType) override;
-    void controlDisplay(aace::navigation::Navigation::ControlDisplay controlDisplay) override;
     void startNavigation(const std::string& payload) override;
     void announceManeuver(const std::string& payload) override;
     void announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) override;
     void cancelNavigation() override;
     std::string getNavigationState() override;
+    /// @}
 
-    // NavigationEngineInterface
+    /// @name @c DisplayHandlerInterface functions.
+    /// @{
+    void controlDisplay(aace::engine::navigation::DisplayMode mode) override;
+    void showAlternativeRoutes(aace::engine::navigation::AlternativeRoutesQueryType queryType) override;
+    /// @}
+
+    /// @name @c NavigationEngineInterface functions.
+    /// @{
     void onNavigationEvent(EventName event) override;
     void onNavigationError(
         aace::navigation::NavigationEngineInterface::ErrorType type,
         aace::navigation::NavigationEngineInterface::ErrorCode code,
         const std::string& description) override;
     void onShowAlternativeRoutesSucceeded(const std::string& payload) override;
+    /// @}
 
 protected:
     void doShutdown() override;
 
 private:
+    void handleControlDisplaySuccess(aace::navigation::NavigationEngineInterface::EventName event);
+
+    void handleControlDisplayError(
+        aace::navigation::NavigationEngineInterface::ErrorType type,
+        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        const std::string& description);
+
+    void handleShowAlternativeRoutesError(
+        aace::navigation::NavigationEngineInterface::ErrorType type,
+        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        const std::string& description);
+
     std::shared_ptr<aace::navigation::Navigation> m_navigationPlatformInterface;
     std::shared_ptr<NavigationCapabilityAgent> m_navigationCapabilityAgent;
-    std::shared_ptr<displaymanager::DisplayManagerCapabilityAgent> m_displayManagerCapabilityAgent;
+    std::shared_ptr<DisplayManagerCapabilityAgent> m_displayManagerCapabilityAgent;
     std::shared_ptr<navigationassistance::NavigationAssistanceCapabilityAgent> m_navigationAssistanceCapabilityAgent;
     std::string m_navigationProviderName;
 };

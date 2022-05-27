@@ -15,7 +15,10 @@
 
 package com.amazon.aacstelephony;
 
+import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
+
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 import android.content.ComponentName;
 import android.content.Context;
@@ -33,6 +36,7 @@ import com.amazon.aacsconstants.TelephonyConstants;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.aacsipc.IPCConstants;
+import com.amazon.aacsipc.IPCUtils;
 import com.amazon.aacsipc.TargetComponent;
 import com.amazon.alexa.auto.aacs.common.AACSComponentRegistryUtil;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
@@ -43,8 +47,6 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
 
 public class Util {
     private static final String TAG = AACSConstants.AACS + "-" + Util.class.getSimpleName();
@@ -171,8 +173,7 @@ public class Util {
         sendNonAASBIntent(context, listeners, intent);
     }
 
-    static void broadcastConnectionCheckCompleted(
-            @NonNull Context context) {
+    static void broadcastConnectionCheckCompleted(@NonNull Context context) {
         String action = TelephonyConstants.ACTION_BLUETOOTH_STATE_CONNECTION_CHECK_COMPLETED;
         Intent intent = new Intent(action);
         intent.addCategory(TelephonyConstants.CATEGORY_AACS_TELEPHONY);
@@ -182,6 +183,43 @@ public class Util {
 
         if (listeners == null) {
             Log.e(TAG, "No listeners to the bluetooth connection check completed events");
+            return;
+        }
+
+        sendNonAASBIntent(context, listeners, intent);
+    }
+
+    static void broadcastPairedDevices(@NonNull Context context, String deviceName, String deviceAddress) {
+        String action = TelephonyConstants.ACTION_PAIRED_DEVICE;
+        Intent intent = new Intent(action);
+        intent.putExtra("deviceName", deviceName);
+        intent.putExtra("deviceAddress", deviceAddress);
+        intent.addCategory(TelephonyConstants.CATEGORY_AACS_TELEPHONY);
+
+        List<TargetComponent> listeners =
+                AACSComponentRegistryUtil.queryPackageManager(context, intent, Constants.AACS_TELEPHONY_PERMISSION);
+
+        if (listeners == null) {
+            Log.e(TAG, "No listeners to the broadcast paired devices events");
+            return;
+        }
+
+        sendNonAASBIntent(context, listeners, intent);
+    }
+
+    static void broadcastBondState(
+            @NonNull Context context, String deviceName, String deviceAddress, Integer bondState) {
+        Intent intent = new Intent(Constants.AACS_BOND_STATE_CHANGED);
+        intent.putExtra("deviceName", deviceName);
+        intent.putExtra("deviceAddress", deviceAddress);
+        intent.putExtra("bondState", bondState);
+        intent.addCategory(TelephonyConstants.CATEGORY_AACS_TELEPHONY);
+
+        List<TargetComponent> listeners =
+                AACSComponentRegistryUtil.queryPackageManager(context, intent, Constants.AACS_TELEPHONY_PERMISSION);
+
+        if (listeners == null) {
+            Log.w(TAG, "No listeners to the bond state bluetooth connection check completed events");
             return;
         }
 
@@ -235,7 +273,8 @@ public class Util {
                     context.startActivity(intent, null);
                     break;
                 case SERVICE:
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                            && !IPCUtils.getInstance(context).isSystemApp()) {
                         context.startForegroundService(intent);
                     } else {
                         context.startService(intent);

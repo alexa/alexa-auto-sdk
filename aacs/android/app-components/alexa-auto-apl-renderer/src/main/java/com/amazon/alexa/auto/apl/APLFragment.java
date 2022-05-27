@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apl;
 
 import static com.amazon.aacsconstants.AASBConstants.AlexaClient.DIALOG_STATE_LISTENING;
@@ -20,8 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.amazon.aacsconstants.Action;
-import com.amazon.aacsipc.AACSSender;
-import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
+import com.amazon.alexa.auto.apis.apl.APLVisualController;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.session.SessionActivityController;
 import com.amazon.alexa.auto.apl.handler.APLHandler;
@@ -57,7 +70,7 @@ public class APLFragment extends Fragment {
     private int mAPLViewPortHeight;
     private Bundle mCreationArgs;
 
-    private String mCurrentPayload = "";
+    private String mRenderPayload = "";
 
     private APLLayout mAPLLayout;
 
@@ -76,9 +89,18 @@ public class APLFragment extends Fragment {
     public void onStop() {
         Log.d(TAG, "onStop");
         super.onStop();
-        if (mAplHandler != null) {
-            mAplHandler.cancelExecution();
-        }
+
+        Context context = getContext();
+        Preconditions.checkNotNull(context);
+
+        AlexaApp.from(getContext())
+                .getRootComponent()
+                .getComponent(APLVisualController.class)
+                .ifPresent(aplVisualController -> {
+                    aplVisualController.cancelExecution();
+                    handleClearDocumentIntent(mRenderPayload);
+                });
+
         EventBus.getDefault().unregister(mAPLReceiver);
     }
 
@@ -86,7 +108,6 @@ public class APLFragment extends Fragment {
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
-        handleClearDocumentIntent(mCurrentPayload);
     }
 
     @Override
@@ -100,13 +121,16 @@ public class APLFragment extends Fragment {
         mCreationArgs = getArguments();
         if (mCreationArgs != null) {
             View fragmentView = requireView();
-            mAPLLayout = fragmentView.findViewById(R.id.apl);
+            View aplview = fragmentView.findViewById(R.id.apl);
+            mAPLLayout = (APLLayout) aplview;
 
-            WeakReference<Context> contextWk = new WeakReference<>(context);
-            mAplHandler = new APLHandler(contextWk, new AACSMessageSender(contextWk, new AACSSender()), mAPLLayout);
+            AlexaApp.from(context)
+                    .getRootComponent()
+                    .getComponent(APLVisualController.class)
+                    .ifPresent(aplVisualController -> { aplVisualController.setAPLLayout(aplview); });
+
+            FileUtil.readAACSConfigurationAsync(context).subscribe(this::constructAPLLayout);
         }
-
-        FileUtil.readAACSConfigurationAsync(context).subscribe(this::buildAPLPresenter);
     }
 
     @Override
@@ -114,19 +138,11 @@ public class APLFragment extends Fragment {
         Context context = getContext();
         Preconditions.checkNotNull(context);
 
-        //---------------------------------------------------------------------
-        // Initialize the APL Runtime. This must be called during
-        // Activity.onCreate() or prior to APLLayout inflation.
-        //---------------------------------------------------------------------
-        APLPresenter.initialize(context);
-
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_apl, container, false);
     }
 
     private void handleRenderDocumentIntent(@NonNull Bundle creationArgs) {
-        Preconditions.checkNotNull(mAplHandler);
-
         try {
             String payload = creationArgs.getString(Constants.PAYLOAD);
             Log.i(TAG, "handleRenderDocumentIntent payload: " + payload);
@@ -136,58 +152,94 @@ public class APLFragment extends Fragment {
             String token = json.getString(Constants.TOKEN);
             String renderPayload = json.getString(Constants.PAYLOAD);
 
-            mAplHandler.renderDocument(renderPayload, token, mDefaultWindowId);
+            AlexaApp.from(getContext())
+                    .getRootComponent()
+                    .getComponent(APLVisualController.class)
+                    .ifPresent(aplVisualController -> {
+                        aplVisualController.renderDocument(renderPayload, token, mDefaultWindowId);
+                    });
         } catch (Exception exception) {
             Log.w(TAG, "Failed to handle render document. Error:" + exception);
         }
     }
 
     private void handleClearDocumentIntent(@NonNull String payload) {
-        if (mAplHandler != null) {
-            try {
-                JSONObject json = new JSONObject(payload);
-                String token = json.getString(Constants.TOKEN);
+        try {
+            JSONObject json = new JSONObject(payload);
+            String token = json.getString(Constants.TOKEN);
 
-                mAplHandler.clearDocument(token);
-            } catch (Exception exception) {
-                Log.w(TAG, "Failed to handle clear document. Error:" + exception);
-            }
+            AlexaApp.from(getContext())
+                    .getRootComponent()
+                    .getComponent(APLVisualController.class)
+                    .ifPresent(aplVisualController -> { aplVisualController.clearDocument(token); });
+        } catch (Exception exception) {
+            Log.w(TAG, "Failed to handle clear document. Error:" + exception);
         }
     }
 
     private void handleExecuteCommandsIntent(@NonNull String payload) {
-        Preconditions.checkNotNull(mAplHandler);
         try {
             JSONObject json = new JSONObject(payload);
             String token = json.getString(Constants.TOKEN);
             String executeCommandPayload = json.getString(Constants.PAYLOAD);
 
-            mAplHandler.executeCommands(executeCommandPayload, token);
+            AlexaApp.from(getContext())
+                    .getRootComponent()
+                    .getComponent(APLVisualController.class)
+                    .ifPresent(aplVisualController -> {
+                        aplVisualController.executeCommands(executeCommandPayload, token);
+                    });
         } catch (Exception exception) {
             Log.w(TAG, "Failed to handle execute commands. Error:" + exception);
         }
     }
 
     private void handleUpdateAPLRuntimePropertiesIntent(@NonNull String payload) {
-        Preconditions.checkNotNull(mAplHandler);
         try {
             // Construct APL runtime properties with local cached values.
             String aplRuntimeProperties = constructAPLRuntimeProperties();
-            mAplHandler.handleAPLRuntimeProperties(aplRuntimeProperties);
+
+            AlexaApp.from(getContext())
+                    .getRootComponent()
+                    .getComponent(APLVisualController.class)
+                    .ifPresent(aplVisualController -> {
+                        aplVisualController.handleAPLRuntimeProperties(aplRuntimeProperties);
+                    });
         } catch (Exception exception) {
             Log.w(TAG, "Failed to handle update APL runtime properties commands. Error:" + exception);
         }
     }
 
+    private void handleDataSourceUpdateIntent(@NonNull String payload) {
+        try {
+            Log.v(TAG, "handleUpdateAPLDataSourceUpdateIntent: " + payload);
+            JSONObject json = new JSONObject(payload);
+            String dataType = json.getString(Constants.TYPE);
+            String token = json.getString(Constants.TOKEN);
+            String dataSourceUpdatePayload = json.getString(Constants.PAYLOAD);
+
+            AlexaApp.from(getContext())
+                    .getRootComponent()
+                    .getComponent(APLVisualController.class)
+                    .ifPresent(aplVisualController -> {
+                        aplVisualController.handleAPLDataSourceUpdate(dataType, dataSourceUpdatePayload, token);
+                    });
+        } catch (Exception exception) {
+            Log.w(TAG, "Failed to handle data source update. Error:" + exception);
+        }
+    }
+
     private void handleDialogStateChangedIntent(@NonNull String payload) {
-        Preconditions.checkNotNull(mAplHandler);
         try {
             Log.v(TAG, "handleDialogStateChangedIntent: " + payload);
             JSONObject dialogState = new JSONObject(payload);
             // Cancel APL execution when we go into listening state
             if (dialogState.getString(STATE).equals(DIALOG_STATE_LISTENING)) {
                 Log.v(TAG, "handleDialogStateChangedIntent: cancellingExecution");
-                mAplHandler.cancelExecution();
+                AlexaApp.from(getContext())
+                        .getRootComponent()
+                        .getComponent(APLVisualController.class)
+                        .ifPresent(APLVisualController::cancelExecution);
             }
         } catch (Exception exception) {
             Log.w(TAG, "Failed to handle dialog state change. Error:" + exception);
@@ -195,12 +247,11 @@ public class APLFragment extends Fragment {
     }
 
     /**
-     * Initialize APLPresenter class to provide the orchestration logic in the APL rendering process.
+     * Construct APL layout with visual characteristics configs.
      *
      * @param configs AACS configs.
      */
-    private void buildAPLPresenter(@NonNull String configs) {
-        Preconditions.checkNotNull(mAplHandler);
+    private void constructAPLLayout(@NonNull String configs) {
         try {
             JSONObject config = new JSONObject(configs);
             mVisualConfig =
@@ -229,18 +280,21 @@ public class APLFragment extends Fragment {
                 }
             }
 
-            mAplHandler.buildAPLPresenter(mVisualConfig, mDefaultWindowId);
-
             setAPLFragmentLayout(mAPLLayout);
 
-            mCurrentPayload = mCreationArgs.getString(Constants.PAYLOAD);
+            mRenderPayload = mCreationArgs.getString(Constants.PAYLOAD);
+
+            handleRenderDocumentIntent(mCreationArgs);
 
             String aplRuntimeProperties = constructAPLRuntimeProperties();
             if (!aplRuntimeProperties.isEmpty()) {
-                mAplHandler.handleAPLRuntimeProperties(aplRuntimeProperties);
+                AlexaApp.from(getContext())
+                        .getRootComponent()
+                        .getComponent(APLVisualController.class)
+                        .ifPresent(aplVisualController -> {
+                            aplVisualController.handleAPLRuntimeProperties(aplRuntimeProperties);
+                        });
             }
-
-            handleRenderDocumentIntent(mCreationArgs);
         } catch (JSONException e) {
             Log.w(TAG, "Failed to parse APL visual characteristics" + e);
         }
@@ -249,7 +303,6 @@ public class APLFragment extends Fragment {
     class APLDirectiveReceiver {
         @Subscribe
         public void OnReceive(APLDirective directive) {
-            mCurrentPayload = directive.message.payload;
             switch (directive.message.action) {
                 case Action.AlexaClient.DIALOG_STATE_CHANGED:
                     Preconditions.checkNotNull(directive.message.payload);
@@ -279,6 +332,10 @@ public class APLFragment extends Fragment {
                 case Action.APL.UPDATE_APL_RUNTIME_PROPERTIES:
                     Preconditions.checkNotNull(directive.message.payload);
                     handleUpdateAPLRuntimePropertiesIntent(directive.message.payload);
+                    break;
+                case Action.APL.DATA_SOURCE_UPDATE:
+                    Preconditions.checkNotNull(directive.message.payload);
+                    handleDataSourceUpdateIntent(directive.message.payload);
                     break;
                 default:
                     Log.d(TAG, "Unknown APL intent, action is " + directive.message.action);

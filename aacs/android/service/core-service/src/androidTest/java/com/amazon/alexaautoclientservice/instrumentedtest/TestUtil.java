@@ -10,10 +10,9 @@ public class TestUtil {
     final static String AACS_CONFIG_FILE = "aacs_config.json";
     final static String ENGINE_CONFIG_FILE = "auto_sdk_config.json";
 
-    // Make sure these values are set before running the tests
-    final static String CLIENT_ID = "";
-    final static String PRODUCT_ID = "";
-    final static String DSN = "";
+    final static String CLIENT_ID = "test_client_id";
+    final static String PRODUCT_ID = "test_product_id";
+    final static String DSN = "test_dsn";
 
     public static JSONObject constructOEMConfigMessage(String[] filepaths, String[] configStrings) throws Exception {
         String files = "";

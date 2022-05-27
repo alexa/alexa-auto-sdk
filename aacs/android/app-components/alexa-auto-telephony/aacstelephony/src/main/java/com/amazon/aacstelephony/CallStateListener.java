@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.TelephonyConstants;
+import com.amazon.aacsipc.IPCUtils;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 
 public class CallStateListener extends Call.Callback {
@@ -71,7 +72,7 @@ public class CallStateListener extends Call.Callback {
         intent.setComponent(mTelephonyServiceComponent);
         intent.setPackage(mPackageName);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !IPCUtils.getInstance(mContext).isSystemApp()) {
             mContext.startForegroundService(intent);
         } else {
             mContext.startService(intent);

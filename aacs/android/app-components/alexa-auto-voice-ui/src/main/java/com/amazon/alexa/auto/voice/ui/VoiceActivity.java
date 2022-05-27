@@ -1,11 +1,33 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.voice.ui;
 
+import static com.amazon.alexa.auto.apps.common.util.ModuleProvider.ModuleName.LVC;
+
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.Action;
@@ -30,18 +52,13 @@ import com.amazon.autovoicechrome.util.AutoVoiceChromeState;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import io.reactivex.rxjava3.disposables.Disposable;
-
-import static com.amazon.alexa.auto.apps.common.util.ModuleProvider.ModuleName.LVC;
-import static com.amazon.alexa.auto.apps.common.util.NetworkUtil.TYPE_NOT_CONNECTED;
 
 /**
  * Active Alexa Auto voice session activity, providing a facility for the implementation
@@ -54,6 +71,7 @@ public class VoiceActivity extends AppCompatActivity {
     private Disposable mActivityControllerDisposable;
     private boolean mVoiceSessionInUse;
     private boolean mSessionEnded;
+    private AutoVoiceChromeState mCurrentAlexaDialogState;
     private Disposable mViewControllerDisposable;
     private MediaPlayer mNetworkErrorTTSPrompt;
     private Fragment mVoiceFragment;
@@ -112,78 +130,12 @@ public class VoiceActivity extends AppCompatActivity {
 
         // TODO: we provide user a way to cancel Alexa voice request anytime needed, now it can be anywhere on the
         // screen, the UX could be replace with "X" button, need UX confirm
-        mContentView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Cancel current Alexa request");
-                AACSMessageBuilder.buildMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "")
-                        .ifPresent(message -> {
-                            mMessageSender.sendMessage(
-                                    Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "");
-                        });
-                AlexaApp app = AlexaApp.from(getApplicationContext());
-                Optional<SessionViewController> viewController =
-                        app.getRootComponent().getComponent(SessionViewController.class);
-                viewController.ifPresent(SessionViewController::clearTemplate);
-                finish();
-            }
-        });
+        mContentView.setOnClickListener(view -> cancelAlexaDialog());
 
         Bundle args = getIntent().getExtras();
-
-        if (args.containsKey(Topic.SPEECH_RECOGNIZER)) {
-            String action = args.getString(Topic.SPEECH_RECOGNIZER);
-            if (mEarconProvider != null) {
-                if (Action.SpeechRecognizer.WAKEWORD_DETECTED.equals(action)) {
-                    mEarconController.playAudioCueStartVoice(
-                            mEarconProvider.shouldUseAudioCueStartVoice(args.getString(action)));
-                }
-            } else {
-                if (Action.SpeechRecognizer.WAKEWORD_DETECTED.equals(action)) {
-                    mEarconController.playAudioCueStartVoice();
-                }
-            }
-
-            if (mAnimationProvider != null) {
-                switchAnimation(AutoVoiceChromeState.LISTENING.toString());
-            } else {
-                mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
-            }
-        } else if (args.containsKey(Constants.TOPIC_ALEXA_CONNECTION)) {
-            if (Constants.ACTION_ALEXA_NOT_CONNECTED.equals(args.getString(Constants.TOPIC_ALEXA_CONNECTION))) {
-                //Error chrome is only shown if authenticated
-                if (AlexaApp.from(getApplicationContext()).getRootComponent().getAuthController().isAuthenticated()) {
-                    mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IN_ERROR);
-                    mNetworkErrorTTSPrompt.start();
-                }
-
-            }
-        } else {
-            // User presses PTT
-            if (AlexaApp.from(getApplicationContext()).getRootComponent().getAuthController().isAuthenticated()) {
-                int connectivityStatus = NetworkUtil.getConnectivityStatus(getApplicationContext());
-                if ( connectivityStatus == NetworkUtil.TYPE_NOT_CONNECTED
-                        && !ModuleProvider.containsModule(getApplicationContext(), LVC)) {
-                    mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IN_ERROR);
-                    mNetworkErrorTTSPrompt.start();
-                } else {
-                    //Notifying AACS to start capture
-                    Log.d(TAG, "PTT: Start capture...");
-                    mSpeechRecognizerMessages.sendStartCapture(AASBConstants.SpeechRecognizer.SPEECH_INITIATOR_TAP_TO_TALK);
-                    mEarconController.playAudioCueStartTouch();
-
-                    if (mAnimationProvider != null) {
-                        // Prepare animation for PTT action
-                        mAnimationProvider.prepareAnimationForPTT();
-                        switchAnimation(AutoVoiceChromeState.LISTENING.toString());
-                    } else {
-                        mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
-                    }
-                }
-            } else {
-                Log.d(TAG, "PTT: User not authenticated, ignoring ...");
-            }
-        }
+        mCurrentAlexaDialogState = AutoVoiceChromeState.IDLE;
+        if (args != null && args.containsKey(AASBConstants.TOPIC))
+            sendAutoVoiceUIMessage(args);
 
         setVISViewForSessionController();
     }
@@ -214,8 +166,11 @@ public class VoiceActivity extends AppCompatActivity {
                             mVoiceFragment = sessionActivityController.getFragment();
                             if (mVoiceFragment != null) {
                                 if (fragmentAdded) {
-                                    getSupportFragmentManager().beginTransaction().add(R.id.auto_voice_interaction_view_container,
-                                            mVoiceFragment, mVoiceFragment.getClass().getSimpleName()).commit();
+                                    getSupportFragmentManager()
+                                            .beginTransaction()
+                                            .add(R.id.auto_voice_interaction_view_container, mVoiceFragment,
+                                                    mVoiceFragment.getClass().getSimpleName())
+                                            .commit();
 
                                 } else {
                                     getSupportFragmentManager().beginTransaction().remove(mVoiceFragment).commit();
@@ -232,6 +187,15 @@ public class VoiceActivity extends AppCompatActivity {
                         });
             });
         }
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "onNewIntent");
+        Bundle args = intent.getExtras();
+        if (args != null && args.containsKey(AASBConstants.TOPIC))
+            sendAutoVoiceUIMessage(args);
     }
 
     @Override
@@ -288,39 +252,72 @@ public class VoiceActivity extends AppCompatActivity {
         Log.d(TAG,
                 "Receiving voice interaction message, topic: " + message.getTopic()
                         + " action: " + message.getAction());
-
+        final String messageTopic = message.getTopic();
+        final String messageAction = message.getAction();
+        final String messagePayload = message.getPayload();
         if (!isFinishing()) {
-            if (message.getTopic().equals(Constants.TOPIC_VOICE_ANIMATION)) {
+            if (Topic.SPEECH_RECOGNIZER.equals(messageTopic)) {
+                switch (messageAction) {
+                    case Action.SpeechRecognizer.WAKEWORD_DETECTED:
+                        if (!AutoVoiceChromeState.LISTENING.equals(mCurrentAlexaDialogState))
+                            wakewordDetected(messagePayload);
+                        break;
+                    case Action.SpeechRecognizer.START_CAPTURE:
+                        if (AutoVoiceChromeState.LISTENING.equals(mCurrentAlexaDialogState))
+                            cancelAlexaDialog();
+                        else
+                            pttPressed();
+                        break;
+                    case Action.SpeechRecognizer.END_OF_SPEECH_DETECTED:
+                        if (mEarconProvider != null) {
+                            mEarconController.playAudioCueEnd(mEarconProvider.shouldUseAudioCueEnd(""));
+                        } else {
+                            mEarconController.playAudioCueEnd();
+                        }
+                        break;
+                }
+            } else if (Constants.TOPIC_ALEXA_CONNECTION.equals(messageTopic)) {
+                if (Constants.ACTION_ALEXA_NOT_CONNECTED.equals(messagePayload)) {
+                    // Error chrome is only shown if authenticated
+                    if (AlexaApp.from(getApplicationContext())
+                                    .getRootComponent()
+                                    .getAuthController()
+                                    .isAuthenticated()) {
+                        mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IN_ERROR);
+                        mNetworkErrorTTSPrompt.start();
+                    }
+                }
+            } else if (Constants.TOPIC_VOICE_ANIMATION.equals(messageTopic)) {
                 switch (message.getAction()) {
                     case Action.AlexaClient.DIALOG_STATE_CHANGED:
+                        mCurrentAlexaDialogState = convertToAutoVoiceChromeDialogState(message.getPayload());
                         if (mAnimationProvider != null) {
                             // Switching animation for dialog state changed
-                            switchAnimation(message.getPayload());
+                            switchAnimation(mCurrentAlexaDialogState.toString());
                         } else {
                             mAutoVoiceChromeController.onStateChanged(
-                                    convertToAutoVoiceChromeDialogState(message.getPayload()));
+                                    convertToAutoVoiceChromeDialogState(mCurrentAlexaDialogState.toString()));
                         }
 
-                        if (message.getPayload().equals(AutoVoiceChromeState.IDLE.toString())) {
+                        if (AutoVoiceChromeState.IDLE.equals(mCurrentAlexaDialogState)) {
                             mSessionEnded = true;
-                            if (!mVoiceSessionInUse) {
-                                Log.d(TAG, "voice session idle, so finishing voice session.");
-                                finish();
-                            }
-                        } else if (message.getPayload().equals(AutoVoiceChromeState.LISTENING.toString())) {
+                        }
+                        if (AutoVoiceChromeState.LISTENING.equals(mCurrentAlexaDialogState)) {
                             mSessionEnded = false;
+                        } else if (AASBConstants.AlexaClient.DIALOG_STATE_EXPECTING.equals(
+                                           mCurrentAlexaDialogState.toString())) {
+                            if (mEarconProvider != null) {
+                                mEarconController.playAudioCueStartVoice(
+                                        mEarconProvider.shouldUseAudioCueStartVoice(""));
+                            } else {
+                                mEarconController.playAudioCueStartVoice();
+                            }
                         }
                         break;
                     case Action.Animation.ANIMATION_SWITCH:
                         if (mAnimationProvider != null) {
                             switchAnimation(AutoVoiceChromeState.SPEAKING.toString());
                         }
-                }
-            } else if (message.getAction().equals(Action.SpeechRecognizer.END_OF_SPEECH_DETECTED)) {
-                if (mEarconProvider != null) {
-                    mEarconController.playAudioCueEnd(mEarconProvider.shouldUseAudioCueEnd(""));
-                } else {
-                    mEarconController.playAudioCueEnd();
                 }
             }
         }
@@ -368,7 +365,6 @@ public class VoiceActivity extends AppCompatActivity {
      */
     private void setVISViewForSessionController() {
         ViewGroup view = findViewById(R.id.auto_voice_interaction_view);
-
         AlexaApp app = AlexaApp.from(getApplicationContext());
         Optional<SessionViewController> viewController =
                 app.getRootComponent().getComponent(SessionViewController.class);
@@ -382,7 +378,8 @@ public class VoiceActivity extends AppCompatActivity {
 
                         View layout = findViewById(R.id.auto_voice_chrome_bar_view);
                         if (templateDisplayed) {
-                            layout.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.transparent_black));
+                            layout.getRootView().setBackgroundColor(
+                                    getApplicationContext().getResources().getColor(R.color.transparent_black));
                         } else {
                             layout.setBackgroundColor(Color.TRANSPARENT);
                         }
@@ -422,5 +419,81 @@ public class VoiceActivity extends AppCompatActivity {
                 break;
         }
         return autoVoiceChromeState;
+    }
+
+    private void cancelAlexaDialog() {
+        Log.d(TAG, "Cancel current Alexa request");
+        if (!mSessionEnded) {
+            AACSMessageBuilder.buildMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "")
+                    .ifPresent(message -> {
+                        mMessageSender.sendMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "");
+                    });
+        }
+
+        AlexaApp app = AlexaApp.from(getApplicationContext());
+        Optional<SessionViewController> viewController =
+                app.getRootComponent().getComponent(SessionViewController.class);
+        viewController.ifPresent(SessionViewController::clearTemplate);
+        Log.d(TAG, "Finishing Voice Activity...");
+        finish();
+    }
+
+    private void wakewordDetected(String action) {
+        if (isFinishing())
+            return;
+        if (AlexaApp.from(getApplicationContext()).getRootComponent().getAuthController().isAuthenticated()) {
+            int connectivityStatus = NetworkUtil.getConnectivityStatus(getApplicationContext());
+            if (connectivityStatus == NetworkUtil.TYPE_NOT_CONNECTED
+                    && !ModuleProvider.containsModule(getApplicationContext(), LVC)) {
+                mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IN_ERROR);
+                mNetworkErrorTTSPrompt.start();
+            } else {
+                if (mEarconProvider != null)
+                    mEarconController.playAudioCueStartVoice(mEarconProvider.shouldUseAudioCueStartVoice(action));
+                else
+                    mEarconController.playAudioCueStartVoice();
+                if (mAnimationProvider != null)
+                    switchAnimation(AutoVoiceChromeState.LISTENING.toString());
+                else
+                    mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
+            }
+        } else {
+            Log.d(TAG, "WW: User has not complete setup. Ignoring...");
+        }
+    }
+
+    private void sendAutoVoiceUIMessage(Bundle args) {
+        final String msgTopic = args.getString(AASBConstants.TOPIC, null);
+        final String msgAction = args.getString(AASBConstants.ACTION, null);
+        final String msgPayload = args.getString(AASBConstants.PAYLOAD, null);
+
+        onVoiceUiStateChange(new AutoVoiceUIMessage(msgTopic, msgAction, msgPayload));
+    }
+
+    private void pttPressed() {
+        if (isFinishing())
+            return;
+        if (AlexaApp.from(getApplicationContext()).getRootComponent().getAuthController().isAuthenticated()) {
+            int connectivityStatus = NetworkUtil.getConnectivityStatus(getApplicationContext());
+            if (connectivityStatus == NetworkUtil.TYPE_NOT_CONNECTED
+                    && !ModuleProvider.containsModule(getApplicationContext(), LVC)) {
+                mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.IN_ERROR);
+                mNetworkErrorTTSPrompt.start();
+            } else {
+                // Notifying AACS to start capture
+                Log.d(TAG, "PTT: Start capture...");
+                mSpeechRecognizerMessages.sendStartCapture(AASBConstants.SpeechRecognizer.SPEECH_INITIATOR_TAP_TO_TALK);
+                mEarconController.playAudioCueStartTouch();
+                if (mAnimationProvider != null) {
+                    // Prepare animation for PTT action
+                    mAnimationProvider.prepareAnimationForPTT();
+                    switchAnimation(AutoVoiceChromeState.LISTENING.toString());
+                } else {
+                    mAutoVoiceChromeController.onStateChanged(AutoVoiceChromeState.LISTENING);
+                }
+            }
+        } else {
+            Log.d(TAG, "PTT User has not complete setup. Ignoring...");
+        }
     }
 }

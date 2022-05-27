@@ -88,6 +88,9 @@ static const std::string METRIC_NETWORK_BAD_USER_INPUT = "Network.BadUserInput";
 /// Metric for any Network Error
 static const std::string METRIC_NETWORK_ERROR = "Network.Error";
 
+/// Address book AVS service type
+static const std::string ADDRESS_BOOK_SERVICE_TYPE_AVS = "AVS";
+
 using json = nlohmann::json;
 
 AddressBookCloudUploader::AddressBookCloudUploader() :
@@ -147,7 +150,7 @@ bool AddressBookCloudUploader::initialize(
         } else {
             AACE_DEBUG(LX(TAG).m("networkObserverNotAvailable"));
         }
-        m_addressBookService->addObserver(shared_from_this());
+        m_addressBookService->addObserver(shared_from_this(), ADDRESS_BOOK_SERVICE_TYPE_AVS);
 
         // Infinite event loop
         m_eventThread = std::thread{&AddressBookCloudUploader::eventLoop, this, cleanAllAddressBooksAtStart};

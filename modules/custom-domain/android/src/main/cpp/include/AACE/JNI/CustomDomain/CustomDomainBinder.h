@@ -82,7 +82,7 @@ public:
     }
 
     std::vector<std::pair<T, std::string>> getConfiguration() override {
-        return {{T::UNEXPECTED_INFORMATION_RECEIVED, "UNEXPECTED_INFORMATION_RECEIVED"}, 
+        return {{T::UNEXPECTED_INFORMATION_RECEIVED, "UNEXPECTED_INFORMATION_RECEIVED"},
                 {T::UNSUPPORTED_OPERATION, "UNSUPPORTED_OPERATION"},
                 {T::INTERNAL_ERROR, "INTERNAL_ERROR"},
                 {T::SUCCESS, "SUCCESS"}};

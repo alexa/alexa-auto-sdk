@@ -106,7 +106,7 @@ final public class Engine extends NativeRef {
      * @sa com.amazon.aace.core.MessageBroker
      */
     public final MessageBroker getMessageBroker() {
-        if(mMessageBroker == null) {
+        if (mMessageBroker == null) {
             mMessageBroker = getMessageBroker(getNativeRef());
         }
         return mMessageBroker;

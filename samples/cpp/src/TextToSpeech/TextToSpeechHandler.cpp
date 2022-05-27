@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@
 // Guidelines Support Library
 #include <gsl/gsl-lite.hpp>
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 namespace sampleApp {
 namespace textToSpeech {
 
@@ -47,7 +50,6 @@ static constexpr size_t READ_BUFFER_SIZE = 4096;
 static const std::string ID("TEXT_TO_SPEECH");
 static const std::string TEXT_TO_SPEECH_PROVIDER("text-to-speech-provider");
 
-using json = nlohmann::json;
 using MessageBroker = aace::core::MessageBroker;
 using MessageStream = aace::core::MessageStream;
 
@@ -92,7 +94,7 @@ void TextToSpeechHandler::subscribeToAASBMessages() {
 }
 
 void TextToSpeechHandler::handlePrepareSpeechCompletedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PrepareSpeechCompletedMessage");
     PrepareSpeechCompletedMessage msg = json::parse(message);
     prepareSpeechCompleted(
         msg.payload.speechId,
@@ -101,13 +103,13 @@ void TextToSpeechHandler::handlePrepareSpeechCompletedMessage(const std::string&
 }
 
 void TextToSpeechHandler::handlePrepareSpeechFailedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received PrepareSpeechFailedMessage");
     PrepareSpeechFailedMessage msg = json::parse(message);
     prepareSpeechFailed(msg.payload.speechId, msg.payload.reason);
 }
 
 void TextToSpeechHandler::handleGetCapabilitiesReplyMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetCapabilitiesReplyMessage");
     GetCapabilitiesMessageReply msg = json::parse(message);
 
     auto promise = getReplyMessagePromise(msg.header.messageDescription.replyToId);

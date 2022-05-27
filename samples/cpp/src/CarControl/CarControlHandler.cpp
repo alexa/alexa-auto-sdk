@@ -112,7 +112,7 @@ void CarControlHandler::subscribeToAASBMessages() {
 
 void CarControlHandler::handleSetControllerValueMessage(const std::string& message) {
     json msgJson = json::parse(message);
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetControllerValueMessage");
 
     std::string capabilityType = msgJson["payload"]["capabilityType"];
     if (capabilityType.compare("POWER") == 0) {
@@ -134,7 +134,7 @@ void CarControlHandler::handleSetControllerValueMessage(const std::string& messa
 
 void CarControlHandler::handleAdjustControllerValueMessage(const std::string& message) {
     json msgJson = json::parse(message);
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AdjustControllerValueMessage");
 
     std::string capabilityType = msgJson["payload"]["capabilityType"];
     if (capabilityType.compare("RANGE") == 0) {

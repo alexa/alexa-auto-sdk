@@ -2,37 +2,41 @@ import os
 import shutil
 
 from conans import ConanFile
+from conans.errors import ConanInvalidConfiguration
 
 
 class QNXOpenSSLConan(ConanFile):
     """
     Allow recipe consumer to compile and link with OpenSSL libraries provided by QNX SDP
     """
+
     name = "openssl"
-    version = "qnx700-1.0"
+    version = "qnx7"
     settings = "os", "compiler", "build_type", "arch"
     description = "Wrapper for OpenSSL libraries provided by QNX SDP"
 
     options = {
-        "shared": [True, False]
+        "shared": [True, False],
+        "openssl_version": ["default", "1.1"],
     }
 
     default_options = {
         "shared": False,
+        "openssl_version": "default",
     }
 
     @property
     def _qnx_ver(self):
-        return self.version.split("-")[0]
+        return self.version
 
     @property
     def _openssl_ver(self):
-        return self.version.split("-")[1]
+        return self.options.openssl_version
 
     @property
     def _openssl_include_path(self):
         ver = self._openssl_ver
-        if ver == "1.0":
+        if ver == "default":
             return os.path.join(self._qnx_target, "usr", "include", "openssl")
         elif ver == "1.1":
             return os.path.join(self._qnx_target, "usr", "include", "openssl1_1", "openssl")
@@ -42,7 +46,7 @@ class QNXOpenSSLConan(ConanFile):
     @property
     def _libssl_name(self):
         ver = self._openssl_ver
-        if ver == "1.0":
+        if ver == "default":
             return "libssl"
         elif ver == "1.1":
             return "libssl1_1"
@@ -52,7 +56,7 @@ class QNXOpenSSLConan(ConanFile):
     @property
     def _libcrypto_name(self):
         ver = self._openssl_ver
-        if ver == "1.0":
+        if ver == "default":
             return "libcrypto"
         elif ver == "1.1":
             return "libcrypto1_1"
@@ -60,12 +64,11 @@ class QNXOpenSSLConan(ConanFile):
             raise Exception(f"Unsupported OpenSSL version {ver}")
 
     @property
-    def _qnx_base(self):
-        return os.path.join(os.getenv('HOME'), self._qnx_ver)
-
-    @property
     def _qnx_target(self):
-        return os.path.join(self._qnx_base, "target", self._qnx_ver[0:4])
+        qnx_target = os.getenv("QNX_TARGET")
+        if not qnx_target:
+            raise ConanInvalidConfiguration("QNX_TARGET is not exported")
+        return qnx_target
 
     @property
     def _qnx_arch(self):

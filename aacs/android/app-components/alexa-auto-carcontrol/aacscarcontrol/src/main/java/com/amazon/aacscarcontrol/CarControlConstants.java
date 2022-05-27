@@ -45,5 +45,6 @@ public class CarControlConstants {
     public static final int CELSIUS_UNIT = 48;
     public static final int FAHRENHEIT_UNIT = 49;
 
-    public enum DataType { INT, BOOLEAN, FLOAT, UNKNOWN };
+    public enum DataType { INT, BOOLEAN, FLOAT, UNKNOWN }
+    ;
 }

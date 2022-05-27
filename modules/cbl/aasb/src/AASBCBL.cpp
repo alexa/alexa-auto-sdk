@@ -95,7 +95,8 @@ bool AASBCBL::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBro
     }
 }
 
-std::shared_ptr<AASBCBL> AASBCBL::create(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+std::shared_ptr<AASBCBL> AASBCBL::create(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
 

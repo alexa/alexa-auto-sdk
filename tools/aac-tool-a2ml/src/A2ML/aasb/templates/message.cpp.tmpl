@@ -1,0 +1,195 @@
+$header
+
+#if $type.messageType == "publish"
+
+// $type.name::Payload
+
+void to_json(nlohmann::json &j, const $type.name::Payload &c) {
+    j = nlohmann::json {
+        #for $next in $type.payload:
+        {"$next.name", c.$next.name},
+        #end for
+    };
+}
+
+void from_json(const nlohmann::json &j, $type.name::Payload &c) {
+    #for $next in $type.payload:
+    #if $next.value
+    // CONST: j.at("$next.name").get_to(c.$next.name);
+    #elif $next.optional
+    if (j.contains("$next.name")) {
+        j.at("$next.name").get_to(c.$next.name);
+    }
+    #else
+    j.at("$next.name").get_to(c.$next.name);
+    #end if
+    #end for
+}
+
+// $type.name::Header::MessageDescription
+
+void to_json(nlohmann::json &j, const $type.name::Header::MessageDescription &c) {
+    j = nlohmann::json{
+        {"topic", c.topic()},
+        {"action", c.action()},
+    };
+}
+
+void from_json(const nlohmann::json &j, $type.name::Header::MessageDescription &c) {
+}
+
+${type.name}::Payload::Payload() = default;
+
+${type.name}::Payload::Payload(const std::string& payload) {
+    *this = nlohmann::json::parse(payload);
+}
+
+// $type.name::Header
+
+void to_json(nlohmann::json &j, const $type.name::Header &c) {
+    j = nlohmann::json{
+        {"version", c.version()},
+        {"messageType", c.messageType()},
+        {"id", c.id},
+        {"messageDescription", c.messageDescription},
+    };
+}
+
+void from_json(const nlohmann::json &j, $type.name::Header &c) {
+    j.at("id").get_to(c.id);
+    j.at("messageDescription").get_to(c.messageDescription);
+}
+
+${type.name}::Header::Header() {
+    id = ::aasb::utils::uuid::generateUUID();
+}
+
+${type.name}::Header::Header(const std::string& header) {
+    *this = nlohmann::json::parse(header);
+}
+
+// $type.name
+
+void to_json(nlohmann::json &j, const $type.name &c) {
+    j = nlohmann::json{
+        {"header", c.header},
+        {"payload", c.payload},
+    };
+}
+
+void from_json(const nlohmann::json &j, $type.name &c) {
+    j.at("header").get_to(c.header);
+    j.at("payload").get_to(c.payload);
+}
+
+${type.name}::${type.name}() = default;
+
+${type.name}::${type.name}(const std::string& message) {
+    *this = nlohmann::json::parse(message);
+}
+
+// $type.name::toString()
+
+std::string $type.name::toString() const{
+    nlohmann::json j = *this;
+    return j.dump(3);
+}
+
+#end if
+
+#if $type.reply
+
+// ${type.name}Reply::Payload
+
+void to_json(nlohmann::json &j, const ${type.name}Reply::Payload &c) {
+    j = nlohmann::json {
+        #for $next in $type.reply:
+        {"$next.name", c.$next.name},
+        #end for
+    };
+}
+
+void from_json(const nlohmann::json &j, ${type.name}Reply::Payload &c) {
+    #for $next in $type.reply:
+    #if $next.value
+    // CONST: j.at("$next.name").get_to(c.$next.name);
+    #else
+    j.at("$next.name").get_to(c.$next.name);
+    #end if
+    #end for
+}
+
+${type.name}Reply::Payload::Payload() = default;
+
+${type.name}Reply::Payload::Payload(const std::string& payload) {
+    *this = nlohmann::json::parse(payload);
+}
+
+// ${type.name}Reply::Header::MessageDescription
+
+void to_json(nlohmann::json &j, const ${type.name}Reply::Header::MessageDescription &c) {
+    j = nlohmann::json{
+        {"topic", c.topic()},
+        {"action", c.action()},
+        {"replyToId", c.replyToId},
+    };
+}
+
+void from_json(const nlohmann::json &j, ${type.name}Reply::Header::MessageDescription &c) {
+    j.at("replyToId").get_to(c.replyToId);
+}
+
+// ${type.name}Reply::Header
+
+void to_json(nlohmann::json &j, const ${type.name}Reply::Header &c) {
+    j = nlohmann::json{
+        {"version", c.version()},
+        {"messageType", c.messageType()},
+        {"id", c.id},
+        {"messageDescription", c.messageDescription},
+    };
+}
+
+void from_json(const nlohmann::json &j, ${type.name}Reply::Header &c) {
+    j.at("id").get_to(c.id);
+    j.at("messageDescription").get_to(c.messageDescription);
+}
+
+${type.name}Reply::Header::Header() {
+    id = ::aasb::utils::uuid::generateUUID();
+}
+
+${type.name}Reply::Header::Header(const std::string& header) {
+    *this = nlohmann::json::parse(header);
+}
+
+// ${type.name}Reply
+
+void to_json(nlohmann::json &j, const ${type.name}Reply &c) {
+    j = nlohmann::json{
+        {"header", c.header},
+        {"payload", c.payload},
+    };
+}
+
+void from_json(const nlohmann::json &j, ${type.name}Reply &c) {
+    j.at("header").get_to(c.header);
+    j.at("payload").get_to(c.payload);
+}
+
+${type.name}Reply::${type.name}Reply() = default;
+
+${type.name}Reply::${type.name}Reply(const std::string& message) {
+    *this = nlohmann::json::parse(message);
+}
+
+// ${type.name}Reply::toString()
+
+std::string ${type.name}Reply::toString() const {
+    nlohmann::json j = *this;
+    return j.dump(3);
+}
+
+#end if
+
+$footer

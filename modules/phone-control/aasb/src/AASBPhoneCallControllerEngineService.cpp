@@ -33,13 +33,17 @@ REGISTER_SERVICE(AASBPhoneCallControllerEngineService);
 
 AASBPhoneCallControllerEngineService::AASBPhoneCallControllerEngineService(
     const aace::engine::core::ServiceDescription& description) :
-        aace::engine::messageBroker::MessageHandlerEngineService(description, minRequiredVersion, {"PhoneCallController"}) {
+        aace::engine::messageBroker::MessageHandlerEngineService(
+            description,
+            minRequiredVersion,
+            {"PhoneCallController"}) {
 }
 
 bool AASBPhoneCallControllerEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // PhoneCallController

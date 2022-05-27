@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -417,6 +417,9 @@ std::string NavigationAssistanceCapabilityAgent::getManeuverErrorCode(
     std::string errorCodeString;
     switch (code) {
         case aace::navigation::NavigationEngineInterface::ErrorCode::ROUTE_NOT_FOUND:
+            errorCodeString = "NO_ROUTES_FOUND";
+            break;
+        case aace::navigation::NavigationEngineInterface::ErrorCode::NOT_NAVIGATING:
             errorCodeString = "NOT_NAVIGATING";
             break;
         case aace::navigation::NavigationEngineInterface::ErrorCode::NOT_SUPPORTED:
@@ -433,8 +436,14 @@ std::string NavigationAssistanceCapabilityAgent::getRoadRegulationErrorCode(
     aace::navigation::NavigationEngineInterface::ErrorCode code) {
     std::string errorCodeString;
     switch (code) {
+        case aace::navigation::NavigationEngineInterface::ErrorCode::ROUTE_NOT_FOUND:
+            errorCodeString = "NO_ROUTES_FOUND";
+            break;
         case aace::navigation::NavigationEngineInterface::ErrorCode::NOT_SUPPORTED:
             errorCodeString = "NOT_SUPPORTED";
+            break;
+        case aace::navigation::NavigationEngineInterface::ErrorCode::NOT_NAVIGATING:
+            errorCodeString = "NOT_NAVIGATING";
             break;
         default:
             errorCodeString = "INTERNAL_ERROR";

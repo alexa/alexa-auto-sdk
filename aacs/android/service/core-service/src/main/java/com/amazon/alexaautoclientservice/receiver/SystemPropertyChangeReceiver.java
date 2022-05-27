@@ -49,8 +49,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SystemPropertyChangeReceiver
-        extends BroadcastReceiver implements AACSStateObserver, AuthStateObserver {
+public class SystemPropertyChangeReceiver extends BroadcastReceiver implements AACSStateObserver, AuthStateObserver {
     private final String TAG = AACSConstants.AACS + "-" + SystemPropertyChangeReceiver.class.getSimpleName();
     private final Uri mUri = Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI);
     private AASBHandler mAASBHandler;
@@ -78,7 +77,7 @@ public class SystemPropertyChangeReceiver
         updateAlexaLocale();
         updateAlexaTimeZone();
     }
-    
+
     public void changeEnablement(String property, boolean enable) {
         if (!mPropertyUpdateEnablementMap.containsKey(property)) {
             Log.e(TAG, String.format("Unknown property %s, ignored.", property));
@@ -203,9 +202,6 @@ public class SystemPropertyChangeReceiver
         // Do an initial sync after user logging in
         if (AASBConstants.AlexaClient.AUTH_STATE_REFRESHED.equals(authState)) {
             initialSyncPropertyValues();
-        } else if (AASBConstants.AlexaClient.AUTH_STATE_UNINITIALIZED.equals(authState)){
-            // Reset the enablement when user logs out
-            resetPropertyUpdateEnablementMap();
         }
     }
 }

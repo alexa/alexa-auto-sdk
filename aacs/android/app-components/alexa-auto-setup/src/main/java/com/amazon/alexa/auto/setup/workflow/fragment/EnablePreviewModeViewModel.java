@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import android.app.Application;
@@ -47,28 +61,24 @@ public class EnablePreviewModeViewModel extends AndroidViewModel {
     public void enablePreviewMode() {
         if (!this.mAuthController.isAuthenticated()) {
             Log.d(TAG, "Enable Preview Mode workflow starting");
-            mAuthController.cancelLogin(AuthMode.CBL_AUTHORIZATION);
             mAuthController.setAuthMode(AuthMode.AUTH_PROVIDER_AUTHORIZATION);
-            this.mAuthWorkflowSubscription = this.mAuthController.newAuthenticationWorkflow()
-                .subscribe(loginData -> {
-                    Log.d(TAG, "Login Workflow state changed: " + loginData.getAuthState());
-                    if (Looper.myLooper() == Looper.getMainLooper()) {
-                        mAuthWorkflowState.setValue(loginData);
-                    } else {
-                        mAuthWorkflowState.postValue(loginData);
-                    }
+            this.mAuthWorkflowSubscription = this.mAuthController.newAuthenticationWorkflow().subscribe(loginData -> {
+                Log.d(TAG, "Login Workflow state changed: " + loginData.getAuthState());
+                if (Looper.myLooper() == Looper.getMainLooper()) {
+                    mAuthWorkflowState.setValue(loginData);
+                } else {
+                    mAuthWorkflowState.postValue(loginData);
+                }
 
-                    if (loginData.getAuthState().equals(AuthState.Auth_Provider_Auth_Started)) {
-                        mWaitForStartLogin.startWaitForAuthStartTimer();
-                    } else if (loginData.getAuthState().equals(AuthState.Auth_Provider_Authorizing)) {
-                        mWaitForStartLogin.cancelWaitForAuthStartTimer();
-                    }
-                });
-            EventBus.getDefault()
-                    .post(new AuthWorkflowData(AuthState.Auth_Provider_Auth_Started, null, null));
+                if (loginData.getAuthState().equals(AuthState.Auth_Provider_Auth_Started)) {
+                    mWaitForStartLogin.startWaitForAuthStartTimer();
+                } else if (loginData.getAuthState().equals(AuthState.Auth_Provider_Authorizing)) {
+                    mWaitForStartLogin.cancelWaitForAuthStartTimer();
+                }
+            });
+            EventBus.getDefault().post(new AuthWorkflowData(AuthState.Auth_Provider_Auth_Started, null, null));
         } else {
-                EventBus.getDefault()
-                        .post(new WorkflowMessage(LoginEvent.PREVIEW_MODE_ENABLED));
+            EventBus.getDefault().post(new WorkflowMessage(LoginEvent.PREVIEW_MODE_ENABLED));
         }
     }
 
@@ -140,13 +150,13 @@ public class EnablePreviewModeViewModel extends AndroidViewModel {
         @Override
         public void run() {
             Preconditions.checkArgument(!mLoginStarted,
-                    "Cannot set Preview mode workflow state to " +
-                            "Auth_Provider_Authorization_Error since login workflow is started.");
+                    "Cannot set Preview mode workflow state to "
+                            + "Auth_Provider_Authorization_Error since login workflow is started.");
 
             Log.i(TAG, "WaitForLoginStart timer kicked in. Sending start login failed update.");
 
-            AuthWorkflowData loginFailed = new AuthWorkflowData(
-                    AuthState.Auth_Provider_Authorization_Error, null, null);
+            AuthWorkflowData loginFailed =
+                    new AuthWorkflowData(AuthState.Auth_Provider_Authorization_Error, null, null);
             mAuthWorkflowState.setValue(loginFailed);
         }
     }

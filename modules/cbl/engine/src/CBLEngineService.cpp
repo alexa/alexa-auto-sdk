@@ -22,6 +22,8 @@
 #include "AACE/Engine/Authorization/AuthorizationServiceInterface.h"
 #include "AACE/Engine/CBL/CBLEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Network/NetworkInfoObserver.h>
+#include <AACE/Engine/Network/NetworkObservableInterface.h>
 #include <AACE/Engine/PropertyManager/PropertyManagerEngineService.h>
 #include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
 #include "AACE/Engine/Utils/JSON/JSON.h"
@@ -101,10 +103,14 @@ bool CBLEngineService::setup() {
                     "aace.propertyManager");
             ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
 
+            auto networkObserver =
+                getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>("aace.network");
+
             m_cblAuthorizationProvider = CBLAuthorizationProvider::create(
                 SERVICE_NAME,
                 alexaComponents->getAuthorizationManager(),
                 configuration,
+                networkObserver,
                 propertyManager,
                 m_enableUserProfile);
             authorizationService->registerProvider(m_cblAuthorizationProvider, SERVICE_NAME);
@@ -176,6 +182,9 @@ bool CBLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::cbl::
                 "aace.propertyManager");
         ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
 
+        auto networkObserver =
+            getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>("aace.network");
+
         m_cblEngineImpl = aace::engine::cbl::CBLEngineImpl::create(
             cbl,
             alexaComponents->getAuthorizationManager(),
@@ -183,6 +192,7 @@ bool CBLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::cbl::
             m_codePairRequestTimeout,
             alexaEndpoints,
             localeAssetManager,
+            networkObserver,
             propertyManager,
             m_enableUserProfile);
         ThrowIfNull(m_cblEngineImpl, "createCBLEngineImplFailed");

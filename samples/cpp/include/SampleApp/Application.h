@@ -65,6 +65,7 @@
 #include "SampleApp/Alexa/AlexaSpeakerHandler.h"
 #include "SampleApp/Alexa/DoNotDisturbHandler.h"
 #include "SampleApp/Alexa/DeviceSetupHandler.h"
+#include "SampleApp/Alexa/FeatureDiscoveryHandler.h"
 #include "SampleApp/Alexa/MediaPlaybackRequestorHandler.h"
 #endif
 

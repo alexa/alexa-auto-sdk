@@ -47,7 +47,7 @@ AudioInputProviderHandler::AudioInputProviderHandler(
     std::weak_ptr<logger::LoggerHandler> loggerHandler,
     std::shared_ptr<MessageBroker> messageBroker,
     bool setup) :
-        m_activity{std::move(activity)}, 
+        m_activity{std::move(activity)},
         m_loggerHandler{std::move(loggerHandler)},
         m_messageBroker{std::move(messageBroker)} {
     if (setup) {
@@ -79,7 +79,7 @@ void AudioInputProviderHandler::subscribeToAASBMessages() {
 }
 
 void AudioInputProviderHandler::handleStartAudioInputMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StartAudioInputMessage");
 
     StartAudioInputMessage msg = json::parse(message);
     auto stream = m_messageBroker->openStream(msg.payload.streamId, MessageStream::Mode::WRITE);
@@ -87,7 +87,7 @@ void AudioInputProviderHandler::handleStartAudioInputMessage(const std::string& 
 }
 
 void AudioInputProviderHandler::handleStopAudioInputMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StopAudioInputMessage");
     stopAudioInput();
 }
 

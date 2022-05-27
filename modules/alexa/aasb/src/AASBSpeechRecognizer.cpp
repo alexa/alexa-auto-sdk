@@ -50,7 +50,8 @@ std::shared_ptr<AASBSpeechRecognizer> AASBSpeechRecognizer::create(
     }
 }
 
-bool AASBSpeechRecognizer::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBSpeechRecognizer::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         // save the message broker reference
         m_messageBroker = messageBroker;

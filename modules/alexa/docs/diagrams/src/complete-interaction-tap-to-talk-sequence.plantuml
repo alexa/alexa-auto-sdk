@@ -1,0 +1,267 @@
+@startuml
+
+title: Complete Alexa Interaction (Tap-to-Talk)
+
+skinparam sequenceMessageAlign direction
+skinparam lifelineStrategy nosolid
+
+
+<style>
+sequenceDiagram {
+	.alexa {
+    	RoundCorner 5
+        BackgroundColor #05FEFE
+        LineColor #214CFB
+    }
+    .engine {
+    	RoundCorner 5
+        BackgroundColor LightCyan
+        LineColor LightSlateGray
+    }
+    .client {
+    	RoundCorner 5
+    	BackgroundColor WhiteSmoke
+        LineColor DarkGrey
+    }
+    actor {
+    	BackgroundColor White
+    	LineColor Black
+    }
+    arrow {
+    	LineColor Black
+    }
+    lifeline {
+    	LineColor Grey
+        LineStyle 4
+    }
+    .message{
+    	BackgroundColor Ivory
+        LineColor LightSlateGray
+        RoundCorner 5
+    }
+}
+</style>
+
+
+actor User Order 10
+participant Application <<client>> order 30
+participant Microphone <<client>> order 31
+participant MessageBroker <<engine>> order 40
+participant Engine as Engine <<engine>> order 45
+participant Alexa as Alexa <<alexa>> order 50
+
+
+note over Application
+Alexa is in an idle state
+end note
+
+== User invokes Alexa ==
+
+
+User -> Application: tap and release Alexa\ninvocation button
+Application -> MessageBroker : **publish(message)**
+note <<message>> left 
+**message**
+topic=SpeechRecognizer
+action=StartCapture
+initiator=TAP_TO_TALK
+end note
+activate MessageBroker
+MessageBroker -> Engine: handle message
+activate Engine
+Engine --> MessageBroker
+deactivate Engine
+MessageBroker --> Application
+deactivate MessageBroker
+Engine -> Alexa: SpeechRecognizer.Recognize event \n(pt. 1 - JSON)
+note <<message>> left 
+**event**
+initiator.type=TAP
+profile=NEAR_FIELD
+end note
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic=AudioInput
+action=StartAudioInput
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application -> MessageBroker: **openStream(streamId, mode)**
+note <<message>> left 
+mode=WRITE
+end note
+activate MessageBroker
+create MessageStream <<engine>> order 35
+MessageBroker -> MessageStream: create
+MessageBroker --> Application: <<MessageStream>>
+deactivate MessageBroker
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine
+deactivate MessageBroker
+
+Application -> Microphone: open
+activate Microphone
+Microphone --> Application
+deactivate Microphone
+loop until closed
+  Microphone -> Microphone : record audio data
+end
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic=AlexaClient
+action=DialogStateChanged
+state=LISTENING
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine
+deactivate MessageBroker
+Application -> User : play start of listening \naudio cue
+Application -> User : display listening \nvoice chrome
+
+...
+
+loop until StopAudioInput message
+  Application -> Microphone : read audio data
+  activate Microphone
+  Microphone --> Application : <<data>>
+  deactivate Microphone
+  Application -> MessageStream : **write(data, size)**
+  activate MessageStream
+  MessageStream -> Engine: buffer audio data
+  activate Engine
+  Engine --> MessageStream
+  deactivate Engine
+  MessageStream --> Application
+  deactivate MessageStream
+end
+
+...
+== User speaks to Alexa ==
+
+User -> Microphone: speak to Alexa
+
+loop while there is audio data
+  Engine -> Alexa : SpeechRecognizer.Recognize event \n(pt. 2 - binary audio chunks)
+end
+
+...
+
+Alexa -> Engine: SpeechRecognizer.StopCapture directive
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic=SpeechRecognizer
+action=EndOfSpeechDetected
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine
+deactivate MessageBroker
+Application -> User : play end of listening \naudio cue
+
+Engine -> MessageBroker: **publish(message)**
+note <<message>> right 
+**message**
+topic=AudioInput
+action=StopAudioInput
+end note
+activate MessageBroker
+MessageBroker -> Application: handle message
+activate Application
+Application --> MessageBroker
+deactivate Application
+MessageBroker --> Engine
+deactivate MessageBroker
+Application -> Microphone: close
+activate Microphone
+Microphone --> Application
+deactivate Microphone
+
+...
+== Alexa prepares response ==
+
+Alexa -> Engine: InteractionModel.RequestProcessingStarted directive
+Engine -> Application: AlexaClient.DialogStateChanged message \n  state=THINKING
+activate Application
+Application-->Engine
+deactivate Application
+Application -> User : Display thinking \nvoice chrome
+
+
+== Alexa responds to user ==
+
+Alexa -> Engine: SpeechSynthesizer.Speak directive
+Engine -> Application : AudioOutput.Prepare message\n  source=STREAM
+activate Application
+Application --> Engine
+deactivate Application
+
+Application -> Engine: openStream()\n  mode=READ
+activate Engine
+Engine --> Application: MessageStream
+deactivate Engine
+Application -> Application : buffer stream content
+
+
+Engine -> Application : AudioOutput.Play message
+activate Application
+Application --> Engine
+deactivate Application
+
+Application -> User : play Alexa speech\nfrom stream
+Application -> Engine : AudioOutput.MediaStateChanged message\n  state=PLAYING
+activate Engine
+Engine --> Application
+deactivate Engine
+Engine -> Alexa : SpeechSynthesizer.SpeechStarted event
+
+
+Engine -> Application : AlexaClient.DialogStateChanged message\n  state=SPEAKING
+activate Application
+Application --> Engine
+deactivate Application
+Application -> User : display speaking\nvoice chrome
+
+note left of Alexa
+Alexa sends additional directives depending on what the user requested
+end note
+Alexa->Engine: <<details omitted>>
+Engine->Application: <<details omitted>>
+Application->User: <<details omitted>>
+
+...
+
+== Interaction ends ==
+
+note over Application
+Alexa finishes speaking
+end note
+
+Application -> Engine : AudioOutput.MediaStateChanged message\n  state=STOPPED
+activate Engine
+Engine --> Application
+deactivate Engine
+Engine -> Alexa : SpeechSynthesizer.SpeechFinished event
+
+Engine -> Application : AlexaClient.DialogStateChanged message\n  state=IDLE
+activate Application
+Application --> Engine
+deactivate Application
+Application -> User : dismiss \nvoice chrome
+
+
+
+@enduml

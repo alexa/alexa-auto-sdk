@@ -60,7 +60,8 @@ public class APLTtsPlayer extends TtsPlayer implements AudioFocusController.Play
 
         if (state == AudioPlayer.AudioPlayerState.STATE_PREPARING) {
             Log.v(TAG, "Acquire APL focus");
-        } else if (state == AudioPlayer.AudioPlayerState.STATE_ENDED || state == AudioPlayer.AudioPlayerState.STATE_IDLE) {
+        } else if (state == AudioPlayer.AudioPlayerState.STATE_ENDED
+                || state == AudioPlayer.AudioPlayerState.STATE_IDLE) {
             mAplEventSender.sendActivityEventRequest(
                     mAplTokenProvider.getToken(), IAPLEventSender.ActivityEvent.DEACTIVATED);
             Log.v(TAG, "Release APL focus");

@@ -1,5 +1,16 @@
 package com.amazon.alexa.auto.setup.workflow.receiver;
 
+import static com.amazon.aacsconstants.NetworkConstants.ANDROID_CONNECTIVITY_CHANGE_ACTION;
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.NETWORK_CONNECTED_EVENT;
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.NETWORK_DISCONNECTED_EVENT;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -21,19 +32,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Field;
 
-import static com.amazon.aacsconstants.NetworkConstants.ANDROID_CONNECTIVITY_CHANGE_ACTION;
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.NETWORK_CONNECTED_EVENT;
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.NETWORK_DISCONNECTED_EVENT;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 @RunWith(RobolectricTestRunner.class)
 public class NetworkStateChangeReceiverTest {
-
     private NetworkStateChangeReceiver mClassUnderTest;
     @Mock
     Application mMockApplication;
@@ -57,7 +57,8 @@ public class NetworkStateChangeReceiverTest {
         mClassUnderTest = new NetworkStateChangeReceiver();
 
         Field field = EventBus.class.getDeclaredField("defaultInstance");
-        if (!field.isAccessible()) field.setAccessible(true);
+        if (!field.isAccessible())
+            field.setAccessible(true);
         field.set(null, Mockito.mock(EventBus.class));
     }
 

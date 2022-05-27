@@ -2,6 +2,9 @@ package com.amazon.alexa.auto.aacs.common;
 
 import static org.junit.Assert.assertTrue;
 
+import com.amazon.alexa.auto.aacs.common.navi.NavigationMessages;
+import com.amazon.alexa.auto.aacs.common.navi.StartNavigation;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;

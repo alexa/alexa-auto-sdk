@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Alexaナビゲーション</string>
+    <string name="app_name">Alexa Navigation</string>
     <string name="yelp_provider">Yelp</string>
     <string name="navigate_button_text">ナビゲーション</string>
     <string name="call_button_text">通話</string>

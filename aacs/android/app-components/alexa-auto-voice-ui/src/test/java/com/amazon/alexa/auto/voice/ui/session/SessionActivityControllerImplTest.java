@@ -1,11 +1,12 @@
 package com.amazon.alexa.auto.voice.ui.session;
 
+import androidx.fragment.app.Fragment;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import androidx.fragment.app.Fragment;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.observers.TestObserver;
 

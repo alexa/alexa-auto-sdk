@@ -253,6 +253,112 @@
         },
         {
             "do": "GoTo",
+            "key": "U",
+            "name": "Things To Try",
+            "value": {
+                "id": "things-to-try",
+                "item": [
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "1",
+                        "name": "Getting Started",
+                        "value": "GETTING_STARTED"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "2",
+                        "name": "Alexa's Talents",
+                        "value": "TALENTS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "3",
+                        "name": "Entertainment",
+                        "value": "ENTERTAINMENT"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "4",
+                        "name": "Communication",
+                        "value": "COMMS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "5",
+                        "name": "Weather",
+                        "value": "WEATHER"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "6",
+                        "name": "Smart Home",
+                        "value": "SMART_HOME"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "7",
+                        "name": "News and Information",
+                        "value": "NEWS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "8",
+                        "name": "Navigation",
+                        "value": "NAVIGATION"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "9",
+                        "name": "Traffic Information",
+                        "value": "TRAFFIC"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "0",
+                        "name": "Skills",
+                        "value": "SKILLS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "a",
+                        "name": "Lists",
+                        "value": "LISTS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "b",
+                        "name": "Shopping",
+                        "value": "SHOPPING"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "c",
+                        "name": "Questions and Answers",
+                        "value": "QUESTIONS_ANSWERS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "d",
+                        "name": "Sports",
+                        "value": "SPORTS"
+                    },
+                    {
+                        "do": "notify/onGetFeatures",
+                        "key": "e",
+                        "name": "Calendar",
+                        "value": "CALENDAR"
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Things to Try Menu"
+            }
+        },
+        {
+            "do": "GoTo",
             "key": "O",
             "name": "Messaging",
             "value": {
@@ -1017,7 +1123,7 @@
             "      \\___/ /_/   /_/   /___/\\_,_/_/_/_/ .__/_/\\__/ /_/ |_/ .__/ .__/",
             "                                      /_/                /_/  /_/    ",
             "",
-            "  Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved."
+            "  Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved."
         ],
         "keyTapError": [
             "${KEYOPEN}${KEY}${KEYCLOSE} is not valid in this menu\u0007"

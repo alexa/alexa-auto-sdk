@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:textAppearance="@style/Alexa.Heading2Text"
+        android:textAppearance="@style/Alexa.TitleText"
         android:layout_marginTop="@dimen/setting_item_vertical_margin"
         android:text="@string/pair_new_device"/>
 </LinearLayout>

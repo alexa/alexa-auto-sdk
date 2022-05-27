@@ -27,9 +27,10 @@ import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
-import com.amazon.alexaautoclientservice.mediaPlayer.AudioFocusAttributes;
+import com.amazon.aacsconstants.MediaConstants;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AlexaClientMessageHandler;
 import com.amazon.alexaautoclientservice.modules.alexaClient.DialogStateObserver;
+import com.amazon.alexaautoclientservice.modules.audioOutput.mediaPlayer.AudioFocusAttributes;
 
 public class AudioInputFocusManager implements DialogStateObserver, AudioManager.OnAudioFocusChangeListener {
     public static final String TAG = AACSConstants.AACS + "-" + AudioInputFocusManager.class.getSimpleName();
@@ -41,6 +42,7 @@ public class AudioInputFocusManager implements DialogStateObserver, AudioManager
     private AudioFocusRequest mPreviousAudioFocusRequest;
     private boolean hasAudioFocus;
     private ConfigurationStates mHandleAudioInputFocus = ConfigurationStates.UNINITIALIZED;
+    private boolean mIsMusicPlaying = false;
 
     public AudioInputFocusManager(@NonNull Context context, @NonNull AlexaClientMessageHandler alexaClient) {
         mContext = context;
@@ -55,9 +57,10 @@ public class AudioInputFocusManager implements DialogStateObserver, AudioManager
     }
 
     private AudioFocusRequest getAudioFocusRequest() {
-        int focusType = mHandleAudioInputFocus == ConfigurationStates.HANDLE_AUDIO_FOCUS
+        int focusType = mHandleAudioInputFocus == ConfigurationStates.HANDLE_AUDIO_FOCUS && !mIsMusicPlaying
                 ? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
                 : AudioManager.AUDIOFOCUS_NONE;
+        Log.d(TAG, "Focus Type " + focusType);
         if (mPreviousAudioFocusRequest != null && focusType == mPreviousAudioFocusRequest.getFocusGain())
             return mPreviousAudioFocusRequest;
 
@@ -126,6 +129,12 @@ public class AudioInputFocusManager implements DialogStateObserver, AudioManager
             default:
                 break;
         }
+    }
+
+    public void setMediaState(String channel, String state) {
+        mIsMusicPlaying = AASBConstants.AudioOutput.Channel.AUDIO_PLAYER.equals(channel)
+                && MediaConstants.MediaState.PLAYING.equals(state);
+        Log.d(TAG, "setMediaState isMusicPlaying " + mIsMusicPlaying);
     }
 
     /**

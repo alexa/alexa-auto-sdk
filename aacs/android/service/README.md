@@ -1,31 +1,10 @@
 #  Configuration Reference for AACS (Alexa Auto Client Service)
-This document explains the various fields of the AACS configuration. The AACS configuration is similar to the Auto SDK configuration, 
-with a few additional fields unique to AACS.  
-<!-- omit in toc -->
-## Table of Contents
 
-- [Auto SDK Modules](#auto-sdk-modules)
-  - [localMediaSource](#localmediasource)
-- [AACS Module Enablement](#aacs-module-enablement)
-- [General](#general)
-  - [persistentSystemService](#persistentsystemservice)
-  - [startServiceOnBootEnabled](#startserviceonbootenabled)
-  - [syncSystemPropertyChange](#syncsystempropertychange)
-  - [updateSystemPropertyAllowed](#updatesystempropertyallowed)
-  - [intentTargets](#intenttargets)
-- [Default Platform Handlers](#default-platform-handlers)
-  - [useDefaultLocationProvider](#usedefaultlocationprovider)
-  - [useDefaultNetworkInfoProvider](#usedefaultnetworkinfoprovider)
-  - [useDefaultExternalMediaAdapter](#usedefaultexternalmediaadapter)
-  - [useDefaultPropertyManager](#usedefaultpropertymanager)
-  - [useDefaultCustomDomainMessageDispatcher](#usedefaultcustomdomainmessagedispatcher)
-  - [audioInput](#audioinput)
-  - [audioOutput](#audiooutput)
-  - [useDefaultLocalMediaSource](#usedefaultlocalmediasource)
+## Overview
+This document explains the various fields of the AACS configuration. The AACS configuration is similar to the Auto SDK configuration, with a few additional fields unique to AACS.
 
 ## Auto SDK Modules
-You configure a module in AACS in a similar way as you configure a module in the Auto SDK. For example,  the Auto SDK specifies a module in the configuration as `aace.<module>`, and AACS specifies a module in the configuration as `aacs.<module>`. See the [Auto SDK's 
-documentation](https://alexa.github.io/alexa-auto-sdk/docs/cpp/annotated.html) for information about the Auto SDK configuration.
+You configure a module in AACS in a similar way as you configure a module in the Auto SDK. For example, Auto SDK specifies a module in the configuration as `aace.<module>`, and AACS specifies a module in the configuration as `aacs.<module>`. See the [Auto SDK module documentation](https://alexa.github.io/alexa-auto-sdk/docs/explore/features) for information about the Auto SDK configuration for each module.
 
 The following example shows the syntax for configuring the CBL module in AACS, which is the same as the syntax in the Auto SDK: 
 ~~~
@@ -36,7 +15,7 @@ The following example shows the syntax for configuring the CBL module in AACS, w
 }
 ~~~
 
-Optionally, you can also configure the timeout value of AASB synchronous messages in `aacs.messageBroker`, as detailed in [Core Module README](../../../modules/core/README.md#configuring-the-messagebroker) for configuring the MessageBroker. The default timeout duration is 500 ms. 
+Optionally, you can also configure the timeout value of AASB synchronous messages in `aacs.messageBroker`, as detailed in `Core` module documentation for configuring the MessageBroker. The default timeout duration is 500 ms. 
 ~~~
 {
     "aacs.messageBroker": {
@@ -97,6 +76,7 @@ add certain JSON blocks to the AACS configuration inside "aacs.modules" block, a
     }
 }
 ```
+
 - Custom Domain module is disabled by default. Similarly to APL, to enable Custom Domain, add the following configuration to `aacs.modules` in the configuration file:
 ```
 "aacs.customDomain": {
@@ -105,10 +85,11 @@ add certain JSON blocks to the AACS configuration inside "aacs.modules" block, a
   }
 }
 ```
->**Note**: If Custom Domain module is enabled, you must provide a valid `aacs.customDomain` configuration to configure the engine with your custom interfaces. Otherwise, the engine will fail to start. See [Required Engine Configuration](../../../modules/custom-domain/README.md#required-engine-configuration) for Custom Domain module.  
+>**Note**: If Custom Domain module is enabled, you must provide a valid `aacs.customDomain` configuration to configure the engine with your custom interfaces. Otherwise, the Engine will fail to start. See the `Custom Domain` module documentation for the required configuration.  
 
-- `Authorization` and `CBL` cannot be enabled at the same time. CBL module is deprecated in version 3.1, your application should use the Authorization 
-modules instead. To disable `CBL`, add the following configuration to `aacs.modules` in the configuration file:
+- CBL interface is deprecated in version 3.1, your application should use the Authorization interface instead for both alexa:cbl and alexa:auth_provider services.
+
+If you want to disable CBL module  add the following configuration to `aacs.modules` in the configuration file:
 ```
 "aacs.cbl": {
   "CBL": {
@@ -116,7 +97,7 @@ modules instead. To disable `CBL`, add the following configuration to `aacs.modu
   }
 }
 ```
-If your application uses the deprecated `CBL` module, disable the `Authorization` module in the configuration:
+If your application wants to disable the `Authorization` module in the configuration:
 ```
 "aacs.authorization": {
   "Authorization": {
@@ -124,7 +105,9 @@ If your application uses the deprecated `CBL` module, disable the `Authorization
   }
 }
 ```
-For configuring module enablement, more information can be found at [Configurating the MessageBroker](../../../modules/core/README.md#configuring-the-messagebroker)
+**Note**: Both CBL and Alexa Authorization modules are needed to support alexa:cbl authorization
+
+For configuring module enablement, more information can be found in the `Core` module documentation.
 
 ## General
 `aacs.general` is used for most configurable values of AACS that are not required for the Auto SDK, as shown in the following example: 
@@ -143,12 +126,7 @@ For configuring module enablement, more information can be found at [Configurati
 **Type:** String
 Indicates the version of AACS to be used. Releases of AACS will have current and minimum-supported versions. Versions outside this range will not be compatible and the service will not start as a result.
 
-### persistentSystemService
-**Type:** Boolean
-
-When `persistentSystemService` is set to `false` (default), AACS starts as a foreground service, which has higher priority on the Android system. If you have 
-system-level control over your device, you may set this field to `true` to run AACS as a truly persistent service. Doing so also hides 
-the AACS notification that is displayed when the service is run in the foreground.
+>**Note:** `persistentSystemService` configuration is deprecated. You no longer need to specify this field to run AACS as a persistent system service. If you have root access on the device and your application containing AACS AAR is a system application, then AACS is run as a system service.
 
 ### startServiceOnBootEnabled
 **Type:** Boolean
@@ -184,7 +162,7 @@ Specifies the class name within the application that receives messages for this 
 
 ## Default Platform Handlers
 AACS provides the default platform implementation for certain services, which you can enable through the configuration in 
-`aacs.defaultPlatformHandlers`. For a full explanation of default platform handlers, see the [AACS README](../README.md#default-platform-implementation).
+`aacs.defaultPlatformHandlers`. For a full explanation of default platform handlers, see the [AACS documentation](../README.md#default-platform-implementation).
 ~~~
 "aacs.defaultPlatformHandlers": {
     "useDefaultLocationProvider": true,
@@ -289,13 +267,15 @@ The following sample configuration is for an external stream:
         }
 ~~~
 
-**Note**: When specifying both `VOICE` and `COMMUNICATION`'s  `audioSource` values as non-`EXTERNAL`, be sure that their `audioSource` values are the same. 
+> **Note:** When specifying both `VOICE` and `COMMUNICATION`'s  `audioSource` values as non-`EXTERNAL`, be sure that their `audioSource` values are the same. 
 
 ### audioOutput
 **Type:** JSON Object
 
 Configures `audioOutput` in AACS based on the audio type. This JSON object consists of JSON nodes for audio types that contain this information. Available 
-audio types are `TTS`, `ALARM`, `MUSIC`, `NOTIFICATION`, `EARCON`, and `RINGTONE`.
+audio types are `TTS`, `ALARM`, `NOTIFICATION`, `EARCON`, and `RINGTONE`.
+
+> **Note:** AACS default audio output does not support `MUSIC` type of audio output. See [alexa-auto-media-player README](../app-components/alexa-auto-media-player/README.md) for more information on the `MUSIC` type implementation.
 
 #### useDefault
 **Type:** Boolean
@@ -378,7 +358,7 @@ Refer the following sample configuration for the `useDefaultLocalMediaSource`.
 
 >**Note:** If OEM wishes to make the application with AACS AAR as a system application, they can avoid the `Notification Access` step. Please add a line `<uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />` in the AACS `AndroidManifest.xml` file and provide all the required permissions to the system application in the Android operating system.
 
-Refer [Local Media Source](../../../modules/alexa/README.md#handling-local-media-sources) to know more about `DEFAULT` media source.
+Refer `Local Media Source` interface documentation `DEFAULT` media source.
 `supported` configures the given Local Media Source. if `supported` is set `true`, that media source would be handled and controlled through AACS. If `supported` is set `false`, AACS would ignore the media source.
 
 `mediaPackageName` and `mediaServiceClass` are mandatory configuration keys.  `mediaPackageName` represents the package name of the media source and `mediaServiceClass` represents the The name of the class inside of package that implements the component of the media browser service. This is a requirement of the [ComponentName](https://developer.android.com/reference/android/content/ComponentName). Please ensure that right data is provided here. Since `DEFAULT` player can act on behalf of all latest the media sources except Alexa music, MACC supported players and other configured local media sources, it is not full time associated to any package name and MediaBrowserService. It always represents 0th media controller of the [onActiveSessionsChanged](https://developer.android.com/reference/android/media/session/MediaSessionManager.OnActiveSessionsChangedListener#onActiveSessionsChanged(java.util.List%3Candroid.media.session.MediaController%3E)) controller list.
@@ -411,7 +391,7 @@ Local Media Player like FM or AM application should be able to handle this reque
     "payload":"98.7 FM HD 1"
 }
 ~~~ 
->**Note** Refer [Local Media Source](../../../modules/alexa/README.md#handling-local-media-sources) for more information of the ContentSelector and payload.
+>**Note** Refer `Local Media Source` interface documentation for more information of the ContentSelector and payload.
 
 `supportsSetPreset` This takes a boolean value. It should be set `true` if media source can play media by preset number.
 >**Note** `onPrepareFromSearch` and `onPlayFromSearch` related details given in the above section are applicable for content type PRESET as well.

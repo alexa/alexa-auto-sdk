@@ -50,6 +50,3 @@ private:
 }  // namespace aace
 
 #endif  // AACE_ENGINE_AUDIO_ISTREAM_AUDIO_STREAM_H
-
-
-

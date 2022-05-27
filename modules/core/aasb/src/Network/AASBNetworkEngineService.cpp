@@ -32,13 +32,17 @@ static const aace::engine::core::Version minRequiredVersion = VERSION("4.0");
 REGISTER_SERVICE(AASBNetworkEngineService);
 
 AASBNetworkEngineService::AASBNetworkEngineService(const aace::engine::core::ServiceDescription& description) :
-        aace::engine::messageBroker::MessageHandlerEngineService(description, minRequiredVersion, {"NetworkInfoProvider"}) {
+        aace::engine::messageBroker::MessageHandlerEngineService(
+            description,
+            minRequiredVersion,
+            {"NetworkInfoProvider"}) {
 }
 
 bool AASBNetworkEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // Network

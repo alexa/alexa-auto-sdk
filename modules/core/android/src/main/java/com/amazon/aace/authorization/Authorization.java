@@ -24,9 +24,9 @@ import com.amazon.aace.core.PlatformInterface;
  * shall be carried out by the individual providers, referred here as authorization service. The platform implementation
  * is responsible to follow the protocol established by the authorization service. Please refer to the authorization
  * service documentation for the protocol information.
- * 
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ *
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

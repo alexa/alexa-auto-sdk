@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.templateruntime.weather;
 
 import android.content.Context;
@@ -22,6 +36,7 @@ import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.app.common.ui.CirclePageIndicatorDecoration;
 import com.amazon.alexa.auto.templateruntime.R;
+import com.amazon.alexa.auto.templateruntime.dependencies.TemplateDirectiveHandler;
 import com.amazon.alexa.auto.templateruntime.receiver.AlexaVoiceoverCompletedMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -30,19 +45,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
 
-
 /**
  * Handles rendering and clearing of Weather templates
  */
-public class WeatherDirectiveHandler {
+public class WeatherDirectiveHandler implements TemplateDirectiveHandler {
     private static final String TAG = WeatherDirectiveHandler.class.getSimpleName();
-    private static final int CLEAR_TEMPLATE_DELAY_MS = 8000;
     private static final Handler mHandler = new Handler();
     private final WeakReference<Context> mContext;
     private long voiceOverEndTime;
 
-    public WeatherDirectiveHandler(WeakReference<Context> context) {
-        mContext = context;
+    public WeatherDirectiveHandler(Context context) {
+        mContext = new WeakReference<Context>(context);
         voiceOverEndTime = Long.MAX_VALUE;
     }
 
@@ -51,23 +64,22 @@ public class WeatherDirectiveHandler {
      *
      * @param message aacs template runtime intent.
      */
-    public void renderWeatherTemplate(AACSMessage message) {
+    @Override
+    public void renderTemplate(AACSMessage message) {
         AlexaApp app = AlexaApp.from(mContext.get());
-        app.getRootComponent().getComponent(SessionViewController.class)
-                .ifPresent(sessionViewController -> {
-                    sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
-                        TemplateRuntimeMessages.parseWeatherTemplate(message.payload)
-                                .ifPresent(weatherTemplate -> {
-                                    try {
-                                        renderWeatherView(viewGroup, weatherTemplate);
-                                        sessionViewController.setTemplateDisplayed();
-                                        EventBus.getDefault().register(this);
-                                    } catch (Exception e) {
-                                        Log.e(TAG, "Issue inflating template: " + e);
-                                    }
-                                });
-                    });
+        app.getRootComponent().getComponent(SessionViewController.class).ifPresent(sessionViewController -> {
+            sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
+                TemplateRuntimeMessages.parseWeatherTemplate(message.payload).ifPresent(weatherTemplate -> {
+                    try {
+                        renderWeatherView(viewGroup, weatherTemplate);
+                        sessionViewController.setTemplateDisplayed();
+                        EventBus.getDefault().register(this);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Issue inflating template: " + e);
+                    }
                 });
+            });
+        });
     }
 
     /**
@@ -82,13 +94,13 @@ public class WeatherDirectiveHandler {
         View inflatedView = layoutInflater.inflate(R.layout.weather, null);
         inflatedView.setId(R.id.template_weather_view);
 
-        viewGroup.addView(
-                inflatedView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        viewGroup.addView(inflatedView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         WeatherAdapter adapter = new WeatherAdapter(weatherTemplate);
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(mContext.get(), LinearLayoutManager.HORIZONTAL, false);
 
+        removeClearTemplateCallback();
         RecyclerView recyclerView = inflatedView.findViewById(R.id.weather_recycler_view);
         recyclerView.setLayoutManager(layoutManager);
         SnapHelper snapHelper = new PagerSnapHelper();
@@ -98,8 +110,7 @@ public class WeatherDirectiveHandler {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             public void onScrollStateChanged(@NotNull RecyclerView recyclerView, int newState) {
                 long screenScrolledAtTime = System.currentTimeMillis();
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING &&
-                        screenScrolledAtTime > voiceOverEndTime) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING && screenScrolledAtTime > voiceOverEndTime) {
                     startClearTemplateDelay();
                 }
             }
@@ -120,8 +131,7 @@ public class WeatherDirectiveHandler {
     private View.OnAttachStateChangeListener getOnAttachStateChangeListener() {
         return new View.OnAttachStateChangeListener() {
             @Override
-            public void onViewAttachedToWindow(View v) {
-            }
+            public void onViewAttachedToWindow(View v) {}
 
             @Override
             public void onViewDetachedFromWindow(View v) {
@@ -148,6 +158,7 @@ public class WeatherDirectiveHandler {
     /**
      * Clears existing template, if any.
      */
+    @Override
     public void clearTemplate() {
         Log.i(TAG, "clearTemplate");
         AlexaApp.from(mContext.get())
@@ -158,8 +169,9 @@ public class WeatherDirectiveHandler {
 
     /**
      * Runnable to clear weather template from the screen.
-     * By Default the delay is set to {@link #CLEAR_TEMPLATE_DELAY_MS} after the voice response is complete - {@link #startClearTemplateDelay()}
-     * However if the user interacts (swipes left or right) with the display card, we extend the delay by
+     * By Default the delay is set to {@link #CLEAR_TEMPLATE_DELAY_MS} after the voice response is complete - {@link
+     * #startClearTemplateDelay()} However if the user interacts (swipes left or right) with the display card, we extend
+     * the delay by
      * {@link #CLEAR_TEMPLATE_DELAY_MS} everytime they swipe. This is done so that they have enough time to view
      * the display card after swiping.
      */
@@ -188,5 +200,4 @@ public class WeatherDirectiveHandler {
     public void removeClearTemplateCallback() {
         mHandler.removeCallbacksAndMessages(null);
     }
-
 }

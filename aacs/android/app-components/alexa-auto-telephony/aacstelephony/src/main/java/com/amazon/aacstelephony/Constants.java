@@ -25,6 +25,7 @@ public class Constants {
     public static final String ACTION_BLUETOOTH_HFP_CLIENT_STATE_CHANGED =
             "android.bluetooth.headsetclient.profile.action.CONNECTION_STATE_CHANGED";
     public static final String AACS_TELEPHONY_PERMISSION = "com.amazon.aacstelephony";
+    public static final String AACS_BOND_STATE_CHANGED = "com.amazon.aacstelephony.bluetooth.bondStateChanged";
 
     public static final String CALLEE = "callee";
     public static final String CODE = "code";
@@ -34,7 +35,8 @@ public class Constants {
     public static final String PBAP_CLIENT = "PBAP_CLIENT";
 
     // Bluetooth Profile IDs that are marked as @SystemApi in Android 30
-    // ID source: https://cs.android.com/android/platform/superproject/+/android-11.0.0_r2:frameworks/base/core/java/android/bluetooth/BluetoothProfile.java
+    // ID source:
+    // https://cs.android.com/android/platform/superproject/+/android-11.0.0_r2:frameworks/base/core/java/android/bluetooth/BluetoothProfile.java
     public static final int HEADSET_CLIENT_PROFILE_ID = 16;
     public static final int PBAP_CLIENT_PROFILE_ID = 17;
 

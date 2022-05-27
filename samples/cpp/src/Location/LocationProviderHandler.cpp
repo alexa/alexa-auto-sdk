@@ -38,7 +38,7 @@ LocationProviderHandler::LocationProviderHandler(
     std::weak_ptr<Activity> activity,
     std::weak_ptr<logger::LoggerHandler> loggerHandler,
     std::shared_ptr<MessageBroker> messageBroker) :
-        m_activity{std::move(activity)}, 
+        m_activity{std::move(activity)},
         m_loggerHandler{std::move(loggerHandler)},
         m_messageBroker{std::move(messageBroker)} {
     // Expects((m_activity != nullptr) && (m_loggerHandler != nullptr));
@@ -69,7 +69,7 @@ void LocationProviderHandler::subscribeToAASBMessages() {
 }
 
 void LocationProviderHandler::handleGetCountryMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetCountryMessage");
     GetCountryMessage msg = json::parse(message);
 
     // Publish the reply message for getCountry.
@@ -81,7 +81,7 @@ void LocationProviderHandler::handleGetCountryMessage(const std::string& message
 }
 
 void LocationProviderHandler::handleGetLocationMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetLocationMessage");
     GetLocationMessage msg = json::parse(message);
 
     // Publish the reply message for getLocation.
@@ -92,7 +92,8 @@ void LocationProviderHandler::handleGetLocationMessage(const std::string& messag
     m_messageBroker->publish(replyMsg.toString());
 }
 
-void LocationProviderHandler::locationServiceAccessChanged(aasb::message::location::locationProvider::LocationServiceAccess access) {
+void LocationProviderHandler::locationServiceAccessChanged(
+    aasb::message::location::locationProvider::LocationServiceAccess access) {
     // Publish the "LocationServiceAccessChanged" message
     LocationServiceAccessChangedMessage msg;
     msg.payload.access = access;

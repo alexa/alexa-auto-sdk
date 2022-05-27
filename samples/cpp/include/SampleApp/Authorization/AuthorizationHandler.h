@@ -50,9 +50,10 @@ private:
     std::shared_ptr<aace::core::MessageBroker> m_messageBroker;
 
 protected:
-    AuthorizationHandler(std::weak_ptr<Activity> activity, 
-                         std::weak_ptr<logger::LoggerHandler> loggerHandler,
-                         std::shared_ptr<aace::core::MessageBroker> messageBroker);
+    AuthorizationHandler(
+        std::weak_ptr<Activity> activity,
+        std::weak_ptr<logger::LoggerHandler> loggerHandler,
+        std::shared_ptr<aace::core::MessageBroker> messageBroker);
 
 public:
     template <typename... Args>
@@ -114,7 +115,9 @@ private:
     /**
      * Provides the implementation for when the authorization state changed.
      */
-    void authorizationStateChanged(const std::string& service, aasb::message::authorization::authorization::AuthorizationState state);
+    void authorizationStateChanged(
+        const std::string& service,
+        aasb::message::authorization::authorization::AuthorizationState state);
 
     /**
      * Provides the implementation for when an authorization error happens.

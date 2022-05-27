@@ -1,5 +1,9 @@
 package com.amazon.alexa.auto.templateruntime.weather;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,10 +31,6 @@ import org.robolectric.RobolectricTestRunner;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class WeatherDirectiveHandlerTest {
     @Mock
@@ -52,26 +52,23 @@ public class WeatherDirectiveHandlerTest {
         when(mMockRootComponent.getComponent(SessionViewController.class))
                 .thenReturn(Optional.of(mMockSessionController));
         when(mMockSessionController.getTemplateRuntimeViewContainer()).thenReturn(Optional.of(mViewGroup));
-        mClassUnderTest = new WeatherDirectiveHandler(new WeakReference<>(mContext));
+        mClassUnderTest = new WeatherDirectiveHandler(mContext);
     }
 
     @Test
     public void testOnRenderWeatherTemplate_renderLocalSearchListTest() {
-        Intent intent =
-                generateIntent("aacs/RenderTemplateWeather.json", "com.amazon.aacs.aasb.RenderTemplate");
+        Intent intent = generateIntent("aacs/RenderTemplateWeather.json", "com.amazon.aacs.aasb.RenderTemplate");
         Optional<AACSMessage> aacsMessage = AACSMessageBuilder.parseEmbeddedIntent(intent);
         try (MockedStatic<AlexaApp> staticMock = Mockito.mockStatic(AlexaApp.class)) {
             staticMock.when(() -> AlexaApp.from(any(Context.class))).thenReturn(mMockAlexaApp);
             WeatherDirectiveHandler spyWeatherDirectiveHandler = Mockito.spy(mClassUnderTest);
             Mockito.doNothing()
                     .when(spyWeatherDirectiveHandler)
-                    .renderWeatherView(
-                            Mockito.any(ViewGroup.class), Mockito.any(WeatherTemplate.class));
-            spyWeatherDirectiveHandler.renderWeatherTemplate(aacsMessage.get());
+                    .renderWeatherView(Mockito.any(ViewGroup.class), Mockito.any(WeatherTemplate.class));
+            spyWeatherDirectiveHandler.renderTemplate(aacsMessage.get());
 
             ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
-            Mockito.verify(spyWeatherDirectiveHandler, times(1))
-                    .renderWeatherTemplate(aacsMessageArgumentCaptor.capture());
+            Mockito.verify(spyWeatherDirectiveHandler, times(1)).renderTemplate(aacsMessageArgumentCaptor.capture());
 
             AACSMessage capturedAACSMessage = aacsMessageArgumentCaptor.getValue();
             Assert.assertEquals(capturedAACSMessage.action, "RenderTemplate");
@@ -97,5 +94,4 @@ public class WeatherDirectiveHandlerTest {
         intent.putExtra("payload", sampleListeningPayload);
         return intent;
     }
-
 }

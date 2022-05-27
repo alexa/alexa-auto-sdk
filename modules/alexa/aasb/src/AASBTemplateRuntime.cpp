@@ -49,7 +49,8 @@ std::shared_ptr<AASBTemplateRuntime> AASBTemplateRuntime::create(
     }
 }
 
-bool AASBTemplateRuntime::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBTemplateRuntime::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBrokerInterface");
 
@@ -124,7 +125,8 @@ void AASBTemplateRuntime::renderPlayerInfo(
         aasb::message::alexa::templateRuntime::RenderPlayerInfoMessage message;
 
         message.payload.payload = payload;
-        message.payload.audioPlayerState = static_cast<aasb::message::alexa::templateRuntime::PlayerActivity>(audioPlayerState);
+        message.payload.audioPlayerState =
+            static_cast<aasb::message::alexa::templateRuntime::PlayerActivity>(audioPlayerState);
         message.payload.offset = offset.count();
         message.payload.focusState = static_cast<aasb::message::alexa::templateRuntime::FocusState>(focusState);
 

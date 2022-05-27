@@ -321,7 +321,10 @@ void gstreamer_destroy(aal_handle_t handle) {
     g_main_loop_unref(ctx->main_loop);
 
     g_debug("%s: waiting for gstreamer loop to exit", ctx->name);
-    pthread_join(ctx->thread_id, NULL);
+    if (ctx->thread_running) {
+        pthread_join(ctx->thread_id, NULL);
+        ctx->thread_running = false;
+    }
     g_debug("%s: gstreamer loop exited", ctx->name);
 
     g_debug("%s: free aal_gst_context_t", ctx->name);
@@ -538,7 +541,11 @@ static void* gloop(void* arg) {
 }
 
 void gstreamer_start_main_loop(aal_gst_context_t* ctx) {
-    pthread_create(&ctx->thread_id, NULL, gloop, ctx);
+    ctx->thread_running = true;
+    int r = pthread_create(&ctx->thread_id, NULL, gloop, ctx);
+    if (r != 0) {
+        ctx->thread_running = false;
+    }
 }
 
 char* gstreamer_audio_pcm_caps(GstAudioFormat sample_format, int channels, int sample_rate) {

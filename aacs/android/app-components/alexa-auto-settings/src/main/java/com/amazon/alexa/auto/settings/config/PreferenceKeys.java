@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings.config;
 
 public class PreferenceKeys {
@@ -22,16 +36,21 @@ public class PreferenceKeys {
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_ENABLE_NONALEXA = "voice-assistance-enable-nonalexa";
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_ENABLE_ALEXA = "voice-assistance-enable-alexa";
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK = "voice-assistance-push-to-talk";
-    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK_SELECTION = "voice-assistance-push-to-talk-selection";
+    public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK_SELECTION =
+            "voice-assistance-push-to-talk-selection";
+    public static final String ALEXA_SETTINGS_ACA_ADDRESSBOOK_CONSENT = "aca-addressbook-consent";
+    public static final String ALEXA_SETTINGS_ADDRESSBOOK_CONSENT = "alexa-addressbook-consent";
     public static final String ALEXA_SETTINGS_HANDS_FREE = "alexa-hands-free-settings";
     public static final String ALEXA_SETTINGS_LOCATION_CONSENT = "alexa-location-consent-setting";
     public static final String ALEXA_SETTINGS_LANGUAGES = "alexa-languages-settings";
+    public static final String ALEXA_SETTINGS_THINGS_TO_TRY = "alexa-things-to-try";
     public static final String ALEXA_SETTINGS_SIGNIN = "alexa-signin";
     public static final String ALEXA_SETTINGS_SIGNOUT = "alexa-signout";
     public static final String ALEXA_SETTINGS_DISABLE = "alexa-disable";
     public static final String ALEXA_SETTINGS_DISABLE_NON_ALEXA = "non-alexa-disable";
     public static final String ALEXA_SETTINGS_AACS = "alexa-auto-client-service-settings";
     public static final String ALEXA_SETTINGS_DO_NOT_DISTURB = "alexa-dnd-setting";
+    public static final String ALEXA_SETTINGS_NAVI_FAVORITES = "alexa-nav_favorite-consent-setting";
     public static final String ALEXA_SETTINGS_COMMUNICATION = "alexa-communication";
     public static final String ALEXA_SETTINGS_SOUNDS = "alexa-sounds";
 

@@ -1,0 +1,149 @@
+From 83f679b5ab0eb0671357cf479d0b7fbb93208c54 Mon Sep 17 00:00:00 2001
+From: Raghavendra Bilamkar <bilamkar@amazon.com>
+Date: Thu, 12 May 2022 19:56:51 -0700
+Subject: [PATCH] Initialize default values to deviceWindowState
+
+---
+ .../VisualCharacteristics.h                   |  2 +
+ .../src/VisualCharacteristics.cpp             | 84 +++++++++++++++++++
+ 2 files changed, 86 insertions(+)
+
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/include/VisualCharacteristics/VisualCharacteristics.h b/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/include/VisualCharacteristics/VisualCharacteristics.h
+index 1de44f9..3b83a76 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/include/VisualCharacteristics/VisualCharacteristics.h
++++ b/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/include/VisualCharacteristics/VisualCharacteristics.h
+@@ -95,6 +95,8 @@ private:
+     void doShutdown() override;
+     /// @}
+ 
++    void initializeDeviceWindowStateId( const std::string& configurations );
++
+     /// Set of capability configurations that will get published using the Capabilities API
+     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
+         m_capabilityConfigurations;
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/src/VisualCharacteristics.cpp b/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/src/VisualCharacteristics.cpp
+index 642999a..f5b444c 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/src/VisualCharacteristics.cpp
++++ b/modules/Alexa/SmartScreenCapabilityAgents/VisualCharacteristics/src/VisualCharacteristics.cpp
+@@ -19,6 +19,7 @@
+ #include <rapidjson/error/en.h>
+ 
+ #include <AVSCommon/AVS/CapabilityConfiguration.h>
++#include <AVSCommon/Utils/JSON/JSONGenerator.h>
+ #include <AVSCommon/Utils/JSON/JSONUtils.h>
+ #include <AVSCommon/Utils/Logger/Logger.h>
+ #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
+@@ -81,6 +82,12 @@ static const std::string ALEXA_DISPLAY_WINDOW_NAMESPACE{"Alexa.Display.Window"};
+ /// Tag for finding the device window state context information sent from the runtime as part of event context.
+ static const std::string WINDOW_STATE_NAME{"WindowState"};
+ 
++/// Key for the configuration
++static const std::string CONFIGURATION_KEY = "configuration";
++
++/// Key for the id
++static const std::string ID_KEY = "id";
++
+ /// The VisualCharacteristics context state signature.
+ static const alexaClientSDK::avsCommon::avs::NamespaceAndName DEVICE_WINDOW_STATE{
+     ALEXA_DISPLAY_WINDOW_NAMESPACE,
+@@ -131,6 +138,9 @@ void VisualCharacteristics::getVisualCharacteristicsCapabilityConfiguration() {
+     /// Get the ConfigurationNode contains VisualCharacteristics config array.
+     auto configurationArray = configurationGui.getArray(VISUALCHARACTERISTICS_CONFIGURATION_ROOT_KEY);
+ 
++    /// Is device window state initialized.
++    bool isDeviceWindowStateInitialized = false;
++
+     /// Loop through the configuration node array and construct configMap for these APIs.
+     for (size_t i = 0; i < configurationArray.getArraySize(); i++) {
+         std::string interfaceName;
+@@ -161,6 +171,11 @@ void VisualCharacteristics::getVisualCharacteristicsCapabilityConfiguration() {
+             configMap.insert({CAPABILITY_INTERFACE_VERSION_KEY, ALEXADISPLAYWINDOW_CAPABILITY_INTERFACE_VERSION});
+             configMap.insert({CAPABILITY_INTERFACE_CONFIGURATIONS_KEY, configurations});
+             m_capabilityConfigurations.insert(std::make_shared<CapabilityConfiguration>(configMap));
++
++            if (!isDeviceWindowStateInitialized) {
++                isDeviceWindowStateInitialized = true;
++                initializeDeviceWindowStateId( configurations );
++            }
+         } else if (ALEXADISPLAY_CAPABILITY_INTERFACE_NAME == interfaceName) {
+             std::unordered_map<std::string, std::string> configMap;
+             std::string configurations = configurationArray[i][INTERFACE_CONFIGURATION_KEY].serialize();
+@@ -173,6 +188,75 @@ void VisualCharacteristics::getVisualCharacteristicsCapabilityConfiguration() {
+     }
+ }
+ 
++ void VisualCharacteristics::initializeDeviceWindowStateId( const std::string& configurations ) {
++    ACSDK_DEBUG9(LX(__func__));
++    std::string defaultWindowId;
++    std::string interactionMode;
++    std::string sizeConfigurationId;
++
++    rapidjson::Document document;
++    jsonUtils::parseJSON(configurations, &document);
++
++    if (document.HasParseError()) {
++        ACSDK_ERROR(LX("initializeDeviceWindowStateIdFailed").d("reason", "invalidConfigurationsJson").sensitive("configurations", configurations));
++        return;
++    }
++
++    auto templates = document.FindMember("templates");
++	if (templates == document.MemberEnd() || !templates->value.IsArray() || templates->value.Size() <= 0) {
++        ACSDK_ERROR(LX("initializeDeviceWindowStateIdFailed").d("reason", "templatesInvalid"));
++        return;
++	}
++
++	rapidjson::Value::ConstValueIterator itr = templates->value.Begin();
++	
++	defaultWindowId = (*itr)["id"].GetString();
++
++	auto sizesArray = (*itr)["configuration"].FindMember("sizes");
++	if (sizesArray == document.MemberEnd() || !sizesArray->value.IsArray() || sizesArray->value.Size() <= 0) {
++        ACSDK_ERROR(LX("initializeDeviceWindowStateIdFailed").d("reason", "sizesArrayInvalid"));
++        return;
++	}
++
++	rapidjson::Value::ConstValueIterator sizesItr = sizesArray->value.Begin();
++	sizeConfigurationId = (*sizesItr)["id"].GetString();
++
++	auto interactionModesArray = (*itr)["configuration"].FindMember("interactionModes");
++	if (interactionModesArray == document.MemberEnd() || !interactionModesArray->value.IsArray() || interactionModesArray->value.Size() <= 0) {
++		ACSDK_ERROR(LX("initializeDeviceWindowStateIdFailed").d("reason", "interactionModesArrayInvalid"));
++        return;
++	}
++
++	rapidjson::Value::ConstValueIterator interactionModesItr = interactionModesArray->value.Begin();
++	interactionMode =(*interactionModesItr).GetString(); // Use the first item in the array,
++
++    if( defaultWindowId.empty() || interactionMode.empty() || sizeConfigurationId.empty() ) {
++        ACSDK_ERROR(LX("initializeDeviceWindowStateIdFailed")
++                .d("defaultWindowId", defaultWindowId)
++                .d("interactionMode", interactionMode)
++                .d("sizeConfigurationId", sizeConfigurationId));
++        return;
++    }
++
++    json::JsonGenerator jsonGenerator;
++    jsonGenerator.addMember("defaultWindowId", defaultWindowId);
++    jsonGenerator.startArray("instances");
++    jsonGenerator.startArrayElement();
++    jsonGenerator.addMember("id", defaultWindowId );
++    jsonGenerator.addMember("templateId", defaultWindowId);
++    jsonGenerator.startObject("configuration");
++    jsonGenerator.addMember("interactionMode", interactionMode );
++    jsonGenerator.addMember("sizeConfigurationId", sizeConfigurationId);
++    jsonGenerator.finishObject();
++    jsonGenerator.finishArrayElement();
++    jsonGenerator.finishArray();
++
++    m_deviceWindowState = jsonGenerator.toString();
++    
++    ACSDK_DEBUG9(LX(__func__).d("m_deviceWindowState",m_deviceWindowState));
++}
++
++
+ std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> VisualCharacteristics::
+     getCapabilityConfigurations() {
+     return m_capabilityConfigurations;
+-- 
+2.33.0
+

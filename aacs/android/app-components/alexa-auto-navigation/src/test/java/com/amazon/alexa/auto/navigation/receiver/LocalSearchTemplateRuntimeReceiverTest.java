@@ -1,5 +1,7 @@
 package com.amazon.alexa.auto.navigation.receiver;
 
+import static org.mockito.Mockito.times;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,8 +22,6 @@ import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.Optional;
-
-import static org.mockito.Mockito.times;
 
 @RunWith(RobolectricTestRunner.class)
 public class LocalSearchTemplateRuntimeReceiverTest {

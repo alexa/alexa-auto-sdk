@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ Message::Message(const std::string& msg, Direction direction) {
             m_topic = topic;
             m_action = action;
         } else {
-            Throw("invalidMessgeType");
+            Throw("invalidMessageType");
         }
 
         m_direction = direction;
@@ -81,15 +81,15 @@ Message::Message(const std::string& msg, Direction direction) {
     }
 }
 
-const bool Message::valid() const {
-    return m_message.is_null() ? false : true;
+bool Message::valid() const {
+    return !m_message.is_null();
 }
 
 const std::string& Message::messageId() const {
     return m_messageId;
 }
 
-const Message::MessageType& Message::messageType() const {
+Message::MessageType Message::messageType() const {
     return m_messageType;
 }
 
@@ -105,7 +105,7 @@ const std::string& Message::replyTo() const {
     return m_replyTo;
 }
 
-const std::string Message::payload() const {
+std::string Message::payload() const {
     try {
         auto payloadIt = m_message.find("payload");
         ThrowIf(payloadIt == m_message.end(), "missingPayloadInMessage");
@@ -118,11 +118,15 @@ const std::string Message::payload() const {
     }
 }
 
-const Message::Direction& Message::direction() const {
+Message::Direction Message::direction() const {
     return m_direction;
 }
 
-const std::string Message::str() const {
+Message::Direction Message::replyDirection() const {
+    return m_direction == Direction::INCOMING ? Direction::OUTGOING : Direction::INCOMING;
+}
+
+std::string Message::str() const {
     return m_message.dump(3);
 }
 

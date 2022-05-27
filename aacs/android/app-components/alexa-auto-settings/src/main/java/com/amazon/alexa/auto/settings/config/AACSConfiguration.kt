@@ -3,7 +3,7 @@ package com.amazon.alexa.auto.settings.config
 data class AACSConfigurationDeviceInfo (
     var clientId : String,
     var productId: String,
-    var deviceSerialNumber: String,
+    var deviceSerialNumber: String?,
     var manufacturerName: String,
     var description: String
 )

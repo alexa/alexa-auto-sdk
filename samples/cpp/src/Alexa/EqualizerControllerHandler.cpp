@@ -77,7 +77,7 @@ void EqualizerControllerHandler::subscribeToAASBMessages() {
 }
 
 void EqualizerControllerHandler::handleGetBandLevelsMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetBandLevelsMessage");
     GetBandLevelsMessage msg = json::parse(message);
 
     // Publish the reply message with the band levels.
@@ -88,7 +88,7 @@ void EqualizerControllerHandler::handleGetBandLevelsMessage(const std::string& m
 }
 
 void EqualizerControllerHandler::handleSetBandLevelsMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetBandLevelsMessage");
     SetBandLevelsMessage msg = json::parse(message);
     setBandLevels(msg.payload.bandLevels);
 }

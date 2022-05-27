@@ -98,7 +98,7 @@ void AuthorizationHandler::subscribeToAASBMessages() {
         [=](const std::string& message) { handleEventReceivedMessage(message); },
         EventReceivedMessage::topic(),
         EventReceivedMessage::action());
-    
+
     log(logger::LoggerHandler::Level::INFO, "Subscribe to AuthorizationStateChanged Messages");
     m_messageBroker->subscribe(
         [=](const std::string& message) { handleAuthorizationStateChangedMessage(message); },
@@ -125,25 +125,25 @@ void AuthorizationHandler::subscribeToAASBMessages() {
 }
 
 void AuthorizationHandler::handleEventReceivedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received EventReceivedMessage");
     EventReceivedMessage msg = json::parse(message);
     eventReceived(msg.payload.service, msg.payload.event);
 }
 
 void AuthorizationHandler::handleAuthorizationStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AuthorizationStateChangedMessage");
     AuthorizationStateChangedMessage msg = json::parse(message);
     authorizationStateChanged(msg.payload.service, msg.payload.state);
 }
 
 void AuthorizationHandler::handleAuthorizationErrorMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AuthorizationErrorMessage");
     AuthorizationErrorMessage msg = json::parse(message);
     authorizationError(msg.payload.service, msg.payload.error, msg.payload.message);
 }
 
 void AuthorizationHandler::handleGetAuthorizationDataMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetAuthorizationDataMessage");
     GetAuthorizationDataMessage msg = json::parse(message);
 
     // Publish the reply message for getAuthorizationData.
@@ -155,7 +155,7 @@ void AuthorizationHandler::handleGetAuthorizationDataMessage(const std::string& 
 }
 
 void AuthorizationHandler::handleSetAuthorizationDataMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SetAuthorizationDataMessage");
     SetAuthorizationDataMessage msg = json::parse(message);
     setAuthorizationData(msg.payload.service, msg.payload.key, msg.payload.data);
 }
@@ -245,9 +245,7 @@ void AuthorizationHandler::eventReceived(const std::string& service, const std::
     }
 }
 
-void AuthorizationHandler::authorizationStateChanged(
-    const std::string& service,
-    AuthorizationState state) {
+void AuthorizationHandler::authorizationStateChanged(const std::string& service, AuthorizationState state) {
     std::stringstream ss;
     std::string authState;
     switch (state) {

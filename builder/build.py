@@ -1,11 +1,11 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import logging, argparse, importlib, sys
 
 def parse_arguments():
 
     parser = argparse.ArgumentParser( description="AutoSDK Builder" )
     subparsers = parser.add_subparsers(title="commands")
-    
+
     add_build_arguments( subparsers.add_parser("build", help="builds auto sdk components") )
     add_clean_arguments( subparsers.add_parser("clean", help="cleans builder cache") )
     add_configure_arguments( subparsers.add_parser("configure", help="builder configuration") )
@@ -120,68 +120,68 @@ def add_build_arguments(parser):
         help="specify a conan build setting"
     )
     # build.with_aasb
-    parser.add_argument( "--with-aasb", "--aasb", 
+    parser.add_argument( "--with-aasb", "--aasb",
         action="store_true",
         default=True,
         help="include aasb messages (default: True)"
     )
-    parser.add_argument( "--no-aasb", 
-        dest="with_aasb", 
+    parser.add_argument( "--no-aasb",
+        dest="with_aasb",
         action="store_false",
         # help="don't include aasb messages"
     )
     # build.with_docs
-    parser.add_argument( "--with-docs", "--docs", 
+    parser.add_argument( "--with-docs", "--docs",
         action="store_true",
         default=True,
         help="include docs (default: True)"
     )
-    parser.add_argument( "--no-docs", 
-        dest="with_docs", 
+    parser.add_argument( "--no-docs",
+        dest="with_docs",
         action="store_false",
         # help="don't include docs"
     )
-    # build.with_unit_tests 
-    parser.add_argument( "--with-unit-tests", "--unit-tests", 
+    # build.with_unit_tests
+    parser.add_argument( "--with-unit-tests", "--unit-tests",
         action="store_true",
         default=False,
         help="include unit tests (default: False)"
     )
-    parser.add_argument( "--no-unit-tests", 
-        dest="with_unit_tests", 
+    parser.add_argument( "--no-unit-tests",
+        dest="with_unit_tests",
         action="store_false",
         # help="don't include unit tests"
     )
     # build.with_samplepp
-    parser.add_argument( "--with-sampleapp", "--sampleapp", 
+    parser.add_argument( "--with-sampleapp", "--sampleapp",
         action="store_true",
         default=False,
         help="include sample app (default: False)"
     )
-    parser.add_argument( "--no-sampleapp", 
-        dest="with_sampleapp", 
+    parser.add_argument( "--no-sampleapp",
+        dest="with_sampleapp",
         action="store_false",
         # help="don't include sample app"
     )
     # build.sensitive_logs
-    parser.add_argument( "--with-sensitive-logs", "--sensitive-logs", 
+    parser.add_argument( "--with-sensitive-logs", "--sensitive-logs",
         action="store_true",
         default=False,
         help="emit sensitive data in debugging logs (default: False)"
     )
-    parser.add_argument( "--no-sensitive-logs", 
-        dest="with_sensitive_logs", 
+    parser.add_argument( "--no-sensitive-logs",
+        dest="with_sensitive_logs",
         action="store_false",
         # help="don't emit sensitive data in debugging logs"
     )
     # build.latency_logs
-    parser.add_argument( "--with-latency-logs", "--latency-logs", 
+    parser.add_argument( "--with-latency-logs", "--latency-logs",
         action="store_true",
         default=False,
         help="emit latency data in debugging logs (default: False)"
     )
-    parser.add_argument( "--no-latency-logs", 
-        dest="with_latency_logs", 
+    parser.add_argument( "--no-latency-logs",
+        dest="with_latency_logs",
         action="store_false",
         # help="don't emit latency data in debugging logs"
     )
@@ -202,7 +202,7 @@ def add_build_arguments(parser):
         default=False,
         help="skip build configuration"
     )
-    
+
 def add_clean_arguments(parser):
     parser.set_defaults( handler="clean" )
     add_common_arguments( parser )

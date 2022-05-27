@@ -60,7 +60,9 @@ public:
     // MessageBroker implementation
     void publish(const std::string& message) override;
     void subscribe(MessageHandler handler, const std::string& topic = "", const std::string& action = "") override;
-    std::shared_ptr<aace::core::MessageStream> openStream(const std::string& streamId, aace::core::MessageStream::Mode mode) override;
+    std::shared_ptr<aace::core::MessageStream> openStream(
+        const std::string& streamId,
+        aace::core::MessageStream::Mode mode) override;
 
     // create the engine
     static std::shared_ptr<EngineImpl> create();

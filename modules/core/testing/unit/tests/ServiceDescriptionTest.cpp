@@ -46,7 +46,6 @@ TEST_F(ServiceDescriptionTest, versionAssignment) {
 }
 
 TEST_F(ServiceDescriptionTest, versionComparator) {
-
     // test major version comparison
     ASSERT_TRUE(Version("1.0.0") == Version("1.0.0")) << "Major version equal comparator failed!";
     ASSERT_FALSE(Version("1.0.0") == Version("1.1.0")) << "Major version not-equal comparator failed!";
@@ -67,18 +66,22 @@ TEST_F(ServiceDescriptionTest, versionComparator) {
 
     // test accessors
     auto v = Version();
-    ASSERT_TRUE(v.major_version() == 0 && v.minor_version() == 0 && v.revision_version() == 0 && v.tag_version() == "") << "Default version invalid!";
+    ASSERT_TRUE(v.major_version() == 0 && v.minor_version() == 0 && v.revision_version() == 0 && v.tag_version() == "")
+        << "Default version invalid!";
     v = Version("1.2.3-tag");
     ASSERT_TRUE(v.major_version() == 1) << "Major version accessor failed!";
     ASSERT_TRUE(v.minor_version() == 2) << "Minor version accessor failed!";
     ASSERT_TRUE(v.revision_version() == 3) << "Revision version accessor failed!";
     ASSERT_TRUE(v.tag_version() == "tag") << "Tag version accessor failed!";
     v = Version("1");
-    ASSERT_TRUE(v.major_version() == 1 && v.minor_version() == 0 && v.revision_version() == 0 && v.tag_version() == "") << "Major version with defaults invalid!";
+    ASSERT_TRUE(v.major_version() == 1 && v.minor_version() == 0 && v.revision_version() == 0 && v.tag_version() == "")
+        << "Major version with defaults invalid!";
     v = Version("0.1");
-    ASSERT_TRUE(v.major_version() == 0 && v.minor_version() == 1 && v.revision_version() == 0 && v.tag_version() == "") << "Minor version with defaults invalid!";
+    ASSERT_TRUE(v.major_version() == 0 && v.minor_version() == 1 && v.revision_version() == 0 && v.tag_version() == "")
+        << "Minor version with defaults invalid!";
     v = Version("0.0.1");
-    ASSERT_TRUE(v.major_version() == 0 && v.minor_version() == 0 && v.revision_version() == 1 && v.tag_version() == "") << "Revision version with defaults invalid!";
+    ASSERT_TRUE(v.major_version() == 0 && v.minor_version() == 0 && v.revision_version() == 1 && v.tag_version() == "")
+        << "Revision version with defaults invalid!";
 
     // test assignment
     auto v1 = Version("1.0.0");

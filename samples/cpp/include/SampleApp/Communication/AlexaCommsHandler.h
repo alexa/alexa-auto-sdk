@@ -33,6 +33,7 @@ namespace communication {
 class AlexaCommsHandler : public extension::Extension {
     // Enable extension for dynamic loading
     ENABLE_EXTENSION;
+
 private:
     std::weak_ptr<Activity> m_activity;
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler;

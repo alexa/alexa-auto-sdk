@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -112,6 +112,7 @@
 #include "EndpointBuilderFactory.h"
 #include "EqualizerControllerEngineImpl.h"
 #include "ExternalMediaPlayerEngineImpl.h"
+#include "FeatureDiscoveryEngineImpl.h"
 #include "GeolocationServiceInterface.h"
 #include "MediaPlaybackRequestorEngineImpl.h"
 #include "NotificationsEngineImpl.h"
@@ -239,6 +240,7 @@ public:
     std::string getAVSGateway() override;
     std::string getLWAEndpoint() override;
     std::string getACMSEndpoint() override;
+    std::string getFeatureDiscoveryEndpoint() override;
     /// @}
 
     /// WakewordObservableInterface
@@ -346,6 +348,8 @@ private:
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::SpeechSynthesizer> speechSynthesizer);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::TemplateRuntime> templateRuntime);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::DeviceSetup> deviceSetupPlatformInterface);
+    bool registerPlatformInterfaceType(
+        std::shared_ptr<aace::alexa::FeatureDiscovery> featureDiscoveryPlatformInterface);
 
     bool createExternalMediaPlayerImpl();
 
@@ -419,6 +423,7 @@ private:
 
     /// ACMS endpoint provided as part of the engine configuration.
     std::string m_acmsEndpoint;
+    std::string m_featureDiscoveryEndpoint;
 
     alexaClientSDK::avsCommon::utils::AudioFormat m_audioFormat;
     AuthObserverInterface::State m_authState;
@@ -457,6 +462,7 @@ private:
     std::shared_ptr<aace::engine::alexa::SpeechSynthesizerEngineImpl> m_speechSynthesizerEngineImpl;
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> m_templateRuntimeEngineImpl;
     std::shared_ptr<aace::engine::alexa::DeviceSetupEngineImpl> m_deviceSetupEngineImpl;
+    std::shared_ptr<aace::engine::alexa::FeatureDiscoveryEngineImpl> m_featureDiscoveryEngineImpl;
 
     // logger
     std::shared_ptr<AlexaEngineLogger> m_logger;

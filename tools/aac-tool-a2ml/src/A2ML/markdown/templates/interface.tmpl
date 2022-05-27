@@ -1,10 +1,27 @@
 \# $interface.name
 
+#set $outgoing_msg_list = $interface.get_message_names("outgoing")
+#set $incoming_msg_list = $interface.get_message_names("incoming")
+
 ## print the outgoing message list (from engine)
-$print_message_list($interface.get_message_names("outgoing"),"Outgoing Messages")
+$print_message_list($outgoing_msg_list,"Outgoing Messages")
+
+## print the reply of incoming message in outgoing message list
+#if $outgoing_msg_list
+$print_message_list_reply($incoming_msg_list,"")
+#else
+$print_message_list_reply($incoming_msg_list,"Outgoing Messages")
+#end if
 
 ## print the incoming message list (to engine)
-$print_message_list($interface.get_message_names("incoming"),"Incoming Messages")
+$print_message_list($incoming_msg_list,"Incoming Messages")
+
+## print the reply of outgoing message in incoming message list
+#if $incoming_msg_list
+$print_message_list_reply($outgoing_msg_list,"")
+#else
+$print_message_list_reply($outgoing_msg_list,"Incoming Messages")
+#end if
 
 ## print the struct typedef list
 #set $type_def_list = $interface.get_type_names("struct")
@@ -36,12 +53,30 @@ $print_enum($interface.get_type($next_type_name))
 ## print the message
 $print_message($msg,$msg.action,"Publish",$msg.payload)
 
-## print the reply
-#if $msg.reply
-$print_message($msg,$msg.action + "Reply","Reply",$msg.reply)
-#end if
 #end for
 #end if
+#end def
+
+##
+## FUNCTION: print_message_list_reply($msg_names,$msg_list_title)
+##
+#def print_message_list_reply($msg_names,$msg_list_title)
+#set $idx = 1
+#for $next_message_name in $msg_names
+#set $msg = $interface.get_message( $next_message_name )
+
+## print the reply
+## add the title for the first reply message, if not added before
+#if $msg.reply
+#if $idx == 1
+#if $msg_list_title != ""
+\#\# $msg_list_title
+#end if
+#end if
+$print_message($msg,$msg.action + "Reply","Reply",$msg.reply)
+#set $idx = $idx + 1
+#end if
+#end for
 #end def
 
 ##
@@ -80,7 +115,11 @@ $msg.description
     "payload": {
         #set $idx = 1
         #for $next in $msg_params
+        #if $next.value
+        "$next.name": "$next.value"#slurp
+        #else
         "$next.name": $print_json_value_type($next)#slurp
+        #end if
         #if $idx < $len($msg_params)
 ,
         #else

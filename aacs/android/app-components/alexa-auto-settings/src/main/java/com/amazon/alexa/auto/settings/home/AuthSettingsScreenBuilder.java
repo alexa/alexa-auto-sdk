@@ -1,4 +1,24 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings.home;
+
+import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.isDNDSettingEnabled;
+import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.updateDNDSetting;
+import static com.amazon.alexa.auto.apps.common.util.ModuleProvider.isAlexaCustomAssistantEnabled;
+import static com.amazon.alexa.auto.apps.common.util.NaviFavoritesSettingsProvider.isNavFavoritesEnabled;
+import static com.amazon.alexa.auto.apps.common.util.NaviFavoritesSettingsProvider.updateNavFavoritesSetting;
 
 import android.content.Context;
 import android.util.Log;
@@ -23,10 +43,6 @@ import com.amazon.alexa.auto.settings.config.PreferenceKeys;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.isDNDSettingEnabled;
-import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.updateDNDSetting;
-import static com.amazon.alexa.auto.apps.common.util.ModuleProvider.isAlexaCustomAssistantEnabled;
 
 /**
  * Alexa menu builder to take care of Auth related settings.
@@ -70,6 +86,9 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
             Preference dndPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_DO_NOT_DISTURB);
             if (dndPref != null)
                 screen.removePreference(dndPref);
+            Preference navFavPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_NAVI_FAVORITES);
+            if (navFavPref != null)
+                screen.removePreference(navFavPref);
         }
     }
 
@@ -92,6 +111,7 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
         if (!isPreviewMode() && mAuthController.isAuthenticated()) {
             installSignoutEventHandler(screen, view);
             installDNDEventHandler(screen, view);
+            installNavigationFavoritesHandler(screen, view);
         } else {
             installDisableAlexaEventHandler(screen, view);
             installSigninEventHandler(screen, view);
@@ -115,6 +135,21 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
                 Log.d(TAG, "Changing DND setting to:" + newValue);
                 return updateDNDSetting(view.getContext(), (boolean) newValue);
             });
+        }
+    }
+
+    private void installNavigationFavoritesHandler(@NonNull PreferenceScreen screen, @NonNull View view) {
+        SwitchPreferenceCompat defaultAlexaNavFavoriteSetting =
+                screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_NAVI_FAVORITES);
+        if (defaultAlexaNavFavoriteSetting != null) {
+            defaultAlexaNavFavoriteSetting.setChecked(isNavFavoritesEnabled(view.getContext()));
+
+            defaultAlexaNavFavoriteSetting.setOnPreferenceChangeListener((preference, newValue) -> {
+                Log.d(TAG, "Changing Navi Favorites setting to:" + newValue);
+                return updateNavFavoritesSetting(view.getContext(), (boolean) newValue);
+            });
+        } else {
+            Log.w(TAG, "defaultAlexaNavFavoriteSetting is null");
         }
     }
 
@@ -194,8 +229,8 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
     public void onTwoChoiceDialogEvent(TwoChoiceDialog.Button2Clicked event) {
         if (LOGOUT_DIALOG_KEY.equals(event.dialogKey)) {
             Log.i(TAG, "Logging user out");
-            mAuthController.logOut();
             mAlexaSetupController.setSetupCompleteStatus(false);
+            mAuthController.logOut();
         }
     }
 

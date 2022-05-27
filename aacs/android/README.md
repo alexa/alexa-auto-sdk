@@ -1,62 +1,36 @@
 #  Alexa Auto Client Service (AACS)
+
+## Overview
 Alexa Auto Client Service (AACS) is an Alexa Auto SDK feature packaged in an Android archive library (AAR). By providing a common service framework, AACS simplifies the integration of the Auto SDK with your Android device and supports all the Auto SDK extensions.
 
 Your application communicates with AACS through an intent, which is a messaging object on an Android device. AACS provides the platform implementation for certain interfaces, which speeds up Alexa integration for in-vehicle infotainment (IVI). Without AACS, typical integration of the Auto SDK in the IVI involves the implementation of abstract interfaces provided by each Auto SDK module to handle platform-specific functionality. To implement all required platform interfaces, the Auto SDK is integrated to an event-based system that converts from direct method APIs to an event-based architecture.
 
-This document assumes that you understand how the Auto SDK works, as described in the [Auto SDK README](../../README.md). When this document uses the term "application," it refers to the application you develop on the Android platform. Information for your application in this document also applies to your Android service.
-
-<!-- omit in toc -->
-## Table of Contents
-- [AACS Architecture](#aacs-architecture)
-- [Obtaining the AACS AAR](#obtaining-the-aacs-aar)
-- [Using AACS with Your Application](#using-aacs-with-your-application)
-  - [AACS as Foreground Service or System Service](#aacs-as-foreground-service-or-system-service)
-  - [AACS Initialization and Configuration](#aacs-initialization-and-configuration)
-- [Default Platform Implementation](#default-platform-implementation)
-  - [Property Content Provider Implementation (Optional)](#property-content-provider-implementation-optional)
-  - [Enabling AACS to synchronize Alexa's Time Zone and Locale with Device Settings (Optional)](#enabling-aacs-to-synchronize-alexas-time-zone-and-locale-with-device-settings-optional)
-  - [Using Custom Domain Module with CustomDomainMessageDispatcher Enabled (Optional)](#using-custom-domain-module-with-customdomainmessagedispatcher-enabled-optional)
-- [Specifying the Intent Targets for Handling Messages](#specifying-the-intent-targets-for-handling-messages)
-  - [Using Android Manifest](#using-android-manifest)
-  - [Using AACS Configuration File](#using-aacs-configuration-file)
-- [Platform Implementation in Your Application](#platform-implementation-in-your-application)
-  - [Initial Authentication Sequence Diagram](#initial-authentication-sequence-diagram)
-  - [Wake Word Enabled Sequence Diagram](#wake-word-enabled-sequence-diagram)
-- [Client Utility Library](#client-utility-library)
-- [Device Settings Required for AACS](#device-settings-required-for-aacs)
-- [Checking AACS Connection State](#checking-aacs-connection-state)
-- [Request list of extras from AACS](#request-list-of-extras-from-aacs)
-- [Using Instrumentation](#using-instrumentation)
-- [Including App Components with AACS AAR in your application](#including-app-components-with-aacs-aar-in-your-application)
-- [AACS Sample App](#aacs-sample-app)
+This document assumes that you understand how the Auto SDK works, as described in the [Auto SDK concepts documentation](https://alexa.github.io/alexa-auto-sdk/docs/explore/concepts). When this document uses the term "application," it refers to the application you develop on the Android platform. Information for your application in this document also applies to your Android service.
 
 ## AACS Architecture
 The following diagram shows the high-level architecture of AACS on the Android platform. The shaded boxes in the diagram represent components developed by Amazon that are packaged in AACS.
 
-<p align="center">
-<img src="./assets/AACSArchDetailed.png"/>
-</p>
+![AACS Arch Detailed](./docs/diagrams/AACSArchDetailed.png)
 The following list describes the components in the AACS service layer, as illustrated in the diagram, and how they interact with one another and with the Auto SDK:
 
-1) **AlexaAutoClientService** is a persistent service that can start automatically after device boot-up or be manually started by an application through a `startService()` call. The service performs the following functions:
+1. **AlexaAutoClientService** is a persistent service that can start automatically after device boot-up or be manually started by an application through a `startService()` call. The service performs the following functions:
    
-   * Instantiating the Auto SDK Engine.
-   * Creating and registering the AASB message handler with the AASB MessageBroker. 
-   * Setting the required Engine configuration.
-   * Managing the notifications displayed in the system notification area.
+    * Instantiating the Auto SDK Engine.
+    * Creating and registering the AASB message handler with the AASB MessageBroker. 
+    * Setting the required Engine configuration.
+    * Managing the notifications displayed in the system notification area.
   
-2) **PhoneControlMessagingImpl** and **NavigationMessagingImpl** are messaging implementations that serialize direct API calls into a standardized message format. The `PhoneControlMessagingImpl` or `NavigationMessagingImpl` converts platform interface
-method parameters into the message payload of the respective messaging implementation. The message is then sent to the service layer by using the AASB `MessageBroker` with a specific message topic and action. The messaging implementation also subscribes to message topics that are sent from the human-machine interface (HMI) application to the Auto SDK.
-3) **AudioInputImpl**, **AudioOutputImpl**, **ExternalMediaPlayerImpl**, and **AdditionalPlatformImpl** are the direct implementations of Auto SDK platform interfaces. You can enable or disable the implementations in the AACS AAR through the configuration file. If an implementation is disabled, the platform message handler must be provided by a client application.
-4) **AASB MessageBroker** is an abstraction built on top of the Auto SDK core. `MessageBroker` routes messages between the application and the Auto SDK core. When the 
+2. **PhoneControlMessagingImpl** and **NavigationMessagingImpl** are messaging implementations that serialize direct API calls into a standardized message format. The `PhoneControlMessagingImpl` or `NavigationMessagingImpl` converts platform interface method parameters into the message payload of the respective messaging implementation. The message is then sent to the service layer by using the AASB `MessageBroker` with a specific message topic and action. The messaging implementation also subscribes to message topics that are sent from the human-machine interface (HMI) application to the Auto SDK.
+3. **AudioInputImpl**, **AudioOutputImpl**, **ExternalMediaPlayerImpl**, and **AdditionalPlatformImpl** are the direct implementations of Auto SDK platform interfaces. You can enable or disable the implementations in the AACS AAR through the configuration file. If an implementation is disabled, the platform message handler must be provided by a client application.
+4. **AASB MessageBroker** is an abstraction built on top of the Auto SDK core. `MessageBroker` routes messages between the application and the Auto SDK core. When the 
 application responds to `MessageBroker` with an event, the event is routed back through the platform interface implementation.
-5) **AASB MessageHandler** implements the platform-specific logic to send and receive AASB messages.
-6) **Mediaplayer** handles the default AudioOutput actions, such as prepare, play, and pause for a TTS channel.
-7) **IPCLibrary** defines the protocol for the communication between the HMI application and AACS.
+5. **AASB MessageHandler** implements the platform-specific logic to send and receive AASB messages.
+6. **Mediaplayer** handles the default AudioOutput actions, such as prepare, play, and pause for a TTS channel.
+7. **IPCLibrary** defines the protocol for the communication between the HMI application and AACS.
 It provides the APIs for sending and receiving AASB Messages over the Android Intent/Binder interface and
 supports streaming audio data to and from an external application. It builds into an Android archive (AAR) file, which you can include in other apps that need to communicate with AACS.  For more information about the IPC, see this [README](common/ipc/README.md).
-1) **LVCInteractionProvider** implements APIs defined by the `ILVCClient` Android Interface Definition Language (AIDL) file to connect with  `ILVCService`, which is implemented by the Local Voice Control (LVC) application. This connection also enables the LVC APK to provide the configuration for LVC.
-2) The core of the **HMI application** that holds the business logic need not change with
+8. **LVCInteractionProvider** implements APIs defined by the `ILVCClient` Android Interface Definition Language (AIDL) file to connect with  `ILVCService`, which is implemented by the Local Voice Control (LVC) application. This connection also enables the LVC APK to provide the configuration for LVC.
+9. The core of the **HMI application** that holds the business logic need not change with
 `AlexaAutoClientService`. However, you must modify the application so that it can interface with the APIs defined by AACS.
 
 ## Obtaining the AACS AAR
@@ -65,22 +39,24 @@ AACS is packaged as an Android library (AAR). You can obtain the AACS AAR in one
 * To obtain the pre-built AACS AAR and the other dependency AARs which are required for using AACS, contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
 
 * To build the AACS AAR from source code, following the steps below.
-  1) Enter the following command to change the directory:
-    ~~~
-    cd ${AAC_SDK_HOME}/aacs/android/service
-    ~~~   
 
-  2) Enter the following command to start the local build.
-    ~~~
-      ./gradlew assembleLocalRelease
-    ~~~
-    This command builds AACS core service, as well as all the other needed dependencies (such as Auto SDK) required for AACS to function. It also generates AAR files that are used for communicating with AACS from your application.
+    1. Enter the following command to change the directory:
+        ```
+        cd ${AAC_SDK_HOME}/aacs/android/service
+        ```  
 
-    To install all the generated AARs to your application, add the `installDeps` task after the build command. Specify the path you want the artifacts to be installed to by using the `-PinstallPath` option. If `-PinstallPath` is not specified, the artifacts will be copied to `alexa-auto-sdk/aacs/android/service/deploy` by default.
-    ~~~
-        ./gradlew assembleLocalRelease installDeps -PinstallPath=<path/to/your/application/directory>
-    ~~~
+    2. Enter the following command to start the local build.
+        ```
+          ./gradlew assembleLocalRelease
+        ```
+    
+          This command builds AACS core service, as well as all the other needed dependencies (such as Auto SDK) required for AACS to function. It also generates AAR files that are used for communicating with AACS from your application.
 
+          To install all the generated AARs to your application, add the `installDeps` task after the build command. Specify the path you want the artifacts to be installed to by using the `-PinstallPath` option. If `-PinstallPath` is not specified, the artifacts will be copied to `alexa-auto-sdk/aacs/android/service/deploy` by default.
+          
+          ```
+              ./gradlew assembleLocalRelease installDeps -PinstallPath=<path/to/your/application/directory>
+          ```
 
 ## Using AACS with Your Application
 This section provides information about how AACS works with your application.
@@ -89,30 +65,30 @@ To build your application with AACS, you can either include AACS and the other d
 
 1. Using AACS as a local module
 
-  Include AACS and the other dependency libraries as sub-projects in the `settings.gradle` file of your project.
-  In the `build.gradle` file of your application, add the following `implementation` statements:
-  ~~~
-    implementation project(':aacs')
-    implementation project(':aacs-extra')
-    implementation project(':aacs-maccandroid')
-    implementation project(':aacsconstants')
-    implementation project(':aacsipc')
-    implementation project(':aacscommonutils')
-    implementation project(':alexa-auto-tts')
+    Include AACS and the other dependency libraries as sub-projects in the `settings.gradle` file of your project.
+    In the `build.gradle` file of your application, add the following `implementation` statements:
+    ~~~
+      implementation project(':aacs')
+      implementation project(':aacs-extra')
+      implementation project(':aacs-maccandroid')
+      implementation project(':aacsconstants')
+      implementation project(':aacsipc')
+      implementation project(':aacscommonutils')
+      implementation project(':alexa-auto-tts')
+      
+      // replace the <path/to/Auto/SDK/AARs> placeholder with your path
+      implementation fileTree(include: ['*.aar'], dir: <path/to/Auto/SDK/AARs>)
+    ~~~
+    See the `${AUTO_SDK_HOME}/aacs/android/sample-app/settings.gradle` and `${AUTO_SDK_HOME}/aacs/android/sample-app/alexa-auto-app/build.gradle` files of the AACS Sample App for more information.
+
+2. Using AACS as a local binary
+
+    Include the AARs in the libs folder of your application. See [Obtaining the AACS AAR](#obtaining-the-aacs-aar) for instructions of how to obtain the AACS AARs.
     
-    // replace the <path/to/Auto/SDK/AARs> placeholder with your path
-    implementation fileTree(include: ['*.aar'], dir: <path/to/Auto/SDK/AARs>)
-  ~~~
-  See the [settings.gradle](../android/sample-app/settings.gradle) and the [build.gradle](../android/sample-app/alexa-auto-app/build.gradle) of AACS Sample App for more information.
-
-2) Using AACS as a local binary
-
-  Include the AARs in the libs folder of your application. See [Obtaining the AACS AAR](#obtaining-the-aacs-aar) for instructions of how to obtain the AACS AARs.
-  
-  Add the following `implementation` statement to the `build.gradle` file of your application:
-  ~~~
-      implementation fileTree(dir: 'libs', include: ['*.aar'])
-  ~~~
+    Add the following `implementation` statement to the `build.gradle` file of your application:
+    ~~~
+        implementation fileTree(dir: 'libs', include: ['*.aar'])
+    ~~~
 
 ### AACS as Foreground Service or System Service
 AACS runs as a started service on Android. The [Initialization](#initialization) section describes how it is started; this section describes what you do to run AACS as a foreground service or a system service. 
@@ -120,8 +96,8 @@ AACS runs as a started service on Android. The [Initialization](#initialization)
 #### As Foreground Service
 Typically, AACS is started as a foreground service, which has higher priority and continues running unless it is under memory constraints. In addition, the service displays notifications to alert the user that it is running. 
 
-To run AACS as a foreground service, in the AACS configuration, set `persistentSystemService` under `aacs.general` to
-`false`. Then your application can use the `startForegroundService()` function to initialize AACS. If AACS is started properly, a notification is displayed.
+AACS is run as a foreground service if your application containg AACS AAR is not a system application.
+Then your application can use the `startForegroundService()` function to initialize AACS. If AACS is started properly, a notification is displayed.
 
 Since Android 8.0 (API level 26), foreground services have had
 some changes in how they are initialized. The following code checks the Android version and calls the correct API:
@@ -139,14 +115,8 @@ if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 ~~~
 
 #### As Persistent System Service
-If you have root access on the device and your application containing AACS AAR is a system application, you can configure AACS to run as a system service. In the AACS configuration, set `persistentSystemService` under `aacs.general` to `true`.
-~~~
-"aacs.general" : {
-    "persistentSystemService": true,
-    ...
-}
-~~~
-This setting is equivalent to setting the 'persistent' flag to true within the `application` element of the Android Manifest file. This flag indicates that the service runs at all times, and should only be set to true by system applications. Your application no longer needs to start AACS in the foreground, and no notifications appear to show that the service is running. The following example shows an application starting AACS as a system service:
+If you have root access on the device and your application containing AACS AAR is a system application, then AACS is run as a system service.
+Your application no longer needs to start AACS in the foreground, and no notifications appear to show that the service is running. The following example shows an application starting AACS as a system service:
 ~~~
 Intent intentStartService = new Intent();
 intentStartService.setComponent(new ComponentName(AACSConstants.getAACSPackageName(new WeakReference<Context>(context)),
@@ -155,6 +125,8 @@ intentStartService.setAction(Action.LAUNCH_SERVICE);
 
 startService(intent);
 ~~~
+
+Note: persistentSystemService configuration is deprecated. You no longer need to specify this field to run AACS as a persistent system service.
 
 ### AACS Initialization and Configuration
 Initializing AACS means getting AACS ready to communicate with other applications. However, Alexa functionality is not available until AACS receives the configuration.
@@ -165,13 +137,13 @@ There are two ways to initialize AACS:
 * Start AACS from an application:
 AACS includes a permission that determines whether an application can start or stop the service. For an application to start or stop AACS, specify the permission name in the application's `AndroidManifest.xml` file as follows:
 
-  `<uses-permission android:name="com.amazon.alexaautoclientservice"/>`
+    `<uses-permission android:name="com.amazon.alexaautoclientservice"/>`
 
-  For an example of starting AACS from an application, see [example for starting AACS as a system service](#as-persistent-system-service).
+    For an example of starting AACS from an application, see [example for starting AACS as a system service](#as-persistent-system-service).
 
 * Start AACS upon device boot: If you want AACS to start every time the user turns on the device, set `startOnDeviceBootEnabled` in `aacs.general` of your configuration to `true`. Due to this setting, AACS initiates a `startService()` call on itself when it receives the `BOOT_COMPLETED` intent, which the device broadcasts when it is finished booting. 
 
-  >**Important!** The device considers AACS inactive until AACS is run at least once. AACS does not start automatically on device boot unless AACS is considered active. Simply run AACS at least once after installation, and AACS will start each time the device is restarted. 
+    >**Important!** The device considers AACS inactive until AACS is run at least once. AACS does not start automatically on device boot unless AACS is considered active. Simply run AACS at least once after installation, and AACS will start each time the device is restarted. 
 
 Whether `startOnDeviceBootEnabled` is set to `true` or `false`, the application can always send a `startService()` or `stopService()` call to start or stop AACS.
 
@@ -181,14 +153,15 @@ This section describes the configuration schema, which includes Auto SDK engine 
   >**Important!** Some configuration fields may require you to provide filepaths. These filepaths must be absolute paths that are accessible to AACS. AACS will not accept filepaths to public locations (such as SD card) for security reasons.
 
 The sample configuration JSON file in this section illustrates the AACS configuration structure. Be sure to fill out the following required sections under `deviceInfo` of `aacs.alexa`:
-  * `clientId`
-  * `productId`
-  * `deviceSerialNumber` 
+
+* `clientId`
+* `productId`
+* `deviceSerialNumber` 
    
 The following documents provide more information about configuration:
 
-* [Auto SDK class list](https://alexa.github.io/alexa-auto-sdk/docs/cpp/annotated.html)
-* [Complete configuration file](./assets/config.json)
+* [Auto SDK module documentation](https://alexa.github.io/alexa-auto-sdk/docs/explore/features)
+* [Complete configuration file](https://github.com/alexa/alexa-auto-sdk/blob/4.0/aacs/android/assets/config.json)
 ~~~
 {
   "aacs.alexa": {
@@ -335,6 +308,7 @@ Some configurable fields for the Auto SDK require paths to files in your applica
 AACS's file sharing protocol uses Android's `FileProvider` class to securely receive the URIs of files in applications. See the [Android documentation](#https://developer.android.com/training/secure-file-sharing/setup-sharing) on how to set up `FileProvider` in your application. Your `FileProvider` is functional after the application includes a `<provider>` element in its AndroidManifest and a `filepaths.xml` file for specifying shareable paths. 
 
 After `FileProvider` is set up, AACS expects to receive an intent with action  `Intent.ACTION_SEND_MULTIPLE` to include the URIs of files to be shared. Send the intent **after** service initialization but **before** the configuration message is sent. It requires the following structure:
+
 * **Action:** `Intent.ACTION_SEND_MULTIPLE` - The standard Android intent for sharing multiple pieces of content
 * **Type:** The MIME type of a URI 
 * **Extra:** `AACSConstants.CONFIG_MODULE` or `configModule`- A `String` representing the module to be configured by the shared files
@@ -401,14 +375,13 @@ stop the service and restart it with `newConfig` set to `true`. This same rule a
 
 #### Initialization Sequence Diagram
 The following diagram shows an example of initializing AACS from an app used by a driver.
-<p align="center">
-<img src="./assets/AACSInitFlow.png"/>
-</p>
+![AASC Init Flow](./docs/diagrams/AACSInitFlow.png)
 
 ## Default Platform Implementation
 Default platform implementations refer to implementations of Auto SDK platform interfaces that AACS provides to replace the normal protocol of using AASB messages. By enabling a default platform implementation in AACS, you no longer have to handle messages for a particular platform interface and can rely on AACS to provide the necessary functionality.
 
 AACS provides a default implementation for these platform interfaces:
+
 * AudioInput (audioType: VOICE, COMMS)
 * AudioOutput (audioType: TTS, ALARM, NOTIFICATIONS, EARCON, RINGTONE)
 * LocationProvider
@@ -481,98 +454,96 @@ aace.network.networkInterface
 
 By using the native Android `ContentProvider` class, you can initiate `query` and `update` operations. query retrieves and returns the current String value of an Auto SDK property. `update` sets an Auto SDK property in the Engine and returns a boolean value based on the success of the operation. Insert and Delete operations are disabled for Auto SDK properties. 
 
-<p align="center">
-<img src="./assets/APCP.png"/>
-</p>
+![APCP](./docs/diagrams/APCP.png)
 
 #### Implementation Examples
 1. Add `useDefaultPropertyManager` in the `config.json` file and set it to `true`, as shown in the following example:
 
-~~~
-...
-    "aacs.defaultPlatformHandlers": {
-        "useDefaultLocationProvider": true,
--->     "useDefaultPropertyManager": true,
-        "audioInput": {
-        "audioType": {
-...
-~~~
+    ~~~
+    ...
+        "aacs.defaultPlatformHandlers": {
+            "useDefaultLocationProvider": true,
+    -->     "useDefaultPropertyManager": true,
+            "audioInput": {
+            "audioType": {
+    ...
+    ~~~
 
 2. Add `READ_USER_DICTIONARY` permission to `AndroidManifest.xml` in your application, as shown in the following example:
-~~~
-<uses-permission...
-<uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
-<uses-permission...
-~~~
+    ~~~
+    <uses-permission...
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY" />
+    <uses-permission...
+    ~~~
 
 3. In the application implementation, set the URI for getting the `ContentResolver` instance as follows:
-~~~
-private final Uri uri = Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI);
-~~~
+    ~~~
+    private final Uri uri = Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI);
+    ~~~
 
 4. Register `ContentObserver` for monitoring any Auto SDK property changes that are initiated by the engine. `ContentObserver` is a native Android class which observes changes to data and will call its `onChange()` method to perform callbacks when a content change occurs. It includes the changed content Uri when available.
 
-To register `ContentObserver`, first register your application with `ContentObserver`
-~~~
-// PropertyHandler is an example class using ContentProvider API to query and update properties in your application 
-PropertyHandler alexaPropertyHandler = new PropertyHandler(this);
+    To register `ContentObserver`, first register your application with `ContentObserver`
+    ~~~
+    // PropertyHandler is an example class using ContentProvider API to query and update properties in your application 
+    PropertyHandler alexaPropertyHandler = new PropertyHandler(this);
 
-// PropertyContentObserver is an example implementation of the callback for property changes
-PropertyContentObserver propertyObserver = new PropertyContentObserver(alexaPropertyHandler, this);
+    // PropertyContentObserver is an example implementation of the callback for property changes
+    PropertyContentObserver propertyObserver = new PropertyContentObserver(alexaPropertyHandler, this);
 
-getContentResolver().registerContentObserver(Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), true, propertyObserver);
-~~~
+    getContentResolver().registerContentObserver(Uri.parse("content://" + AACSConstants.AACS_PROPERTY_URI), true, propertyObserver);
+    ~~~
 
-Then implement the `PropertyContentObserver` class and add the desired callback behavior in method `onChange()`:
-~~~
-public class PropertyContentObserver extends ContentObserver {
-    private static Activity mActivity;
-    public PropertyContentObserver(Handler handler, Activity activity) {
-        super(handler);
-        mActivity = activity;
+    Then implement the `PropertyContentObserver` class and add the desired callback behavior in method `onChange()`:
+    ~~~
+    public class PropertyContentObserver extends ContentObserver {
+        private static Activity mActivity;
+        public PropertyContentObserver(Handler handler, Activity activity) {
+            super(handler);
+            mActivity = activity;
+        }
+
+        @Override
+        public void onChange(boolean changed) {
+            this.onChange(changed, null);
+        }
+
+        @Override
+        public void onChange(boolean changed, Uri uri) {
+            // Do something when content change occurs
+        }
     }
-
-    @Override
-    public void onChange(boolean changed) {
-        this.onChange(changed, null);
-    }
-
-    @Override
-    public void onChange(boolean changed, Uri uri) {
-        // Do something when content change occurs
-    }
-}
-~~~
+    ~~~
 
 5. Perform query() and update() operation within application using the previously set URI: 
 
-query()
+    query()
 
-~~~
-Cursor cursor = getContentResolver().query(uri, null, propertyName, null, null);
-cursor.moveToFirst();
-String propertyValue = cursor.getString(1);
-~~~
+    ~~~
+    Cursor cursor = getContentResolver().query(uri, null, propertyName, null, null);
+    cursor.moveToFirst();
+    String propertyValue = cursor.getString(1);
+    ~~~
 
-update() must be called in its own thread, not the main UI thread since update() calls setProperty and receive the result asynchronously.
+    update() must be called in its own thread, not the main UI thread since update() calls setProperty and receive the result asynchronously.
 
-~~~
-ExecutorService mExecutor;
-ContentValues cv = new ContentValues();
-cv.put(propertyName, propertyValue);
-if (mExecutor == null ) {
-    mExecutor = Executors.newSingleThreadExecutor();
-} else {
-    synchronized (OEMApplication.class) {
-        if (mExecutor.isShutdown()) {
-            // Log warning that Executor has already been shut down for update. Not updating property.
+    ~~~
+    ExecutorService mExecutor;
+    ContentValues cv = new ContentValues();
+    cv.put(propertyName, propertyValue);
+    if (mExecutor == null ) {
+        mExecutor = Executors.newSingleThreadExecutor();
+    } else {
+        synchronized (OEMApplication.class) {
+            if (mExecutor.isShutdown()) {
+                // Log warning that Executor has already been shut down for update. Not updating property.
+            }
+            mExecutor.submit(() -> {
+                getContentResolver().update(uri, cv, propertyName, null);
+            });
         }
-        mExecutor.submit(() -> {
-            getContentResolver().update(uri, cv, propertyName, null);
-        });
     }
-}
-~~~
+    ~~~
 
 #### Important Considerations for Using ContentProvider
 
@@ -588,15 +559,17 @@ if (mExecutor == null ) {
 
 ### Enabling AACS to synchronize Alexa's Time Zone and Locale with Device Settings (Optional)
 AACS supports synchronizing Alexa's time zone and locale properties with the ones in device settings. To enable the functionality, refer to this [README](service/README.md#syncsystempropertychange) for proper configuration. Once enabled, AACS will synchronize the time zone and/or locale properties of Alexa with the device settings in the following conditions:
+
 * When Auto SDK engine is initialized, AACS tries to synchronize both properties with the device settings. The property change would fail and not take effect if the system locale is not supported by Alexa.
 * When the authorization state is refreshed, AACS tries to synchronize both properties with the device settings. The property change would fail and not take effect if the system locale is not supported by Alexa.
 * When AACS gets `android.intent.action.LOCALE_CHANGED` intent as a result of device locale setting change, Alexa locale property will be updated if the locale is supported by Alexa.
 * When AACS gets `android.intent.action.TIMEZONE_CHANGED` intent as a result of device time zone setting change, Alexa time zone property will be updated.
 
 You can also disable the automatic synchronization for specific properties. This is particularly useful when your application wants to disable/enable the synchronization at runtime. For example, after the user manually selects a locale, you may want to disable the synchronization to allow the user's selection to override the system setting changes. To achieve this use case, your application can send intents with the metadata below to AACS:
+
 * Action: 
-  * Disable: `com.amazon.aacs.syncSystemPropertyChange.disable`
-  * Enable: `com.amazon.aacs.syncSystemPropertyChange.enable`
+    * Disable: `com.amazon.aacs.syncSystemPropertyChange.disable`
+    * Enable: `com.amazon.aacs.syncSystemPropertyChange.enable`
 * Category: `com.amazon.aacs.syncSystemPropertyChange`
 * Extra: `"property": <alexa_property_name>`
 
@@ -615,18 +588,18 @@ Below is the intent schema of the intents sent from the dispatcher. All the inte
 
 * Intent for handling/canceling a custom directive:
 
-  * Action: `com.amazon.aacs.customDomain.<custom-directive-name>`.
-  * Category: `com.amazon.aacs.customDomain.<custom-directive-namespace>`.
+    * Action: `com.amazon.aacs.customDomain.<custom-directive-name>`.
+    * Category: `com.amazon.aacs.customDomain.<custom-directive-namespace>`.
 
 * Intent for getting the context for a custom namespace:
 
-  * Action: `com.amazon.aacs.customDomain.GetContext`
-  * Category: `com.amazon.aacs.customDomain.<custom-context-namespace>`.
+    * Action: `com.amazon.aacs.customDomain.GetContext`
+    * Category: `com.amazon.aacs.customDomain.<custom-context-namespace>`.
 
 You can define intent filters in the Android Manifest of your applications to subscribe to the specific Custom Domain intents. See [Specifying the Intent Targets for Handling Messages Using Android Manifest](#using-android-manifest) to learn more about specifying intent targets. 
 Please refer to this [README](service/README.md#usedefaultcustomdomainmessagedispatcher) on enabling CustomDomainMessageDispatcher. 
 
->**Note**: CustomDomainMessageDispatcher does not process any custom directives. Your application is responsible for handling any custom directives, sending custom events, and providing custom contexts following the [Custom Domain AASB Documentation](https://alexa.github.io/alexa-auto-sdk/docs/sdk-docs/modules/custom-domain/aasb-docs/CustomDomain/index.html). If the dispatcher is not enabled, your application will be responsible for receiving all the Custom Domain AASB Messages (as intents) at one place. 
+>**Note**: CustomDomainMessageDispatcher does not process any custom directives. Your application is responsible for handling any custom directives, sending custom events, and providing custom contexts following the [Custom Domain AASB Documentation](https://alexa.github.io/alexa-auto-sdk/docs/aasb/custom-domain/CustomDomain/index.html). If the dispatcher is not enabled, your application will be responsible for receiving all the Custom Domain AASB Messages (as intents) at one place. 
 
 ## Specifying the Intent Targets for Handling Messages
 
@@ -697,26 +670,22 @@ Android Manifest, the configuration file takes priority and the targets with int
 AACS first searches for targets for an intent with a topic in the configuration file. If nothing is found, the package manager scans the intent filters on the device to locate a match. AACS also caches the scan results based on both topic and action. The cache is cleared every time AACS is restarted.
 
 ## Platform Implementation in Your Application
-Your applications can register for specific AASB messages and provide a platform implementation. For example, an application (“Login app") can register for Authorization messages. For information about the Authorization module, see the [Core Module README](../../modules/core/README.md).
+Your applications can register for specific AASB messages and provide a platform implementation. For example, an application (“Login app") can register for Authorization messages. For information about the Authorization module, see the `Core` module documentation.
 
 ### Initial Authentication Sequence Diagram
 The following sequence diagram illustrates how an application (“Login app") exchanges messages with AACS over Android Intents to log in the user for Alexa.
 
-<p align="center">
-<img src="./assets/AACS_CBLLogin.png"/>
-</p>
+![AACS CBL Login](./docs/diagrams/AACS_CBLLogin.png)
 
 ### Wake Word Enabled Sequence Diagram
 The sequence diagram illustrates the sequence for the user to access Alexa if you use the default implementation of AudioInput in AACS. In this diagram, the driver is logged in and wake word is enabled. The driver initiates the action by uttering the Alexa wake word.
-<p align="center">
-<img src="./assets/AACSWakeword.png"/>
-</p>
+![AACS Wakeword](./docs/diagrams/AACSWakeword.png)
 
 1. Audio is processed locally by the wake word engine in AACS until the wake word is detected. Upon wake word detection, AACS notifies the application that the dialog state has changed to "listening" and initiates a Recognize event with Alexa.
    
 2. While in the listening state, audio data is sent to Alexa. When the end of speech is detected, Alexa sends a `StopCapture` directive to AACS, and the dialog state is changed to "thinking." Alexa then responds with additional directives in response to the speech request.
 
-For information about other messages to provide your implementation in the client APK, please refer to the README for each Auto SDK module.
+For information about other messages to provide your implementation in the client APK, please refer to the documentation for each Auto SDK module.
 
 ## Client Utility Library
 
@@ -768,7 +737,28 @@ If AACS responds to the ping request, the `AACSPingResponse.AACSState` string re
 
 If AACS does not respond within the default timeout of 1 second, `AACSPingResponse.hasResponse` is `false`.
 
+## AACS State Notification
 
+As an alternative to pinger where the application or service can fetch the AACS State, AACS also broadcast the various state transitions.
+
+Your application needs to register a receiver for the following intent action:
+
+"com.amazon.aacs.service.statechanged"
+
+This is defined in AACS Constants as ACTION_STATE_CHANGE
+
+The following example shows an intent receiver to receive AACS State transition events:
+
+~~~
+
+mAACSStateIntentReceiver = new aacsStateIntentReceiver();
+
+IntentFilter filter = new IntentFilter();
+filter.addAction(AACSConstants.ACTION_STATE_CHANGE);
+
+(context.get()).registerReceiver(mAACSStateIntentReceiver, filter);
+
+~~~
 ## Request list of extras from AACS
 
 Your application can receive the list of AACS extra modules by sending an intent with the action `AACSConstants.IntentAction.GET_SERVICE_METADATA` and the category `AACSConstants.IntentCategory.GET_SERVICE_METADATA`, which returns a response by receiving an intent `AACSConstants.IntentAction.GET_SERVICE_METADATA_REPLY`.

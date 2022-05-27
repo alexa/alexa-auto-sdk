@@ -1,5 +1,20 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.comms.ui.fragment.setup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +33,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.comms.ui.Constants;
 import com.amazon.alexa.auto.comms.ui.R;
+import com.amazon.alexa.auto.comms.ui.RequestContactsConsentActivity;
 import com.amazon.alexa.auto.comms.ui.db.BTDevice;
 import com.amazon.alexa.auto.comms.ui.db.BTDeviceRepository;
 import com.amazon.alexa.auto.comms.ui.db.ConnectedBTDevice;
@@ -51,7 +67,6 @@ public class CommunicationConsentFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (mViewModel == null) { // It would be non-null for test injected dependencies.
             mViewModel = new ViewModelProvider(this).get(CommunicationConsentViewModel.class);
         }
@@ -70,9 +85,6 @@ public class CommunicationConsentFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        requireView();
-
         observePrimaryConnectedDevice();
     }
 
@@ -108,39 +120,64 @@ public class CommunicationConsentFragment extends Fragment {
                     mViewModel.uploadContacts(deviceAddress);
                 } else {
                     View fragmentView = requireView();
-                    TextView consentPermissionBody = fragmentView.findViewById(R.id.contacts_permission_consent_body);
+                    TextView consentPermissionHeading =
+                            fragmentView.findViewById(R.id.contacts_permission_consent_heading);
                     TextView getYesButtonText = fragmentView.findViewById(R.id.contacts_upload_yes_action_button);
                     TextView getSkipButtonText = fragmentView.findViewById(R.id.contacts_upload_skip_action_button);
+                    ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
 
                     String format = "";
                     if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
                         // Remove Alexa logo placeholder
-                        ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
+
                         alexaImage.setVisibility(View.GONE);
 
                         // Update text content
-                        format = getResources().getString(R.string.contacts_permission_consent_body_with_alexa_custom_assistant);
+                        format = getResources().getString(
+                                R.string.contacts_permission_consent_body_with_alexa_custom_assistant);
                         getYesButtonText.setText(R.string.contacts_consent_yes_with_alexa_custom_assistant);
                         TextView alexaContactsHint = fragmentView.findViewById(R.id.alexa_contacts_hint1);
                         alexaContactsHint.setVisibility(View.GONE);
                     } else {
-                        format = getResources().getString(R.string.contacts_permission_consent_body);
+                        ViewGroup.MarginLayoutParams marginLayoutParams =
+                                (ViewGroup.MarginLayoutParams) alexaImage.getLayoutParams();
+                        marginLayoutParams.topMargin =
+                                (int) getResources().getDimension(R.dimen.contacts_permission_alexa_image_topMargin);
+                        format = getResources().getString(R.string.contacts_permission_consent_title);
                     }
-                    String bodyString = String.format(format, device.getValue().getDeviceName());
-                    consentPermissionBody.setText(bodyString);
+                    String headingString = String.format(format, device.getValue().getDeviceName());
+                    consentPermissionHeading.setText(headingString);
+                    String actName = String.valueOf(getActivity());
                     Log.d(TAG, "Device's contacts upload permission is NO, showing contacts consent card.");
+                    getYesButtonText.setOnClickListener(view -> {
+                        mViewModel.setContactsUploadPermission(
+                                device.getValue().getDeviceAddress(), Constants.CONTACTS_PERMISSION_YES);
+                        if (actName.contains(Constants.CONTACTS_ACTIVITY)) {
+                            popupActivity();
+                        }
+                    });
 
-                    getYesButtonText.setOnClickListener(view
-                            -> mViewModel.setContactsUploadPermission(
-                                    device.getValue().getDeviceAddress(), Constants.CONTACTS_PERMISSION_YES));
-
-                    getSkipButtonText.setOnClickListener(view
-                            -> mViewModel.setContactsUploadPermission(
-                                    device.getValue().getDeviceAddress(), Constants.CONTACTS_PERMISSION_NO));
+                    getSkipButtonText.setOnClickListener(view -> {
+                        mViewModel.setContactsUploadPermission(
+                                device.getValue().getDeviceAddress(), Constants.CONTACTS_PERMISSION_NO);
+                        if (actName.contains(Constants.CONTACTS_ACTIVITY)) {
+                            popupActivity();
+                        }
+                    });
                 }
             } else {
                 Log.d(TAG, "Connected device is not found");
             }
         });
+    }
+    /**
+     * Starts the RequestContactsConsentActivity
+     */
+    private void popupActivity() {
+        Intent intent = new Intent(getActivity(), RequestContactsConsentActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("keep", "false");
+        startActivity(intent);
     }
 }

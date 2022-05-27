@@ -1,5 +1,15 @@
 package com.amazon.alexa.auto.templateruntime.receiver;
 
+import static com.amazon.aacsconstants.TemplateRuntimeConstants.TEMPLATE_TYPE_WEATHER;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -34,15 +44,6 @@ import org.robolectric.RobolectricTestRunner;
 import java.lang.reflect.Field;
 import java.util.Optional;
 
-import static com.amazon.aacsconstants.TemplateRuntimeConstants.TEMPLATE_TYPE_WEATHER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class AlexaStateChangeReceiverTest {
     private AlexaStateChangeReceiver mClassUnderTest;
@@ -68,7 +69,8 @@ public class AlexaStateChangeReceiverTest {
         when(mMockSessionController.getTemplateRuntimeViewContainer()).thenReturn(Optional.of(mViewGroup));
 
         Field field = EventBus.class.getDeclaredField("defaultInstance");
-        if (!field.isAccessible()) field.setAccessible(true);
+        if (!field.isAccessible())
+            field.setAccessible(true);
         field.set(null, Mockito.mock(EventBus.class));
     }
 
@@ -114,5 +116,4 @@ public class AlexaStateChangeReceiverTest {
         sampleListeningPayload.putString("message", sampleAACSListeningMessage.get());
         mIntent.putExtra("payload", sampleListeningPayload);
     }
-
 }

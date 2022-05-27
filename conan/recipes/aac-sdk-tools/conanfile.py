@@ -14,6 +14,7 @@ class AacSdkTools(ConanFile):
     options = {
         "build_name": "ANY",
         "pkg_modules": "ANY",
+        "thirdparty_includes": "ANY",
         "aac_version": "ANY",
         "with_aasb": [True,False],
         "with_unit_tests": [True,False],
@@ -75,6 +76,9 @@ class AacSdkTools(ConanFile):
             # write exported package name
             with open( "pkg_manifest.json", "w" ) as file:
                 json.dump( self.create_manifest(), file, indent=3 )
+        if self.options.thirdparty_includes:
+            for inc in str(self.options.thirdparty_includes).split(","):
+                self.copy( inc )
 
     def create_manifest(self):
         pkgname = "aac-%s-%s_%s-%s-%s" % (str(self.options.aac_version).lower(), 
@@ -115,6 +119,7 @@ class BaseSdkModule(object):
 
     module_name = None
     module_requires = []
+    module_system_libs = []
     module_options = {}
     module_default_options = {}
     module_overrides_cmake = False
@@ -200,6 +205,10 @@ class BaseSdkModule(object):
         return modules
 
     @property
+    def _required_system_libs(self):
+        return self.module_system_libs
+
+    @property
     def _module_export_name(self):
         name = ""
         for part in self.module_name.split("-"):
@@ -222,7 +231,7 @@ class BaseSdkModule(object):
         if self.options.get_safe("with_jni",default=False):
             includeDirectoryList.append( "android/src/main/cpp/include" )
         if self.options.get_safe("with_messages",default=False):
-            includeDirectoryList.append( os.path.join( self.install_folder, "aasb-message-headers" ) )
+            includeDirectoryList.append( os.path.join( self.install_folder, "aasb-messages", "include" ) )
         return includeDirectoryList
 
     @property
@@ -247,7 +256,7 @@ class BaseSdkModule(object):
         if self.options.get_safe("with_platform",default=False):
             includeDirectoryList.append( "platform/include" if use_relpath else os.path.join( root_folder, "platform/include" ) )
         if self.options.get_safe("with_messages",default=False):
-            includeDirectoryList.append( os.path.join( self.install_folder, "aasb-message-headers" ) )
+            includeDirectoryList.append( os.path.join( self.install_folder, "aasb-messages", "include" ) )
         return includeDirectoryList
         
     @property
@@ -309,15 +318,17 @@ class BaseSdkModule(object):
         }
 
     def imports(self):
-        cmake_build.imports(self,self.install_folder)
-        # import gradle files for android library build
-        if self.options.get_safe("with_android_libs", default=False):
-            gradle_build.imports(self,self.install_folder)
         # generate the message headers in the install folder - we do this in the
         # imports phase so that the generated headers will be available for local
         # build development when using `conan intstall`.
         if self.options.with_messages:
             a2ml_build.imports(self)
+
+        cmake_build.imports(self,self.install_folder)
+
+        # import gradle files for android library build
+        if self.options.get_safe("with_android_libs", default=False):
+            gradle_build.imports(self,self.install_folder)
 
     def build(self):
         # build the cmake project

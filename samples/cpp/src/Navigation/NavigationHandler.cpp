@@ -130,30 +130,30 @@ void NavigationHandler::subscribeToAASBMessages() {
 }
 
 void NavigationHandler::handleAnnounceManeuverMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AnnounceManeuverMessage");
     AnnounceManeuverMessage msg = json::parse(message);
     announceManeuver(msg.payload.payload);
 }
 
 void NavigationHandler::handleAnnounceRoadRegulationMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AnnounceRoadRegulationMessage");
     AnnounceRoadRegulationMessage msg = json::parse(message);
     announceRoadRegulation(msg.payload.roadRegulation);
 }
 
 void NavigationHandler::handleCancelNavigationMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received CancelNavigationMessage");
     cancelNavigation();
 }
 
 void NavigationHandler::handleControlDisplayMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ControlDisplayMessage");
     ControlDisplayMessage msg = json::parse(message);
     controlDisplay(msg.payload.controlDisplay);
 }
 
 void NavigationHandler::handleGetNavigationStateMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetNavigationStateMessage");
 
     // Publish the "GetNavigationStateReply" message
     GetNavigationStateMessage msg = json::parse(message);
@@ -164,23 +164,23 @@ void NavigationHandler::handleGetNavigationStateMessage(const std::string& messa
 }
 
 void NavigationHandler::handleNavigateToPreviousWaypointMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received NavigateToPreviousWaypointMessage");
     navigateToPreviousWaypoint();
 }
 
 void NavigationHandler::handleShowAlternativeRoutesMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Recevied ShowAlternativeRoutesMessage");
     ShowAlternativeRoutesMessage msg = json::parse(message);
     showAlternativeRoutes(msg.payload.alternateRouteType);
 }
 
 void NavigationHandler::handleShowPreviousWaypointsMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received ShowPreviousWaypointsMessage");
     showPreviousWaypoints();
 }
 
 void NavigationHandler::handleStartNavigationMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received StartNavigationMessage");
     StartNavigationMessage msg = json::parse(message);
     startNavigation(msg.payload.payload);
 }
@@ -310,7 +310,7 @@ void NavigationHandler::showAlternativeRoutes(AlternateRouteType alternateRouteT
 
     std::string payload = "{\"inquiryType\": \"" + alternateRouteTypeString +
                           "\", \"alternateRoute\": {\"labels\": [\"US-101 N\"], \"savings\": [{\"type\":\"TIME\", "
-                          "\"amount\": \"12.0\", \"unit\": \"MINUTE\"}]}}";
+                          "\"amount\": 12.0, \"unit\": \"MINUTE\"}]}}";
     showAlternativeRoutesSucceeded(payload);
 }
 

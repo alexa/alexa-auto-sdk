@@ -26,16 +26,16 @@ namespace core {
 
 class MessageBrokerBinder {
 public:
-    MessageBrokerBinder( std::shared_ptr<aace::core::MessageBroker> messageBroker );
+    MessageBrokerBinder(std::shared_ptr<aace::core::MessageBroker> messageBroker);
 
     std::shared_ptr<aace::core::MessageBroker> getMessageBroker() {
         return m_messageBroker.lock();
     }
 
-    void subscribe( jobject handler, const std::string& topic, const std::string& action );
+    void subscribe(jobject handler, const std::string& topic, const std::string& action);
 
 private:
-    void invokeCallbackMethod( std::shared_ptr<JObject> handler, const std::string& message );
+    void invokeCallbackMethod(std::shared_ptr<JObject> handler, const std::string& message);
 
 private:
     std::weak_ptr<aace::core::MessageBroker> m_messageBroker;

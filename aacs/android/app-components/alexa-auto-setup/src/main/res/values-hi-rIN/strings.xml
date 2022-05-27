@@ -1,51 +1,66 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="login_qr_code_message">
-        <![CDATA[
-            <font color=\'#33B5E5\'>%1$s</font> पर जाएं और साइन इन करें. इसके बाद, 
-        ]]>
-कोड डालें    </string>
-    <string name="try_alexa_button">ALEXA को आज़माकर देखें</string>
-    <string name="privacy_notice_button">प्राइवेसी नोटिस</string>
-    <string name="terms_of_use_button">इस्तेमाल की शर्तें</string>
-    <string name="login_action_retry_button">फिर से कोशिश करें</string>
-    <string name="sign_in_action_button">साइन इन करें</string>
-    <string name="login_later_action_button">बाद में साइन इन करें</string>
-    <string name="login_connect_to_aacs">कृपया इंतज़ार करें, AACS से कनेक्ट किया जा रहा है…</string>
-    <string name="login_message">गाड़ी चलाते समय बस बोलकर कई सुविधाएं इस्तेमाल करें. Alexa से आपको रास्ते की जानकारी, म्यूज़िक, कॉल, और कई दूसरी चीज़ों में मदद मिल सकती है.</string>
-    <string name="enable_preview_mode_header">बिना साइन इन किए Alexa को चालू करना है?</string>
-    <string name="enable_preview_mode_action_button">सहमति दें और ALEXA को चालू करें</string>
-    <string name="enable_preview_mode_message">आपके पास अब भी जानकारी और रास्तों के बारे में पता करने जैसी चीज़ों के लिए, Alexa से बात करने की सुविधा है. म्यूज़िक, मौसम, स्मार्ट होम, और कई दूसरी चीज़ों के लिए, साइन इन करें.</string>
-    <string name="enable_preview_mode_disclaimer">Amazon, Alexa से होने वाली बातचीत और अन्य डेटा को Amazon क्लाउड में प्रोसेस करता है और सेव करके रखता है. \"सहमति दें और चालू करें\" को चुनने का मतलब है कि आप Amazon की <annotation placeholder="">इस्तेमाल की शर्तों</annotation> और <annotation placeholder="">यहां दी गई सभी शर्तों</annotation> से सहमत हैं. \n\n<annotation placeholder=""> जानें कि कैसे Alexa को आपकी प्राइवेसी की सुरक्षा के लिए डिज़ाइन किया गया है</annotation>.</string>
-    <string name="enable_preview_mode_error_message">प्रीव्यू मोड मोड को चालू करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
-    <string name="login_method_or_text">या यहां दिए गए कोड को स्कैन करें:</string>
-    <string name="login_finish_heading_text">आप पूरी तरह तैयार हैं%1$s!</string>
-    <string name="login_finish_try_text">कोशिश करें:</string>
-    <string name="login_network_settings">नेटवर्क की सेटिंग</string>
-    <string name="login_network_error_heading_text">नेटवर्क की गड़बड़ी</string>
-    <string name="login_network_error_body_text">Alexa को सेटअप पूरा करने के लिए इंटरनेट की ज़रूरत है. \n कृपया अपने नेटवर्क कनेक्शन की जांच करें और फिर से कोशिश करें.</string>
-    <string name="cbl_login_title">अपने Amazon अकाउंट में साइन इन करें</string>
-    <string name="cbl_login_alexa_hint1">\"Alexa, तापमान को 22 पर सेट करो\"</string>
-    <string name="cbl_login_alexa_hint2">\"Alexa, कॉफ़ी शॉप ढूंढो\"</string>
-    <string name="cbl_login_alexa_hint3">\"Alexa, म्यूज़िक चलाओ\"</string>
-    <string name="auth_provider_login_alexa_hint1">\"Alexa, तापमान को 22 पर सेट करो\"</string>
-    <string name="auth_provider_login_alexa_hint2">\"Alexa, मुझे एयरपोर्ट ले चलो\"</string>
-    <string name="auth_provider_login_alexa_hint3">\"Alexa, 88.5 FM पर ट्यून करो\"</string>
-    <string name="auth_provider_sign_in_hint">म्यूज़िक, मौसम, स्मार्ट होम, और कई दूसरी चीज़ों के लिए, साइन इन करें.</string>
-    <string name="login_all_done_btn_text">हो गया</string>
-    <string name="setting_alexa_language_title">Alexa की भाषा</string>
-    <string name="select_language_action_button">भाषा चुनें</string>
-    <string name="select_language_body">Alexa %1$s में उपलब्ध नहीं है. Alexa के लिए भाषा चुनें.</string>
-    <string name="select_language_continue_button">जारी रखें</string>
-    <string name="setup_not_complete_header">कुछ समस्या हुई है</string>
-    <string name="setup_not_complete_text">Alexa को सेट अप करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
-    <string name="setup_not_complete_text_with_alexa_custom_assistant">सेट अप करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
-    <string name="cbl_login_error_message">साइन इन करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
-    <string name="setup_not_complete_retry_button">फिर से कोशिश करें</string>
-    <string name="skip_permission_button_text">छोड़ें</string>
-    <string name="use_location_button_text">लोकेशन इस्तेमाल करें</string>
-    <string name="location_permission_header_text">आस-पास में क्या है?</string>
-    <string name="location_permission_body_text">आस-पास के रेस्टोरेंट, स्थानीय मौसम और कई दूसरी चीज़ों के बारे में बेहतर जवाब पाने के लिए, अपनी गाड़ी की मौजूदा लोकेशन को Alexa के साथ शेयर करें.</string>
-    <string name="location_permission_body_text_with_alexa_custom_assistant">आस-पास के रेस्टोरेंट, स्थानीय मौसम और बहुत सी चीज़ों पर बेहतर जवाब पाने के लिए अपनी गाड़ी की मौजूदा लोकेशन को [Brandon] और Alexa के साथ शेयर करें.</string>
-    <string name="location_permission_hint_text">\"Alexa, मेरे आस-पास के रेस्टोरेंट ढूंढो\"</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+     <string name="login_qr_code_message">
+         <![CDATA[
+             <font color=\'#33B5E5\'>%1$s</font> पर जाएं और साइन इन करें. इसके बाद,
+         ]]>
+ कोड डालें    </string>
+   <string name="confirm_yes_button">हां</string>
+   <string name="confirm_exit_button">बाहर जाएं</string>
+   <string name="settings_button">सेटिंग</string>
+   <string name="try_alexa_button">ALEXA को आज़माकर देखें</string>
+   <string name="privacy_notice_button">प्राइवेसी नोटिस</string>
+   <string name="terms_of_use_button">इस्तेमाल की शर्तें</string>
+   <string name="login_action_retry_button">फिर से कोशिश करें</string>
+   <string name="sign_in_action_button">साइन इन करें</string>
+   <string name="login_later_action_button">बाद में साइन इन करें</string>
+   <string name="login_connect_to_aacs">कृपया इंतज़ार करें, AACS से कनेक्ट किया जा रहा है…</string>
+   <string name="login_message">गाड़ी चलाते समय बस बोलकर कई सुविधाएं इस्तेमाल करें. Alexa से आपको रास्ते की जानकारी, म्यूज़िक, कॉल, और कई दूसरी चीज़ों में मदद मिल सकती है.</string>
+   <string name="enable_preview_mode_header">बिना साइन इन किए Alexa को चालू करना है?</string>
+   <string name="enable_preview_mode_action_button">सहमति दें और ALEXA को चालू करें</string>
+   <string name="enable_preview_mode_message">आपके पास अब भी जानकारी और रास्तों के बारे में पता करने जैसी चीज़ों के लिए, Alexa से बात करने की सुविधा है. म्यूज़िक, मौसम, स्मार्ट होम, और कई दूसरी चीज़ों के लिए, साइन इन करें.</string>
+   <string name="enable_preview_mode_disclaimer">Amazon, Alexa से होने वाली बातचीत और अन्य डेटा को Amazon क्लाउड में प्रोसेस करता है और सेव करके रखता है. \"सहमति दें और चालू करें\" को चुनने का मतलब है कि आप Amazon की <annotation placeholder="">इस्तेमाल की शर्तों</annotation> और <annotation placeholder="">यहां दी गई सभी शर्तों</annotation> से सहमत हैं. \n\n<annotation placeholder=""> जानें कि कैसे Alexa को आपकी प्राइवेसी की सुरक्षा के लिए डिज़ाइन किया गया है</annotation>.</string>
+   <string name="enable_preview_mode_error_message">प्रीव्यू मोड मोड को चालू करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
+   <string name="login_method_or_text">या यहां दिए गए कोड को स्कैन करें:</string>
+   <string name="login_finish_heading_text">आप पूरी तरह तैयार हैं%1$s!</string>
+   <string name="login_finish_try_text">कोशिश करें:</string>
+   <string name="login_network_settings">नेटवर्क की सेटिंग</string>
+   <string name="login_network_error_heading_text">नेटवर्क की गड़बड़ी</string>
+   <string name="login_network_error_body_text">Alexa को सेटअप पूरा करने के लिए इंटरनेट की ज़रूरत है. \n कृपया अपने नेटवर्क कनेक्शन की जांच करें और फिर से कोशिश करें.</string>
+   <string name="cbl_login_title">अपने Amazon अकाउंट में साइन इन करें</string>
+   <string name="login_all_done_btn_text">हो गया</string>
+   <string name="setting_alexa_language_title">Alexa की भाषा</string>
+   <string name="select_language_action_button">भाषा चुनें</string>
+   <string name="select_language_body">Alexa %1$s में उपलब्ध नहीं है. Alexa के लिए भाषा चुनें.</string>
+   <string name="select_language_continue_button">जारी रखें</string>
+   <string name="setup_not_complete_header">कुछ समस्या हुई है</string>
+   <string name="setup_not_complete_text">Alexa को सेट अप करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
+   <string name="setup_not_complete_text_with_alexa_custom_assistant">सेट अप करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
+   <string name="cbl_login_error_message">साइन इन करते समय कोई गड़बड़ी हुई. कृपया फिर से कोशिश करें.</string>
+   <string name="setup_not_complete_retry_button">फिर से कोशिश करें</string>
+   <string name="skip_permission_button_text">छोड़ें</string>
+   <string name="back_button_text">पीछे जाएं</string>
+   <string name="use_location_button_text">लोकेशन इस्तेमाल करें</string>
+   <string name="location_permission_header_text">आस-पास में क्या है?</string>
+   <string name="location_permission_body_text">आस-पास के रेस्टोरेंट, स्थानीय मौसम और कई दूसरी चीज़ों के बारे में बेहतर जवाब पाने के लिए, अपनी गाड़ी की मौजूदा लोकेशन को Alexa के साथ शेयर करें.</string>
+   <string name="location_permission_body_text_with_alexa_custom_assistant">आस-पास के रेस्टोरेंट, स्थानीय मौसम और बहुत सी चीज़ों पर बेहतर जवाब पाने के लिए अपनी गाड़ी की मौजूदा लोकेशन को [Brandon] और Alexa के साथ शेयर करें.</string>
+   <string name="nav_favorites_permission_header_text">अपनी पसंदीदा जगहों पर नेविगेट करें</string>
+   <string name="nav_favorites_permission_body_text">अपने वाहन में स्टोर की गई पसंदीदा जगहों पर नेविगेट करने में Alexa की मदद ली जा सकती है. पसंदीदा जगहें Amazon सेवा पर अपलोड की जाएंगी.</string>
+   <string name="consent_agree_text">सहमति है और अनुमति है</string>
+   <string name="assist_selection_title">Alexa को डिफ़ॉल्ट असिस्टेंट के रूप में सेट करें</string>
+   <string name="assist_selection_in_app">Alexa का इस्तेमाल करने के लिए, आपको Alexa को डिफ़ॉल्ट असिस्ट ऐप के रूप में सेट करना होगा. ये मौजूदा असिस्टेंट को बदल देगा.</string>
+   <string name="assist_selection_in_system_settings">Alexa का इस्तेमाल करने के लिए, आपको सेटिंग में जाकर Alexa को डिफ़ॉल्ट असिस्ट ऐप के रूप में सेट करना होगा.\n नीचे <b>सेटिंग</b> पर टैप करें. इसके बाद, <b>असिस्ट ऐप</b>, <b>Alexa</b> चुनें.</string>
+   <string name="block_setup_on_drive_text">Alexa को सेट अप करने के लिए, वाहन को पार्क करना ज़रूरी है.</string>
+   <string name="alexa_logo_content_description">Alexa स्माइल लोगो</string>
+
+  <!-- translatable="false" tag is used for things-to-try (hint) strings only. These strings need to be localized based on the country and region -->
+  <string name="cbl_login_alexa_hint1" translatable="false">\"Alexa, तापमान को 72 पर सेट करो\"</string>
+  <string name="cbl_login_alexa_hint2" translatable="false">\"Alexa, कॉफ़ी शॉप ढूंढो\"</string>
+  <string name="cbl_login_alexa_hint3" translatable="false">\"Alexa, म्यूज़िक चलाओ\"</string>
+  <string name="auth_provider_login_alexa_hint1" translatable="false">\"Alexa, तापमान को 22 पर सेट करो\"</string>
+  <string name="auth_provider_login_alexa_hint2" translatable="false">\"Alexa, मुझे एयरपोर्ट ले चलो\"</string>
+  <string name="auth_provider_login_alexa_hint3" translatable="false"></string>
+  <string name="auth_provider_sign_in_hint" translatable="false">म्यूज़िक, मौसम, स्मार्ट होम, और कई दूसरी चीज़ों के लिए, साइन इन करें.</string>
+  <string name="location_permission_hint_text" translatable="false">\"Alexa, मेरे आस-पास के रेस्टोरेंट ढूंढो\"</string>
+  <string name="nav_favorites_permission_hint_text" translatable="false">\"Alexa, मुझे घर का रास्ता बताओ\"</string>
 </resources>

@@ -33,13 +33,17 @@ REGISTER_SERVICE(AASBConnectivityEngineService);
 
 AASBConnectivityEngineService::AASBConnectivityEngineService(
     const aace::engine::core::ServiceDescription& description) :
-        aace::engine::messageBroker::MessageHandlerEngineService(description, minRequiredVersion, {"AlexaConnectivity"}) {
+        aace::engine::messageBroker::MessageHandlerEngineService(
+            description,
+            minRequiredVersion,
+            {"AlexaConnectivity"}) {
 }
 
 bool AASBConnectivityEngineService::postRegister() {
     try {
         auto aasbServiceInterface =
-            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>("aace.messageBroker");
+            getContext()->getServiceInterface<aace::engine::messageBroker::MessageBrokerServiceInterface>(
+                "aace.messageBroker");
         ThrowIfNull(aasbServiceInterface, "invalidAASBServiceInterface");
 
         // AlexaConnectivity

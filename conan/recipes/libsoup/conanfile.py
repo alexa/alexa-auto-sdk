@@ -22,8 +22,8 @@ class LibsoupConan(ConanFile):
             pass # use libpsl, libxml2, and sqlite3 provided by the toolchain
         else:
             self.requires("libpsl/0.21.1")
-            self.requires("libxml2/2.9.10")
-            self.requires("sqlite3/3.32.3")
+            self.requires("libxml2/2.9.10#7293e7b3f9703b324258194bb749ce85")
+            self.requires("sqlite3/3.37.2#8e4989a1ee5d3237a25a911fbcb19097")
 
         self.requires(f"glib/2.67.1@{self.user}/{self.channel}")
         self.requires(f"glib-networking/2.68.2@{self.user}/{self.channel}")

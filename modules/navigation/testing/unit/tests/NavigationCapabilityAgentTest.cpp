@@ -188,8 +188,7 @@ TEST_F(NavigationCapabilityAgentTest, createWithNullContextManager) {
 }
 
 TEST_F(NavigationCapabilityAgentTest, testUnknownDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader =
         std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(NAMESPACE, UNKNOWN_DIRECTIVE, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
@@ -203,8 +202,7 @@ TEST_F(NavigationCapabilityAgentTest, testUnknownDirective) {
 }
 
 TEST_F(NavigationCapabilityAgentTest, testSetDestinationDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
         STARTNAVIGATION.nameSpace, STARTNAVIGATION.name, MESSAGE_ID);
     std::string MockPayload =
@@ -220,8 +218,7 @@ TEST_F(NavigationCapabilityAgentTest, testSetDestinationDirective) {
 }
 
 TEST_F(NavigationCapabilityAgentTest, testCancelNavigationDirective) {
-    auto attachmentManager = std::make_shared<
-        testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
+    auto attachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     auto avsMessageHeader = std::make_shared<alexaClientSDK::avsCommon::avs::AVSMessageHeader>(
         CANCELNAVIGATION.nameSpace, CANCELNAVIGATION.name, MESSAGE_ID);
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =

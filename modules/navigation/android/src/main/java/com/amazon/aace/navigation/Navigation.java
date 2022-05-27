@@ -20,8 +20,8 @@ import com.amazon.aace.core.PlatformInterface;
 /**
  * Navigation should be extended to handle navigation directives from the Engine.
  *
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */
@@ -686,7 +686,7 @@ abstract public class Navigation extends PlatformInterface {
      *       "savings": [
      *           {
      *               "type": "{{STRING}}", // DISTANCE, TIME
-     *               "amount": "{{FLOAT}}",
+     *               "amount": {{FLOAT}},
      *               "unit": "{{STRING}}" // MINUTE, HOUR, YARD, FOOT, MILE, METER, KILOMETER
      *           }
      *       ]

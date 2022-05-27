@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_contacts_description">Utilizza il servizio di contatti telefonici sul tuo dispositivo Android</string>
+    <string name="aacs_contacts_title">Servizio contatti AACS</string>
+</resources>

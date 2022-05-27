@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -37,10 +37,10 @@ static const char* MILLIS_FORMAT_STRING = "%03d";
 static const int MILLIS_STRING_SIZE = 4;
 
 /// Separator string between milliseconds value and ExampleLogger name.
-static const std::string MILLIS_AND_THREAD_SEPARATOR = " [";
+#define MILLIS_AND_THREAD_SEPARATOR "["
 
 /// Separator between thread ID and level indicator in log lines.
-static const std::string THREAD_AND_LEVEL_SEPARATOR = "] ";
+#define THREAD_AND_LEVEL_SEPARATOR "]"
 
 /// Separator between level indicator and text in log lines.
 static const char LEVEL_AND_TEXT_SEPARATOR = ' ';
@@ -48,13 +48,7 @@ static const char LEVEL_AND_TEXT_SEPARATOR = ' ';
 /// Number of milliseconds per second.
 static const int MILLISECONDS_PER_SECOND = 1000;
 
-std::string LogFormatter::format(
-    Level level,
-    std::chrono::system_clock::time_point time,
-    const char* threadMoniker,
-    const char* text) {
-    std::stringstream stringToEmit;
-
+char LogFormatter::getLevelCh(const LogFormatter::Level& level) const {
     char levelCh;
     switch (level) {
         case Level::CRITICAL:
@@ -79,6 +73,16 @@ std::string LogFormatter::format(
             levelCh = '?';
             break;
     }
+    return levelCh;
+}
+
+std::string LogFormatter::format(
+    Level level,
+    std::chrono::system_clock::time_point time,
+    const char* source,
+    const char* threadMoniker,
+    const char* text) {
+    std::stringstream stringToEmit;
 
     if (time.time_since_epoch().count() > 0) {
         bool dateTimeFailure = false;
@@ -98,17 +102,190 @@ std::string LogFormatter::format(
             millisecondFailure = true;
         }
 
-        stringToEmit << (dateTimeFailure ? "ERROR: strftime() failed.  Date and time not logged." : dateTimeString)
-                     << TIME_AND_MILLIS_SEPARATOR
-                     << (millisecondFailure ? "ERROR: snprintf() failed.  Milliseconds not logged." : millisString)
-                     << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR << levelCh
-                     << LEVEL_AND_TEXT_SEPARATOR << text;
+        formatWithTime(
+            stringToEmit,
+            dateTimeFailure,
+            dateTimeString,
+            millisecondFailure,
+            millisString,
+            source,
+            threadMoniker,
+            level,
+            text);
     } else {
-        stringToEmit << "[" << threadMoniker << THREAD_AND_LEVEL_SEPARATOR << levelCh << LEVEL_AND_TEXT_SEPARATOR
-                     << text;
+        formatWithoutTime(stringToEmit, source, threadMoniker, level, text);
     }
 
     return stringToEmit.str();
+}
+
+class PlainTextLogFormatter : public LogFormatter {
+public:
+    void formatWithTime(
+        std::stringstream& stringToEmit,
+        bool dateTimeFailure,
+        const char* dateTimeString,
+        bool millisecondFailure,
+        const char* millisString,
+        const char* source,
+        const char* threadMoniker,
+        LogFormatter::Level level,
+        const char* text) override;
+
+    void formatWithoutTime(
+        std::stringstream& stringToEmit,
+        const char* source,
+        const char* threadMoniker,
+        LogFormatter::Level level,
+        const char* text) override;
+};
+
+void PlainTextLogFormatter::formatWithTime(
+    std::stringstream& stringToEmit,
+    bool dateTimeFailure,
+    const char* dateTimeString,
+    bool millisecondFailure,
+    const char* millisString,
+    const char* source,
+    const char* threadMoniker,
+    LogFormatter::Level level,
+    const char* text) {
+    stringToEmit << (dateTimeFailure ? "ERROR: strftime() failed.  Date and time not logged." : dateTimeString)
+                 << TIME_AND_MILLIS_SEPARATOR
+                 << (millisecondFailure ? "ERROR: snprintf() failed.  Milliseconds not logged." : millisString)
+                 << " " MILLIS_AND_THREAD_SEPARATOR << source << THREAD_AND_LEVEL_SEPARATOR
+#ifdef AAC_EMIT_THREAD_MONIKER_LOGS
+                 << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR
+#endif
+                 << " " << getLevelCh(level) << LEVEL_AND_TEXT_SEPARATOR << text;
+}
+
+void PlainTextLogFormatter::formatWithoutTime(
+    std::stringstream& stringToEmit,
+    const char* source,
+    const char* threadMoniker,
+    LogFormatter::Level level,
+    const char* text) {
+    stringToEmit << " " MILLIS_AND_THREAD_SEPARATOR << source << THREAD_AND_LEVEL_SEPARATOR
+#ifdef AAC_EMIT_THREAD_MONIKER_LOGS
+                 << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR
+#endif
+                 << " " << getLevelCh(level) << LEVEL_AND_TEXT_SEPARATOR << text;
+}
+
+std::unique_ptr<LogFormatter> LogFormatter::createPlainText() {
+    return std::unique_ptr<LogFormatter>(new PlainTextLogFormatter());
+}
+
+enum class Color {
+    RESET = 0,
+
+    FG_BLACK = 30,
+    FG_RED = 31,
+    FG_GREEN = 32,
+    FG_YELLOW = 33,
+    FG_BLUE = 34,
+    FG_MAGENTA = 35,
+    FG_CYAN = 36,
+    FG_LIGHT_GRAY = 37,
+    FG_DEFAULT = 39,
+
+    FG_DARK_GRAY = 90,
+    FG_LIGHT_RED = 91,
+    FG_LIGHT_GREEN = 92,
+    FG_LIGHT_YELLOW = 93,
+    FG_LIGHT_BLUE = 94,
+    FG_LIGHT_MAGENTA = 95,
+    FG_LIGHT_CYAN = 96,
+    FG_WHITE = 97,
+};
+
+std::ostream& operator<<(std::ostream& os, Color c) {
+    return os << "\033[" << (int)c << "m";
+}
+
+class ColorLogFormatter : public LogFormatter {
+public:
+    void formatWithTime(
+        std::stringstream& stringToEmit,
+        bool dateTimeFailure,
+        const char* dateTimeString,
+        bool millisecondFailure,
+        const char* millisString,
+        const char* source,
+        const char* threadMoniker,
+        LogFormatter::Level level,
+        const char* text) override;
+
+    void formatWithoutTime(
+        std::stringstream& stringToEmit,
+        const char* source,
+        const char* threadMoniker,
+        LogFormatter::Level level,
+        const char* text) override;
+
+private:
+    static Color getLevelColor(const LogFormatter::Level& level);
+};
+
+Color ColorLogFormatter::getLevelColor(const LogFormatter::Level& level) {
+    using Level = LogFormatter::Level;
+
+    switch (level) {
+        case Level::VERBOSE:
+            return Color::FG_DARK_GRAY;
+        case Level::INFO:
+            return Color::FG_WHITE;
+        case Level::METRIC:
+            return Color::FG_LIGHT_BLUE;
+        case Level::WARN:
+            return Color::FG_YELLOW;
+        case Level::ERROR:
+            return Color::FG_LIGHT_RED;
+        case Level::CRITICAL:
+            return Color::FG_LIGHT_MAGENTA;
+        default:
+            return Color::FG_DEFAULT;
+    }
+}
+void ColorLogFormatter::formatWithTime(
+    std::stringstream& stringToEmit,
+    bool dateTimeFailure,
+    const char* dateTimeString,
+    bool millisecondFailure,
+    const char* millisString,
+    const char* source,
+    const char* threadMoniker,
+    LogFormatter::Level level,
+    const char* text) {
+    stringToEmit << Color::FG_LIGHT_GRAY
+                 << (dateTimeFailure ? "ERROR: strftime() failed.  Date and time not logged." : dateTimeString)
+                 << TIME_AND_MILLIS_SEPARATOR
+                 << (millisecondFailure ? "ERROR: snprintf() failed.  Milliseconds not logged." : millisString)
+                 << Color::FG_LIGHT_CYAN << " " MILLIS_AND_THREAD_SEPARATOR << source << THREAD_AND_LEVEL_SEPARATOR
+#ifdef AAC_EMIT_THREAD_MONIKER_LOGS
+                 << Color::FG_LIGHT_GREEN << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR
+#endif
+                 << " " << getLevelColor(level) << getLevelCh(level) << LEVEL_AND_TEXT_SEPARATOR << text
+                 << Color::FG_DEFAULT;
+}
+
+void ColorLogFormatter::formatWithoutTime(
+    std::stringstream& stringToEmit,
+    const char* source,
+    const char* threadMoniker,
+    LogFormatter::Level level,
+    const char* text) {
+    stringToEmit << Color::FG_LIGHT_CYAN << MILLIS_AND_THREAD_SEPARATOR << source << THREAD_AND_LEVEL_SEPARATOR
+#ifdef AAC_EMIT_THREAD_MONIKER_LOGS
+                 << Color::FG_LIGHT_GREEN << MILLIS_AND_THREAD_SEPARATOR << threadMoniker << THREAD_AND_LEVEL_SEPARATOR
+#endif
+                 << " " << getLevelColor(level) << getLevelCh(level) << LEVEL_AND_TEXT_SEPARATOR << text
+                 << Color::FG_DEFAULT;
+}
+
+std::unique_ptr<LogFormatter> LogFormatter::createColor() {
+    return std::unique_ptr<LogFormatter>(new ColorLogFormatter());
 }
 
 }  // namespace logger

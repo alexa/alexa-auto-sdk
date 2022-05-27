@@ -1,0 +1,14 @@
+topic: FeatureDiscovery
+namespace: aasb.message.alexa.featureDiscovery
+path: Alexa/FeatureDiscovery
+
+messages:
+  - action: GetFeatures
+    direction: incoming
+    desc: Get a list of Alexa features based on the domain, eventType, locale and limit.
+    payload:
+      - name: discoveryRequests
+        desc: An escaped JSON string containing the discovery requests. See the Alexa module documentation for complete details of the schema.
+    reply:
+      - name: discoveryResponses
+        desc: An escaped JSON string containing the discovery responses. See the Alexa module documentation for complete details of the schema.

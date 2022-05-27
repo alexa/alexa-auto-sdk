@@ -62,8 +62,9 @@ public class TestFileUtil {
         TestUtil.addDeviceInfoToConfig(configJson, TestUtil.CLIENT_ID, TestUtil.PRODUCT_ID, TestUtil.DSN);
         JSONObject configMessage = TestUtil.constructOEMConfigMessage(
                 new String[] {}, new String[] {TestUtil.escapeJsonString(configJson)});
-        FileUtil.saveConfiguration(
+        FileUtil.setConfiguration(
                 mContext, configMessage.getJSONArray("configFilepaths"), configMessage.getJSONArray("configStrings"));
+        FileUtil.saveConfigToSharedPref(mContext);
     }
 
     @Test
@@ -95,7 +96,7 @@ public class TestFileUtil {
 
         JSONObject configMessage = TestUtil.constructOEMConfigMessage(new String[] {}, configStrings);
 
-        FileUtil.saveConfiguration(
+        FileUtil.setConfiguration(
                 mContext, configMessage.getJSONArray("configFilepaths"), configMessage.getJSONArray("configStrings"));
         assertTrue(FileUtil.isConfigurationSaved(mContext));
 
@@ -153,25 +154,25 @@ public class TestFileUtil {
         final String AACS_CONFIG_LOCATION_PROVIDER = "LocationProvider";
         final String AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
 
-        assertTrue(FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_NETWORK_INFO_PROVIDER));
-        assertTrue(FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_LOCATION_PROVIDER));
-        assertTrue(FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER));
+        assertTrue(FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_NETWORK_INFO_PROVIDER));
+        assertTrue(FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_LOCATION_PROVIDER));
+        assertTrue(FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER));
 
         // Test the case when the defaultPlatformHandler is disabled or the field is not present in configuration
         defaultHandlersJson.put("useDefault" + AACS_CONFIG_NETWORK_INFO_PROVIDER, false);
         defaultHandlersJson.remove("useDefault" + AACS_CONFIG_LOCATION_PROVIDER);
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(!FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_NETWORK_INFO_PROVIDER));
-        assertTrue(!FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_LOCATION_PROVIDER));
+        assertTrue(!FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_NETWORK_INFO_PROVIDER));
+        assertTrue(!FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_LOCATION_PROVIDER));
 
         // Test the case when the value is not a boolean type
         defaultHandlersJson.put("useDefault" + AACS_CONFIG_NETWORK_INFO_PROVIDER, 1);
         defaultHandlersJson.put("useDefault" + AACS_CONFIG_LOCATION_PROVIDER, "true");
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(!FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_NETWORK_INFO_PROVIDER));
-        assertTrue(!FileUtil.isDefaultImplementationEnabled(mContext, AACS_CONFIG_LOCATION_PROVIDER));
+        assertTrue(!FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_NETWORK_INFO_PROVIDER));
+        assertTrue(!FileUtil.isDefaultImplementationEnabled(AACS_CONFIG_LOCATION_PROVIDER));
     }
 
     @Test
@@ -181,15 +182,15 @@ public class TestFileUtil {
                 TestUtil.readConfig(mTestContext.getAssets().open(TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE));
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(FileUtil.isAudioInputTypeEnabled(mContext, AASBConstants.AudioInput.AudioType.VOICE));
-        assertTrue(!FileUtil.isAudioInputTypeEnabled(mContext, AASBConstants.AudioInput.AudioType.COMMUNICATION));
-        assertTrue(FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.ALARM));
-        assertTrue(FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.EARCON));
-        assertTrue(FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.NOTIFICATION));
-        assertTrue(FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.RINGTONE));
-        assertTrue(FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.TTS));
-        assertTrue(!FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.COMMUNICATION));
-        assertTrue(!FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.MUSIC));
+        assertTrue(FileUtil.isAudioInputTypeEnabled(AASBConstants.AudioInput.AudioType.VOICE));
+        assertTrue(!FileUtil.isAudioInputTypeEnabled(AASBConstants.AudioInput.AudioType.COMMUNICATION));
+        assertTrue(FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.ALARM));
+        assertTrue(FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.EARCON));
+        assertTrue(FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.NOTIFICATION));
+        assertTrue(FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.RINGTONE));
+        assertTrue(FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.TTS));
+        assertTrue(!FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.COMMUNICATION));
+        assertTrue(!FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.MUSIC));
 
         // Test when useDefault is set to false or is set to an invalid value
         JSONObject audioInputTypeForVoiceJson = configJson.getJSONObject("aacs.defaultPlatformHandlers")
@@ -204,8 +205,8 @@ public class TestFileUtil {
         audioOutputTypeForTTSJson.put("useDefault", "true");
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(!FileUtil.isAudioInputTypeEnabled(mContext, AASBConstants.AudioInput.AudioType.VOICE));
-        assertTrue(!FileUtil.isAudioOutputTypeEnabled(mContext, AASBConstants.AudioOutput.AudioType.TTS));
+        assertTrue(!FileUtil.isAudioInputTypeEnabled(AASBConstants.AudioInput.AudioType.VOICE));
+        assertTrue(!FileUtil.isAudioOutputTypeEnabled(AASBConstants.AudioOutput.AudioType.TTS));
     }
 
     @Test
@@ -215,10 +216,10 @@ public class TestFileUtil {
                 TestUtil.readConfig(mTestContext.getAssets().open(TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE));
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(FileUtil.getAudioSourceForAudioType(mContext, AASBConstants.AudioInput.AudioType.VOICE)
+        assertTrue(FileUtil.getAudioSourceForAudioType(AASBConstants.AudioInput.AudioType.VOICE)
                 == MediaRecorder.AudioSource.MIC);
         // Test the default value when it fails to retrieve the audio source for a given type
-        assertTrue(FileUtil.getAudioSourceForAudioType(mContext, AASBConstants.AudioInput.AudioType.COMMUNICATION)
+        assertTrue(FileUtil.getAudioSourceForAudioType(AASBConstants.AudioInput.AudioType.COMMUNICATION)
                 == MediaRecorder.AudioSource.MIC);
 
         // Test when audio source is set to VOICE_RECOGNITION
@@ -229,7 +230,7 @@ public class TestFileUtil {
         audioInputTypeForVoiceJson.put("audioSource", "MediaRecorder.AudioSource.VOICE_RECOGNITION");
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(FileUtil.getAudioSourceForAudioType(mContext, AASBConstants.AudioInput.AudioType.VOICE)
+        assertTrue(FileUtil.getAudioSourceForAudioType(AASBConstants.AudioInput.AudioType.VOICE)
                 == MediaRecorder.AudioSource.VOICE_RECOGNITION);
     }
 
@@ -280,18 +281,18 @@ public class TestFileUtil {
         assertTrue(FileUtil.isConfigurationSaved(mContext));
 
         // Test getting the value with a given topic and target
-        assertEquals("RECEIVER", FileUtil.getIntentTargets(mContext, "CBL", "type").get(0));
-        assertEquals("com.amazon.aacssampleapp1", FileUtil.getIntentTargets(mContext, "CBL", "package").get(0));
-        assertEquals(".IntentReceiver", FileUtil.getIntentTargets(mContext, "CBL", "class").get(0));
-        assertEquals("RECEIVER", FileUtil.getIntentTargets(mContext, "CBL", "type").get(1));
-        assertEquals("com.amazon.aacssampleapp2", FileUtil.getIntentTargets(mContext, "CBL", "package").get(1));
-        assertEquals(".IntentReceiver", FileUtil.getIntentTargets(mContext, "CBL", "class").get(1));
+        assertEquals("RECEIVER", FileUtil.getIntentTargets("CBL", "type").get(0));
+        assertEquals("com.amazon.aacssampleapp1", FileUtil.getIntentTargets("CBL", "package").get(0));
+        assertEquals(".IntentReceiver", FileUtil.getIntentTargets("CBL", "class").get(0));
+        assertEquals("RECEIVER", FileUtil.getIntentTargets("CBL", "type").get(1));
+        assertEquals("com.amazon.aacssampleapp2", FileUtil.getIntentTargets("CBL", "package").get(1));
+        assertEquals(".IntentReceiver", FileUtil.getIntentTargets("CBL", "class").get(1));
 
         // Test when the topic doesn't exist in the config
-        assertNull(FileUtil.getIntentTargets(mContext, "ABC", "type"));
+        assertNull(FileUtil.getIntentTargets("ABC", "type"));
 
         // Test when the info field is not present
-        assertNull(FileUtil.getIntentTargets(mContext, "AASB", "ABC"));
+        assertNull(FileUtil.getIntentTargets("AASB", "ABC"));
     }
 
     @Test
@@ -301,7 +302,7 @@ public class TestFileUtil {
                 TestUtil.readConfig(mTestContext.getAssets().open(TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE));
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertFalse(FileUtil.isAudioSourceExternal(mContext, "VOICE"));
+        assertFalse(FileUtil.isAudioSourceExternal("VOICE"));
 
         // Test when audioSource is set to "EXTERNAL"
         JSONObject audioInputTypeForVoiceJson = configJson.getJSONObject("aacs.defaultPlatformHandlers")
@@ -311,7 +312,7 @@ public class TestFileUtil {
         audioInputTypeForVoiceJson.put("audioSource", "EXTERNAL");
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertTrue(FileUtil.isAudioSourceExternal(mContext, "VOICE"));
+        assertTrue(FileUtil.isAudioSourceExternal("VOICE"));
     }
 
     @Test
@@ -322,7 +323,7 @@ public class TestFileUtil {
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
 
-        JSONObject actualJsonObj = FileUtil.getAudioExternalSourceForAudioType(mContext, "VOICE");
+        JSONObject actualJsonObj = FileUtil.getAudioExternalSourceForAudioType("VOICE");
         String type = actualJsonObj.optString("type");
         String packageName = actualJsonObj.optString("package");
         String className = actualJsonObj.optString("class");
@@ -340,7 +341,7 @@ public class TestFileUtil {
         assertTrue(FileUtil.isConfigurationSaved(mContext));
 
         // Test getting the value of cache capacity
-        assertEquals(20, FileUtil.getIPCCacheCapacity(mContext));
+        assertEquals(20, FileUtil.getIPCCacheCapacity());
     }
 
     @Test
@@ -349,6 +350,6 @@ public class TestFileUtil {
                 TestUtil.readConfig(mTestContext.getAssets().open(TestUtil.ASSETS_PATH + TestUtil.AACS_CONFIG_FILE));
         prepareAndSaveConfiguration(configJson);
         assertTrue(FileUtil.isConfigurationSaved(mContext));
-        assertEquals(1.0, FileUtil.getVersionNumber(mContext), 0.0);
+        assertEquals(1.0, FileUtil.getVersionNumber(), 0.0);
     }
 }

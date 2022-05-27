@@ -22,13 +22,17 @@ class Nghttp2Conan(ConanFile):
                "with_app": [True, False],
                "with_hpack": [True, False],
                "with_jemalloc": [True, False],
-               "with_asio": [True, False]}
+               "with_asio": [True, False],
+               "openssl_version": ["1.0", "1.1", None],
+              }
     default_options = {"shared": False,
                        "fPIC": True,
                        "with_app": True,
                        "with_hpack": False,
                        "with_jemalloc": False,
-                       "with_asio": False}
+                       "with_asio": False,
+                       "openssl_version": None,
+                      }
 
     _source_subfolder = "source_subfolder"
 
@@ -52,17 +56,19 @@ class Nghttp2Conan(ConanFile):
         if self.settings.os == "Android":
             self.options.with_app = False
 
+        if self.options.openssl_version:
+            self.options["openssl"].openssl_version = self.options.openssl_version
+
     def requirements(self):
-        self.requires("zlib/1.2.11")
         if self.settings.os == "Neutrino":
-            self.requires("openssl/qnx700-1.0")
+            self.requires("openssl/qnx7")
         else:
             self.requires("openssl/1.1.1h") # always set openssl dependency - (aac) fix for with_app=False
         if self.options.with_app:
             self.requires("c-ares/1.17.1")
             self.requires("libev/4.33")
             self.requires("libevent/2.1.12")
-            self.requires("libxml2/2.9.10")
+            self.requires("libxml2/2.9.10#7293e7b3f9703b324258194bb749ce85")
         if self.options.with_hpack:
             self.requires("jansson/2.13.1")
         if self.options.with_jemalloc:
@@ -100,7 +106,6 @@ class Nghttp2Conan(ConanFile):
 
         if self.options.with_asio:
             cmake.definitions["BOOST_ROOT"] = self.deps_cpp_info["boost"].rootpath
-        cmake.definitions["ZLIB_ROOT"] = self.deps_cpp_info["zlib"].rootpath
 
         cmake.configure()
         return cmake

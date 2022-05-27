@@ -20,6 +20,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -185,7 +186,6 @@ public class AACSTelephonyService extends Service {
             }
         } catch (JSONException e) {
             Log.e(TAG, "Error parsing Dial directive payload: " + e.getMessage());
-
         }
     }
 
@@ -243,6 +243,7 @@ public class AACSTelephonyService extends Service {
         filter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
         filter.addAction(Constants.ACTION_BLUETOOTH_PBAP_CLIENT_STATE_CHANGED);
         filter.addAction(Constants.ACTION_BLUETOOTH_HFP_CLIENT_STATE_CHANGED);
+        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
 
         // BluetoothStateListener run on another thread
         HandlerThread handlerThread = new HandlerThread("BluetoothStateListener");

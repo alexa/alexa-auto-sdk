@@ -1,10 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="login_qr_code_message">
-        <![CDATA[
-            Ve a <font color=\'#33B5E5\'>%1$s</font> e inicia sesión. Después, escribe este código:
-        ]]>
-    </string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+     <string name="login_qr_code_message">
+         <![CDATA[
+             Ve a <font color=\'#33B5E5\'>%1$s</font> e inicia sesión. Después, escribe este código:
+         ]]>
+     </string>
+    <string name="confirm_yes_button">Sí</string>
+    <string name="confirm_exit_button">Salir</string>
+    <string name="settings_button">Configuración</string>
     <string name="try_alexa_button">PROBAR ALEXA</string>
     <string name="privacy_notice_button">Aviso de privacidad</string>
     <string name="terms_of_use_button">Términos de uso</string>
@@ -25,13 +28,6 @@
     <string name="login_network_error_heading_text">Error de red</string>
     <string name="login_network_error_body_text">Alexa necesita acceso a Internet para completar la configuración. \n Revisa tu conexión de red y vuelve a intentarlo.</string>
     <string name="cbl_login_title">Iniciar sesión en tu cuenta de Amazon</string>
-    <string name="cbl_login_alexa_hint1">“Alexa, pon la temperatura a 22 grados”</string>
-    <string name="cbl_login_alexa_hint2">“Alexa, busca una cafetería”</string>
-    <string name="cbl_login_alexa_hint3">“Alexa, pon música”</string>
-    <string name="auth_provider_login_alexa_hint1">“Alexa, pon la temperatura a 22 grados”</string>
-    <string name="auth_provider_login_alexa_hint2">“Alexa, llévame al aeropuerto”</string>
-    <string name="auth_provider_login_alexa_hint3">“Alexa, pon la estación de radio 88.5 FM”</string>
-    <string name="auth_provider_sign_in_hint">Inicia sesión para escuchar música, obtener el estado del tiempo, usar las opciones de Casa Inteligente y mucho más.</string>
     <string name="login_all_done_btn_text">LISTO</string>
     <string name="setting_alexa_language_title">Idioma de Alexa</string>
     <string name="select_language_action_button">SELECCIONAR IDIOMA</string>
@@ -43,9 +39,28 @@
     <string name="cbl_login_error_message">Hubo un problema al iniciar sesión. Vuelve a intentarlo.</string>
     <string name="setup_not_complete_retry_button">VOLVER A INTENTAR</string>
     <string name="skip_permission_button_text">OMITIR</string>
+    <string name="back_button_text">ATRÁS</string>
     <string name="use_location_button_text">USAR UBICACIÓN</string>
     <string name="location_permission_header_text">¿Qué hay cerca?</string>
     <string name="location_permission_body_text">Comparte la ubicación actual de tu vehículo con Alexa para obtener respuestas más específicas sobre restaurantes cercanos, el clima local y más.</string>
     <string name="location_permission_body_text_with_alexa_custom_assistant">Comparte la ubicación actual de tu vehículo con [Brandon] y Alexa para obtener respuestas más específicas sobre restaurantes cercanos, el clima local y más.</string>
-    <string name="location_permission_hint_text">“Alexa, busca restaurantes cerca de mí”</string>
+    <string name="nav_favorites_permission_header_text">Ve a tus lugares favoritos</string>
+    <string name="nav_favorites_permission_body_text">Alexa puede ayudarte a navegar a tus ubicaciones favoritas almacenadas en el vehículo, las cuales se cargarán al servicio de Amazon.</string>
+    <string name="consent_agree_text">ACEPTAR Y PERMITIR</string>
+    <string name="assist_selection_title">Establece a Alexa como tu asistente predeterminado</string>
+    <string name="assist_selection_in_app">Establece a Alexa como la app de asistente predeterminada para usar sus funcionalidades. Esta acción reemplazará a tu asistente actual.</string>
+    <string name="assist_selection_in_system_settings">Establece a Alexa como la app de asistente predeterminada en Configuración para usar sus funcionalidades. \n Presiona <b>Configuración</b> a continuación, después selecciona <b>App del asistente</b> y por último <b>Alexa</b>.</string>
+    <string name="block_setup_on_drive_text">Para configurar Alexa, el vehículo debe estar estacionado.</string>
+    <string name="alexa_logo_content_description">Logotipo de sonrisa de Alexa</string>
+
+    <!-- translatable="false" tag is used for things-to-try (hint) strings only. These strings need to be localized based on the country and region -->
+    <string name="cbl_login_alexa_hint1" translatable="false">“Alexa, pon la temperatura a 72 grados”</string>
+    <string name="cbl_login_alexa_hint2" translatable="false">“Alexa, busca una cafetería”</string>
+    <string name="cbl_login_alexa_hint3" translatable="false">“Alexa, pon música”</string>
+    <string name="auth_provider_login_alexa_hint1" translatable="false">“Alexa, pon la temperatura a 22 grados”</string>
+    <string name="auth_provider_login_alexa_hint2" translatable="false">“Alexa, llévame al aeropuerto”</string>
+    <string name="auth_provider_login_alexa_hint3" translatable="false"></string>
+    <string name="auth_provider_sign_in_hint" translatable="false">Inicia sesión para escuchar música, obtener el estado del tiempo, usar las opciones de Casa Inteligente y mucho más.</string>
+    <string name="location_permission_hint_text" translatable="false">“Alexa, busca restaurantes cerca de mí”</string>
+    <string name="nav_favorites_permission_hint_text" translatable="false">“Alexa, llévame a casa”</string>
 </resources>

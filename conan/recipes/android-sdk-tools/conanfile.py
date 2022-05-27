@@ -18,8 +18,9 @@ class AndroidSdkToolsConanFile(ConanFile):
     }
     default_options = {
         "sdk_version": "7302050",
-        "ndk_version": "20.0.5594570",
-        "android_stl": "c++_shared"
+        # Sync with the version specified in `aacs/android/sample-app/alexa-auto-app/build.gradle`.
+        "ndk_version": "21.4.7075529",  # r21e
+        "android_stl": "c++_shared",
     }
 
     @staticmethod
@@ -82,11 +83,11 @@ class AndroidSdkToolsConanFile(ConanFile):
         with tools.environment_append( env_run.vars ):
             # check the license -- needs to be accepted once
             check_yes_opt = f"yes | {sdk_manager}" if auto_accept_licenses else sdk_manager
-            self.run( f"{check_yes_opt} --sdk_root={self.package_folder} --licenses", run_environment=True ) 
+            self.run( f"{check_yes_opt} --sdk_root={self.package_folder} --licenses", run_environment=True )
             # install android sdk
-            self.run( f"{sdk_manager} --sdk_root={self.package_folder} 'platform-tools' 'platforms;android-{self.settings_target.os.api_level}'", run_environment=True ) 
+            self.run( f"{sdk_manager} --sdk_root={self.package_folder} 'platform-tools' 'platforms;android-{self.settings_target.os.api_level}'", run_environment=True )
             # install android ndk
-            self.run( f"{sdk_manager} --sdk_root={self.package_folder} --install 'ndk;{self.options.ndk_version}'", run_environment=True ) 
+            self.run( f"{sdk_manager} --sdk_root={self.package_folder} --install 'ndk;{self.options.ndk_version}'", run_environment=True )
 
     @property
     def _platform(self):
@@ -154,14 +155,14 @@ class AndroidSdkToolsConanFile(ConanFile):
         # ndk-build: https://developer.android.com/ndk/guides/ndk-build
         self.env_info.PATH.append( self._ndk_home )
 
-        # You should use the ANDROID_NDK_ROOT environment variable to indicate where the NDK is located. 
+        # You should use the ANDROID_NDK_ROOT environment variable to indicate where the NDK is located.
         # That's what most NDK-related scripts use (inside the NDK, and outside of it).
         # https://groups.google.com/g/android-ndk/c/qZjhOaynHXc
         logging.info(f"Creating ANDROID_NDK_ROOT environment variable: {self._ndk_home}")
         self.env_info.ANDROID_NDK_ROOT = self._ndk_home
 
         # Gradle is complaining about the ANDROID_NDK_HOME environment variable:
-        #   WARNING: Support for ANDROID_NDK_HOME is deprecated and will be removed in the future. 
+        #   WARNING: Support for ANDROID_NDK_HOME is deprecated and will be removed in the future.
         #   Use android.ndkVersion in build.gradle instead.
         # logging.info(f"Creating ANDROID_NDK_HOME environment variable: {self._ndk_home}")
         # self.env_info.ANDROID_NDK_HOME = self._ndk_home

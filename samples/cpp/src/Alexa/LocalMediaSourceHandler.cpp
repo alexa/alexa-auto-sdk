@@ -168,7 +168,7 @@ void LocalMediaSourceHandler::subscribeToAASBMessages() {
 void LocalMediaSourceHandler::handleAdjustSeekMessage(const std::string& message) {
     AdjustSeekMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO, "Received AdjustSeekMessage for source: " + m_sourceMediaProvider);
         adjustSeek(std::chrono::milliseconds(msg.payload.deltaOffset));
     }
 }
@@ -176,7 +176,7 @@ void LocalMediaSourceHandler::handleAdjustSeekMessage(const std::string& message
 void LocalMediaSourceHandler::handleSeekMessage(const std::string& message) {
     SeekMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO, "Received SeekMessage for source: " + m_sourceMediaProvider);
         seek(std::chrono::milliseconds(msg.payload.offset));
     }
 }
@@ -184,7 +184,7 @@ void LocalMediaSourceHandler::handleSeekMessage(const std::string& message) {
 void LocalMediaSourceHandler::handleGetStateMessage(const std::string& message) {
     GetStateMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO, "Received GetStateMessage for source: " + m_sourceMediaProvider);
         // publish reply message with state information for the source
         publishGetStateReply(msg.header.id);
     }
@@ -193,7 +193,8 @@ void LocalMediaSourceHandler::handleGetStateMessage(const std::string& message) 
 void LocalMediaSourceHandler::handleMutedStateChangedMessage(const std::string& message) {
     MutedStateChangedMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO,
+            "Received MutedStateChangedMessage for source: " + m_sourceMediaProvider);
         mutedStateChanged(msg.payload.state);
     }
 }
@@ -201,7 +202,7 @@ void LocalMediaSourceHandler::handleMutedStateChangedMessage(const std::string& 
 void LocalMediaSourceHandler::handleVolumeChangedMessage(const std::string& message) {
     VolumeChangedMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO, "Received VolumeChangedMessage for source: " + m_sourceMediaProvider);
         volumeChanged(msg.payload.volume);
     }
 }
@@ -209,7 +210,7 @@ void LocalMediaSourceHandler::handleVolumeChangedMessage(const std::string& mess
 void LocalMediaSourceHandler::handlePlayControlMessage(const std::string& message) {
     PlayControlMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO, "Received PlayControlMessage for source: " + m_sourceMediaProvider);
         playControl(msg.payload.controlType);
     }
 }
@@ -217,7 +218,7 @@ void LocalMediaSourceHandler::handlePlayControlMessage(const std::string& messag
 void LocalMediaSourceHandler::handlePlayMessage(const std::string& message) {
     PlayMessage msg = json::parse(message);
     if (msg.payload.source == m_source) {
-        log(logger::LoggerHandler::Level::INFO, message);
+        log(logger::LoggerHandler::Level::INFO, "Received PlayMessage for source: " + m_sourceMediaProvider);
         play(msg.payload.contentSelectorType, msg.payload.payload, msg.payload.sessionId);
     }
 }
@@ -226,8 +227,8 @@ void LocalMediaSourceHandler::publishGetStateReply(const std::string& messageId)
     GetStateMessageReply replyMsg;
     replyMsg.header.messageDescription.replyToId = messageId;
     replyMsg.payload.state = getState();
-    log(logger::LoggerHandler::Level::INFO, "Publishing GetState Reply Message for message " + messageId);
     m_messageBroker->publish(replyMsg.toString());
+    log(logger::LoggerHandler::Level::INFO, "Published GetStateMessageReply");
 }
 
 void LocalMediaSourceHandler::playerEvent(const std::string& eventName, const std::string& sessionId) {

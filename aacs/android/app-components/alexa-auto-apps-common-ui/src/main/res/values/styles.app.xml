@@ -13,14 +13,14 @@
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:background">@drawable/light_button_background</item>
-        <item name="android:textStyle">italic</item>
         <item name="android:textSize">35sp</item>
         <item name="android:textColor">@color/Black</item>
         <item name="android:lines">1</item>
+        <item name="android:fontFamily">@font/amazonember_rg</item>
     </style>
 
     <style name="Alexa.LightButtonRoundSmall" parent="Alexa.LightButtonRound">
-        <item name="android:textSize">25sp</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
     </style>
 
     <style name="Alexa.DarkButtonRound" parent="Theme.AppCompat.Light">
@@ -29,14 +29,14 @@
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:background">@drawable/transparent_button_background</item>
-        <item name="android:textStyle">italic</item>
-        <item name="android:textSize">35sp</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
         <item name="android:textColor">@color/White</item>
         <item name="android:lines">1</item>
+        <item name="android:fontFamily">@font/amazonember_rg</item>
     </style>
 
     <style name="Alexa.DarkButtonRoundSmall" parent="Alexa.DarkButtonRound">
-        <item name="android:textSize">25sp</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
     </style>
 
     <style name="Alexa.DarkButton" parent="Theme.AppCompat.Light">
@@ -45,13 +45,13 @@
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
         <item name="android:background">@drawable/transparent_rect_button_background</item>
-        <item name="android:textSize">35sp</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
         <item name="android:textColor">@color/White</item>
         <item name="android:lines">1</item>
     </style>
 
     <style name="Alexa.DarkButtonSmall" parent="Alexa.DarkButton">
-        <item name="android:textSize">25sp</item>
+        <item name="android:textSize">@dimen/button_font_size</item>
     </style>
 
 </resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -113,5 +113,8 @@
 #define LX2(tag, event) aace::engine::logger::LogEntry(tag, event)
 
 #define DX aace::engine::logger::LogEntry(__FILE__, __func__)
+
+#define AACE_NOT_REACHED AACE_CRITICAL(DX.m("notReached").d("line", __LINE__).abortAfterEmission())
+#define AACE_NOT_IMPLEMENTED AACE_CRITICAL(DX.m("notImplemented").d("line", __LINE__).abortAfterEmission())
 
 #endif  // AACE_ENGINE_CORE_ENGINE_EXCEPTIONS_H

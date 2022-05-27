@@ -25,6 +25,11 @@ namespace aace {
 namespace aasb {
 
 /**
+ * @deprecated This platform interface is deprecated. 
+ *             Use the Alexa Auto Services Bridge (AASB) MessageBroker 
+ *             to publish and subscribe to AASB messages instead.
+ *             @see aace::core::MessageBroker
+ *
  * AASB should be extended to handle sending and receiving AASB messages
  * to and from the Engine.
  */

@@ -77,13 +77,13 @@ void LocalSearchProviderHandler::subscribeToAASBMessages() {
 }
 
 void LocalSearchProviderHandler::handleSearchRequestMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SearchRequestMessage");
     SearchRequestMessage msg = json::parse(message);
     searchRequest(msg.payload.request);
 }
 
 void LocalSearchProviderHandler::handleLookupRequestMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received LookupRequestMessage");
     LookupRequestMessage msg = json::parse(message);
     lookupRequest(msg.payload.request);
 }

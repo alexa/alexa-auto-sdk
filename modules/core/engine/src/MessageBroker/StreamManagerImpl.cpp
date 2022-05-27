@@ -36,7 +36,9 @@ void StreamManagerImpl::shutdown() {
 // aace::engine::messageBroker::StreamManagerInterface
 //
 
-bool StreamManagerImpl::registerStreamHandler(const std::string& streamId, std::shared_ptr<aace::core::MessageStream> stream) {
+bool StreamManagerImpl::registerStreamHandler(
+    const std::string& streamId,
+    std::shared_ptr<aace::core::MessageStream> stream) {
     try {
         std::lock_guard<std::mutex> lock(m_mutex);
 

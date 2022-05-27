@@ -154,7 +154,6 @@ void DoNotDisturbEngineImpl::onSettingNotification(
                 emitCounterMetrics(
                     METRIC_PROGRAM_NAME_SUFFIX, "onSettingNotification", {METRIC_DND_SET_DO_NOT_DISTURB, stateString});
                 m_doNotDisturbPlatformInterface->setDoNotDisturb(value);
-                m_doNotDisturbCapabilityAgent->sendReportEvent(stateString);
                 AACE_VERBOSE(LX(TAG, "onSettingNotification").d("DND ON", stateString));
                 break;
             case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE_FAILED:
@@ -182,12 +181,15 @@ bool DoNotDisturbEngineImpl::onDoNotDisturbChanged(bool doNotDisturb) {
     if (m_doNotDisturbCapabilityAgent != nullptr) {
         AACE_VERBOSE(LX(TAG, "onDoNotDisturbChanged").d("DND ON", stateString));
         auto m_dndModeSetting = m_doNotDisturbCapabilityAgent->getDoNotDisturbSetting();
-        m_dndModeSetting->setLocalChange(doNotDisturb);
-        if (!m_doNotDisturbCapabilityAgent->sendChangedEvent(stateString).get()) {
-            return false;
-            AACE_ERROR(LX(TAG, "onDoNotDisturbChangedFailed").d("sendChangedEventFailed", "event not sent"));
-        } else
-            return true;
+        auto result = m_dndModeSetting->setLocalChange(doNotDisturb);
+        switch (result) {
+            case SetSettingResult::NO_CHANGE:
+            case SetSettingResult::ENQUEUED:
+                return true;
+            default:
+                AACE_ERROR(LX(TAG).m("failed to enqueue local change").d("reason", result));
+                return false;
+        }
     }
     return false;
 }

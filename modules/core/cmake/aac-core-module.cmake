@@ -90,3 +90,11 @@ if(AAC_DEFAULT_LOGGER_ENABLED)
     # message(STATUS "Logger Compile Definitions: ${LOGGER_COMPILE_DEFINITIONS}")
 
 endif(AAC_DEFAULT_LOGGER_ENABLED)
+
+if(AAC_EMIT_COLOR_LOGS)
+    add_definitions(-DAAC_EMIT_COLOR_LOGS)
+endif()
+
+if(AAC_EMIT_THREAD_MONIKER_LOGS)
+    add_definitions(-DAAC_EMIT_THREAD_MONIKER_LOGS)
+endif()

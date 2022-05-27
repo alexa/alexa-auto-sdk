@@ -6,77 +6,94 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
+    <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/setup_bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/setup_bottom_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
+    <!--Alexa logo-->
     <ImageView
         android:id="@+id/alexa_img_view"
         android:layout_width="@dimen/login_alexa_image_width"
         android:layout_height="@dimen/login_alexa_image_height"
         android:layout_gravity="center"
-        android:layout_marginStart="@dimen/login_item_margin_start"
-        android:layout_marginEnd="@dimen/login_item_margin_end"
-        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:contentDescription="@string/alexa_logo_content_description"
         android:src="@drawable/alexa_logo"
         android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!--Title text-->
     <TextView
         android:id="@+id/qr_code_title_textview_first_line"
-        style="@style/Alexa.Heading1TextNormal"
+        style="@style/Alexa.TitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/login_margin_start"
-        android:layout_marginEnd="@dimen/login_margin_end"
-        android:layout_marginTop="@dimen/login_item_margin_top"
         android:gravity="center_horizontal"
         android:text="@string/cbl_login_title"
-        app:layout_constraintBottom_toTopOf="@+id/qr_code_title_textview"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view" />
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
+        android:layout_marginTop="@dimen/login_item_margin_top"/>
 
+    <!--Subtitle text-->
     <TextView
         android:id="@+id/qr_code_title_textview"
-        style="@style/Alexa.Heading2Text"
+        style="@style/Alexa.SubtitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/login_margin_start"
-        android:layout_marginEnd="@dimen/login_margin_end"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        android:layout_marginLeft="@dimen/login_item_margin_top"
-        android:layout_marginRight="@dimen/login_item_margin_top"
         android:gravity="center_horizontal"
         android:text="Title is changed at run time. We have hardcoded string to assist the design"
-        app:layout_constraintBottom_toTopOf="@+id/cbl_code"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
         app:layout_constraintVertical_chainStyle="packed"
-        app:layout_constraintTop_toBottomOf="@id/qr_code_title_textview_first_line" />
+        app:layout_constraintTop_toBottomOf="@id/qr_code_title_textview_first_line"
+        android:layout_marginTop="@dimen/title_to_subtitle_margin"
+        app:layout_constraintVertical_bias="0"/>
 
+    <!--CBL code-->
     <TextView
         android:id="@+id/cbl_code"
-        style="@style/Alexa.Heading2Text"
-        android:layout_width="wrap_content"
+        style="@style/Alexa.TitleText"
+        android:layout_width="0dp"
+        android:gravity="center_horizontal"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        app:layout_constraintBottom_toTopOf="@+id/qr_code"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/qr_code_title_textview" />
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/qr_code_title_textview"
+        android:layout_marginTop="@dimen/setup_qr_code_bottom_margin"
+        />
 
+    <!--QR code-->
     <ImageView
         android:id="@+id/qr_code"
         android:layout_width="@dimen/login_qr_code_size"
         android:layout_height="@dimen/login_qr_code_size"
         android:layout_gravity="center|bottom"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cbl_code" />
+        app:layout_constraintBottom_toTopOf="@id/setup_bottom_guideline"
+        app:layout_constraintTop_toBottomOf="@id/cbl_code"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

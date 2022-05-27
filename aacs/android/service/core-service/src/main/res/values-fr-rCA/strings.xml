@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_description">Le service à la clientèle Alexa Auto vous permet de parler à Alexa dans votre véhicule.</string>
+    <string name="aacs_initializing">Initialisation...</string>
+    <string name="aacs_ready">Initialisation terminée.</string>
+    <string name="aacs_title">AACS</string>
+    <string name="component_registry_key">%1$s + %2$s</string>
+</resources>

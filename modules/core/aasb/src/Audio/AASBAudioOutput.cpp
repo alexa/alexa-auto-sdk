@@ -240,9 +240,6 @@ void AASBAudioOutput::mayDuck() {
         auto m_messageBroker_lock = m_messageBroker.lock();
         ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
 
-        // generate a unique token id
-        m_currentToken = aace::engine::utils::uuid::generateUUID();
-
         aasb::message::audio::audioOutput::MayDuckMessage message;
         message.payload.channel = m_name;
         message.payload.token = m_currentToken;

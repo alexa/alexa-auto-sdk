@@ -7,7 +7,9 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
+        buildConfigField 'int', 'VERSION_CODE', "1"
+        buildConfigField 'String', 'VERSION_NAME', "\"4.1\""
     }
 
     buildTypes {
@@ -34,7 +36,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.2'
+        classpath 'com.android.tools.build:gradle:4.1.0'
     }
 }
 

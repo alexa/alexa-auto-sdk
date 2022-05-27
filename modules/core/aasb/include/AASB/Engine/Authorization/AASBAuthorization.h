@@ -49,7 +49,6 @@ public:
 private:
     std::weak_ptr<aace::engine::messageBroker::MessageBrokerInterface> m_messageBroker;
     std::string m_cachedRefreshTokenData;
-
 };
 
 }  // namespace authorization

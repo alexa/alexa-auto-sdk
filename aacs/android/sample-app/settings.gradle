@@ -19,6 +19,10 @@ include ':aacs-maccandroid'
 project(':aacs-maccandroid').projectDir = new File(gradle.ext.aacsRoot, '/service/modules/maccandroid')
 include ':aacsconstants'
 project(':aacsconstants').projectDir = new File(gradle.ext.aacsRoot, '/common/constants/aacsconstants')
+include ':aacs-annotation-api'
+project(':aacs-annotation-api').projectDir = new File(gradle.ext.aacsRoot, '/common/annotations/aacs-annotation-api')
+include ':aacs-annotation-processor'
+project(':aacs-annotation-processor').projectDir = new File(gradle.ext.aacsRoot, '/common/annotations/aacs-annotation-processor')
 include ':aacsipc'
 project(':aacsipc').projectDir = new File(gradle.ext.aacsRoot, '/common/ipc/aacsipc')
 include ':aacscommonutils'
@@ -61,7 +65,7 @@ if (hasProperty('enabledAPL')){
     project(':alexa-auto-apl-renderer').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apl-renderer')
     include ':alexa-auto-apl-renderer:apl-render'
     project(':alexa-auto-apl-renderer:apl-render').projectDir = new File(gradle.ext.appComponentsRoot, '/alexa-auto-apl-renderer/modules/apl-render')
-} 
+}
 
 if (hasProperty('enabledUXRestrictions')) {
     include ':alexa-auto-ux-restrictions'
@@ -104,6 +108,8 @@ if (getStartParameter().projectProperties.get("extensions") != null) {
 gradle.ext.extra_module_names = []
 gradle.ext.extra_module_factory_names = []
 gradle.ext.extra_module_project_names = []
+gradle.ext.extra_app_component_names = []
+gradle.ext.extra_app_component_dependencies = []
 
 for (extra_module_path in gradle.ext.extra_module_paths) {
 
@@ -134,5 +140,34 @@ for (extra_module_path in gradle.ext.extra_module_paths) {
         include ':' + extram_module_project_name
         project(':' + extram_module_project_name).projectDir = new File(gradle.ext.extramodulecomponent, '/' + extram_module_project_name)
         gradle.ext.extra_module_project_names << extram_module_project_name
+    }
+    // Add dependencies on app components under a different directory for extensions
+    gradle.ext.extraappcomponent = new File("${extra_module_path}/aacs/android/app-components")
+    if (gradle.ext.extraappcomponent.exists()) {
+        def extra_app_component_name = ''
+        def folder = new File(gradle.ext.extraappcomponent.getAbsolutePath())
+        folder.eachDir {
+            if (it.name.startsWith('alexa-auto')) {
+                extra_app_component_name = it.name
+                include ':' + extra_app_component_name
+                def extra_app_component_dir = ''
+                // Check if the extra app component has an inner module with the same name to be imported
+                def inner_module_dir = new File("${gradle.ext.extraappcomponent}/${extra_app_component_name}/${extra_app_component_name}")
+                if (inner_module_dir.exists()) {
+                    extra_app_component_dir = inner_module_dir
+                }
+                else {
+                    // If the extra app component directory does not contain an inner module, include the root project directly
+                    extra_app_component_dir = new File(gradle.ext.extraappcomponent, '/' + extra_app_component_name)
+                }
+                project(':' + extra_app_component_name).projectDir = extra_app_component_dir
+
+                gradle.ext.extra_app_component_names << extra_app_component_name
+
+                // Include dependency libs (if any) needed by the extra app component
+                def dependency_dir = new File(extra_app_component_dir, 'libs')
+                gradle.ext.extra_app_component_dependencies << dependency_dir
+            }
+        }
     }
 }

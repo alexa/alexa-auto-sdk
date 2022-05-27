@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.apis.auth
 
 enum class AuthMode {
@@ -16,6 +30,7 @@ enum class AuthState {
     Auth_Provider_Request_Authorization,
     Auth_Provider_Authorization_Error,
     Auth_Provider_Authorization_Get_Data,
+    Auth_Provider_Authorization_Expired,
     Auth_Provider_Authorized,
     Auth_Provider_Not_Authorized,
     Auth_Provider_Token_Saved,
@@ -24,7 +39,8 @@ enum class AuthState {
     Auth_Provider_Logout,
     Alexa_Client_Connected,
     Alexa_Client_Disconnected,
-    Alexa_Client_Auth_Unintialized
+    Alexa_Client_Auth_Unintialized,
+    Auth_State_Refreshed
 }
 
 data class CodePair (

@@ -28,8 +28,8 @@ import com.amazon.aace.core.PlatformInterface;
  *
  * @note The TextToSpeech platform is not responsible for the playback of the synthesized speech.
  *
- * @deprecated This platform interface is deprecated. 
- *             Use the Alexa Auto Services Bridge (AASB) message broker 
+ * @deprecated This platform interface is deprecated.
+ *             Use the Alexa Auto Services Bridge (AASB) message broker
  *             to publish and subscribe to AASB messages instead.
  *             @see aace::core::MessageBroker
  */

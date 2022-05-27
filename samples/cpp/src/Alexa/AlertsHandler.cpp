@@ -82,19 +82,19 @@ void AlertsHandler::subscribeToAASBMessages() {
 }
 
 void AlertsHandler::handleAlertStateChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AlertStateChangedMessage");
     AlertStateChangedMessage msg = json::parse(message);
     alertStateChanged(msg.payload.alertToken, msg.payload.state, msg.payload.reason);
 }
 
 void AlertsHandler::handleAlertCreatedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AlertCreatedMessage");
     AlertCreatedMessage msg = json::parse(message);
     alertCreated(msg.payload.alertToken, msg.payload.detailedInfo);
 }
 
 void AlertsHandler::handleAlertDeletedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received AlertDeletedMessage");
     AlertDeletedMessage msg = json::parse(message);
     alertDeleted(msg.payload.alertToken);
 }

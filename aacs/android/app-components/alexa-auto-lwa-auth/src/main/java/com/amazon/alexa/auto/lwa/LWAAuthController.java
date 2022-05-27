@@ -1,28 +1,42 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.lwa;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
-import com.amazon.aacsipc.IPCConstants;
 import com.amazon.aacsipc.AACSSender;
+import com.amazon.aacsipc.IPCConstants;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
+import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.auth.AuthMode;
 import com.amazon.alexa.auto.apis.auth.AuthState;
 import com.amazon.alexa.auto.apis.auth.AuthStatus;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
-import com.amazon.alexa.auto.apis.auth.AuthorizationHandlerInterface;
 import com.amazon.alexa.auto.apis.auth.UserIdentity;
 import com.amazon.alexa.auto.apps.common.util.FileUtil;
 
@@ -39,8 +53,6 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
@@ -56,9 +68,6 @@ public class LWAAuthController implements AuthController {
     private WeakReference<Context> context;
     private BehaviorSubject<AuthStatus> authStatusColdStream;
     private AACSMessageSender messageSender;
-    private AuthMode mAuthMode;
-    private ExecutorService mExecutorService;
-    private Handler mMainThreadHandler;
     private AlexaClientEventReceiver mAlexaClientEventReceiver;
     private boolean mIsAlexaConnected;
     private boolean mEnableUserProfile;
@@ -72,20 +81,8 @@ public class LWAAuthController implements AuthController {
         messageSender = new AACSMessageSender(context, new AACSSender());
 
         authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), getUserIdentity()));
-        mAuthMode = AuthMode.CBL_AUTHORIZATION;
+
         mIsAlexaConnected = false;
-
-        mExecutorService = Executors.newSingleThreadExecutor();
-        mMainThreadHandler = new Handler(Looper.getMainLooper());
-
-        getExtraAuthorizationHandlerFactoryAsync()
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .subscribe((authHandlerFactory) -> {
-                    for (AuthorizationHandlerInterface authorizationHandlerInterface : authHandlerFactory) {
-                        authorizationHandlerInterface.initialize(this.context.get());
-                    }
-                });
 
         subscribeAlexaClientConnectionStatus();
 
@@ -101,12 +98,13 @@ public class LWAAuthController implements AuthController {
 
     @Override
     public void setAuthMode(AuthMode authMode) {
-        mAuthMode = authMode;
+        Log.v(TAG, "setAuthMode =" + authMode);
+        AuthModeStore.persistAuthMode(context.get(), authMode);
     }
 
     @Override
     public AuthMode getAuthMode() {
-        return mAuthMode;
+        return AuthModeStore.getPersistentAuthMode(context.get());
     }
 
     @Override
@@ -138,12 +136,12 @@ public class LWAAuthController implements AuthController {
                     emitter.onNext(data);
                     switch (data.getAuthState()) {
                         case Auth_Provider_Auth_Started:
-                            mAuthMode = AuthMode.AUTH_PROVIDER_AUTHORIZATION;
+                            setAuthMode(AuthMode.AUTH_PROVIDER_AUTHORIZATION);
                             if (!startLoginWorkflow()) {
                                 emitter.onError(new Exception("Failed to start Login workflow"));
                             }
                             break;
-                        case Alexa_Client_Connected:
+                        case Auth_State_Refreshed:
                             // When Alexa is connected, and the auth token has also been saved, we will send the auth
                             // finished/authorized event to subscribers.
                             if (isAuthenticated()) {
@@ -181,7 +179,7 @@ public class LWAAuthController implements AuthController {
             AuthEventReceiver eventReceiver = new AuthEventReceiver();
             EventBus.getDefault().register(eventReceiver);
 
-            if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+            if (getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
                 emitter.onNext(new AuthWorkflowData(AuthState.CBL_Auth_Not_Started, null, null));
             }
             if (!startLoginWorkflow()) {
@@ -216,10 +214,10 @@ public class LWAAuthController implements AuthController {
 
         Log.d(TAG, "Resetting the login state");
 
-        if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+        if (getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
             service = LWAAuthConstants.AUTH_CBL_SERVICE_NAME;
-        } else if (mAuthMode.equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
-             service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
+        } else if (getAuthMode().equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
+            service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
         }
         try {
             String payload = new JSONStringer()
@@ -233,12 +231,13 @@ public class LWAAuthController implements AuthController {
             Log.e(TAG, "Fail to generate authorization logout message.");
         }
 
-
         try {
             TokenStore.resetRefreshToken(strongContext);
         } catch (GeneralSecurityException | IOException e) {
             Log.e(TAG, "Failed to reset refresh token.");
         }
+
+        AuthModeStore.resetPersistentAuthMode(context.get());
 
         try {
             UserIdentityStore.resetUserIdentity(strongContext);
@@ -246,14 +245,13 @@ public class LWAAuthController implements AuthController {
             Log.e(TAG, "Failed to reset user identity.");
         }
 
-
         authStatusColdStream.onNext(new AuthStatus(false, null));
     }
 
     @Override
     public void cancelLogin(AuthMode mode) {
         Context strongContext = context.get();
-         String service = "";
+        String service = "";
 
         if (strongContext == null) {
             Log.w(TAG, "Cannot cancel login workflow. Context is invalid");
@@ -262,10 +260,10 @@ public class LWAAuthController implements AuthController {
 
         Log.d(TAG, "Cancelling the login state");
 
-        if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+        if (getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
             service = LWAAuthConstants.AUTH_CBL_SERVICE_NAME;
-        } else if (mAuthMode.equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
-             service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
+        } else if (getAuthMode().equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
+            service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
         }
 
         try {
@@ -275,16 +273,18 @@ public class LWAAuthController implements AuthController {
                                      .value(service)
                                      .endObject()
                                      .toString();
-            messageSender.sendMessage(Topic.AUTHORIZATION, Action.Authorization.LOGOUT, payload);
+            messageSender.sendMessage(Topic.AUTHORIZATION, Action.Authorization.CANCEL_AUTHORIZATION, payload);
         } catch (JSONException e) {
             Log.e(TAG, "Fail to generate authorization logout message.");
         }
+
+        AuthModeStore.resetPersistentAuthMode(context.get());
     }
 
     @Override
     public UserIdentity getUserIdentity() {
-        if (mAuthMode != null) {
-            if (isAuthenticated() && mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+        if (getAuthMode() != null) {
+            if (isAuthenticated() && getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
                 try {
                     String userName = UserIdentityStore.getUserIdentity(context.get());
 
@@ -294,7 +294,7 @@ public class LWAAuthController implements AuthController {
                     return null;
                 } catch (GeneralSecurityException | IOException e) {
                     Log.e(TAG, "Fail to get user identity data.");
-                   return null;
+                    return null;
                 }
             } else {
                 Log.w(TAG, "Device is not authenticated or it is not for CBL login, we cannot get user identity data.");
@@ -316,10 +316,10 @@ public class LWAAuthController implements AuthController {
         // Then send a Start request.
         Log.i(TAG, "Starting new Login workflow");
 
-        if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+        if (getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
             service = LWAAuthConstants.AUTH_CBL_SERVICE_NAME;
-        } else if (mAuthMode.equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
-             service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
+        } else if (getAuthMode().equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
+            service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
         }
 
         try {
@@ -333,7 +333,7 @@ public class LWAAuthController implements AuthController {
                                      .toString();
             messageSender.sendMessage(Topic.AUTHORIZATION, Action.Authorization.START_AUTHORIZATION, payload);
         } catch (JSONException e) {
-        Log.e(TAG, "Fail to generate start authorization message.");
+            Log.e(TAG, "Fail to generate start authorization message.");
         }
         return true;
     }
@@ -349,10 +349,10 @@ public class LWAAuthController implements AuthController {
 
         Log.i(TAG, "Cancelling the login workflow (if prior login workflow exists).");
 
-        if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+        if (getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
             service = LWAAuthConstants.AUTH_CBL_SERVICE_NAME;
-        } else if (mAuthMode.equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
-             service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
+        } else if (getAuthMode().equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
+            service = LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME;
         }
 
         try {
@@ -368,49 +368,6 @@ public class LWAAuthController implements AuthController {
         }
     }
 
-    private Single<Optional<List<AuthorizationHandlerInterface>>> getExtraAuthorizationHandlerFactoryAsync() {
-        return Single.create(emitter -> {
-            mExecutorService.submit(() -> {
-                Optional<List<AuthorizationHandlerInterface>> handlerFactoryOptional =
-                        getExtraAuthorizationHandlerFactorySync(context.get());
-                mMainThreadHandler.post(() -> emitter.onSuccess(handlerFactoryOptional));
-            });
-        });
-    }
-
-    private Optional<List<AuthorizationHandlerInterface>> getExtraAuthorizationHandlerFactorySync(Context context) {
-        List<AuthorizationHandlerInterface> extraAuthorizationHandlerFactories = new ArrayList<>();
-        try {
-            String folderName = "auth-handler";
-            String factoryKey = "authorizationHandlerFactory";
-            String category = "name";
-            String[] fileList = context.getAssets().list(folderName);
-            for (String f : fileList) {
-                InputStream is = context.getAssets().open(folderName + "/" + f);
-                byte[] buffer = new byte[is.available()];
-                is.read(buffer);
-                String json = new String(buffer, "UTF-8");
-                JSONObject obj = new JSONObject(json);
-                if (obj != null) {
-                    JSONObject factoryKeyObj = obj.optJSONObject(factoryKey);
-                    if (factoryKeyObj == null) {
-                        continue;
-                    }
-                    String factoryName = factoryKeyObj.getString(category);
-                    AuthorizationHandlerInterface instance =
-                            (AuthorizationHandlerInterface) Class.forName(factoryName).newInstance();
-                    extraAuthorizationHandlerFactories.add(instance);
-                    Log.i(TAG, "getExtraAuthorizationHandlerFactory: load extra module:" + factoryName);
-                }
-                is.close();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "getExtraAuthorizationHandlerFactory: " + e.getMessage());
-            return Optional.empty();
-        }
-        return Optional.of(extraAuthorizationHandlerFactories);
-    }
-
     private void isCBLUserProfileEnabled(@NonNull String configs) {
         try {
             JSONObject config = new JSONObject(configs);
@@ -422,12 +379,10 @@ public class LWAAuthController implements AuthController {
     }
 
     private void publishAuthFinishedStatus(ObservableEmitter emitter) {
-
-        if (mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+        if (getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
             emitter.onNext(new AuthWorkflowData(AuthState.CBL_Auth_Finished, null, null));
         } else {
-            emitter.onNext(
-                    new AuthWorkflowData(AuthState.Auth_Provider_Authorized, null, null));
+            emitter.onNext(new AuthWorkflowData(AuthState.Auth_Provider_Authorized, null, null));
         }
         authStatusColdStream.onNext(new AuthStatus(isAuthenticated(), getUserIdentity()));
     }
@@ -453,44 +408,65 @@ public class LWAAuthController implements AuthController {
                 mIsAlexaConnected = true;
             } else if (data.getAuthState().equals(AuthState.Alexa_Client_Disconnected)) {
                 mIsAlexaConnected = false;
-            } else if(data.getAuthState().equals(AuthState.Alexa_Client_Auth_Unintialized)){
+            } else if (data.getAuthState().equals(AuthState.Alexa_Client_Auth_Unintialized)) {
+                AuthMode authMode = getAuthMode();
 
-                 if(mAuthMode.equals(AuthMode.CBL_AUTHORIZATION)) {
-                    Log.w(TAG, "AuthState.Alexa_Client_Auth_Unintialized authmode = "  + mAuthMode );
-                 //check if we have a valid refresh token then send start authorization
-                 try {
-                     Context contextStrong = context.get();
-                     if (contextStrong == null) {
-                         throw new RuntimeException("Context not valid any more.");
-                     }
+                if (authMode.equals(AuthMode.CBL_AUTHORIZATION)) {
+                    Log.w(TAG, "AuthState.Alexa_Client_Auth_Unintialized authmode = " + getAuthMode());
+                    // check if we have a valid refresh token then send start authorization
+                    try {
+                        Context contextStrong = context.get();
+                        if (contextStrong == null) {
+                            throw new RuntimeException("Context not valid any more.");
+                        }
 
-                     Optional<String> refreshToken = TokenStore.getRefreshToken(contextStrong);
+                        Optional<String> refreshToken = TokenStore.getRefreshToken(contextStrong);
 
-                      if(refreshToken.isPresent()){
-                        Log.w(TAG, "refreshToken.isPresent() ");
-                          try {
-                              JSONObject payloadJson;
-                              payloadJson = new JSONObject();
-                              payloadJson.put("refreshToken", refreshToken.orElse(""));
-                               Log.w(TAG, "refreshToken.isPresent() refreshToken="+ refreshToken);
-                              String payload = new JSONStringer()
-                                                       .object()
-                                                       .key(LWAAuthConstants.AUTH_SERVICE)
-                                                       .value(LWAAuthConstants.AUTH_CBL_SERVICE_NAME)
-                                                       .key(LWAAuthConstants.AUTH_DATA)
-                                                       .value(payloadJson.toString())
-                                                       .endObject()
-                                                       .toString();
-                              messageSender.sendMessage(Topic.AUTHORIZATION, Action.Authorization.START_AUTHORIZATION, payload);
-                          } catch (JSONException e) {
-                              Log.e(TAG, "Fail to generate start authorization message.");
-                          }
-                       }
-                 } catch (GeneralSecurityException | IOException e) {
-                     Log.e(TAG, "Failed to get refresh token.");
-                 }
-             }
-         }
-       }
+                        if (refreshToken.isPresent()) {
+                            Log.w(TAG, "refreshToken.isPresent() ");
+                            try {
+                                JSONObject payloadJson;
+                                payloadJson = new JSONObject();
+                                payloadJson.put("refreshToken", refreshToken.orElse(""));
+                                Log.w(TAG, "refreshToken.isPresent() refreshToken=" + refreshToken);
+                                String payload = new JSONStringer()
+                                                         .object()
+                                                         .key(LWAAuthConstants.AUTH_SERVICE)
+                                                         .value(LWAAuthConstants.AUTH_CBL_SERVICE_NAME)
+                                                         .key(LWAAuthConstants.AUTH_DATA)
+                                                         .value(payloadJson.toString())
+                                                         .endObject()
+                                                         .toString();
+                                messageSender.sendMessage(
+                                        Topic.AUTHORIZATION, Action.Authorization.START_AUTHORIZATION, payload);
+                            } catch (JSONException e) {
+                                Log.e(TAG, "Fail to generate start authorization message.");
+                            }
+                        }
+                    } catch (GeneralSecurityException | IOException e) {
+                        Log.e(TAG, "Failed to get refresh token.");
+                    }
+                } else if (authMode.equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
+                    try {
+                        String payload = new JSONStringer()
+                                                 .object()
+                                                 .key(LWAAuthConstants.AUTH_SERVICE)
+                                                 .value(LWAAuthConstants.AUTH_PROVIDER_SERVICE_NAME)
+                                                 .key(LWAAuthConstants.AUTH_DATA)
+                                                 .value("")
+                                                 .endObject()
+                                                 .toString();
+                        messageSender.sendMessage(
+                                Topic.AUTHORIZATION, Action.Authorization.START_AUTHORIZATION, payload);
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Fail to generate start authorization message.");
+                    }
+                }
+            } else if (data.getAuthState().equals(AuthState.Auth_Provider_Authorization_Expired)) {
+                Log.d(TAG, "Authorization is expired, start logging out");
+                AlexaApp.from(context.get()).getRootComponent().getAlexaSetupController().setSetupCompleteStatus(false);
+                logOut();
+            }
+        }
     }
 }

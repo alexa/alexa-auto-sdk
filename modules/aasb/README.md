@@ -1,0 +1,1 @@
+The AASB module is deprecated.

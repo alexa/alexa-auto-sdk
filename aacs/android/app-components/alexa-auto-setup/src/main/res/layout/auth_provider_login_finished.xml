@@ -8,124 +8,136 @@
     android:orientation="vertical"
     android:theme="@style/Theme.Alexa.Standard">
 
+    <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/setup_bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/setup_bottom_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
+    <!--Alexa logo-->
     <ImageView
         android:id="@+id/alexa_img_view"
         android:layout_width="@dimen/login_alexa_image_width"
         android:layout_height="@dimen/login_alexa_image_height"
         android:layout_gravity="center"
-        android:layout_marginStart="@dimen/login_item_margin_start"
-        android:layout_marginEnd="@dimen/login_item_margin_end"
-        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:contentDescription="@string/alexa_logo_content_description"
         android:src="@drawable/alexa_logo"
         android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- "You're all set" title text-->
     <TextView
         android:id="@+id/login_finish_heading"
-        style="@style/Alexa.Heading2Text"
+        style="@style/Alexa.TitleText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/login_finish_heading_text"
         android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/login_margin_start"
-        android:layout_marginEnd="@dimen/login_margin_start"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"/>
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
+        android:layout_marginTop="@dimen/login_item_margin_top"/>
 
+    <!-- "Try" hint text-->
     <TextView
         android:id="@+id/login_hint_try"
-        style="@style/Alexa.Heading2Text"
-        android:text="@string/login_finish_try_text"
-        android:layout_width="match_parent"
+        style="@style/Alexa.SubtitleText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        android:layout_marginStart="@dimen/login_margin_start_double"
-        android:layout_marginEnd="@dimen/login_margin_start_double"
         android:gravity="center_horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_finish_heading"
-        app:layout_constraintBottom_toTopOf="@+id/alexa_hint1"
-        app:layout_constraintVertical_chainStyle="packed"/>
+        android:text="@string/login_finish_try_text"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/login_finish_heading"
+        app:layout_constraintVertical_chainStyle="packed" />
 
+    <!-- Next 3 text views are the hints-->
     <TextView
         android:id="@+id/alexa_hint1"
-        style="@style/Alexa.Hint2Text"
+        style="@style/Alexa.UtteranceText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/auth_provider_login_alexa_hint1"
         android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/login_margin_start_double"
-        android:layout_marginEnd="@dimen/login_margin_start_double"
-        app:layout_constraintTop_toBottomOf="@+id/login_hint_try"
-        app:layout_constraintBottom_toTopOf="@+id/alexa_hint2"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/login_hint_try" />
 
     <TextView
         android:id="@+id/alexa_hint2"
-        style="@style/Alexa.Hint2Text"
+        style="@style/Alexa.UtteranceText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/auth_provider_login_alexa_hint2"
         android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/login_margin_start_double"
-        android:layout_marginEnd="@dimen/login_margin_start_double"
-        app:layout_constraintTop_toBottomOf="@+id/alexa_hint1"
-        app:layout_constraintBottom_toTopOf="@+id/alexa_hint3"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/alexa_hint1" />
 
     <TextView
         android:id="@+id/alexa_hint3"
-        style="@style/Alexa.Hint2Text"
+        style="@style/Alexa.UtteranceText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/auth_provider_login_alexa_hint3"
         android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/login_margin_start_double"
-        android:layout_marginEnd="@dimen/login_margin_start_double"
-        app:layout_constraintTop_toBottomOf="@+id/alexa_hint2"
-        app:layout_constraintBottom_toTopOf="@+id/sign_in_hint"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/alexa_hint2" />
 
+    <!-- Sign in hint-->
     <TextView
         android:id="@+id/sign_in_hint"
-        style="@style/Alexa.HintText"
+        style="@style/Alexa.Hint2Text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/auth_provider_sign_in_hint"
         android:textAlignment="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/login_item_margin_top"
-        android:layout_marginStart="@dimen/login_margin_start"
-        android:layout_marginEnd="@dimen/login_margin_start"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/sign_in_action_button"/>
+        app:layout_constraintBottom_toTopOf="@id/auth_provider_login_finished_btn"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/alexa_hint3" />
 
+    <!--Preview mode Button-->
     <TextView
         android:id="@+id/sign_in_action_button"
         style="@style/Alexa.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
-        android:layout_marginTop="@dimen/login_button_margin_bottom"
-        android:layout_marginBottom="@dimen/login_item_margin_top"
         android:text="@string/sign_in_action_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/auth_provider_login_finished_btn"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@id/setup_bottom_guideline"
+        app:layout_constraintEnd_toStartOf="@id/auth_provider_login_finished_btn"
+        app:layout_constraintStart_toStartOf="@id/left_guideline" />
 
+    <!--Access settings Button-->
     <TextView
         android:id="@+id/auth_provider_login_finished_btn"
         style="@style/Alexa.Button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/action_button_margin_bottom"
         android:text="@string/login_all_done_btn_text"
-        app:layout_constraintStart_toStartOf="@+id/sign_in_action_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toTopOf="@id/setup_bottom_guideline"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/sign_in_action_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

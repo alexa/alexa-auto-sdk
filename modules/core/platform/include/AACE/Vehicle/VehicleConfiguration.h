@@ -101,7 +101,18 @@ public:
         /**
          * The automaker's identifier for the vehicle.
          */
-        VEHICLE_IDENTIFIER
+        VEHICLE_IDENTIFIER,
+
+        /**
+         * The engine type for the vehicle.
+         */
+        ENGINE_TYPE,
+
+        /**
+         * The number of RSE embedded FireTVs installed in the vehicle.
+         */
+        RSE_EMBEDDED_FIRETVS,
+
     };
 
     /**
@@ -129,7 +140,9 @@ public:
      *          "arch": "<HARDWARE_ARCH>",
      *          "language": "<LANGUAGE>",
      *          "microphone": "<MICROPHONE>",
-     *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>"
+     *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>",
+     *          "engineType": "<ENGINE_TYPE>",
+     *          "rseEmbeddedFireTvs": "<RSE_EMBEDDED_FIRETVS>"
      *      }
      *   }
      * }
@@ -193,6 +206,12 @@ inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration
             break;
         case VehicleConfiguration::VehiclePropertyType::VEHICLE_IDENTIFIER:
             stream << "VEHICLE_IDENTIFIER";
+            break;
+        case VehicleConfiguration::VehiclePropertyType::ENGINE_TYPE:
+            stream << "ENGINE_TYPE";
+            break;
+        case VehicleConfiguration::VehiclePropertyType::RSE_EMBEDDED_FIRETVS:
+            stream << "RSE_EMBEDDED_FIRETVS";
             break;
     }
     return stream;

@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="contacts_permission_consent_title">Rufen Sie Ihre Kontakte mit Alexa an</string>
+    <string name="contacts_permission_consent_title">Zugriff auf deine Kontakte von %1$s erlauben?</string>
     <string name="contacts_permission_consent_title_with_alexa_custom_assistant">Sprachanrufe einrichten</string>
-    <string name="contacts_permission_consent_body">Das Hochladen von Kontakten auf %1$s auf den Amazon-Dienst zulassen.</string>
-    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Rufen Sie mit [Acme Brandon] und Amazon Alexa Ihre Telefonkontakte per Sprachbefehl an. Ihre Kontakte auf %1$s werden auf den Amazon-Dienst hochgeladen.</string>
+    <string name="contacts_permission_consent_body">Kontakte werden regelmäßig in die Amazon Cloud hochgeladen. Das macht es einfacher, Freunde und Familienmitglieder zu finden und Anrufe zu tätigen.</string>
+    <string name="contacts_permission_consent_body_with_alexa_custom_assistant">Ruf mit [Acme Brandon] und Amazon Alexa deine Telefonkontakte per Sprachbefehl an. Deine Kontakte auf %1$s werden auf den Amazon-Dienst hochgeladen.</string>
     <string name="contacts_upload_consent_title">Kontakte</string>
     <string name="contacts_upload_consent_summary">Damit Kontakte mit Alexa angerufen werden können, werden die Kontakte auf diesem Telefon auf den Amazon-Dienst hochgeladen.</string>
-    <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Laden Sie Ihre Kontakte auf den Amazon-Dienst hoch, um Sie über Ihren Namen anzurufen und Ihnen Nachrichten zu schicken</string>
-    <string name="contacts_consent_yes">AKTIVIEREN</string>
+    <string name="contacts_upload_consent_summary_with_alexa_custom_assistant">Lade deine Kontakte auf den Amazon-Dienst hoch, um sie über ihren Namen anzurufen und ihnen Nachrichten zu schicken</string>
+    <string name="contacts_consent_yes">ZUSTIMMEN UND ERLAUBEN</string>
     <string name="contacts_consent_yes_with_alexa_custom_assistant">Kontakte verwenden</string>
     <string name="contacts_consent_skip">ÜBERSPRINGEN</string>
     <string name="comms_permission_status">Kontakte %1$s</string>
@@ -16,6 +16,6 @@
     <string name="comms_sample_utterance">„Alexa, ruf Stefan an.“</string>
     <string name="sms_consent_title">SMS</string>
     <string name="sms_consent_summary">Zum Senden und Empfangen von SMS mit Alexa werden die SMS auf diesem Telefon auf den Amazon-Dienst hochgeladen.</string>
-    <string name="sms_consent_summary_with_alexa_custom_assistant">SMS auf den Amazon-Dienst hochladen, damit sie Ihnen vorgelesen werden können</string>
+    <string name="sms_consent_summary_with_alexa_custom_assistant">SMS auf den Amazon-Dienst hochladen, damit sie dir vorgelesen werden können</string>
     <string name="pair_new_device">Neu koppeln</string>
 </resources>

@@ -1,4 +1,23 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
+
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.LOCATION_CONSENT_COMPLETED;
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.DISABLED;
+import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.ENABLED;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -24,11 +43,6 @@ import org.greenrobot.eventbus.EventBus;
 
 import javax.inject.Inject;
 
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.LOCATION_CONSENT_COMPLETED;
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.DISABLED;
-import static com.amazon.alexa.auto.setup.workflow.model.LocationConsent.ENABLED;
-
 /**
  * Fragment to support displaying the location consent screen
  */
@@ -41,8 +55,7 @@ public class LocationConsentFragment extends Fragment {
     /**
      * Constructs an instance of LocationConsentFragment.
      */
-    public LocationConsentFragment() {
-    }
+    public LocationConsentFragment() {}
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,13 +86,9 @@ public class LocationConsentFragment extends Fragment {
         View fragmentView = requireView();
 
         TextView skipButtonView = fragmentView.findViewById(R.id.setup_skip_button_view);
-        skipButtonView.setOnClickListener(view -> {
-            updateAACSPropertyAndNavigate(DISABLED.getValue());
-        });
+        skipButtonView.setOnClickListener(view -> { updateAACSPropertyAndNavigate(DISABLED.getValue()); });
         TextView useLocationButtonView = fragmentView.findViewById(R.id.use_location_button_view);
-        useLocationButtonView.setOnClickListener(view -> {
-            updateAACSPropertyAndNavigate(ENABLED.getValue());
-        });
+        useLocationButtonView.setOnClickListener(view -> { updateAACSPropertyAndNavigate(ENABLED.getValue()); });
 
         if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
             ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);

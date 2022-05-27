@@ -1,9 +1,29 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.settings.config;
+
+import static com.amazon.aacsconstants.AACSConstants.AACS_AMAZONLITE_CONFIG;
+import static com.amazon.aacsconstants.AACSConstants.AACS_COASSISTANT;
+import static com.amazon.alexa.auto.apps.common.Constants.MODELS;
+import static com.amazon.alexa.auto.apps.common.Constants.PATH;
 
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -29,11 +49,6 @@ import java.util.ArrayList;
 
 import io.reactivex.rxjava3.core.Single;
 
-import static com.amazon.aacsconstants.AACSConstants.AACS_AMAZONLITE_CONFIG;
-import static com.amazon.aacsconstants.AACSConstants.AACS_COASSISTANT;
-import static com.amazon.alexa.auto.apps.common.Constants.MODELS;
-import static com.amazon.alexa.auto.apps.common.Constants.PATH;
-
 /**
  * A helper object to configure AACS.
  */
@@ -43,6 +58,8 @@ public class AACSConfigurator {
     // AACS Configs
     private static final String AACS_CONFIG_FILE_PATH = "configFilepaths";
     private static final String AACS_CONFIG_STRINGS = "configStrings";
+
+    private static final String ASSISTANTS = "assistants";
 
     @NonNull
     private final WeakReference<Context> mContextWk;
@@ -114,25 +131,24 @@ public class AACSConfigurator {
         FileUtil.copyModelsToFilesDir(context);
         File modelsDir = new File(fileDir, MODELS);
 
-        FileUtil.readAACSConfigurationAsync(context).subscribe(
-                config -> {
-                    try {
-                        JSONObject configJson = new JSONObject(config);
-                        JSONObject aacsAmazonLite = configJson.getJSONObject(AACS_AMAZONLITE_CONFIG);
-                        JSONArray modelsJson = aacsAmazonLite.getJSONArray(MODELS);
-                        ArrayList<String> modelFiles = new ArrayList<>();
-                        for (int i = 0; i < modelsJson.length(); i++) {
-                            String modelPath = modelsJson.getJSONObject(i).getString(PATH);
-                            modelFiles.add(modelPath);
-                        }
-                        AMAZONLITE_MODEL_FILES = new String[modelFiles.size()];
-                        modelFiles.toArray(AMAZONLITE_MODEL_FILES);
-                        AACSServiceController.shareFilePermissionsOfSameType(context,
-                                modelsDir, AMAZONLITE_MODEL_FILES, AACS_AMAZONLITE_CONFIG);
-                    } catch (JSONException e) {
-                        Log.w(TAG, "Error occurs while sharing wake word models with AACS" + e);
-                    }
-                });
+        FileUtil.readAACSConfigurationAsync(context).subscribe(config -> {
+            try {
+                JSONObject configJson = new JSONObject(config);
+                JSONObject aacsAmazonLite = configJson.getJSONObject(AACS_AMAZONLITE_CONFIG);
+                JSONArray modelsJson = aacsAmazonLite.getJSONArray(MODELS);
+                ArrayList<String> modelFiles = new ArrayList<>();
+                for (int i = 0; i < modelsJson.length(); i++) {
+                    String modelPath = modelsJson.getJSONObject(i).getString(PATH);
+                    modelFiles.add(modelPath);
+                }
+                AMAZONLITE_MODEL_FILES = new String[modelFiles.size()];
+                modelFiles.toArray(AMAZONLITE_MODEL_FILES);
+                AACSServiceController.shareFilePermissionsOfSameType(
+                        context, modelsDir, AMAZONLITE_MODEL_FILES, AACS_AMAZONLITE_CONFIG);
+            } catch (JSONException e) {
+                Log.w(TAG, "Error occurs while sharing wake word models with AACS" + e);
+            }
+        });
     }
 
     /**
@@ -143,18 +159,18 @@ public class AACSConfigurator {
     private void sendConfigurationMessage(@NonNull String configs) {
         Context context = mContextWk.get();
         Preconditions.checkNotNull(context);
-
         if (ModuleProvider.isAlexaCustomAssistantEnabled(context)) {
             Log.d(TAG, "Updating aacs config for assistant settings");
             try {
                 JSONObject configJson = new JSONObject(configs);
                 AlexaApp mApp = AlexaApp.from(context);
                 if (mApp.getRootComponent().getComponent(AssistantManager.class).isPresent()) {
-                    AssistantManager assistantManager = mApp.getRootComponent().getComponent(AssistantManager.class).get();
+                    AssistantManager assistantManager =
+                            mApp.getRootComponent().getComponent(AssistantManager.class).get();
                     JSONObject settings = assistantManager.getAssistantsSettings();
                     if (settings != null && !settings.toString().isEmpty()) {
-                        Log.d(TAG, "Assistant settings from assistant manager: " + settings.toString());
-                        configJson.put(AACS_COASSISTANT, settings);
+                        JSONObject coAssistantConfig = configJson.getJSONObject(AACS_COASSISTANT);
+                        coAssistantConfig.put(ASSISTANTS, settings.getJSONObject(ASSISTANTS));
                         configs = configJson.toString();
                     }
                 }

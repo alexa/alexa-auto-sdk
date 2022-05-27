@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -84,7 +84,6 @@ private:
     friend class LoggerEngineService;
 
 private:
-    Level m_level;
     std::unordered_set<std::shared_ptr<LogEventObserver>> m_observers;
 
     // sink map
@@ -92,9 +91,6 @@ private:
 
     // log mutex
     std::mutex m_mutex;
-
-    // singleton
-    static std::shared_ptr<EngineLogger> s_instance;
 };
 
 }  // namespace logger

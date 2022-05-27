@@ -23,13 +23,22 @@
     <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">आपके हर बार \"Alexa\" कहने पर Alexa की ओर से जवाब दिया जाएगा</string>
     <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">लोकेशन शेयर करना</string>
     <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">आस-पास के रेस्टोरेंट, स्थानीय मौसम और कई दूसरी चीज़ों के बारे में बेहतर जवाब पाने के लिए, अपनी गाड़ी की मौजूदा लोकेशन को Alexa के साथ शेयर करें.</string>
+    <string name="setting_navigation_favorites_title">नेविगेशन पसंदीदा जगहों को सिंक करें</string>
+    <string name="setting_navigation_favorites_summary">अपने वाहन में स्टोर की गई पसंदीदा जगहों पर नेविगेट करने में Alexa की मदद ली जा सकती है. पसंदीदा जगहें Amazon सेवा पर अपलोड की जाएंगी.</string>
     <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">परेशान न करें (डीएनडी)</string>
-    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">इससे नोटिफ़िकेशन बंद हो जाएंगे</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Alexa की ओर से आपको टाइमर और अलार्म के अलावा किसी और चीज़ के लिए परेशान नहीं किया जाएगा</string>
     <string name="setting_alexa_communication" tools:ignore="MissingTranslation">बातचीत</string>
     <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">टोन और वॉल्यूम</string>
     <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexa की भाषा</string>
     <string name="setting_alexa_signout" tools:ignore="MissingTranslation">साइन आउट करें</string>
+    <string name="setting_alexa_things_to_try" tools:ignore="MissingTranslation">इन्हें आज़माएं</string>
     <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Alexa को बंद करें</string>
+    <string name="setting_alexa_language_mismatch" tools:ignore="MissingTranslation">इसमें Alexa सपोर्टेड नहीं है</string>
+    <string name="setting_language_mismatch_title" tools:ignore="MissingTranslation">भाषा अलग है</string>
+    <string name="setting_language_mismatch_content_1" tools:ignore="MissingTranslation">सिस्टम की भाषा को %1$s पर सेट कर दिया है.&#160;</string>
+    <string name="setting_language_mismatch_content_2" tools:ignore="MissingTranslation">क्या आपको Alexa को %1$s में इस्तेमाल करना जारी रखना है?</string>
+    <string name="setting_alexa" tools:ignore="MissingTranslation">Alexa की सेटिंग</string>
+    <string name="setting_continue" tools:ignore="MissingTranslation">जारी रखें</string>
     <string name="setting_aacs" tools:ignore="MissingTranslation">Alexa Auto क्लाइंट सेवा</string>
     <string name="settings_alexa" tools:ignore="MissingTranslation">सेटिंग</string>
     <string name="logout" tools:ignore="MissingTranslation">साइन आउट करें?</string>
@@ -37,6 +46,7 @@
     <string name="logout_confirm" tools:ignore="MissingTranslation">क्या आपको Amazon Alexa से साइन आउट करना है?</string>
     <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">साइन आउट करें</string>
     <string name="confirm_yesno_no" tools:ignore="MissingTranslation">कैंसिल करें</string>
+    <string name="confirm_yesno_confirm" tools:ignore="MissingTranslation">हां</string>
     <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">बंद करें</string>
     <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">Alexa की सुविधा अब इस गाड़ी में उपलब्ध नहीं होगी.</string>
     <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">बेस कॉन्फ़िगरेशन को ओवरराइड करें</string>
@@ -54,4 +64,76 @@
     <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">AACS को रीबूट करें और कॉन्फ़िगरेशन लागू करें</string>
     <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">AACS को शट डाउन करें</string>
     <string name="preference_aacs_start" tools:ignore="MissingTranslation">AACS को शुरू करें</string>
+    <string name="ttt_preview_mode_note" tools:ignore="MissingTranslation">ध्यान दें: कुछ सुविधाओं में Amazon Alexa की मदद से साइन इन करना होता है.</string>
+
+    <!-- translatable="false" tag is used for things-to-try strings only. These strings need to be localized based on the country and region -->
+    <string name="ttt_getting_started" translatable="false">शुरुआत के टिप्स</string>
+    <string name="ttt_alexa_s_talents" translatable="false">Alexa\ के टैलेंट</string>
+    <string name="ttt_entertainment" translatable="false">मनोरंजन</string>
+    <string name="ttt_communication" translatable="false">बातचीत</string>
+    <string name="ttt_weather" translatable="false">मौसम</string>
+    <string name="ttt_smart_home" translatable="false">स्मार्ट होम</string>
+    <string name="ttt_news_and_information" translatable="false">समाचार और सूचना</string>
+    <string name="ttt_navigation" translatable="false">नेविगेशन</string>
+    <string name="ttt_traffic_information" translatable="false">ट्रैफ़िक की जानकारी</string>
+    <string name="ttt_skills" translatable="false">स्किल्स</string>
+    <string name="ttt_lists" translatable="false">लिस्ट</string>
+    <string name="ttt_shopping" translatable="false">शॉपिंग</string>
+    <string name="ttt_questions_and_answers" translatable="false">सवाल और जवाब</string>
+    <string name="ttt_sports" translatable="false">खेल</string>
+    <string name="ttt_calendar" translatable="false">कैलेंडर</string>
+    <string name="ttt_getting_started_text1" translatable="false">\"Alexa, आस-पास का कोई पेट्रॉल पंप ढूंढो.\"</string>
+    <string name="ttt_getting_started_text2" translatable="false">\"Alexa, म्यूज़िक चलाओ.\"</string>
+    <string name="ttt_getting_started_text3" translatable="false">\"Alexa, मौसम कैसा है?\"</string>
+    <string name="ttt_getting_started_text4" translatable="false">\"Alexa, रास्ते पर ट्रैफ़िक कैसा है?\"</string>
+    <string name="ttt_getting_started_text5" translatable="false">\"Alexa, मेरे हाइलाइट क्या हैं?\"</string>
+    <string name="ttt_alexa_s_talents_text1" translatable="false">\"Alexa, गुड मॉर्निंग.\"</string>
+    <string name="ttt_alexa_s_talents_text2" translatable="false">\"Alexa, कहानी सुनाओ.\"</string>
+    <string name="ttt_alexa_s_talents_text3" translatable="false">\"Alexa, क्या-क्या चीज़ें याद रखी जा सकती है?\"</string>
+    <string name="ttt_entertainment_text1" translatable="false">\"Alexa, म्यूज़िक चलाओ.\"</string>
+    <string name="ttt_entertainment_text2" translatable="false">\"Alexa, 70 के दशक का रॉक म्यूज़िक चलाओ.\"</string>
+    <string name="ttt_entertainment_text3" translatable="false">\"Alexa, Bruno Mars की नई एल्बम चलाओ.\"</string>
+    <string name="ttt_entertainment_text4" translatable="false">\"Alexa, मेरी Audible बुक फिर से चलाओ.\"</string>
+    <string name="ttt_communication_text1" translatable="false">\"Alexa,  रोहित को एक मैसेज भेजो.\"</string>
+    <string name="ttt_communication_text2" translatable="false">\"Alexa, मैं मैसेज कैसे भेजूं?\"</string>
+    <string name="ttt_communication_text3" translatable="false">\"Alexa,  राहुल के मोबाइल पर कॉल करो.\"</string>
+    <string name="ttt_communication_text4" translatable="false">\"Alexa, 755–5747–330 पर कॉल करो.\"</string>
+    <string name="ttt_weather_text1" translatable="false">\"Alexa, मौसम कैसा है?\"</string>
+    <string name="ttt_weather_text2" translatable="false">\"Alexa, क्या आज बारिश होगी?\"</string>
+    <string name="ttt_weather_text3" translatable="false">\"Alexa,  दिल्ली में कैसा मौसम है?\"</string>
+    <string name="ttt_smart_home_text1" translatable="false">\"Alexa, बरामदे की लाइट चालू करो.\"</string>
+    <string name="ttt_smart_home_text2" translatable="false">\"Alexa, सामने का दरवाज़ा बंद करो.\"</string>
+    <string name="ttt_smart_home_text3" translatable="false">\"Alexa, घर का तापमान 21 डिग्री सेल्सियस पर सेट कर दो.\"</string>
+    <string name="ttt_smart_home_text4" translatable="false">\"Alexa, गैराज का दरवाज़ा बंद करो.\"</string>
+    <string name="ttt_news_and_information_text1" translatable="false">\"Alexa, समाचार बताओ?\"</string>
+    <string name="ttt_news_and_information_text2" translatable="false">\"Alexa, मेरे खेलों के अपडेट क्या हैं?\"</string>
+    <string name="ttt_news_and_information_text3" translatable="false">\"Alexa, DD News चलाओ.\"</string>
+    <string name="ttt_news_and_information_text4" translatable="false">\"Alexa, NDTV चलाओ.\"</string>
+    <string name="ttt_navigation_text1" translatable="false">\"Alexa, आस-पास टॉप रेटिंग वाला थाई रेस्टोरेंट ढूंढो.\"</string>
+    <string name="ttt_navigation_text2" translatable="false">\"Alexa, मुझे एयरपोर्ट का रास्ता बताओ.\"</string>
+    <string name="ttt_navigation_text3" translatable="false">\"Alexa, मुझे रेलवे स्टेशन का रास्ता बताओ.\"</string>
+    <string name="ttt_traffic_information_text1" translatable="false">\"Alexa, ऑफ़िस जाने के रास्ते में ट्रैफ़िक कैसा है?\"</string>
+    <string name="ttt_traffic_information_text2" translatable="false">\"Alexa, एयरपोर्ट के रास्ते में ट्रैफ़िक कैसा है?\"</string>
+    <string name="ttt_skills_text1" translatable="false">\"Alexa, आपमें नई स्किल क्या हैं?\"</string>
+    <string name="ttt_lists_text1" translatable="false">\"Alexa, आज मेरी टू-डू लिस्ट में क्या-क्या है?\"</string>
+    <string name="ttt_lists_text2" translatable="false">\"Alexa, मेरी शॉपिंग लिस्ट में दूध ऐड करो\"</string>
+    <string name="ttt_lists_text3" translatable="false">\"Alexa, आज मेरी शॉपिंग लिस्ट में क्या-क्या है?\"</string>
+    <string name="ttt_lists_text4" translatable="false">\"Alexa, पैकिंग लिस्ट बनाओ.\"</string>
+    <string name="ttt_shopping_text1" translatable="false">\"Alexa, मेरा सामान कहां है?\"</string>
+    <string name="ttt_shopping_text2" translatable="false">\"Alexa, मेरी कार के लिए एयर फ़्रेशनर खरीदो.\"</string>
+    <string name="ttt_shopping_text3" translatable="false">\"Alexa, टूथपेस्ट को फिर से ऑर्डर करो.\"</string>
+    <string name="ttt_questions_and_answers_text1" translatable="false">\"Alexa, टोक्यो में अभी क्या समय हुआ है?\"</string>
+    <string name="ttt_questions_and_answers_text2" translatable="false">\"Alexa, चांद कितनी दूर है?\"</string>
+    <string name="ttt_questions_and_answers_text3" translatable="false">\"Alexa,  वर्ल्ड कप कब है?\"</string>
+    <string name="ttt_sports_text1" translatable="false">\"Alexa, मेरे खेलों के अपडेट क्या हैं?\"</string>
+    <string name="ttt_sports_text2" translatable="false">\"Alexa, IPL का फ़ाइनल कब है?\"</string>
+    <string name="ttt_sports_text3" translatable="false">\"Alexa, मुंबई इंडियंस का अगला मैच कब है?\"</string>
+    <string name="ttt_sports_text4" translatable="false">\"Alexa, क्रिकेट वर्ल्ड कप कब है?\"</string>
+    <string name="ttt_sports_text5" translatable="false">\"Alexa, Wimbledon कब है?\"</string>
+    <string name="ttt_sports_text6" translatable="false">\"Alexa, हॉकी इंडिया लीग कब है?\"</string>
+    <string name="ttt_sports_text7" translatable="false">\"Alexa, पिछले मैच में कोलकाता नाईट राइडर्स का स्कोर क्या था?\"</string>
+    <string name="ttt_sports_text8" translatable="false">\"Alexa, चेन्नई सुपर किंग्स ने कितने IPL जीते हैं?\"</string>
+    <string name="ttt_calendar_text1" translatable="false">\"Alexa, मेरा दिन कैसा लगता है?\"</string>
+    <string name="ttt_calendar_text2" translatable="false">\"Alexa, मेरा अगला अपॉइंटमेंट क्या है?\"</string>
+    <string name="ttt_calendar_text3" translatable="false">\"Alexa, मेरे कैलेंडर में दोपहर 2:00 बजे कॉफ़ी चैट ऐड करो.\"</string>
 </resources>

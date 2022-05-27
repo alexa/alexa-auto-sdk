@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include <gst/app/gstappsrc.h>
 #include <gst/audio/audio.h>
+#include <inttypes.h>
 #include <string.h>
 
 #define USE_APPSRC_CALLBACK 1
@@ -143,32 +144,25 @@ static aal_handle_t gstreamer_player_create(const aal_attributes_t* attr, aal_au
 
     if (!attr->device || IS_EMPTY_STRING(attr->device)) {
         sink = gstreamer_create_and_add_element(bin, "autoaudiosink", "sink");
-#ifdef USE_UDPSINK
-    } else if (strstr(attr->device, "udpsink") == attr->device) {
+    } else if (strstr(attr->device, "bin:") == attr->device) {
+        g_info("Using gstreamer bin: %s\n", attr->device);
         GError* err = NULL;
         // treat the device name as the initial part of pipeline description
-        sink =
-            gst_parse_bin_from_description_full(attr->device, FALSE, NULL, GST_PARSE_FLAG_NO_SINGLE_ELEMENT_BINS, &err);
+        sink = gst_parse_bin_from_description_full(
+            attr->device + 4, FALSE, NULL, GST_PARSE_FLAG_NO_SINGLE_ELEMENT_BINS, &err);
         if (err) {
             g_critical("Failed to create udpsink: %s\n", err->message);
             g_error_free(err);
             goto exit;
         }
-#endif
+        gst_element_set_name(sink, "sink");
+    } else if (strstr(attr->device, "element:") == attr->device) {
+        g_info("Using gstreamer element: %s\n", attr->device);
+        sink = gstreamer_create_and_add_element(bin, attr->device + 8, "sink");
     } else {
-#ifdef USE_PIPEWIRE
-        g_info("Using Pipewire device: %s\n", attr->device);
-        sink = gstreamer_create_and_add_element(bin, "pwaudiosink", "sink");
-        if (sink) {
-            GstStructure* s = gst_structure_new("properties", "media.role", G_TYPE_STRING, attr->device, NULL);
-            g_object_set(G_OBJECT(sink), "stream-properties", s, NULL);
-            gst_structure_free(s);
-        }
-#else
         g_info("Using ALSA device: %s\n", attr->device);
         sink = gstreamer_create_and_add_element(bin, "alsasink", "sink");
         if (sink) g_object_set(G_OBJECT(sink), "device", attr->device, NULL);
-#endif
     }
 
     if (!sink) goto exit;
@@ -259,7 +253,7 @@ static void gstreamer_player_seek(aal_handle_t handle, int64_t position) {
             GST_CLOCK_TIME_NONE)) {
         // Note: Seeking may fail when the pipeline is not in PLAYING state
         // We will save the value and seek again when it plays
-        g_debug("seek failed %lld\n", position);
+        g_debug("seek failed %" PRId64 "\n", position);
         ctx->pending_position = position;
     }
 }
@@ -332,7 +326,7 @@ static ssize_t gstreamer_player_write(aal_handle_t handle, const char* data, con
         return r;
     }
 
-    g_debug("write size=%zu current=%llu\n", size, gst_app_src_get_current_level_bytes(GST_APP_SRC(source)));
+    g_debug("write size=%zu current=%" PRIu64 "\n", size, gst_app_src_get_current_level_bytes(GST_APP_SRC(source)));
 
     buffer = gst_buffer_new_allocate(NULL, size, NULL);
     if (!buffer) {

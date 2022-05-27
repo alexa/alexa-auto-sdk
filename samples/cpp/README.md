@@ -1,15 +1,7 @@
 # Alexa Auto SDK C++ Sample App
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Prerequisites](#prerequisites)
-- [Build and Run the Sample App](#build-and-run-the-sample-app)
-- [Configure the Sample App](#configure-the-sample-app)
-- [Use the Sample App](#use-the-sample-app)
-- [Troubleshooting](#troubleshooting)
-
 ## Overview
+
 The purpose of the C++ Sample App is to provide useful example code to help you integrate your implementation with the Alexa Auto SDK. The C++ Sample App provides an example of creating and configuring an instance of the Engine, and using the MessageBroker API to subscribe to messages from the Engine. It also provides examples of handling audio and stream based interfaces with the MessageStream API, and replying to messages from the Engine. The C++ Sample App also includes detailed logs for interactions with the Alexa Auto SDK, as well as UI elements relevant to the implementation.
 
 ## Prerequisites
@@ -27,17 +19,17 @@ When you follow the instructions to [fill in the product information](https://de
 * Use your own custom information, taking note of the **Product ID**, as this information is required to confingure the Sample App.
 * Be sure to select **Automotive** from the **Product category** pull-down.
 
-When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required to confingure the Sample App.
+When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required to configure the Sample App.
 
 ### Optional device capabilities
 
-In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](../../NEED_HELP.md#requesting-additional-functionality) page.
+In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](https://alexa.github.io/alexa-auto-sdk/docs/help) page.
 
 >**Note:** Most of the commands that follow are meant to be run from this `alexa-auto-sdk` directory.
 
 ## Build and Run the Sample App
 
-Before you build and run the Sample App, it is recommended that you first review and understand how to [build Auto SDK](../../BUILDING.md). The Sample App can be built by using the Auto SDK Builder Tool, or by using Conan to build the Auto SDK and Sample App packages directly. Each option is described in more detail in this section.
+Before you build and run the Sample App, it is recommended that you first review and understand how to [build Auto SDK](https://alexa.github.io/alexa-auto-sdk/docs/native/building). The Sample App can be built by using the Auto SDK Builder Tool, or by using Conan to build the Auto SDK and Sample App packages directly. Each option is described in more detail in this section.
 
 ### Build using Builder Tool
 
@@ -97,7 +89,7 @@ $ DYLD_LIBRARY_PATH=lib:+:${DYLD_LIBRARY_PATH} \
 
 ### Build using Conan
 
-The Auto SDK C++ Sample App can be configured using the provided Conan recipe, and then built with CMake. The Conan recipe requires packages that are defined as part of Auto SDK, which must first be installed into the local cache (see [Building Auto SDK](../../BUILDING.md) for instructions about how to install Auto SDK Conan packages). If you are specifying any additional dependencies, such as extra modules for Auto SDK, those packages must also be installed in the Conan cache before configuring the Sample App.
+The Auto SDK C++ Sample App can be configured using the provided Conan recipe, and then built with CMake. The Conan recipe requires packages that are defined as part of Auto SDK, which must first be installed into the local cache (see [Build Alexa Auto SDK](https://alexa.github.io/alexa-auto-sdk/docs/native/building) for instructions about how to install Auto SDK Conan packages). If you are specifying any additional dependencies, such as extra modules for Auto SDK, those packages must also be installed in the Conan cache before configuring the Sample App.
 
 If the required dependencies are already installed, the following commands can be used to quickly configure, build and run the Sample App.
 
@@ -124,11 +116,11 @@ $ DYLD_LIBRARY_PATH=lib:+:${DYLD_LIBRARY_PATH} \
 
 You can use the following command line options with the Conan install command. The options are defined in the Conan recipe:
 
-**`aac_modules`** - Specify default Auto SDK modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. If this option is not overriden, the default value will be `core, alexa, cbl, system-audio`.
+**`aac_modules`** - Specify default Auto SDK modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. If this option is not overridden, the default value will be `core, alexa, cbl, system-audio`.
 
-**`extra_modules`** - Specify additional modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. This is a useful option if you want to specify modules to build in addition to the default modules, rather than replacing the default modules entirely.
+**`extra_modules`** - Specify additional modules to build with the Sample App. This is a comma separated list of modules that must be installed in the Conan local cache before building. This is a useful option if you want to specify modules to build in addition to the default modules, rather than replacing the default modules entirely.
 
-You can specify the options above using `-o` when running the Conan command. For example, to specify addtional modules that are included when building the Sample App, you can us the following option:
+You can specify the options above using `-o` when running the Conan command. For example, to specify additional modules that are included when building the Sample App, you can us the following option:
 
 ```shell
 $ conan install samples/cpp -if=build-sampleapp -b missing \ 
@@ -137,7 +129,7 @@ $ conan install samples/cpp -if=build-sampleapp -b missing \
 
 #### Specify environment variables for configuration values
 
-For convenience, a [config file template](./assets/config/config.json) has been included for the core Auto SDK modules with well-known tokens (e.g. `CLIENT_ID`, `PRODUCT_ID`) for various configuration values. You can set environment variables for these tokens; when building the Sample App, they will be replaced in the configuration file.
+For convenience, a [config file template](https://github.com/alexa/alexa-auto-sdk/blob/master/samples/cpp/assets/config/config.json) has been included for the core Auto SDK modules with well-known tokens (e.g. `CLIENT_ID`, `PRODUCT_ID`) for various configuration values. You can set environment variables for these tokens; when building the Sample App, they will be replaced in the configuration file.
 
 For example you can set an environment variable when running `conan install` like this:
 
@@ -151,22 +143,22 @@ $ CLIENT_ID=xxxx \
 
 You can pass one or more configuration files to the Sample App using the `--config <config-file-path>` flag. When you build additional modules with the sample app, you may need to pass module-specific configuration. Please refer to the `README` file within each module to get this configuration information. 
 
-For convenience, a [config file template](./assets/config/config.json) has been included for the core Auto SDK modules. You must customize this template with values specific to your implementation. You can either edit the configuration file manually or specify environment variables that can be used to override the configuration values when building the Sample App with Conan, see how to [specify environment variables for configuration values](#specify-environment-variables-for-configuration-values).
+For convenience, a [config file template](https://github.com/alexa/alexa-auto-sdk/blob/master/samples/cpp/assets/config/config.json) has been included for the core Auto SDK modules. You must customize this template with values specific to your implementation. You can either edit the configuration file manually or specify environment variables that can be used to override the configuration values when building the Sample App with Conan, see how to [specify environment variables for configuration values](#specify-environment-variables-for-configuration-values).
 
 To change the config file manually, follow these steps:
 
-1. Edit the [config file template](./assets/config/config.json) and save it.
+1. Edit the [config file template](https://github.com/alexa/alexa-auto-sdk/blob/master/samples/cpp/assets/config/config.json) and save it.
 
 2. Replace the `${YOUR_CLIENT_ID}`, `${YOUR_PRODUCT_ID}`, and `${YOUR_DEVICE_SERIAL_NUMBER}` placeholders with your values as follows:
-   * Replace `${YOUR_CLIENT_ID}` with the Client ID, which you can find in your device's Security Profile under the **Other devices and platforms** tab.
-   * Replace `${YOUR_PRODUCT_ID}` with the Product ID, which you can find under the **Products** tab on the AVS Developer Console. (It is different from the Amazon ID.)
-   * Replace `${YOUR_DEVICE_SERIAL_NUMBER}` with an arbitrary value that must not contain spaces and must be unique.
+    * Replace `${YOUR_CLIENT_ID}` with the Client ID, which you can find in your device's Security Profile under the **Other devices and platforms** tab.
+    * Replace `${YOUR_PRODUCT_ID}` with the Product ID, which you can find under the **Products** tab on the AVS Developer Console. (It is different from the Amazon ID.)
+    * Replace `${YOUR_DEVICE_SERIAL_NUMBER}` with an arbitrary value that must not contain spaces and must be unique.
 
- >**Note:** The Client ID and Product ID must correspond to a development device profile that you created as an **automotive** product by selecting the `Automotive` product category when you [filled in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information).  
+    >**Note:** The Client ID and Product ID must correspond to a development device profile that you created as an **automotive** product by selecting the `Automotive` product category when you [filled in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information).  
 
 3. Replace the `${DATA_PATH}` and `${CERTS_PATH}` with paths to your database and certificates, respectively. You must ensure that the directories exist and have write permissions.
 
- >**Note:** The Auto SDK engine will fail to start if the database directory path does not exist or does not have write permissions.
+    >**Note:** The Auto SDK engine will fail to start if the database directory path does not exist or does not have write permissions.
 
 4. Modify the vehicle information (`aace.vehicle`) to match your vehicle specifics.
 
@@ -243,11 +235,11 @@ The C++ Sample App supports the [BlackBerry QNX Multimedia Suite](https://blackb
 
 >**Note:** The SHOUTcast/lcecast streaming format is not supported.
 
-See the [System Audio extension README](../../modules/system-audio/README.md) for details about configuring audio input and output on QNX platforms.
+See the System Audio module documentation for details about configuring audio input and output on QNX platforms.
 
 ### AudioFile menu
 
-The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](./assets/menu/MENU.md#audiofile) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the [System Audio](../../modules/system-audio/README.md) configuration defined in the config-system-audio.json file.
+The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. Responses are saved as MP3 audio files within the current directory where the app was run. Refer to the [C++ Sample App Menu System documentation](https://github.com/alexa/alexa-auto-sdk/blob/master/samples/cpp/assets/menu/MENU.md) for information on how to extend the AudioFile menu with custom audio files. However, this menu is only available if there is no default audio provider specified during the build. By default the Auto SDK Builder will build the C++ Sample App with the `System Audio` configuration defined in the `config-system-audio.json` file.
 
 >**Note:** The AudioFile menu appears on platforms that do not provide built-in audio support (such as platforms that are under development). On platforms that provide built-in audio support, the AudioFile menu does not appear. 
 
@@ -255,7 +247,7 @@ The C++ Sample App provides an AudioFile menu to send pre-recorded utterances. R
 Your platform implementation should handle cases where a GPS location cannot be obtained by returning the `UNDEFINED` value provided by the Auto SDK. In these cases, the Auto SDK does not report the location in the context, and your platform implementation should return a localization object initialized with `UNDEFINED` values for latitude and longitude ((latitude,longitude) = (`UNDEFINED`,`UNDEFINED`)) in the context object of every SpeechRecognizer event. 
 
 ### Enable SiriusXM as a local media source
-The Sample App does not configure SiriusXM as a local media source by default. If you need the SiriusXM local media source, you must enable and build it. To do this, add the following line to the list of local media sources in the [`Application.cpp`](./src/Application.cpp#L493) class then rebuild the Sample App:
+The Sample App does not configure SiriusXM as a local media source by default. If you need the SiriusXM local media source, you must enable and build it. To do this, add the following line to the list of local media sources in the [`Application.cpp`](https://github.com/alexa/alexa-auto-sdk/blob/4.0/samples/cpp/src/Application.cpp#L493) class then rebuild the Sample App:
 
 `{ aace::alexa::LocalMediaSource::Source::SIRIUS_XM, nullptr }`
 

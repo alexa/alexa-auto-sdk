@@ -110,7 +110,9 @@ private:
      * @param [in] token The Id of the message that this one is replying to
      * @param [in] statusCode represents the delivery status of event sent using SendConnectivityEventMessage
      */
-    void connectivityEventResponse(const std::string& token, aasb::message::connectivity::alexaConnectivity::StatusCode statusCode);
+    void connectivityEventResponse(
+        const std::string& token,
+        aasb::message::connectivity::alexaConnectivity::StatusCode statusCode);
 
     /**
      * Publishes the ConnectivityStateChange message to notify the Engine of a change in the connectivity state.
@@ -131,7 +133,7 @@ private:
      * 
      * @param [in] event The stringified JSON containing the event.
      */
-   aasb::message::connectivity::alexaConnectivity::StatusCode sendConnectivityEvent(const std::string& event);
+    aasb::message::connectivity::alexaConnectivity::StatusCode sendConnectivityEvent(const std::string& event);
 
 private:
     using AlexaConnectivityPromise = std::promise<json>;

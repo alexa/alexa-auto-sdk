@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:sharedUserId="com.amazon.AlexaAutoUserId"
     package="com.amazon.alexaautoclientservice">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -14,7 +13,7 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:persistent="true"
-        android:extractNativeLibs="true">
+        android:extractNativeLibs="false">
 
         <receiver
             android:name="com.amazon.alexaautoclientservice.receiver.InstrumentationReceiver"

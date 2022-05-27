@@ -1,0 +1,31 @@
+@startuml
+
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+<style>
+sequenceDiagram {
+    .engine {
+        BackgroundColor LightSkyBlue
+        BorderColor CornflowerBlue
+    }
+}
+</style>
+
+participant Application  
+participant "Auto SDK Engine"  as AutoSDK  <<engine>> 
+
+
+AutoSDK -> Application: Publish StartAudioInput message
+
+...
+
+Application -> AutoSDK: Open Message Stream
+
+...
+
+Application -> AutoSDK: Write Audio Samples
+...
+
+AutoSDK -> Application: Publish StopAudioInput message
+
+@enduml

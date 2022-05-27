@@ -66,7 +66,7 @@ void AlexaSpeakerHandler::subscribeToAASBMessages() {
 }
 
 void AlexaSpeakerHandler::handleSpeakerSettingsChangedMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received SpeakerSettingsChangedMessage");
     SpeakerSettingsChangedMessage msg = json::parse(message);
     speakerSettingsChanged(msg.payload.type, msg.payload.local, msg.payload.volume, msg.payload.mute);
 }

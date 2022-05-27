@@ -71,7 +71,7 @@ void NetworkInfoProviderHandler::subscribeToAASBMessages() {
 }
 
 void NetworkInfoProviderHandler::handleGetNetworkStatusMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetNetworkStatusMessage");
     GetNetworkStatusMessage _msg = json::parse(message);
 
     // Publish the reply message for getNetworkStatus.
@@ -83,7 +83,7 @@ void NetworkInfoProviderHandler::handleGetNetworkStatusMessage(const std::string
 }
 
 void NetworkInfoProviderHandler::handleGetWifiSignalStrengthMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, message);
+    log(logger::LoggerHandler::Level::INFO, "Received GetWifiSignalStrengthMessage");
     GetWifiSignalStrengthMessage _msg = json::parse(message);
 
     // Publish the reply message for getWifiSignalStrength.

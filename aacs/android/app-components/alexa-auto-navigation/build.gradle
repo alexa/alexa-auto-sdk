@@ -5,7 +5,7 @@ android {
     defaultConfig {
         minSdkVersion 26
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':aacs-annotation-api')
+    annotationProcessor project(path: ':aacs-annotation-processor')
     implementation project(path: ':aacscommonutils')
     implementation project(path: ':aacsconstants')
     implementation project(path: ':alexa-auto-apis')
@@ -57,6 +59,9 @@ dependencies {
     // Dagger
     implementation deps.dagger
     annotationProcessor deps.dagger_compiler
+
+    // RX
+    implementation deps.rxjava3
 
     // Glide
     implementation deps.glide

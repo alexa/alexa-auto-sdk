@@ -4,15 +4,19 @@
     package="com.amazon.alexa.auto.comms.ui">
 
     <!-- Enables getting intents from AACS -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.amazon.alexaautoclientservice"/>
     <uses-permission android:name="com.amazon.aacstelephony" />
     <uses-permission android:name="com.amazon.aacscontacts" />
-
     <application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:supportsRtl="true">
+        <activity android:name="com.amazon.alexa.auto.comms.ui.RequestContactsConsentActivity"
+        android:label="contacts activity">
+            android:launchmode="singleTop"
+        </activity>
         <receiver android:name="com.amazon.alexa.auto.comms.ui.receiver.BluetoothReceiver"
             android:exported="true">
             <intent-filter>
@@ -20,12 +24,13 @@
                 <action android:name="com.amazon.aacstelephony.bluetooth.connected"/>
                 <action android:name="com.amazon.aacstelephony.bluetooth.disconnected"/>
                 <action android:name="com.amazon.aacstelephony.bluetooth.connectionCheckCompleted"/>
+                <action android:name="com.amazon.aacstelephony.bluetooth.bondStateChanged"/>
+                <action android:name="com.amazon.aacstelephony.bluetooth.pairedDevice"/>
             </intent-filter>
             <intent-filter>
                 <category android:name="com.amazon.alexa.auto.comms" />
                 <action android:name="com.amazon.alexa.auto.comms.primaryPhoneChanged"/>
             </intent-filter>
         </receiver>
-
     </application>
 </manifest>

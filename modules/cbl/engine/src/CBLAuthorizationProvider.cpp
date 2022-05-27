@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -341,6 +341,7 @@ std::shared_ptr<CBLAuthorizationProvider> CBLAuthorizationProvider::create(
     const std::string& service,
     std::shared_ptr<AuthorizationManagerInterface> authorizationManagerInterface,
     std::shared_ptr<CBLConfigurationInterface> configuration,
+    std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
     bool enableUserProfile,
     std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier) {
@@ -355,7 +356,7 @@ std::shared_ptr<CBLAuthorizationProvider> CBLAuthorizationProvider::create(
             service, authorizationManagerInterface, configuration, enableUserProfile, legacyEventNotifier));
         ThrowIfNull(cblAuthorizationProvider, "createFailed");
 
-        ThrowIfNot(cblAuthorizationProvider->initialize(propertyManager), "initializeFailed");
+        ThrowIfNot(cblAuthorizationProvider->initialize(propertyManager, networkObserver), "initializeFailed");
 
         return cblAuthorizationProvider;
     } catch (std::exception& ex) {
@@ -374,6 +375,7 @@ CBLAuthorizationProvider::CBLAuthorizationProvider(
         m_configuration{configuration},
         m_isStopping{false},
         m_authFailureReported{false},
+        m_networkWakeup{true},
         m_explicitAuthorizationRequest{false},
         m_legacyCBLExplicitStart{false},
         m_authState{AuthObserverInterface::State::UNINITIALIZED},
@@ -391,7 +393,8 @@ CBLAuthorizationProvider::CBLAuthorizationProvider(
 }
 
 bool CBLAuthorizationProvider::initialize(
-    std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager) {
+    std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+    std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver) {
     try {
         auto authorizationManager_lock = m_authorizationManager.lock();
         ThrowIfNull(authorizationManager_lock, "invalidAuthorizationManagerReference");
@@ -408,6 +411,11 @@ bool CBLAuthorizationProvider::initialize(
         propertyManager->addListener(aace::alexa::property::LOCALE, shared_from_this());
         lock.unlock();
 
+        m_networkObserver = networkObserver;
+
+        if (m_networkObserver != nullptr) {  // This could be null when NetworkInfoProvider interface is not registered.
+            m_networkObserver->addObserver(shared_from_this());
+        }
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -416,6 +424,7 @@ bool CBLAuthorizationProvider::initialize(
 }
 
 void CBLAuthorizationProvider::doShutdown() {
+    m_executor.waitForSubmittedTasks();
     m_executor.shutdown();
 
     // Stop and wait for the thread to finish
@@ -429,6 +438,11 @@ void CBLAuthorizationProvider::doShutdown() {
     }
     if (m_configuration) {
         m_configuration.reset();
+    }
+
+    if (m_networkObserver != nullptr) {
+        m_networkObserver->removeObserver(shared_from_this());
+        m_networkObserver.reset();
     }
 }
 
@@ -839,7 +853,13 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
 
             auto nextActionTime = (isAboutToExpire ? m_tokenExpirationTime : m_timeToRefresh);
 
-            m_wake.wait_until(lock, nextActionTime, [this] { return m_authFailureReported || m_isStopping; });
+            m_networkWakeup = false;
+            m_wake.wait_until(
+                lock, nextActionTime, [this] { return m_authFailureReported || m_isStopping || m_networkWakeup; });
+
+            if (m_networkWakeup) {
+                m_networkWakeup = false;
+            }
 
             if (m_isStopping) {
                 break;
@@ -861,8 +881,8 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
                 ThrowIfNull(listener, "invalidListenerReference");
 
                 auto data = listener->onGetAuthorizationData(m_service, AUTHORIZATION_DATA_REFRESH_TOKEN_KEY);
-                ThrowIf( data.empty(), "invalidAuthorizationData" );
-                
+                ThrowIf(data.empty(), "invalidAuthorizationData");
+
                 auto refreshTokenJson = json::parse(data);
                 if (refreshTokenJson.contains(AUTHORIZATION_JSON_DATA_REFRESH_TOKEN_KEY) &&
                     refreshTokenJson[AUTHORIZATION_JSON_DATA_REFRESH_TOKEN_KEY].is_string()) {
@@ -1380,6 +1400,21 @@ void CBLAuthorizationProvider::onAuthFailure(const std::string& token) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return;
     }
+}
+
+void CBLAuthorizationProvider::onNetworkInfoChanged(NetworkInfoObserver::NetworkStatus status, int wifiSignalStrength) {
+    AACE_DEBUG(LX(TAG, "onNetworkInfoChanged").d("m_networkStatus", status));
+    if (status == NetworkInfoObserver::NetworkStatus::CONNECTED) {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_networkWakeup = true;
+        m_wake.notify_all();
+    }
+}
+
+void CBLAuthorizationProvider::onNetworkInterfaceChangeStatusChanged(
+    const std::string& networkInterface,
+    NetworkInterfaceChangeStatus status) {
+    // No action required as we don't create and persist network connection using AVS LibCurlUtils.
 }
 
 void CBLAuthorizationProvider::propertyChanged(const std::string& name, const std::string& newValue) {

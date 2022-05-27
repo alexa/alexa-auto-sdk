@@ -47,7 +47,8 @@ std::shared_ptr<AASBPlaybackController> AASBPlaybackController::create(
     }
 }
 
-bool AASBPlaybackController::initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
+bool AASBPlaybackController::initialize(
+    std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker) {
     try {
         // create a wp reference
         std::weak_ptr<AASBPlaybackController> wp = shared_from_this();

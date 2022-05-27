@@ -1,5 +1,13 @@
 package com.amazon.alexa.auto.settings.home;
 
+import static com.amazon.alexa.auto.apps.common.Constants.ALEXA;
+import static com.amazon.alexa.auto.apps.common.Constants.ALEXA_DISABLED;
+import static com.amazon.alexa.auto.apps.common.Constants.BOTH_ENABLED;
+import static com.amazon.alexa.auto.apps.common.Constants.NONALEXA;
+import static com.amazon.alexa.auto.apps.common.Constants.NON_ALEXA_DISABLED;
+
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
 import android.content.Context;
 import android.view.View;
@@ -34,13 +42,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
-
-import static com.amazon.alexa.auto.apps.common.Constants.ALEXA;
-import static com.amazon.alexa.auto.apps.common.Constants.ALEXA_DISABLED;
-import static com.amazon.alexa.auto.apps.common.Constants.BOTH_ENABLED;
-import static com.amazon.alexa.auto.apps.common.Constants.NONALEXA;
-import static com.amazon.alexa.auto.apps.common.Constants.NON_ALEXA_DISABLED;
-import static org.mockito.Mockito.when;
 
 public class VoiceAssistanceSettingsScreenBuilderTest {
     // Overriding class under test to mock statics.
@@ -154,20 +155,17 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
             when(mMockRootComponent.getAuthController()).thenReturn(mMockAuthController);
             when(mMockRootComponent.getComponent(AlexaSetupWorkflowController.class))
                     .thenReturn(Optional.of(mMockAlexaSetupWorkflowController));
-            when(mMockRootComponent.getComponent(SetupProvider.class))
-                    .thenReturn(Optional.of(mMockSetupProvider));
+            when(mMockRootComponent.getComponent(SetupProvider.class)).thenReturn(Optional.of(mMockSetupProvider));
 
             mClassUnderTest = new VoiceAssistanceSettingsScreenBuilderOverride();
         }
-
     }
 
     @Test
     public void testPreferencesAreRemovedForNonAlexaCustomAssistantMode() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(false);
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(false);
 
             // Action
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
@@ -185,10 +183,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testPreferencesWhenBothAssistantsAreEnabled() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(BOTH_ENABLED);
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(BOTH_ENABLED);
 
             // Action
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
@@ -212,10 +208,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testPreferencesWhenAlexaIsDisabled() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(ALEXA_DISABLED);
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(ALEXA_DISABLED);
 
             // Action
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
@@ -239,10 +233,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testPreferencesWhenNonAlexaIsDisabled() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(NON_ALEXA_DISABLED);
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(NON_ALEXA_DISABLED);
 
             // Action
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
@@ -266,16 +258,11 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testAlexaEnablePreference() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(ALEXA_DISABLED);
-            Mockito.when(mMockAuthController.getAuthMode())
-                    .thenReturn(AuthMode.CBL_AUTHORIZATION);
-            Mockito.when(mMockNavController.getNavInflater())
-                    .thenReturn(mMockNavInflater);
-            Mockito.when(mMockNavInflater.inflate(0))
-                    .thenReturn(mMockNavGraph);
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(ALEXA_DISABLED);
+            Mockito.when(mMockAuthController.getAuthMode()).thenReturn(AuthMode.CBL_AUTHORIZATION);
+            Mockito.when(mMockNavController.getNavInflater()).thenReturn(mMockNavInflater);
+            Mockito.when(mMockNavInflater.inflate(0)).thenReturn(mMockNavGraph);
 
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
 
@@ -285,7 +272,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
             // Verify
             ArgumentCaptor<Preference.OnPreferenceClickListener> clickListenerCaptor =
                     ArgumentCaptor.forClass(Preference.OnPreferenceClickListener.class);
-            Mockito.verify(mMockPrefVoiceAssistanceEnableAlexa, Mockito.times(1)).setOnPreferenceClickListener(clickListenerCaptor.capture());
+            Mockito.verify(mMockPrefVoiceAssistanceEnableAlexa, Mockito.times(1))
+                    .setOnPreferenceClickListener(clickListenerCaptor.capture());
 
             // Invoke Signout preference by clicking on it.
             Assert.assertTrue(clickListenerCaptor.getValue().onPreferenceClick(mMockPrefVoiceAssistanceEnableAlexa));
@@ -293,7 +281,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
             // Verify
             Mockito.verify(mMockSetupController, Mockito.times(1)).setCurrentSetupFlow(ALEXA);
             Mockito.verify(mMockAuthController, Mockito.times(1)).logOut();
-            Mockito.verify(mMockAlexaSetupWorkflowController, Mockito.times(1)).startSetupWorkflow(mMockView.getContext(), mMockNavController, VoiceAssistanceEvent.ALEXA_ONLY);
+            Mockito.verify(mMockAlexaSetupWorkflowController, Mockito.times(1))
+                    .startSetupWorkflow(mMockView.getContext(), mMockNavController, VoiceAssistanceEvent.ALEXA_ONLY);
         }
     }
 
@@ -301,14 +290,10 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testNonAlexaEnablePreference() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(NON_ALEXA_DISABLED);
-            Mockito.when(mMockNavController.getNavInflater())
-                    .thenReturn(mMockNavInflater);
-            Mockito.when(mMockNavInflater.inflate(0))
-                    .thenReturn(mMockNavGraph);
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(NON_ALEXA_DISABLED);
+            Mockito.when(mMockNavController.getNavInflater()).thenReturn(mMockNavInflater);
+            Mockito.when(mMockNavInflater.inflate(0)).thenReturn(mMockNavGraph);
 
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
 
@@ -318,14 +303,17 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
             // Verify
             ArgumentCaptor<Preference.OnPreferenceClickListener> clickListenerCaptor =
                     ArgumentCaptor.forClass(Preference.OnPreferenceClickListener.class);
-            Mockito.verify(mMockPrefVoiceAssistanceEnableNonAlexa, Mockito.times(1)).setOnPreferenceClickListener(clickListenerCaptor.capture());
+            Mockito.verify(mMockPrefVoiceAssistanceEnableNonAlexa, Mockito.times(1))
+                    .setOnPreferenceClickListener(clickListenerCaptor.capture());
 
             // Invoke Signout preference by clicking on it.
             Assert.assertTrue(clickListenerCaptor.getValue().onPreferenceClick(mMockPrefVoiceAssistanceEnableNonAlexa));
 
             // Verify
             Mockito.verify(mMockSetupController, Mockito.times(1)).setCurrentSetupFlow(NONALEXA);
-            Mockito.verify(mMockAlexaSetupWorkflowController, Mockito.times(1)).startSetupWorkflow(mMockView.getContext(), mMockNavController, VoiceAssistanceEvent.NON_ALEXA_ONLY);
+            Mockito.verify(mMockAlexaSetupWorkflowController, Mockito.times(1))
+                    .startSetupWorkflow(
+                            mMockView.getContext(), mMockNavController, VoiceAssistanceEvent.NON_ALEXA_ONLY);
         }
     }
 
@@ -333,17 +321,11 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testAlexaPreference() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(BOTH_ENABLED);
-            Mockito.when(mMockNavController.getNavInflater())
-                    .thenReturn(mMockNavInflater);
-            Mockito.when(mMockNavInflater.inflate(0))
-                    .thenReturn(mMockNavGraph);
-            Mockito.when(mMockSettingsProvider.getSettingResId(ALEXA))
-                    .thenReturn(1);
-
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(BOTH_ENABLED);
+            Mockito.when(mMockNavController.getNavInflater()).thenReturn(mMockNavInflater);
+            Mockito.when(mMockNavInflater.inflate(0)).thenReturn(mMockNavGraph);
+            Mockito.when(mMockSettingsProvider.getSettingResId(ALEXA)).thenReturn(1);
 
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
 
@@ -353,7 +335,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
             // Verify
             ArgumentCaptor<Preference.OnPreferenceClickListener> clickListenerCaptor =
                     ArgumentCaptor.forClass(Preference.OnPreferenceClickListener.class);
-            Mockito.verify(mMockPrefVoiceAssistanceAlexa, Mockito.times(1)).setOnPreferenceClickListener(clickListenerCaptor.capture());
+            Mockito.verify(mMockPrefVoiceAssistanceAlexa, Mockito.times(1))
+                    .setOnPreferenceClickListener(clickListenerCaptor.capture());
 
             // Invoke Signout preference by clicking on it.
             Assert.assertTrue(clickListenerCaptor.getValue().onPreferenceClick(mMockPrefVoiceAssistanceAlexa));
@@ -367,17 +350,11 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
     public void testNonAlexaPreference() {
         try (MockedStatic<ModuleProvider> mockModuleProvider = Mockito.mockStatic(ModuleProvider.class)) {
             // Prepare
-            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext))
-                    .thenReturn(true);
-            Mockito.when(mMockAssistantManager.getAssistantsState())
-                    .thenReturn(BOTH_ENABLED);
-            Mockito.when(mMockNavController.getNavInflater())
-                    .thenReturn(mMockNavInflater);
-            Mockito.when(mMockNavInflater.inflate(0))
-                    .thenReturn(mMockNavGraph);
-            Mockito.when(mMockSettingsProvider.getSettingResId(NONALEXA))
-                    .thenReturn(1);
-
+            mockModuleProvider.when(() -> ModuleProvider.isAlexaCustomAssistantEnabled(mMockContext)).thenReturn(true);
+            Mockito.when(mMockAssistantManager.getAssistantsState()).thenReturn(BOTH_ENABLED);
+            Mockito.when(mMockNavController.getNavInflater()).thenReturn(mMockNavInflater);
+            Mockito.when(mMockNavInflater.inflate(0)).thenReturn(mMockNavGraph);
+            Mockito.when(mMockSettingsProvider.getSettingResId(NONALEXA)).thenReturn(1);
 
             mClassUnderTest.addRemovePreferences(mMockPrefScreen);
 
@@ -387,7 +364,8 @@ public class VoiceAssistanceSettingsScreenBuilderTest {
             // Verify
             ArgumentCaptor<Preference.OnPreferenceClickListener> clickListenerCaptor =
                     ArgumentCaptor.forClass(Preference.OnPreferenceClickListener.class);
-            Mockito.verify(mMockPrefVoiceAssistanceNonAlexa, Mockito.times(1)).setOnPreferenceClickListener(clickListenerCaptor.capture());
+            Mockito.verify(mMockPrefVoiceAssistanceNonAlexa, Mockito.times(1))
+                    .setOnPreferenceClickListener(clickListenerCaptor.capture());
 
             // Invoke Signout preference by clicking on it.
             Assert.assertTrue(clickListenerCaptor.getValue().onPreferenceClick(mMockPrefVoiceAssistanceNonAlexa));

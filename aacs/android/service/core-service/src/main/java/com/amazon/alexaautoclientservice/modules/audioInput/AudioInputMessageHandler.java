@@ -28,7 +28,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import com.amazon.aace.aasb.AASBStream;
+import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.Action;
@@ -61,8 +61,8 @@ public class AudioInputMessageHandler {
     private AACSSender mAACSSender;
     private TargetComponent mCommsExternalSourceTarget;
     private TargetComponent mVoiceExternalSourceTarget;
-    private AASBStream mCommsStream;
-    private AASBStream mVoiceStream;
+    private MessageStream mCommsStream;
+    private MessageStream mVoiceStream;
     private AudioReader mReader;
     private HashMap<String, String> mStreamIdToTypeMap;
     private HashMap<String, AudioReader> mStreamIdToReaderMap; // EXTERNAL case only
@@ -163,9 +163,9 @@ public class AudioInputMessageHandler {
 
     private AudioReader setupStreamsAndReader(String audioType, String streamId, AudioSourceType sourceType) {
         if (audioType.equals(AASBConstants.AudioInput.AudioType.COMMUNICATION) && mCommsStream == null) {
-            mCommsStream = mAASBHandler.openStream(streamId, AASBStream.Mode.WRITE);
+            mCommsStream = mAASBHandler.openStream(streamId, MessageStream.Mode.WRITE);
         } else if (audioType.equals(AASBConstants.AudioInput.AudioType.VOICE) && mVoiceStream == null) {
-            mVoiceStream = mAASBHandler.openStream(streamId, AASBStream.Mode.WRITE);
+            mVoiceStream = mAASBHandler.openStream(streamId, MessageStream.Mode.WRITE);
         }
         mStreamIdToTypeMap.put(streamId, audioType);
 

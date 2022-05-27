@@ -31,6 +31,12 @@ public:
     MOCK_METHOD2(
         connectionStatusChanged,
         void(aace::alexa::AlexaClient::ConnectionStatus, aace::alexa::AlexaClient::ConnectionChangedReason));
+    MOCK_METHOD3(
+        connectionStatusChanged,
+        void(
+            aace::alexa::AlexaClient::ConnectionStatus,
+            aace::alexa::AlexaClient::ConnectionChangedReason,
+            std::vector<aace::alexa::AlexaClient::ConnectionStatusInfo>));
 };
 
 }  // namespace alexa

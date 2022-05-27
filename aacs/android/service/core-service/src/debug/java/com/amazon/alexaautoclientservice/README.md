@@ -36,17 +36,17 @@ To manage instrumentation, use the Android activity manager through the Android 
 
 * To start instrumentation, enter the following command:
   
-  `adb shell am broadcast -a com.amazon.aacs.startinstrumentation -n com.amazon.alexaautoclientservice/.receiver.InstrumentationReceiver`
+    `adb shell am broadcast -a com.amazon.aacs.startinstrumentation -n com.amazon.alexaautoclientservice/.receiver.InstrumentationReceiver`
 
 * To stop instrumentation, enter the following command:
   
-  `adb shell am broadcast -a com.amazon.aacs.stopinstrumentation -n com.amazon.alexaautoclientservice/.receiver.InstrumentationReceiver`
+    `adb shell am broadcast -a com.amazon.aacs.stopinstrumentation -n com.amazon.alexaautoclientservice/.receiver.InstrumentationReceiver`
 
 * To specify the log file location, enter the following command. In this example, the log file location is `/sdcard/Log/aacs.log`.
   
-  `adb shell am broadcast -a com.amazon.aacs.startinstrumentation -n com.amazon.alexaautoclientservice/.receiver.InstrumentationReceiver  --es fileLocation "/sdcard/Log/aacs.log"`
+    `adb shell am broadcast -a com.amazon.aacs.startinstrumentation -n com.amazon.alexaautoclientservice/.receiver.InstrumentationReceiver  --es fileLocation "/sdcard/Log/aacs.log"`
 
-  By default, the location is `/sdcard`. 
+    By default, the location is `/sdcard`. 
 
 ## Sample Log File
 The following is an instrumentation log file example:

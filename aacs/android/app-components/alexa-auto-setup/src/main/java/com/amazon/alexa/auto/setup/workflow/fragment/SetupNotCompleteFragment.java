@@ -1,4 +1,25 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
+
+import static com.amazon.alexa.auto.apps.common.Constants.ALEXA;
+import static com.amazon.alexa.auto.apps.common.Constants.ALEXA_AND_PTT;
+import static com.amazon.alexa.auto.apps.common.Constants.NONALEXA;
+import static com.amazon.alexa.auto.apps.common.Constants.NONALEXA_AND_PTT;
+import static com.amazon.alexa.auto.setup.workflow.event.VoiceAssistanceEvent.ALEXA_ONLY;
+import static com.amazon.alexa.auto.setup.workflow.event.VoiceAssistanceEvent.NON_ALEXA_ONLY;
 
 import android.app.Application;
 import android.content.Context;
@@ -24,13 +45,6 @@ import com.amazon.alexa.auto.apis.setup.AlexaSetupWorkflowController;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.setup.R;
 
-import static com.amazon.alexa.auto.apps.common.Constants.ALEXA;
-import static com.amazon.alexa.auto.apps.common.Constants.ALEXA_AND_PTT;
-import static com.amazon.alexa.auto.apps.common.Constants.NONALEXA;
-import static com.amazon.alexa.auto.apps.common.Constants.NONALEXA_AND_PTT;
-import static com.amazon.alexa.auto.setup.workflow.event.VoiceAssistanceEvent.ALEXA_ONLY;
-import static com.amazon.alexa.auto.setup.workflow.event.VoiceAssistanceEvent.NON_ALEXA_ONLY;
-
 /**
  * Fragment to support errors during the setup process
  */
@@ -44,8 +58,7 @@ public class SetupNotCompleteFragment extends Fragment {
     /**
      * Constructs an instance of SetupNotCompleteFragment.
      */
-    public SetupNotCompleteFragment() {
-    }
+    public SetupNotCompleteFragment() {}
 
     @VisibleForTesting
     SetupNotCompleteFragment(@NonNull NavController navController, @NonNull Application application) {
@@ -90,8 +103,7 @@ public class SetupNotCompleteFragment extends Fragment {
         TextView tryAlexaButtonView = fragmentView.findViewById(R.id.setup_not_complete_retry_button);
         tryAlexaButtonView.setOnClickListener(view -> {
             if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
-                SetupProvider setupProvider =
-                        mApp.getRootComponent().getComponent(SetupProvider.class).get();
+                SetupProvider setupProvider = mApp.getRootComponent().getComponent(SetupProvider.class).get();
                 NavGraph graph = mNavController.getNavInflater().inflate(setupProvider.getCustomSetupNavigationGraph());
 
                 // get current setup flow here
@@ -100,9 +112,7 @@ public class SetupNotCompleteFragment extends Fragment {
                 }
 
                 graph.setStartDestination(
-                        setupProvider.getSetupWorkflowStartDestinationByKey(
-                                mSetupController.getCurrentSetupFlow()
-                        ));
+                        setupProvider.getSetupWorkflowStartDestinationByKey(mSetupController.getCurrentSetupFlow()));
                 mNavController.setGraph(graph);
 
                 mApp.getRootComponent()
@@ -113,17 +123,16 @@ public class SetupNotCompleteFragment extends Fragment {
                             switch (mSetupController.getCurrentSetupFlow()) {
                                 case ALEXA:
                                 case ALEXA_AND_PTT:
-                                    alexaSetupWorkflowController.startSetupWorkflow(getContext(),
-                                            mNavController, ALEXA_ONLY);
+                                    alexaSetupWorkflowController.startSetupWorkflow(
+                                            getContext(), mNavController, ALEXA_ONLY);
                                     break;
                                 case NONALEXA:
                                 case NONALEXA_AND_PTT:
-                                    alexaSetupWorkflowController.startSetupWorkflow(getContext(),
-                                            mNavController, NON_ALEXA_ONLY);
+                                    alexaSetupWorkflowController.startSetupWorkflow(
+                                            getContext(), mNavController, NON_ALEXA_ONLY);
                                     break;
                                 default:
-                                    alexaSetupWorkflowController.startSetupWorkflow(getContext(),
-                                            mNavController, null);
+                                    alexaSetupWorkflowController.startSetupWorkflow(getContext(), mNavController, null);
                             }
                         });
             } else {
@@ -131,8 +140,7 @@ public class SetupNotCompleteFragment extends Fragment {
                         .getComponent(AlexaSetupWorkflowController.class)
                         .ifPresent(alexaSetupWorkflowController -> {
                             alexaSetupWorkflowController.stopSetupWorkflow();
-                            alexaSetupWorkflowController.startSetupWorkflow(getContext(),
-                                    mNavController, null);
+                            alexaSetupWorkflowController.startSetupWorkflow(getContext(), mNavController, null);
                         });
             }
         });
@@ -149,4 +157,3 @@ public class SetupNotCompleteFragment extends Fragment {
         return app.getRootComponent().getComponent(SetupController.class).orElse(null);
     }
 }
-

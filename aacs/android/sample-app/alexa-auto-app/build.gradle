@@ -9,7 +9,7 @@ android {
         applicationId "com.amazon.alexa.auto.app"
         minSdkVersion 27
         versionCode 1
-        versionName "4.0"
+        versionName "4.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -66,11 +66,11 @@ android {
         doNotStrip '**/*.so'
     }
 
-    ndkVersion = "20.0.5594570"
+    ndkVersion = "21.4.7075529"
 }
 
 ext {
-    remoteLibVersion = "4.0+"
+    remoteLibVersion = "4.1+"
 }
 dependencies {
     def tasks = gradle.startParameter.getTaskNames()
@@ -142,12 +142,24 @@ dependencies {
 
     // AACS module factories.
     for (extra_module_factory_name in gradle.ext.extra_module_factory_names) {
+        println "Loaded module factory: $extra_module_factory_name"
         implementation project(':' + extra_module_factory_name)
     }
 
     // Extra modules for AACS Sample App Projects.
     for (extra_module_project_name in gradle.ext.extra_module_project_names) {
         implementation project(':' + extra_module_project_name)
+    }
+
+    // Extra app components for AACS Sample App Projects.
+    for (extra_app_component_name in gradle.ext.extra_app_component_names) {
+        println "Loaded extra app component: ${extra_app_component_name}"
+        implementation project(':' + extra_app_component_name)
+    }
+
+    // Extra app components dependencies
+    for (extra_app_component_dependency in gradle.ext.extra_app_component_dependencies) {
+        implementation fileTree(include: ['*.aar'], dir: extra_app_component_dependency)
     }
 
     // AndroidX dependencies
@@ -182,4 +194,11 @@ dependencies {
     testImplementation deps.androidx_test_core
     testImplementation deps.androidx_arch_core_testing
     testImplementation deps.roboelectric
+}
+
+tasks.whenTaskAdded { task ->
+    if ((task.name == 'assembleLocalDebug' || task.name == 'assembleLocalRelease')
+            && !project.hasProperty("skipDeps")) {
+        delete gradle.ext.aarDir
+    }
 }

@@ -79,53 +79,77 @@ public class CarControlHandlerTests {
         mMockedHelper = PowerMockito.mock(CarControlHelper.class);
         mCarControlHandler = new CarControlHandler(mMockedContext, mMockedCarManager, mMockedHelper);
 
-        PowerMockito.doNothing().when(mMockedCarManager).setBooleanProperty(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyBoolean());
-        PowerMockito.doNothing().when(mMockedCarManager).setIntProperty(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt());
-        PowerMockito.doNothing().when(mMockedCarManager).setFloatProperty(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyFloat());
+        PowerMockito.doNothing()
+                .when(mMockedCarManager)
+                .setBooleanProperty(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyBoolean());
+        PowerMockito.doNothing()
+                .when(mMockedCarManager)
+                .setIntProperty(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyInt());
+        PowerMockito.doNothing()
+                .when(mMockedCarManager)
+                .setFloatProperty(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyFloat());
 
         mModeList = new ArrayList<>();
-        mModeList.add(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_MAX_AC_ON, AREA_ID_FULL, CarControlConstants.DataType.BOOLEAN, "true"));
-        mModeList.add(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, CarControlConstants.DataType.INT, "6"));
-        mModeList.add(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_TEMPERATURE_SET, AREA_ID_LEFT, CarControlConstants.DataType.FLOAT, "60.0"));
-        mModeList.add(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_TEMPERATURE_SET, AREA_ID_RIGHT, CarControlConstants.DataType.FLOAT, "60.0"));
+        mModeList.add(new CarControlHelper.PropertySetting(
+                PROPERTY_ID_HVAC_MAX_AC_ON, AREA_ID_FULL, CarControlConstants.DataType.BOOLEAN, "true"));
+        mModeList.add(new CarControlHelper.PropertySetting(
+                PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, CarControlConstants.DataType.INT, "6"));
+        mModeList.add(new CarControlHelper.PropertySetting(
+                PROPERTY_ID_HVAC_TEMPERATURE_SET, AREA_ID_LEFT, CarControlConstants.DataType.FLOAT, "60.0"));
+        mModeList.add(new CarControlHelper.PropertySetting(
+                PROPERTY_ID_HVAC_TEMPERATURE_SET, AREA_ID_RIGHT, CarControlConstants.DataType.FLOAT, "60.0"));
     }
 
     @Test
-    public void setPowerControllerWithValidParam () {
-        PowerMockito.when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_POWER_ON, AREA_ID_FULL, CarControlConstants.DataType.BOOLEAN, ""));
+    public void setPowerControllerWithValidParam() {
+        PowerMockito
+                .when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new CarControlHelper.PropertySetting(
+                        PROPERTY_ID_HVAC_POWER_ON, AREA_ID_FULL, CarControlConstants.DataType.BOOLEAN, ""));
 
         // Test Set Power Controller
         Assert.assertTrue(mCarControlHandler.changePowerController(DEFAULT_FAN_ENDPOINT, true));
-        Mockito.verify(mMockedCarManager, Mockito.times(1)).setBooleanProperty(PROPERTY_ID_HVAC_POWER_ON, AREA_ID_FULL, true);
+        Mockito.verify(mMockedCarManager, Mockito.times(1))
+                .setBooleanProperty(PROPERTY_ID_HVAC_POWER_ON, AREA_ID_FULL, true);
         Assert.assertTrue(mCarControlHandler.changePowerController(DEFAULT_FAN_ENDPOINT, false));
-        Mockito.verify(mMockedCarManager, Mockito.times(1)).setBooleanProperty(PROPERTY_ID_HVAC_POWER_ON, AREA_ID_FULL, false);
+        Mockito.verify(mMockedCarManager, Mockito.times(1))
+                .setBooleanProperty(PROPERTY_ID_HVAC_POWER_ON, AREA_ID_FULL, false);
     }
     @Test
-    public void setToggleControllerWithValidParam () {
-        PowerMockito.when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_RECIRC_ON, AREA_ID_FULL, CarControlConstants.DataType.BOOLEAN, ""));
+    public void setToggleControllerWithValidParam() {
+        PowerMockito
+                .when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new CarControlHelper.PropertySetting(
+                        PROPERTY_ID_HVAC_RECIRC_ON, AREA_ID_FULL, CarControlConstants.DataType.BOOLEAN, ""));
         // Test Set Toggle Controller
         Assert.assertTrue(mCarControlHandler.changeToggleController(CAR_ENDPOINT, RECIR_INSTANCE, true));
-        Mockito.verify(mMockedCarManager, Mockito.times(1)).setBooleanProperty(PROPERTY_ID_HVAC_RECIRC_ON, AREA_ID_FULL, true);
+        Mockito.verify(mMockedCarManager, Mockito.times(1))
+                .setBooleanProperty(PROPERTY_ID_HVAC_RECIRC_ON, AREA_ID_FULL, true);
         Assert.assertTrue(mCarControlHandler.changeToggleController(CAR_ENDPOINT, RECIR_INSTANCE, false));
-        Mockito.verify(mMockedCarManager, Mockito.times(1)).setBooleanProperty(PROPERTY_ID_HVAC_RECIRC_ON, AREA_ID_FULL, false);
+        Mockito.verify(mMockedCarManager, Mockito.times(1))
+                .setBooleanProperty(PROPERTY_ID_HVAC_RECIRC_ON, AREA_ID_FULL, false);
     }
 
     @Test
-    public void setModeControllerWithValidParam () {
-        PowerMockito.when(mMockedHelper.getPropertySettings(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+    public void setModeControllerWithValidParam() {
+        PowerMockito
+                .when(mMockedHelper.getPropertySettings(
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mModeList);
         // Test Set Mode Controller
-        Assert.assertTrue(mCarControlHandler.setModeControllerValue(DEFAULT_AC_ENDPOINT, INTENSITY_INSTANCE, HIGH_VALUE));
-        Mockito.verify(mMockedCarManager, Mockito.times(1)).setBooleanProperty(PROPERTY_ID_HVAC_MAX_AC_ON, AREA_ID_FULL, true);
+        Assert.assertTrue(
+                mCarControlHandler.setModeControllerValue(DEFAULT_AC_ENDPOINT, INTENSITY_INSTANCE, HIGH_VALUE));
+        Mockito.verify(mMockedCarManager, Mockito.times(1))
+                .setBooleanProperty(PROPERTY_ID_HVAC_MAX_AC_ON, AREA_ID_FULL, true);
         Mockito.verify(mMockedCarManager, Mockito.times(1)).setIntProperty(PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, 6);
     }
 
     @Test
-    public void setRangeControllerWithValidParam () {
-        PowerMockito.when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, CarControlConstants.DataType.INT, ""));
+    public void setRangeControllerWithValidParam() {
+        PowerMockito
+                .when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new CarControlHelper.PropertySetting(
+                        PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, CarControlConstants.DataType.INT, ""));
         // Test Set Range Controller
         Assert.assertTrue(mCarControlHandler.setRangeControllerValue(DEFAULT_FAN_ENDPOINT, SPEED_INSTANCE, 3.0));
         Mockito.verify(mMockedCarManager, Mockito.times(1)).setIntProperty(PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, 3);
@@ -133,8 +157,10 @@ public class CarControlHandlerTests {
 
     public void adjustRangeControllerWithValidParam() {
         // Test Adjust Range Controller
-        PowerMockito.when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(new CarControlHelper.PropertySetting(PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, CarControlConstants.DataType.INT, ""));
+        PowerMockito
+                .when(mMockedHelper.getPropertySetting(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new CarControlHelper.PropertySetting(
+                        PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, CarControlConstants.DataType.INT, ""));
         Assert.assertTrue(mCarControlHandler.adjustRangeControllerValue(DEFAULT_FAN_ENDPOINT, SPEED_INSTANCE, 1.0));
         Mockito.verify(mMockedCarManager, Mockito.times(1)).setIntProperty(PROPERTY_ID_HVAC_FAN_SPEED, AREA_ID_FULL, 4);
         Assert.assertTrue(mCarControlHandler.adjustRangeControllerValue(DEFAULT_FAN_ENDPOINT, SPEED_INSTANCE, -1.0));
@@ -152,17 +178,22 @@ public class CarControlHandlerTests {
         Assert.assertFalse(mCarControlHandler.changeToggleController(INVALID_CAR_ENDPOINT, RECIR_INSTANCE, false));
 
         // Test Set Range Controller
-        Assert.assertFalse(mCarControlHandler.setRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 3.0));
-        Assert.assertFalse(mCarControlHandler.setRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 6.0));
+        Assert.assertFalse(
+                mCarControlHandler.setRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 3.0));
+        Assert.assertFalse(
+                mCarControlHandler.setRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 6.0));
 
         // Test Set Mode Controller
-        Assert.assertFalse(mCarControlHandler.setModeControllerValue(DEFAULT_AC_ENDPOINT, INTENSITY_INSTANCE, SUPERHIGH_VALUE));
+        Assert.assertFalse(
+                mCarControlHandler.setModeControllerValue(DEFAULT_AC_ENDPOINT, INTENSITY_INSTANCE, SUPERHIGH_VALUE));
     }
 
     @Test
     public void adjustControllerWithInvalidParam() {
         // Test Adjust Range Controller
-        Assert.assertFalse(mCarControlHandler.adjustRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 3.0));
-        Assert.assertFalse(mCarControlHandler.adjustRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 6.0));
+        Assert.assertFalse(
+                mCarControlHandler.adjustRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 3.0));
+        Assert.assertFalse(
+                mCarControlHandler.adjustRangeControllerValue(DEFAULT_FAN_ENDPOINT, INVALID_SPEED_INSTANCE, 6.0));
     }
 }

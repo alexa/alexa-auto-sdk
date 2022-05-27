@@ -1,3 +1,17 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.media.player;
 
 import android.content.Context;
@@ -65,23 +79,24 @@ public class MediaSourceFactory {
         switch (type) {
             case DASH:
                 Log.d(TAG, "dash");
-                DashMediaSource dashMediaSource = new DashMediaSource
-                        .Factory(new DefaultDashChunkSource.Factory(dataSourceFactory), dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                DashMediaSource dashMediaSource =
+                        new DashMediaSource
+                                .Factory(new DefaultDashChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+                                .createMediaSource(mediaItem);
                 dashMediaSource.addEventListener(handler, mediaSourceListener);
                 return dashMediaSource;
             case SMOOTH_STREAMING:
                 Log.d(TAG, "smooth streaming");
-                SsMediaSource ssMediaSource = new SsMediaSource
-                        .Factory(new DefaultSsChunkSource.Factory(dataSourceFactory), dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                SsMediaSource ssMediaSource =
+                        new SsMediaSource
+                                .Factory(new DefaultSsChunkSource.Factory(dataSourceFactory), dataSourceFactory)
+                                .createMediaSource(mediaItem);
                 ssMediaSource.addEventListener(handler, mediaSourceListener);
                 return ssMediaSource;
             case HLS:
                 Log.d(TAG, "hls");
-                HlsMediaSource hlsMediaSource = new HlsMediaSource
-                        .Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                HlsMediaSource hlsMediaSource =
+                        new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem);
                 hlsMediaSource.addEventListener(handler, mediaSourceListener);
                 return hlsMediaSource;
             case M3U:
@@ -91,9 +106,8 @@ public class MediaSourceFactory {
                 return createMediaSource(parsedUri, dataSourceFactory, mediaSourceListener, handler, playlistParser);
             case OTHER:
                 Log.d(TAG, "other");
-                ProgressiveMediaSource progressiveMediaSource = new ProgressiveMediaSource
-                        .Factory(dataSourceFactory)
-                        .createMediaSource(mediaItem);
+                ProgressiveMediaSource progressiveMediaSource =
+                        new ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem);
                 progressiveMediaSource.addEventListener(handler, mediaSourceListener);
                 return progressiveMediaSource;
             default:

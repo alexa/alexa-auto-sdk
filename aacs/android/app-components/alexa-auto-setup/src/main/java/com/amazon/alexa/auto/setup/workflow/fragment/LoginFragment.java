@@ -1,4 +1,23 @@
+/*
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *     http://aws.amazon.com/apache2.0/
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 package com.amazon.alexa.auto.setup.workflow.fragment;
+
+import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
+import static com.amazon.alexa.auto.app.common.util.ViewUtils.toggleViewVisibility;
+import static com.amazon.alexa.auto.apps.common.util.LocaleUtil.getLocalizedDomain;
+import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
 
 import android.app.Application;
 import android.content.Context;
@@ -10,13 +29,14 @@ import android.os.LocaleList;
 import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,26 +47,24 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.amazon.aacsconstants.FeatureDiscoveryConstants;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthWorkflowData;
 import com.amazon.alexa.auto.apis.auth.CodePair;
+import com.amazon.alexa.auto.apps.common.util.FeatureDiscoveryUtil;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
+import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
 import com.amazon.alexa.auto.setup.R;
+import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
+import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
 import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
 import com.amazon.alexa.auto.setup.workflow.event.LoginEvent;
 import com.amazon.alexa.auto.setup.workflow.util.QRCodeGenerator;
-import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
-import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
-import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import javax.inject.Inject;
 
 import org.greenrobot.eventbus.EventBus;
 
-import static com.amazon.alexa.auto.app.common.util.ViewUtils.toggleViewVisibility;
-import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
-import static com.amazon.alexa.auto.apps.common.util.LocaleUtil.getLocalizedDomain;
-import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
+import javax.inject.Inject;
 
 /**
  * Fragment for displaying Login screen and different options to login.
@@ -144,9 +162,7 @@ public class LoginFragment extends Fragment {
             tryAlexaButtonView.setOnClickListener(view -> {
                 updateSpinnerVisibility(View.VISIBLE);
                 Handler handler = new Handler();
-                handler.postDelayed(() ->
-                                mNavController.navigate(R.id.navigation_fragment_enablePreviewMode),
-                        2000);
+                handler.postDelayed(() -> mNavController.navigate(R.id.navigation_fragment_enablePreviewMode), 2000);
             });
         }
     }
@@ -163,6 +179,7 @@ public class LoginFragment extends Fragment {
                 Preconditions.checkNotNull(loginData.getCodePair());
 
                 updateQRCodeContainerVisibility(View.VISIBLE);
+                modifyBackButtonVisibility(View.VISIBLE);
                 updateSpinnerVisibility(View.GONE);
                 updateLoginInContainerVisibility(View.GONE);
                 updateCBLCodePair(loginData.getCodePair());
@@ -207,6 +224,19 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.login_display_cbl_code_layout).setVisibility(visible);
     }
 
+    /**
+     * The back button behavior is globally handled at the Activity level. This method is
+     * to modify back button visibility for a specific view since there are multiple views within
+     * the same fragment
+     */
+    private void modifyBackButtonVisibility(int visible) {
+        View view = requireView();
+        ((LinearLayout) view.getParent().getParent().getParent())
+                .findViewWithTag("navbar")
+                .findViewWithTag("nav_back_button")
+                .setVisibility(visible);
+    }
+
     private void setCBLCodeText(String cblCode) {
         View view = requireView();
         TextView cblCodeTextView = view.findViewById(R.id.cbl_code);
@@ -249,5 +279,4 @@ public class LoginFragment extends Fragment {
     boolean isPreviewModeEnabled(@NonNull Context context) {
         return ModuleProvider.isPreviewModeEnabled(context);
     }
-
 }

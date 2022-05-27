@@ -142,7 +142,8 @@ bool NetworkEngineService::setProperty_httpProxyHeaders(
     const SetPropertyResultCallback& callbackFunction) {
     try {
         AACE_INFO(LX(TAG).sensitive("value", value));
-        ThrowIfNot(m_networkInfoProviderEngineImpl->setNetworkHttpProxyHeader(value), "setNetworkHttpProxyHeaderFailed");
+        ThrowIfNot(
+            m_networkInfoProviderEngineImpl->setNetworkHttpProxyHeader(value), "setNetworkHttpProxyHeaderFailed");
         changed = true;
         return true;
     } catch (std::exception& ex) {

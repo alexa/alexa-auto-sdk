@@ -1,5 +1,13 @@
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
 import android.view.View;
 import android.widget.TextView;
@@ -27,14 +35,6 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @RunWith(RobolectricTestRunner.class)
 public class CBLLoginErrorFragmentTest {
     @Mock
@@ -55,9 +55,8 @@ public class CBLLoginErrorFragmentTest {
 
     @Test
     public void testOnFragmentLoad_inflatesCBLLoginErrorView() {
-        FragmentScenario<CBLLoginErrorFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(CBLLoginErrorFragment.class, null,
-                        new CBLLoginErrorFragmentFactory());
+        FragmentScenario<CBLLoginErrorFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                CBLLoginErrorFragment.class, null, new CBLLoginErrorFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -69,9 +68,8 @@ public class CBLLoginErrorFragmentTest {
 
     @Test
     public void testOnClickTryAgain_resetsSetupWorkflow() {
-        FragmentScenario<CBLLoginErrorFragment> fragmentScenario =
-                FragmentScenario.launchInContainer(CBLLoginErrorFragment.class, null,
-                        new CBLLoginErrorFragmentFactory());
+        FragmentScenario<CBLLoginErrorFragment> fragmentScenario = FragmentScenario.launchInContainer(
+                CBLLoginErrorFragment.class, null, new CBLLoginErrorFragmentFactory());
 
         fragmentScenario.onFragment(fragment -> {
             View view = fragment.getView();
@@ -79,11 +77,9 @@ public class CBLLoginErrorFragmentTest {
             TextView tryAgainButton = view.findViewById(R.id.cbl_retry_button);
             tryAgainButton.performClick();
 
-            verify(mMockRootComponent, times(1))
-                    .getComponent(AlexaSetupWorkflowController.class);
+            verify(mMockRootComponent, times(1)).getComponent(AlexaSetupWorkflowController.class);
             verify(alexaSetupWorkflowController, times(1)).stopSetupWorkflow();
-            verify(alexaSetupWorkflowController, times(1))
-                    .startSetupWorkflow(any(), eq(mMockNavController), eq(null));
+            verify(alexaSetupWorkflowController, times(1)).startSetupWorkflow(any(), eq(mMockNavController), eq(null));
         });
     }
 

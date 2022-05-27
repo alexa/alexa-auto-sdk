@@ -88,7 +88,7 @@ public class MediaAppsDirectivesHandler implements MediaAppsConnectionListener {
             } else {
                 if (isAppInstalled(mContext, mediaApp.getLocalPlayerId())) {
                     Log.i(TAG, "handleDirective| app is already installed trying to connect");
-                    mediaApp.connect(this);
+                    mMainThreadDirectivesHandler.post(() -> mediaApp.connect(MediaAppsDirectivesHandler.this));
                     mCachedDirective = directive;
                 } else {
                     Log.i(TAG, "error");

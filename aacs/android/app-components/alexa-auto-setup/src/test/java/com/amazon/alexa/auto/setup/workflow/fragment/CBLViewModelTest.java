@@ -3,6 +3,7 @@ package com.amazon.alexa.auto.setup.workflow.fragment;
 import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS;
 import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS_END;
 import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.EARCON_SETTINGS_START;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.times;

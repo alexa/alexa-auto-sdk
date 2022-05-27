@@ -10,12 +10,12 @@ The AACS Telephony library is an Android library for you to pre-integrate Alexa 
 - [Setup for AACS Telephony Library](#setup-for-aacs-telephony-library)
 - [Sequence Diagram](#sequence-diagram)
 - [Phone Call Controlling](#phone-call-controlling)
-  - [Answer](#answer)
-  - [Dial](#dial)
-  - [Redial](#redial)
-  - [SendDTMF](#senddtmf)
-  - [Stop](#stop)
-  - [Update Device Configuration](#update-device-configuration)
+      - [Answer](#answer)
+      - [Dial](#dial)
+      - [Redial](#redial)
+      - [SendDTMF](#senddtmf)
+      - [Stop](#stop)
+      - [Update Device Configuration](#update-device-configuration)
 - [(Optional) Receiving Device Connection Changes](#optional-receiving-device-connection-changes)
 - [Known Issue](#known-issue)
 
@@ -24,13 +24,13 @@ The AACS Telephony library is an Android library for you to pre-integrate Alexa 
 AACS Telephony Library is responsible for communicating with the AACS Core Service and initiating the corresponding actions based on the incoming directives from the Engine. The following list describes its major components that carry out these responsibilities: 
 
 * The AACS Telephony Service is responsible for:
-  * Receiving and processing `PhoneCallController` AASB message intents from the AACS Core Service.
-  * Receiving defined intents from your application for specific actions, such as providing the proper Phone Account Handler to be used to place a call.
+    * Receiving and processing `PhoneCallController` AASB message intents from the AACS Core Service.
+    * Receiving defined intents from your application for specific actions, such as providing the proper Phone Account Handler to be used to place a call.
 
 * The AACS Telephony platform implementation (`PhoneCallController`) with the Android telephony framework is responsible for:
-  * Fulfilling the phone-call-related directives, which are received as intents by the AACS Telephony Service 
-  * Capturing and reporting call state changes to the AACS Core Service
-  * Capturing and reporting Bluetooth connection state changes to the AACS Core Service, and broadcasting the changes to any client listeners
+    * Fulfilling the phone-call-related directives, which are received as intents by the AACS Telephony Service 
+    * Capturing and reporting call state changes to the AACS Core Service
+    * Capturing and reporting Bluetooth connection state changes to the AACS Core Service, and broadcasting the changes to any client listeners
 
 The AACS Telephony Library is an optional module, which you can use as is or as a reference when you integrate the Phone Call Controller module with AACS. You can enable it in the AACS Sample App or in your application APK.
 
@@ -41,6 +41,7 @@ The AACS Telephony Library is an optional module, which you can use as is or as 
 
 ## Building the Library
 You can build the library locally using the following steps:
+
   1) Enter the following command to change the directory:
 ~~~
     cd ${AAC_SDK_HOME}/aacs/android/sample-app
@@ -56,6 +57,7 @@ You must include the `AACSIPC`, `AACSConstants`, `AACSCommonUtils`, `AACS` and `
 
 
 To enable telephony support in the AACS Sample App, follow these steps:
+
 1) Enter the following command to change the directory:
 ~~~
     cd ${AAC_SDK_HOME}/aacs/android/sample-app
@@ -69,10 +71,10 @@ For more build options, see the [AACS Sample App README](../../sample-app/README
 ## Setup for AACS Telephony Library
 Before using the AACS Telephony Library, follow these major steps:
 
-1) Make the application containing the library into a system-privileged application.
-2) Provide the library with appropriate system permissions.
-3) Provide permission in your application's Android manifest so that the AACS Telephony Service can be started by your application.
-4) Specify targets for intents from the AACS Core Service.
+1. Make the application containing the library into a system-privileged application.
+2. Provide the library with appropriate system permissions.
+3. Provide permission in your application's Android manifest so that the AACS Telephony Service can be started by your application.
+4. Specify targets for intents from the AACS Core Service.
 
 ### Making Application into a System-Privileged App
 
@@ -126,9 +128,7 @@ The AACS Telephony Service listens to intents from the AACS Core Service with th
 ## Sequence Diagram
 The following sequence diagram illustrates the flow when the driver initiates a call with Alexa if the AACS Telephony Library is used.
 
-<p>
-<img src="./assets/AACSTelephony_initiateCall.png" />
-</p>
+![AACS Initiate Call](./docs/diagrams/AACSTelephony_initiateCall.png)
 
 ## Phone Call Controlling
 
@@ -143,6 +143,7 @@ When a user asks Alexa to answer a call, the AACS Telephony Library answers the 
 When a user asks Alexa to dial a number or call an uploaded contact, the AACS Telephony Service calls the Android API [getDefaultOutgoingPhoneAccount](https://developer.android.com/reference/android/telecom/TelecomManager#getDefaultOutgoingPhoneAccount(java.lang.String)) to determine the proper [PhoneAccountHandle](https://developer.android.com/reference/android/telecom/PhoneAccountHandle) to use for initiating the call. 
 
 The specific account returned by `getDefaultOutgoingPhoneAccount` depends on the following priorities:
+
 * If the user-selected default PhoneAccount supports the specified scheme, it will be returned.
 * If there exists only one PhoneAccount that supports the specified scheme, it will be returned.
 
@@ -172,9 +173,9 @@ Use one of the following methods to update the device configuration:
 
 * Use intent. Your application can send messages with a particular intent to the AACS Telephony Service to update the device configuration. Specify the attributes of the intent as follows:
 
-  * Action is `com.amazon.aacstelephony.updateDeviceConfiguration`.
-  * Category is `com.amazon.aacstelephony`.
-  * Extras is:
+    * Action is `com.amazon.aacstelephony.updateDeviceConfiguration`.
+    * Category is `com.amazon.aacstelephony`.
+    * Extras is:
 ```
         {
             "deviceProperty": "<Property name>",
@@ -206,7 +207,27 @@ The AACS Telephony Library not only detects and reports the Bluetooth connection
         "deviceAddress": "<Device Bluetooth MAC address>"
     }
 ```
-
+It also detects when a phone is being paired and sends an intent with the device name, address, and bond state to the listener. There are  3 different bond states while a phone is pairing: [BOND_BONDED](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#BOND_BONDED), [BOND_BONDING](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#BOND_BONDING), and [BOND_NONE](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#BOND_NONE).
+* Action is `com.amazon.aacstelephony.bluetooth.bondStateChanged` 
+* Category is `com.amazon.aacstelephony`
+* Extras is
+```  
+    {
+        "deviceName": "<Device name>",
+        "deviceAddress": "<Device Bluetooth MAC address>"
+        "bondState":<{BOND_BONDED, BOND_BONDING, or BOND_NONE}>
+    }
+```
+The action "com.amazon.aacstelephony.bluetooth.pairedDevice" is also broadcasted during the initial connection check to add devices to notify the client application of devices paired before signing into Alexa.
+* Action is `com.amazon.aacstelephony.bluetooth.pairedDevice` 
+* Category is `com.amazon.aacstelephony`
+* Extras is
+```  
+    {
+        "deviceName": "<Device name>",
+        "deviceAddress": "<Device Bluetooth MAC address>"
+    }
+```
 ## Known Issue
 
 * When there is an active phone call, and if the application (either AACS or your application) containing AACS Telephony Library crashes, when it comes back, the InCallService defined in AACS Telephony Library would not automatically rebound, and therefore you cannot control the active call with Alexa. This is due to the InCallService in this library is not with the default dialer. New calls after the crash would trigger the InCallService to rebind to the system and phone call controlling would work as usual. Besides, reconnecting Bluetooth also triggers a rebinding in this case. 

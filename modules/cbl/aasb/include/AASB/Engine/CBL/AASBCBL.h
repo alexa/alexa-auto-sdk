@@ -35,7 +35,8 @@ private:
     bool initialize(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker);
 
 public:
-    static std::shared_ptr<AASBCBL> create(std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker);
+    static std::shared_ptr<AASBCBL> create(
+        std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker);
 
     // aace::cbl::CBL
     void cblStateChanged(CBLState state, CBLStateChangedReason reason, const std::string& url, const std::string& code)

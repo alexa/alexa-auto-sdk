@@ -1,4 +1,5 @@
-# AACS Car Control
+# AACS Car Control <!-- omit in toc -->
+
 The AACS Car Control library is an Android library for the AACS Core Service to run car control commands in cars that are based on Android Automotive OS. A car control command is run by the AACS Core Service each time the user tries to voice-control a vehicle component.
 
 <!-- omit in toc -->
@@ -7,9 +8,9 @@ The AACS Car Control library is an Android library for the AACS Core Service to 
 - [Understanding Library Components](#understanding-library-components)
 - [Building the AACS Car Control Library](#building-the-aacs-car-control-library)
 - [Before Using the AACS Car Control Library](#before-using-the-aacs-car-control-library)
-  - [Including AACS Car Control Library in a System Application](#including-aacs-car-control-library-in-a-system-application)
-  - [Providing Permission in Android Manifest](#providing-permission-in-android-manifest)
-  - [Ensuring Intent Target Specified in the Library is Used](#ensuring-intent-target-specified-in-the-library-is-used)
+    - [Including AACS Car Control Library in a System Application](#including-aacs-car-control-library-in-a-system-application)
+    - [Providing Permission in Android Manifest](#providing-permission-in-android-manifest)
+    - [Ensuring Intent Target Specified in the Library is Used](#ensuring-intent-target-specified-in-the-library-is-used)
 - [Sequence Diagrams](#sequence-diagrams)
 - [How the AACS Car Control Library Works](#how-the-aacs-car-control-library-works)
   
@@ -25,25 +26,26 @@ The library is an optional module. You can build it into an Android archive (AAR
 The following list describes the purposes of the major components of the library: 
 
 * The AACS Car Control Broadcast Receiver:
-  * Receiving AASB `AdjustControllerValue` or `SetControllerValue` messages from the AACS Core Service.
-  * Instantiating the Car Control Handler to call specific controller operations. The exact operations supported depend on the controller type, which can be Power, Toggle, Mode, or Range.
+    * Receiving AASB `AdjustControllerValue` or `SetControllerValue` messages from the AACS Core Service.
+    * Instantiating the Car Control Handler to call specific controller operations. The exact operations supported depend on the controller type, which can be Power, Toggle, Mode, or Range.
 
 * The AACS Car Control platform implementation (`CarControlHandler`):
-  * Instantiating the Android Car object to be called in the set and adjust methods for each controller type.
-  * Defining the get and set methods for each controller type.
-  * Defining the adjust methods for the Range or Power Controller.
+    * Instantiating the Android Car object to be called in the set and adjust methods for each controller type.
+    * Defining the get and set methods for each controller type.
+    * Defining the adjust methods for the Range or Power Controller.
 
 * The AACS Car Control Helper/Util:
-  * Providing translation between [endpointID, controllerType, controllerID, value] in the AASB Car Control message from the Auto SDK Engine to [propertyId, areaId, value] used in the Android Automotive API call.
-  * Getting or saving the current Mode setting for the Mode Controller.
-  * Enabling you to parse an external configuration file if you want to use a customized `CarControlEndpointMapping.json` file.
+    * Providing translation between [endpointID, controllerType, controllerID, value] in the AASB Car Control message from the Auto SDK Engine to [propertyId, areaId, value] used in the Android Automotive API call.
+    * Getting or saving the current Mode setting for the Mode Controller.
+    * Enabling you to parse an external configuration file if you want to use a customized `CarControlEndpointMapping.json` file.
 
 * Car Control Endpoint Mapping configuration file maps [endpointID, controllerType, controllerID, value] from the Auto SDK Car Control Asset to [propertyId, areaId, value] used in the Android Automotive API call. 
 
-  A default `CarControlEndpointMapping.json` file is provided in the assets directory. Be sure to review `CarControlEndpointMapping.json` to verify that it contains values consistent with the ones specified in the [CarControlConfig.json file in the Car Control module](../../../../modules/car-control/assets/CarControlConfig.json). For example, if you have changed an `endpointId` in `CarControlConfig.json` from `"default.light"` to `"default.roof.light"`, the `CarControlEndpointMapping.json` file must contain the same endpoint mapping information.
+    A default `CarControlEndpointMapping.json` file is provided in the assets directory. Be sure to review `CarControlEndpointMapping.json` to verify that it contains values consistent with the ones specified in the [CarControlConfig.json file in the Car Control module](https://github.com/alexa/alexa-auto-sdk/blob/4.0/modules/car-control/assets/CarControlConfig.json). For example, if you have changed an `endpointId` in `CarControlConfig.json` from `"default.light"` to `"default.roof.light"`, the `CarControlEndpointMapping.json` file must contain the same endpoint mapping information.
 
 ## Building the AACS Car Control Library
 You can build the library locally using the following steps:
+
   1) Enter the following command to change the directory:
   ~~~
       cd ${AAC_SDK_HOME}/aacs/android/sample-app
@@ -56,6 +58,7 @@ You can build the library locally using the following steps:
   You must include the `AACSIPC`, `AACSConstants`, `AACSCommonUtils`, `AACS` and `Auto SDK` AARs in your application to use with the AACS Car Control AAR.
 
 To enable car control support in the AACS Sample App, follow these steps:
+
 1) Enter the following command to change the directory:
 ~~~
     cd ${AAC_SDK_HOME}/aacs/android/sample-app
@@ -69,9 +72,9 @@ For more build options, see the [AACS Sample App README](../../sample-app/README
 ## Before Using the AACS Car Control Library
 Before using the library, follow these major steps:
 
-1) Install your application with the AACS and Car Control AARs as a system privileged app on Android Automotive OS.
-2) Provide permission in your app's Android Manifest.
-3) Ensure that the intent target specified in the library is used.
+1. Install your application with the AACS and Car Control AARs as a system privileged app on Android Automotive OS.
+2. Provide permission in your app's Android Manifest.
+3. Ensure that the intent target specified in the library is used.
 
 ### Including AACS Car Control Library in a System Application
 For AACS to enable the permission namespace `android.car.permission`, it must run in a system privileged app. To install your application as a system privileged app, place it in the `/system/priv-app/` directory. 
@@ -130,14 +133,10 @@ The AACS Car Control Broadcast Receiver listens to intents from the AACS Core Se
 
 ## Sequence Diagrams
 The following diagram illustrates the flow when an utterance asks Alexa to set fan speed to 3.
-<p>
-<img src="./assets/set-fan-speed-to-3.png" />
-</p>
+![Set Fan Speed](./docs/diagrams/set-fan-speed-to-3.png)
 
 The following diagram illustrates the flow after the set value is finished at the hardware layer.
-<p>
-<img src="./assets/set-reply-to-engine.png" />
-</p>
+![Set Reply](./docs/diagrams/set-reply-to-engine.png)
 
 ## How the AACS Car Control Library Works
 When the user issues an utterance, the Engine receives a car control event from Alexa, which the Engine passes to AACS through an AASB message.
@@ -148,59 +147,60 @@ The AASB message received by AACS has the following attributes:
 * Category is `com.amazon.aacs.aasb.CarControl`.
 * Extras is `payload`.
   
-  The `payload` object includes detailed information about the action, which is  specified in the `messageDescription` field of the AASB message. The following list describes the `payload` for each action:
-  * For `SetControllerValue`, the payload has the following schema:
-    ```
-    "payload" : {
-        "controllerType" : "POWER",
-        "endpointId" : "{{String}}",
-        "turnOn" : {{Boolean}}
-    }
-    ```
-  * For `AdjustControllerValue`, the payload has the following schema:
-    ```
-    "payload" : {
-        "controllerType" : "TOGGLE",
-        "endpointId" : "{{String}}",
-        "controllerId" : "{{String}}",
-        "turnOn" : {{Boolean}}
-    }
-    ```
-  * For `SetModeController`, the payload has the following schema:
-    ```
-    "payload" : {
-        "controllerType" : "MODE",
-        "endpointId" : "{{String}}",
-        "controllerId" : "{{String}}",
-        "value" : "{{String}}"
-    }
-    ```
-  * For `SetRangeController`, the payload has the following schema:
-    ```
-    "payload" : {
-        "controllerType" : "RANGE",
-        "endpointId" : "{{String}}",
-        "controllerId" : "{{String}}",
-        "value" : {{Double}}
-    }
-    ```
-  * For `AdjustModeController`, the payload has the following schema:
-    ```
-    "payload" : {
-        "controllerType" : "MODE",
-        "endpointId" : "{{String}}",
-        "controllerId" : "{{String}}",
-        "delta" : {{Integer}}
-    }
-    ```
-  * For `AdjustRangeController`, the payload has the following schema:
-    ```
-    "payload" : {
-        "controllerType" : "RANGE",
-        "endpointId" : "{{String}}",
-        "controllerId" : "{{String}}",
-        "delta" : {{Double}}
-    }
-    ```
+    The `payload` object includes detailed information about the action, which is  specified in the `messageDescription` field of the AASB message. The following list describes the `payload` for each action:
+    
+    * For `SetControllerValue`, the payload has the following schema:
+      ```
+      "payload" : {
+          "controllerType" : "POWER",
+          "endpointId" : "{{String}}",
+          "turnOn" : {{Boolean}}
+      }
+      ```
+    * For `AdjustControllerValue`, the payload has the following schema:
+      ```
+      "payload" : {
+          "controllerType" : "TOGGLE",
+          "endpointId" : "{{String}}",
+          "controllerId" : "{{String}}",
+          "turnOn" : {{Boolean}}
+      }
+      ```
+    * For `SetModeController`, the payload has the following schema:
+      ```
+      "payload" : {
+          "controllerType" : "MODE",
+          "endpointId" : "{{String}}",
+          "controllerId" : "{{String}}",
+          "value" : "{{String}}"
+      }
+      ```
+    * For `SetRangeController`, the payload has the following schema:
+      ```
+      "payload" : {
+          "controllerType" : "RANGE",
+          "endpointId" : "{{String}}",
+          "controllerId" : "{{String}}",
+          "value" : {{Double}}
+      }
+      ```
+    * For `AdjustModeController`, the payload has the following schema:
+      ```
+      "payload" : {
+          "controllerType" : "MODE",
+          "endpointId" : "{{String}}",
+          "controllerId" : "{{String}}",
+          "delta" : {{Integer}}
+      }
+      ```
+    * For `AdjustRangeController`, the payload has the following schema:
+      ```
+      "payload" : {
+          "controllerType" : "RANGE",
+          "endpointId" : "{{String}}",
+          "controllerId" : "{{String}}",
+          "delta" : {{Double}}
+      }
+      ```
 
 After receiving the intent, the AACS Car Control Broadcast Receiver parses the payload and calls for the Car Control Handler to perform specific car control operations.

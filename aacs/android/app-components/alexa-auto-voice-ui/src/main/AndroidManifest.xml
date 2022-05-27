@@ -13,6 +13,7 @@
         <activity
             android:name=".VoiceActivity"
             android:launchMode="singleTask"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.Translucent"
             android:label="voice activity">
             <!-- Tag voice activity to be distraction optimized. More details can be found from https://source.android.com/devices/automotive/driver_distraction/guidelines -->

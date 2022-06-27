@@ -18,6 +18,8 @@ RUN apt update && \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 2
 
+RUN pip3 install -U pip
+
 RUN pip3 install conan
 
 RUN useradd -l --uid 1000 --create-home conan

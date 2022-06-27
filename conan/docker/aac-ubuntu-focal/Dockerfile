@@ -8,6 +8,8 @@ RUN apt update && \
     gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl \
     gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
 
+RUN pip install -U pip
+
 RUN pip install conan
 
 RUN useradd -l --uid 1000 --create-home conan

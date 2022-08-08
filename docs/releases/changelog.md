@@ -1,4 +1,54 @@
 # Change Log
+## v4.1.1 released on 2022-08-08
+
+### Enhancements
+* Improved Auto SDK AACS Sample App Setup and Settings UX.
+* Updated APL renderer app component, as well as dependent APL Viewhost Android libraries (AARs). It is highly recommended you update to release 4.1.1 for APL integrations.
+>**Note:** All Auto SDK 4.1 extensions are compatible with 4.1.1.
+
+### Resolved Issues
+* Improved the settings menu by expanding the clickable area of settings, and added missing descriptions for menu items.
+* Fixed a race condition in which updating the Alexa language setting, and then navigating away from the menu page could crash the application without switching the language.
+* Fixed an issue in which the Alexa comms permission screen did not render properly. Improved the margin alignment issue in the setup screens.
+
+### Known Issues
+**General**
+
+* The [Alexa Automotive UX guidelines](#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards) specify when to automatically dismiss a `TemplateRuntime` display card for each template type. The Engine publishes the `TemplateRuntime` interface messages `ClearTemplate` and `ClearPlayerInfo` based on the timeouts configured in the `aace.alexa.templateRuntimeCapabilityAgent` Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., `LocalSearchListTemplate2`) with a different timeout than other templates (e.g., `WeatherTemplate`). The configuration also does not provide a way for you to specify infinite timeout for `NowPlaying` cards. You must implement your application’s dismissal logic for display cards and media info accordingly.
+* There is a rare race condition in which publishing the `AlexaClient.StopForegroundActivity` message does not cancel the active Alexa interaction. The race condition can happen when the application publishes the message at the beginning of the `THINKING` state `AlexaClient.DialogStateChanged` transition.
+
+**Car control**
+
+* If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in the set from Alexa. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, Alexa retains endpoint 1 from set A, which might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try
+
+**Communications**
+
+* If the user asks Alexa to redial the last called number when their phone is not connected to the head unit, Alexa is silent rather than prompting the user to connect their phone.
+
+**Entertainment**
+
+* When music is playing, repeatedly pressing the “next” button to advance in the playlist restarts the current song.
+* When using the LVC extension, if the application publishes the `MediaPlaybackRequestor.RequestMediaPlayback` AASB message before the Auto SDK Engine connects to Alexa cloud, media playback will not automatically resume as expected. The workaround is to wait for the connection to Alexa cloud to complete before publishing the `RequestMediaPlayback` message.
+* There is no AASB message to indicate to Alexa that the user switched the media player UI on the head unit from an Alexa-integrated local media source, such as FM radio, to Alexa cloud-based music service provider. The only way to switch the audio context between the two player types is through voice interaction explicitly requesting a particular player.
+* If your application cancels an Alexa interaction by sending the `AlexaClient.StopForegroundActivity` message to the Engine during music playback, the Engine might erroneously request your application to dismiss the `NowPlaying` media info by publishing the `TemplateRuntime.ClearPlayerInfo` message. Your application should not dismiss the media info in this scenario.
+
+**Local Voice Control**
+
+* In offline mode with LVC, after the user requests a list of POIs with an utterance such as “Alexa, find a nearby Starbucks”, Alexa does not recognize follow up requests such as "Alexa, select the first one" and does not display or read detailed information about the requested selection.
+
+**AACS sample app**
+* Sometimes the sample app will display an error page during sign-in if the user launched the app with the launcher icon. The recommended workaround is to set Alexa as the default assistant in the settings menu to guarantee AACS initializes properly before sign in.
+* APL Card is prematurely closed if there is music playing in the background and APL command `SpeakItem` or `SpeakList`is executed.
+* The voice interaction UI does not match the automotive UX guidelines for touching the screen during the interaction. The UX guidelines state that the interaction should continue if the user taps or scrolls, but the sample app cancels the interaction when the user taps or scrolls.
+* The volume Alexa uses to read a shopping list is louder than the volume set for other Alexa responses.
+* When the device has internet disconnected and the user sets the system language to a language not supported by Alexa, the sample app does not always display the language selection screen automatically.
+* When the user revokes Alexa permission to use the microphone and then re-enables the permission, Alexa does not respond to utterances until the user restarts the app.
+* If an alert is going off while Alexa is speaking, the timer audio cancels the Alexa speech. timer is going off while Alexa is speaking, the timer audio cancels the Alexa speech.
+
+**C++ sample app**
+
+* The sample app may fail to handle synchronous-style `AASB messages` within the required timeout to construct device context for Alexa. As a result, some utterances may not work as expected.
+
 ## v4.1.0 released on 2022-05-27
 
 #### Enhancements
@@ -87,6 +137,16 @@
 **C++ sample app**
 
 * The sample app may fail to handle synchronous-style `AASB messages` within the required timeout to construct device context for Alexa. As a result, some utterances may not work as expected.
+
+**AACS sample app**
+
+* Sometimes the sample app will display an error page during sign-in if the user launched the app with the launcher icon. The recommended workaround is to set Alexa as the default assistant in the settings menu to guarantee AACS initializes properly before sign in.
+* APL Card is prematurely closed if there is music playing in the background and APL command `SpeakItem` or `SpeakList`is executed.
+* The voice interaction UI does not match the automotive UX guidelines for touching the screen during the interaction. The UX guidelines state that the interaction should continue if the user taps or scrolls, but the sample app cancels the interaction when the user taps or scrolls.
+* The volume Alexa uses to read a shopping list is louder than the volume set for other Alexa responses.
+* When the device has internet disconnected and the user sets the system language to a language not supported by Alexa, the sample app does not always display the language selection screen automatically.
+* When the user revokes Alexa permission to use the microphone and then re-enables the permission, Alexa does not respond to utterances until the user restarts the app.
+* If an alert is going off while Alexa is speaking, the timer audio cancels the Alexa speech. timer is going off while Alexa is speaking, the timer audio cancels the Alexa speech.
 
 ## v4.0.0 released on 2021-12-15
 

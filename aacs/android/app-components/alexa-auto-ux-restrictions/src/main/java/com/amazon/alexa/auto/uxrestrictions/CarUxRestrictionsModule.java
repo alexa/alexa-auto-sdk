@@ -160,6 +160,14 @@ public class CarUxRestrictionsModule implements ModuleInterface {
     private void saveDrivingState(String drivingStateValue) {
         SharedPreferences.Editor editor = mContext.getSharedPreferences(Constants.APL_RUNTIME_PROPERTIES, 0).edit();
         editor.putString(Constants.APL_RUNTIME_PROPERTY_DRIVING_STATE_NAME, drivingStateValue);
+        // This is a temporary solution as it should be handled by the Auto SDK
+        String videoValue = Constants.APL_RUNTIME_PROPERTY_VIDEO_VALUE_DISABLED;
+        if (drivingStateValue.equals(Constants.APL_RUNTIME_PROPERTY_DRIVING_STATE_VALUE_PARKED)) {
+            videoValue = Constants.APL_RUNTIME_PROPERTY_VIDEO_VALUE_ENABLED;
+        }
+
+        Log.d(TAG, "Video property " + videoValue);
+        editor.putString(Constants.APL_RUNTIME_PROPERTY_VIDEO_NAME, videoValue);
         editor.apply();
     }
 }

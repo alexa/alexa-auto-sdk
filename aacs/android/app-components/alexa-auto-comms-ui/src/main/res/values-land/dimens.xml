@@ -14,6 +14,7 @@
     <dimen name="contacts_permission_margin_start">50dp</dimen>
     <dimen name="contacts_permission_margin_end">50dp</dimen>
     <dimen name="contacts_permission_margin_start_double">32dp</dimen>
+    <dimen name="contacts_permission_alexa_image_topMargin">66dp</dimen>
 
     <!-- Communication settings dimensions -->
     <dimen name="comms_nav_icon_height_width">64dp</dimen>

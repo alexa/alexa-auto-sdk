@@ -22,30 +22,26 @@ import android.view.TextureView;
 import androidx.annotation.NonNull;
 
 import com.amazon.apl.android.dependencies.impl.MediaPlayer;
-import com.amazon.apl.android.render.audio.AudioFocusController;
 import com.amazon.apl.android.render.interfaces.IAPLEventSender;
 import com.amazon.apl.android.render.interfaces.IAPLTokenProvider;
 
 /**
- * Provides a wrapper of the MediaPlayer player that can report activity events
- * and request Android audio focus. The Media player is used for playing video
- * content.
+ * Provides a wrapper of the MediaPlayer player that can report activity events.
+ * The Media player is used for playing video content. Android audio focus
+ * management is built into the base MediaPlayer class.
  */
-public class APLMediaPlayer extends MediaPlayer implements AudioFocusController.PlaybackController {
+public class APLMediaPlayer extends MediaPlayer {
     private static final String TAG = APLMediaPlayer.class.getSimpleName();
 
     private final IAPLEventSender mAplEventSender;
     private final IAPLTokenProvider mAplTokenProvider;
-    private final AudioFocusController mAudioFocusController;
 
     public APLMediaPlayer(@NonNull Context context, @NonNull TextureView view, @NonNull IAPLEventSender aplEventSender,
             @NonNull IAPLTokenProvider aplTokenProvider) {
         super(context, view);
+        Log.v(TAG, "Created");
         mAplEventSender = aplEventSender;
         mAplTokenProvider = aplTokenProvider;
-        AudioManager audioManager =
-                (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        mAudioFocusController = new AudioFocusController(audioManager, this);
     }
 
     /**
@@ -53,8 +49,9 @@ public class APLMediaPlayer extends MediaPlayer implements AudioFocusController.
      */
     @Override
     public void play() {
-        Log.v(TAG, "play: ");
-        mAudioFocusController.startPlaybackAfterAcquiringFocus();
+        Log.v(TAG, "play:");
+        super.play();
+        mAplEventSender.sendActivityEventRequest(mAplTokenProvider.getToken(), IAPLEventSender.ActivityEvent.ACTIVATED);
     }
 
     /**
@@ -62,49 +59,9 @@ public class APLMediaPlayer extends MediaPlayer implements AudioFocusController.
      */
     @Override
     public void stop() {
-        Log.v(TAG, "stop: ");
-        super.stop();
-        mAudioFocusController.relinquishAudioFocusIfCurrentlyAcquired();
-        mAplEventSender.sendActivityEventRequest(
-                mAplTokenProvider.getToken(), IAPLEventSender.ActivityEvent.DEACTIVATED);
-    }
-
-    @Override
-    public void startPlaybackNow() {
-        Log.v(TAG, "startPlaybackNow: ");
-        super.play();
-        mAplEventSender.sendActivityEventRequest(mAplTokenProvider.getToken(), IAPLEventSender.ActivityEvent.ACTIVATED);
-    }
-
-    @Override
-    public void requestResumingPlayback() {
-        Log.v(TAG, "requestResumingPlayback: ");
-        super.play();
-        mAplEventSender.sendActivityEventRequest(mAplTokenProvider.getToken(), IAPLEventSender.ActivityEvent.ACTIVATED);
-    }
-
-    @Override
-    public void requestPausePlayback() {
-        Log.v(TAG, "requestPausePlayback: ");
-        super.pause();
-    }
-
-    @Override
-    public void requestStopPlayback() {
-        Log.v(TAG, "requestStopPlayback: ");
+        Log.v(TAG, "stop:");
         super.stop();
         mAplEventSender.sendActivityEventRequest(
                 mAplTokenProvider.getToken(), IAPLEventSender.ActivityEvent.DEACTIVATED);
-    }
-
-    @Override
-    public void adjustPlaybackVolume(float volumeMultiplier) {
-        Log.v(TAG, "adjustPlaybackVolume: " + volumeMultiplier);
-    }
-
-    @Override
-    public void failedToAcquireFocus() {
-        Log.e(TAG, "failedToAcquireFocus: ");
-        super.stop();
     }
 }

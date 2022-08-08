@@ -5460,9 +5460,9 @@
 </tr>
 <tr>
 <td>shapes</td>
-<td>Array of arrays</td>
-<td>Yes (if <code>state</code> is <code>"NAVIGATING"</code>)</td>
-<td>The array contains an ordered list of coordinates depicting the route from the source to destination. Each coordinate is a latitude-longitude pair, specified as an array of doubles (in that order). The array can be empty. The maximum number of coordinates is 100.<br><br> <strong>Special considerations:</strong> <ul><li>The set of coordinates might not represent the complete route.</li><li>Shapes are provider specific. The shape of a route can correspond to one of these versions: a complete route, a route for a view port, or a route defined for a particular distance.</li><li>It is recommended to use one mile spacing between each coordinate in the shapes array.</li><li>The coordinates in the array are ordered in the same direction as the user is driving.</li></ul></td>
+<td>Array of double arrays</td>
+<td>Yes</td>
+<td>The array contains an ordered list of coordinates depicting the route from the source to the destination. The coordinate is a latitude-longitude pair (in that order) specified as an array of doubles. The array can be empty. The maximum number of coordinates is 100.<br><br> <strong>Special considerations:</strong> <ul><li>The set of coordinates might not represent the complete route.</li><li>Shapes are provider specific. The shape of a route can correspond to one of these versions: a complete route, a route for a viewport, or a route defined for a certain distance.</li><li>One mile spacing between each coordinate in the shapes array is recommended.</li><li>The coordinates in the array are ordered in the same direction as the user is driving.</li></ul></td>
 </tr>
 <tr>
 <td>waypoints</td>
@@ -5494,7 +5494,7 @@
 <tr>
 <td>estimatedTimeOfArrival</td>
 <td>Object</td>
-<td>No (Applicable only if <code>type</code> is <code>"DESTINATION"</code> or <code>"INTERIM"</code>.)</td>
+<td>Yes (Applicable only if <code>type</code> is <code>"DESTINATION"</code> or <code>"INTERIM"</code>.)</td>
 <td>Time of arrival at the waypoint, specified in the ISO-8601 time format.</td>
 </tr>
 <tr>
@@ -5679,12 +5679,12 @@
 <span class="w">  </span><span class="p">],</span><span class="w"></span>
 <span class="w">  </span><span class="nt">&quot;shapes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
 <span class="w">    </span><span class="p">[</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;37.380946&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;-121.9794846&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="mf">37.380946</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="mf">-121.9794846</span><span class="w"></span>
 <span class="w">    </span><span class="p">],</span><span class="w"></span>
 <span class="w">    </span><span class="p">[</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;37.380545&quot;</span><span class="p">,</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;-122.073252&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="mf">37.380545</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="mf">-122.073252</span><span class="w"></span>
 <span class="w">    </span><span class="p">],</span><span class="w"></span>
 <span class="w">    </span><span class="err">...</span><span class="w"></span>
 <span class="w">  </span><span class="p">]</span><span class="w"></span>
@@ -6285,7 +6285,7 @@
 </details>
 <p></br></p>
 <h3 id="android-integration_1">Android Integration<a class="headerlink" href="#android-integration_1" title="Permanent link">&para;</a></h3>
-<p>The Alexa Auto Client Service (AACS) provides the <code>Navigation App Component</code> to integrate the Auto SDK <code>Navigation</code> module on Android. See the AACS Navigation App Component documentation for more information.</p>
+<p>The Alexa Auto Client Service (AACS) provides the <code>Navigation App Component</code> to integrate the Auto SDK <code>Navigation</code> module on Android. See the <a href="https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-navigation/">AACS Navigation App Component</a> documentation for more information.</p>
 
               
             </article>

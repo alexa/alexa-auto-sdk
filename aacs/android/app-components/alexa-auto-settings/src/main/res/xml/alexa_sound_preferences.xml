@@ -16,6 +16,6 @@
         app:title="@string/setting_alexa_sounds_request_end_title"
         app:summary="@string/setting_alexa_sounds_request_end_summary"
         app:defaultValue="true"
-        app:layout="@layout/alexa_last_preference_layout" />
+        app:layout="@layout/alexa_preference_layout" />
 
 </androidx.preference.PreferenceScreen>

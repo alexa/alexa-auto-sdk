@@ -68,6 +68,15 @@ public class APLTtsPlayerProvider implements ITtsPlayerProvider {
     }
 
     @Override
+    public void prepare(@NonNull String source) {
+        try {
+            getPlayer().prepare(source, new URL(source));
+        } catch (Exception e) {
+            Log.e(TAG, "Could not set the speech source", e);
+        }
+    }
+
+    @Override
     public void onDocumentFinish() {
         if (mTtsPlayer != null) {
             Log.i(TAG, "Releasing TTS player");

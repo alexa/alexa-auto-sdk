@@ -1,7 +1,0 @@
-var searchData=
-[
-  ['playbacksource',['playbackSource',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ab65edcec57ea9126b9936b68f3694509',1,'aace::alexa::ExternalMediaAdapter::PlaybackState::playbackSource()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#ae5c486e6d4c79537597a8430d099b2dd',1,'aace::alexa::LocalMediaSource::PlaybackState::playbackSource()']]],
-  ['playbacksourceid',['playbackSourceId',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#a1b0f4fbadc859257a4c2300f41494b16',1,'aace::alexa::ExternalMediaAdapter::PlaybackState::playbackSourceId()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_playback_state.html#a42ff0f9ba02eff868248aa688db77221',1,'aace::alexa::LocalMediaSource::PlaybackState::playbackSourceId()']]],
-  ['playbackstate',['playbackState',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_external_media_adapter_state.html#aadbf68e90a1b84c5714dc432cf2c7dbf',1,'aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState::playbackState()'],['../classaace_1_1alexa_1_1_local_media_source_1_1_local_media_source_state.html#a22cb98bddfdd580cc71069d3167a58a5',1,'aace::alexa::LocalMediaSource::LocalMediaSourceState::playbackState()']]],
-  ['playercookie',['playerCookie',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_session_state.html#a6aa00c891594ccfe90626c3a15e139a0',1,'aace::alexa::ExternalMediaAdapter::SessionState']]]
-];

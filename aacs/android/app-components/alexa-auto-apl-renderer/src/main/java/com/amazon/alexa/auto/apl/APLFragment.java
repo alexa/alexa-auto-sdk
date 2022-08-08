@@ -19,6 +19,7 @@ import static com.amazon.alexa.auto.apl.Constants.STATE;
 import static com.amazon.alexa.auto.apps.common.Constants.APL_RUNTIME_PROPERTIES;
 import static com.amazon.alexa.auto.apps.common.Constants.APL_RUNTIME_PROPERTY_DRIVING_STATE_NAME;
 import static com.amazon.alexa.auto.apps.common.Constants.APL_RUNTIME_PROPERTY_THEME_NAME;
+import static com.amazon.alexa.auto.apps.common.Constants.APL_RUNTIME_PROPERTY_VIDEO_NAME;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -380,12 +381,16 @@ public class APLFragment extends Fragment {
             Preconditions.checkNotNull(sharedPreferences);
             String drivingStateValue = sharedPreferences.getString(APL_RUNTIME_PROPERTY_DRIVING_STATE_NAME, "");
             String themeValue = sharedPreferences.getString(APL_RUNTIME_PROPERTY_THEME_NAME, "");
+            String videoValue = sharedPreferences.getString(APL_RUNTIME_PROPERTY_VIDEO_NAME, "");
 
             if (!drivingStateValue.isEmpty()) {
                 properties.put(APL_RUNTIME_PROPERTY_DRIVING_STATE_NAME, drivingStateValue);
             }
             if (!themeValue.isEmpty()) {
                 properties.put(APL_RUNTIME_PROPERTY_THEME_NAME, themeValue);
+            }
+            if (!videoValue.isEmpty()) {
+                properties.put(APL_RUNTIME_PROPERTY_VIDEO_NAME, videoValue);
             }
 
             return properties.toString();

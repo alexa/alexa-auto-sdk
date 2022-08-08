@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-if [[ ! -x "/usr/bin/clang-format-9" ]]; then
-  echo "Please install clang-format-9 on your system."
-  echo "Try 'sudo apt install clang-format-9' if you are on Ubuntu Linux."
-  exit 1
-fi
-exec "/usr/bin/clang-format-9" "$@"

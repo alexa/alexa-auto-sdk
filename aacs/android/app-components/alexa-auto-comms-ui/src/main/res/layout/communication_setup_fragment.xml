@@ -40,6 +40,7 @@
         android:contentDescription="@string/alexa_logo_content_description"
         android:src="@drawable/alexa_logo"
         android:textAlignment="center"
+        android:layout_marginTop="@dimen/contacts_permission_alexa_image_topMargin"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
         app:layout_constraintTop_toTopOf="parent" />

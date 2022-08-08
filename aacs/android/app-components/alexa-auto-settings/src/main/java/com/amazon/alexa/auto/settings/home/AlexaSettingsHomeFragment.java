@@ -301,11 +301,12 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
                         defaultAlexaComms.setSummary(device.getValue().getDeviceName());
                     } else {
                         Log.d(TAG, "Primary device is not found.");
-                        defaultAlexaComms.setSummary("");
+                        defaultAlexaComms.setSummary("None");
                     }
                 });
             } else {
                 Log.d(TAG, "Device is not found.");
+                defaultAlexaComms.setSummary("None");
             }
 
             defaultAlexaComms.setOnPreferenceClickListener(preference -> {

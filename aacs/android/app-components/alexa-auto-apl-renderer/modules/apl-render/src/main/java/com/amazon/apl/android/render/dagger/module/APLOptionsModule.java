@@ -19,8 +19,10 @@ import android.content.Context;
 
 import com.amazon.apl.android.APLOptions;
 import com.amazon.apl.android.RootConfig;
+import com.amazon.apl.android.audio.RuntimeAudioPlayerFactory;
 import com.amazon.apl.android.dependencies.IOpenUrlCallback;
 import com.amazon.apl.android.dependencies.impl.OpenUrlCallback;
+import com.amazon.apl.android.media.RuntimeMediaPlayerFactory;
 import com.amazon.apl.android.render.BuildConfig;
 import com.amazon.apl.android.render.dagger.ActivityContext;
 import com.amazon.apl.android.render.dagger.ActivityScope;
@@ -42,12 +44,8 @@ public class APLOptionsModule {
      * @return an instance of {@link APLOptions}.
      */
     @Provides
-    APLOptions.Builder provideAPLOptions(final APLMediaPlayerProvider mediaProvider,
-            final IOpenUrlCallback openUrlCallback, final APLTtsPlayerProvider ttsProvider) {
-        return APLOptions.builder()
-                .mediaPlayerProvider(mediaProvider)
-                .openUrlCallback(openUrlCallback)
-                .ttsPlayerProvider(ttsProvider);
+    APLOptions.Builder provideAPLOptions(final IOpenUrlCallback openUrlCallback) {
+        return APLOptions.builder().openUrlCallback(openUrlCallback);
     }
 
     /**
@@ -64,7 +62,8 @@ public class APLOptionsModule {
      * @return an instance of {@link RootConfig}
      */
     @Provides
-    public RootConfig provideRootConfig(@ActivityContext final Context context) {
+    public RootConfig provideRootConfig(@ActivityContext final Context context, final APLTtsPlayerProvider ttsProvider,
+            final APLMediaPlayerProvider mediaProvider) {
         Map<String, String> autoEnvironmentValues = new HashMap<>();
         autoEnvironmentValues.put("drivingState", "moving");
         return RootConfig.create(context)
@@ -72,6 +71,8 @@ public class APLOptionsModule {
                 .registerDataSource("dynamicIndexList")
                 .registerDataSource("dynamicTokenList")
                 .setEnvironmentValue("automobile", autoEnvironmentValues)
+                .audioPlayerFactory(new RuntimeAudioPlayerFactory(ttsProvider))
+                .mediaPlayerFactory(new RuntimeMediaPlayerFactory(mediaProvider))
                 .allowOpenUrl(false);
     }
 }

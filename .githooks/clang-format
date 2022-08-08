@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-readonly SCRIPT_ROOT="$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)"
-readonly TOOL_NAME=$(basename "$0")
-
-source "${SCRIPT_ROOT}/exec_tool.sh"

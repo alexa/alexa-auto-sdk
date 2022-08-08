@@ -88,7 +88,7 @@ bool APLEngineImpl::initialize(
         ThrowIfNull(m_aplCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         m_aplCapabilityAgent->addObserver(shared_from_this());
-        m_aplCapabilityAgent->setAPLMaxVersion("1.9");
+        m_aplCapabilityAgent->setAPLMaxVersion("2022.2");
         dialogUXStateAggregator->addObserver(m_aplCapabilityAgent);
 
         // Register capability with the default endpoint

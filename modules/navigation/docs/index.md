@@ -77,7 +77,7 @@ The following table explains the properties in the JSON.
 | Property | Type | Required | Description |
 |-|-|-|-|
 | state | String | Yes | The navigation device state. <br><br>**Accepted values:** <ul><li>`"NAVIGATING"`: Navigation engine is navigating to a predefined destination set. </li> <li>`"NOT_NAVIGATING"`: Navigation is not in progress.</li></ul> |
-| shapes | Array of arrays | Yes (if `state` is `"NAVIGATING"`) | The array contains an ordered list of coordinates depicting the route from the source to destination. Each coordinate is a latitude-longitude pair, specified as an array of doubles (in that order). The array can be empty. The maximum number of coordinates is 100.<br><br> **Special considerations:** <ul><li>The set of coordinates might not represent the complete route.</li><li>Shapes are provider specific. The shape of a route can correspond to one of these versions: a complete route, a route for a view port, or a route defined for a particular distance.</li><li>It is recommended to use one mile spacing between each coordinate in the shapes array.</li><li>The coordinates in the array are ordered in the same direction as the user is driving.</li></ul>
+| shapes | Array of double arrays | Yes | The array contains an ordered list of coordinates depicting the route from the source to the destination. The coordinate is a latitude-longitude pair (in that order) specified as an array of doubles. The array can be empty. The maximum number of coordinates is 100.<br><br> **Special considerations:** <ul><li>The set of coordinates might not represent the complete route.</li><li>Shapes are provider specific. The shape of a route can correspond to one of these versions: a complete route, a route for a viewport, or a route defined for a certain distance.</li><li>One mile spacing between each coordinate in the shapes array is recommended.</li><li>The coordinates in the array are ordered in the same direction as the user is driving.</li></ul>
 | waypoints | Array | Yes | List of objects, each representing a waypoint that is a stop on the route. Expand the section below for more information. <br><br> **Note:** Can be empty except when `state` is `"NAVIGATING"`.   
 
 <details markdown="1"><summary>Click to expand or collapse the properties of <code>waypoints</code> object</summary>
@@ -87,7 +87,7 @@ The following table explains the properties in the JSON.
 | Property | Type | Required | Description |
 |-|-|-|-|
 | type | String | Yes | Type of the location on the route. <br><br>**Accepted values:** <ul><li>`SOURCE`: The location from which the user starts driving.</li><li>`DESTINATION`: Final location to which the user wants to navigate to.</li><li>`INTERIM`: Intermediate stop where the user wants to navigate to before reaching the destination.</ul>
-| estimatedTimeOfArrival | Object | No (Applicable only if `type` is `"DESTINATION"` or `"INTERIM"`.) | Time of arrival at the waypoint, specified in the ISO-8601 time format. 
+| estimatedTimeOfArrival | Object | Yes (Applicable only if `type` is `"DESTINATION"` or `"INTERIM"`.) | Time of arrival at the waypoint, specified in the ISO-8601 time format. 
 | estimatedTimeOfArrival.ideal | String | No | Expected arrival time without considering traffic, diversions, etc.
 | estimatedTimeOfArrival.predicted | String | Yes | Expected arrival time, after considering traffic conditions. If the ideal ETA and predicted ETA match, only the predicted ETA will be populated.
 | address | Object | No | Address of the waypoint specified in multiple string fields, such as `addressLine1`, `city`, etc. <br><br>**Note:** `countryCode` is a 3-letter country code in ISO 3166-1 alpha-3 format.
@@ -207,12 +207,12 @@ The following table explains the properties in the JSON.
   ],
   "shapes": [
     [
-      "37.380946",
-      "-121.9794846"
+      37.380946,
+      -121.9794846
     ],
     [
-      "37.380545",
-      "-122.073252"
+      37.380545,
+      -122.073252
     ],
     ...
   ]
@@ -782,4 +782,4 @@ void MyNavigationHandler::subscribeToAASBMessages() {
 
 ### Android Integration
 
-The Alexa Auto Client Service (AACS) provides the `Navigation App Component` to integrate the Auto SDK `Navigation` module on Android. See the AACS Navigation App Component documentation for more information.
+The Alexa Auto Client Service (AACS) provides the `Navigation App Component` to integrate the Auto SDK `Navigation` module on Android. See the [AACS Navigation App Component](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-navigation/) documentation for more information.

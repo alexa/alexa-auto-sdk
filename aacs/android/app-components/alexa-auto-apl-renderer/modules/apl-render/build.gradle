@@ -7,9 +7,9 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 1
-        versionName "4.1"
+        versionName "4.1.1"
         buildConfigField 'int', 'VERSION_CODE', "1"
-        buildConfigField 'String', 'VERSION_NAME', "\"4.1\""
+        buildConfigField 'String', 'VERSION_NAME', "\"4.1.1\""
     }
 
     buildTypes {

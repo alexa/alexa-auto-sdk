@@ -56,6 +56,9 @@ public class Constants {
     public static final String APL_RUNTIME_PROPERTY_THEME_NAME = "theme";
     public static final String APL_RUNTIME_PROPERTY_DRIVING_STATE_VALUE_MOVING = "moving";
     public static final String APL_RUNTIME_PROPERTY_DRIVING_STATE_VALUE_PARKED = "parked";
+    public static final String APL_RUNTIME_PROPERTY_VIDEO_NAME = "video";
+    public static final String APL_RUNTIME_PROPERTY_VIDEO_VALUE_ENABLED = "enabled";
+    public static final String APL_RUNTIME_PROPERTY_VIDEO_VALUE_DISABLED = "disabled";
 
     // Car UX Restrictions
     public static final String CAR_UX_RESTRICTIONS_DRIVING_STATE_ACTION =

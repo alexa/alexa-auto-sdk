@@ -81,6 +81,8 @@ public class BluetoothDirectiveHandler {
             Log.d(TAG, "Device bonded, update device on first pair");
             mBTDeviceRepository.insertEntry(device);
             mBTDeviceRepository.updateFirstPair(deviceAddress, true);
+        } else if (bondState == BluetoothDevice.BOND_NONE ) {
+            mBTDeviceRepository.updateContactsPermission(deviceAddress, Constants.CONTACTS_PERMISSION_NO);
         }
     }
     /**

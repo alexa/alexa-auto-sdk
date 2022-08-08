@@ -139,10 +139,6 @@ public class CommunicationConsentFragment extends Fragment {
                         TextView alexaContactsHint = fragmentView.findViewById(R.id.alexa_contacts_hint1);
                         alexaContactsHint.setVisibility(View.GONE);
                     } else {
-                        ViewGroup.MarginLayoutParams marginLayoutParams =
-                                (ViewGroup.MarginLayoutParams) alexaImage.getLayoutParams();
-                        marginLayoutParams.topMargin =
-                                (int) getResources().getDimension(R.dimen.contacts_permission_alexa_image_topMargin);
                         format = getResources().getString(R.string.contacts_permission_consent_title);
                     }
                     String headingString = String.format(format, device.getValue().getDeviceName());

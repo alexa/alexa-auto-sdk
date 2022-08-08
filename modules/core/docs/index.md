@@ -4,7 +4,7 @@
 
 The `Core` module is the heart of the Alexa Auto SDK. The `Core` module provides the following elements that are the foundation for all Auto SDK features:
 
-- **Defining the Auto SDK API for your application—** `Core` defines the `Engine` and `MessageBroker` components. Alongside the Alexa Auto Services Bridge (AASB) messages defined by each Auto SDK module, these components comprise the core API for your application to access the features of Auto SDK. To learn about the API, see [Understand the Core Auto SDK API](https://alexa.github.io/alexa-auto-sdk/docs/explore/core-api-overview.md).
+- **Defining core API for your application to access the features of Auto SDK—** `Core` defines the `Engine` and `MessageBroker` components. Alongside the Alexa Auto Services Bridge (AASB) messages defined by each Auto SDK module, these components comprise the core API for your application to access the features of Auto SDK. To learn about the API, see [Auto SDK Core API Overview](https://alexa.github.io/alexa-auto-sdk/docs/explore/concepts/core-api-overview/).
 
 - **Providing an infrastructure to other modules—** `Core` provides the base infrastructure of the Engine, which each Auto SDK module extends to add module-specific features. 
 

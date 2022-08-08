@@ -331,8 +331,13 @@ public class SettingsActivity extends AppCompatActivity {
     private void setupBackButtonVisibility() {
         getNavigationController().addOnDestinationChangedListener((controller, destination, arguments) -> {
             int id = destination.getId();
+            mViewBinding.navigationBar.settingNavHostLayout.setVisibility(View.VISIBLE);
             if (disableBackButtonForResource(id)) {
-                mViewBinding.navigationBar.navigateBackButton.setVisibility(View.INVISIBLE);
+                if (id == R.id.navigation_fragment_communication) {
+                    mViewBinding.navigationBar.settingNavHostLayout.setVisibility(View.GONE);
+                } else {
+                    mViewBinding.navigationBar.navigateBackButton.setVisibility(View.INVISIBLE);
+                }
             } else {
                 mViewBinding.navigationBar.navigateBackButton.setVisibility(View.VISIBLE);
             }

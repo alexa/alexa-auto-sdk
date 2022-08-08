@@ -443,7 +443,9 @@ public class AlexaSettingsLanguagesFragment extends Fragment {
      */
     private void RefreshAppUI() {
         Log.d(TAG, "Refresh Alexa application UI.");
-        getActivity().recreate();
+        if (getActivity() != null) {
+            getActivity().recreate();
+        }
     }
 
     private TwoChoiceDialog createTwoChoiceDialog(@NonNull TwoChoiceDialog.Params params) {

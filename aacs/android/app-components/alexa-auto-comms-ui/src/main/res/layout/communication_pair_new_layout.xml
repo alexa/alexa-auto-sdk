@@ -8,7 +8,7 @@
     android:orientation="vertical">
     <TextView android:id="@android:id/title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/settings_pref_item_min_height"
         android:singleLine="true"
         android:textAppearance="@style/Alexa.TitleText"
         android:layout_marginTop="@dimen/setting_item_vertical_margin"

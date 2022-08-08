@@ -9,7 +9,7 @@ android {
         applicationId "com.amazon.alexa.auto.app"
         minSdkVersion 27
         versionCode 1
-        versionName "4.1"
+        versionName "4.1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

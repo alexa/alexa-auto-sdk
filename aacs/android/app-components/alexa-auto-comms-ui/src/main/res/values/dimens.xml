@@ -26,4 +26,5 @@
     <dimen name="setting_item_vertical_margin">8dp</dimen>
     <dimen name="setting_item_width_wrap">0dp</dimen>
     <dimen name="setting_item_divider_height">1dp</dimen>
+    <dimen name="settings_pref_item_min_height">100dp</dimen>
 </resources>

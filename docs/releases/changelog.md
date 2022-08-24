@@ -37,6 +37,7 @@
 * In offline mode with LVC, after the user requests a list of POIs with an utterance such as “Alexa, find a nearby Starbucks”, Alexa does not recognize follow up requests such as "Alexa, select the first one" and does not display or read detailed information about the requested selection.
 
 **AACS sample app**
+
 * Sometimes the sample app will display an error page during sign-in if the user launched the app with the launcher icon. The recommended workaround is to set Alexa as the default assistant in the settings menu to guarantee AACS initializes properly before sign in.
 * APL Card is prematurely closed if there is music playing in the background and APL command `SpeakItem` or `SpeakList`is executed.
 * The voice interaction UI does not match the automotive UX guidelines for touching the screen during the interaction. The UX guidelines state that the interaction should continue if the user taps or scrolls, but the sample app cancels the interaction when the user taps or scrolls.

@@ -14,7 +14,7 @@ class AvsDeviceSdkConan(ConanFile):
     exports_sources = "CMakeLists.txt", "patches/*"
     requires = [
         "sqlite3/3.37.2#8e4989a1ee5d3237a25a911fbcb19097",
-        "opus/1.3.1",
+        "opus/1.3.1#5132ab8db7b69dd8e26466e0b3b017dd",
     ]
 
     options = {

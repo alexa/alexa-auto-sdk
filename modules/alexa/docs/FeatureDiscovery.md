@@ -180,4 +180,4 @@ class MyFeatureDiscoveryHandler {
 
 ### Android Integration
 
-The Alexa Auto Client Service (AACS) sample app provides a sample implementation to integrate the Auto SDK `FeatureDiscovery` messages on Android. See the [Alexa Auto Settings App Component](https://alexa.github.io/alexa-auto-sdk/docs/aacs/android/app-components/alexa-auto-settings/) for the reference implementation.
+The Alexa Auto Client Service (AACS) sample app provides a sample implementation to integrate the Auto SDK `FeatureDiscovery` messages on Android. See the [Alexa Auto Settings App Component](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-settings/) for the reference implementation.

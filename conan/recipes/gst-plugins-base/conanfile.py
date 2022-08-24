@@ -57,7 +57,7 @@ class GStPluginsBaseConan(ConanFile):
             self.options.with_gl = False
 
     def requirements(self):
-        self.requires("opus/1.3.1")
+        self.requires("opus/1.3.1#5132ab8db7b69dd8e26466e0b3b017dd")
         self.requires("ogg/1.3.4")
         self.requires(f"gstreamer/{self.version}@{self.user}/{self.channel}")
         if self.settings.os == "Linux":

@@ -44,11 +44,6 @@ public class LocalSessionHandler {
     }
 
     public void onCreate(Context context) {
-        if (!NotificationListener.isEnabled(context)) {
-            Log.w(TAG,
-                    "Notification Listener permission is required for this feature to work, please provide the permission and restart the app to use Local Media Source controlling through Alexa");
-            return;
-        }
         mMediaSessionManager = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
         if (mMediaSessionManager == null) {
             Log.w(TAG, "MediaSessionManager is null, something went wrong");

@@ -34,9 +34,11 @@ You can enable audio ducking for the Alexa media using this configuration. By de
 ```JSON
 {
     "aacs.alexa" : {
-        "audioOutputType.music": {
-            "ducking": {
-                "enabled" : true
+        "audio": {
+            "audioOutputType.music": {
+                "ducking": {
+                    "enabled": true
+                }
             }
         }
     }

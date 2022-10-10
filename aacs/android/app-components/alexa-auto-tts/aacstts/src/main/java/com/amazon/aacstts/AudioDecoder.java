@@ -94,23 +94,23 @@ public class AudioDecoder {
         if (inputData.length % BITS_IN_A_BYTE != 0)
             return null;
 
-        while (true) {
-            /*
-             * Loading the input data into the input buffers.
-             */
-            int inputBufferIndex = mDecoder.dequeueInputBuffer(TIMEOUT_IN_MICROSECONDS);
-            if (inputBufferIndex >= 0) {
-                mDecoder.getInputBuffer(inputBufferIndex).put(inputData);
-                if (bytesToDecode < 0) {
-                    mDecoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, BUFFER_FLAG_END_OF_STREAM);
-                } else {
-                    int presentationTime = 0; // Only required if we are synchronizing audio and video.
-                    mDecoder.queueInputBuffer(inputBufferIndex, 0, bytesToDecode, presentationTime, 0);
-                }
+        /*
+         * Loading the input data into the input buffers.
+         */
+        int inputBufferIndex = mDecoder.dequeueInputBuffer(TIMEOUT_IN_MICROSECONDS);
+        if (inputBufferIndex >= 0) {
+            mDecoder.getInputBuffer(inputBufferIndex).put(inputData);
+            if (bytesToDecode < 0) {
+                mDecoder.queueInputBuffer(inputBufferIndex, 0, 0, 0, BUFFER_FLAG_END_OF_STREAM);
             } else {
-                Log.e(TAG, "Input Buffer is not available");
+                int presentationTime = 0; // Only required if we are synchronizing audio and video.
+                mDecoder.queueInputBuffer(inputBufferIndex, 0, bytesToDecode, presentationTime, 0);
             }
+        } else {
+            Log.e(TAG, "Input Buffer is not available");
+        }
 
+        while (true) {
             /*
              * Checking if output buffers are ready with the decoded data
              * and returning when they are ready

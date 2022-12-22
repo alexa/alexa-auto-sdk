@@ -120,4 +120,13 @@ public class PlaybackController {
     public void requestMediaPlayback() {
         mMessageSender.sendRequestMediaPlaybackToAACS();
     }
+
+    /**
+     * Set Alexa AudioPlayer interface as the foreground activity of Alexa's content channel so GUI and VUI
+     * playback interactions act on AudioPlayer, even if another source like ExternalMediaPlayer was more recently
+     * playing.
+     */
+    public void setAudioPlayerAsForegroundActivity() {
+        mMessageSender.setAudioPlayerAsForegroundActivity();
+    }
 }

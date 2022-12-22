@@ -119,9 +119,6 @@ private:
     /// Flag indicating the auth refresh status
     bool m_isAuthRefreshed;
 
-    /// This represents phone connection state.
-    aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState m_connectionState;
-
     /// Condition variable used to wake @c autoProvisioningThread when it is waiting.
     std::condition_variable m_wakeAutoProvisioningLoop;
 

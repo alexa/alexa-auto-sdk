@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/two_choice_dialog"
+    android:background="@drawable/settings_lightbox_background"
+    android:minWidth="@dimen/dialog_min_width"
+    android:minHeight="@dimen/dialog_min_height"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!--Next 4 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/top_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="67dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="67dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
+    <!--Title-->
+    <TextView
+        android:id="@+id/header_text"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintTop_toTopOf="@id/top_guideline"
+        app:layout_constraintBottom_toTopOf="@id/content_text"
+        app:layout_constraintHorizontal_weight="2"
+        tools:textColor="@color/White"
+        tools:text="Dialog Header">
+    </TextView>
+
+    <!--Body-->
+    <TextView
+        android:id="@+id/content_text"
+        style="?attr/bodyText"
+        android:layout_width="0dp"
+        app:layout_constraintHeight_min="@dimen/dialog_content_min_height"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dialog_space_between_title_content"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/header_text"
+        tools:text="Dialog Content"
+        tools:textColor="@color/White" />
+
+    <!--Left button-->
+    <TextView
+        android:id="@+id/button1"
+        style="?attr/button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dialog_space_between_content_buttons"
+        android:layout_marginEnd="@dimen/dialog_space_between_button1_button2"
+        app:layout_constraintBottom_toTopOf="@id/bottom_guideline"
+        app:layout_constraintEnd_toStartOf="@id/button2"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/content_text"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="Button 1" />
+
+
+    <!--Right button-->
+    <TextView
+        android:id="@+id/button2"
+        style="?attr/button2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/dialog_space_between_button1_button2"
+        app:layout_constraintBottom_toTopOf="@id/bottom_guideline"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/button1"
+        app:layout_constraintTop_toTopOf="@id/button1"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="Button 2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

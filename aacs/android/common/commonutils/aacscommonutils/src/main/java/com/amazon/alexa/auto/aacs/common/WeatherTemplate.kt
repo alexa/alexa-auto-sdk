@@ -23,10 +23,11 @@ data class WeatherTemplate (
         val lowTemperature: Temperature,
         val title: WeatherTitle,
         val currentWeatherIcon: DisplayAsset,
-        val description: String,
+        val description: String?,
         val highTemperature: Temperature,
         val currentWeather: String,
-        val weatherForecast: List<WeatherForecast>
+        val weatherForecast: List<WeatherForecast>,
+        val skillIcon: ImageStructure?
 )
 
 @JsonClass(generateAdapter = true)

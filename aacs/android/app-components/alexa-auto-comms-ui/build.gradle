@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -48,6 +49,7 @@ dependencies {
     implementation project(':alexa-auto-apis')
     implementation project(':alexa-auto-setup')
     implementation project(':alexa-auto-apps-common-util')
+    implementation project(':alexa-auto-telephony')
 
     implementation deps.androidx_appcompat
     implementation deps.androidx_preference
@@ -65,8 +67,8 @@ dependencies {
     implementation deps.eventbus
 
     // Database
-    implementation "androidx.room:room-runtime:2.2.6"
-    annotationProcessor "androidx.room:room-compiler:2.2.6"
+    implementation "androidx.room:room-runtime:2.4.2"
+    annotationProcessor "androidx.room:room-compiler:2.4.2"
 
     // Navigation between UI components.
     implementation deps.androidx_navigation_fragment

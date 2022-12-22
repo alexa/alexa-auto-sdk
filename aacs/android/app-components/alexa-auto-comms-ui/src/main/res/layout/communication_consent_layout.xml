@@ -5,8 +5,7 @@
     android:id="@+id/communication_consent_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:theme="@style/Theme.Alexa.Standard">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/checkMore"
@@ -35,23 +34,25 @@
 
         <TextView
             android:id="@+id/deviceName"
-            android:textAppearance="@style/Alexa.TitleText"
+            android:textAppearance="?attr/headerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+            android:layout_marginTop="@dimen/setting_item_vertical_margin"
+            android:text="iPhone">
         </TextView>
 
         <TextView
             android:id="@+id/consentStatus"
-            android:textAppearance="@style/Alexa.HintText"
+            android:textAppearance="?attr/bodyText"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:text="Contacts enabled">
         </TextView>
     </LinearLayout>
 
     <View
         android:id="@+id/divider"
-        android:background="?attr/dividerColorOnBackground"
+        android:background="@android:color/darker_gray"
         android:layout_height="@dimen/setting_item_divider_height"
         android:layout_width="fill_parent"
         android:layout_marginStart="@dimen/setting_item_horizontal_margin_start"

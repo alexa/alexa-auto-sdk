@@ -40,6 +40,7 @@ public class IPCConstants {
     public static final String AACS_IPC_READ_FROM = "readFrom";
     public static final String AACS_IPC_ACK_STATE = "state";
     public static final String AACS_IPC_ACK_SUCCESS = "success";
+    public static final String AACS_IPC_BYTES_WRITTEN = "bytesWritten";
 
     // AACS AAR Check
     public static final String AACS_IPC_PACKAGE_NAME_MATCHES = "aacsIncludedAsAAR";

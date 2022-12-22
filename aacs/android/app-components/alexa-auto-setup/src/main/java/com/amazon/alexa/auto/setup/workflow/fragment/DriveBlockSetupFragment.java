@@ -58,7 +58,7 @@ public class DriveBlockSetupFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         View fragmentView = requireView();
-        TextView backButtonText = fragmentView.findViewById(R.id.block_setup_on_drive_back_btn);
+        TextView backButtonText = fragmentView.findViewById(R.id.block_setup_on_drive_back_button);
         if (getActivity() != null)
             backButtonText.setOnClickListener(view -> getActivity().onBackPressed());
     }

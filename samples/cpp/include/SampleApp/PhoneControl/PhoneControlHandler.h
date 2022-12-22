@@ -252,6 +252,9 @@ private:
 
     /// Call error
     std::string m_callError;
+
+    /// Connection state
+    ConnectionState m_connectionState;
 };
 
 }  // namespace phoneControl

@@ -338,6 +338,15 @@ public class APLFragment extends Fragment {
                     Preconditions.checkNotNull(directive.message.payload);
                     handleDataSourceUpdateIntent(directive.message.payload);
                     break;
+                case Action.Navigation.START_NAVIGATION:
+                    context = getContext();
+                    Preconditions.checkNotNull(context);
+                    handleClearDocumentIntent(mRenderPayload);
+                    AlexaApp.from(context)
+                            .getRootComponent()
+                            .getComponent(SessionActivityController.class)
+                            .ifPresent(SessionActivityController::removeFragment);
+                    break;
                 default:
                     Log.d(TAG, "Unknown APL intent, action is " + directive.message.action);
                     break;
@@ -351,19 +360,20 @@ public class APLFragment extends Fragment {
      * @param layout APL fragment layout
      */
     private void setAPLFragmentLayout(APLLayout layout) {
-        requireActivity();
-
         ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layout.getLayoutParams();
-
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int height = displayMetrics.heightPixels;
-        int width = displayMetrics.widthPixels;
-
         marginLayoutParams.width = mAPLViewPortWidth;
         marginLayoutParams.height = mAPLViewPortHeight;
-        marginLayoutParams.topMargin = (int) (height * APL_FRAGMENT_MARGIN_RATIO);
-        marginLayoutParams.leftMargin = (int) (width * APL_FRAGMENT_MARGIN_RATIO);
+
+        if(getContext() != null) {
+            DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
+            int height = displayMetrics.heightPixels;
+            int width = displayMetrics.widthPixels;
+            marginLayoutParams.topMargin = (int) (height * APL_FRAGMENT_MARGIN_RATIO);
+            marginLayoutParams.leftMargin = (int) (width * APL_FRAGMENT_MARGIN_RATIO);
+        }
+        else {
+            Log.w(TAG, "getContext() was null");
+        }
 
         layout.setLayoutParams(marginLayoutParams);
     }

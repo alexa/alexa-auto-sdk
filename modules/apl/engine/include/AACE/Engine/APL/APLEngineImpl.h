@@ -72,7 +72,7 @@ public:
     // AlexaPresentationObserverInterface
     virtual void renderDocument(const std::string& jsonPayload, const std::string& token, const std::string& windowId)
         override;
-    virtual void clearDocument(const std::string& token, bool focusCleared) override;
+    virtual void clearDocument(const std::string& token) override;
     virtual void executeCommands(const std::string& jsonPayload, const std::string& token) override;
     virtual void dataSourceUpdate(
         const std::string& sourceType,

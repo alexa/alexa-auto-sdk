@@ -22,6 +22,7 @@
 #include <AACE/Engine/Core/EngineService.h>
 #include <AACE/Engine/Alexa/AlexaEngineService.h>
 #include <AACE/Engine/Alexa/InitiatorVerifier.h>
+#include "LoopbackDetector.h"
 
 namespace aace {
 namespace engine {
@@ -37,13 +38,14 @@ public:
 protected:
     bool configure(std::shared_ptr<std::istream> configuration) override;
     bool preRegister() override;
+    bool shutdown() override;
 
 private:
     LoopbackDetectorEngineService(const core::ServiceDescription& description);
     bool prepareVerifier();
 
     std::string m_wakewordEngineName;
-    std::shared_ptr<alexa::InitiatorVerifier> m_initiatorVerifier;
+    std::shared_ptr<LoopbackDetector> m_loopbackDetector;
 };
 
 }  // namespace loopbackDetector

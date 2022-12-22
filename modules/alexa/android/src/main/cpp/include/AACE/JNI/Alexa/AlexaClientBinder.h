@@ -33,6 +33,7 @@ public:
 
     // aace::alexa::AlexaClient
     void dialogStateChanged(DialogState state) override;
+    void dialogStateChanged(aace::alexa::AssistantIdType id, DialogState state) override;
     void authStateChanged(AuthState state, AuthError error) override;
     void connectionStatusChanged(ConnectionStatus status, ConnectionChangedReason reason) override;
 

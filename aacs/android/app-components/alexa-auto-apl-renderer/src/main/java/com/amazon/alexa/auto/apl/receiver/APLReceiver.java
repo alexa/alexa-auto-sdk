@@ -30,9 +30,10 @@ import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.session.SessionActivityController;
-import com.amazon.alexa.auto.apl.APLDirective;
-import com.amazon.alexa.auto.apl.APLFragment;
-import com.amazon.alexa.auto.apl.Constants;
+import com.amazon.alexa.auto.apis.session.SessionViewController;
+import com.amazon.alexa.auto.apl.*;
+import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
+import com.amazon.alexa.auto.voiceinteraction.common.Constants;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -63,11 +64,20 @@ public class APLReceiver extends BroadcastReceiver {
         app.getRootComponent().getComponent(SessionActivityController.class).ifPresent(sessionActivityController -> {
             Fragment aplFragment;
             Bundle args = new Bundle();
-            args.putString(Constants.PAYLOAD, message.payload);
+            args.putString(com.amazon.alexa.auto.apl.Constants.PAYLOAD, message.payload);
             if (!sessionActivityController.isFragmentAdded()) {
                 aplFragment = new APLFragment();
                 aplFragment.setArguments(args);
                 sessionActivityController.addFragment(aplFragment);
+
+                app.getRootComponent().getComponent(SessionViewController.class).ifPresent(sessionViewController -> {
+                    if (!sessionViewController.isSessionActive()) {
+                        Log.d(TAG, "Session was closed before document received. Recreating session");
+                        EventBus.getDefault().post(new AutoVoiceInteractionMessage(
+                                com.amazon.alexa.auto.voiceinteraction.common.Constants.TOPIC_RELAUNCH_SESSION, "",
+                                ""));
+                    }
+                });
             } else {
                 APLDirective directive = new APLDirective(message);
                 EventBus.getDefault().post(directive);

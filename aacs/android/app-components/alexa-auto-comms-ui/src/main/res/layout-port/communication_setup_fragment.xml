@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/communication_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:theme="@style/AlexaAppTheme"
+    android:background="@drawable/gradient_background"
+    >
+
+    <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/setup_bottom_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="@dimen/setup_bottom_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/alexa_img_view_left_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.058" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/alexa_img_view_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.35" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/alexa_img_view_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/alexa_img_view_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.583" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/communicate_dialog_box_view_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.583" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_permission_consent_heading_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.333" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_permission_consent_heading_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.425" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_permission_consent_heading_left_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.583" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_permission_consent_heading_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.958" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_upload_skip_action_button_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.708" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_upload_skip_action_button_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.792" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_upload_skip_action_button_left_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.24" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_upload_skip_action_button_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/contacts_upload_yes_action_button_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.78" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/alexa_contacts_hint1_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.292" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/alexa_contacts_hint1_left_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.282" />
+
+    <!--Alexa logo-->
+    <ImageView
+        android:id="@+id/alexa_img_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/alexa_logo_content_description"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view_upper_bound"
+        app:layout_constraintBottom_toTopOf="@id/alexa_img_view_lower_bound"
+        app:layout_constraintStart_toEndOf="@id/alexa_img_view_left_bound"
+        app:layout_constraintEnd_toStartOf="@id/alexa_img_view_right_bound"
+        android:scaleType="fitStart"
+        android:src="@drawable/comms_illustration"
+        android:textAlignment="center" />
+
+    <!--Utterance-->
+    <TextView
+        android:id="@+id/alexa_contacts_hint1"
+        style="@style/Alexa.UtteranceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/comms_sample_utterance"
+        android:background="@drawable/rounded_corner"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        app:layout_constraintStart_toEndOf="@id/alexa_contacts_hint1_left_bound"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view_upper_bound"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintVertical_bias="0.0"
+        android:textColor="#FFFFFF"
+        android:textSize="23sp" />
+
+    <!--Title-->
+
+    <!--Subtitle-->
+    <TextView
+        android:id="@+id/contacts_permission_consent_header"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/contacts_only_permission_consent_title"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@id/contacts_permission_consent_body"
+        app:layout_constraintEnd_toStartOf="@id/contacts_permission_consent_heading_right_bound"
+        app:layout_constraintStart_toEndOf="@id/contacts_permission_consent_heading_left_bound"
+        app:layout_constraintTop_toBottomOf="@id/alexa_img_view_upper_bound"  />
+
+    <TextView
+        android:id="@+id/contacts_permission_consent_body"
+        style="?attr/bodyText"
+        android:text="@string/contacts_permission_consent_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="23sp"
+        android:layout_marginTop="28dp"
+        app:layout_constraintEnd_toStartOf="@id/contacts_permission_consent_heading_right_bound"
+        app:layout_constraintStart_toEndOf="@id/contacts_permission_consent_heading_left_bound"
+        app:layout_constraintTop_toBottomOf="@id/contacts_permission_consent_header" />
+
+
+    <!-- Consent Button-->
+    <TextView
+        android:id="@+id/contacts_upload_skip_action_button"
+        style="?attr/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/contacts_consent_skip"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/contacts_upload_skip_action_button_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/contacts_upload_yes_action_button"
+        app:layout_constraintStart_toEndOf="@id/contacts_upload_skip_action_button_left_bound"
+        app:layout_constraintTop_toBottomOf="@id/contacts_upload_skip_action_button_upper_bound" />
+
+    <!-- Skip button-->
+    <TextView
+        android:id="@+id/contacts_upload_yes_action_button"
+        style="?attr/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="@string/contacts_consent_yes"
+        app:layout_constraintBottom_toTopOf="@id/contacts_upload_skip_action_button_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/contacts_upload_yes_action_button_right_bound"
+        app:layout_constraintStart_toEndOf="@id/contacts_upload_skip_action_button"
+        app:layout_constraintTop_toBottomOf="@id/contacts_upload_skip_action_button_upper_bound" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ void MessagingHandler::sendMessage(
 
     // Construct a string version of the send message for display purposes later
     std::string messageInfo = "Message: " + message.substr(0, message.find("\n")) + " Recipients: ";
-    for (int i = 0; i < recipientsJson.size(); i++) {
+    for (size_t i = 0; i < recipientsJson.size(); i++) {
         messageInfo += recipientsJson[i]["address"].get<std::string>();
         if (i < recipientsJson.size() - 1) {
             messageInfo += ", ";
@@ -638,14 +638,14 @@ void MessagingHandler::setupUI() {
 
         if (!m_readMessages.empty()) {
             buffer << "\nRead messages\n" << std::endl;
-            for (int i = 0; i < m_readMessages.size(); i++) {
+            for (size_t i = 0; i < m_readMessages.size(); i++) {
                 buffer << "  " << m_readMessages[i] << std::endl;
             }
         }
 
         if (!m_sentMessages.empty()) {
             buffer << "\nSent messages\n" << std::endl;
-            for (int i = 0; i < m_sentMessages.size(); i++) {
+            for (size_t i = 0; i < m_sentMessages.size(); i++) {
                 buffer << "  " << m_sentMessages[i] << std::endl;
             }
         }
@@ -713,7 +713,7 @@ bool MessagingHandler::validateConversationsReport(std::stringstream& buffer) {
                     if (!messages.empty()) {
                         buffer << "    Messages" << std::endl;
                         // Print messages
-                        for (int i = 0; i < messages.size(); i++) {
+                        for (size_t i = 0; i < messages.size(); i++) {
                             auto message = messages[i];
 
                             buffer << "\n      Message id  : ";
@@ -819,11 +819,11 @@ void MessagingHandler::updateMessages(const std::string& conversationId, const j
     }
 
     // Update conversations array
-    for (int i = 0; i < m_conversations.size(); i++) {
+    for (size_t i = 0; i < m_conversations.size(); i++) {
         if (conversationId == m_conversations[i]["id"]) {
             auto messages = m_conversations[i]["messages"];
             std::vector<int> messagesToErase;
-            for (int j = 0; j < messages.size(); j++) {
+            for (size_t j = 0; j < messages.size(); j++) {
                 if (readSet.find(messages[j]["id"]) != readSet.end()) {
                     auto message = messages[j];
                     m_readMessages.push_back(

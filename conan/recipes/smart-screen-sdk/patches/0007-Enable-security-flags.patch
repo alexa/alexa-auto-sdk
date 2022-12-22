@@ -1,7 +1,7 @@
-From 7450e4bbff99fe0004d5e6fcbd981f2b937f3a6a Mon Sep 17 00:00:00 2001
+From 22c4f8d4ad8b68a6c9c8e124cd1fe4826d6a7d98 Mon Sep 17 00:00:00 2001
 From: Patrick Tsai <yingtsai@amazon.com>
 Date: Wed, 23 Feb 2022 11:20:51 -0800
-Subject: [PATCH] Enable security flags
+Subject: [PATCH 07/14] Enable security flags
 
 ---
  modules/Alexa/build/cmake/BuildOptions.cmake | 11 +++++++++++
@@ -34,5 +34,5 @@ index fc887a6..4cf9fa6 100644
 +    set(CMAKE_SHARED_LINKER_FLAGS_MINSIZEREL "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
 +endif()
 -- 
-2.35.1
+2.36.0
 

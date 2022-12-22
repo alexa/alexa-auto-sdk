@@ -113,8 +113,6 @@ public class CBLViewModel extends AndroidViewModel {
     public void startLogin() {
         Log.d(TAG, "CBL Workflow starting");
 
-        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
-
         // Resetting the current user's preferences to clear out existing state (e.g. it's possible
         // that previously the user had enabled preview mode and enabled location consent)
         resetUserPreferences(getApplication().getApplicationContext());

@@ -42,7 +42,8 @@ bool SpeechSynthesizerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     try {
         ThrowIfNot(initializeAudioChannel(audioOutputChannel, speakerManager), "initializeAudioChannelFailed");
 
@@ -56,7 +57,8 @@ bool SpeechSynthesizerEngineImpl::initialize(
                 metricRecorder,
                 dialogUXStateAggregator,
                 nullptr,
-                nullptr);
+                nullptr,
+                agentManager);
         ThrowIfNull(m_speechSynthesizerCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         // add dialog state observer
@@ -84,7 +86,8 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     std::shared_ptr<SpeechSynthesizerEngineImpl> speechSynthesizerEngineImpl = nullptr;
 
     try {
@@ -120,7 +123,8 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
                 dialogUXStateAggregator,
                 speakerManager,
                 exceptionSender,
-                metricRecorder),
+                metricRecorder,
+                agentManager),
             "initializeSpeechSynthesizerEngineImplFailed");
 
         return speechSynthesizerEngineImpl;

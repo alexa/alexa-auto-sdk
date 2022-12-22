@@ -17,4 +17,7 @@ package com.amazon.alexa.auto.media;
 public class Constants {
     public static final String CONTENT_PROVIDER_AUTHORITY = "com.amazon.alexa.auto.media.provider";
     public static final String CONTENT_PROVIDER_DRAWABLE_PATH_PREFIX = "drawable/";
+    public static final String MEDIA_PLAYER_CONFIG = "MediaPlayerConfig.json";
+    public static final String MEDIA_PREFERENCES = "com.amazon.alexa.auto.media.preferences";
+    public static final String PREFERENCE_PREVIOUS_PLAYBACK_STATE = "previousPlaybackState";
 }

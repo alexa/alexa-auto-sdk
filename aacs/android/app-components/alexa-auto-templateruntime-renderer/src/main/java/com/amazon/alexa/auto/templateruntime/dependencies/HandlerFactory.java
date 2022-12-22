@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HandlerFactory {
-    private Map<String, TemplateDirectiveHandler> templateMap = new HashMap<String, TemplateDirectiveHandler>();
+    private final Map<String, TemplateDirectiveHandler> templateMap = new HashMap<>();
 
     public TemplateDirectiveHandler getHandler(Context context, String type) throws IllegalArgumentException {
         if (type.startsWith(TEMPLATE_TYPE_BODY)) {

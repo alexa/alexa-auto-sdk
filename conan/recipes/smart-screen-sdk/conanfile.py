@@ -1,12 +1,13 @@
 import os, glob
 from conans import ConanFile, CMake, tools
 
+
 class SmartScreenSDKConan(ConanFile):
     python_requires = "aac-sdk-tools/1.0"
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
 
     name = "smart-screen-sdk"
-    version = "2.8.0"
+    version = "2.9.2"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "cmake_find_package", "pkg_config"
     exports_sources = "CMakeLists.txt", "patches/*"
@@ -31,12 +32,12 @@ class SmartScreenSDKConan(ConanFile):
             self.options["openssl"].shared = False
 
     def requirements(self):
-        self.requires(f"avs-device-sdk/1.25.0@{self.user}/{self.channel}")
+        self.requires(f"avs-device-sdk/1.26.0@{self.user}/{self.channel}")
 
     def _configure_cmake(self):
         cmake = CMake(self)
         if self.settings.os == "Android":
-            cmake.definitions["ANDROID"] = "OFF" # this is not a mistake!
+            cmake.definitions["ANDROID"] = "OFF"  # this is not a mistake!
         cmake.configure(source_folder=self._source_subfolder)
         return cmake
 

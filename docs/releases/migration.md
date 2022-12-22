@@ -10,6 +10,67 @@ Auto SDK remains backward compatible across minor version updates; however, to c
 
 Although rare, if Auto SDK makes an exception to the backward compatibility tenants in a minor version, this guide explicitly calls out the change.
 
+## Migrating from Auto SDK v4.1.1 to v4.2.0
+This section provides the information you need to migrate from Auto SDK v4.1.1 to Auto SDK v4.2.0
+
+
+### Alerts (Alarms, timers and reminders) interface disabled
+
+The Alerts AASB messages and the corresponding Engine implementation for Reminders, Alarms and Timers have been removed in the SDK from this release. OEMs should no longer subscribe to the Alerts AASB messages and must remove their applications' alert-related features.
+
+### Updated build option
+
+The build option flag to generate metrics has been changed from **with_latency_logs** to **with_metrics.** The "with_metrics"
+variable is a more accurate representation to describe metrics emission. The default value of **with_metrics** is True, meaning metrics logs will be emitted when built with DCM extension without explicitly specifying any flag. 
+### Deprecated API
+
+Deprecated `dialogStateChanged(DialogState state`) API in AlexaClient in favor of a new one with the assistant ID specified. If you use `MessageBroker` (recommended) to receive AlexaClient messages, the payload of the DialogStateChanged message will now have the ID of the assistant that the change is associated.
+
+### Breaking Configuration & API Changes
+
+The Assistant ID in the Alexa Custom Assistant extension is now an integer, and the previous ID in string format is renamed to uuid. This change applies to the related extension configuration fields and APIs, including `SetAssistantsSetting`. Please refer to the extension documentation for further details.
+
+### Alexa Auto App 
+
+#### Building 
+
+We deprecated the optional non-extension module arguments to the gradlew build script — by default, components like `APL`, and `Car Control`, will now be built with only one argument.
+
+Example
+```
+./gradlew assembleLocal{Debug|Release}
+```
+This means that all required resources to build these optional components must be already downloaded and placed in the correct directories for the build to succeed — please refer to the Alexa Auto App README for more information.
+
+For developing with Android Studio, we've upgraded the AGP version to 7.3.1, and the corresponding bundled Gradle version to 7.5.1. We've also raised the compileSDK across our modules to 33 while temporarily fixing the minSDK=targetSDK to 27.
+
+**Note**: Modules that utilize VHAL APIs (e.g., APL, Car Control, and UXRestrictions) expect to be able to use android.car library, which is available on AAOS platforms. The Alexa Auto App will still run on AOSP, but you are responsible for adequately implementing these modules so that all features work end-to-end on your AOSP device..
+
+#### Permissions 
+
+These are the new privileged permissions required to be added to the alexa auto app privileged permission allowlist XML file: 
+
+```
+<permission name="android.permission.WRITE_SECURE_SETTINGS" />
+<permission name="android.permission.SET_TIME_ZONE" />
+<permission name="android.permission.BLUETOOTH_PRIVILEGED" />
+<permission name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+<permission name="android.permission.PACKAGE_USAGE_STATS" />
+<permission name="android.permission.MEDIA_CONTENT_CONTROL" />
+        
+<permission name="android.car.permission.CAR_POWER" />
+<permission name="android.car.permission.CONTROL_CAR_ENERGY_PORTS" />
+<permission name="android.car.permission.CAR_VENDOR_EXTENSION" />
+```
+#### Breaking API Changes 
+
+* The `FetchStreamCallback.onStreamFetchCancelled` callback now has a second parameter; the signature now is (`String streamID, long bytesWritten`). The `bytesWritten` parameter returns the total number of bytes successfully written to AutoSDK relative to the start of `AudioInputMessageHandler`.
+* `LocaleUtil` has been refactored to be greatly simplified — all app-locale setting has been replaced with `AppCompatDelegate.[get/set]ApplicationLocales` (backwards-compatible, but requires `compileSDK=33`)
+* Every fragment/UI layout was updated. If you had any code that previously modified these pages, you need to first carefully re-evaluate if your local changes conflict with the newer UI updates. The following are some particular cases you’ll need to be aware of: 
+    * The sign-in URL used to be hard-coded in the `CBLFragment` and LoginFragment within the setup module. Now, the Auto SDK provides the sign-in URL as a part of the CBL authorization payload — we mandate that all partners use this functionality over the hard-coded URL..
+    * Certain pages were translated from Java to Kotlin on top of new additions to those same pages (`SettingsActivity`). If you had any local additions to these pages initially written in Java, these would undoubtedly break, and you will need to port those over to Kotlin.
+* If your device relied on the `DefaultNaviProvider` to broadcast intents to your navigation app, then be mindful that there was a minor change to the `controlDisplay` method to parse the `controlDisplayData` into a JSON object instead of passing it in as a raw string. 
+
 ## Migrating from Auto SDK v4.0.0 to v4.1.0
 This section provides the information you need to migrate from Auto SDK v4.0.0 to Auto SDK v4.1.0
 
@@ -19,7 +80,7 @@ The field `alternateRoute.savings.amount` in the `Navigation.ShowAlternativeRout
 
 ### LVC App Components replace LVC APK on Android Platform
 
-AACS LVC App Components replace the LVC APK on Android. Auto SDK no longer releases the LVC APK, and the previous LVC APK does not work with 4.1 AACS. The LVC App Components are Android libraries (AARs) that run LVC in the same application as AACS, and the AACS sample app integrates them by default. 
+AACS LVC App Components replace the LVC APK on Android. Auto SDK no longer releases the LVC APK, and the previous LVC APK does not work with 4.1 AACS. The LVC App Components are Android libraries (AARs) that run LVC in the same application as AACS, and the AACS Sample App integrates them by default. 
 
 * If your Alexa client application uses the Java platform interfaces (deprecated in 4.0), you are required to update your application to use AACS before integrating with LVC App Components. See [Migrate to the MessageBroker API](./migrate-to-messagebroker.md) and the [AACS documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/) for information about migrating your application.
 

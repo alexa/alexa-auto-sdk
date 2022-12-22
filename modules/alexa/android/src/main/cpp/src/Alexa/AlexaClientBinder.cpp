@@ -51,6 +51,20 @@ void AlexaClientHandler::dialogStateChanged(DialogState state) {
     }
 }
 
+void AlexaClientHandler::dialogStateChanged(aace::alexa::AssistantIdType id, DialogState state) {
+    try_with_context {
+        jobject stateObj;
+        ThrowIfNot(JDialogState::checkType(state, &stateObj), "invalidDialogState");
+        ThrowIfNot(
+            m_obj.invoke<void>(
+                "dialogStateChanged", "(I;Lcom/amazon/aace/alexa/AlexaClient$DialogState;)V", nullptr, id, stateObj),
+            "invokeFailed");
+    }
+    catch_with_ex {
+        AACE_JNI_ERROR(TAG, "dialogStateChanged", ex.what());
+    }
+}
+
 void AlexaClientHandler::authStateChanged(AuthState state, AuthError error) {
     try_with_context {
         jobject stateObj;

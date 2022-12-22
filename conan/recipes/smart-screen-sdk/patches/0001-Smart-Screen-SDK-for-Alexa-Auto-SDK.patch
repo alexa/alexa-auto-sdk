@@ -1,18 +1,18 @@
-From 1edb048ce4c1af07d739ce22d8e62b0f58668545 Mon Sep 17 00:00:00 2001
+From e19b9a8098ef5afdc86c611cc34b77e7f999fe28 Mon Sep 17 00:00:00 2001
 From: Eze Cervantes <ezeqc@amazon.com>
 Date: Mon, 8 Mar 2021 14:40:10 -0800
-Subject: [PATCH 1/3] Smart Screen SDK for Alexa Auto SDK
+Subject: [PATCH 01/14] Smart Screen SDK for Alexa Auto SDK
 
 ---
- modules/Alexa/CMakeLists.txt            | 12 ++++++------
+ modules/Alexa/CMakeLists.txt            | 10 +++++-----
  modules/Alexa/build/BuildDefaults.cmake |  2 +-
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/modules/Alexa/CMakeLists.txt b/modules/Alexa/CMakeLists.txt
-index ca1233f..7a0a8e5 100644
+index 91a4333..9fef1f6 100644
 --- a/modules/Alexa/CMakeLists.txt
 +++ b/modules/Alexa/CMakeLists.txt
-@@ -87,17 +87,17 @@ include(tools/Testing.cmake)
+@@ -94,16 +94,16 @@ include(tools/Testing.cmake)
  include(build/cmake/PrepareInstall.cmake)
  
  # Alexa Client SDK targets.
@@ -21,9 +21,7 @@ index ca1233f..7a0a8e5 100644
  add_subdirectory("SmartScreenCapabilityAgents")
  add_subdirectory("SmartScreenSDKInterfaces")
 -add_subdirectory("ApplicationUtilities")
--add_subdirectory("APLClientLibrary")
 +#add_subdirectory("ApplicationUtilities")
-+#add_subdirectory("APLClientLibrary")
  if (NOT MSVC)
  	# For UWP SampleApp files are built as part of UWPSampleApp
 -	add_subdirectory("SampleApp")
@@ -37,10 +35,10 @@ index ca1233f..7a0a8e5 100644
  
  # Create .pc pkg-config file
 diff --git a/modules/Alexa/build/BuildDefaults.cmake b/modules/Alexa/build/BuildDefaults.cmake
-index 74475d3..ae778cb 100644
+index 251b66e..03dcf6a 100644
 --- a/modules/Alexa/build/BuildDefaults.cmake
 +++ b/modules/Alexa/build/BuildDefaults.cmake
-@@ -77,7 +77,7 @@ include_once(Metrics)
+@@ -101,7 +101,7 @@ include_once(Metrics)
  include_once(Captions)
  
  # Setup Config Validation variables.
@@ -50,5 +48,5 @@ index 74475d3..ae778cb 100644
  if (HAS_EXTERNAL_MEDIA_PLAYER_ADAPTERS)
      include_once(ExternalMediaPlayerAdapters)
 -- 
-2.30.1 (Apple Git-130)
+2.36.0
 

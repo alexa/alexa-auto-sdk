@@ -90,4 +90,16 @@ public interface AlexaSetupController {
      * @param isReady Boolean indicating whether AACS is in the ENGINE_INITIALIZED state or not.
      **/
     void setAACSReadiness(boolean isReady);
+
+    /**
+     * Observe the Alexa cloud connection status.
+     * @return Alexa cloud status observable
+     **/
+    Observable<Boolean> observeAlexaCloudConnectionStatus();
+
+    /**
+     * Set the Alexa cloud connection status.
+     * @param isConnected Whether the app has a connection to Alexa cloud.
+     **/
+    void setAlexaCloudConnectionStatus(boolean isConnected);
 }

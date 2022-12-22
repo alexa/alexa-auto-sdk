@@ -4,7 +4,7 @@ Amazon provides requirements you must follow when integrating Alexa Auto SDK int
 
 ## Customer experience requirements
 
-The [Alexa Automotive customer experience requirements](https://github.com/alexa/alexa-auto-sdk/blob/master/Alexa_Embedded_CX_Requirements_v12.0.xlsx) define product requirements your integration must meet in order to provide a customer experience that passes Amazon's certification process.
+The [Alexa Automotive customer experience requirements](https://github.com/alexa/alexa-auto-sdk/blob/master/Alexa_Embedded_CX_Requirements_v13.0.xlsx) define product requirements your integration must meet in order to provide a customer experience that passes Amazon's certification process.
 
 ## Product and UX guidelines
 

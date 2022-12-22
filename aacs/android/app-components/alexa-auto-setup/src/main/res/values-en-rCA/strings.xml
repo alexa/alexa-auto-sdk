@@ -1,25 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-     <string name="login_qr_code_message">
-         <![CDATA[
-             Go to <font color=\'#33B5E5\'>%1$s</font> and sign in. Then enter this code:
-         ]]>
-     </string>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            Go to <font color=\'#33B5E5\'>%1$s</font> and sign in. Then enter this code:
+        ]]>
+    </string>
     <string name="confirm_yes_button">Yes</string>
     <string name="confirm_exit_button">Exit</string>
     <string name="settings_button">Settings</string>
-    <string name="try_alexa_button">TRY ALEXA</string>
+    <string name="try_alexa_button">Try Alexa</string>
     <string name="privacy_notice_button">Privacy Notice</string>
     <string name="terms_of_use_button">Terms of Use</string>
     <string name="login_action_retry_button">Try Again</string>
-    <string name="sign_in_action_button">SIGN IN</string>
+    <string name="sign_in_action_button">Sign In</string>
     <string name="login_later_action_button">SIGN IN LATER</string>
-    <string name="login_connect_to_aacs">Please wait. Connecting to AACS…</string>
     <string name="login_message">Use voice to make the most of your drive. Alexa can help with directions, music, calls and much more.</string>
     <string name="enable_preview_mode_header">Enable Alexa without sign in?</string>
-    <string name="enable_preview_mode_action_button">AGREE &amp; ENABLE ALEXA</string>
-    <string name="enable_preview_mode_message">You can still talk to Alexa for things like information and getting directions. For music, weather, smart home and more, sign in.</string>
-    <string name="enable_preview_mode_disclaimer">Amazon processes and retains Alexa interactions and other data in the cloud to provide and improve our services. By selecting \“Agree &amp; Enable Alexa\“ you accept Amazon\’s <annotation placeholder="">Conditions of Use</annotation> and <annotation placeholder="">all the terms found here</annotation>. \n\n <annotation placeholder="">Learn how Alexa is designed to protect your privacy</annotation>.</string>
+    <string name="enable_preview_mode_message">You can still ask Alexa for weather and address navigation. For music, nearby restaurants and more, sign in.</string>
     <string name="enable_preview_mode_error_message">There was an issue enabling Preview mode. Please try again.</string>
     <string name="login_method_or_text">Or scan this code:</string>
     <string name="login_finish_heading_text">You\'re all done%1$s!</string>
@@ -31,14 +28,17 @@
     <string name="login_all_done_btn_text">DONE</string>
     <string name="setting_alexa_language_title">Alexa\'s language</string>
     <string name="select_language_action_button">SELECT LANGUAGE</string>
-    <string name="select_language_body">Alexa isn\'t available in %1$s. Select a language for Alexa.</string>
-    <string name="select_language_continue_button">CONTINUE</string>
+    <string name="select_language_body">Alexa isn\'t available in %1$s.</string>
+    <string name="unsupported_country_title">Alexa is not supported in the %1$s.</string>
+    <string name="unsupported_country_body">Alexa in-vehicle experience is currently not supported in your region.</string>
+    <string name="unsupported_country_cta">OK</string>
+    <string name="select_language_continue_button">Continue</string>
     <string name="setup_not_complete_header">Something\'s gone wrong</string>
     <string name="setup_not_complete_text">There was an issue setting up Alexa. Please try again.</string>
     <string name="setup_not_complete_text_with_alexa_custom_assistant">There was an issue setting up. Please try again.</string>
     <string name="cbl_login_error_message">There was an issue signing in. Please try again.</string>
     <string name="setup_not_complete_retry_button">TRY AGAIN</string>
-    <string name="skip_permission_button_text">SKIP</string>
+    <string name="skip_permission_button_text">Skip</string>
     <string name="back_button_text">BACK</string>
     <string name="use_location_button_text">USE LOCATION</string>
     <string name="location_permission_header_text">What\'s nearby?</string>
@@ -46,21 +46,28 @@
     <string name="location_permission_body_text_with_alexa_custom_assistant">Share your vehicle\'s current location with [Brandon] and Alexa to get smarter responses for nearby restaurants, local weather and more.</string>
     <string name="nav_favorites_permission_header_text">Navigate to your favourite places</string>
     <string name="nav_favorites_permission_body_text">Alexa can help you navigate to the favourite locations stored in your vehicle. Favourites will be uploaded to the Amazon service.</string>
-    <string name="consent_agree_text">AGREE &amp; ALLOW</string>
+    <string name="consent_agree_text">Agree &amp; Allow</string>
+    <string name="use_nav_favorites_button_text">Agree &amp; Allow</string>
     <string name="assist_selection_title">Set Alexa as your default assistant</string>
     <string name="assist_selection_in_app">To use Alexa, you need to set Alexa as the default Assist app. This will replace your current assistant.</string>
     <string name="assist_selection_in_system_settings">To use Alexa, you need to set Alexa as the default Assist app in Settings. \n Tap <b>Settings</b> below, then select <b>Assist App</b>, <b>Alexa</b>.</string>
     <string name="block_setup_on_drive_text">To set up Alexa, the vehicle must be parked.</string>
     <string name="alexa_logo_content_description">Alexa smile logo</string>
-
-    <!-- translatable="false" tag is used for things-to-try (hint) strings only. These strings need to be localized based on the country and region -->
-    <string name="cbl_login_alexa_hint1" translatable="false">\"Alexa, set the temperature to 72\"</string>
-    <string name="cbl_login_alexa_hint2" translatable="false">\"Alexa, find a café\"</string>
-    <string name="cbl_login_alexa_hint3" translatable="false">\"Alexa, play music\"</string>
-    <string name="auth_provider_login_alexa_hint1" translatable="false">\"Alexa, set the temperature to 22\"</string>
-    <string name="auth_provider_login_alexa_hint2" translatable="false">\"Alexa, take me to the airport\"</string>
-    <string name="auth_provider_login_alexa_hint3" translatable="false"></string>
-    <string name="auth_provider_sign_in_hint" translatable="false">For music, weather, smart home and more, sign in.</string>
-    <string name="location_permission_hint_text" translatable="false">\"Alexa, find restaurants near me\"</string>
-    <string name="nav_favorites_permission_hint_text" translatable="false">\"Alexa, take me home\"</string>
+    <string name="login_qr_code_url_message">
+        <![CDATA[
+            Go to <font color=\'#0000FF\'>%1$s</font> and sign in.\n Then enter this code:
+        ]]>
+    </string>
+    <string name="login_qr_code_message_with_code">
+        <![CDATA[
+            Go to <font color=\'#33B5E5\'>%1$s</font> and sign in. Then enter this code: <b>%2$s</b>
+        ]]>
+    </string>
+    <string name="login_qr_code_scan_message">OR scan the QR code below.</string>
+    <string name="enable_push_to_talk_header">Enable Push-to-Talk for Alexa?</string>
+    <string name="enable_push_to_talk_message">This allows you to access Alexa by tapping the Voice button on your steering wheel. This will replace your default assistant.</string>
+    <string name="choose_language_action_button">Choose Language</string>
+    <string name="choose_language_body">Choose a language for Alexa.</string>
+    <string name="select_a_language_body">Alexa isn\'t available in %1$s.</string>
+    <string name="select_language_confirm_button">Confirm</string>
 </resources>

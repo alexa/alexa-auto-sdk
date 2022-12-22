@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,7 +28,12 @@ import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.amazon.aacsconstants.Action;
+import com.amazon.aacsconstants.Topic;
+import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
+import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
+import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.aacs.common.HourOfOperation;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
 import com.amazon.alexa.auto.aacs.common.navi.LocalSearchDetailTemplate;
@@ -37,7 +43,10 @@ import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.navigation.R;
 import com.amazon.alexa.auto.navigation.poi.LocalSearchListAdapter;
 import com.amazon.alexa.auto.navigation.providers.NaviProvider;
+import com.amazon.alexa.auto.voice.ui.common.AutoVoiceUIMessage;
 import com.bumptech.glide.Glide;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
@@ -50,10 +59,13 @@ public class LocalSearchDirectiveHandler {
     private static final String TAG = LocalSearchDirectiveHandler.class.getSimpleName();
     private final WeakReference<Context> mContext;
     private final NaviProvider mNaviProvider;
-
+    private AACSMessageSender mMessageSender;
+    private AACSSender mAACSSender;
     public LocalSearchDirectiveHandler(WeakReference<Context> context, NaviProvider naviProvider) {
         mContext = context;
         mNaviProvider = naviProvider;
+        mAACSSender = new AACSSender();
+        mMessageSender = new AACSMessageSender(mContext, mAACSSender);
     }
 
     /**
@@ -151,6 +163,16 @@ public class LocalSearchDirectiveHandler {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext.get()));
+
+
+        ImageView closeButton = inflatedView.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(v -> {
+            AACSMessageBuilder.buildMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "")
+                    .ifPresent(message -> {
+                        mMessageSender.sendMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "");
+                    });
+            clearTemplate();
+        });
     }
 
     @VisibleForTesting
@@ -168,14 +190,6 @@ public class LocalSearchDirectiveHandler {
         TextView titleText = inflatedView.findViewById(R.id.local_search_detail_title);
         titleText.setText(title);
 
-        if (!localSearchDetailTemplate.getProvider().equals("Yelp")) {
-            inflatedView.findViewById(R.id.yelp_rating_layout).setVisibility(View.GONE);
-        } else {
-            ImageView yelpRatingView = inflatedView.findViewById(R.id.yelp_rating_image);
-            setYelpImageView(yelpRatingView, localSearchDetailTemplate);
-            ((TextView) inflatedView.findViewById(R.id.yelp_review_count))
-                    .setText(String.format("(%s)", localSearchDetailTemplate.getRating().getReviewCount()));
-        }
 
         TextView hoursOfOperationView = inflatedView.findViewById(R.id.local_search_hours_of_operation);
         setHoursOfOperation(hoursOfOperationView, localSearchDetailTemplate.getHoursOfOperation());
@@ -195,14 +209,24 @@ public class LocalSearchDirectiveHandler {
         });
 
         inflatedView.findViewById(R.id.close_button).setOnClickListener(view -> clearTemplate());
+
+        ImageView closeButton = inflatedView.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(v -> {
+            AACSMessageBuilder.buildMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "")
+                    .ifPresent(message -> {
+                        mMessageSender.sendMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "");
+                    });
+            AutoVoiceUIMessage msg = new AutoVoiceUIMessage(Topic.ALEXA_CLIENT,Action.AlexaClient.CLOSE_DISPLAY_CARD,"");
+            clearTemplate();
+        });
     }
 
-    private void setYelpImageView(ImageView yelpRatingView, LocalSearchDetailTemplate localSearchDetailTemplate) {
+    /*private void setYelpImageView(ImageView yelpRatingView, LocalSearchDetailTemplate localSearchDetailTemplate) {
         if (!localSearchDetailTemplate.getRating().getImage().getSources().isEmpty()) {
             String yelpImageUrl = localSearchDetailTemplate.getRating().getImage().getSources().get(0).getUrl();
             Glide.with(mContext.get()).load(yelpImageUrl).into(yelpRatingView);
         }
-    }
+    }*/
 
     @VisibleForTesting
     void setHoursOfOperation(TextView hoursOfOperationView, List<HourOfOperation> hoursOfOperation) {
@@ -219,9 +243,8 @@ public class LocalSearchDirectiveHandler {
         if (hoursOfOperationForSpecificDay.isPresent()) {
             String hours = hoursOfOperationForSpecificDay.get().getHours();
             String[] startAndEndHours = hours.split("-");
-
             if (startAndEndHours.length == 2) {
-                final SimpleDateFormat twentyFourHourFormat = new SimpleDateFormat("HH:mm:ss");
+                final SimpleDateFormat twentyFourHourFormat = new SimpleDateFormat("HH:mm");
                 final SimpleDateFormat twelveHourFormat = new SimpleDateFormat("h a");
 
                 try {

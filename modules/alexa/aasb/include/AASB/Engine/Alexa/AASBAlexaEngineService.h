@@ -20,6 +20,8 @@
 
 #include <AACE/Engine/MessageBroker/MessageHandlerEngineService.h>
 #include <AASB/Engine/Audio/AASBAudioEngineService.h>
+#include <AASB/Engine/Arbitrator/AASBArbitratorEngineService.h>
+#include <AASB/Engine/Wakeword/AASBWakewordEngineService.h>
 
 #include "AASBLocalMediaSource.h"
 
@@ -33,7 +35,9 @@ public:
         "aasb.alexa",
         VERSION("1.0"),
         DEPENDS(aace::engine::messageBroker::MessageBrokerEngineService),
-        DEPENDS(aasb::engine::audio::AASBAudioEngineService))
+        DEPENDS(aasb::engine::audio::AASBAudioEngineService),
+        DEPENDS(aasb::engine::arbitrator::AASBArbitratorEngineService),
+        DEPENDS(aasb::engine::wakeword::AASBWakewordEngineService))
 
 private:
     AASBAlexaEngineService(const aace::engine::core::ServiceDescription& description);

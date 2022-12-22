@@ -38,6 +38,7 @@
 #include <acsdkShutdownManager/ShutdownNotifier.h>
 #include <acsdkShutdownManagerInterfaces/ShutdownManagerInterface.h>
 
+#include <AACE/Test/Unit/AVS/MockActivityTrackerInterface.h>
 #include <AACE/Test/Unit/AVS/MockNotificationsAudioFactoryInterface.h>
 #include <AACE/Test/Unit/AVS/MockAttachmentManager.h>
 #include <AACE/Test/Unit/AVS/MockAudioPlayerInterface.h>
@@ -72,7 +73,6 @@
 #include <AACE/Test/Unit/Audio/MockAudioOutputChannelInterface.h>
 #include <AACE/Test/Unit/Audio/MockAudioInputChannelInterface.h>
 
-#include "MockAlerts.h"
 #include "MockNotifications.h"
 #include "MockAudioPlayer.h"
 #include "MockAuthProvider.h"
@@ -136,6 +136,7 @@ public:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager>
     getAVSConnectionManagerInterfaceMock();
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> getAVSConnectionManagerMock();
+    std::shared_ptr<aace::test::unit::avs::MockActivityTrackerInterface> getActivityTrackerInterfaceMock();
     std::shared_ptr<aace::test::unit::avs::MockMessageStorage> getMessageStorageMock();
     std::shared_ptr<aace::test::unit::avs::MockMessageRouter> getMessageRouterMock();
     std::shared_ptr<aace::test::unit::avs::MockAttachmentManager> getAttachmentManagerMock();
@@ -155,7 +156,6 @@ public:
     std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> getShutDownNotifierMock();
 
     // platform interface mocks
-    std::shared_ptr<MockAlerts> getAlertsMock();
     std::shared_ptr<MockNotifications> getNotificationsMock();
     std::shared_ptr<MockAudioPlayer> getAudioPlayerMock();
     std::shared_ptr<MockAuthProvider> getAuthProviderMock();
@@ -209,6 +209,7 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockAVSConnectionManager>
         m_mockAVSConnectionManagerInterface;
     std::shared_ptr<alexaClientSDK::acl::AVSConnectionManager> m_mockAVSConnectionManager;
+    std::shared_ptr<aace::test::unit::avs::MockActivityTrackerInterface> m_mockActivityTracker;
     std::shared_ptr<aace::test::unit::avs::MockMessageStorage> m_mockMessageStorage;
     std::shared_ptr<aace::test::unit::avs::MockMessageRouter> m_mockMessageRouter;
     std::shared_ptr<aace::test::unit::avs::MockAttachmentManager> m_mockAttachmentManager;
@@ -227,7 +228,6 @@ private:
     std::shared_ptr<alexaClientSDK::acsdkShutdownManagerInterfaces::ShutdownManagerInterface> m_mockShutDownManager;
 
     // platform interface mocks
-    std::shared_ptr<MockAlerts> m_mockAlerts;
     std::shared_ptr<MockNotifications> m_mockNotifications;
     std::shared_ptr<MockAudioPlayer> m_mockAudioPlayer;
     std::shared_ptr<MockAuthProvider> m_mockAuthProvider;

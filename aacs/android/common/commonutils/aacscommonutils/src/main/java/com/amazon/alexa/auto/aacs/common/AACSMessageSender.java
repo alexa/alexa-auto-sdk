@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -52,11 +52,23 @@ public class AACSMessageSender {
      * @param sender AACS Sender.
      */
     public AACSMessageSender(@NonNull WeakReference<Context> contextWk, @NonNull AACSSender sender) {
+        this(contextWk, sender, AACSConstants.getAACSPackageName(contextWk));
+    }
+
+    /**
+     * Constructs an instance of @c AACSMessageSender.
+     *
+     * @param contextWk Android Context which will be used for sending intents
+     *                  to AACS.
+     * @param sender AACS Sender.
+     * @param packageName Package name for TargetComponent.
+     */
+    public AACSMessageSender(
+            @NonNull WeakReference<Context> contextWk, @NonNull AACSSender sender, @NonNull String packageName) {
         this.mContextWk = contextWk;
         this.mAACSSender = sender;
         this.mAACSTarget = TargetComponent.withComponent(
-                new ComponentName(AACSConstants.getAACSPackageName(contextWk), AACSConstants.AACS_CLASS_NAME),
-                TargetComponent.Type.SERVICE);
+                new ComponentName(packageName, AACSConstants.AACS_CLASS_NAME), TargetComponent.Type.SERVICE);
     }
 
     /**

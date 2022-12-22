@@ -43,6 +43,10 @@
                 <action android:name="com.amazon.aacs.aasb.RenderTemplate" />
                 <action android:name="com.amazon.aacs.aasb.ClearTemplate" />
             </intent-filter>
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.Navigation" />
+                <action android:name="com.amazon.aacs.aasb.StartNavigation"/>
+            </intent-filter>
         </receiver>
     </application>
 </manifest>

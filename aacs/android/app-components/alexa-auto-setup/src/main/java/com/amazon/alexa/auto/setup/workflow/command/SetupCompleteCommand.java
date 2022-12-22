@@ -15,15 +15,21 @@
 package com.amazon.alexa.auto.setup.workflow.command;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 
+import com.amazon.aacsconstants.Action;
+import com.amazon.aacsconstants.Topic;
+import com.amazon.aacsipc.AACSSender;
+import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
-import com.amazon.alexa.auto.apis.auth.AuthMode;
-import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
-import com.amazon.alexa.auto.setup.workflow.event.LoginEvent;
+import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
+import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
+
+import java.lang.ref.WeakReference;
 
 /**
  * Command that checks auth mode and publishes event accordingly which then navigates user
@@ -31,28 +37,32 @@ import com.amazon.alexa.auto.setup.workflow.event.LoginEvent;
  */
 public class SetupCompleteCommand extends Command {
     private static final String TAG = SetupCompleteCommand.class.getSimpleName();
+    AlexaSetupController mAlexaSetupController;
+    LoginUIEventListener mUIEventListener;
 
-    AuthController mAuthController;
 
     public SetupCompleteCommand(@NonNull Context context) {
         super(context);
         AlexaApp app = AlexaApp.from(context);
-        mAuthController = app.getRootComponent().getAuthController();
+        mAlexaSetupController = app.getRootComponent().getAlexaSetupController();
+        mUIEventListener = app.getRootComponent().getComponent(LoginUIEventListener.class).orElse(null);
     }
 
     @VisibleForTesting
-    SetupCompleteCommand(Context context, AuthController mAuthController) {
+    SetupCompleteCommand(Context context, AlexaSetupController alexaSetupController, LoginUIEventListener loginUIEventListener) {
         super(context);
-        this.mAuthController = mAuthController;
+        this.mAlexaSetupController = alexaSetupController;
+        this.mUIEventListener = loginUIEventListener;
     }
 
     @Override
     public void execute() {
-        AuthMode mode = mAuthController.getAuthMode();
-        if (mode.equals(AuthMode.CBL_AUTHORIZATION)) {
-            publishEvent(new WorkflowMessage(LoginEvent.CBL_FLOW_SETUP_COMPLETED));
-        } else if (mode.equals(AuthMode.AUTH_PROVIDER_AUTHORIZATION)) {
-            publishEvent(new WorkflowMessage(LoginEvent.PREVIEW_MODE_FLOW_SETUP_COMPLETED));
+        Log.d(TAG, "Setup completed, forwarding to landing page...");
+        mAlexaSetupController.setSetupCompleteStatus(true);
+        new AACSMessageSender(new WeakReference<>(getContext()), new AACSSender())
+                .sendMessage(Topic.DEVICE_SETUP, Action.DeviceSetup.SETUP_COMPLETED, "");
+        if (mUIEventListener != null) {
+            mUIEventListener.loginFinished();
         }
     }
 }

@@ -17,22 +17,24 @@ class Nghttp2Conan(ConanFile):
     exports_sources = ["CMakeLists.txt", "patches/**"]
     generators = "cmake", "pkg_config"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False],
-               "fPIC": [True, False],
-               "with_app": [True, False],
-               "with_hpack": [True, False],
-               "with_jemalloc": [True, False],
-               "with_asio": [True, False],
-               "openssl_version": ["1.0", "1.1", None],
-              }
-    default_options = {"shared": False,
-                       "fPIC": True,
-                       "with_app": True,
-                       "with_hpack": False,
-                       "with_jemalloc": False,
-                       "with_asio": False,
-                       "openssl_version": None,
-                      }
+    options = {
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "with_app": [True, False],
+        "with_hpack": [True, False],
+        "with_jemalloc": [True, False],
+        "with_asio": [True, False],
+        "openssl_version": ["1.0", "1.1", None],
+    }
+    default_options = {
+        "shared": False,
+        "fPIC": True,
+        "with_app": True,
+        "with_hpack": False,
+        "with_jemalloc": False,
+        "with_asio": False,
+        "openssl_version": None,
+    }
 
     _source_subfolder = "source_subfolder"
 
@@ -63,7 +65,9 @@ class Nghttp2Conan(ConanFile):
         if self.settings.os == "Neutrino":
             self.requires("openssl/qnx7")
         else:
-            self.requires("openssl/1.1.1h") # always set openssl dependency - (aac) fix for with_app=False
+            self.requires(
+                "openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7"
+            )  # always set openssl dependency - (aac) fix for with_app=False
         if self.options.with_app:
             self.requires("c-ares/1.17.1")
             self.requires("libev/4.33")
@@ -120,26 +124,22 @@ class Nghttp2Conan(ConanFile):
         #                       "${CMAKE_CURRENT_SOURCE_DIR}/includes)\n"
         #                       "set_target_properties(nghttp2_static ")
         target_libnghttp2 = "nghttp2" if self.options.shared else "nghttp2_static"
-        tools.replace_in_file(os.path.join(self._source_subfolder, "src", "CMakeLists.txt"),
-                              "\n"
-                              "link_libraries(\n"
-                              "  nghttp2\n",
-                              "\n"
-                              "link_libraries(\n"
-                              "  {} ${{CONAN_LIBS}}\n".format(target_libnghttp2))
+        tools.replace_in_file(
+            os.path.join(self._source_subfolder, "src", "CMakeLists.txt"),
+            "\n" "link_libraries(\n" "  nghttp2\n",
+            "\n" "link_libraries(\n" "  {} ${{CONAN_LIBS}}\n".format(target_libnghttp2),
+        )
         if not self.options.shared:
-            tools.replace_in_file(os.path.join(self._source_subfolder, "src", "CMakeLists.txt"),
-                                  "\n"
-                                  "  add_library(nghttp2_asio SHARED\n",
-                                  "\n"
-                                  "  add_library(nghttp2_asio\n")
-            tools.replace_in_file(os.path.join(self._source_subfolder, "src", "CMakeLists.txt"),
-                                  "\n"
-                                  "  target_link_libraries(nghttp2_asio\n"
-                                  "    nghttp2\n",
-                                  "\n"
-                                  "  target_link_libraries(nghttp2_asio\n"
-                                  "    {}\n".format(target_libnghttp2))
+            tools.replace_in_file(
+                os.path.join(self._source_subfolder, "src", "CMakeLists.txt"),
+                "\n" "  add_library(nghttp2_asio SHARED\n",
+                "\n" "  add_library(nghttp2_asio\n",
+            )
+            tools.replace_in_file(
+                os.path.join(self._source_subfolder, "src", "CMakeLists.txt"),
+                "\n" "  target_link_libraries(nghttp2_asio\n" "    nghttp2\n",
+                "\n" "  target_link_libraries(nghttp2_asio\n" "    {}\n".format(target_libnghttp2),
+            )
 
     def build_cmake(self):
         self._patch_sources()
@@ -148,10 +148,8 @@ class Nghttp2Conan(ConanFile):
 
     def build_autotools(self):
         autotools = AutoToolsBuildEnvironment(self)
-        conf_args = [
-            "--enable-lib-only"
-        ]
-        autotools.configure(configure_dir=self._source_subfolder,args=conf_args)
+        conf_args = ["--enable-lib-only"]
+        autotools.configure(configure_dir=self._source_subfolder, args=conf_args)
         autotools.make()
         pass
 
@@ -174,11 +172,15 @@ class Nghttp2Conan(ConanFile):
             cmake = self._configure_cmake()
             cmake.install()
             cmake.patch_config_paths()
-            tools.rmdir(os.path.join(self.package_folder, 'share'))
-            tools.rmdir(os.path.join(self.package_folder, 'lib', 'pkgconfig'))
+            tools.rmdir(os.path.join(self.package_folder, "share"))
+            tools.rmdir(os.path.join(self.package_folder, "lib", "pkgconfig"))
 
     def package_info(self):
-        suffix = "_static" if tools.Version(self.version) > "1.39.2" and not self.options.shared and not self.settings.os == "Android" else ""
+        suffix = (
+            "_static"
+            if tools.Version(self.version) > "1.39.2" and not self.options.shared and not self.settings.os == "Android"
+            else ""
+        )
         self.cpp_info.libs = ["nghttp2" + suffix]
         if self.options.with_asio:
             self.cpp_info.libs.insert(0, "nghttp2_asio")

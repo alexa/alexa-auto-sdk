@@ -122,9 +122,14 @@ public:
     void addCounter(const std::string& name, int value);
 
     /**
-     * Print the metric event data via logger in a standardized metric format.
+     * Print the metric event data via logger in a standardized metric format for an unknown context.
      */
     void record();
+
+    /**
+     * Print the metric event data via logger in a standardized metric format for the provided context.
+     */
+    void record(const std::string& context);
 
 private:
     /**

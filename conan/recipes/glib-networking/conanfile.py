@@ -12,12 +12,10 @@ class GlibnetworkingConan(ConanFile):
     license = "LGPLv2Plus"
     settings = "os", "arch", "compiler", "build_type"
     options = {"shared": [True, False]}
-    default_options = {
-        "shared": False
-    }
+    default_options = {"shared": False}
     generators = "pkg_config"
-    requires = ["openssl/1.1.1i#b843148d42054bebfdca6e9561a35d77"]
-    build_requires = ["meson/0.56.2","pkgconf/1.7.3"]
+    requires = ["openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7"]
+    build_requires = ["meson/0.56.2", "pkgconf/1.7.3"]
 
     _meson = None
     _source_subfolder = "source_subfolder"
@@ -27,9 +25,8 @@ class GlibnetworkingConan(ConanFile):
         self.requires(f"glib/2.67.1@{self.user}/{self.channel}")
 
     def source(self):
-        maj_ver = '.'.join(self.version.split('.')[0:2])
-        tarball_name = '{name}-{version}.tar'.format(
-            name=self.name, version=self.version)
+        maj_ver = ".".join(self.version.split(".")[0:2])
+        tarball_name = "{name}-{version}.tar".format(name=self.name, version=self.version)
         archive_name = f"{tarball_name}.xz"
         source_url = f"https://download.gnome.org/sources/glib-networking/{maj_ver}/{archive_name}"
         tools.get(source_url)
@@ -49,9 +46,7 @@ class GlibnetworkingConan(ConanFile):
         meson.options["static_modules"] = "false" if self.options["shared"] else "true"
 
         meson.options["pkg_config_path"] = f"{os.getcwd()}:{os.getenv('PKG_CONFIG_PATH')}"
-        meson.configure(build_folder=self._build_subfolder,
-                        source_folder=self._source_subfolder,
-                        args=[])
+        meson.configure(build_folder=self._build_subfolder, source_folder=self._source_subfolder, args=[])
         self._meson = meson
         return self._meson
 
@@ -66,6 +61,5 @@ class GlibnetworkingConan(ConanFile):
         tools.remove_files_by_mask(self.package_folder, "*.so")
 
     def package_info(self):
-        self.cpp_info.libdirs.append(os.path.join(
-            self.package_folder, "lib", "gio", "modules"))
+        self.cpp_info.libdirs.append(os.path.join(self.package_folder, "lib", "gio", "modules"))
         self.cpp_info.libs = tools.collect_libs(self)

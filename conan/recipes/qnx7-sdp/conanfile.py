@@ -9,10 +9,7 @@ class QNX7SDPConan(ConanFile):
     version = "7.x"
     description = "Cross-compiling with QNX 7 SDP"
 
-    settings = {
-        "os": ["Linux", "Macos"],
-        "arch": ["x86_64", "armv8"]
-    }
+    settings = {"os": ["Linux", "Macos"], "arch": ["x86_64", "armv8"]}
 
     options = {"qnx7sdp_path": "ANY"}
     default_options = {"qnx7sdp_path": ""}
@@ -26,8 +23,7 @@ class QNX7SDPConan(ConanFile):
 
     @property
     def _platform(self):
-        return {"Macos": "darwin",
-                "Linux": "linux"}.get(str(self._build_os))
+        return {"Macos": "darwin", "Linux": "linux"}.get(str(self._build_os))
 
     @property
     def _qnx_version(self):
@@ -35,9 +31,7 @@ class QNX7SDPConan(ConanFile):
             return "700"
         elif self.settings_target.os.version == "7.1":
             return "710"
-        raise ConanInvalidConfiguration(
-            f"Unsupported QNX version: {self.settings_target.os.version}"
-        )
+        raise ConanInvalidConfiguration(f"Unsupported QNX version: {self.settings_target.os.version}")
 
     @property
     def _qnx_base(self):
@@ -58,13 +52,11 @@ class QNX7SDPConan(ConanFile):
 
     @property
     def _qnx_arch(self):
-        return {"x86_64": "x86_64",
-                "armv8": "aarch64le"}.get(str(self.settings_target.arch))
+        return {"x86_64": "x86_64", "armv8": "aarch64le"}.get(str(self.settings_target.arch))
 
     @property
     def _qnx_toolchain_arch(self):
-        return {"x86_64": "x86_64",
-                "armv8": "aarch64"}.get(str(self.settings_target.arch))
+        return {"x86_64": "x86_64", "armv8": "aarch64"}.get(str(self.settings_target.arch))
 
     def configure(self):
         if self.settings_target.arch not in ["x86_64", "armv8"]:
@@ -105,7 +97,9 @@ class QNX7SDPConan(ConanFile):
         self.env_info.READELF = f"{toolchain_prefix}-readelf"
         self.env_info.NM = f"{toolchain_prefix}-nm"
 
-        self.env_info.CMAKE_TOOLCHAIN_FILE = os.path.join(self.package_folder, f"qnx7_toolchain_{self.settings_target.arch}.cmake")
+        self.env_info.CMAKE_TOOLCHAIN_FILE = os.path.join(
+            self.package_folder, f"qnx7_toolchain_{self.settings_target.arch}.cmake"
+        )
 
         self.env_info.QNX_HOST = self._qnx_host
         self.env_info.QNX_TARGET = self._qnx_target

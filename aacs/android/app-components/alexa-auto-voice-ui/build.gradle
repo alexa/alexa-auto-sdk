@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        targetSdkVersion 28
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -65,6 +65,8 @@ dependencies {
 
     // Eventbus
     implementation deps.eventbus
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'com.google.android.gms:play-services-wearable:17.1.0'
 
     // Test Dependencies
     testImplementation deps.junit

@@ -43,7 +43,7 @@
     <!--Title-->
     <TextView
         android:id="@+id/header_text"
-        style="@style/Alexa.TitleText"
+        style="?attr/headerText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
@@ -58,7 +58,7 @@
     <!--Body-->
     <TextView
         android:id="@+id/content_text"
-        style="@style/Alexa.SubtitleText"
+        style="?attr/bodyText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="left"

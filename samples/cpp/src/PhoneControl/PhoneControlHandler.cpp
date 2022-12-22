@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -57,7 +57,8 @@ PhoneCallControllerHandler::PhoneCallControllerHandler(
         m_loggerHandler{std::move(loggerHandler)},
         m_messageBroker{std::move(messageBroker)},
         m_callState{CallState::IDLE},
-        m_callError{} {
+        m_callError{},
+        m_connectionState{ConnectionState::DISCONNECTED} {
     setupUI();
     subscribeToAASBMessages();
 }
@@ -173,6 +174,7 @@ void PhoneCallControllerHandler::callerIdReceived(const std::string& callId, con
 }
 
 void PhoneCallControllerHandler::connectionStateChanged(ConnectionState state) {
+    m_connectionState = state;
     // Publish the "ConnectionStateChanged" message
     ConnectionStateChangedMessage msg;
     msg.payload.state = state;
@@ -225,6 +227,18 @@ bool PhoneCallControllerHandler::dial(const std::string& payload) {
     // Save payload of current call
     updatePayload(payload);
 
+    // Check for valid connection state
+    if (m_connectionState == ConnectionState::DISCONNECTED) {
+        auto callId = getCallId(m_currentCall);
+        callFailed(callId, CallError::OTHER, "Cannot dial on disconnected state");
+        if (auto console = m_console.lock()) {
+            console->printRuler();
+            console->printLine("Please connect your phone to make a call");
+            console->printRuler();
+        }
+        return false;
+    }
+
     // Assume that we dialed successfully
     m_callState = CallState::ACTIVE;
     m_callError = "";
@@ -260,6 +274,18 @@ bool PhoneCallControllerHandler::redial(const std::string& payload) {
             if (!redial.empty()) {
                 // Redial only sends back new call id, so update current payload with new call id
                 updateCallId(payload);
+                // Check for valid connection state
+                if (m_connectionState == ConnectionState::DISCONNECTED) {
+                    auto callId = getCallId(m_currentCall);
+                    callFailed(callId, CallError::OTHER, "Cannot redial on disconnected state");
+                    if (auto console = m_console.lock()) {
+                        console->printRuler();
+                        console->printLine("Please connect your phone to make a call");
+                        console->printRuler();
+                    }
+                    return;
+                }
+
                 // Assume that we dialed successfully
                 m_callState = CallState::ACTIVE;
                 m_callError = "";

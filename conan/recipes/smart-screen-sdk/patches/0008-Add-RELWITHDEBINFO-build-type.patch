@@ -1,7 +1,7 @@
-From 29a6c4cf58e335d6f053460c869c45b3eacaa89b Mon Sep 17 00:00:00 2001
+From 5fda89e8df0f059697e7ea581b6dbe4d046fcfcc Mon Sep 17 00:00:00 2001
 From: Patrick Tsai <yingtsai@amazon.com>
 Date: Tue, 15 Feb 2022 23:17:37 +0000
-Subject: [PATCH] Add RELWITHDEBINFO build type
+Subject: [PATCH 08/14] Add RELWITHDEBINFO build type
 
 ---
  modules/Alexa/build/cmake/BuildOptions.cmake | 15 ++++++++++++---
@@ -71,5 +71,5 @@ index 4cf9fa6..bee2e4c 100644
 +    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "-Wl,-z,relro,-z,now -Wl,-z,noexecstack")
  endif()
 -- 
-2.35.1
+2.36.0
 

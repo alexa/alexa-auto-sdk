@@ -67,7 +67,7 @@ messages:
   - action: GetState
     direction: outgoing
     desc: >
-      Must provide the local media source @PlaybackStateLocal, and @SessionStateLocal information 
+      Must provide the local media source @PlaybackState, and @SessionState information
       to maintain cloud sync.
     payload:
       - name: source

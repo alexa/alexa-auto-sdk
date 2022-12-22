@@ -14,7 +14,10 @@
  */
 package com.amazon.alexa.auto.voiceinteraction.service;
 
+import static com.amazon.aacsconstants.AssistantConstants.ON_DEVICE_POLICY;
+
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -28,6 +31,7 @@ import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.AssistantManager;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
@@ -61,6 +65,7 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
     AACSMessageSender mMessageSender;
 
     private boolean isAlexaConnected;
+    private boolean isOnDeviceACA;
 
     private static String[] AMAZONLITE_MODEL_FILES;
 
@@ -73,6 +78,11 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
         AlexaApp mApp = AlexaApp.from(this);
         mApp.getRootComponent().activateScope(new SessionViewControllerImpl());
         mApp.getRootComponent().activateScope(new SessionActivityControllerImpl());
+
+        if (mApp.getRootComponent().getComponent(AssistantManager.class).isPresent()) {
+            AssistantManager assistantManager = mApp.getRootComponent().getComponent(AssistantManager.class).get();
+            isOnDeviceACA = ON_DEVICE_POLICY.equals(assistantManager.getCoAssistantPolicy());
+        }
 
         mAuthController = mApp.getRootComponent().getAuthController();
         mAlexaSetupController = mApp.getRootComponent().getAlexaSetupController();
@@ -134,9 +144,11 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
             isAlexaConnected = message.getAction().equals(Constants.CONNECTION_STATUS_CONNECTED);
         }
 
-        if (message.getAction().equals(Action.SpeechRecognizer.WAKEWORD_DETECTED)) {
+        // This blocks the start of an assistant dialogue if the user is not already authenticated.
+        if (message.getAction().equals(Action.SpeechRecognizer.WAKEWORD_DETECTED) && mAuthController.isAuthenticated()) {
             final Bundle args = new Bundle();
-            if (isAlexaConnected) {
+            // Alexa connection state does not cover On-Device custom assistant.
+            if (isAlexaConnected || isOnDeviceACA) {
                 Log.d(TAG, "SpeechRecognizer: Wake word is detected...");
                 args.putString(AASBConstants.TOPIC, Topic.SPEECH_RECOGNIZER);
                 args.putString(AASBConstants.ACTION, Action.SpeechRecognizer.WAKEWORD_DETECTED);
@@ -147,6 +159,11 @@ public class AutoVoiceInteractionService extends VoiceInteractionService {
             }
             args.putString(AASBConstants.PAYLOAD, message.getPayload());
             showSession(args, VoiceInteractionSession.SHOW_WITH_ASSIST);
+        } else if (message.getTopic().equals(Constants.TOPIC_RELAUNCH_SESSION)) {
+            Log.d(TAG, "A component in the Alexa app needs to re-open the session");
+            final Bundle args = new Bundle();
+            args.putString(AASBConstants.TOPIC, Constants.TOPIC_RELAUNCH_SESSION);
+            showSession(args, VoiceInteractionSession.SHOW_SOURCE_APPLICATION);
         }
     }
 }

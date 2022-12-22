@@ -18,6 +18,9 @@ package com.amazon.aacstelephony;
 public class Constants {
     public static final String TELEPHONY_SERVICE_CLASS = "com.amazon.aacstelephony.AACSTelephonyService";
 
+    // Messaging intents
+    public final static String MESSAGING_CONSENT_FILE_NAME = "com.amazon.aacstelephony.messaging_consent";
+
     public static final String ACTION_CANCEL_IDLE_TIMER = "com.amazon.aacs.telephony.serviceLifecycle.cancel";
     public static final String ACTION_RESET_IDLE_TIMER = "com.amazon.aacs.telephony.serviceLifecycle.reset";
     public static final String ACTION_BLUETOOTH_PBAP_CLIENT_STATE_CHANGED =

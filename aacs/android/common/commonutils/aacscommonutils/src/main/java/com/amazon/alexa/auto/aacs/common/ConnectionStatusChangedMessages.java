@@ -44,4 +44,21 @@ public class ConnectionStatusChangedMessages {
             return Optional.empty();
         }
     }
+
+    /**
+     * Get the AVS connection status from a ConnectionStatusChanged message.
+     *
+     * @param json Json to parse.
+     * @return avs connection status if available.
+     */
+    public static Optional<String> getAvsConnectionStatus(@NonNull String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            String connectionStatus = obj.getJSONObject("detailed").getJSONObject("avs").getString("status");
+            return connectionStatus != null ? Optional.of(connectionStatus) : Optional.empty();
+        } catch (Exception exception) {
+            Log.w(TAG, "Failed to parse connection status from aacs message: " + json + " error: " + exception);
+            return Optional.empty();
+        }
+    }
 }

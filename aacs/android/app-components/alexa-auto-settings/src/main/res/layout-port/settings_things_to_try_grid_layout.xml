@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearLayoutCompat"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/title_text_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/ttt_grid_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <include
+        android:id="@+id/ttt_item1"
+        layout="@layout/settings_things_to_try_item_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintBottom_toTopOf="@id/ttt_item4"
+        app:layout_constraintEnd_toStartOf="@+id/ttt_item2"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title_text_bottom" />
+
+    <include
+        android:id="@+id/ttt_item2"
+        layout="@layout/settings_things_to_try_item_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ttt_item1"
+        app:layout_constraintEnd_toStartOf="@+id/ttt_item3"
+        app:layout_constraintStart_toEndOf="@+id/ttt_item1"
+        app:layout_constraintTop_toTopOf="@+id/ttt_item1" />
+
+    <include
+        android:id="@+id/ttt_item3"
+        layout="@layout/settings_things_to_try_item_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ttt_item2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ttt_item2"
+        app:layout_constraintTop_toTopOf="@+id/ttt_item2" />
+
+    <include
+        android:id="@+id/ttt_item4"
+        layout="@layout/settings_things_to_try_item_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="150dp"
+        app:layout_constraintBottom_toTopOf="@id/ttt_grid_bottom"
+        app:layout_constraintEnd_toStartOf="@+id/ttt_item5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@+id/ttt_item1"
+        app:layout_constraintTop_toBottomOf="@+id/ttt_item1" />
+
+    <include
+        android:id="@+id/ttt_item5"
+        layout="@layout/settings_things_to_try_item_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ttt_item4"
+        app:layout_constraintEnd_toStartOf="@+id/ttt_item6"
+        app:layout_constraintStart_toEndOf="@+id/ttt_item4"
+        app:layout_constraintTop_toTopOf="@+id/ttt_item4" />
+
+    <include
+        android:id="@+id/ttt_item6"
+        layout="@layout/settings_things_to_try_item_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ttt_item4"
+        app:layout_constraintEnd_toEndOf="@+id/ttt_item3"
+        app:layout_constraintStart_toEndOf="@+id/ttt_item5"
+        app:layout_constraintTop_toTopOf="@+id/ttt_item5" />
+
+
+    <TextView
+        android:id="@+id/ttt_preview_mode_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ttt_preview_mode_note"
+        android:textAlignment="center"
+        android:textAppearance="?attr/bodyText"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ttt_item4" />
+</androidx.constraintlayout.widget.ConstraintLayout>

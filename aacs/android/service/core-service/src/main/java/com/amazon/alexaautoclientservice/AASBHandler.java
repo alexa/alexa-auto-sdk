@@ -27,6 +27,7 @@ import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import com.amazon.aace.aasb.BuildConfig;
 import com.amazon.aace.core.MessageBroker;
 import com.amazon.aace.core.MessageStream;
 import com.amazon.aacsconstants.AACSConstants;
@@ -38,9 +39,9 @@ import com.amazon.aacsconstants.MediaConstants;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.aacsipc.TargetComponent;
+import com.amazon.alexaautoclientservice.modules.notification.NotificationsMessageHandler;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AlexaClientMessageHandler;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AuthStateObserver;
-import com.amazon.alexaautoclientservice.modules.alexaClient.ConnectionStateObserver;
 import com.amazon.alexaautoclientservice.modules.audioInput.AudioInputFocusManager;
 import com.amazon.alexaautoclientservice.modules.audioInput.AudioInputMessageHandler;
 import com.amazon.alexaautoclientservice.modules.audioOutput.AudioOutputMessageHandler;
@@ -66,6 +67,7 @@ public class AASBHandler {
     private AudioInputMessageHandler mAudioInput;
     private AudioInputFocusManager mAudioInputFocusManager;
     private AlexaClientMessageHandler mAlexaClient;
+    private NotificationsMessageHandler mNotifications;
     private CustomDomainMessageDispatcher mCustomDomainMessageDispatcher;
     private HashMap<String, String> mAudioInputStreamMap;
     private long mCachedBufferedBytes;
@@ -80,6 +82,7 @@ public class AASBHandler {
 
         mAACSSender = new AACSSender(cacheCapacity);
         mAlexaClient = new AlexaClientMessageHandler();
+        mNotifications = new NotificationsMessageHandler(context);
         mAudioInputFocusManager = new AudioInputFocusManager(context, mAlexaClient);
         mAudioOutput = new AudioOutputMessageHandler(context, mAlexaClient);
         mAudioInput = new AudioInputMessageHandler(context, mAACSSender, mAudioInputFocusManager);
@@ -106,18 +109,18 @@ public class AASBHandler {
         try {
             JSONObject aasbMessage = new JSONObject(message);
             String topic = aasbMessage.getJSONObject(AASBConstants.HEADER)
-                                   .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
-                                   .getString(AASBConstants.TOPIC);
+                    .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
+                    .getString(AASBConstants.TOPIC);
             String action = aasbMessage.getJSONObject(AASBConstants.HEADER)
-                                    .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
-                                    .getString(AASBConstants.ACTION);
+                    .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
+                    .getString(AASBConstants.ACTION);
             String replyToId = "";
             if (aasbMessage.getJSONObject(AASBConstants.HEADER)
-                            .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
-                            .has(AASBConstants.REPLY_TO_ID)) {
+                    .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
+                    .has(AASBConstants.REPLY_TO_ID)) {
                 replyToId = aasbMessage.getJSONObject(AASBConstants.HEADER)
-                                    .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
-                                    .getString(AASBConstants.REPLY_TO_ID);
+                        .getJSONObject(AASBConstants.MESSAGE_DESCRIPTION)
+                        .getString(AASBConstants.REPLY_TO_ID);
             }
 
             String messageId = aasbMessage.getJSONObject(AASBConstants.HEADER).getString(AASBConstants.ID);
@@ -168,6 +171,9 @@ public class AASBHandler {
     }
 
     private void sendDirective(String messageId, String topic, String action, String payload, String message) {
+        if (topic.equals(Topic.NOTIFICATIONS) || topic.equals(Topic.DO_NOT_DISTURB)) {
+            mNotifications.handleNotificationMessage(messageId, topic, action, payload);
+        }
         if (topic.equals(Topic.AUDIO_OUTPUT)) {
             try {
                 JSONObject payloadJSON = new JSONObject(payload);

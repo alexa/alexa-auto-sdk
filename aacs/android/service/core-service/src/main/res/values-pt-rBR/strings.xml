@@ -1,8 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="aacs_description">O Serviço de atendimento ao cliente Alexa Auto permite que você fale com a Alexa no seu veículo.</string>
+    <string name="aacs_description">O Serviço de atendimento ao cliente Alexa Auto permite que você fale com Alexa no seu veículo.</string>
     <string name="aacs_initializing">Iniciando..</string>
     <string name="aacs_ready">Inicialização concluída.</string>
     <string name="aacs_title">Serviço de atendimento ao cliente Alexa Auto</string>
     <string name="component_registry_key">%1$s + %2$s</string>
+    <string name="general_notification_title">Novo notificação de Alexa</string>
+    <string name="general_notification_text">Tente dizer: Alexa, quais são as minhas notificações?</string>
 </resources>

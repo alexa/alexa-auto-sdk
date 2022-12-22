@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -198,18 +198,13 @@ void AuthorizationHandler::eventReceived(const std::string& service, const std::
                                 if (auto card = activity->findViewById("id:card").lock()) {
                                     // clang-format off
                                     json string = {
-                                        {"code",  code}, 
+                                        {"code",  code},
                                         {"url", url}
                                     };
                                     // clang-format on
                                     card->set(string.dump(), View::Type::CBLCode);
                                 }
                             });
-                            auto command = m_applicationContext->getBrowserCommand();
-                            if (!command.empty()) {
-                                m_applicationContext->executeCommand(
-                                    (command + ' ' + url + "?cbl-code=" + code).c_str());
-                            }
                         } else {
                             log(logger::LoggerHandler::Level::ERROR, "invalidCodeOrUrl");
                         }
@@ -303,7 +298,7 @@ void AuthorizationHandler::authorizationError(
         if (auto card = activity->findViewById("id:card").lock()) {
             // clang-format off
             json string = {
-                {"service",  service}, 
+                {"service",  service},
                 {"error", error}
             };
             // clang-format on

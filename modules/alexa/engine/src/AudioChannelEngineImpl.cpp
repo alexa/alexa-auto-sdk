@@ -64,8 +64,7 @@ AudioChannelEngineImpl::AudioChannelEngineImpl(
 
 bool AudioChannelEngineImpl::initializeAudioChannel(
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
     try {
         ThrowIfNull(audioOutputChannel, "invalidAudioOutputChannel");
         ThrowIfNull(speakerManager, "invalidSpeakerManager");
@@ -79,12 +78,6 @@ bool AudioChannelEngineImpl::initializeAudioChannel(
         // add the speaker impl to the speaker manager
         m_speakerManager = speakerManager;
         speakerManager->addChannelVolumeInterface(getChannelVolumeInterface());
-
-        // Register for auth changes
-        if (authDelegate != nullptr) {
-            m_authDelegate = authDelegate;
-            m_authDelegate->addAuthObserver(shared_from_this());
-        }
 
         return true;
     } catch (std::exception& ex) {
@@ -121,12 +114,6 @@ void AudioChannelEngineImpl::doShutdown() {
     }
 
     m_channelVolumeInterface.reset();
-
-    // Clean up auth delegate
-    if (m_authDelegate != nullptr) {
-        m_authDelegate->removeAuthObserver(shared_from_this());
-        m_authDelegate.reset();
-    }
 }
 
 void AudioChannelEngineImpl::sendPendingEvent() {
@@ -368,7 +355,7 @@ void AudioChannelEngineImpl::executeMediaError(SourceId id, MediaError error, co
                 if (auto observer_lock = observer.lock()) {
                     observer_lock->onPlaybackError(
                         id,
-                        static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>(error),
+                        convertErrorType(error),
                         description,
                         alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState{offset});
                 }
@@ -491,7 +478,7 @@ void AudioChannelEngineImpl::executePlaybackError(SourceId id, MediaError error,
                 if (auto observer_lock = observer.lock()) {
                     observer_lock->onPlaybackError(
                         id,
-                        static_cast<alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType>(error),
+                        convertErrorType(error),
                         description,
                         alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState{offset});
                 }
@@ -541,6 +528,7 @@ void AudioChannelEngineImpl::executeBufferRefilled(SourceId id) {
 }
 
 void AudioChannelEngineImpl::resetSource() {
+    AACE_DEBUG(LXT);
     m_currentId = ERROR;
     m_pendingEventState = PendingEventState::NONE;
     m_currentMediaState = MediaState::STOPPED;
@@ -587,6 +575,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     std::shared_ptr<alexaClientSDK::avsCommon::avs::attachment::AttachmentReader> attachmentReader,
     const alexaClientSDK::avsCommon::utils::AudioFormat* format,
     const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config) {
+    AACE_INFO(LXT.d("type", "attachment"));
     return m_executor
         .submit([this, attachmentReader, format, config] { return execSetSource(attachmentReader, format, config); })
         .get();
@@ -622,6 +611,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     std::chrono::milliseconds offsetAdjustment,
     const alexaClientSDK::avsCommon::utils::AudioFormat* format,
     const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config) {
+    AACE_INFO(LXT.d("type", "attachmentWithOffset").d("offsetAdjustment", offsetAdjustment.count()));
     return m_executor
         .submit([this, attachmentReader, offsetAdjustment, format, config] {
             return execSetSource(attachmentReader, offsetAdjustment, format, config);
@@ -661,6 +651,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     bool repeat,
     const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config,
     alexaClientSDK::avsCommon::utils::MediaType format) {
+    AACE_INFO(LXT.d("type", "stream"));
     return m_executor
         .submit([this, stream, repeat, config, format] { return execSetSource(stream, repeat, config, format); })
         .get();
@@ -725,6 +716,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
     const alexaClientSDK::avsCommon::utils::mediaPlayer::SourceConfig& config,
     bool repeat,
     const alexaClientSDK::avsCommon::utils::mediaPlayer::PlaybackContext& playbackContext) {
+    AACE_INFO(LXT.sensitive("url", url));
     return m_executor
         .submit([this, url, offset, config, repeat, playbackContext] {
             return execSetSource(url, offset, config, repeat, playbackContext);
@@ -766,6 +758,7 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
 }
 
 bool AudioChannelEngineImpl::play(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) {
+    AACE_INFO(LXT.d("id", id));
     return m_executor.submit([this, id] { return execPlay(id); }).get();
 }
 
@@ -777,13 +770,10 @@ bool AudioChannelEngineImpl::execPlay(
         ThrowIfNot(validateSource(id), "invalidSource");
 
         // return false if audio is already playing
-        ReturnIf(m_currentMediaState == MediaState::PLAYING || m_currentMediaState == MediaState::BUFFERING, false);
+        ReturnIf(m_currentMediaState == MediaState::PLAYING, false);
 
         // return false if play() was already called but no callback has been made yet
         ReturnIf(m_pendingEventState == PendingEventState::PLAYBACK_STARTED, false);
-
-        // send the pending event
-        sendPendingEvent();
 
         // invoke the platform interface play method
         auto outputChannel = m_audioOutputChannel;
@@ -802,6 +792,7 @@ bool AudioChannelEngineImpl::execPlay(
 }
 
 bool AudioChannelEngineImpl::stop(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) {
+    AACE_INFO(LXT.d("id", id));
     auto future = m_executor.submit([this, id] { return execStop(id); });
     return future.valid() ? future.get() : false;
 }
@@ -833,6 +824,7 @@ bool AudioChannelEngineImpl::execStop(
 }
 
 bool AudioChannelEngineImpl::pause(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) {
+    AACE_INFO(LXT.d("id", id));
     return m_executor.submit([this, id] { return execPause(id); }).get();
 }
 
@@ -862,11 +854,6 @@ bool AudioChannelEngineImpl::execPause(
         // set the expected pending event state and media offset
         m_pendingEventState = PendingEventState::PLAYBACK_PAUSED;
 
-        // if the current media state is already stopped then send up the pending event now
-        if (m_currentMediaState == MediaState::STOPPED) {
-            sendPendingEvent();
-        }
-
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()).d("expectedState", m_pendingEventState).d("id", id));
@@ -875,6 +862,7 @@ bool AudioChannelEngineImpl::execPause(
 }
 
 bool AudioChannelEngineImpl::resume(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) {
+    AACE_INFO(LXT.d("id", id));
     return m_executor.submit([this, id] { return execResume(id); }).get();
 }
 
@@ -884,12 +872,6 @@ bool AudioChannelEngineImpl::execResume(
         AACE_VERBOSE(LXT.d("id", id));
 
         ThrowIfNot(validateSource(id), "invalidSource");
-
-        // return false if audio is not paused
-        ReturnIf(m_mediaStateChangeInitiator != MediaStateChangeInitiator::PAUSE, false);
-
-        // return false if audio is already playing
-        ReturnIf(m_currentMediaState == MediaState::PLAYING || m_currentMediaState == MediaState::BUFFERING, false);
 
         // return false if resume() was already called but no callback has been made yet
         ReturnIf(m_pendingEventState == PendingEventState::PLAYBACK_RESUMED, false);
@@ -921,7 +903,17 @@ std::chrono::milliseconds AudioChannelEngineImpl::getOffset(
 std::chrono::milliseconds AudioChannelEngineImpl::execGetOffset(
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId id) {
     try {
-        ReturnIf(m_currentId == ERROR || m_currentId != id, m_savedOffset);
+        if (m_currentId == ERROR) {
+            AACE_WARN(LXT.m("getOffset called after source reset. Returning cached ID from last source")
+                          .d("requestedId", id));
+            return m_savedOffset;
+        }
+        if (m_currentId != id) {
+            AACE_WARN(LXT.m("getOffset called but ID does not match. Returning cached ID from last source")
+                          .d("requestedId", id)
+                          .d("m_currentId", m_currentId));
+            return m_savedOffset;
+        }
 
         std::chrono::milliseconds offset = std::chrono::milliseconds(m_audioOutputChannel->getPosition());
         ThrowIf(offset.count() < 0, "invalidMediaTime");
@@ -947,27 +939,42 @@ uint64_t AudioChannelEngineImpl::execGetNumBytesBuffered() {
 
 alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState>
 AudioChannelEngineImpl::getMediaPlayerState(SourceId id) {
+    AACE_INFO(LXT);
     return m_executor.submit([this, id] { return execGetMediaPlayerState(id); }).get();
 }
 
 alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState>
 AudioChannelEngineImpl::execGetMediaPlayerState(SourceId id) {
+    AACE_VERBOSE(LXT.d("id", id));
     auto optional =
         alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState>();
-    if (m_audioOutputChannel != nullptr && m_currentId == id)
+    if (m_currentId != id) {
+        AACE_WARN(LXT.m("ID does not match current source").d("m_currentId", m_currentId).d("requestedId", id));
+        return optional;
+    }
+    if (m_audioOutputChannel != nullptr) {
         optional.set(alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerState{
             std::chrono::milliseconds(m_audioOutputChannel->getPosition())});
+    }
     return optional;
 }
 
 void AudioChannelEngineImpl::addObserver(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) {
-    m_callbackExecutor.submit([this, observer] { m_mediaPlayerObservers.insert(observer); });
+    AACE_INFO(LXT);
+    m_callbackExecutor.submit([this, observer] {
+        AACE_VERBOSE(LX("addObserverExec"));
+        m_mediaPlayerObservers.insert(observer);
+    });
 }
 
 void AudioChannelEngineImpl::removeObserver(
     std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerObserverInterface> observer) {
-    m_callbackExecutor.submit([this, observer] { m_mediaPlayerObservers.erase(observer); });
+    AACE_INFO(LXT);
+    m_callbackExecutor.submit([this, observer] {
+        AACE_VERBOSE(LX("removeObserverExec"));
+        m_mediaPlayerObservers.erase(observer);
+    });
 }
 
 bool AudioChannelEngineImpl::validateSource(
@@ -1032,20 +1039,6 @@ bool AudioChannelEngineImpl::getSpeakerSettings(
     }
 }
 
-// alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
-
-void AudioChannelEngineImpl::onAuthStateChange(
-    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
-    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) {
-    // Stop audio playback if we are not authenticated
-    if (state == alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::UNINITIALIZED) {
-        if (m_audioOutputChannel != nullptr) {
-            AACE_INFO(LXT.m("Stop audio playback since we are not authenticated"));
-            m_audioOutputChannel->stop();
-        }
-    }
-}
-
 //
 // aace::engine::alexa::DuckingInterface
 //
@@ -1088,6 +1081,23 @@ bool AudioChannelEngineImpl::execStopDucking() {
     } catch (std::exception& ex) {
         AACE_ERROR(LXT.d("reason", ex.what()));
         return false;
+    }
+}
+
+alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType AudioChannelEngineImpl::convertErrorType(MediaError error) {
+    switch (error) {
+        case MediaError::MEDIA_ERROR_UNKNOWN:
+            return alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType::MEDIA_ERROR_UNKNOWN;
+        case MediaError::MEDIA_ERROR_INVALID_REQUEST:
+            return alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType::MEDIA_ERROR_INVALID_REQUEST;
+        case MediaError::MEDIA_ERROR_SERVICE_UNAVAILABLE:
+            return alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType::MEDIA_ERROR_SERVICE_UNAVAILABLE;
+        case MediaError::MEDIA_ERROR_INTERNAL_SERVER_ERROR:
+            return alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_SERVER_ERROR;
+        case MediaError::MEDIA_ERROR_INTERNAL_DEVICE_ERROR:
+            return alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType::MEDIA_ERROR_INTERNAL_DEVICE_ERROR;
+        default:
+            return alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType::MEDIA_ERROR_UNKNOWN;
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <string>
 #include <chrono>
 
-#include <AIP/Initiator.h>
+#include <AVSCommon/AVS/AgentInitiator.h>
 
 namespace aace {
 namespace engine {
@@ -45,7 +45,7 @@ public:
      * @param initiator The initiator being used
      * @return Returns @c true if the initiator should be blocked, @c false otherwise
      */
-    virtual bool shouldBlock(const alexaClientSDK::capabilityAgents::aip::Initiator& initiator);
+    virtual bool shouldBlock(const alexaClientSDK::avsCommon::avs::AgentInitiator& initiator);
 };
 
 }  // namespace alexa

@@ -21,6 +21,8 @@ public class LoginEvent {
     public static final String READY_FOR_SETUP = "Ready_For_Setup";
     public static final String ALEXA_NOT_SELECTED_EVENT = "Alexa_Not_Selected_Default";
     public static final String ALEXA_IS_SELECTED_EVENT = "Alexa_Is_Selected_Default";
+    public static final String AACS_NOT_CONNECTED_EVENT = "AACS_Not_Connected_Event";
+    public static final String AACS_CONNECTED_EVENT = "AACS_Connected_Event";
     public static final String NETWORK_CONNECTED_EVENT = "Network_Connected";
     public static final String NETWORK_DISCONNECTED_EVENT = "Network_Disconnected";
     public static final String CAR_STATE_DRIVE_EVENT = "Car_State_Drive";

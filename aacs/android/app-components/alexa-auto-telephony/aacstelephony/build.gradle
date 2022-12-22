@@ -1,13 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
-
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
+        minSdkVersion 27
         targetSdkVersion 27
-        versionCode 1
-        versionName "4.1.1"
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'

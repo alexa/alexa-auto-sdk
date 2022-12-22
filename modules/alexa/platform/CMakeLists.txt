@@ -1,7 +1,6 @@
 # AACE Alexa Platform
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/Alerts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaClient.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaConfiguration.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/AACE/Alexa/AlexaEngineInterfaces.h
@@ -29,7 +28,6 @@ source_group("Header Files" FILES ${HEADERS})
 
 add_library(AACEAlexaPlatform SHARED
     ${HEADERS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Alerts.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaClient.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AlexaSpeaker.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/AudioPlayer.cpp

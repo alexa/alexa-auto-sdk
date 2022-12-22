@@ -103,11 +103,12 @@ engine->configure({coreConfig, alexaConfig, navigationConfig});
 
 #### Specify configuration programmatically
 
-Each Auto SDK module that defines configuration provides a factory class with functions that return `EngineConfiguration` objects. The values a function puts in the configuration it creates correspond to the function parameters. For example, you can configure the `Alexa` module's `alertsCapabilityAgent` settings by using the [`AlexaConfiguration::createAlertsConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/native/api/classes/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#af7a3007198c8d8e47ce33edbf5c902a7) function:
+Each Auto SDK module that defines configuration provides a factory class with functions that return `EngineConfiguration` objects. The values a function puts in the configuration it creates correspond to the function parameters. For example, you can configure the `Alexa` module's `notificationsCapabilityAgent` settings by using the [`AlexaConfiguration::createNotificationsConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/native/api/classes/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5205a15e4b9f8596a6aff6e4c26595fa) function:
+
 
 ```cpp
-auto alertsConfig = aace::alexa::config::AlexaConfiguration::createAlertsConfig("</some/directory/path/for/databases/alerts.db>" );
-```
+auto notificationConfig = aace::alexa::config::AlexaConfiguration::createNotificationsConfig("</some/directory/path/for/databases/notifications.db>" );
+``` 
 
 ### Register for AASB Messages
 

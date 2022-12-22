@@ -163,7 +163,6 @@ void TextToSpeechHandler::prepareSpeechCompleted(
         auto output = std::make_shared<std::ofstream>(path, std::ios::binary);
         // copy the stream to the file
         char buffer[READ_BUFFER_SIZE];
-        ssize_t size = 0;
 
         while (!preparedAudio->isClosed()) {
             ssize_t bytesRead = preparedAudio->read(buffer, READ_BUFFER_SIZE);
@@ -176,8 +175,6 @@ void TextToSpeechHandler::prepareSpeechCompleted(
 
             // write the data to the output file
             output->write(buffer, bytesRead);
-
-            size += bytesRead;
         }
 
         output->close();

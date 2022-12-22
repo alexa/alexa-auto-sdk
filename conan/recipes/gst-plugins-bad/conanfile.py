@@ -12,17 +12,22 @@ class GStPluginsBadConan(ConanFile):
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
     name = "gst-plugins-bad"
     version = "1.18.4"
-    description = "GStreamer is a development framework for creating applications like media players, video editors, " \
-                  "streaming media broadcasters and so on"
+    description = (
+        "GStreamer is a development framework for creating applications like media players, video editors, "
+        "streaming media broadcasters and so on"
+    )
     topics = ("conan", "gstreamer", "multimedia", "video", "audio", "broadcasting", "framework", "media")
     homepage = "https://gstreamer.freedesktop.org/"
     license = "GPL-2.0-only"
     exports = ["LICENSE.md"]
     settings = "os", "arch", "compiler", "build_type"
-    options = dict({"shared": [True, False], "fPIC": [ True, False]}, **{f: _meson_feature for f in _features})
+    options = dict({"shared": [True, False], "fPIC": [True, False]}, **{f: _meson_feature for f in _features})
     default_options = dict({"shared": False, "fPIC": True}, **{f: "auto" for f in _features})
     exports_sources = ["patches/*.patch"]
-    requires = ["openssl/1.1.1i#b843148d42054bebfdca6e9561a35d77", "libxml2/2.9.10#7293e7b3f9703b324258194bb749ce85"]
+    requires = [
+        "openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7",
+        "libxml2/2.9.10#7293e7b3f9703b324258194bb749ce85",
+    ]
     build_requires = ["meson/0.56.2", "bison/3.7.1", "flex/2.6.4", "pkgconf/1.7.3"]
     generators = "pkg_config"
 
@@ -32,10 +37,10 @@ class GStPluginsBadConan(ConanFile):
     def configure(self):
         del self.settings.compiler.libcxx
         del self.settings.compiler.cppstd
-        self.options['gstreamer'].shared = self.options.shared
+        self.options["gstreamer"].shared = self.options.shared
 
     def config_options(self):
-        if self.settings.os == 'Windows':
+        if self.settings.os == "Windows":
             del self.options.fPIC
 
     def requirements(self):
@@ -82,7 +87,9 @@ class GStPluginsBadConan(ConanFile):
             defs[x] = self.options.get_safe(x)
 
         # Disable options that cause build issues on non-Linux systems
-        if self.settings.os != 'Linux' or (hasattr(self, 'settings_build') and tools.cross_building(self, skip_x64_x86=True)):
+        if self.settings.os != "Linux" or (
+            hasattr(self, "settings_build") and tools.cross_building(self, skip_x64_x86=True)
+        ):
             meson.options["introspection"] = "disabled"
             meson.options["orc"] = "disabled"
 
@@ -95,7 +102,7 @@ class GStPluginsBadConan(ConanFile):
         meson.options["hls-crypto"] = "openssl"
 
         # Somehow Meson ignore PKG_CONFIG_PATH env. Force setting it with option.
-        meson.options["pkg_config_path"] = os.getenv('PKG_CONFIG_PATH')
+        meson.options["pkg_config_path"] = os.getenv("PKG_CONFIG_PATH")
 
         meson.configure(build_folder=self._build_subfolder, source_folder=self._source_subfolder, defs=defs)
         return meson

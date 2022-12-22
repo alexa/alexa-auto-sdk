@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:theme="@style/DeviceDefaults">
+
+    <TextView
+        android:id="@+id/weather_card_forecast_day"
+        style="?attr/headerText"
+        android:layout_width="wrap_content"
+        android:layout_height="53dp"
+        android:layout_marginStart="12dp"
+        android:text="FRI"
+        app:layout_constraintBottom_toTopOf="@+id/weather_card_forecast_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/weather_card_forecast_icon"
+        android:layout_width="78dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="64dp"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/weather_card_arrow_down"
+        android:layout_width="26dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weather_card_arrow_up" />
+
+    <TextView
+        android:id="@+id/weather_card_forecast_temp_high"
+        style="?attr/headerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:text="99"
+        app:layout_constraintStart_toEndOf="@+id/weather_card_arrow_up"
+        app:layout_constraintTop_toBottomOf="@+id/weather_card_forecast_icon" />
+
+    <ImageView
+        android:id="@+id/weather_card_arrow_up"
+        android:layout_width="26dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="14dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/weather_card_forecast_icon" />
+
+    <TextView
+        android:id="@+id/weather_card_forecast_temp_low"
+        style="?attr/headerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="70"
+        app:layout_constraintStart_toEndOf="@+id/weather_card_arrow_down"
+        app:layout_constraintTop_toBottomOf="@+id/weather_card_forecast_temp_high" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_description">تتيح لك Alexa Auto Client Service التحدث إلى Alexa في سيارتك.</string>
+    <string name="aacs_initializing">جار التهيئة..</string>
+    <string name="aacs_ready">اكتملت التهيئة.</string>
+    <string name="aacs_title">AACS</string>
+    <string name="component_registry_key">%1$s + %2$s</string>
+    <string name="general_notification_title">إشعار جديد من Alexa</string>
+    <string name="general_notification_text">جرّب قول، \"Alexa، ما هي إشعاراتي؟\"</string>
+</resources>

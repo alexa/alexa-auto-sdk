@@ -28,6 +28,7 @@ import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.ConnectionStatusChangedMessages;
 import com.amazon.alexa.auto.aacs.common.WakewordDetectedMessages;
+import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.voiceinteraction.common.AutoVoiceInteractionMessage;
 import com.amazon.alexa.auto.voiceinteraction.common.Constants;
 
@@ -48,7 +49,7 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
 
             switch (message.action) {
                 case Action.AlexaClient.CONNECTION_STATUS_CHANGED:
-                    handleConnectionStatusChanged(message);
+                    handleConnectionStatusChanged(message, context);
                     break;
                 case Action.SpeechRecognizer.WAKEWORD_DETECTED:
                     handleWakewordDetected(message);
@@ -62,10 +63,16 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
     }
 
     @VisibleForTesting
-    void handleConnectionStatusChanged(@NonNull AACSMessage aacsMessage) {
+    void handleConnectionStatusChanged(@NonNull AACSMessage aacsMessage, Context context) {
         if (aacsMessage.payload != null) {
             ConnectionStatusChangedMessages.parseConnectionStatus(aacsMessage.payload).ifPresent(message -> {
                 sendAutoVoiceInteractionMessage(Constants.TOPIC_ALEXA_CONNECTION, message, "");
+            });
+
+            ConnectionStatusChangedMessages.getAvsConnectionStatus(aacsMessage.payload).ifPresent(avsStatus -> {
+                boolean isConnected = Constants.CONNECTION_STATUS_CONNECTED.equals(avsStatus);
+                AlexaApp.from(context).getRootComponent().getAlexaSetupController().setAlexaCloudConnectionStatus(
+                        isConnected);
             });
         }
     }

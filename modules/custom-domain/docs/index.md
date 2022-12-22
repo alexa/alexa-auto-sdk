@@ -48,7 +48,7 @@ The Custom Domain module requires proper Engine Configuration for your custom in
 | aace.customDomain.<br>interfaces[i].version | string | Yes | The version of the custom interface in string. The version should follow the versioning convention `<major>.<minor>`. e.g. "1.0". |
 | aace.customDomain.<br>interfaces[i].states | list | No | Optional. The list of the custom state names for a custom interface. It must be provided if custom states are available for this interface. The custom state names must match with the ones you specified in your Skill Manifest.|
 
-**Note:** On AACS and AACS Sample App, this module is disabled by default. Please refer to [AACS Configuration documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/service/) to enable the module through AACS configuration file. If your product does not use AACS but uses AASB messages and if you do not intend to enable the communication between the vehicle and your cloud Alexa skills, you can disable this module by providing the block below in the Engine Configuration.
+**Note:** On AACS and Alexa Auto App, this module is disabled by default. Please refer to [AACS Configuration documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/service/) to enable the module through AACS configuration file. If your product does not use AACS but uses AASB messages and if you do not intend to enable the communication between the vehicle and your cloud Alexa skills, you can disable this module by providing the block below in the Engine Configuration.
 ```jsonc
     "aasb.customDomain": {
         "CustomDomain": {    

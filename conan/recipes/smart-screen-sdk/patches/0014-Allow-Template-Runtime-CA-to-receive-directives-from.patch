@@ -1,0 +1,48 @@
+From 0ab28490b6251897973dd0634c719c7191272fe8 Mon Sep 17 00:00:00 2001
+From: Sherry Yang <yanyidi@amazon.com>
+Date: Thu, 6 Oct 2022 22:19:28 -0700
+Subject: [PATCH 14/14] Allow Template Runtime CA to receive directives from
+ all agents
+
+---
+ .../TemplateRuntime/src/TemplateRuntime.cpp               | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+index c3eadaa..29b8bb6 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
++++ b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+@@ -16,7 +16,7 @@
+ #include <ostream>
+ 
+ #include <rapidjson/error/en.h>
+-
++#include <AVSCommon/AVS/AgentId.h>
+ #include <AVSCommon/AVS/CapabilityConfiguration.h>
+ #include <AVSCommon/Utils/JSON/JSONUtils.h>
+ #include <AVSCommon/Utils/Logger/Logger.h>
+@@ -36,6 +36,8 @@ using namespace alexaClientSDK::avsCommon::utils::json;
+ 
+ using namespace smartScreenSDKInterfaces;
+ 
++using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
++
+ /// TemplateRuntime capability constants
+ /// TemplateRuntime interface type
+ static const std::string TEMPLATERUNTIME_CAPABILITY_INTERFACE_TYPE = "AlexaInterface";
+@@ -73,10 +75,10 @@ static const std::string RENDER_TEMPLATE{"RenderTemplate"};
+ static const std::string RENDER_PLAYER_INFO{"RenderPlayerInfo"};
+ 
+ /// The RenderTemplate directive signature.
+-static const NamespaceAndName TEMPLATE{NAMESPACE, RENDER_TEMPLATE};
++static const NamespaceAndName TEMPLATE{NAMESPACE, RENDER_TEMPLATE, AgentId::AGENT_ID_ALL};
+ 
+ /// The RenderPlayerInfo directive signature.
+-static const NamespaceAndName PLAYER_INFO{NAMESPACE, RENDER_PLAYER_INFO};
++static const NamespaceAndName PLAYER_INFO{NAMESPACE, RENDER_PLAYER_INFO, AgentId::AGENT_ID_ALL};
+ 
+ /// Tag for find the AudioItemId in the payload of the RenderPlayerInfo directive
+ static const std::string AUDIO_ITEM_ID_TAG{"audioItemId"};
+-- 
+2.36.0
+

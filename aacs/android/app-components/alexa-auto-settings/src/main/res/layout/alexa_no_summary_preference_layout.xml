@@ -33,7 +33,7 @@
 
             <TextView
                 android:id="@android:id/title"
-                style="@style/Alexa.TitleText"
+                style="?attr/headerText"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/settings_pref_item_min_height"
                 android:gravity="center_vertical"
@@ -51,7 +51,7 @@
             android:orientation="vertical" />
     </LinearLayout>
     <View
-        android:background="?attr/dividerColorOnBackground"
+        android:background="@android:color/darker_gray"
         android:layout_height="1dp"
         android:layout_width="fill_parent"/>
 </LinearLayout>

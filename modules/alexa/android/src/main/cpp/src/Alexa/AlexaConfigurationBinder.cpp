@@ -107,21 +107,6 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
     }
 }
 
-JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_createAlertsConfigBinder(
-    JNIEnv* env,
-    jobject obj,
-    jstring databaseFilePath) {
-    try {
-        auto config = aace::alexa::config::AlexaConfiguration::createAlertsConfig(JString(databaseFilePath).toStdStr());
-        ThrowIfNull(config, "createAlertsConfigFailed");
-
-        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
-    } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_alexa_config_AlexaConfiguration_createAlertsConfigBinder", ex.what());
-        return 0;
-    }
-}
-
 JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_createNotificationsConfigBinder(
     JNIEnv* env,
     jobject obj,

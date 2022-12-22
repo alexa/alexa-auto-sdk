@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_display_cbl_code_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="horizontal">
+
+    <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.333" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.667" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/qr_code_title_textview_first_line_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/qr_code_title_textview_first_line_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.333" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/qr_code_title_textview_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/scan_qr_code_textview_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.583" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/qr_code_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.667" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/qr_code_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="1.0" />
+
+    <!--Alexa logo-->
+
+    <!--Title text-->
+    <TextView
+        android:id="@+id/qr_code_title_textview_first_line"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/cbl_login_title"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toTopOf="@id/qr_code_title_textview_first_line_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/qr_code_title_textview_first_line_upper_bound" />
+
+    <!--Subtitle text-->
+    <TextView
+        android:id="@+id/qr_code_title_textview"
+        style="?attr/bodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="Title is changed at run time. We have hardcoded string to assist the design"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toTopOf="@id/qr_code_title_textview_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/qr_code_title_textview_first_line_lower_bound"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/scan_qr_code_text_view"
+        style="?attr/bodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/login_qr_code_scan_message"
+        android:textSize="34sp"
+        app:layout_constraintBottom_toTopOf="@id/scan_qr_code_textview_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/qr_code_title_textview_lower_bound" />
+
+    <!--QR code-->
+    <ImageView
+        android:id="@+id/qr_code"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center|bottom"
+        app:layout_constraintBottom_toTopOf="@id/qr_code_lower_bound"
+        app:layout_constraintTop_toBottomOf="@id/scan_qr_code_textview_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toEndOf="@id/left_guideline" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

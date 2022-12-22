@@ -24,7 +24,7 @@ $ build.py build [-h] [--home PATH] [-v] [-p PLATFORM] [-a ARCH] [-g]
                  [--with-docs] [--no-docs] [--with-unit-tests]
                  [--no-unit-tests] [--with-sampleapp] [--no-sampleapp]
                  [--with-sensitive-logs] [--no-sensitive-logs]
-                 [--with-latency-logs] [--no-latency-logs]
+                 [--with-metrics] [--no-metrics]
                  [--output FILE] [--no-output] [--skip-config]
 ```
 Used to build Auto SDK modules and components.
@@ -65,9 +65,8 @@ optional arguments:
   --with-sensitive-logs, --sensitive-logs
                         emit sensitive data in debugging logs (default: False)
   --no-sensitive-logs
-  --with-latency-logs, --latency-logs
-                        emit latency data in debugging logs (default: False)
-  --no-latency-logs
+  --with-metrics        Enables metrics emission (default: True)
+  --no-metrics          Disables metrics emission 
   --output FILE         filename for output build archive
   --no-output           don't create output package
   --skip-config         skip build configuration

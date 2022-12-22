@@ -5,7 +5,6 @@ Text-to-Speech (TTS) Service provides an implementation on the Android platform 
 <!-- omit in toc -->
 ## Table of Contents
 - [Overview](#overview)
-- [Building the Library](#building-the-library)
 - [Architecture](#architecture)
 - [Configuration](#configuration)
 - [Sample Usage](#sample-usage)
@@ -20,38 +19,20 @@ Text-to-Speech (TTS) Service provides an implementation on the Android platform 
 Text-to-Speech Service implements [TextToSpeechService](https://developer.android.com/reference/android/speech/tts/TextToSpeechService), which is an abstract base class for TTS engine implementations. The following list describes the responsibilities of the service and the Android TTS framework:
 
 * The service is responsible for:
-
-    * retrieving the TTS capabilities from AACS
+    * retrieving the TTS capabilities
     * preparing the TTS audio and vending out the stream to the Android TTS framework APIs 
 
 * The Android TTS framework is responsible for:
-
     * handling the states of TTS requests
     * playing out the audio
     * saving the audio to file
 
 The Text-to-Speech Service communicates with AACS to get the available locales and fetch the synthesized audio stream. Therefore, AACS must be started, configured, and running in connected state to ensure the Text-to-Speech Service can generate the designated TTS audio correctly. 
 
-## Building the Library
-Text-to-Speech Service is built as an Android Archive (AAR) to be included in your application along with the AACS AAR.
-You can build the library locally using the following steps:
-
-  1) Enter the following command to change the directory:
-      ~~~
-          cd ${AAC_SDK_HOME}/aacs/android/sample-app
-      ~~~
-  2) Enter the following command to build the TTS library:
-      ~~~
-          ./gradlew :alexa-auto-tts:assembleRelease
-      ~~~
-      Replace `assembleRelease` with `assembleDebug` if you want to build the debug version of the library. The generated AAR is available at `alexa-auto-sdk/aacs/android/app-components/alexa-auto-tts/aacstts/build/outputs/aar`.
-      You must include the `AACSIPC`, `AACSConstants`, `AACSCommonUtils`, `AACS` and `Auto SDK` AARs in your application to use with the AACS TTS AAR.
-
-AACS TTS is by default enabled in the AACS Sample App. See the [AACS Sample App documentation](../../sample-app/README.md#building-and-signing-the-aacs-sample-app-apk) for build instructions.
 >**Important!** The Text-to-Speech Service requires the Local Voice Control and Alexa Custom Assistant extensions to function.
 
 ## Architecture
-The following diagram shows the high-level architecture of TTS Service and AACS. The blue box in the diagram represents the Text-to-Speech Service and the white boxes in the diagram represent the other components developed by Amazon. These components are all packaged in AARs to be added along with AACS AAR into AACS Sample App or your application. The other boxes represent components that do not belong to Amazon: The yellow boxes represent the components from the Android TTS framework, and the green box represents the OEM application using Android TTS APIs.
+The following diagram shows the high-level architecture of TTS Service and AACS. The blue box in the diagram represents the Text-to-Speech Service and the white boxes in the diagram represent the other components developed by Amazon. These components are all packaged in AARs to be added along with AACS AAR into Alexa Auto App or your application. The other boxes represent components that do not belong to Amazon: The yellow boxes represent the components from the Android TTS framework, and the green box represents the OEM application using Android TTS APIs.
 
 ![Android TTS](./docs/diagrams/Android_TTS.png)
 

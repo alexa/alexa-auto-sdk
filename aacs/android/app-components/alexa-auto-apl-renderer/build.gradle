@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        targetSdkVersion 28
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
     }
     buildTypes {
         release {
@@ -36,7 +36,7 @@ android {
             def separator = "_"
             def buildType = variant.buildType.name
             def apkName = project + separator + buildType + ".aar"
-            outputFileName = new File(apkName)
+            outputFileName = file(apkName).name
         }
     }
 }
@@ -49,10 +49,10 @@ dependencies {
     implementation project(':aacscommonutils')
     implementation project(':aacsipc')
     implementation project(':aacsconstants')
-
     implementation project(':alexa-auto-apis')
     implementation project(":alexa-auto-apps-common-util")
     implementation project(":alexa-auto-navigation")
+    implementation project(':alexa-auto-voice-interaction')
 
     implementation deps.androidx_appcompat
     implementation deps.eventbus

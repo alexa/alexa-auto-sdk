@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,7 +29,12 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
+import com.amazon.aacsconstants.Action;
+import com.amazon.aacsconstants.Topic;
+import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
+import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
+import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.aacs.common.ListTemplate;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
@@ -36,6 +42,7 @@ import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.templateruntime.R;
 import com.amazon.alexa.auto.templateruntime.dependencies.TemplateDirectiveHandler;
 import com.amazon.alexa.auto.templateruntime.receiver.AlexaVoiceoverCompletedMessage;
+import com.amazon.alexa.auto.voice.ui.common.AutoVoiceUIMessage;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -48,14 +55,18 @@ public class ListDirectiveHandler implements TemplateDirectiveHandler {
     private WeakReference<Context> mContext;
     private static final Handler mHandler = new Handler();
     private long voiceOverEndTime;
-
+    private AACSMessageSender mMessageSender;
+    private AACSSender mAACSSender;
     public ListDirectiveHandler(Context context) {
         mContext = new WeakReference<Context>(context);
         voiceOverEndTime = Long.MAX_VALUE;
+        mAACSSender = new AACSSender();
+        mMessageSender = new AACSMessageSender(mContext, mAACSSender);
     }
 
     @Override
     public void renderTemplate(AACSMessage message) {
+        TemplateDirectiveHandler.clearTemplate(mContext);
         AlexaApp app = AlexaApp.from(mContext.get());
         app.getRootComponent().getComponent(SessionViewController.class).ifPresent(sessionViewController -> {
             sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
@@ -72,22 +83,12 @@ public class ListDirectiveHandler implements TemplateDirectiveHandler {
         });
     }
 
-    @Override
-    public void clearTemplate() {
-        Log.i(TAG, "clearTemplate");
-        AlexaApp.from(mContext.get())
-                .getRootComponent()
-                .getComponent(SessionViewController.class)
-                .ifPresent(SessionViewController::clearTemplate);
-    }
-
     void renderListTemplateView(ViewGroup viewGroup, ListTemplate listTemplate) {
         LayoutInflater layoutInflater =
                 (LayoutInflater) mContext.get().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         viewGroup.addOnAttachStateChangeListener(getOnAttachStateChangeListener());
         View inflatedView = layoutInflater.inflate(R.layout.list_template, null);
         inflatedView.setId(R.id.list_template_view);
-
         viewGroup.addView(inflatedView, LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
         ListTemplateAdapter listTemplateAdapter = new ListTemplateAdapter(listTemplate);
@@ -117,6 +118,11 @@ public class ListDirectiveHandler implements TemplateDirectiveHandler {
 
         TextView subTitleText = inflatedView.findViewById(R.id.list_template_card_subTitle);
         subTitleText.setText(listTemplate.getTitle().getSubTitle());
+
+        ImageView closeButton = inflatedView.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(v -> {
+            TemplateDirectiveHandler.clearTemplateAndEndVoiceActivity(mMessageSender, mContext);
+        });
     }
 
     private View.OnAttachStateChangeListener getOnAttachStateChangeListener() {

@@ -14,7 +14,7 @@
             android:name=".VoiceActivity"
             android:launchMode="singleTask"
             android:exported="true"
-            android:theme="@style/Theme.AppCompat.Translucent"
+            android:theme="@style/AlexaAppTheme.TransparentVoiceUI"
             android:label="voice activity">
             <!-- Tag voice activity to be distraction optimized. More details can be found from https://source.android.com/devices/automotive/driver_distraction/guidelines -->
             <meta-data android:name="distractionOptimized" android:value="true"/>
@@ -27,7 +27,6 @@
                 <action android:name="com.amazon.aacs.aasb.DialogStateChanged"/>
 
                 <category android:name="com.amazon.aacs.aasb.SpeechRecognizer" />
-                <action android:name="com.amazon.aacs.aasb.WakewordDetected"/>
                 <action android:name="com.amazon.aacs.aasb.EndOfSpeechDetected"/>
             </intent-filter>
         </receiver>

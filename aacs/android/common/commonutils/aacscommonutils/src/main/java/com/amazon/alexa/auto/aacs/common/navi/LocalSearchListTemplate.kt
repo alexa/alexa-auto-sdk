@@ -21,7 +21,7 @@ import com.squareup.moshi.JsonClass
 data class PointOfInterest (
     val priceRange : String?,
     val coordinate : Coordinate,
-    val hoursOfOperation : List<HourOfOperation>,
+    val hoursOfOperation : List<HourOfOperation>?,
     val address : String,
     val provider : String?,
     val url : String?,

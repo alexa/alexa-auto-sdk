@@ -14,6 +14,8 @@
  */
 package com.amazon.alexa.auto.voice.ui.session;
 
+import android.util.Log;
+
 import androidx.fragment.app.Fragment;
 
 import com.amazon.alexa.auto.apis.session.SessionActivityController;
@@ -25,25 +27,40 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
  * Implementation for {@link SessionActivityController}.
  */
 public class SessionActivityControllerImpl implements SessionActivityController {
+    private static final String TAG = SessionActivityControllerImpl.class.getSimpleName();
+
     private final BehaviorSubject<Boolean> mFragmentAdded;
     private Fragment mVoiceFragment;
     private boolean isFragmentAdded;
+    private boolean isFragmentConsumed;
 
     public SessionActivityControllerImpl() {
-        mFragmentAdded = BehaviorSubject.createDefault(false);
+        Log.d(TAG, "constructor");
+        isFragmentAdded = false;
+        isFragmentConsumed = false;
+        mFragmentAdded = BehaviorSubject.createDefault(isFragmentAdded);
     }
 
     @Override
     public void addFragment(Fragment fragment) {
+        Log.d(TAG, "addFragment");
         mVoiceFragment = fragment;
-        mFragmentAdded.onNext(true);
+        isFragmentConsumed = false;
         isFragmentAdded = true;
+        mFragmentAdded.onNext(isFragmentAdded);
     }
 
     @Override
     public void removeFragment() {
-        mFragmentAdded.onNext(false);
+        Log.d(TAG, "removeFragment");
+        isFragmentConsumed = true;
         isFragmentAdded = false;
+        mFragmentAdded.onNext(isFragmentAdded);
+    }
+
+    @Override
+    public void consumeFragment() {
+        isFragmentConsumed = true;
     }
 
     @Override
@@ -54,6 +71,11 @@ public class SessionActivityControllerImpl implements SessionActivityController 
     @Override
     public boolean isFragmentAdded() {
         return isFragmentAdded;
+    }
+
+    @Override
+    public boolean isFragmentConsumed() {
+        return isFragmentConsumed;
     }
 
     @Override

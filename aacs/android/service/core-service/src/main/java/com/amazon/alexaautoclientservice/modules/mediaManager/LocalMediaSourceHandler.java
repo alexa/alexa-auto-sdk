@@ -18,7 +18,6 @@ package com.amazon.alexaautoclientservice.modules.mediaManager;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.session.MediaController;
-import android.os.RemoteException;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -212,8 +211,6 @@ public class LocalMediaSourceHandler extends LocalMediaSource {
                 mMediaController = new MediaControllerCompat(
                         mContext, MediaSessionCompat.Token.fromToken(controller.getSessionToken()));
                 mMediaController.registerCallback(mCallback);
-            } catch (RemoteException e) {
-                Log.e(TAG, e.getMessage());
             } catch (IllegalStateException exe) {
                 // Sometimes app may crash with java.lang.IllegalStateException: getSessionToken()
                 // called while not connected, if local media app is crashed
@@ -359,15 +356,9 @@ public class LocalMediaSourceHandler extends LocalMediaSource {
     public boolean volumeChanged(float volume) {
         Log.v(TAG, "volumeChanged requested " + volume);
         if (isSessionActive && mMediaController != null) {
-            MediaControllerCompat.PlaybackInfo playbackInfo = mMediaController.getPlaybackInfo();
-            if (playbackInfo == null) {
-                return false;
-            }
             mMediaController.setVolumeTo((int) (volume * 100), AudioManager.FLAG_SHOW_UI);
-            return true;
-        } else {
-            return false;
         }
+        return true;
     }
 
     @Override

@@ -74,7 +74,7 @@
 
                         <TextView
                             android:id="@+id/deDETitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -82,13 +82,13 @@
 
                         <TextView
                             android:id="@+id/deDESummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +129,7 @@
 
                         <TextView
                             android:id="@+id/deDEenUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -137,13 +137,13 @@
 
                         <TextView
                             android:id="@+id/deDEenUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -184,7 +184,7 @@
 
                         <TextView
                             android:id="@+id/enAUTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -192,13 +192,13 @@
 
                         <TextView
                             android:id="@+id/enAUSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -239,7 +239,7 @@
 
                         <TextView
                             android:id="@+id/enCATitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -247,13 +247,13 @@
 
                         <TextView
                             android:id="@+id/enCASummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -294,7 +294,7 @@
 
                         <TextView
                             android:id="@+id/enCAfrCATitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -302,13 +302,13 @@
 
                         <TextView
                             android:id="@+id/enCAfrCASummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -353,18 +353,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin"
-                            android:textAppearance="@style/Alexa.BodyText">
+                            android:textAppearance="?attr/headerText">
                         </TextView>
 
                         <TextView
                             android:id="@+id/enINSummary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/Alexa.HintText">
+                            android:textAppearance="?attr/bodyText">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -409,18 +409,18 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin"
-                            android:textAppearance="@style/Alexa.BodyText">
+                            android:textAppearance="?attr/headerText">
                         </TextView>
 
                         <TextView
                             android:id="@+id/enINhiINSummary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="@style/Alexa.HintText">
+                            android:textAppearance="?attr/bodyText">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -461,7 +461,7 @@
 
                         <TextView
                             android:id="@+id/enGBTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -469,13 +469,13 @@
 
                         <TextView
                             android:id="@+id/enGBSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -516,7 +516,7 @@
 
                         <TextView
                             android:id="@+id/enUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -524,13 +524,13 @@
 
                         <TextView
                             android:id="@+id/enUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -571,7 +571,7 @@
 
                         <TextView
                             android:id="@+id/enUSdeDETitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -579,13 +579,13 @@
 
                         <TextView
                             android:id="@+id/enUSdeDESummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -626,7 +626,7 @@
 
                         <TextView
                             android:id="@+id/enUSesESTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -634,13 +634,13 @@
 
                         <TextView
                             android:id="@+id/enUSesESSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -681,7 +681,7 @@
 
                         <TextView
                             android:id="@+id/enUSesUsTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -689,13 +689,13 @@
 
                         <TextView
                             android:id="@+id/enUSesUsSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="fill_parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -703,7 +703,7 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         />
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -744,7 +744,7 @@
 
                         <TextView
                             android:id="@+id/enUSfrFRTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -752,13 +752,13 @@
 
                         <TextView
                             android:id="@+id/enUSfrFRSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -799,7 +799,7 @@
 
                         <TextView
                             android:id="@+id/enUSitITTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -807,13 +807,13 @@
 
                         <TextView
                             android:id="@+id/enUSitITSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -854,7 +854,7 @@
 
                         <TextView
                             android:id="@+id/enUSjaJPTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -862,13 +862,13 @@
 
                         <TextView
                             android:id="@+id/enUSjaJPSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -909,7 +909,7 @@
 
                         <TextView
                             android:id="@+id/esESTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -917,13 +917,13 @@
 
                         <TextView
                             android:id="@+id/esESSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -964,7 +964,7 @@
 
                         <TextView
                             android:id="@+id/esESenUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -972,13 +972,13 @@
 
                         <TextView
                             android:id="@+id/esESenUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1019,7 +1019,7 @@
 
                         <TextView
                             android:id="@+id/esUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1027,13 +1027,13 @@
 
                         <TextView
                             android:id="@+id/esUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1074,7 +1074,7 @@
 
                         <TextView
                             android:id="@+id/esUsenUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1082,13 +1082,13 @@
 
                         <TextView
                             android:id="@+id/esUsenUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1129,7 +1129,7 @@
 
                         <TextView
                             android:id="@+id/esMXTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1137,13 +1137,13 @@
 
                         <TextView
                             android:id="@+id/esMXSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1184,7 +1184,7 @@
 
                         <TextView
                             android:id="@+id/frCATitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1192,13 +1192,13 @@
 
                         <TextView
                             android:id="@+id/frCASummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1239,7 +1239,7 @@
 
                         <TextView
                             android:id="@+id/frCAenCATitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1247,13 +1247,13 @@
 
                         <TextView
                             android:id="@+id/frCAenCASummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1294,7 +1294,7 @@
 
                         <TextView
                             android:id="@+id/frFRTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1302,13 +1302,13 @@
 
                         <TextView
                             android:id="@+id/frFRSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1349,7 +1349,7 @@
 
                         <TextView
                             android:id="@+id/frFRenUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1357,13 +1357,13 @@
 
                         <TextView
                             android:id="@+id/frFRenUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1404,7 +1404,7 @@
 
                         <TextView
                             android:id="@+id/itITTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1412,13 +1412,13 @@
 
                         <TextView
                             android:id="@+id/itITSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1459,7 +1459,7 @@
 
                         <TextView
                             android:id="@+id/itITenUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1467,13 +1467,13 @@
 
                         <TextView
                             android:id="@+id/itITenUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1514,7 +1514,7 @@
 
                         <TextView
                             android:id="@+id/ptBRTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1522,13 +1522,13 @@
 
                         <TextView
                             android:id="@+id/ptBRSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1569,7 +1569,7 @@
 
                         <TextView
                             android:id="@+id/hiINTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1577,13 +1577,13 @@
 
                         <TextView
                             android:id="@+id/hiINSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1624,7 +1624,7 @@
 
                         <TextView
                             android:id="@+id/hiINenINTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1632,13 +1632,13 @@
 
                         <TextView
                             android:id="@+id/hiINenINSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1679,7 +1679,7 @@
 
                         <TextView
                             android:id="@+id/jaJPTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1687,13 +1687,13 @@
 
                         <TextView
                             android:id="@+id/jaJPSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
                     </LinearLayout>
                     <View
-                        android:background="?attr/dividerColorOnBackground"
+                        android:background="@android:color/darker_gray"
                         android:layout_height="@dimen/setting_item_divider_height"
                         android:layout_width="0dp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -1734,7 +1734,7 @@
 
                         <TextView
                             android:id="@+id/jaJPenUSTitle"
-                            android:textAppearance="@style/Alexa.BodyText"
+                            android:textAppearance="?attr/headerText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/setting_item_vertical_margin">
@@ -1742,7 +1742,7 @@
 
                         <TextView
                             android:id="@+id/jaJPenUSSummary"
-                            android:textAppearance="@style/Alexa.HintText"
+                            android:textAppearance="?attr/bodyText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
                         </TextView>
@@ -1778,7 +1778,7 @@
 
         <TextView
             android:id="@+id/continueButton"
-            style="@style/Alexa.Button2"
+            style="?attr/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/select_language_continue_button"

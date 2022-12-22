@@ -1,30 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root"
-    android:orientation="vertical"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:ignore="MissingDefaultResource">
 
-        <LinearLayout
-            android:id="@+id/navigation_bar_fragment"
-            android:tag="navbar"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/left_button_end"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/navigation_horizontal_margin">
-                <include
-                    android:id="@+id/navigation_bar"
-                    layout="@layout/navigation_bar_layout" />
-        </LinearLayout>
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.0753" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/right_button_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.924" />
+
+        <ImageView
+            android:id="@+id/alexa_logo"
+            android:layout_width="105.47dp"
+            android:layout_height="65.51dp"
+            app:srcCompat="@drawable/alexa_logo_topbar"
+            android:contentDescription="alexa logo"
+            android:layout_gravity="center"
+            app:tint="?android:attr/colorForeground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/toolbar_bottom"
+            />
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:tag="back_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            app:srcCompat="@drawable/back_button"
+            android:contentDescription="alexa logo"
+            android:layout_gravity="center"
+            app:tint="#FFFFFF"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/left_button_end"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/toolbar_bottom"
+            />
+
+        <ImageView
+            android:id="@+id/sign_out"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:clickable="true"
+            android:visibility="invisible"
+            android:backgroundTint="#000000FF"
+            app:tint="?android:attr/colorForeground"
+            app:layout_constraintBottom_toTopOf="@id/toolbar_bottom"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/right_button_start"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/sign_out_icon"/>
 
         <androidx.fragment.app.FragmentContainerView
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:id="@+id/settings_nav_host_fragment"
-            android:layout_width="match_parent"
+            android:id="@+id/content"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/item_vertical_margin"
-            app:defaultNavHost="true" />
-</LinearLayout>
+            android:name="androidx.navigation.fragment.NavHostFragment" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout="@layout/fragment_alexa_landing_page" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/toolbar_bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.0742" />
+</androidx.constraintlayout.widget.ConstraintLayout>

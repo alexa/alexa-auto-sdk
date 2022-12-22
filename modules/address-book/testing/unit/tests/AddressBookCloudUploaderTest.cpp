@@ -30,8 +30,11 @@ namespace test {
 namespace unit {
 namespace addressBook {
 
-/// Plenty of timeout to wait for HTTP timeouts
-static std::chrono::seconds TIMEOUT(10);
+/// Plenty of timeout to wait for HTTP timeouts and retries
+static std::chrono::seconds TIMEOUT(20);
+
+/// Plenty of timeout to wait for HTTP timeouts with CleanAddressBooks
+static std::chrono::seconds LARGE_TIMEOUT(60);
 
 /// Mock token to be returned by @c getAuthToken
 static const std::string AUTH_TOKEN = "MockAuthToken";
@@ -214,7 +217,7 @@ public:
         m_alexaEndpointInterface = std::make_shared<DummyAlexaEndpointInterface>();
 
         // create device info
-        auto deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(
+        m_deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(
             alexaClientSDK::avsCommon::utils::configuration::ConfigurationNode::getRoot());
 
         m_mockContactAddressBook = std::make_shared<aace::engine::addressBook::AddressBookEntity>(
@@ -232,11 +235,11 @@ public:
         m_addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create(
             m_mockAddressBookServiceInterface,
             m_mockAuthDelegate,
-            std::move(deviceInfo),
+            m_deviceInfo,
             aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED,
             m_mockNetworkObservableInterface,
             m_alexaEndpointInterface,
-            true);
+            false);  // To flase, makes test cases simple by not waiting on EXPECT_CALL due to cleaning of Address Book events.
     }
 
     void TearDown() override {
@@ -246,6 +249,7 @@ public:
         }
     }
 
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
     std::shared_ptr<aace::engine::addressBook::AddressBookEntity> m_mockContactAddressBook;
     std::shared_ptr<aace::engine::addressBook::AddressBookEntity> m_mockNavigationAddressBook;
 
@@ -261,15 +265,8 @@ TEST_F(AddressBookCloudUploaderTest, create) {
 }
 
 TEST_F(AddressBookCloudUploaderTest, WithNoNetworkAndAuthRefreshedAddAndRemoveAddressBookExpectNoGetEntiresCall) {
-    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     // Expect No Call for GetEntries
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries("1000", testing::_)).Times(0);
-    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .Times(1)
-        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> std::string {
-            waitEvent.wakeUp();
-            return std::string(AUTH_TOKEN);
-        }));
 
     // First disconnect the network as to make the event loop wait for all the events.
     m_addressBookCloudUploader->onNetworkInfoChanged(
@@ -283,8 +280,6 @@ TEST_F(AddressBookCloudUploaderTest, WithNoNetworkAndAuthRefreshedAddAndRemoveAd
 
     // Now connect the network
     m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
-
-    EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 
     // Sleep to allow AddressBookCloudUploader threads to run.
     std::this_thread::sleep_for(std::chrono::seconds(3));
@@ -339,10 +334,56 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndNoAuthRefreshedAddSingleConta
     std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
+TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddSingleContactAddressBookWithCleanAllAddressBook) {
+    alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
+    auto mockAuthDelegate = std::make_shared<testing::StrictMock<MockAuthDelegateInterface>>();
+    auto mockNetworkObservableInterface = std::make_shared<testing::StrictMock<MockNetworkObservableInterface>>();
+    auto mockAddressBookServiceInterface = std::make_shared<testing::StrictMock<MockAddressBookServiceInterface>>();
+    auto alexaEndpointInterface = std::make_shared<DummyAlexaEndpointInterface>();
+
+    EXPECT_CALL(*mockAuthDelegate, addAuthObserver(testing::_)).WillOnce(testing::Return());
+    EXPECT_CALL(*mockAuthDelegate, removeAuthObserver(testing::_)).WillOnce(testing::Return());
+    EXPECT_CALL(*mockNetworkObservableInterface, addObserver(testing::_)).WillOnce(testing::Return());
+    EXPECT_CALL(*mockNetworkObservableInterface, removeObserver(testing::_)).WillOnce(testing::Return());
+    EXPECT_CALL(*mockAddressBookServiceInterface, addObserver(testing::_, "AVS")).WillOnce(testing::Return());
+    EXPECT_CALL(*mockAddressBookServiceInterface, removeObserver(testing::_)).WillOnce(testing::Return());
+
+    auto addressBookCloudUploader = aace::engine::addressBook::AddressBookCloudUploader::create(
+        mockAddressBookServiceInterface,
+        mockAuthDelegate,
+        m_deviceInfo,
+        aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED,
+        mockNetworkObservableInterface,
+        alexaEndpointInterface,
+        true);
+
+    EXPECT_CALL(*mockAuthDelegate, getAuthToken())
+        .WillRepeatedly(
+            testing::Return(std::string(AUTH_TOKEN)));  // Called multiple times due to provision status retry.
+
+    EXPECT_CALL(*mockAddressBookServiceInterface, getEntries("1000", testing::_))
+        .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> bool {
+            waitEvent.wakeUp();
+            return true;
+        }));
+
+    addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
+    addressBookCloudUploader->onAuthStateChange(
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED,
+        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error::SUCCESS);
+
+    addressBookCloudUploader->addressBookAdded(m_mockContactAddressBook);
+
+    EXPECT_TRUE(waitEvent.wait(LARGE_TIMEOUT));  // Sufficient time for Contact and Navigation address book clean up.
+
+    addressBookCloudUploader->shutdown();
+}
+
 TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddSingleContactAddressBook) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .WillOnce(testing::Return(std::string(AUTH_TOKEN)));  // Called once while checking for provision status.
+        .WillRepeatedly(
+            testing::Return(std::string(AUTH_TOKEN)));  // Called multiple times due to provision status retry.
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries("1000", testing::_))
         .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> bool {
             waitEvent.wakeUp();
@@ -362,7 +403,8 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddSingleContact
 TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddSingleNavigationAddressBook) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .WillOnce(testing::Return(std::string(AUTH_TOKEN)));  // Called once while checking for provision status.
+        .WillRepeatedly(
+            testing::Return(std::string(AUTH_TOKEN)));  // Called multiple times due to provision status retry.
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries("1001", testing::_))
         .WillOnce(testing::InvokeWithoutArgs([&waitEvent]() -> bool {
             waitEvent.wakeUp();
@@ -384,7 +426,8 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddTwiceSameAddr
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent2;
     int callCounter = 0;
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .WillOnce(testing::Return(std::string(AUTH_TOKEN)));  // Called once while checking for provision status.
+        .WillRepeatedly(
+            testing::Return(std::string(AUTH_TOKEN)));  // Called multiple times due to provision status retry.
 
     m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
     m_addressBookCloudUploader->onAuthStateChange(
@@ -419,7 +462,8 @@ TEST_F(
     EXPECT_CALL(
         *m_mockAuthDelegate,
         getAuthToken())
-        .WillOnce(testing::Return(std::string(AUTH_TOKEN)));  // Called once while checking for provision status.
+        .WillRepeatedly(
+            testing::Return(std::string(AUTH_TOKEN)));  // Called multiple times due to provision status retry.
     {
         ::testing::InSequence dummy;
 
@@ -479,7 +523,8 @@ TEST_F(AddressBookCloudUploaderTest, CheckForSequneceCallWhenAddingAndRemovingTw
     EXPECT_CALL(
         *m_mockAuthDelegate,
         getAuthToken())
-        .WillOnce(testing::Return(std::string(AUTH_TOKEN)));  // Called once while checking for provision status.
+        .WillRepeatedly(
+            testing::Return(std::string(AUTH_TOKEN)));  // Called multiple times due to provision status retry.
 
     {
         ::testing::InSequence dummy;
@@ -489,18 +534,12 @@ TEST_F(AddressBookCloudUploaderTest, CheckForSequneceCallWhenAddingAndRemovingTw
                 waitEvent1.wakeUp();
                 return true;
             }));
-        EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-            .Times(testing::AtLeast(1))
-            .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
 
         EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries("1001", testing::_))
             .WillOnce(testing::InvokeWithoutArgs([&waitEvent2]() -> bool {
                 waitEvent2.wakeUp();
                 return true;
             }));
-        EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-            .Times(testing::AtLeast(1))
-            .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
     }
 
     m_addressBookCloudUploader->onNetworkInfoChanged(aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED, 123);
@@ -766,9 +805,7 @@ TEST_F(AddressBookCloudUploaderTest, VerifyPostalAddressInputSanity) {
 TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
-    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .Times(testing::AtLeast(1))
-        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken()).WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
 
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
         .WillRepeatedly(testing::Invoke(
@@ -796,9 +833,7 @@ TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookSho
 TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldFail) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
-    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .Times(testing::AtLeast(1))
-        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken()).WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
 
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
         .WillRepeatedly(testing::Invoke(
@@ -829,9 +864,9 @@ TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookSho
 
 TEST_F(AddressBookCloudUploaderTest, AddingPhoneForNavigationAddressBookShouldFail_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
-    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .Times(testing::AtLeast(1))
-        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken()).WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
         .WillRepeatedly(testing::Invoke(
             [&waitEvent](
@@ -856,9 +891,9 @@ TEST_F(AddressBookCloudUploaderTest, AddingPhoneForNavigationAddressBookShouldFa
 
 TEST_F(AddressBookCloudUploaderTest, AddingPhoneForNavigationAddressBookShouldFail) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
-    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken())
-        .Times(testing::AtLeast(1))
-        .WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+
+    EXPECT_CALL(*m_mockAuthDelegate, getAuthToken()).WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
+
     EXPECT_CALL(*m_mockAddressBookServiceInterface, getEntries(testing::_, testing::_))
         .WillRepeatedly(testing::Invoke(
             [&waitEvent](

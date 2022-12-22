@@ -113,6 +113,7 @@ messages:
     payload:
       - name: localPlayerId
         desc: The opaque token that uniquely identifies the local external player app.
+    reply:
       - name: state
         type: ExternalMediaAdapterState
         desc: The ExternalMediaAdapterState to be initialized by the platform.

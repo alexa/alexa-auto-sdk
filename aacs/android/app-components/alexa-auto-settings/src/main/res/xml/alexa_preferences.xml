@@ -1,6 +1,9 @@
 <androidx.preference.PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:theme="@style/AlexaAppTheme"
+    tools:background="@drawable/gradient_background"
     app:iconSpaceReserved="false">
 
     <!-- This file maintains all settings for Signed-In mode, Preview Mode, Release/Debug builds
@@ -17,65 +20,116 @@
         app:key="voice-assistance-enable-nonalexa"
         app:title="@string/setting_voice_assistance_enable_nonalexa"
         app:layout="@layout/alexa_preference_layout"/>
-    <Preference
-        app:key="voice-assistance-alexa"
-        app:title="@string/setting_voice_assistance_alexa"
-        app:layout="@layout/alexa_preference_layout"/>
+
     <Preference
         app:key="voice-assistance-enable-alexa"
         app:title="@string/setting_voice_assistance_enable_alexa"
         app:layout="@layout/alexa_preference_layout"/>
 
-    <!-- General Settings -->
-    <Preference
-        app:key="alexa-signin"
-        app:title="@string/setting_alexa_signin"
-        app:layout="@layout/alexa_no_summary_preference_layout"/>
-    <SwitchPreferenceCompat
-        app:key="alexa-hands-free-settings"
-        app:title="@string/setting_alexa_hands_free_title"
-        app:summary="@string/setting_alexa_hands_free_summary"
-        app:defaultValue="true"
-        app:layout="@layout/alexa_preference_layout" />
-    <SwitchPreferenceCompat
-        app:key="alexa-dnd-setting"
-        app:title="@string/setting_alexa_dnd_title"
-        app:summary="@string/setting_alexa_dnd_summary"
-        app:defaultValue="false"
-        app:layout="@layout/alexa_preference_layout" />
     <Preference
         app:key="voice-assistance-push-to-talk"
         app:title="@string/setting_voice_assistance_setting_push_to_talk"
         app:layout="@layout/alexa_preference_layout"/>
-    <SwitchPreferenceCompat
-        app:key="alexa-location-consent-setting"
-        app:title="@string/setting_location_sharing_title"
-        app:summary="@string/setting_location_sharing_summary"
-        app:defaultValue="false"
-        app:layout="@layout/alexa_preference_layout" />
-    <SwitchPreferenceCompat
-        app:key="alexa-nav_favorite-consent-setting"
-        app:title="@string/setting_navigation_favorites_title"
-        app:summary="@string/setting_navigation_favorites_summary"
-        app:defaultValue="false"
-        app:layout="@layout/alexa_preference_layout" />
-    <Preference
-        app:key="alexa-communication"
-        app:title="@string/setting_alexa_communication"
-        app:layout="@layout/alexa_preference_layout"/>
-    <Preference
-        app:key="alexa-sounds"
-        app:title="@string/setting_alexa_sounds"
-        app:layout="@layout/alexa_no_summary_preference_layout"/>
-    <Preference
-        app:key="alexa-languages-settings"
-        app:title="@string/setting_alexa_language_title"
-        app:layout="@layout/alexa_preference_layout"/>
 
     <Preference
-        app:key="alexa-things-to-try"
-        app:title="@string/setting_alexa_things_to_try"
-        app:layout="@layout/alexa_no_summary_preference_layout"/>
+        app:key="voice-assistance-alexa"
+        app:title="@string/setting_voice_assistance_alexa"
+        app:layout="@layout/alexa_preference_layout"/>
+
+    <PreferenceCategory
+        app:key="settings_header"
+        app:title="Settings"
+        app:layout="@layout/settings_header"
+        >
+
+    </PreferenceCategory>
+
+    <Preference
+        app:key="alexa-signin"
+        app:title="@string/setting_alexa_signin"
+        app:layout="@layout/settings_middle_preference_no_summary"
+        app:icon="@drawable/settings_signin"
+        />
+
+    <!-- General Settings -->
+    <PreferenceCategory
+        app:key="talking_to_alexa_category"
+        app:title="Talking to Alexa"
+        app:layout="@layout/settings_preference_category"
+        >
+
+        <SwitchPreferenceCompat
+            app:key="alexa-hands-free-settings"
+            app:title="@string/setting_alexa_wake_word_title"
+            app:summary="@string/setting_alexa_wake_word_summary"
+            app:icon="@drawable/settings_handsfree_icon"
+            app:defaultValue="true"
+            app:layout="@layout/settings_top_preference" />
+
+        <Preference
+            app:key="alexa-things-to-try"
+            app:title="@string/cta_label_things_to_try"
+            app:icon="@drawable/settings_ttt_icon"
+            app:layout="@layout/settings_bottom_preference_no_summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="permissions-category"
+        app:title="Permissions"
+        app:layout="@layout/settings_preference_category"
+        >
+
+        <SwitchPreferenceCompat
+            app:key="alexa-location-consent-setting"
+            app:title="@string/setting_location_sharing_title"
+            app:summary="@string/setting_location_sharing_summary"
+            app:icon="@drawable/settings_location_icon"
+            app:defaultValue="false"
+            app:layout="@layout/settings_top_preference" />
+
+        <SwitchPreferenceCompat
+            app:key="alexa-nav_favorite-consent-setting"
+            app:title="@string/setting_navigation_favorites_title"
+            app:summary="@string/setting_navigation_favorites_summary"
+            app:icon="@drawable/settings_nav_favorites_icon"
+            app:defaultValue="false"
+            app:layout="@layout/settings_middle_preference" />
+
+        <Preference
+            app:key="alexa-communication"
+            app:title="@string/setting_alexa_calling_texting_title"
+            app:icon="@drawable/settings_call_icon"
+            app:layout="@layout/settings_bottom_preference"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="etc-settings-category"
+        app:title="More Settings"
+        app:layout="@layout/settings_preference_category"
+        >
+
+        <SwitchPreferenceCompat
+            app:key="alexa-dnd-setting"
+            app:title="@string/setting_alexa_dnd_title"
+            app:summary="@string/setting_alexa_dnd_summary"
+            app:icon="@drawable/settings_dnd_icon"
+            app:defaultValue="false"
+            app:layout="@layout/settings_top_preference" />
+
+        <Preference
+            app:key="alexa-sounds"
+            app:title="@string/setting_alexa_sounds"
+            app:icon="@drawable/settings_sound_icon"
+            app:layout="@layout/settings_middle_preference_no_summary"/>
+
+        <Preference
+            app:key="alexa-languages-settings"
+            app:title="@string/setting_language_title"
+            app:icon="@drawable/settings_language_icon"
+            app:layout="@layout/settings_bottom_preference_no_summary"/>
+
+    </PreferenceCategory>
 
     <!-- General Debug Settings -->
     <Preference
@@ -83,13 +137,5 @@
         app:title="@string/setting_aacs"
         app:layout="@layout/alexa_preference_layout" />
 
-    <!-- Sign Out/ Disable -->
-    <Preference
-        app:key="alexa-signout"
-        app:title="@string/setting_alexa_signout"
-        app:layout="@layout/alexa_last_preference_layout"/>
-    <Preference
-        app:key="alexa-disable"
-        app:title="@string/setting_alexa_disable"
-        app:layout="@layout/alexa_last_preference_layout"/>
+
 </androidx.preference.PreferenceScreen>

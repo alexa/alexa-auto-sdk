@@ -3,13 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:orientation="vertical"
-    android:theme="@style/Theme.Alexa.Standard">
+    android:orientation="vertical">
 
     <include
+        layout="@layout/login_start"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        layout="@layout/login_start" />
+        android:layout_height="fill_parent" />
 
     <include
         android:layout_width="fill_parent"

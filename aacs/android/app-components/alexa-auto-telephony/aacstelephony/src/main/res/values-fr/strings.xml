@@ -2,4 +2,14 @@
 <resources>
     <string name="aacs_telephony_description">Bénéficiez d\'une fonctionnalité d\'appel téléphonique sur votre appareil Android</string>
     <string name="aacs_telephony_title">Service de téléphonie AACS</string>
+
+    <string name="comms_toast_contacts_syncing">Synchronisation des contacts depuis %1$s…</string>
+    <string name="comms_toast_contacts_synced">Contacts depuis %1$s synchronisés</string>
+    <string name="comms_toast_contacts_removing">Suppression des contacts du service Amazon…</string>
+    <string name="comms_toast_contacts_removed">Contacts supprimés du service Amazon</string>
+
+    <string name="aacs_telephony_toast_sms_syncing">Synchronisation des SMS depuis %1$s…</string>
+    <string name="aacs_telephony_toast_sms_synced">SMS depuis %1$s synchronisés</string>
+    <string name="aacs_telephony_toast_sms_removing">Suppression des SMS du service Amazon…</string>
+    <string name="aacs_telephony_toast_sms_removed">SMS supprimés du service Amazon</string>
 </resources>

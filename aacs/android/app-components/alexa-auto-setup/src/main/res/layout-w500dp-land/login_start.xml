@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_start_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="horizontal">
+
+        <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/left_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.083" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/right_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.917" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/login_dialog_text_view_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/login_dialog_text_view_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.521" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/sign_in_action_button_upper_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.667" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/sign_in_action_button_lower_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.833" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/sign_in_action_button_left_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.51" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/sign_in_action_button_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.875" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/try_alexa_action_button_left_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.125" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/try_alexa_action_button_right_bound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.49" />
+
+        <!--Alexa logo-->
+
+    <!--Main text box-->
+    <TextView
+        android:id="@+id/login_dialog_text_view"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/login_message"
+        android:textAlignment="center"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@id/login_dialog_text_view_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/right_guideline"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/login_dialog_text_view_upper_bound" />
+
+        <ProgressBar
+            android:id="@+id/login_progress_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@id/sign_in_action_button_lower_bound"
+            app:layout_constraintEnd_toStartOf="@id/sign_in_action_button_right_bound"
+            app:layout_constraintStart_toEndOf="@id/try_alexa_action_button_left_bound"
+            app:layout_constraintTop_toBottomOf="@id/sign_in_action_button_upper_bound" />
+
+    <!--Preview Mode Button-->
+
+    <!--CBL Button-->
+    <TextView
+        android:id="@+id/try_alexa_action_button"
+        style="?attr/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/try_alexa_button"
+        android:textAllCaps="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/sign_in_action_button_lower_bound"
+        app:layout_constraintEnd_toStartOf="@id/sign_in_action_button"
+        app:layout_constraintStart_toStartOf="@id/try_alexa_action_button_left_bound"
+        app:layout_constraintTop_toTopOf="@id/sign_in_action_button_upper_bound" />
+
+    <TextView
+        android:id="@+id/sign_in_action_button"
+        style="?attr/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_in_action_button"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/sign_in_action_button_lower_bound"
+        app:layout_constraintEnd_toEndOf="@id/sign_in_action_button_right_bound"
+        app:layout_constraintStart_toEndOf="@id/try_alexa_action_button"
+        app:layout_constraintTop_toBottomOf="@id/sign_in_action_button_upper_bound" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

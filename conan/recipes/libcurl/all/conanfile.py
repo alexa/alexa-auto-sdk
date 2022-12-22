@@ -88,7 +88,12 @@ class LibcurlConan(ConanFile):
 
     @property
     def _is_using_cmake_build(self):
-        return self.settings.compiler == "Visual Studio" or self.settings.os in ["Android", "Neutrino", "Macos", "Linux"]
+        return self.settings.compiler == "Visual Studio" or self.settings.os in [
+            "Android",
+            "Neutrino",
+            "Macos",
+            "Linux",
+        ]
 
     @property
     def _has_zstd_option(self):
@@ -114,8 +119,18 @@ class LibcurlConan(ConanFile):
 
         # Deprecated options
         # ===============================
-        if (any(deprecated_option != "deprecated" for deprecated_option in [self.options.with_openssl, self.options.with_wolfssl, self.options.with_winssl, self.options.darwin_ssl])):
-            self.output.warn("with_openssl, with_winssl, darwin_ssl and with_wolfssl options are deprecated. Use with_ssl option instead.")
+        if any(
+            deprecated_option != "deprecated"
+            for deprecated_option in [
+                self.options.with_openssl,
+                self.options.with_wolfssl,
+                self.options.with_winssl,
+                self.options.darwin_ssl,
+            ]
+        ):
+            self.output.warn(
+                "with_openssl, with_winssl, darwin_ssl and with_wolfssl options are deprecated. Use with_ssl option instead."
+            )
             if tools.is_apple_os(self.settings.os) and self.options.with_ssl == "darwinssl":
                 if self.options.darwin_ssl == True:
                     self.options.with_ssl = "darwinssl"
@@ -141,7 +156,9 @@ class LibcurlConan(ConanFile):
         if self.options.with_ssl == "darwinssl" and not tools.is_apple_os(self.settings.os):
             raise ConanInvalidConfiguration("darwinssl only suppported on Apple like OS (Macos, iOS, watchOS or tvOS).")
         if self.options.with_ssl == "wolfssl" and self._is_using_cmake_build and tools.Version(self.version) < "7.70.0":
-            raise ConanInvalidConfiguration("Before 7.70.0, libcurl has no wolfssl support for Visual Studio or \"Windows to Android cross compilation\"")
+            raise ConanInvalidConfiguration(
+                'Before 7.70.0, libcurl has no wolfssl support for Visual Studio or "Windows to Android cross compilation"'
+            )
 
         # These options are not used in CMake build yet
         if self._is_using_cmake_build:
@@ -157,7 +174,7 @@ class LibcurlConan(ConanFile):
             if self.settings.os == "Neutrino":
                 self.requires("openssl/qnx7")
             else:
-                self.requires("openssl/1.1.1i#b843148d42054bebfdca6e9561a35d77")
+                self.requires("openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7")
         if self.options.with_zlib:
             self.requires("zlib/1.2.11#95482d4fb614fadd27775f2def0a5323")
 
@@ -174,7 +191,7 @@ class LibcurlConan(ConanFile):
 
     def build_requirements(self):
         if self._is_using_cmake_build:
-            self.build_requires("ninja/1.10.2")
+            self.build_requires("ninja/1.10.2#0854c9e542f0a6e63cd6f53f988c5b0d")
         else:
             self.build_requires("libtool/2.4.6")
             self.build_requires("pkgconf/1.7.3")
@@ -211,22 +228,27 @@ class LibcurlConan(ConanFile):
 
     def _patch_misc_files(self):
         if self.options.with_largemaxwritesize:
-            tools.replace_in_file(os.path.join(self._source_subfolder, "include", "curl", "curl.h"),
-                                  "define CURL_MAX_WRITE_SIZE 16384",
-                                  "define CURL_MAX_WRITE_SIZE 10485760")
+            tools.replace_in_file(
+                os.path.join(self._source_subfolder, "include", "curl", "curl.h"),
+                "define CURL_MAX_WRITE_SIZE 16384",
+                "define CURL_MAX_WRITE_SIZE 10485760",
+            )
 
         # https://github.com/curl/curl/issues/2835
         # for additional info, see this comment https://github.com/conan-io/conan-center-index/pull/1008#discussion_r386122685
         if self.settings.compiler == "apple-clang" and self.settings.compiler.version == "9.1":
             if self.options.with_ssl == "darwinssl":
-                tools.replace_in_file(os.path.join(self._source_subfolder, "lib", "vtls", "sectransp.c"),
-                                      "#define CURL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300",
-                                      "#define CURL_BUILD_MAC_10_13 0")
+                tools.replace_in_file(
+                    os.path.join(self._source_subfolder, "lib", "vtls", "sectransp.c"),
+                    "#define CURL_BUILD_MAC_10_13 MAC_OS_X_VERSION_MAX_ALLOWED >= 101300",
+                    "#define CURL_BUILD_MAC_10_13 0",
+                )
 
         if self._has_zstd_option:
             # Custom findZstd.cmake file relies on pkg-config file, make sure that it's consumed on all platforms
-            tools.replace_in_file(os.path.join(self._source_subfolder, "CMake", "FindZstd.cmake"),
-                                  "if(UNIX)", "if(TRUE)")
+            tools.replace_in_file(
+                os.path.join(self._source_subfolder, "CMake", "FindZstd.cmake"), "if(UNIX)", "if(TRUE)"
+            )
 
     def _get_configure_command_args(self):
         yes_no = lambda v: "yes" if v else "no"
@@ -280,7 +302,7 @@ class LibcurlConan(ConanFile):
                 params.append("--enable-threaded-resolver")
                 params.append("--disable-verbose")
             elif self.settings.os == "Android":
-                pass # this just works, conan is great!
+                pass  # this just works, conan is great!
 
         return params
 
@@ -312,38 +334,26 @@ class LibcurlConan(ConanFile):
         # patch autotools files
         # for mingw builds - do not compile curl tool, just library
         # linking errors are much harder to fix than to exclude curl tool
-        tools.replace_in_file("Makefile.am",
-                              "SUBDIRS = lib src",
-                              "SUBDIRS = lib")
+        tools.replace_in_file("Makefile.am", "SUBDIRS = lib src", "SUBDIRS = lib")
 
-        tools.replace_in_file("Makefile.am",
-                              "include src/Makefile.inc",
-                              "")
+        tools.replace_in_file("Makefile.am", "include src/Makefile.inc", "")
 
         # patch for zlib naming in mingw
         # when cross-building, the name is correct
         if not tools.cross_building(self.settings):
-            tools.replace_in_file("configure.ac",
-                                  "-lz ",
-                                  "-lzlib ")
+            tools.replace_in_file("configure.ac", "-lz ", "-lzlib ")
 
         # patch for openssl extras in mingw
         if self.options.with_ssl == "openssl":
-            tools.replace_in_file("configure",
-                                  "-lcrypto ",
-                                  "-lcrypto -lcrypt32 ")
+            tools.replace_in_file("configure", "-lcrypto ", "-lcrypto -lcrypt32 ")
 
         if self.options.shared:
             # patch for shared mingw build
-            tools.replace_in_file(os.path.join("lib", "Makefile.am"),
-                                  "noinst_LTLIBRARIES = libcurlu.la",
-                                  "")
-            tools.replace_in_file(os.path.join("lib", "Makefile.am"),
-                                  "noinst_LTLIBRARIES =",
-                                  "")
-            tools.replace_in_file(os.path.join("lib", "Makefile.am"),
-                                  "lib_LTLIBRARIES = libcurl.la",
-                                  "noinst_LTLIBRARIES = libcurl.la")
+            tools.replace_in_file(os.path.join("lib", "Makefile.am"), "noinst_LTLIBRARIES = libcurlu.la", "")
+            tools.replace_in_file(os.path.join("lib", "Makefile.am"), "noinst_LTLIBRARIES =", "")
+            tools.replace_in_file(
+                os.path.join("lib", "Makefile.am"), "lib_LTLIBRARIES = libcurl.la", "noinst_LTLIBRARIES = libcurl.la"
+            )
             # add directives to build dll
             # used only for native mingw-make
             if not tools.cross_building(self.settings):
@@ -353,7 +363,11 @@ class LibcurlConan(ConanFile):
     def _build_with_autotools(self):
         with tools.chdir(self._source_subfolder):
             # autoreconf
-            self.run("{} -fiv".format(tools.get_env("AUTORECONF") or "autoreconf"), win_bash=tools.os_info.is_windows, run_environment=True)
+            self.run(
+                "{} -fiv".format(tools.get_env("AUTORECONF") or "autoreconf"),
+                win_bash=tools.os_info.is_windows,
+                run_environment=True,
+            )
 
             # fix generated autotools files on alle to have relocateable binaries
             if tools.is_apple_os(self.settings.os):
@@ -402,7 +416,7 @@ class LibcurlConan(ConanFile):
             self._autotools.defines.append("_AMD64_")
 
         if tools.cross_building(self) and tools.is_apple_os(self.settings.os):
-            self._autotools.defines.extend(['HAVE_SOCKET', 'HAVE_FCNTL_O_NONBLOCK'])
+            self._autotools.defines.extend(["HAVE_SOCKET", "HAVE_FCNTL_O_NONBLOCK"])
 
         configure_args = self._get_configure_command_args()
 
@@ -429,7 +443,9 @@ class LibcurlConan(ConanFile):
         self._cmake.definitions["CMAKE_DEBUG_POSTFIX"] = ""
 
         # For https://github.com/curl/curl/commit/9108da2c26d18e927b91e33d3729d9cf0f3eb8fa starting from 7.81.0
-        use = lambda feature: f"CURL_USE_{feature}" if tools.Version(self.version) >= "7.81.0" else f"CMAKE_USE_{feature}"
+        use = (
+            lambda feature: f"CURL_USE_{feature}" if tools.Version(self.version) >= "7.81.0" else f"CMAKE_USE_{feature}"
+        )
 
         if tools.Version(self.version) >= "7.72.0":
             self._cmake.definitions[use("SCHANNEL")] = self.options.with_ssl == "schannel"
@@ -472,9 +488,7 @@ class LibcurlConan(ConanFile):
     def _build_with_cmake(self):
         # patch cmake files
         with tools.chdir(self._source_subfolder):
-            tools.replace_in_file("CMakeLists.txt",
-                                  "include(CurlSymbolHiding)",
-                                  "")
+            tools.replace_in_file("CMakeLists.txt", "include(CurlSymbolHiding)", "")
 
         cmake = self._configure_cmake()
         cmake.build()

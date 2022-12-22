@@ -57,11 +57,21 @@ public class AutoVoiceInteractionSession extends VoiceInteractionSession {
                 Log.e(TAG, "onShow called without message from VIS, VA will not be started.");
                 return;
             }
+        } else if (showFlags == SHOW_SOURCE_APPLICATION) {
+            Log.d(TAG, "onShow requested by Alexa application itself");
+            if (args == null) {
+                Log.w(TAG, "args is expected but missing for flag SHOW_SOURCE_APPLICATION");
+            }
         } else {
             Log.d(TAG, "SpeechRecognizer: PTT is detected...");
-            args.putString(AASBConstants.TOPIC, Topic.SPEECH_RECOGNIZER);
-            args.putString(AASBConstants.ACTION, Action.SpeechRecognizer.START_CAPTURE);
-            args.putString(AASBConstants.PAYLOAD, "");
+            if (args != null) {
+                Log.v(TAG, "onShow Add speech recognizer start capture action.");
+                args.putString(AASBConstants.TOPIC, Topic.SPEECH_RECOGNIZER);
+                args.putString(AASBConstants.ACTION, Action.SpeechRecognizer.START_CAPTURE);
+                args.putString(AASBConstants.PAYLOAD, "");
+            } else {
+                Log.e(TAG, "onShow Bundle argument is null. Cannot add speech recognizer start capture action.");
+            }
         }
 
         intent.putExtras(args);

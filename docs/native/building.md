@@ -18,6 +18,8 @@ Auto SDK can be built for the following supported target platforms and hardware 
 * macOS
     * x86 64-bit
 
+To build Auto SDK for other platforms or architectures, see [Build with a custom toolchain](#build-with-a-custom-toolchain).
+
 ## General build requirements
 
 You can build the Alexa Auto SDK natively on a Linux or macOS host, or you can use Docker. For specific information about Docker, see [Build in a Docker container](#build-in-a-docker-container).
@@ -68,11 +70,11 @@ Auto SDK includes a base Conan recipe class that all Auto SDK modules extend. Th
 
 For each module, the base recipe defines common options that are used to specify which components are included in the library. The default values provided in the base recipe should be used in most cases when you are building release libraries for production. For some cases, however, you may want to enabled features such as `with_sensitive_logs` or `with_unit_tests`, to add additional information when debugging issues with the libraries. To find out which options are defined for a specific module, you can use the `conan inspect` command to display information about any Conan recipe. This command will display all of options and default values for a recipe, including any options that are inherited from the base module recipe. See the [Specify build settings and options](#specify-build-settings-and-options) section in this guide, for more information.
 
-Applications integrate with Auto SDK using the `MessageBroker` API by publishing and subscribing to specific message topics and actions (see [Understand the Auto SDK API](../explore/concepts/core-api-overview.md)). Most modules provide interfaces that require these messages to be defined, in which case they will include one or more message definition files in the `aasb/messages` directory of the module. The model created by the message definitions are used when building Auto SDK to generate message headers that are required to build the module, and are also used to create documentation for each message interface. 
+Applications integrate with Auto SDK using the `MessageBroker` API by publishing and subscribing to specific message topics and actions (see [Understand the Auto SDK API](../explore/concepts/core-api-overview.md)). Most modules provide interfaces that require these messages to be defined, in which case they will include one or more message definition files in the `aasb/messages` directory of the module. The model created by the message definitions are used when building Auto SDK to generate message headers that are required to build the module, and are also used to create documentation for each message interface.
 
 #### Third party dependencies
 
-Auto SDK has dependencies on several third party packages (libraries and build tools for example), which may themselves have dependencies on other packages. In general, managing these types of build requirements can be very complex for a large project. Conan helps by providing community hosted recipes for many common packages, as well as by allowing developers to create there own package recipes. It is important to understand that some of the packages used by Auto SDK are pulled from the Conan Center remote server, while others are defined locally in the `conan/recipes` directory of Auto SDK. Local recipes are typically required when the package does not already exist on Conan Center, or there are specific patches or changes to the recipe that are needed for Auto SDK. 
+Auto SDK has dependencies on several third party packages (libraries and build tools for example), which may themselves have dependencies on other packages. In general, managing these types of build requirements can be very complex for a large project. Conan helps by providing community hosted recipes for many common packages, as well as by allowing developers to create there own package recipes. It is important to understand that some of the packages used by Auto SDK are pulled from the Conan Center remote server, while others are defined locally in the `conan/recipes` directory of Auto SDK. Local recipes are typically required when the package does not already exist on Conan Center, or there are specific patches or changes to the recipe that are needed for Auto SDK.
 
 ### Builder Tool
 
@@ -243,7 +245,7 @@ When you run the builder tool, all of the shared libraries and dependencies will
 [BUILDER] INFO: Created output archive: ../aac-dev-macos_x86_64-release-210706140415.tgz
 ```
 
-The default name of the archive indicates the following information that is used to build the SDK: 
+The default name of the archive indicates the following information that is used to build the SDK:
 
 ```
 aac-<version>-<os>_<arch>-<build-type>-<datetime>.tgz
@@ -319,7 +321,7 @@ You can get additional information about the archive contents from a description
 [options]
     aac_version=dev
     with_sensitive_logs=False
-    pkg_modules=aac-module-aasb/dev,aac-module-address-book/dev,aac-module-alexa/dev,...    
+    pkg_modules=aac-module-aasb/dev,aac-module-address-book/dev,aac-module-alexa/dev,...
     with_aasb=False
 
 [full_settings]
@@ -355,7 +357,7 @@ If you want to export a single package individually, you can run the `conan expo
 $ conan export modules/alexa
 ```
 
-It is important to understand that exporting a module using the `conan export` command does not automatically find and export any of the dependent packages specified in the recipe. Attempting to build the alexa module would fail, unless all of the requirements can be resolved in the local cache. Running the `conan/setup.py` script is usually the safest option to ensure all required packages are copied to the cache, however, exporting a package individually can save time after you make changes, if you have previously exported all of the packages. 
+It is important to understand that exporting a module using the `conan export` command does not automatically find and export any of the dependent packages specified in the recipe. Attempting to build the alexa module would fail, unless all of the requirements can be resolved in the local cache. Running the `conan/setup.py` script is usually the safest option to ensure all required packages are copied to the cache, however, exporting a package individually can save time after you make changes, if you have previously exported all of the packages.
 
 ### Build modules
 
@@ -400,14 +402,14 @@ You usually don't need to change settings specified in the profile, but if neede
 $ conan create modules/alexa -b missing -s build_type=Debug
 ```
 
-Individual packages can also define `options` which are specific to it's own build requirements. One common option that most packages define is `shared`, which is used to build either the static or dynamic library. Options can also be used to specify conditional features which should be included in the build, for example, `libcurl` defines an option called `with_nghttp2` to specify that the build should include support for `http2`. 
+Individual packages can also define `options` which are specific to it's own build requirements. One common option that most packages define is `shared`, which is used to build either the static or dynamic library. Options can also be used to specify conditional features which should be included in the build, for example, `libcurl` defines an option called `with_nghttp2` to specify that the build should include support for `http2`.
 
 #### Inspect package recipes
 
 To see which options a recipe has defined, you can use the `conan inspect` command:
 
 ```shell
-$ conan inspect modules/alexa/conanfile.py 
+$ conan inspect modules/alexa/conanfile.py
 
 name: aac-module-alexa
 version: dev
@@ -435,7 +437,7 @@ options:
     with_docs: [True, False]
     with_engine: [True, False]
     with_jni: [True, False]
-    with_latency_logs: [True, False]
+    with_metrics: [True, False]
     with_messages: [True, False]
     with_platform: [True, False]
     with_sensitive_logs: [True, False]
@@ -450,7 +452,7 @@ default_options:
     with_docs: True
     with_engine: True
     with_jni: True
-    with_latency_logs: False
+    with_metrics: True
     with_messages: True
     with_platform: True
     with_sensitive_logs: False
@@ -500,7 +502,7 @@ You can add Auto SDK modules as a requirement to `conanfile.py` recipes as well,
 
 ```python
 class ConanRecipe(ConanFile):
-    requires = 
+    requires =
         ["aac-module-core/dev","aac-module-alexa","aac-module-cbl/dev","aac-module-system-audio/dev"]
     ...
 ```
@@ -653,7 +655,7 @@ You can override default target architecture to build either the `armv8`, or `x8
 $ ./builder/build.py -p qnx --arch=x86_64
 ```
 
-The Conan recipe assumes that the QNX SDP is installed in your home director: `~/qnx700`, but you can override this by setting the `qnx7sdp_path` option using the `--conan-option` or `-o` argument on the command line: 
+The Conan recipe assumes that the QNX SDP is installed in your home director: `~/qnx700`, but you can override this by setting the `qnx7sdp_path` option using the `--conan-option` or `-o` argument on the command line:
 
 ```shell
 $ ./builder/build.py -p qnx -o qnx7-sdp:qnx7sdp_path=/path/to/qnx7sdp
@@ -666,6 +668,184 @@ macOS can be used as a build host for cross-compiled Android and QNX targets, as
 ### Windows
 
 > Windows is not currently supported as a build host or target.
+
+## Build with a custom toolchain
+
+You can cross-compile Auto SDK for platforms or architectures other than the officially supported targets using [the cross-compilation support provided by Conan](https://docs.conan.io/en/latest/systems_cross_building/cross_building.html).
+
+To build Auto SDK with a custom toolchain, you need to create a new Conan profile, Conan recipe, and CMake toolchain file. The following example demonstrates building Auto SDK for ARMv8 Linux using the CodeSourcery toolchain.
+
+**1. Create a new Conan profile**
+
+Create a new Conan profile file at `${AUTO_SDK_HOME}/conan/config/profiles/aac-codesourcery` with the following content:
+
+```
+include(default)
+
+[settings]
+compiler.version=7.5
+arch=armv8
+build_type=Release
+os=Linux
+compiler.libcxx=libstdc++11
+
+[build_requires]
+codesourcery/1.0.0
+
+[options]
+
+[env]
+```
+
+**2. Create a new Conan recipe**
+
+Create a new Conan profile at `${AUTO_SDK_HOME}/conan/recipes/codesourcery/conanfile.py` with the following content:
+
+```python
+import os, logging
+
+from conans import ConanFile, tools
+from conans.errors import ConanInvalidConfiguration
+
+
+class CodeSourceryConan(ConanFile):
+    name = "codesourcery"
+    version = "1.0.0"
+    description = "Cross-compiling with CodeSourcery toolchain"
+
+    settings = {"os": ["Linux", "Macos"], "arch": ["x86", "x86_64", "armv7hf", "armv8"]}
+
+    exports = "*.cmake"
+
+    def configure(self):
+        if self.settings_target.arch not in ["armv7hf", "armv8"]:
+            raise ConanInvalidConfiguration(f"Invalid arch {self.settings_target.arch}")
+
+    def _check_toolchain_override(self, force=True):
+        var = f"CODESOURCERY_TOOLCHAIN_{self.settings_target.arch}"
+        toolchain_override = os.getenv(var)
+        if force and not toolchain_override:
+            raise ConanInvalidConfiguration(f"{var} is not exported")
+        if toolchain_override and not os.path.exists(toolchain_override):
+            raise ConanInvalidConfiguration(f"{toolchain_override} does not exist")
+        return toolchain_override
+
+    def _check_sysroot_override(self, force=True):
+        var = f"CODESOURCERY_SYSROOT_{self.settings_target.arch}"
+        sysroot_override = os.getenv(var)
+        if force and not sysroot_override:
+            raise ConanInvalidConfiguration(f"{var} is not exported")
+        if sysroot_override and not os.path.exists(sysroot_override):
+            raise ConanInvalidConfiguration(f"{sysroot_override} does not exist")
+        return sysroot_override
+
+    def source(self):
+        pass
+
+    def build(self):
+        pass
+
+    def package(self):
+        toolchain = self._check_toolchain_override(True)
+        self.copy("*.cmake", src=self.recipe_folder, dst=self.package_folder)
+
+    def map_arch_string(self, arch):
+        return {
+            "armv8": ("aarch64", "gnu"),
+            "armv7hf": ("arm", "gnueabihf"),
+        }[arch]
+
+    def _append_path(self, var, path):
+        if os.path.isdir(path):
+            var.append(path)
+
+    def package_info(self):
+        toolchain = self._check_toolchain_override(True)
+        sysroot = self._check_sysroot_override(False)
+
+        self._append_path(self.env_info.PATH, os.path.join(toolchain, "bin"))
+        arch, abi = self.map_arch_string(str(self.settings_target.arch))
+
+        # Specify toolchain executables
+        prefix = f"{arch}-linux-{abi}"
+        self.env_info.CC = f"{prefix}-gcc"
+        self.env_info.CFLAGS = f"--sysroot {sysroot}" if sysroot else ""
+        self.env_info.CXX = f"{prefix}-g++"
+        self.env_info.CXXFLAGS = self.env_info.CFLAGS
+        self.env_info.CPP = f"{prefix}-cpp"
+        self.env_info.AR = f"{prefix}-ar"
+        self.env_info.RANLIB = f"{prefix}-ranlib"
+        self.env_info.LD = f"{prefix}-ld"
+        self.env_info.LDFLAGS = f""
+        self.env_info.AS = f"{prefix}-as"
+        self.env_info.STRIP = f"{prefix}-strip"
+        self.env_info.OBJCOPY = f"{prefix}-objcopy"
+        self.env_info.OBJDUMP = f"{prefix}-objdump"
+        self.env_info.READELF = f"{prefix}-readelf"
+        self.env_info.NM = f"{prefix}-nm"
+
+        # Specify CMake toolchain file and environment variables it expects to use.
+        self.env_info.CONAN_CMAKE_TOOLCHAIN_FILE = os.path.join(self.package_folder, "codesourcery_toolchain.cmake")
+        self.env_info.CODESOURCERY_TOOLCHAIN_PREFIX = prefix
+        if sysroot:
+            self.env_info.CODESOURCERY_SYSROOT = sysroot
+```
+
+The new Conan recipe sets the required build context. This example recipe performs the following setup:
+
+- Checks the environment variables `CODESOURCERY_TOOLCHAIN_armv8` and `CODESOURCERY_SYSROOT_armv8` to find the location of the custom toolchain and sysroot.
+- Exports `CC`, `CXX`, `CFLAGS`, `CXXFLAGS` and other environment variables for GNU Make and CMake to use the specified compiler and flags.
+- Exports `CONAN_CMAKE_TOOLCHAIN_FILE` to specify the toolchain configuration for CMake.
+
+**3. Create a CMake toolchain file**
+
+The Conan recipe in the previous step references a CMake toolchain file at `${AUTO_SDK_HOME}/conan/recipes/codesourcery/codesourcery_toolchain.cmake`. Create this file with the following content:
+
+```cmake
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_VERSION 1)
+
+if("$ENV{CODESOURCERY_TOOLCHAIN_PREFIX}" STREQUAL "")
+    message(FATAL_ERROR "Define the CODESOURCERY_TOOLCHAIN_PREFIX environment variable to specify toolchain prefix, e.g aarch64-none-linux-gnu.")
+else()
+    set(CODESOURCERY_TOOLCHAIN_PREFIX "$ENV{CODESOURCERY_TOOLCHAIN_PREFIX}")
+    set(CMAKE_C_COMPILER   ${CODESOURCERY_TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${CODESOURCERY_TOOLCHAIN_PREFIX}-g++)
+endif()
+
+if("$ENV{CODESOURCERY_SYSROOT}" STREQUAL "")
+    message(WARNING "Define the CODESOURCERY_SYSROOT environment variable to point to the sysroot.")
+else()
+    set(CODESOURCERY_SYSROOT "$ENV{CODESOURCERY_SYSROOT}")
+    message(STATUS "Using sysroot path: ${CODESOURCERY_SYSROOT}")
+
+    # Specify where compiler/linker looks for system include files and libraries
+    set(CMAKE_SYSROOT "${CODESOURCERY_SYSROOT}")
+
+    # Specify where cmake find_xxx looks for files
+    set(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}")
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+endif()
+```
+
+See [cmake-toolchains(7)](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html) for more detailed information about further customization.
+
+**4. Build Auto SDK with the custom toolchain**
+
+Run the setup script to export your new Conan recipe before building Auto SDK:
+
+```shell
+$ ./conan/setup.py
+```
+
+Specify your Conan profile and target platform when running the Auto SDK Builder Tool:
+
+```shell
+$ ./builder/build.py build -p codesourcery --arch armv8
+```
 
 ## Build in a Docker container
 
@@ -696,7 +876,7 @@ When the build is complete, the output archive file will be saved to the mounted
     compiler.libcxx=libstdc++11
     compiler.version=7
     os=Linux
-``` 
+```
 
 ### Optimize build performance
 

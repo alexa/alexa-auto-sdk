@@ -61,6 +61,12 @@
     "aace.cbl" : {
         "enableUserProfile": false
     },
+    "aace.arbitrator": {
+        "Arbitrator": {
+            "WakewordInterruption": "ACTIVE_AGENT_ONLY",
+            "GestureInterruption": "ANY_AGENT"
+        }
+    },
     "aace.logger": {
         "sinks": [{
             "id": "verbose.logs",
@@ -88,6 +94,11 @@
     "aasb.customDomain": {
         "CustomDomain": {    
             "enabled": false
+        }
+    },
+    "aace.wakewordManager": {
+        "WakewordManager": {
+            "3PWakewords": ["SIRI"]
         }
     }
 }

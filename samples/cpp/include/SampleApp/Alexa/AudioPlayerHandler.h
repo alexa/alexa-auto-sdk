@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -109,6 +109,13 @@ public:
      *         or @c TIME_UNKNOWN if the current media duration is unknown or invalid.
     */
     int64_t getPlayerPosition();
+
+    /**
+     * Publishes the @c SetAsForegroundActivity message to notify the Engine to switch the visually focused content
+     * channel player source back to @c AudioPlayer when the user switches GUI back from an @c ExternalMediaPlayer
+     * player source.
+    */
+    void setAsForegroundActivity();
 
     /**
      * Provides the platform implementation of a change in audio playback state

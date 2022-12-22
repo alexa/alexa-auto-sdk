@@ -492,7 +492,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
             playbackDelayed = false;
         }
         if (mType.equals(AASBConstants.AudioOutput.AudioType.ALARM)) {
-            MediaPlayerUtil.sendEvent(mEventReceiver, "", Topic.ALERTS, Action.Alerts.LOCAL_STOP, "", mChannel);
+            Log.d(TAG, String.format("Lost focus with ALARM audio (%s)", mChannel)); 
         } else if (AASBConstants.AudioOutput.AudioType.TTS.equals(mType)) {
             MediaPlayerUtil.sendEvent(
                     mEventReceiver, "", Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "", mChannel);
@@ -552,7 +552,7 @@ public class ExoPlayerHandler implements AACSMediaPlayer, AudioManager.OnAudioFo
     public void onAuthStateChanged(@NonNull String authState) {
         if (AASBConstants.AlexaClient.AUTH_STATE_UNINITIALIZED.equals(authState)) {
             if (mType.equals(AASBConstants.AudioOutput.AudioType.ALARM)) {
-                MediaPlayerUtil.sendEvent(mEventReceiver, "", Topic.ALERTS, Action.Alerts.LOCAL_STOP, "", mChannel);
+                Log.d(TAG, String.format("(%s) Auth state is uninitialized. Alarm audio")); 
             } else if (!mType.equals(AASBConstants.AudioOutput.AudioType.EARCON)) {
                 if (mPlayer.getPlayWhenReady()) {
                     Log.i(TAG, String.format("(%s) Auth state is uninitialized. Stopping media player", mChannel));

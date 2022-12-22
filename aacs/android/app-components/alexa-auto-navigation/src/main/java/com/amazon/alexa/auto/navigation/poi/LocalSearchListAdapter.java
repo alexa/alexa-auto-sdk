@@ -47,7 +47,6 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
     private final List<PointOfInterest> mPOIs = new ArrayList<>();
     private final WeakReference<LocalSearchDirectiveHandler> mDirectiveHandlerWeakReference;
     private final Context mContext;
-
     public LocalSearchListAdapter(NaviProvider naviProvider,
             WeakReference<LocalSearchDirectiveHandler> directiveHandlerWeakReference, Context context) {
         mNaviProvider = naviProvider;
@@ -87,14 +86,18 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
         holder.mPOIName.setText(poi.getTitle().getMainTitle());
         holder.mPOIAddress.setText(poi.getAddress());
         holder.mEta.setText(poi.getTravelTime());
+        holder.mDist.setText(poi.getTravelDistance());
         holder.mPoiRoot.setOnClickListener(poiNameView -> {
             mNaviProvider.startNavigation(poi);
             if (mDirectiveHandlerWeakReference.get() != null) {
-                mDirectiveHandlerWeakReference.get().clearTemplate();
+                //TODO
+                //Current click to navigate is disabled because navigation on pixel 4xl doesn't work
+                //don't have a native navigator to test out function
+                //mDirectiveHandlerWeakReference.get().clearTemplate();
             }
         });
 
-        if (POI_PROVIDER_YELP.equals(poi.getProvider()) && poi.getRating().getImage().getSources().size() >= 1) {
+        /*if (POI_PROVIDER_YELP.equals(poi.getProvider()) && poi.getRating().getImage().getSources().size() >= 1) {
             String yelpImageUrl = poi.getRating().getImage().getSources().get(0).getUrl();
             Glide.with(mContext).load(yelpImageUrl).into(holder.mYelpImage);
             holder.mYelpRatingCount.setText(String.format("(%s)", poi.getRating().getReviewCount()));
@@ -104,7 +107,7 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
 
         if (position == (mPOIs.size() - 1)) {
             holder.mSplitter.setVisibility(View.GONE);
-        }
+        }*/
     }
 
     @Override
@@ -113,13 +116,14 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView mYelpRatingCount;
-        public ImageView mYelpImage;
-        public View mYelpRow;
+        //public TextView mYelpRatingCount;
+        //public ImageView mYelpImage;
+        //public View mYelpRow;
         public TextView mPOIOrdinal;
         public TextView mPOIAddress;
         public TextView mPOIName;
         public TextView mEta;
+        public TextView mDist;
         public View mSplitter;
         public View mPoiRoot;
         public ViewHolder(@NonNull View itemView) {
@@ -128,11 +132,12 @@ public class LocalSearchListAdapter extends RecyclerView.Adapter<LocalSearchList
             mPOIName = itemView.findViewById(R.id.poi_name);
             mPOIAddress = itemView.findViewById(R.id.poi_address);
             mEta = itemView.findViewById(R.id.poi_list_eta);
+            mDist = itemView.findViewById(R.id.poi_list_dist);
             mSplitter = itemView.findViewById(R.id.poi_splitter);
             mPoiRoot = itemView.findViewById(R.id.poi_item_root);
-            mYelpRow = itemView.findViewById(R.id.yelp_rating_row);
-            mYelpImage = itemView.findViewById(R.id.yelp_rating_image);
-            mYelpRatingCount = itemView.findViewById(R.id.yelp_rating_count);
+            //mYelpRow = itemView.findViewById(R.id.yelp_rating_row);
+            //mYelpImage = itemView.findViewById(R.id.yelp_rating_image);
+            //mYelpRatingCount = itemView.findViewById(R.id.yelp_rating_count);
         }
     }
 }

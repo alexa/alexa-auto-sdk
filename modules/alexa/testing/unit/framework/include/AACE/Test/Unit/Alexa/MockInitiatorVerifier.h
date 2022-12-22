@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace alexa {
 class MockInitiatorVerifier : public aace::engine::alexa::InitiatorVerifier {
 public:
     MOCK_METHOD2(shouldBlock, bool(const std::string& wakeword, const std::chrono::milliseconds& timeout));
-    MOCK_METHOD1(shouldBlock, bool(const alexaClientSDK::capabilityAgents::aip::Initiator& initiator));
+    MOCK_METHOD1(shouldBlock, bool(const alexaClientSDK::avsCommon::avs::AgentInitiator& initiator));
 };
 
 }  // namespace alexa

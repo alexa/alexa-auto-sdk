@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -154,6 +154,7 @@ private:
     void addCall(std::string callId, CallState state);
     void setCallState(std::string callId, CallState state);
     void removeCall(std::string callId);
+    alexaClientSDK::avsCommon::avs::AgentId::IdType executeGetAgentByCallId(const std::string& callId, const std::string& eventName);
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
@@ -166,6 +167,7 @@ private:
     std::string m_currentCallId;
     std::unordered_map<std::string, CallState> m_allCallsMap;
     std::unordered_map<std::string, CallMethod> m_callMethodMap;
+    std::unordered_map<std::string, alexaClientSDK::avsCommon::avs::AgentId::IdType> m_callAgentMap;
     std::unordered_map<
         aace::phoneCallController::PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty,
         bool>

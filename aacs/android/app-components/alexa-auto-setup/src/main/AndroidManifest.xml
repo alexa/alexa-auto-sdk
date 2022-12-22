@@ -14,7 +14,7 @@
         android:allowBackup="true"
         android:label="Alexa Setup"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Alexa.Standard">
+        android:theme="@style/AlexaAppTheme">
 
         <receiver android:name="com.amazon.alexa.auto.setup.receiver.FeatureDiscoveryReceiver"
             android:exported="true">

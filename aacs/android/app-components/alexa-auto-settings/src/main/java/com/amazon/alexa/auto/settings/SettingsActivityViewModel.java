@@ -18,13 +18,17 @@ import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
 import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.resetDNDSetting;
 import static com.amazon.alexa.auto.apps.common.util.EarconSoundSettingsProvider.resetEarconSettings;
 import static com.amazon.alexa.auto.apps.common.util.FeatureDiscoveryUtil.clearDiscoveredFeatures;
+import static com.amazon.alexa.auto.apps.common.util.NaviFavoritesSettingsProvider.updateNavFavoritesSetting;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.os.LocaleListCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -45,6 +49,7 @@ import com.amazon.alexa.auto.settings.dependencies.DaggerSettingsComponent;
 
 import javax.inject.Inject;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
@@ -53,7 +58,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class SettingsActivityViewModel extends AndroidViewModel implements LoginUIEventListener {
     private static final String TAG = SettingsActivityViewModel.class.getSimpleName();
 
-    public enum AuthState { LOGGED_OUT, LOGGED_IN, CBL_START }
+    public enum AuthState {LOGGED_OUT, LOGGED_IN, CBL_START}
+
     @NonNull
     private final AlexaAppRootComponent mAppRootComponent;
     @NonNull
@@ -64,12 +70,12 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
     private final MutableLiveData<AuthState> mAuthState;
     @Nullable
     private Disposable mAuthStatusChangeSubscription;
-
-    private boolean isLocaleUpdateNeeded;
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
     @Inject
     AlexaLocalesProvider mAlexaLocalesProvider;
+
+    CompositeDisposable mCompositeDisposable;
 
     /**
      * Creates an instance of {@link SettingsActivityViewModel}.
@@ -110,21 +116,19 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
 
         mAuthState.setValue(AuthState.LOGGED_IN);
 
-        if (isLocaleUpdateNeeded) {
-            if (mAuthController.getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
-                applyLocalePropertyToAACS();
-            }
-            isLocaleUpdateNeeded = false;
+        if (mAuthController.getAuthMode().equals(AuthMode.CBL_AUTHORIZATION)) {
+            applyLocalePropertyToAACS();
         }
 
+
         mAuthStatusChangeSubscription = mAuthController.observeAuthChangeOrLogOut()
-                                                .map(AuthStatus::getLoggedIn)
-                                                .distinctUntilChanged()
-                                                .subscribe(authStatus -> {
-                                                    if (!authStatus) {
-                                                        transitionToLoggedOutState();
-                                                    }
-                                                });
+                .map(AuthStatus::getLoggedIn)
+                .distinctUntilChanged()
+                .subscribe(authStatus -> {
+                    if (!authStatus) {
+                        transitionToLoggedOutState();
+                    }
+                });
     }
 
     public void transitionToLoggedOutState() {
@@ -134,14 +138,13 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
         resetUserPreferences(getApplication().getApplicationContext());
 
         mAuthState.setValue(AuthState.LOGGED_OUT);
-
-        isLocaleUpdateNeeded = true;
     }
 
     public void initialize() {
         mAppRootComponent.activateScope(this);
+        mCompositeDisposable = new CompositeDisposable();
 
-        if (!mAuthController.isAuthenticated() || !mAlexaSetupController.isSetupCompleted()) {
+        if (!mAuthController.isAuthenticated()) {
             transitionToLoggedOutState();
         } else {
             transitionToLoggedInState();
@@ -151,10 +154,12 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
     public void uninitialize() {
         disposeLoggedInStateSubscriptions();
         deactivateLoggedOutScope();
+        mCompositeDisposable.dispose();
     }
 
     /**
      * Reset preferences to default values
+     *
      * @param context
      */
     private void resetUserPreferences(Context context) {
@@ -164,6 +169,12 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
                 resetEarconSettings(context);
                 resetDNDSetting(context);
                 clearDiscoveredFeatures(context);
+                updateNavFavoritesSetting(context, false);
+                mCompositeDisposable.add(
+                        mAlexaPropertyManager.updateAlexaProperty(AACSPropertyConstants.LOCALE, null).subscribe(successStatus -> {
+                            Log.d(TAG, "Success Status: " + successStatus);
+                        })
+                );
             }
         });
     }
@@ -180,14 +191,23 @@ public class SettingsActivityViewModel extends AndroidViewModel implements Login
      * Alexa Locale property setting, otherwise, we have set the locale based on user's choice in the setup.
      */
     private void applyLocalePropertyToAACS() {
-        String currentLocale = LocaleUtil.getCurrentDeviceLocale(getApplication().getApplicationContext());
+        String currentLocale = LocaleUtil.INSTANCE.parseAndroidLocaleListToAlexaLocaleString(
+                AppCompatDelegate.getApplicationLocales()
+        );
+        mCompositeDisposable.add(
+                mAlexaLocalesProvider.isCurrentLocaleSupportedByAlexa(currentLocale).subscribe(localeSupported -> {
+                    if (localeSupported) {
+                        Log.d(TAG, "Update Alexa locale to " + currentLocale);
 
-        mAlexaLocalesProvider.isCurrentLocaleSupportedByAlexa(currentLocale).subscribe(localeSupported -> {
-            if (localeSupported) {
-                Log.d(TAG, "Update Alexa locale to " + currentLocale);
-                mAlexaPropertyManager.updateAlexaProperty(AACSPropertyConstants.LOCALE, currentLocale);
-            }
-        });
+                        mCompositeDisposable.add(
+                                mAlexaPropertyManager.updateAlexaProperty(AACSPropertyConstants.LOCALE, currentLocale).subscribe(successStatus -> {
+                                    Log.d(TAG, "Success: " + successStatus);
+                                })
+                        );
+                    }
+                })
+        );
+
     }
 
     /**

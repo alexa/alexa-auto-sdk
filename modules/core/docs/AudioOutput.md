@@ -16,7 +16,9 @@ To set up content for playback, the Engine includes an `audioType` in an `AudioO
 
 - **NOTIFICATION—** This audio output type plays notification audio cues. For example, short cues from the `Notifications` interface
 
-- **ALARM—** This audio output type plays alarms. For example, repeating alarm audio from the `Alerts` interface
+- **ALARM—** This audio output type plays alerts or alarms.
+
+>**Note:** Auto SDK does not have any features that play audio streams using the ALARM audio output type.
 
 - **EARCON—** This audio output type plays Alexa attention state audio cues. For example, the audio cue to indicate Alexa started listening
 

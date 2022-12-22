@@ -15,6 +15,7 @@
 package com.amazon.alexa.auto.media.player;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -23,8 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
 import java.net.URL;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -80,15 +84,28 @@ public class PlaylistParser {
     private String parseResponse(InputStream inStream) throws IOException {
         if (inStream != null) {
             BufferedReader in = new BufferedReader(new InputStreamReader(inStream));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
+
+            Future<String> res = mExecutor.submit(new Callable<String>() {
+                @Override
+                public String call() throws IOException {
+                    String inputLine = new String();
+                    StringBuilder response = new StringBuilder();
+                    try {
+                        while((inputLine = in.readLine()) != null) {
+                            response.append(inputLine);
+                        }
+                    } catch (SocketException e) {
+                        Log.e(TAG, e.getMessage());
+                    } catch (IOException e) {
+                        throw new IOException(TAG + ": Error in reading from input stream: " + e.getMessage());
+                    }
+                    return response.toString();
+                }
+            });
 
             try {
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                return response.toString();
-            } catch (Exception e) {
+                return res.get();
+            } catch (ExecutionException | InterruptedException | CancellationException e) {
                 throw new IOException(TAG + ": Error parsing response");
             } finally {
                 inStream.close();

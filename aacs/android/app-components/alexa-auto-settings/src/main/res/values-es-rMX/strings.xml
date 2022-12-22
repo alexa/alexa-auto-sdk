@@ -13,27 +13,34 @@
     <string name="setting_voice_assistance_setting_push_to_talk" tools:ignore="MissingTranslation">Presionar para realizar una solicitud</string>
     <string name="setting_voice_assistance_setting_push_to_talk_alexa" tools:ignore="MissingTranslation">Amazon Alexa</string>
     <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
-    <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">Comparte la ubicación actual de tu vehículo con [Brandon] y Alexa para obtener respuestas más específicas sobre restaurantes cercanos, el clima local y más.</string>
+    <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">Comparte la ubicación actual de tu vehículo con [Brandon] y Alexa para obtener respuestas más precisas sobre restaurantes cercanos, el clima local y más.</string>
     <string name="setting_alexa_signin" tools:ignore="MissingTranslation">Iniciar sesión</string>
-    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Manos libres Alexa</string>
+    <string name="setting_alexa_wake_word_title" tools:ignore="MissingTranslation">Palabra de activación</string>
+    <string name="setting_alexa_wake_word_summary" tools:ignore="MissingTranslation">Alexa responderá cuando digas “Alexa”</string>
     <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">Sonido del inicio de la solicitud</string>
-    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Reproduce un sonido cuando Alexa empieza a escucharte</string>
+    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Reproduce un sonido cuando Alexa empieza a escucharte.</string>
     <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">Sonido del final de la solicitud</string>
-    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Reproduce un sonido cuando Alexa deja de escucharte</string>
-    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">Alexa responderá cuando digas “Alexa”</string>
+    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Reproduce un sonido cuando Alexa deja de escucharte.</string>
     <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">Compartir ubicación</string>
-    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">Comparte la ubicación actual de tu vehículo con Alexa para obtener respuestas más específicas sobre restaurantes cercanos, el clima local y más.</string>
+    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">Comparte la ubicación actual de tu vehículo con Alexa para obtener respuestas más precisas sobre restaurantes cercanos, el clima local y mucho más.</string>
     <string name="setting_navigation_favorites_title">Sincronizar favoritos de navegación</string>
     <string name="setting_navigation_favorites_summary">Alexa puede ayudarte a navegar a tus ubicaciones favoritas que estén almacenadas en el vehículo, las cuales se cargarán al servicio de Amazon.</string>
     <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">No molestar</string>
-    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Alexa no te molestará, excepto para timers y alarmas</string>
-    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">Comunicación</string>
+    <string name="setting_alexa_theme_title" tools:ignore="MissingTranslation">Tema del dispositivo</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Desactiva las notificaciones de Alexa</string>
+    <string name="setting_alexa_calling_title" tools:ignore="MissingTranslation">Llamadas</string>
+    <string name="setting_alexa_calling_texting_title">Llamadas y mensajes de texto</string>
     <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">Sonidos</string>
     <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Idioma de Alexa</string>
+    <string name="setting_alexa_language_continue">Continuar</string>
+    <string name="setting_alexa_language_confirm">Confirmar</string>
+    <string name="setting_language_title">Idioma</string>
+    <string name="setting_system_language_title">Idioma del sistema</string>
     <string name="setting_alexa_signout" tools:ignore="MissingTranslation">Cerrar sesión</string>
     <string name="setting_alexa_things_to_try" tools:ignore="MissingTranslation">Sugerencias</string>
     <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Desactivar Alexa</string>
     <string name="setting_alexa_language_mismatch" tools:ignore="MissingTranslation">Alexa no está disponible en</string>
+    <string name="setting_alexa_current_language" tools:ignore="MissingTranslation">Puedes seguir hablado con Alexa en %1$s o seleccionar otro idioma para Alexa.</string>
     <string name="setting_language_mismatch_title" tools:ignore="MissingTranslation">Incompatibilidad de idioma</string>
     <string name="setting_language_mismatch_content_1" tools:ignore="MissingTranslation">El idioma del sistema está configurado en %1$s.&#160;</string>
     <string name="setting_language_mismatch_content_2" tools:ignore="MissingTranslation">¿Quieres seguir usando Alexa en %1$s?</string>
@@ -43,11 +50,11 @@
     <string name="settings_alexa" tools:ignore="MissingTranslation">Configuración</string>
     <string name="logout" tools:ignore="MissingTranslation">¿Quieres cerrar sesión?</string>
     <string name="disable_alexa" tools:ignore="MissingTranslation">¿Quieres desactivar Alexa?</string>
-    <string name="logout_confirm" tools:ignore="MissingTranslation">¿Quieres cerrar la sesión de Amazon Alexa?</string>
-    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">CERRAR SESIÓN</string>
-    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">CANCELAR</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">¿Quieres cerrar sesión y desactivar Alexa?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">Cerrar sesión</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">Cancelar</string>
     <string name="confirm_yesno_confirm" tools:ignore="MissingTranslation">SÍ</string>
-    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">DESACTIVAR</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">Desactivar</string>
     <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">Alexa ya no estará disponible en este vehículo.</string>
     <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">Anular configuración básica</string>
     <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">Si seleccionas esta opción, las siguientes configuraciones se aplicarán</string>
@@ -64,76 +71,39 @@
     <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">REINICIAR AACS Y APLICAR CONFIGURACIÓN</string>
     <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">APAGAR AACS</string>
     <string name="preference_aacs_start" tools:ignore="MissingTranslation">INICIAR AACS</string>
-
-    <!-- translatable="false" tag is used for things-to-try strings only. These strings need to be localized based on the country and region -->
-    <string name="ttt_preview_mode_note" tools:ignore="MissingTranslation">Nota: algunas funcionalidades requieren que inicies sesión con Amazon Alexa para usarlas.</string>
-    <string name="ttt_getting_started" translatable="false">Primeros pasos</string>
-    <string name="ttt_alexa_s_talents" translatable="false">Talentos de Alexa</string>
-    <string name="ttt_entertainment" translatable="false">Entretenimiento</string>
-    <string name="ttt_communication" translatable="false">Comunicación</string>
-    <string name="ttt_weather" translatable="false">El clima</string>
-    <string name="ttt_smart_home" translatable="false">Casa Inteligente</string>
-    <string name="ttt_news_and_information" translatable="false">Noticias e información</string>
-    <string name="ttt_navigation" translatable="false">Navegación</string>
-    <string name="ttt_traffic_information" translatable="false">Información del tráfico</string>
-    <string name="ttt_skills" translatable="false">Skills</string>
-    <string name="ttt_lists" translatable="false">Listas</string>
-    <string name="ttt_shopping" translatable="false">Compras</string>
-    <string name="ttt_questions_and_answers" translatable="false">Preguntas y respuestas</string>
-    <string name="ttt_sports" translatable="false">Deportes</string>
-    <string name="ttt_calendar" translatable="false">Calendario</string>
-    <string name="ttt_getting_started_text1" translatable="false">“Alexa, busca una gasolinera cercana”.</string>
-    <string name="ttt_getting_started_text2" translatable="false">“Alexa, pon música”.</string>
-    <string name="ttt_getting_started_text3" translatable="false">“Alexa, ¿cómo está el clima?”.</string>
-    <string name="ttt_getting_started_text4" translatable="false">“Alexa, ¿cómo está el tráfico en mi trayecto?”.</string>
-    <string name="ttt_getting_started_text5" translatable="false">“Alexa, ¿qué hay en mi resumen de noticias?”.</string>
-    <string name="ttt_alexa_s_talents_text1" translatable="false">“Alexa, buenos días”.</string>
-    <string name="ttt_alexa_s_talents_text2" translatable="false">“Alexa, cuéntame una historia”.</string>
-    <string name="ttt_alexa_s_talents_text3" translatable="false">“Alexa, ¿qué recuerdas?”.</string>
-    <string name="ttt_entertainment_text1" translatable="false">“Alexa, pon música”.</string>
-    <string name="ttt_entertainment_text2" translatable="false">“Alexa, pon música de los años 70”.</string>
-    <string name="ttt_entertainment_text3" translatable="false">“Alexa, pon el álbum más reciente de Bruno Mars”.</string>
-    <string name="ttt_entertainment_text4" translatable="false">“Alexa, sigue leyendo el libro en Audible”.</string>
-    <string name="ttt_communication_text1" translatable="false">“Alexa, envíale un mensaje a Juan”.</string>
-    <string name="ttt_communication_text2" translatable="false">“Alexa, ¿cómo envío un mensaje?”.</string>
-    <string name="ttt_communication_text3" translatable="false">“Alexa, llama al celular de Érica”.</string>
-    <string name="ttt_communication_text4" translatable="false">“Alexa, llama al teléfono 555 582 5393”.</string>
-    <string name="ttt_weather_text1" translatable="false">“Alexa, ¿cómo está el clima?”</string>
-    <string name="ttt_weather_text2" translatable="false">“Alexa, ¿lloverá hoy?”.</string>
-    <string name="ttt_weather_text3" translatable="false">“Alexa, ¿cómo está el clima en Barcelona?”.</string>
-    <string name="ttt_smart_home_text1" translatable="false">“Alexa, prende las luces de la entrada”.</string>
-    <string name="ttt_smart_home_text2" translatable="false">“Alexa, cierra la puerta principal”.</string>
-    <string name="ttt_smart_home_text3" translatable="false">“Alexa, pon la temperatura de la casa a 70 grados”.</string>
-    <string name="ttt_smart_home_text4" translatable="false">“Alexa, cierra la puerta del garaje”.</string>
-    <string name="ttt_news_and_information_text1" translatable="false">“Alexa, ¿qué dicen las noticias?”.</string>
-    <string name="ttt_news_and_information_text2" translatable="false">“Alexa, ¿qué dice mi información deportiva?”.</string>
-    <string name="ttt_news_and_information_text3" translatable="false">“Alexa, pon CNN”.</string>
-    <string name="ttt_news_and_information_text4" translatable="false">“Alexa, pon BBC”.</string>
-    <string name="ttt_navigation_text1" translatable="false">“Alexa, busca un restaurante tailandés con buenas valoraciones en la zona”.</string>
-    <string name="ttt_navigation_text2" translatable="false">“Alexa, llévame al aeropuerto”.</string>
-    <string name="ttt_navigation_text3" translatable="false">“Alexa, llévame a la estación de tren”.</string>
-    <string name="ttt_traffic_information_text1" translatable="false">“Alexa, ¿cómo está el tráfico de camino al trabajo?”.</string>
-    <string name="ttt_traffic_information_text2" translatable="false">“Alexa, ¿cómo está el tráfico de camino al aeropuerto?”.</string>
-    <string name="ttt_skills_text1" translatable="false">“Alexa, ¿qué nuevas Skills tienes?”.</string>
-    <string name="ttt_lists_text1" translatable="false">“Alexa, ¿qué hay en mi lista de tareas?”.</string>
-    <string name="ttt_lists_text2" translatable="false">“Alexa, agrega ‘leche’ a mi lista de compras”</string>
-    <string name="ttt_lists_text3" translatable="false">“Alexa, ¿qué hay en mi lista de compras?”.</string>
-    <string name="ttt_lists_text4" translatable="false">“Alexa, crea una lista para empacar la maleta”.</string>
-    <string name="ttt_shopping_text1" translatable="false">“Alexa, ¿dónde están mis cosas?”.</string>
-    <string name="ttt_shopping_text2" translatable="false">“Alexa, compra un aromatizante para automóvil”.</string>
-    <string name="ttt_shopping_text3" translatable="false">“Alexa, vuelve a pedir pasta de dientes”.</string>
-    <string name="ttt_questions_and_answers_text1" translatable="false">“Alexa, ¿qué hora es en París?”.</string>
-    <string name="ttt_questions_and_answers_text2" translatable="false">“Alexa, ¿a qué distancia está la Luna?”.</string>
-    <string name="ttt_questions_and_answers_text3" translatable="false">“Alexa, ¿cuándo es la Copa Mundial?”.</string>
-    <string name="ttt_sports_text1" translatable="false">“Alexa, ¿qué dice mi información deportiva?”.</string>
-    <string name="ttt_sports_text2" translatable="false">“Alexa, ¿cuándo es la final de la Champions League?”.</string>
-    <string name="ttt_sports_text3" translatable="false">“Alexa, ¿cuándo es el próximo partido de los Lakers?”.</string>
-    <string name="ttt_sports_text4" translatable="false">“Alexa, ¿cuándo es la copa mundial de cricket?”.</string>
-    <string name="ttt_sports_text5" translatable="false">“Alexa, ¿cuándo es el Campeonato de Wimbledon?”.</string>
-    <string name="ttt_sports_text6" translatable="false">“Alexa, ¿cuándo es el Gran Premio de Mónaco?”.</string>
-    <string name="ttt_sports_text7" translatable="false">“Alexa, ¿cuál es el resultado del partido de los Halcones marinos de Seattle?”.</string>
-    <string name="ttt_sports_text8" translatable="false">“Alexa, ¿cuántos Super Bowls han ganado los San Francisco 49ners?”.</string>
-    <string name="ttt_calendar_text1" translatable="false">“Alexa, ¿qué tengo planeado para hoy?”.</string>
-    <string name="ttt_calendar_text2" translatable="false">“Alexa, ¿cuándo es mi próxima cita?”.</string>
-    <string name="ttt_calendar_text3" translatable="false">“Alexa, agrega ‘Café a las 10 de la mañana’ al calendario”.</string>
+    <string name="comms_primary_device_none">No hay ningún teléfono conectado</string>
+    <string name="ttt_preview_mode_note">Nota: algunas funcionalidades requieren que inicies sesión con Amazon Alexa para usarlas.</string>
+    <string name="lp_blocker_mic_primary">Se requiere acceso al micrófono</string>
+    <string name="lp_blocker_mic_secondary">Permite el acceso al micrófono para que Alexa pueda escuchar tus comandos.</string>
+    <string name="lp_blocker_assistant_primary">Establece a Alexa como tu asistente predeterminado</string>
+    <string name="lp_blocker_assistant_secondary">Para usar Alexa, debes establecer a Alexa como la app de asistente predeterminada.</string>
+    <string name="lp_carousel_ttt_primary">Hablar con Alexa</string>
+    <string name="lp_carousel_ttt_secondary_ww_ptt">Presiona el botón de voz o di: “Alexa”.</string>
+    <string name="lp_carousel_ttt_secondary_ptt">Presiona el botón de voz y realiza una solicitud.</string>
+    <string name="lp_carousel_ttt_secondary_ww">Simplemente di: “Alexa” y haz una solicitud.</string>
+    <string name="lp_carousel_previewmode_primary">Inicia sesión para aprovechar Alexa al máximo</string>
+    <string name="lp_carousel_previewmode_secondary">Obtén música por streaming, información local y mucho más.</string>
+    <string name="lp_carousel_smarthome_primary">Revisa tus dispositivos de Casa Inteligente</string>
+    <string name="lp_carousel_smarthome_secondary">Presiona el ícono de Casa Inteligente arriba o di: “Alexa, muestra el panel de Casa Inteligente”.</string>
+    <string name="lp_carousel_location_primary">¿Qué hay cerca?</string>
+    <string name="lp_carousel_location_secondary_alexa_system">Comparte tu ubicación con Alexa para obtener respuestas más precisas sobre restaurantes cercanos y mucho más.</string>
+    <string name="lp_carousel_location_secondary_system">Permite el acceso a la ubicación para obtener respuestas más precisas sobre restaurantes cercanos y mucho más.</string>
+    <string name="lp_carousel_contacts_primary">Llama a tus amigos y familiares usando la voz</string>
+    <string name="lp_carousel_contacts_secondary_alexa_system">Los contactos de %1$s se cargarán al servicio de Amazon.</string>
+    <string name="lp_carousel_contacts_secondary_system">Para realizar llamadas con Alexa, permite el acceso a los contactos.</string>
+    <string name="lp_carousel_sms_primary">Escucha tus mensajes de texto</string>
+    <string name="lp_carousel_sms_secondary_alexa_system">Los mensajes SMS de %1$s se cargarán al servicio de Amazon.</string>
+    <string name="lp_carousel_sms_secondary_system">Para enviar y recibir mensajes de texto con Alexa, permite el acceso a los SMS.</string>
+    <string name="lp_carousel_lowdata_primary">Obtén a un plan de datos móviles para aprovechar Alexa al máximo</string>
+    <string name="lp_carousel_lowdata_secondary">Obtén a un plan de datos móviles para reproducir en streaming música, audiolibros y estaciones de radio en vivo, así como controlar tu Casa Inteligente y mucho más.</string>
+    <string name="cta_label_fix">Corregir</string>
+    <string name="cta_label_set_as_default">Establecer como predeterminado</string>
+    <string name="cta_label_things_to_try">Sugerencias</string>
+    <string name="cta_label_sign_in">Iniciar sesión</string>
+    <string name="cta_label_enable">Activar</string>
+    <string name="cta_label_allow">Permitir</string>
+    <string name="try_saying">Prueba a decir: %1$s</string>
+    <string name="toggle_title">Palabra de activación “Alexa”</string>
+    <string name="cta_label_connect_phone">Conectar un teléfono</string>
+    <string name="lp_carousel_contacts_secondary_no_phone">Para comenzar, conecta un teléfono.</string>
 </resources>

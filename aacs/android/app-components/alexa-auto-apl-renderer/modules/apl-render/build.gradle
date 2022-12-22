@@ -6,10 +6,10 @@ android {
     defaultConfig {
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 1
-        versionName "4.1.1"
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         buildConfigField 'int', 'VERSION_CODE', "1"
-        buildConfigField 'String', 'VERSION_NAME', "\"4.1.1\""
+        buildConfigField 'String', 'VERSION_NAME', "\"4.2\""
     }
 
     buildTypes {
@@ -67,8 +67,9 @@ dependencies {
     implementation 'androidx.fragment:fragment:1.2.4'
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.google.dagger:dagger:2.33'
-    implementation 'org.projectlombok:lombok:1.18.18'
     implementation 'com.google.guava:guava:27.0.1-android'
+
+    compileOnly 'org.projectlombok:lombok:1.18.18'
 
     annotationProcessor 'com.google.dagger:dagger-compiler:2.33'
     annotationProcessor 'org.projectlombok:lombok:1.18.18'

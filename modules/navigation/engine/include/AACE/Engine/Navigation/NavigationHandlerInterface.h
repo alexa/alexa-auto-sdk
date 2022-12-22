@@ -16,22 +16,25 @@
 #ifndef AACE_ENGINE_NAVIGATION_NAVIGATION_HANDLER_INTERFACE_H
 #define AACE_ENGINE_NAVIGATION_NAVIGATION_HANDLER_INTERFACE_H
 
+#include <AVSCommon/AVS/AgentId.h>
 #include <AACE/Navigation/Navigation.h>
 
 namespace aace {
 namespace engine {
 namespace navigation {
 
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+
 class NavigationHandlerInterface {
 public:
     virtual ~NavigationHandlerInterface() = default;
-    virtual void showPreviousWaypoints() = 0;
-    virtual void navigateToPreviousWaypoint() = 0;
-    virtual void startNavigation(const std::string& payload) = 0;
+    virtual void showPreviousWaypoints(AgentId::IdType agentId) = 0;
+    virtual void navigateToPreviousWaypoint(AgentId::IdType agentId) = 0;
+    virtual void startNavigation(AgentId::IdType agentId, const std::string& payload) = 0;
     virtual void announceManeuver(const std::string& payload) = 0;
     virtual void announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) = 0;
-    virtual void cancelNavigation() = 0;
-    virtual std::string getNavigationState() = 0;
+    virtual void cancelNavigation(AgentId::IdType agentId) = 0;
+    virtual std::string getNavigationState(AgentId::IdType agentId) = 0;
 };
 
 }  // namespace navigation

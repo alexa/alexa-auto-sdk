@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package com.amazon.aacstelephony;
 
 import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
 import static com.amazon.aacstelephony.Constants.PBAP_CLIENT_PROFILE_ID;
+import static com.amazon.aacstelephony.MessagingConstants.MAP_CLIENT;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -24,9 +25,11 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
@@ -52,7 +55,7 @@ public class BluetoothStateListener extends BroadcastReceiver {
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                Log.i(TAG, "Adding devices paired before initial check to database");
+                Log.d(TAG, "Adding devices paired before initial check to database");
                 Util.broadcastPairedDevices(context, device.getName(), device.getAddress());
             }
         }
@@ -76,7 +79,7 @@ public class BluetoothStateListener extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(TAG, "action: " + action);
+        Log.d(TAG, "action: " + action + " intent: " + intent);
         if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             Log.d(TAG, "bonded state: " + device.getBondState());
@@ -95,6 +98,8 @@ public class BluetoothStateListener extends BroadcastReceiver {
                     == intent.getIntExtra(BluetoothProfile.EXTRA_STATE, BluetoothAdapter.STATE_DISCONNECTED);
 
             if (isConnected) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                Log.i(TAG, "Device: " + device.getName() + " " + device.getAddress() + " " + device.getBondState());
                 Log.v(TAG, "Bluetooth HFP connected, sending ConnectionStateChanged message to AACS");
                 Util.publishConnectionStateToAACS(Constants.ConnectionState.CONNECTED, mAACSMessageSender);
             } else {

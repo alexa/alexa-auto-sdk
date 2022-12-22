@@ -29,4 +29,7 @@ public class VoiceAssistanceEvent {
     public static final String SEPARATE_ADDRESSBOOK_CONSENT_SETUP_FINISHED =
             "Separate_AddressBook_Consent_Setup_Finished";
     public static final String ALEXA_ADDRESSBOOK_CONSENT_SETUP_FINISHED = "Alexa_AddressBook_Consent_Setup_Finished";
+
+    public static final String ACA_LOCATION_CONSENT_SETUP_NOT_FINISHED = "ACA_Location_Consent_Setup_Not_Finished";
+    public static final String ACA_LOCATION_CONSENT_SETUP_FINISHED = "ACA_Location_Consent_Setup_Finished";
 }

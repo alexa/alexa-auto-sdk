@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include <acsdkAudioPlayer/AudioPlayer.h>
 #include <acsdkAudioPlayerInterfaces/AudioPlayerObserverInterface.h>
+#include <AFML/ActivityTrackerInterface.h>
 #include <AVSCommon/AVS/Attachment/AttachmentManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/AVSConnectionManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
@@ -29,6 +30,7 @@
 #include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
 #include <AVSCommon/Utils/Metrics/MetricRecorderInterface.h>
 #include <ContextManager/ContextManager.h>
+#include <RegistrationManager/CustomerDataManagerInterface.h>
 
 #include <AACE/Alexa/AlexaEngineInterfaces.h>
 #include <AACE/Alexa/AudioPlayer.h>
@@ -63,8 +65,9 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface>
             audioPlayerObserverDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder);
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+        std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager);
 
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
@@ -81,19 +84,21 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface>
             audioPlayerObserverDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder);
+        std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+        std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager);
 
-    //
-    // AudioPlayerEngineInterface
-    //
+    /// @name AudioPlayerEngineInterface functions
+    /// @{
     int64_t onGetPlayerPosition() override;
     int64_t onGetPlayerDuration() override;
+    void onSetAsForegroundActivity() override;
+    /// @}
 
-    //
-    // AudioPlayerObserverInterface
-    //
+    /// @name AudioPlayerObserverInterface functions
+    /// @{
     void onPlayerActivityChanged(alexaClientSDK::avsCommon::avs::PlayerActivity state, const Context& context) override;
+    /// @}
 
     /// @name RenderPlayerInfoCardsProviderInterface Functions
     /// @{
@@ -107,6 +112,7 @@ protected:
 private:
     std::shared_ptr<aace::alexa::AudioPlayer> m_audioPlayerPlatformInterface = nullptr;
     std::shared_ptr<alexaClientSDK::acsdkAudioPlayer::AudioPlayer> m_audioPlayerCapabilityAgent;
+    std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> m_activityTracker;
 
     /// Observer for changes related to RenderPlayerInfoCards.
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>

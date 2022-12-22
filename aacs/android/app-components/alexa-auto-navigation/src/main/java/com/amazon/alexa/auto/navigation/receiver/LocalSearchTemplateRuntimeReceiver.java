@@ -60,7 +60,8 @@ public class LocalSearchTemplateRuntimeReceiver extends BroadcastReceiver {
                             mLocalSearchDirectiveHandler.renderLocalSearchDetailTemplate(message);
                         }
                     });
-                } else if (message.action.equals(Action.TemplateRuntime.CLEAR_TEMPLATE)) {
+                } else if (message.action.equals(Action.TemplateRuntime.CLEAR_TEMPLATE) ||
+                           message.action.equals(Action.Navigation.START_NAVIGATION)) {
                     mLocalSearchDirectiveHandler.clearLocalSearchTemplate();
                 }
             });

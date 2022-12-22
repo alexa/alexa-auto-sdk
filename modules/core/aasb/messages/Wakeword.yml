@@ -1,0 +1,33 @@
+topic: WakewordManager
+namespace: aasb.message.wakeword.wakeword
+path: wakeword/wakeword
+
+messages:
+  - action: OnWakewordDetected
+    direction: outgoing
+    desc: Notifies the platform 3P wakeword detected
+    payload:
+      - name: wakeword
+        type: string
+        desc: Wakeword detected 
+      - name: beginIndex
+        type: int
+        desc: Begin index of wakeword detected
+      - name: endIndex
+        type: int
+        desc: End index of wakeword detected  
+
+  - action: SetWakewordStatus
+    direction: incoming
+    desc: Enables/disables wakeword detection
+    payload:
+      - name: name
+        type: string
+        desc: name of the wakeword to be enabled/disabled 
+      - name: value
+        type: bool
+        desc: vaues of enable/disable wakeword
+    reply:
+      - name: success
+        type: bool
+        desc: True if SetWakewordStatus was successful, False otherwise. 

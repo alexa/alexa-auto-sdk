@@ -1,18 +1,24 @@
 apply plugin: 'com.android.application'
 apply plugin: 'androidx.navigation.safeargs'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "org.jetbrains.kotlin.kapt"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     defaultConfig {
-        applicationId "com.amazon.alexa.auto.app"
         minSdkVersion 27
-        versionCode 1
-        versionName "4.1.1"
+        targetSdkVersion 27
+        applicationId "com.amazon.alexa.auto.app"
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -56,7 +62,7 @@ android {
             def buildType = variant.buildType.name
             def version = variant.versionName
             def apkName = project + separator + buildType + separator + version + ".apk"
-            outputFileName = new File(apkName)
+            outputFileName = file(apkName).name
         }
     }
 
@@ -66,12 +72,22 @@ android {
         doNotStrip '**/*.so'
     }
 
-    ndkVersion = "21.4.7075529"
+    ndkVersion = "23.2.8568313"
 }
 
 ext {
-    remoteLibVersion = "4.1+"
+    remoteLibVersion = "4.2+"
 }
+
+tasks.whenTaskAdded { task ->
+
+    if (task.name == "assembleLocalDebug" || task.name == "assembleLocalRelease") {
+        if (!project.hasProperty("skipDeps")) {
+            delete gradle.ext.aarDir
+        }
+    }
+}
+
 dependencies {
     def tasks = gradle.startParameter.getTaskNames()
     if (tasks.empty || tasks.any { it.toLowerCase().contains("local") }) {
@@ -92,6 +108,7 @@ dependencies {
         remoteImplementation "com.amazon.alexa.aace:phonecontrol:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:text-to-speech:${remoteLibVersion}@aar"
         remoteImplementation "com.amazon.alexa.aace:text-to-speech-provider:${remoteLibVersion}@aar"
+        remoteImplementation "com.amazon.alexa.aace:metrics-proxy:${remoteLibVersion}@aar"
     }
 
     // AACS Projects.
@@ -101,17 +118,6 @@ dependencies {
     implementation project(':aacsconstants')
     implementation project(':aacsipc')
     implementation project(':aacscommonutils')
-    implementation project(':alexa-auto-tts')
-
-    if(project.hasProperty('enabledTelephony')){
-        implementation project(':alexa-auto-telephony')
-    }
-    if(project.hasProperty('enabledCarControl')){
-        implementation project(':alexa-auto-carcontrol')
-    }
-    if(project.hasProperty('enabledContacts')){
-       implementation project(':alexa-auto-contacts')
-    }
 
     // AACS Sample App Projects.
     implementation project(':alexa-auto-apis')
@@ -119,26 +125,24 @@ dependencies {
     implementation project(':alexa-auto-apps-common-util')
     implementation project(':alexa-auto-lwa-auth')
     implementation project(':alexa-auto-setup')
-    implementation project(':alexa-auto-media-player')
-    implementation project(':alexa-auto-voice-interaction')
-    implementation project(':alexa-auto-navigation')
     implementation project(':alexa-auto-settings')
-    implementation project(':alexa-auto-comms-ui')
-    implementation project(':alexa-auto-templateruntime-renderer')
-
-    if (project.hasProperty('enabledUXRestrictions')) {
-        implementation project(':alexa-auto-ux-restrictions')
-    }
-
+    implementation project(':alexa-auto-voice-interaction')
     implementation project(':alexa-auto-voice-ui')
+    implementation project(':alexa-auto-tts')
+    implementation project(':alexa-auto-device-usage')
 
-    if(project.hasProperty('enabledAPL')){
-        implementation project(':alexa-auto-apl-renderer')
-    }
+    implementation project(':alexa-auto-media-player')
+    implementation project(':alexa-auto-templateruntime-renderer')
+    implementation project(':alexa-auto-apl-renderer')
 
-    if(project.hasProperty('enabledDeviceUsage')){
-        implementation project(':alexa-auto-device-usage')
-    }
+    implementation project(':alexa-auto-navigation')
+
+    implementation project(':alexa-auto-comms-ui')
+    implementation project(':alexa-auto-telephony')
+
+    implementation project(':alexa-auto-ux-restrictions')
+    implementation project(':alexa-auto-carcontrol')
+    implementation project(':alexa-auto-contacts')
 
     // AACS module factories.
     for (extra_module_factory_name in gradle.ext.extra_module_factory_names) {
@@ -194,11 +198,4 @@ dependencies {
     testImplementation deps.androidx_test_core
     testImplementation deps.androidx_arch_core_testing
     testImplementation deps.roboelectric
-}
-
-tasks.whenTaskAdded { task ->
-    if ((task.name == 'assembleLocalDebug' || task.name == 'assembleLocalRelease')
-            && !project.hasProperty("skipDeps")) {
-        delete gradle.ext.aarDir
-    }
 }

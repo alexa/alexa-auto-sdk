@@ -83,7 +83,8 @@ bool TemplateRuntimeEngineImpl::initialize(
         renderPlayerInfoCardsProviderInterfaces,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager) {
     try {
         // The constructor for the TemplateRuntime capability agent takes in a set of renderPlayerInfoCardsProviderInterfaces.  It automatically calls
         // set observer on each element in the set and then caches the set.  The set cannot be modified after the constructor.  In our case, we want
@@ -94,7 +95,8 @@ bool TemplateRuntimeEngineImpl::initialize(
                 std::unordered_set<std::shared_ptr<
                     alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface>>{},
                 focusManager,
-                exceptionSender);
+                exceptionSender,
+                customerDataManager);
         ThrowIfNull(m_templateRuntimeCapabilityAgent, "couldNotCreateCapabilityAgent");
 
         setRenderPlayerInfoCardsProviderInterface(renderPlayerInfoCardsProviderInterfaces);
@@ -124,7 +126,8 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
         renderPlayerInfoCardsProviderInterfaces,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager) {
     std::shared_ptr<TemplateRuntimeEngineImpl> templateRuntimeEngineImpl = nullptr;
 
     try {
@@ -133,6 +136,7 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
         ThrowIfNull(focusManager, "invalidFocusManager");
         ThrowIfNull(dialogUXStateAggregator, "invalidDialogUXStateAggregator");
         ThrowIfNull(exceptionSender, "invalidExceptionEncounteredSenderInterface");
+        ThrowIfNull(customerDataManager, "invalidCustomerDataManager");
 
         templateRuntimeEngineImpl =
             std::shared_ptr<TemplateRuntimeEngineImpl>(new TemplateRuntimeEngineImpl(templateRuntimePlatformInterface));
@@ -143,7 +147,8 @@ std::shared_ptr<TemplateRuntimeEngineImpl> TemplateRuntimeEngineImpl::create(
                 renderPlayerInfoCardsProviderInterfaces,
                 focusManager,
                 dialogUXStateAggregator,
-                exceptionSender),
+                exceptionSender,
+                customerDataManager),
             "initializeTemplateRuntimeEngineImplFailed");
 
         // set the platform's engine interface reference
@@ -173,6 +178,7 @@ void TemplateRuntimeEngineImpl::doShutdown() {
 }
 
 void TemplateRuntimeEngineImpl::renderTemplateCard(
+    const std::string& token,
     const std::string& jsonPayload,
     alexaClientSDK::avsCommon::avs::FocusState focusState) {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderTemplateCard", {METRIC_TEMPLATERUNTIME_RENDER_TEMPLATE});
@@ -185,6 +191,7 @@ void TemplateRuntimeEngineImpl::clearTemplateCard(const std::string& token) {
 }
 
 void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
+    const std::string& token,
     const std::string& jsonPayload,
     alexaSmartScreenSDK::smartScreenSDKInterfaces::AudioPlayerInfo audioPlayerInfo,
     alexaClientSDK::avsCommon::avs::FocusState focusState,

@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,16 +17,18 @@
 #ifndef AACE_ENGINE_ADDRESS_BOOK_ADDRESSBOOK_CLOUD_UPLOADER_REST_AGENT_H
 #define AACE_ENGINE_ADDRESS_BOOK_ADDRESSBOOK_CLOUD_UPLOADER_REST_AGENT_H
 
+#include <condition_variable>
 #include <queue>
 
-#include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
-#include <AVSCommon/Utils/LibcurlUtils/HttpGet.h>
-#include <AVSCommon/Utils/LibcurlUtils/HttpPost.h>
-#include <AVSCommon/Utils/LibcurlUtils/HttpDelete.h>
-#include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
-#include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
+#include <AVSCommon/Utils/HTTP/HttpResponseCode.h>
+#include <AVSCommon/Utils/LibcurlUtils/HttpDelete.h>
+#include <AVSCommon/Utils/LibcurlUtils/HttpGet.h>
+#include <AVSCommon/Utils/LibcurlUtils/HttpPost.h>
+#include <AVSCommon/Utils/LibcurlUtils/HTTPResponse.h>
+#include <AVSCommon/Utils/RequiresShutdown.h>
+#include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
 
 #include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
 #include "AACE/Engine/Utils/JSON/JSON.h"
@@ -35,7 +37,7 @@ namespace aace {
 namespace engine {
 namespace addressBook {
 
-class AddressBookCloudUploaderRESTAgent {
+class AddressBookCloudUploaderRESTAgent : public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 private:
     AddressBookCloudUploaderRESTAgent(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
@@ -75,24 +77,32 @@ public:
     /// Resets the internal ACMS REST attributes
     void reset();
 
+protected:
+    // RequiresShutdown
+    void doShutdown() override;
+
 private:
     enum class CommsProvisionStatus {
         /*
          * Invalid state
          */
         INVALID,
+
         /*
          * Status is new or unknown.
          */
         UNKNOWN,
+
         /*
          * Account is provisioned.
          */
         PROVISIONED,
+
         /*
          * Account is deprovisioned.
          */
         DEPROVISIONED,
+
         /*
          * Account is auto provisioned.
          */
@@ -112,15 +122,14 @@ private:
     std::string getPceIdFromIdentity(const std::string& commsId);
 
     std::vector<std::string> buildCommonHTTPHeader();
-    bool parseCommonHTTPResponse(const HTTPResponse& response);
 
-    HTTPResponse doPost(
+    std::pair<bool, HTTPResponse> doPost(
         const std::string& url,
         const std::vector<std::string> headerLines,
         const std::string& data,
         std::chrono::seconds timeout);
-    HTTPResponse doGet(const std::string& url, const std::vector<std::string>& headers);
-    HTTPResponse doDelete(const std::string& url, const std::vector<std::string>& headers);
+    std::pair<bool, HTTPResponse> doGet(const std::string& url, const std::vector<std::string>& headers);
+    std::pair<bool, HTTPResponse> doDelete(const std::string& url, const std::vector<std::string>& headers);
 
     std::string buildCreateAddressBookDataJson(
         const std::string& addressBookSourceId,
@@ -128,6 +137,9 @@ private:
 
 private:
     std::string m_pceId;
+
+    /// Indicates shutting down of the module.
+    std::atomic<bool> m_isShuttingDown;
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> m_deviceInfo;
@@ -137,6 +149,12 @@ private:
 
     /// Mutex to allow serialized access to m_pceId
     std::mutex m_pceIdMutex;
+
+    /// Mutex used for wait on m_wake
+    std::mutex m_wakeMutex;
+
+    /// Condition variable used to wake waits due to network retries.
+    std::condition_variable m_wake;
 };
 
 }  // namespace addressBook

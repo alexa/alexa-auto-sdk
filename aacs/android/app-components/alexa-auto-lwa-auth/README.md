@@ -1,5 +1,5 @@
 # Alexa Auto Login with Amazon Authorization
-This package provides an implementation of `AuthController` defined in the `alexa-auto-apis` package. The `AuthController` implementation uses the Login with Amazon (LWA) authorization service provided by the Alexa Auto SDK and Alexa Auto Client Service (AACS).
+This package provides an implementation of `AuthController` defined in the `alexa-auto-apis` package. The `AuthController` implementation uses the Login with Amazon (LWA) authorization service provided by the Alexa Auto SDK.
 
 The `AuthController` implementation is useful for observing changes in the authentication state (indicated by the Boolean value of `loggedIn`).
 

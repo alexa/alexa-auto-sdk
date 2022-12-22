@@ -18,8 +18,6 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioAttributes;
-import android.media.AudioFocusRequest;
-import android.media.AudioManager;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -39,6 +37,7 @@ import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.PlaybackControl;
 import com.amazon.alexa.auto.aacs.common.RenderPlayerInfo;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
+import com.amazon.alexa.auto.media.Constants;
 import com.amazon.alexa.auto.media.R;
 import com.amazon.alexa.auto.media.player.MediaPlayerExo;
 import com.google.android.exoplayer2.C;
@@ -55,8 +54,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -87,15 +84,6 @@ public class MediaSessionManager {
     public static final int FAST_FORWARD_MS = 30000;
     // Rewind jump
     public static final int REWIND_MS = FAST_FORWARD_MS;
-
-    // Constant Strings used
-    private static final String LAST_PLAYBACK_STATE = "LAST_PLAYBACK_STATE";
-    private static final String MEDIA_RESUME_SUPPORT = "MEDIA_RESUME_SUPPORT";
-    private static final String FAILED_CAN_RETRY = "FAILED_CAN_RETRY";
-    private static final String ERROR = "ERROR";
-    private static final String FAILED_TIMEOUT = "FAILED_TIMEOUT";
-    private static final String MEDIA_PLAYBACK_REQUEST_STATUS = "mediaPlaybackRequestStatus";
-    private static final String STATUS = "status";
 
     @NonNull
     private final MediaPlayerExo mMediaPlayer;
@@ -129,18 +117,6 @@ public class MediaSessionManager {
     // Shutdown state
     boolean isDeviceShuttingDown = false;
 
-    // Media resume retry variables.
-    private final ExecutorService executor;
-    private boolean mMediaResumeSupported;
-    private int reattempts = 10;
-    private boolean isConnected = false;
-    private boolean isMediaResumePending = false;
-
-    // App Focus Management for Media Resume
-    private AudioManager mAudioManager;
-    private AudioFocusRequest mAudioFocusRequest;
-    boolean isAppFocused;
-
     /**
      * Construct an instance of @c MediaSessionManager.
      *
@@ -152,8 +128,7 @@ public class MediaSessionManager {
      */
     public MediaSessionManager(@NonNull MediaPlayerExo mediaPlayer, @NonNull MediaSessionCompat mediaSession,
             @NonNull MediaMetadataProvider metadataProvider, @NonNull PlaybackController controlDispatcher,
-            @NonNull CustomActionProviders actionProviders, @NonNull SharedPreferences sharedPreferences,
-            @NotNull AudioManager audioManager) {
+            @NonNull CustomActionProviders actionProviders, @NonNull SharedPreferences sharedPreferences) {
         this.mMediaPlayer = mediaPlayer;
         this.mMediaSession = mediaSession;
         this.mMetadataProvider = metadataProvider;
@@ -165,31 +140,6 @@ public class MediaSessionManager {
 
         this.mMediaEventListener = new MediaPlayerEventListener();
         this.mMediaSessionCallback = new MediaSessionCallbackHandler();
-        this.mAudioManager = audioManager;
-
-        executor = Executors.newSingleThreadExecutor();
-        initAppFocusManager();
-    }
-
-    /**
-     * Media Resume starts its cycle when {@link MediaSessionCallbackHandler.onPlay()} is received
-     * by the platform. This class request AudioFocus if Media Resume is expected. If Audio focus
-     * is lost before Alexa gets connected and request media resume, this class assumes that
-     * some other audio is playing and drops the plan of requesting media resume
-     */
-    private void initAppFocusManager() {
-        AudioAttributes mAudioAttributes = new AudioAttributes.Builder()
-                                                   .setUsage(AudioAttributes.USAGE_MEDIA)
-                                                   .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                                   .build();
-
-        AppFocusManager mAppFocusManager = new AppFocusManager();
-
-        mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                                     .setAudioAttributes(mAudioAttributes)
-                                     .setWillPauseWhenDucked(false)
-                                     .setOnAudioFocusChangeListener(mAppFocusManager)
-                                     .build();
     }
 
     /**
@@ -203,16 +153,6 @@ public class MediaSessionManager {
     }
 
     /**
-     * This method needs to be called on the reboot if media resume is expected.
-     * It ensures that Automotive Android calls onPlay() if Alexa Media is last playing active media app
-     */
-    public void setupMediaResume() {
-        if (mayAutoResume()) {
-            setPlaybackStatePaused();
-        }
-    }
-
-    /**
      * Activate the media session.
      */
     public void activateMediaSession() {
@@ -221,10 +161,19 @@ public class MediaSessionManager {
         }
     }
 
+    public boolean isMediaSessionActive() {
+        return mMediaSession.isActive();
+    }
+
     public void setupMediaSessionCallbacks() {
+        Log.d(TAG, "setupMediaSessionCallbacks with default callback");
+        setupMediaSessionCallbacks(mMediaSessionCallback);
+    }
+
+    public void setupMediaSessionCallbacks(MediaSessionCompat.Callback callback) {
         Log.d(TAG, "setupMediaSessionCallbacks");
-        mMediaSession.setCallback(mMediaSessionCallback);
-        mMediaPlayer.getPlayer().addListener(mMediaEventListener);
+        mMediaSession.setCallback(callback);
+        mMediaPlayer.addListener(mMediaEventListener);
     }
 
     /**
@@ -234,14 +183,14 @@ public class MediaSessionManager {
         if (!isDeviceShuttingDown) {
             mMediaSession.setActive(false);
             mMediaSession.setCallback(null);
+            mMediaPlayer.removeListener(mMediaEventListener);
         }
-        mMediaPlayer.getPlayer().removeListener(mMediaEventListener);
     }
 
     /**
-     * Destroy the media session.
+     * Release the media session.
      */
-    public void destroyMediaSession() {
+    public void releaseMediaSession() {
         if (!isDeviceShuttingDown) {
             getMediaSession().release();
         }
@@ -256,9 +205,10 @@ public class MediaSessionManager {
      *        appear on resolution button in the UI.
      * @param resolutionIntent If there is a resolution of error, then pending intent that
      *        is invoked when resolution button in the UI is clicked.
+     * @param activate Whether to activate the media session
      */
     public void setMediaSessionError(int errorCode, @NonNull String errorStr, @Nullable String resolutionStr,
-            @Nullable PendingIntent resolutionIntent) {
+            @Nullable PendingIntent resolutionIntent, boolean activate) {
         Log.i(TAG, "Setting media session error with code:" + errorCode + " Error:" + errorStr);
 
         PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
@@ -274,8 +224,9 @@ public class MediaSessionManager {
             extras.putParcelable("android.media.extras.ERROR_RESOLUTION_ACTION_INTENT", resolutionIntent);
             builder.setExtras(extras);
         }
-        activateMediaSession();
-        Log.d(TAG, "setPlaybackState error");
+        if (activate) {
+            activateMediaSession();
+        }
         mMediaSession.setPlaybackState(builder.build());
     }
 
@@ -355,6 +306,24 @@ public class MediaSessionManager {
     }
 
     /**
+     * Get the playback position of the media buffered in the player.
+     * @return The playback position
+     */
+    public long getPlaybackPosition() {
+        return mMediaPlayer.getPosition();
+    }
+
+    public void requestMediaPlayback() {
+        mControlDispatcher.requestMediaPlayback();
+    }
+
+    public void stopPlayback() {
+        if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_STOP)) {
+            mControlDispatcher.stop();
+        }
+    }
+
+    /**
      * Updates media session playback state based on the last render player info.
      */
     public final void updatePlaybackState() {
@@ -364,14 +333,16 @@ public class MediaSessionManager {
         }
         PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
 
-        int playbackState = 0;
+        int playbackState = PlaybackStateCompat.STATE_NONE;
         ExoPlaybackException exoError = mMediaPlayer.getPlayer().getPlayerError();
         if (exoError != null) {
+            Log.e(TAG, "Player has an error: " + exoError);
             playbackState = PlaybackStateCompat.STATE_ERROR;
             // TODO: Add error string in media session.
         } else {
             playbackState = mMediaPlayer.getMediaState().toMediaSessionState();
         }
+        Log.d(TAG, "PlaybackState: " + playbackState);
 
         if (playbackState == PlaybackStateCompat.STATE_PLAYING) {
             activateMediaSession();
@@ -410,7 +381,7 @@ public class MediaSessionManager {
         }
         Log.d(TAG, String.format("storePlaybackState %d", playbackState));
         SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt(LAST_PLAYBACK_STATE, playbackState);
+        editor.putInt(Constants.PREFERENCE_PREVIOUS_PLAYBACK_STATE, playbackState);
         editor.apply();
     }
 
@@ -421,7 +392,7 @@ public class MediaSessionManager {
      * @return Supported Media Session playback actions as flags.
      */
     private static long computePlaybackActions(@NonNull RenderPlayerInfo playerInfo) {
-        long enabledActions = PlaybackStateCompat.ACTION_STOP;
+        long enabledActions = PlaybackStateCompat.ACTION_STOP | PlaybackStateCompat.ACTION_PREPARE;
 
         if (playerInfo.isControlEnabled(TemplateRuntimeConstants.CONTROL_NAME_SHUFFLE)) {
             enabledActions |= PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE;
@@ -495,92 +466,43 @@ public class MediaSessionManager {
         MediaButtonReceiver.handleIntent(mMediaSession, intent);
     }
 
-    public boolean mayAutoResume() {
-        // Set it true by default for the very first time where config might be not read yet.
-        // Because of the '&&' this logic would not give unexpected result
-        mMediaResumeSupported = mSharedPreferences.getBoolean(MEDIA_RESUME_SUPPORT, true);
-        return mMediaResumeSupported
-                && PlaybackState.STATE_PLAYING
-                == mSharedPreferences.getInt(LAST_PLAYBACK_STATE, PlaybackState.STATE_NONE);
-    }
-
     /**
-     * If device is shutdown while playing the Alexa music,
+     * If device is shut down while playing the Alexa music,
      * set the playback state pause after reboot. This provides automotive android a
      * chance to resume the paused music.
      */
-    private void setPlaybackStatePaused() {
+    public void initStateForResumeOnBoot() {
+        Log.d(TAG, "initStateForResumeOnBoot");
         PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
         builder.setActiveQueueItemId(MediaSessionCompat.QueueItem.UNKNOWN_ID) // until media browse
                 .setState(PlaybackStateCompat.STATE_PAUSED, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f,
                         SystemClock.elapsedRealtime())
-                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID);
-        Log.d(TAG, "setPlaybackState paused");
+                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_STOP);
+        mMediaSession.setPlaybackState(builder.build());
+    }
+
+    public void setBufferingDuringResumeOnBoot() {
+        Log.d(TAG, "setBufferingDuringResumeOnBoot");
+        PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
+        builder.setActiveQueueItemId(MediaSessionCompat.QueueItem.UNKNOWN_ID)
+                .setState(PlaybackStateCompat.STATE_BUFFERING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f,
+                        SystemClock.elapsedRealtime())
+                .setActions(PlaybackStateCompat.ACTION_STOP);
+        mMediaSession.setPlaybackState(builder.build());
+    }
+
+    public void setIdleState() {
+        Log.d(TAG, "setIdleState");
+        PlaybackStateCompat.Builder builder = new PlaybackStateCompat.Builder();
+        builder.setActiveQueueItemId(MediaSessionCompat.QueueItem.UNKNOWN_ID)
+                .setState(PlaybackStateCompat.STATE_NONE, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f,
+                        SystemClock.elapsedRealtime());
         mMediaSession.setPlaybackState(builder.build());
     }
 
     public void shutdown() {
         Log.d(TAG, "device is shutting down");
         isDeviceShuttingDown = true;
-    }
-
-    public void handleMediaResumeResponse(AACSMessage message) {
-        if (message.action.contains(Action.MediaPlaybackRequestor.MEDIA_PLAYBACK_RESPONSE)) {
-            try {
-                JSONObject messagePayload = new JSONObject(message.payload);
-                Log.i(TAG, messagePayload.toString());
-                if (messagePayload.getString(MEDIA_PLAYBACK_REQUEST_STATUS).equals(FAILED_CAN_RETRY)
-                        && reattempts > 0) {
-                    executor.execute(new ExecuteMediaPlaybackRequest(1000));
-                } else if (ERROR.equalsIgnoreCase(messagePayload.getString(MEDIA_PLAYBACK_REQUEST_STATUS))
-                        || FAILED_TIMEOUT.equalsIgnoreCase(messagePayload.getString(MEDIA_PLAYBACK_REQUEST_STATUS))) {
-                    setMediaSessionError(PlaybackStateCompat.ERROR_CODE_UNKNOWN_ERROR, "", null, null);
-                    abandonAudioFocus();
-                } else {
-                    abandonAudioFocus();
-                }
-            } catch (Exception exception) {
-                Log.w(TAG,
-                        String.format("Failed to parse Media resume response message: %s error: %s", message.payload,
-                                exception.getMessage()));
-            }
-        }
-    }
-
-    public void connectionStatusChanged(String payload) {
-        Preconditions.checkArgument(payload != null && !payload.isEmpty());
-        Log.d(TAG, payload);
-        try {
-            JSONObject jsonPayload = new JSONObject(payload);
-            String status = jsonPayload.getString(STATUS);
-            if (status.equalsIgnoreCase(AASBConstants.AlexaClient.ALEXA_CLIENT_STATUS_CONNECTED)) {
-                isConnected = true;
-                handleAlexaConnected();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "failed to get connectionStatusChanged");
-        }
-    }
-
-    private void handleAlexaConnected() {
-        if (isMediaResumePending) {
-            isMediaResumePending = false;
-            executor.execute(new ExecuteMediaPlaybackRequest(0));
-        } else {
-            Log.w(TAG, "handleAlexaConnected resume request is not pending");
-            abandonAudioFocus();
-        }
-    }
-
-    /**
-     * Set if media resume supported or not
-     * @param mediaResumeSupported
-     */
-    public void mediaResumeSupported(boolean mediaResumeSupported) {
-        mMediaResumeSupported = mediaResumeSupported;
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putBoolean(MEDIA_RESUME_SUPPORT, mediaResumeSupported);
-        editor.apply();
     }
 
     /**
@@ -610,27 +532,19 @@ public class MediaSessionManager {
     @VisibleForTesting
     class MediaSessionCallbackHandler extends MediaSessionCompat.Callback {
         @Override
-        public void onPlay() {
-            Log.d(TAG, "onPlay isConnected:" + isConnected);
-            if (mayAutoResume() && mLastRenderPlayerInfo == null) {
-                if (isConnected) {
-                    // Send Media Resume request
-                    executor.execute(new ExecuteMediaPlaybackRequest(0));
-                } else {
-                    // Media Resume request will be sent after Alexa is authenticated and connected
-                    isMediaResumePending = true;
-                }
+        public void onPrepare() {
+            Log.d(TAG, "onPrepare requested");
+            // Expected to be called when the Activity showing Alexa media UI is brought into the foreground while
+            // not currently playing, hence assume the user is looking at Alexa media UI at this point and wants
+            // GUI and generic VUI playback commands to use Alexa media (i.e., AudioPlayer interface)
+            mControlDispatcher.setAudioPlayerAsForegroundActivity();
+        }
 
-                mMediaSession.setPlaybackState(
-                        new PlaybackStateCompat.Builder()
-                                .setActiveQueueItemId(MediaSessionCompat.QueueItem.UNKNOWN_ID) // until media browse
-                                .setState(PlaybackStateCompat.STATE_BUFFERING, PlaybackState.PLAYBACK_POSITION_UNKNOWN,
-                                        1.0f, SystemClock.elapsedRealtime())
-                                .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE)
-                                .build());
-                requestAudioFocus();
-                return;
-            }
+        @Override
+        public void onPlay() {
+            Log.d(TAG, "onPlay");
+            // Setting AudioPlayer as foreground Alexa activity in case onPrepare() was not called before onPlay()
+            mControlDispatcher.setAudioPlayerAsForegroundActivity();
             if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_PLAY)) {
                 mControlDispatcher.setPlay(true);
             }
@@ -638,6 +552,7 @@ public class MediaSessionManager {
 
         @Override
         public void onPause() {
+            Log.d(TAG, "onPause requested");
             if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_PAUSE)) {
                 mControlDispatcher.setPlay(false);
             }
@@ -645,6 +560,7 @@ public class MediaSessionManager {
 
         @Override
         public void onSeekTo(long positionMs) {
+            Log.d(TAG, "onSeekTo requested");
             if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_SEEK_TO)) {
                 mControlDispatcher.seekTo(
                         mMediaPlayer.getPlayer(), mMediaPlayer.getPlayer().getCurrentWindowIndex(), positionMs);
@@ -653,6 +569,7 @@ public class MediaSessionManager {
 
         @Override
         public void onFastForward() {
+            Log.d(TAG, "onFastForward requested");
             if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_FAST_FORWARD)) {
                 if (mMediaPlayer.getPlayer().isCurrentWindowSeekable()) {
                     seekToOffset(FAST_FORWARD_MS);
@@ -662,6 +579,7 @@ public class MediaSessionManager {
 
         @Override
         public void onRewind() {
+            Log.d(TAG, "onRewind requested");
             if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_REWIND)) {
                 seekToOffset(-REWIND_MS);
             }
@@ -669,6 +587,7 @@ public class MediaSessionManager {
 
         @Override
         public void onStop() {
+            Log.d(TAG, "onStop requested");
             if (canDispatchPlaybackAction(PlaybackStateCompat.ACTION_STOP)) {
                 mControlDispatcher.stop();
             }
@@ -753,55 +672,6 @@ public class MediaSessionManager {
             Log.d(TAG, "onMediaButtonEvent");
             onMediaButtonIntentReceived(mediaButtonEvent);
             return true;
-        }
-    }
-
-    private class ExecuteMediaPlaybackRequest implements Runnable {
-        int delayMs;
-        { delayMs = 0; }
-
-        private ExecuteMediaPlaybackRequest(int delay) {
-            delayMs = delay;
-        }
-
-        @Override
-        public void run() {
-            if (delayMs > 0) {
-                try {
-                    Thread.sleep(delayMs);
-                } catch (InterruptedException e) {
-                }
-            }
-            Log.d(TAG, "Retrying for media resume");
-            mControlDispatcher.requestMediaPlayback();
-            reattempts--;
-        }
-    }
-
-    // This code is to handle a case where auto resuming a media can be cancelled if driver plays
-    // any other audio before the media resumes
-    private void requestAudioFocus() {
-        if (mAudioManager.requestAudioFocus(mAudioFocusRequest) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            isAppFocused = true;
-        }
-    }
-
-    private void abandonAudioFocus() {
-        if (isAppFocused
-                && mAudioManager.abandonAudioFocusRequest(mAudioFocusRequest)
-                        == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            isAppFocused = false;
-        }
-    }
-
-    private class AppFocusManager implements AudioManager.OnAudioFocusChangeListener {
-        @Override
-        public void onAudioFocusChange(int focusChange) {
-            if (focusChange == AudioManager.AUDIOFOCUS_LOSS || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
-                    || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                isMediaResumePending = false;
-                abandonAudioFocus();
-            }
         }
     }
 }

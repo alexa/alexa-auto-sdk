@@ -38,8 +38,7 @@ public class ThingsToTryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.settings_things_to_try_layout, container, false);
-        return view;
+        return inflater.inflate(R.layout.settings_things_to_try_layout, container, false);
     }
 
     @Override

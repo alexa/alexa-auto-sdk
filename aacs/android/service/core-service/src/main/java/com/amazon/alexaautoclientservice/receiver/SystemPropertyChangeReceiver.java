@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 
 import com.amazon.aace.alexa.AlexaProperties;
 import com.amazon.aacsconstants.AACSConstants;
+import com.amazon.aacsconstants.AACSPropertyConstants;
 import com.amazon.aacsconstants.AASBConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
@@ -35,6 +36,7 @@ import com.amazon.alexaautoclientservice.AASBHandler;
 import com.amazon.alexaautoclientservice.modules.alexaClient.AuthStateObserver;
 import com.amazon.alexaautoclientservice.modules.alexaClient.ConnectionStateObserver;
 import com.amazon.alexaautoclientservice.util.AACSStateObserver;
+import com.amazon.alexaautoclientservice.util.FileUtil;
 
 import org.json.JSONException;
 import org.json.JSONStringer;
@@ -74,8 +76,13 @@ public class SystemPropertyChangeReceiver extends BroadcastReceiver implements A
 
     public void initialSyncPropertyValues() {
         Log.v(TAG, "initialSyncPropertyValues");
+        if (mPropertyUpdateEnablementMap == null) {
+            Log.v(TAG, "Resetting property update enablement map");
+            resetPropertyUpdateEnablementMap();
+        }
         updateAlexaLocale();
         updateAlexaTimeZone();
+        updateProxyIfPresent();
     }
 
     public void changeEnablement(String property, boolean enable) {
@@ -146,6 +153,15 @@ public class SystemPropertyChangeReceiver extends BroadcastReceiver implements A
 
         if (updatePropertyValue(mContext, AlexaProperties.TIMEZONE, value))
             Log.v(TAG, "Updated Alexa time zone to " + value);
+    }
+
+    private void updateProxyIfPresent() {
+        String proxyheader = FileUtil.getConfigProxyHeader();
+
+        if (proxyheader != null) {
+            if (updatePropertyValue(mContext, AACSPropertyConstants.NETWORK_HTTP_PROXY_HEADERS, proxyheader))
+                Log.v(TAG, "Updated proxyheader network property  to " + proxyheader);
+        }
     }
 
     private boolean updatePropertyValue(Context context, String property, String value) {

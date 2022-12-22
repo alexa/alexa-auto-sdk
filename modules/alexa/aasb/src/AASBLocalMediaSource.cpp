@@ -169,16 +169,15 @@ aace::alexa::LocalMediaSource::LocalMediaSourceState AASBLocalMediaSource::getSt
 
     try {
         AACE_VERBOSE(LX(TAG));
-        auto m_messageBroker_lock = m_messageBroker.lock();
-        ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
+        auto messageBroker = m_messageBroker.lock();
+        ThrowIfNull(messageBroker, "invalidMessageBrokerReference");
 
         aasb::message::alexa::localMediaSource::GetStateMessage message;
 
         message.payload.source = static_cast<aasb::message::alexa::localMediaSource::Source>(getSource());
 
-        auto result = m_messageBroker_lock->publish(message.toString()).get();
-
-        ThrowIfNot(result.valid(), "waitForRefreshTokenTimeout");
+        auto result = messageBroker->publish(message.toString()).get();
+        ThrowIfNot(result.valid(), "waitForReplyTimeout");
 
         aasb::message::alexa::localMediaSource::GetStateMessageReply::Payload payload =
             nlohmann::json::parse(result.payload());

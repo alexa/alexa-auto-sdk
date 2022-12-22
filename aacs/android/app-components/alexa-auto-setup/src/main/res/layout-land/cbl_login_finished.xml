@@ -32,42 +32,31 @@
         app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
 
     <!--Alexa logo-->
-    <ImageView
-        android:id="@+id/alexa_img_view"
-        android:layout_width="@dimen/login_alexa_image_width"
-        android:layout_height="@dimen/login_alexa_image_height"
-        android:layout_gravity="center"
-        android:contentDescription="@string/alexa_logo_content_description"
-        android:src="@drawable/alexa_logo"
+
+    <!-- "You're all set" title text-->
+    <TextView
+        android:id="@+id/login_finish_header"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="133dp"
+        android:text="@string/login_finish_heading_text"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- "You're all set" title text-->
-    <TextView
-        android:id="@+id/login_finish_heading"
-        style="@style/Alexa.TitleText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/login_finish_heading_text"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/right_guideline"
-        app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
-        android:layout_marginTop="@dimen/login_item_margin_top"/>
-
     <!-- "Try" hint text-->
     <TextView
         android:id="@+id/login_hint_try"
-        style="@style/Alexa.SubtitleText"
+        style="?attr/bodyText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text="@string/login_finish_try_text"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/login_finish_heading"
+        app:layout_constraintTop_toBottomOf="@id/login_finish_header"
         app:layout_constraintVertical_chainStyle="packed"
         android:layout_marginTop="@dimen/title_to_subtitle_margin"
         app:layout_constraintVertical_bias="0"/>
@@ -75,7 +64,7 @@
     <!-- Next 3 text views are the hints-->
     <TextView
         android:id="@+id/alexa_hint1"
-        style="@style/Alexa.UtteranceText"
+        style="?attr/utteranceText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/auth_provider_login_alexa_hint1"
@@ -86,7 +75,7 @@
 
     <TextView
         android:id="@+id/alexa_hint2"
-        style="@style/Alexa.UtteranceText"
+        style="?attr/utteranceText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/auth_provider_login_alexa_hint2"
@@ -97,12 +86,12 @@
 
     <TextView
         android:id="@+id/alexa_hint3"
-        style="@style/Alexa.UtteranceText"
+        style="?attr/utteranceText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/auth_provider_login_alexa_hint3"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/cbl_login_finished_btn"
+        app:layout_constraintBottom_toTopOf="@+id/cbl_login_finished_button"
         app:layout_constraintEnd_toStartOf="@+id/right_guideline"
         app:layout_constraintStart_toStartOf="@+id/left_guideline"
         app:layout_constraintTop_toBottomOf="@+id/alexa_hint2"
@@ -110,8 +99,8 @@
 
     <!-- Access settings button-->
     <TextView
-        android:id="@+id/cbl_login_finished_btn"
-        style="@style/Alexa.Button"
+        android:id="@+id/cbl_login_finished_button"
+        style="?button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/login_all_done_btn_text"

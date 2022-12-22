@@ -410,9 +410,6 @@ The **notify/*** action exercises the application platform interfaces with event
 | Event                                       | Value
 | ------------------------------------------- | -------------------------------------------
 | onStopActive                                | -
-| **Alerts**                                  |
-| onAlertsLocalStop                           | -
-| onAlertsRemoveAllAlerts                     | -
 | **AudioManager**                            |
 | onAudioManagerSpeaker                       | `identity/name/value`
 | **Communications**                          |

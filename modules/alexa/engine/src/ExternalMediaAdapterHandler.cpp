@@ -69,6 +69,7 @@ bool ExternalMediaAdapterHandler::validatePlayer(const std::string& localPlayerI
 }
 
 bool ExternalMediaAdapterHandler::setFocus(const std::string& localPlayerId, bool focusAcquire) {
+    AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId).d("focusAcquire", focusAcquire));
     try {
         ThrowIfNot(validatePlayer(localPlayerId, false), "invalidPlayerInfo");
         auto playerInfo = m_playerInfoMap[localPlayerId];
@@ -251,6 +252,7 @@ bool ExternalMediaAdapterHandler::play(
 bool ExternalMediaAdapterHandler::playControl(
     const std::string& playerId,
     aace::engine::alexa::RequestType requestType) {
+    AACE_INFO(LX(TAG).d("playerId", playerId).d("requestType", requestType));
     std::string localPlayerId;
     try {
         // convert RequestType to PlayControlType

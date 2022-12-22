@@ -29,6 +29,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreferenceCompat;
 
@@ -76,19 +77,25 @@ public class AuthSettingsScreenBuilder implements AlexaSettingsScreenBuilder {
                 screen.removePreference(signOutPref);
 
             if (!isAlexaCustomAssistantEnabled(screen.getContext())) {
-                Preference commsPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_COMMUNICATION);
+                PreferenceCategory permCategory = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_PERMISSIONS_CATEGORY);
+                Preference commsPref = permCategory.findPreference(PreferenceKeys.ALEXA_SETTINGS_COMMUNICATION);
                 if (commsPref != null)
-                    screen.removePreference(commsPref);
+                    permCategory.removePreference(commsPref);
             }
         }
 
         if (isPreviewMode() || isAlexaCustomAssistantEnabled(screen.getContext())) {
-            Preference dndPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_DO_NOT_DISTURB);
+            PreferenceCategory permCategory = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_PERMISSIONS_CATEGORY);
+            PreferenceCategory miscCategory = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_ETC_CATEGORY);
+
+            assert miscCategory != null;
+            Preference dndPref = miscCategory.findPreference(PreferenceKeys.ALEXA_SETTINGS_DO_NOT_DISTURB);
             if (dndPref != null)
-                screen.removePreference(dndPref);
-            Preference navFavPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_NAVI_FAVORITES);
+                miscCategory.removePreference(dndPref);
+            assert permCategory != null;
+            Preference navFavPref = permCategory.findPreference(PreferenceKeys.ALEXA_SETTINGS_NAVI_FAVORITES);
             if (navFavPref != null)
-                screen.removePreference(navFavPref);
+                permCategory.removePreference(navFavPref);
         }
     }
 

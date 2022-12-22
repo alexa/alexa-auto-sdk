@@ -15,12 +15,10 @@
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
-import static com.amazon.alexa.auto.apps.common.util.LocaleUtil.getLocalizedDomain;
 
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.os.LocaleList;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -119,8 +117,6 @@ public class CBLFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setContentForCBLViewTitle();
-
         View fragmentView = requireView();
         mNavController = findNavController(fragmentView);
 
@@ -170,7 +166,8 @@ public class CBLFragment extends Fragment {
         String URL_PARAM = "?cbl-code=";
         Bitmap qrCodeBitmap =
                 mQRCodeGenerator.generateQRCode(codePair.getValidationUrl() + URL_PARAM + codePair.getValidationCode());
-        showQRCodeScreen(codePair.getValidationCode(), qrCodeBitmap);
+        showQRCodeScreen(qrCodeBitmap);
+        setContentForCBLViewTitle(codePair.getValidationUrl(), codePair.getValidationCode());
     }
 
     private void updateVisibilitySpinner(int visible) {
@@ -184,12 +181,6 @@ public class CBLFragment extends Fragment {
         view.findViewById(R.id.login_display_cbl_code_layout).setVisibility(visible);
     }
 
-    private void setCBLCodeText(String cblCode) {
-        View view = requireView();
-        TextView cblCodeTextView = view.findViewById(R.id.cbl_code);
-        cblCodeTextView.setText(cblCode);
-    }
-
     private void setQRCodeImage(Bitmap qrCode) {
         View view = requireView();
         ImageView qrCodeImageView = view.findViewById(R.id.qr_code);
@@ -201,8 +192,7 @@ public class CBLFragment extends Fragment {
         view.findViewById(R.id.cbl_loading_layout).setVisibility(visible);
     }
 
-    private void showQRCodeScreen(String cblCode, Bitmap qrCodeBitmap) {
-        setCBLCodeText(cblCode);
+    private void showQRCodeScreen(Bitmap qrCodeBitmap) {
         setQRCodeImage(qrCodeBitmap);
     }
 
@@ -211,13 +201,13 @@ public class CBLFragment extends Fragment {
         view.findViewById(R.id.cbl_login_finished_layout).setVisibility(visible);
     }
 
-    private void setContentForCBLViewTitle() {
+    private void setContentForCBLViewTitle(String verificationUri, String cblCode) {
         View view = requireView();
 
         // Make multicolor text for title.
         TextView titleTextView = view.findViewById(R.id.qr_code_title_textview);
-        String titleText = getResources().getString(R.string.login_qr_code_message);
-        titleText = String.format(titleText, getLocalizedDomain(LocaleList.getDefault().get(0)) + "/code");
+        String titleText = getResources().getString(R.string.login_qr_code_message_with_code);
+        titleText = String.format(titleText, verificationUri, cblCode);
         Spanned spanned = Html.fromHtml(titleText, Html.FROM_HTML_MODE_COMPACT);
         titleTextView.setText(spanned);
     }

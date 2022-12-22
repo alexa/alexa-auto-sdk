@@ -52,7 +52,8 @@ public class CommunicationConsentFragment extends Fragment {
     /**
      * Constructs an instance of CommunicationsFragment.
      */
-    public CommunicationConsentFragment() {}
+    public CommunicationConsentFragment() {
+    }
 
     /**
      * Constructs an instance of CommunicationsFragment.
@@ -109,6 +110,7 @@ public class CommunicationConsentFragment extends Fragment {
     /**
      * Observe contact upload consent, if user consents to upload contacts, we will automatically upload contacts with
      * the synced phone book. If not, we display the consent screen again to ask for the permission.
+     *
      * @param deviceAddress bluetooth device address.
      */
     private void observeContactUploadPermission(String deviceAddress) {
@@ -120,29 +122,27 @@ public class CommunicationConsentFragment extends Fragment {
                     mViewModel.uploadContacts(deviceAddress);
                 } else {
                     View fragmentView = requireView();
-                    TextView consentPermissionHeading =
-                            fragmentView.findViewById(R.id.contacts_permission_consent_heading);
+
                     TextView getYesButtonText = fragmentView.findViewById(R.id.contacts_upload_yes_action_button);
                     TextView getSkipButtonText = fragmentView.findViewById(R.id.contacts_upload_skip_action_button);
-                    ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
 
-                    String format = "";
                     if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
-                        // Remove Alexa logo placeholder
-
-                        alexaImage.setVisibility(View.GONE);
-
                         // Update text content
-                        format = getResources().getString(
-                                R.string.contacts_permission_consent_body_with_alexa_custom_assistant);
+                        TextView consentPermissionHeading =
+                                fragmentView.findViewById(R.id.contacts_permission_consent_header);
+
                         getYesButtonText.setText(R.string.contacts_consent_yes_with_alexa_custom_assistant);
                         TextView alexaContactsHint = fragmentView.findViewById(R.id.alexa_contacts_hint1);
                         alexaContactsHint.setVisibility(View.GONE);
-                    } else {
-                        format = getResources().getString(R.string.contacts_permission_consent_title);
+                        consentPermissionHeading
+                                .setText(
+                                        getResources()
+                                                .getString(
+                                                        R.string.contacts_permission_consent_body_with_alexa_custom_assistant,
+                                                        device.getValue().getDeviceName()
+                                                )
+                                );
                     }
-                    String headingString = String.format(format, device.getValue().getDeviceName());
-                    consentPermissionHeading.setText(headingString);
                     String actName = String.valueOf(getActivity());
                     Log.d(TAG, "Device's contacts upload permission is NO, showing contacts consent card.");
                     getYesButtonText.setOnClickListener(view -> {
@@ -166,6 +166,7 @@ public class CommunicationConsentFragment extends Fragment {
             }
         });
     }
+
     /**
      * Starts the RequestContactsConsentActivity
      */

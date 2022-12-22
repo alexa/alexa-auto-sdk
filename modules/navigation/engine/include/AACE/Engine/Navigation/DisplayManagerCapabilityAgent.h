@@ -19,6 +19,7 @@
 #include <memory>
 #include <unordered_set>
 
+#include <AVSCommon/AVS/AgentId.h>
 #include <AVSCommon/AVS/CapabilityAgent.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
@@ -154,6 +155,21 @@ private:
     void handleUnknownDirective(std::shared_ptr<DirectiveInfo> info);
 
     /**
+     * Set the agent for events based on directive.
+     * 
+     * @param [in] directiveName The name of the directive.
+     * @param [in] agentId The @c AgentId::IdType of the agent to be set.
+     */
+    void setEventAgentByDirective(const std::string& directiveName, alexaClientSDK::avsCommon::avs::AgentId::IdType agentId);
+
+    /**
+     * Get the agent to tag the event.
+     * 
+     * @param [in] eventName The name of the event.
+     */
+    alexaClientSDK::avsCommon::avs::AgentId::IdType getEventAgent(const std::string& eventName);
+
+    /**
      * @name Executor Thread Variables
      *
      * These member variables are only accessed by functions in the @c m_executor worker thread, and do not require any
@@ -175,6 +191,9 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> m_contextManager;
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
+
+    /// Map that stores mapping of event name to agent id. Read and write access should be serialized by executor.
+    std::unordered_map<std::string, alexaClientSDK::avsCommon::avs::AgentId::IdType> m_eventAgentMap;
 };
 
 }  // namespace navigation

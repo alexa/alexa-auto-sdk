@@ -34,10 +34,17 @@ data class ImageAttributes (
         )
 
 @JsonClass(generateAdapter = true)
+data class ImageStructure (
+        val contentDescription: String?,
+        val sources: List<Source>
+        )
+
+@JsonClass(generateAdapter = true)
 data class BodyTemplate (
         val token: String,
         val type: String,
         val title: BodyTemplateTitle,
         val textField: String,
-        val image: ImageAttributes?
+        val image: ImageAttributes?,
+        val skillIcon: ImageStructure?
 )

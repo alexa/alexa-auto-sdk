@@ -61,23 +61,3 @@ m_engine->configure(configurations);
 ```
 
 </details>
-<br/>
-
-<details markdown="1">
-<summary>Click to expand or collapse details— Generate the configuration programatically with the Java factory method</summary>
-
-AACS is the recommended way to integrate Auto SDK for Android, so your application should provide the `aacs.alexa` configuration in the AACS configuration file. However, if your application does not use AACS, and it generates Engine configuration programmatically instead of using a JSON file, you can use the [`com.amazon.aace.alexa.config.AlexaConfiguration.createSpeechRecognizerConfig`](https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1alexa_1_1config_1_1_alexa_configuration.html#a8d70d4b326745849824994e380d7d5f9) factory method to create the `EngineConfiguration` object.
-
-```java
-import com.amazon.aace.alexa.config.AlexaConfiguration;
-
-EngineConfiguration speechRecognizerConfig = AlexaConfiguration.createSpeechRecognizerConfig("opus");
-
-mEngine.configure(new EngineConfiguration[]{
-	// ...add other EngineConfiguration objects...
-	speechRecognizerConfig
-});
-
-```
-</details>
-<br/>

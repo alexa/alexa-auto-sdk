@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="weather_blue">#FF119DE9</color>
+    <color name="weather_red">#FFFE4444</color>
+    <color name="weather_white">#FFFFFFFF</color>
+</resources>

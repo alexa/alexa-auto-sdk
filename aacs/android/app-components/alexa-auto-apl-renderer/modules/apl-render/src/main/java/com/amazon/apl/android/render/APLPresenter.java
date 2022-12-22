@@ -32,6 +32,10 @@ import com.amazon.apl.android.IAPLViewPresenter;
 import com.amazon.apl.android.RootConfig;
 import com.amazon.apl.android.RootContext;
 import com.amazon.apl.android.RuntimeConfig;
+import com.amazon.apl.android.bitmap.GlideCachingBitmapPool;
+import com.amazon.apl.android.bitmap.IBitmapCache;
+import com.amazon.apl.android.bitmap.IBitmapPool;
+import com.amazon.apl.android.bitmap.LruBitmapCache;
 import com.amazon.apl.android.configuration.ConfigurationChange;
 import com.amazon.apl.android.dependencies.IDataSourceErrorCallback;
 import com.amazon.apl.android.dependencies.IDataSourceFetchCallback;
@@ -62,6 +66,8 @@ import com.amazon.apl.android.render.payload.UserEventPayload;
 import com.amazon.apl.android.render.utils.RenderDocumentUtils;
 import com.amazon.apl.android.scaling.Scaling;
 import com.amazon.apl.enums.ViewportMode;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -118,8 +124,18 @@ public class APLPresenter implements IPresenter, ISendEventCallback, IDataSource
      */
     public static void initialize(Context context) {
         mContext = context;
-        APLController.initializeAPL(
-                context, RuntimeConfig.builder().fontResolver(new AutoEmbeddedFontResolver(context)).build());
+
+        BitmapPool glideBitmapPool = Glide.get(mContext).getBitmapPool();
+        IBitmapPool pool = new GlideCachingBitmapPool(glideBitmapPool);
+        IBitmapCache cache = new LruBitmapCache((int) glideBitmapPool.getMaxSize());
+        RuntimeConfig runtimeConfig = RuntimeConfig.builder()
+                                              .bitmapPool(pool)
+                                              .bitmapCache(cache)
+                                              .fontResolver(new AutoEmbeddedFontResolver(context))
+                                              .preloadingFontsEnabled(true)
+                                              .build();
+
+        APLController.initializeAPL(context, runtimeConfig);
     }
 
     /**

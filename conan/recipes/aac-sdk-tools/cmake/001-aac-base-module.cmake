@@ -21,8 +21,8 @@ if (AAC_EMIT_SENSITIVE_LOGS)
     endif()
 endif()
 
-if (AAC_EMIT_LATENCY_LOGS)
-    add_definitions(-DAAC_LATENCY_LOGS_ENABLED)
+if (AAC_EMIT_METRICS)
+    add_definitions(-DAAC_METRICS_ENABLED)
 endif()
 
 # NOTE: we should remove this when we get rid of the rapidjson dependencies
@@ -31,6 +31,8 @@ add_definitions(-DRAPIDJSON_HAS_STDSTRING)
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     add_definitions(-DDEBUG)
     add_definitions(-DAACE_DEBUG_LOG_ENABLED)
+    # For code using ACSDK log function in AAC modules
+    add_definitions(-DACSDK_LOG_ENABLED)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -Werror")
 else()
     add_definitions(-DNDEBUG)

@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     android:layout_gravity="center"
     android:orientation="vertical"
-    android:theme="@style/Theme.Alexa.Standard">
+    android:theme="@style/AlexaAppTheme"
+    android:background="@drawable/gradient_background"
+    >
 
     <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
 
@@ -33,7 +35,7 @@
 
     <!--Alexa logo-->
     <ImageView
-        android:id="@+id/alexa_img_view"
+        android:id="@+id/alexa_image_view"
         android:layout_width="@dimen/login_alexa_image_width"
         android:layout_height="@dimen/login_alexa_image_height"
         android:layout_gravity="center"
@@ -47,23 +49,23 @@
 
     <!--Title-->
     <TextView
-        android:id="@+id/contacts_permission_consent_heading"
-        style="@style/Alexa.TitleText"
+        android:id="@+id/contacts_permission_consent_header"
+        style="?attr/headerText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="@string/contacts_permission_consent_title"
+        android:layout_marginTop="@dimen/login_item_margin_top"
+        android:text="@string/contacts_only_permission_consent_title"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
-        android:layout_marginTop="@dimen/login_item_margin_top"
+        app:layout_constraintTop_toBottomOf="@id/alexa_image_view"
         />
 
     <!--Subtitle-->
     <TextView
         android:id="@+id/contacts_permission_consent_body"
-        style="@style/Alexa.SubtitleText"
+        style="?attr/bodyText"
         android:text="@string/contacts_permission_consent_body"
         android:textAlignment="center"
         android:layout_width="0dp"
@@ -71,7 +73,7 @@
         android:layout_gravity="center_horizontal"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toEndOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/contacts_permission_consent_heading"
+        app:layout_constraintTop_toBottomOf="@id/contacts_permission_consent_header"
         android:layout_marginTop="@dimen/title_to_subtitle_margin"/>
 
     <!--Utterance-->
@@ -91,7 +93,7 @@
     <!-- Consent Button-->
     <TextView
         android:id="@+id/contacts_upload_skip_action_button"
-        style="@style/Alexa.Button"
+        style="?button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/contacts_consent_skip"
@@ -102,7 +104,7 @@
     <!-- Skip button-->
     <TextView
         android:id="@+id/contacts_upload_yes_action_button"
-        style="@style/Alexa.Button2"
+        style="?button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/contacts_consent_yes"

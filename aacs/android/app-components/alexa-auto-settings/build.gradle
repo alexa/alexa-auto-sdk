@@ -3,11 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
     defaultConfig {
-        minSdkVersion 26
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -66,11 +67,21 @@ dependencies {
     implementation deps.androidx_gridlayout
     implementation deps.androidx_preference
 
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
     // RX
     implementation deps.rxjava3
 
     // Dagger
-    api deps.dagger
+    implementation deps.dagger
+    implementation "com.google.dagger:dagger-android:${versions.dagger}"
+    implementation "com.google.dagger:dagger-android-support:${versions.dagger}"
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview-selection:1.1.0'
+    kapt "com.google.dagger:dagger-android-processor:${versions.dagger}"
     kapt deps.dagger_compiler
 
     // Navigation between UI components.

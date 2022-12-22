@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="header_font_size">40sp</dimen>
+    <dimen name="body_font_size">34sp</dimen>
+
+    <dimen name="utterance_font_size">36sp</dimen>
+    <dimen name="utterance_fontWeight">400</dimen>
+    <dimen name="utterance_lineHeight">41sp</dimen>
+
+    <dimen name="large_bold_font_size">125sp</dimen>
+    <dimen name="small_bold_font_size">60sp</dimen>
+    <dimen name="interactive_font_size">34sp</dimen>
+
+    <dimen name="button_font_size">25sp</dimen>
+
+    <!-- Light Box Dimension -->
+    <dimen name="dialog_min_height">455dp</dimen>
+    <dimen name="dialog_min_width">1272dp</dimen>
+    <dimen name="dialog_content_min_height">142dp</dimen>
+    <dimen name="dialog_space_between_title_content">10dp</dimen>
+    <dimen name="dialog_space_between_content_buttons">15dp</dimen>
+    <dimen name="dialog_space_between_button1_button2">7dp</dimen>
+</resources>

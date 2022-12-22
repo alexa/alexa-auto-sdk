@@ -1,11 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -57,8 +59,11 @@ dependencies {
     //Picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
 
+    implementation 'io.coil-kt:coil:2.2.1'
+
     // Dagger
     implementation deps.dagger
+    implementation project(path: ':alexa-auto-voice-ui')
     annotationProcessor deps.dagger_compiler
 
     // Glide

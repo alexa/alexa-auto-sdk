@@ -17,25 +17,30 @@ package com.amazon.aacstelephony;
 
 import static com.amazon.aacstelephony.Constants.HEADSET_CLIENT_PROFILE_ID;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothProfile;
-import android.content.ComponentName;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.telecom.Call;
+import android.telecom.PhoneAccount;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Preconditions;
 
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.TelephonyConstants;
 import com.amazon.aacsconstants.Topic;
-import com.amazon.aacsipc.AACSSender;
-import com.amazon.aacsipc.IPCConstants;
 import com.amazon.aacsipc.IPCUtils;
 import com.amazon.aacsipc.TargetComponent;
 import com.amazon.alexa.auto.aacs.common.AACSComponentRegistryUtil;
@@ -43,13 +48,46 @@ import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 
 import org.json.JSONStringer;
 
-import java.lang.annotation.Target;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Util {
     private static final String TAG = AACSConstants.AACS + "-" + Util.class.getSimpleName();
+
+    @SuppressLint("RestrictedApi")
+    public static void saveMessagingConsent(
+            Context context, boolean value, String deviceAddress, String primaryAddress) {
+        Log.d(TAG,
+                "SMS Consent set to " + value + " deviceAddress: " + deviceAddress
+                        + " primaryAddress: " + primaryAddress);
+        if (primaryAddress.isEmpty() || deviceAddress.equals(primaryAddress)) {
+            Preconditions.checkNotNull(context);
+            SharedPreferences messagingConsentSharedPreferences =
+                    context.getSharedPreferences(Constants.MESSAGING_CONSENT_FILE_NAME, context.MODE_PRIVATE);
+
+            // Commit device address first
+            messagingConsentSharedPreferences.edit().putString("device", deviceAddress).commit();
+            messagingConsentSharedPreferences.edit().putBoolean("consent", value).commit();
+        } else {
+            Log.v(TAG, "Not primary device. Skipping notifying consent notification");
+        }
+    }
+
+    public static String getPrimaryDevice(Context context) {
+        String deviceAddress = "";
+        TelecomManager telecomManager = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+        if (telecomManager != null) {
+            PhoneAccountHandle handle = telecomManager.getDefaultOutgoingPhoneAccount(PhoneAccount.SCHEME_TEL);
+            if (handle != null) {
+                deviceAddress = handle.getId();
+            }
+        }
+        if (deviceAddress.isEmpty() || !BluetoothAdapter.checkBluetoothAddress(deviceAddress)) {
+            Log.e(TAG, "cannot find any valid primary device.");
+            return null;
+        }
+        return deviceAddress;
+    }
 
     static void publishCallStateToAACS(
             int state, @NonNull AACSMessageSender aacsMessageSender, @NonNull String callId, @NonNull String callerId) {
@@ -81,6 +119,49 @@ public class Util {
         } catch (Exception e) {
             Log.e(TAG, "failed to create connectionStateChanged JSON payload.");
         }
+    }
+
+    static void publishMessagingEndpointStateToAACS(
+            @NonNull Context context, @NonNull AACSMessageSender aacsMessageSender) {
+        SharedPreferences messagingPreferences =
+                context.getSharedPreferences(MessagingConstants.PREFERENCES_FILE_NAME, context.MODE_PRIVATE);
+        boolean consent = messagingPreferences.getBoolean(MessagingConstants.CONSENT_PROPERTY, false);
+        String state = messagingPreferences.getString(
+                MessagingConstants.STATE_PROPERTY, Constants.ConnectionState.DISCONNECTED);
+        publishMessagingEndpointStateToAACS(context, aacsMessageSender, state, consent);
+    }
+
+    static void publishMessagingEndpointStateToAACS(
+            @NonNull Context context, @NonNull AACSMessageSender aacsMessageSender, String state, boolean consent) {
+        try {
+            Log.d(TAG, "Publish messaging endpoint state to aacs connection state: " + state + " consent: " + consent);
+            String permissionValue = consent ? MessagingConstants.PERMISSION_ON : MessagingConstants.PERMISSION_OFF;
+            String payload = new JSONStringer()
+                                     .object()
+                                     .key(MessagingConstants.CONNECTION_STATE)
+                                     .value(state)
+                                     .key(MessagingConstants.SEND_PERMISSION)
+                                     .value(permissionValue)
+                                     .key(MessagingConstants.READ_PERMISSION)
+                                     .value(permissionValue)
+                                     .endObject()
+                                     .toString();
+
+            aacsMessageSender.sendMessage(Topic.MESSAGING, Action.Messaging.UPDATE_MESSAGING_ENDPOINT_STATE, payload);
+
+        } catch (Exception e) {
+            Log.e(TAG, "failed to create connectionStateChanged JSON payload.");
+        }
+    }
+
+    static void publishMessagingEndpointStateToAACS(
+            @NonNull String state, @NonNull Context context, @NonNull AACSMessageSender aacsMessageSender) {
+        Log.d(TAG, "Update messaging connection state: " + state);
+        SharedPreferences.Editor messagingPreferences =
+                context.getSharedPreferences(MessagingConstants.PREFERENCES_FILE_NAME, context.MODE_PRIVATE).edit();
+        messagingPreferences.putString(MessagingConstants.STATE_PROPERTY, state);
+        messagingPreferences.commit();
+        publishMessagingEndpointStateToAACS(context, aacsMessageSender);
     }
 
     static String getAACSCallState(int state) {
@@ -149,6 +230,21 @@ public class Util {
     static boolean bluetoothNotConnected() {
         return BluetoothAdapter.getDefaultAdapter().getProfileConnectionState(HEADSET_CLIENT_PROFILE_ID)
                 != BluetoothAdapter.STATE_CONNECTED;
+    }
+
+    @SuppressLint("NewApi")
+    public static String getBluetoothDeviceName(@NonNull Context context, String deviceAddress) {
+        String deviceName = "";
+        if (deviceAddress != null && !deviceAddress.isEmpty()) {
+            BluetoothManager manager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
+            BluetoothAdapter adapter = manager.getAdapter();
+            BluetoothDevice device = adapter.getRemoteDevice(deviceAddress);
+            if (device != null) {
+                deviceName = device.getName();
+            }
+        }
+
+        return deviceName;
     }
 
     static void broadcastBluetoothState(
@@ -285,5 +381,11 @@ public class Util {
                     break;
             }
         }
+    }
+
+    public static void toast(@NonNull Context context, String message) {
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        handler.post(() -> { Toast.makeText(context, message, Toast.LENGTH_SHORT).show(); });
     }
 }

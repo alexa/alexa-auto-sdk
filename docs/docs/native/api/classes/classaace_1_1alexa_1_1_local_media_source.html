@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">4.1.1</span>
+   &#160;<span id="projectnumber">4.2</span>
    </div>
   </td>
  </tr>
@@ -149,7 +149,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html">LocalMediaSource</a></code> should be extended to use Alexa to switch among media sources local to the device. It supports bluetooth, USB, FM radio, AM radio, satellite radio, audio line, and CD player sources.</p>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000025">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000026">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1core_1_1_message_broker.html">aace::core::MessageBroker</a> </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aea96a47b1442b4c5fa2906b2e0d9a4a9"></a>
@@ -278,7 +278,7 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000026">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the new <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#acfa5a4b31e25aad959be05d56a495fb8">LocalMediaSource::play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</a></code> instead Called when the user calls play with a content selection type</dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000027">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the new <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#acfa5a4b31e25aad959be05d56a495fb8">LocalMediaSource::play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</a></code> instead Called when the user calls play with a content selection type</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">ContentSelector</td><td>Content selection type</td></tr>
@@ -673,7 +673,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000027">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a7227c31de96b605df8e22b83eb161a32">LocalMediaSource::playerEvent(const std::string&amp; eventName, const std::string&amp; sessionId)</a></code> instead with playbackSessionStarted and playbackSessionEnded events Should be called on local media source player events. This will switch the media focus to that context. Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000028">Deprecated:</a></b></dt><dd>This function will be removed very soon. Use the <code><a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a7227c31de96b605df8e22b83eb161a32">LocalMediaSource::playerEvent(const std::string&amp; eventName, const std::string&amp; sessionId)</a></code> instead with playbackSessionStarted and playbackSessionEnded events Should be called on local media source player events. This will switch the media focus to that context. Note: PlaybackSessionStarted and PlaybackSessionEnded handles the setFocus(true) and setFocus(false) internally. Do not call the deprecated setFocus method. </dd></dl>
 
 </div>
 </div>
@@ -682,7 +682,7 @@ Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 4.1.1 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.2 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

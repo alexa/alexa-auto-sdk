@@ -4,7 +4,7 @@ Your application should monitor the internet connection and notify the Engine of
 
 >**Note:** You must use the `NetworkInfoProvider` interface if your application uses the Local Voice Control (LVC) extension.
 
-> **Note:** For Android applications, AACS provides a default implementation of `NetworkInfoProvider`. See the [AACS Default Implementation](https://alexa.github.io/alexa-auto-sdk/aacs/android#default-platform-implementation) documentation for more information.
+> **Note:** For Android applications, AACS provides a default implementation of `NetworkInfoProvider`. See the [AACS Default Implementation](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/#default-platform-implementation) documentation for more information.
 
 Various Engine components want the initial network status at startup so they can adapt their initial behavior accordingly. Your application should subscribe to the [`NetworkInfoProvider.GetNetworkStatus`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/NetworkInfoProvider/index.html#getnetworkstatus) and [`NetworkInfoProvider.GetWifiSignalStrength`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/NetworkInfoProvider/index.html#getwifisignalstrength) messages to answer the initial query from the Engine. These messages are synchronous-style and require your application to send the corresponding reply messages right away. 
 

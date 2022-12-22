@@ -39,11 +39,18 @@ import com.amazon.alexa.auto.comms.ui.db.BTDeviceRepository;
 /**
  * Communication preference fragment to manage all the communication consents status.
  */
-public class CommunicationPreferenceFragment extends PreferenceFragmentCompat {
+public class CommunicationPreferenceFragment extends PreferenceFragmentCompat{
     private static final String TAG = CommunicationPreferenceFragment.class.getSimpleName();
 
     private String mDeviceAddress;
     private AlexaApp mApp;
+
+    public CommunicationPreferenceFragment() {}
+
+    public CommunicationPreferenceFragment(Bundle deviceAddress) {
+        Log.d(TAG, "This is device ID from bundle: " + deviceAddress.getString(Constants.COMMUNICATION_DEVICE_ADDRESS));
+        mDeviceAddress = deviceAddress.getString(Constants.COMMUNICATION_DEVICE_ADDRESS);
+    }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -52,14 +59,6 @@ public class CommunicationPreferenceFragment extends PreferenceFragmentCompat {
         Context context = getContext();
         if (context != null) {
             PreferenceManager.setDefaultValues(context, R.xml.communication_preferences, false);
-        }
-
-        if (getArguments() != null) {
-            if (getArguments().getString(Constants.COMMUNICATION_DEVICE_ADDRESS) != null) {
-                mDeviceAddress = getArguments().getString(Constants.COMMUNICATION_DEVICE_ADDRESS);
-            } else {
-                Log.d(TAG, "device ID is null.");
-            }
         }
     }
 
@@ -75,8 +74,12 @@ public class CommunicationPreferenceFragment extends PreferenceFragmentCompat {
 
         requireView();
 
-        setCommunicationConsentPermission();
+        // Initialize switch settings for contact upload and SMS
+        setConsentPermissions();
+
+        // Monitor consent changes for contact upload and SMS
         monitorContactUploadConsentPreferenceChanges();
+        monitorMessagingConsentPreferenceChanges();
     }
 
     private void monitorContactUploadConsentPreferenceChanges() {
@@ -100,7 +103,7 @@ public class CommunicationPreferenceFragment extends PreferenceFragmentCompat {
         });
     }
 
-    private void setCommunicationConsentPermission() {
+    private void setConsentPermissions() {
         Context context = getContext();
         Preconditions.checkNotNull(context);
 
@@ -116,15 +119,40 @@ public class CommunicationPreferenceFragment extends PreferenceFragmentCompat {
                             R.string.contacts_upload_consent_summary_with_alexa_custom_assistant);
                 }
 
-                if ((device.getValue().getContactsUploadPermission().equals(Constants.CONTACTS_PERMISSION_YES))) {
-                    contactUploadConsent.setChecked(true);
-                } else {
-                    contactUploadConsent.setChecked(false);
-                }
+                boolean consent =
+                        device.getValue().getContactsUploadPermission().equals(Constants.CONTACTS_PERMISSION_YES);
+                contactUploadConsent.setChecked(consent);
+
+                SwitchPreferenceCompat messagingConsent = findPreference(PreferenceKeys.SMS_CONSENT_SETTINGS);
+                Preconditions.checkNotNull(messagingConsent);
+
+                consent = device.getValue().getMessagingPermission().equals(Constants.CONTACTS_PERMISSION_YES);
+                messagingConsent.setChecked(consent);
 
             } else {
                 Log.d(TAG, "There is no device found.");
             }
+        });
+    }
+
+    private void monitorMessagingConsentPreferenceChanges() {
+        SwitchPreferenceCompat messagingConsent = findPreference(PreferenceKeys.SMS_CONSENT_SETTINGS);
+        Preconditions.checkNotNull(messagingConsent);
+
+        messagingConsent.setOnPreferenceChangeListener((preference, newValue) -> {
+            Context context = getContext();
+            Preconditions.checkNotNull(context);
+
+            mApp = AlexaApp.from(context);
+
+            boolean newConsent = (Boolean) newValue;
+            mApp.getRootComponent().getComponent(ContactsController.class).ifPresent(contactsController -> {
+                Log.d(TAG, "Saving messaging consent permission");
+                contactsController.setMessagingPermission(mDeviceAddress,
+                        newConsent ? Constants.CONTACTS_PERMISSION_YES : Constants.CONTACTS_PERMISSION_NO);
+            });
+
+            return true;
         });
     }
 

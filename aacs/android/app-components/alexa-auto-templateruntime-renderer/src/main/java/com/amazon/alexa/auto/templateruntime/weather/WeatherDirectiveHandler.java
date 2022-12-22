@@ -20,8 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,7 +29,10 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SnapHelper;
 
+import com.amazon.aacsconstants.TemplateRuntimeConstants;
+import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
+import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
 import com.amazon.alexa.auto.aacs.common.TemplateRuntimeMessages;
 import com.amazon.alexa.auto.aacs.common.WeatherTemplate;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
@@ -38,6 +41,7 @@ import com.amazon.alexa.auto.app.common.ui.CirclePageIndicatorDecoration;
 import com.amazon.alexa.auto.templateruntime.R;
 import com.amazon.alexa.auto.templateruntime.dependencies.TemplateDirectiveHandler;
 import com.amazon.alexa.auto.templateruntime.receiver.AlexaVoiceoverCompletedMessage;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -53,10 +57,14 @@ public class WeatherDirectiveHandler implements TemplateDirectiveHandler {
     private static final Handler mHandler = new Handler();
     private final WeakReference<Context> mContext;
     private long voiceOverEndTime;
+    private AACSMessageSender mMessageSender;
+    private AACSSender mAACSSender;
 
     public WeatherDirectiveHandler(Context context) {
         mContext = new WeakReference<Context>(context);
         voiceOverEndTime = Long.MAX_VALUE;
+        mAACSSender = new AACSSender();
+        mMessageSender = new AACSMessageSender(mContext, mAACSSender);
     }
 
     /**
@@ -66,6 +74,7 @@ public class WeatherDirectiveHandler implements TemplateDirectiveHandler {
      */
     @Override
     public void renderTemplate(AACSMessage message) {
+        TemplateDirectiveHandler.clearTemplate(mContext);
         AlexaApp app = AlexaApp.from(mContext.get());
         app.getRootComponent().getComponent(SessionViewController.class).ifPresent(sessionViewController -> {
             sessionViewController.getTemplateRuntimeViewContainer().ifPresent(viewGroup -> {
@@ -116,11 +125,29 @@ public class WeatherDirectiveHandler implements TemplateDirectiveHandler {
             }
         });
 
-        TextView mainTitleText = inflatedView.findViewById(R.id.weather_card_mainTitle);
-        mainTitleText.setText(weatherTemplate.getTitle().getMainTitle());
+        ImageView closeButton = inflatedView.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(v -> {
+            TemplateDirectiveHandler.clearTemplateAndEndVoiceActivity(mMessageSender, mContext);
+        });
 
-        TextView subTitleText = inflatedView.findViewById(R.id.weather_card_subTitle);
-        subTitleText.setText(weatherTemplate.getTitle().getSubTitle());
+        if (weatherTemplate.getSkillIcon() != null) {
+            String skillIconUrl;
+            try {
+                skillIconUrl = weatherTemplate.getSkillIcon()
+                        .getSources()
+                        .stream()
+                        .filter(source -> source.getSize().equals(TemplateRuntimeConstants.IMAGE_SIZE_SMALL))
+                        .findFirst()
+                        .get()
+                        .getUrl();
+            } catch (Exception e) {
+                skillIconUrl = weatherTemplate.getSkillIcon().getSources().get(0).getUrl();
+            }
+
+            ImageView iconView = inflatedView.findViewById(R.id.weather_template_skill_icon);
+            Picasso.get().load(skillIconUrl).into(iconView);
+        }
+
     }
 
     /**
@@ -153,18 +180,6 @@ public class WeatherDirectiveHandler implements TemplateDirectiveHandler {
     public void OnReceive(AlexaVoiceoverCompletedMessage message) {
         voiceOverEndTime = message.getCompletedAt();
         startClearTemplateDelay();
-    }
-
-    /**
-     * Clears existing template, if any.
-     */
-    @Override
-    public void clearTemplate() {
-        Log.i(TAG, "clearTemplate");
-        AlexaApp.from(mContext.get())
-                .getRootComponent()
-                .getComponent(SessionViewController.class)
-                .ifPresent(SessionViewController::clearTemplate);
     }
 
     /**

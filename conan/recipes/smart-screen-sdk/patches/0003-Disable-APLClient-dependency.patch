@@ -1,7 +1,7 @@
-From 07ed0ee35db8479e8cc170fe9b60139880d34f4b Mon Sep 17 00:00:00 2001
+From 6b168ac41b2070bdb2f56a0416cff506d9743afa Mon Sep 17 00:00:00 2001
 From: Raghavendra Bilamkar <bilamkar@amazon.com>
 Date: Fri, 24 Sep 2021 16:39:19 -0700
-Subject: [PATCH 3/3] Disable APLClient dependency
+Subject: [PATCH 03/14] Disable APLClient dependency
 
 ---
  .../AlexaPresentation/AlexaPresentation.h     | 10 ++--
@@ -10,7 +10,7 @@ Subject: [PATCH 3/3] Disable APLClient dependency
  3 files changed, 35 insertions(+), 35 deletions(-)
 
 diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
-index cb9520e..7fe20c5 100644
+index d460731..05bb351 100644
 --- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
 +++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
 @@ -45,7 +45,7 @@
@@ -22,7 +22,7 @@ index cb9520e..7fe20c5 100644
  #include <SmartScreenSDKInterfaces/ActivityEvent.h>
  #include <SmartScreenSDKInterfaces/AlexaPresentationObserverInterface.h>
  #include <SmartScreenSDKInterfaces/DisplayCardState.h>
-@@ -289,10 +289,10 @@ public:
+@@ -293,10 +293,10 @@ public:
       */
      void recordDropFrameCount(uint64_t dropFrameCount);
  
@@ -38,10 +38,10 @@ index cb9520e..7fe20c5 100644
      /**
       * The placeholder token to use for rendering Non-APL documents
 diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
-index 7ffc41a..b2150a5 100644
+index e12c2ea..a032984 100644
 --- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
 +++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
-@@ -1682,35 +1682,35 @@ void AlexaPresentation::recordDropFrameCount(uint64_t dropFrameCount) {
+@@ -1688,35 +1688,35 @@ void AlexaPresentation::recordDropFrameCount(uint64_t dropFrameCount) {
      triggerMetricsEventWithData(MetricEvent::DROP_FRAME, dropFrameCount, ACTIVITY_DROP_FRAME);
  }
  
@@ -107,19 +107,19 @@ index 7ffc41a..b2150a5 100644
  void AlexaPresentation::executeProactiveStateReport() {
      if (m_stateReportCheckInterval.count() == 0 || !m_lastDisplayedDirective || m_lastRenderedAPLToken.empty() ||
 diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt
-index ae063ed..b4d2528 100644
+index a015da0..2e44ffa 100644
 --- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt
 +++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/CMakeLists.txt
 @@ -10,7 +10,7 @@ target_include_directories(AlexaPresentation
-         "${APLClient_SOURCE_DIR}/include"
+         "${APLCLIENT_INCLUDE_DIRS}"
          "${ASDK_INCLUDE_DIRS}")
  
--target_link_libraries(AlexaPresentation "${ASDK_LDFLAGS}" SmartScreenSDKInterfaces APLClient)
+-target_link_libraries(AlexaPresentation "${ASDK_LDFLAGS}" SmartScreenSDKInterfaces "${APLCLIENT_LDFLAGS}")
 +target_link_libraries(AlexaPresentation "${ASDK_LDFLAGS}" SmartScreenSDKInterfaces)
  
  # install target
  asdk_install()
 \ No newline at end of file
 -- 
-2.30.1 (Apple Git-130)
+2.36.0
 

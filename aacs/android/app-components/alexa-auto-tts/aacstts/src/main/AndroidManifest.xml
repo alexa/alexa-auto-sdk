@@ -11,7 +11,8 @@
         <service
             android:name=".AmazonTextToSpeechService"
             android:label="@string/tts_engine_name"
-            android:process=":aacstts">
+            android:process=":aacstts"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.TTS_SERVICE" />
 

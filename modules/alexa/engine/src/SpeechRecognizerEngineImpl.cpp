@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,12 +23,14 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Alexa/AlexaProperties.h"
 #include "AACE/Engine/Utils/Metrics/Metrics.h"
+#include "AACE/Engine/Utils/String/StringUtils.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
 using namespace aace::engine::utils::metrics;
+using namespace aace::engine::utils::string;
 
 /// The maximum number of readers of the stream.
 static const size_t MAX_READERS = 10;
@@ -49,6 +51,8 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "SpeechRecognizerEngineImp
 static const std::string METRIC_SPEECHRECOGNIZER_START_CAPTURE = "StartCapture";
 static const std::string METRIC_SPEECHRECOGNIZER_STOP_CAPTURE = "StopCapture";
 static const std::string METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED = "WakewordDetected";
+
+static const std::string ASSISTANT_3P_STATE_ACTIVE = "ACTIVE";
 
 /// For metric calculation we want to detect an invalid wakeword duration (20 seconds max based on 16Khz voice rate)
 static const ssize_t MAX_WAKEWORD_SAMPLE_DURATION = 320000;
@@ -138,7 +142,7 @@ bool SpeechRecognizerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> audioFocusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
@@ -151,7 +155,12 @@ bool SpeechRecognizerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifierInterface> capabilityChangeNotifier,
     std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
-    const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers) {
+    std::shared_ptr<aace::engine::wakeword::WakewordManagerServiceInterface> wakewordService,
+    const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager,
+    std::shared_ptr<aace::engine::arbitrator::ArbitratorServiceInterface> arbitratorService)
+    {
     try {
         // create the audio channel
         m_audioInputChannel = audioManager->openAudioInputChannel(
@@ -176,11 +185,21 @@ bool SpeechRecognizerEngineImpl::initialize(
             ThrowIfNot(deviceSettingsDelegate.configureLocaleSetting(assetsManager), "createLocaleSettingFailed");
         }
 
+        m_agentManager = agentManager;
+
+        m_audioFocusManager = audioFocusManager;
+        m_visualFocusManager = visualFocusManager;
+		
+        if (m_agentManager != nullptr) {
+            m_agentManager->addAgentConnectionObserverInterface(
+                alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+        }
+
         m_audioInputProcessor = alexaClientSDK::capabilityAgents::aip::AudioInputProcessor::create(
             directiveSequencer,
             messageSender,
             contextManager,
-            focusManager,
+            audioFocusManager,
             dialogUXStateAggregator,
             exceptionSender,
             userInactivityMonitor,
@@ -193,7 +212,9 @@ bool SpeechRecognizerEngineImpl::initialize(
             speechEncoder,
             alexaClientSDK::capabilityAgents::aip::AudioProvider::null(),
             nullptr,
-            metricRecorder);
+            metricRecorder,
+            nullptr,
+            agentManager);
 
         ThrowIfNull(m_audioInputProcessor, "couldNotCreateAudioInputProcessor");
         ThrowIfNot(initializeAudioInputStream(), "initializeAudioInputStreamFailed");
@@ -215,11 +236,19 @@ bool SpeechRecognizerEngineImpl::initialize(
             m_wakewordEngineAdapter->addKeyWordObserver(shared_from_this());
         }
 
+        m_wakewordService = wakewordService;
         m_directiveSequencer = directiveSequencer;
         m_initiatorVerifiers = initiatorVerifiers;
 
+        //Get configured Wakewordlist
+        m_wakewordConfig = m_wakewordService->getConfigured3PWakewords();
+
         // get the initialize wakeword enabled state from the platform interface
         m_wakewordEnabled = isWakewordSupported() && m_initialWakewordEnabledState;
+
+        // add as arbitrator observer
+        m_arbitratorService = arbitratorService;
+        m_arbitratorService->addObserver(shared_from_this());
 
         return true;
     } catch (std::exception& ex) {
@@ -237,7 +266,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::DirectiveSequencerInterface> directiveSequencer,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> audioFocusManager,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::UserInactivityMonitorInterface> userInactivityMonitor,
@@ -248,9 +277,14 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
     std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifierInterface> capabilityChangeNotifier,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
     std::shared_ptr<alexaClientSDK::speechencoder::SpeechEncoder> speechEncoder,
     std::shared_ptr<aace::engine::alexa::WakewordEngineAdapter> wakewordEngineAdapter,
-    const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers) {
+    std::shared_ptr<aace::engine::wakeword::WakewordManagerServiceInterface> wakewordService,
+    const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager,
+    std::shared_ptr<aace::engine::arbitrator::ArbitratorServiceInterface> arbitratorService
+    ) {
     std::shared_ptr<SpeechRecognizerEngineImpl> speechRecognizerEngineImpl = nullptr;
 
     try {
@@ -259,7 +293,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
         ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(directiveSequencer, "invalidDirectiveSequencer");
         ThrowIfNull(messageSender, "invalidMessageSender");
-        ThrowIfNull(focusManager, "invalidFocusManager");
+        ThrowIfNull(audioFocusManager, "invalidAudioFocusManager");
         ThrowIfNull(contextManager, "invalidContextManager");
         ThrowIfNull(dialogUXStateAggregator, "invalidDialogUXStateAggregator");
         ThrowIfNull(exceptionSender, "invalidExceptionSender");
@@ -268,6 +302,9 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
         ThrowIfNull(systemSoundPlayer, "invalidSystemSoundPlayer");
         ThrowIfNull(metricRecorder, "invalidMetricsRecorder");
         ThrowIfNull(capabilityChangeNotifier, "invalidCapabilityChangeNotifier");
+        ThrowIfNull(wakewordService, "invalidwakewordService");
+        ThrowIfNull(arbitratorService, "invalidArbitratorService");
+	 ThrowIfNull(visualFocusManager, "invalidVisualFocusManager");
 
         speechRecognizerEngineImpl = std::shared_ptr<SpeechRecognizerEngineImpl>(
             new SpeechRecognizerEngineImpl(speechRecognizerPlatformInterface, audioFormat));
@@ -279,7 +316,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
                 directiveSequencer,
                 messageSender,
                 contextManager,
-                focusManager,
+                audioFocusManager,
                 dialogUXStateAggregator,
                 exceptionSender,
                 userInactivityMonitor,
@@ -292,7 +329,12 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
                 capabilityChangeNotifier,
                 speechEncoder,
                 wakewordEngineAdapter,
-                initiatorVerifiers),
+                wakewordService,
+                initiatorVerifiers,
+                visualFocusManager,
+                agentManager,
+                arbitratorService
+                ),
             "initializeSpeechRecognizerEngineImplFailed");
 
         // set the platform engine interface reference
@@ -332,6 +374,15 @@ void SpeechRecognizerEngineImpl::doShutdown() {
     if (m_audioInputChannel != nullptr) {
         m_audioInputChannel->doShutdown();
         m_audioInputChannel.reset();
+    }
+
+    if (m_agentManager != nullptr) {
+        m_agentManager->removeAgentConnectionObserverInterface(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+    }
+
+    if (m_arbitratorService != nullptr) {
+        m_arbitratorService->removeObserver(shared_from_this());
     }
 
     m_initiatorVerifiers.clear();
@@ -452,9 +503,30 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
     std::stringstream ss;
     ss << initiator;
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStartCapture", {METRIC_SPEECHRECOGNIZER_START_CAPTURE, ss.str()});
-    if (m_connectionStatus != aace::alexa::AlexaClient::ConnectionStatus::CONNECTED) {
-        AACE_WARN(LX(TAG, "onStartCapture").d("reason", "AlexaClient is not connected"));
+
+    std::lock_guard<std::mutex> lock(m_agentAvailabilityMutex);
+    if (m_connectionStatus != aace::alexa::AlexaClient::ConnectionStatus::CONNECTED && !m_agentAvailable) {
+        AACE_WARN(LX(TAG).d("reason", "No agent is connected").d("connectionStatus", m_connectionStatus).d("agentAvailable", m_agentAvailable));
         return false;
+    }
+
+    // request dialog for registered agent from arbitrator if we are not already the active assistant
+    if (m_isAgentRegistered && m_registeredAgentDialogId.empty()) {
+        std::string mode = (initiator == Initiator::WAKEWORD) ? "WAKEWORD" : "GESTURE";
+        auto assistantId = std::to_string(ALEXA_ASSISTANT_ID);
+
+        std::string dialogId;
+        std::string reason;
+        AACE_DEBUG(LX(TAG).m("Start dialog for").d("assistantId", assistantId));
+        bool dialogStarted = m_arbitratorService->startDialog(assistantId, mode, dialogId, reason);
+        if (!dialogStarted) {
+            AACE_WARN(LX(TAG).d("Dialog denied by Arbitrator", reason));
+            return false;
+        }
+        AACE_INFO(LX(TAG).m("Dialog started").d("dialogId", dialogId).d("assistantId", assistantId));
+        // set dialog Id
+        std::lock_guard<std::mutex> lock(m_registeredAgentDialogIdMutex);
+        m_registeredAgentDialogId = dialogId;
     }
 
     try {
@@ -468,9 +540,7 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
 
         if (initiator != Initiator::WAKEWORD) {
             for (const auto& initiatorVerifier : m_initiatorVerifiers) {
-                if (initiatorVerifier &&
-                    initiatorVerifier->shouldBlock(
-                        static_cast<alexaClientSDK::capabilityAgents::aip::Initiator>(initiator))) {
+                if (initiatorVerifier && initiatorVerifier->shouldBlock(convertInitiator(initiator))) {
                     AACE_WARN(LX(TAG, "onStartCapture: Cancelled by Initiator Verifier for PTT"));
                     return false;
                 }
@@ -514,12 +584,7 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
 
         // start the recognize event
         ThrowIfNot(
-            startCapture(
-                audioProvider,
-                static_cast<alexaClientSDK::capabilityAgents::aip::Initiator>(initiator),
-                keywordBegin,
-                keywordEnd,
-                keyword),
+            startCapture(audioProvider, convertInitiator(initiator), keywordBegin, keywordEnd, keyword),
             "startCaptureFailed");
 
         return true;
@@ -549,10 +614,8 @@ ssize_t SpeechRecognizerEngineImpl::write(const int16_t* data, const size_t size
     try {
         ThrowIfNot(waitForExpectingAudioState(true), "audioNotExpected");
         ThrowIfNull(m_audioInputWriter, "nullAudioInputWriter");
-
         ssize_t result = m_audioInputWriter->write(data, size);
         ThrowIf(result < 0, "errorWritingData");
-
         return result;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("id", getCurrentChannelId()));
@@ -576,9 +639,28 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index beginIndex,
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index endIndex,
     std::shared_ptr<const std::vector<char>> KWDMetadata) {
+    //Verify if this is external wakeword and it is enabled and call platform interface
+    if (is3PWakewordEnabled(keyword)) {
+        AACE_INFO(LX(TAG).d("Active 3P Wakeword is detected", keyword));
+        m_wakewordService->updateOnWakewordDetected(keyword, beginIndex, endIndex);
+        return;
+    }
+    //Check if confgured 3P wakeword detected and return
+    if (is3PWakewordConfigured(keyword)) {
+        AACE_INFO(LX(TAG).d(" Disabled 3P Wakeword detected ", keyword));
+        return;
+    }
+
+    //if alexawakeword is disabled then return (assumption is that m_wakewordEnabled 
+    //applies to any AVS coformant agent wakeword here, if its name specific
+    //shoudBlock should be used. But enabling through alexaproperty seems to
+    //apply to any AVS alexa wakeword
+    if(m_wakewordEnabled == false) {
+        AACE_INFO(LX(TAG).d(" Disabled AVS wakeword detected ", keyword));
+        return;
+    }		
     if (m_state == AudioInputProcessorObserverInterface::State::IDLE) {
         m_executor.submit([this, beginIndex, endIndex, keyword] {
-            std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>::iterator it;
             for (const auto& initiatorVerifier : m_initiatorVerifiers) {
                 if (initiatorVerifier && initiatorVerifier->shouldBlock(keyword, VERIFICATION_TIMEOUT)) {
                     AACE_WARN(LX(TAG, "onKeyWordDetected: Cancelled by Initiator Verifier for wakeword"));
@@ -587,6 +669,7 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
             }
             emitCounterMetrics(
                 METRIC_PROGRAM_NAME_SUFFIX, "onKeyWordDetected", {METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED});
+
             // Only notifies platform interface after passing wakeword verifiers,
             // otherwise earcon might still play even if keyword is dropped
             m_speechRecognizerPlatformInterface->wakewordDetected(keyword);
@@ -618,9 +701,31 @@ void SpeechRecognizerEngineImpl::onConnectionStatusChanged(
     m_connectionStatus = static_cast<aace::alexa::AlexaClient::ConnectionStatus>(status);
 }
 
+void SpeechRecognizerEngineImpl::onAgentAvailabilityStateChanged(
+    alexaClientSDK::avsCommon::avs::AgentId::IdType id,
+    AvailabilityState status,
+    const std::string& reason) {
+    std::string availability = status == AvailabilityState::AVAILABLE ? "AVAILABLE" : "UNAVAILABLE";
+    AACE_INFO(LX(TAG).d("id", id).d("status", availability).d("reason", reason));
+
+    std::lock_guard<std::mutex> lock_map(m_agentAvailabilityMapMutex);
+    m_agentAvailabilityMap[id] = status == AvailabilityState::AVAILABLE;
+
+    std::lock_guard<std::mutex> lock(m_agentAvailabilityMutex);
+    if (status == AvailabilityState::AVAILABLE) {
+        m_agentAvailable = true;
+        return;
+    }
+
+    m_agentAvailable = false;
+    for (const auto& availability : m_agentAvailabilityMap) {
+        if (availability.second) m_agentAvailable = true;
+    }
+}
+
 bool SpeechRecognizerEngineImpl::startCapture(
     std::shared_ptr<alexaClientSDK::capabilityAgents::aip::AudioProvider> audioProvider,
-    alexaClientSDK::capabilityAgents::aip::Initiator initiator,
+    alexaClientSDK::avsCommon::avs::AgentInitiator initiator,
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index begin,
     alexaClientSDK::avsCommon::avs::AudioInputStream::Index keywordEnd,
     const std::string& keyword) {
@@ -628,7 +733,7 @@ bool SpeechRecognizerEngineImpl::startCapture(
         AACE_VERBOSE(LX(TAG));
         // ask the aip to start recognizing input
         auto startOfSpeechTimestamp = std::chrono::steady_clock::now();
-        if (alexaClientSDK::capabilityAgents::aip::Initiator::WAKEWORD == initiator) {
+        if (alexaClientSDK::avsCommon::avs::AgentInitiator::WAKEWORD == initiator) {
             computeStartOfSpeechTimestamp(
                 begin, keywordEnd, audioProvider->format.sampleRateHz, audioProvider->stream, startOfSpeechTimestamp);
         }
@@ -660,9 +765,8 @@ bool SpeechRecognizerEngineImpl::isWakewordEnabled() {
 }
 
 bool SpeechRecognizerEngineImpl::enableWakewordDetection() {
+    AACE_INFO(LX(TAG));
     try {
-        AACE_INFO(LX(TAG));
-
         // check to make sure wakeword is supported
         ThrowIfNot(isWakewordSupported(), "wakewordNotSupported");
 
@@ -670,21 +774,27 @@ bool SpeechRecognizerEngineImpl::enableWakewordDetection() {
         // wakeword enable state (this is the first time we are enabling!)
         ReturnIf(m_wakewordEnabled && m_initialWakewordEnabledState == false, true);
 
+        m_wakewordEnabled = true;
+        m_initialWakewordEnabledState = false;
+
+        std::lock_guard<std::mutex> lock_adaptor(m_wakewordAdapterMutex);
+        // check if adapater is already enabled
+        ReturnIf(m_wakeWordAdapterEnabled, true);
+
         // enable the wakeword engine adapter
         ThrowIfNot(m_wakewordEngineAdapter->enable(), "enableFailed");
 
         // set the wakeword enabled and expecting audio flags to true
-        m_wakewordEnabled = true;
-        m_initialWakewordEnabledState = false;
-
+        m_wakeWordAdapterEnabled = true;
         // tell the platform interface to start providing audio input
         ThrowIfNot(startAudioInput(), "startAudioInputFailed");
-
         return true;
     } catch (std::exception& ex) {
         //setExpectingAudioState( false );
         AACE_ERROR(LX(TAG, "enableWakewordDetection").d("reason", ex.what()));
         m_wakewordEnabled = false;
+        std::lock_guard<std::mutex> lock_adaptor(m_wakewordAdapterMutex);
+        m_wakeWordAdapterEnabled = false;
         return false;
     }
 }
@@ -692,7 +802,6 @@ bool SpeechRecognizerEngineImpl::enableWakewordDetection() {
 bool SpeechRecognizerEngineImpl::disableWakewordDetection() {
     AACE_INFO(LX(TAG));
     bool success = true;
-
     try {
         // check if wakeword detection is already disabled
         ReturnIfNot(m_wakewordEnabled, true);
@@ -700,22 +809,28 @@ bool SpeechRecognizerEngineImpl::disableWakewordDetection() {
         // check to make sure wakeword is supported
         ThrowIfNot(isWakewordSupported(), "wakewordNotSupported");
 
+        m_wakewordEnabled = false;
+        // check if 3P wakeword is enabled
+        std::lock_guard<std::mutex> lock(m_wakewordEnableMutex);
+        if (m_enabledWakewordSet.size() > 0) return true;
+
         // tell the platform to stop providing audio input
         ThrowIfNot(stopAudioInput(), "stopAudioInputFailed");
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "disableWakewordDetection").d("reason", ex.what()));
+        m_wakewordEnabled = false;
         success = false;
     }
-
+    std::lock_guard<std::mutex> lock_adaptor(m_wakewordAdapterMutex);
     m_wakewordEngineAdapter->disable();
-    m_wakewordEnabled = false;
-
+    m_wakeWordAdapterEnabled = false;
     return success;
 }
 
 void SpeechRecognizerEngineImpl::onStateChanged(
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
     alexaClientSDK::avsCommon::sdkInterfaces::AudioInputProcessorObserverInterface::State state) {
-    AACE_VERBOSE(LX(TAG).d("state", state));
+    AACE_VERBOSE(LX(TAG).d("agentId", agentId).d("state", state));
 
     m_state = state;
 
@@ -745,6 +860,204 @@ void SpeechRecognizerEngineImpl::onStateChanged(
             ThrowIfNot(startAudioInput(), "startAudioInputFailed");
         }
     }
+}
+
+bool SpeechRecognizerEngineImpl::enable3PWakewordDetection(const std::string& name, bool value) {
+    AACE_INFO(LX(TAG));
+    bool success = true;
+
+    //Check if requested wakeword is in configured 3P wakeword list
+    if (!is3PWakewordConfigured(name)) {
+        AACE_ERROR(LX(TAG, "WakewordNotConfiguredAs3PWakeword").d("wakewod", name));
+        return false;
+    }
+    if (value) {
+        //Enable 3P Wakeword
+        ReturnIf(is3PWakewordEnabled(name), true);
+        success = enable3PWakewordAdapter();
+        if (success) {
+            std::lock_guard<std::mutex> lock(m_wakewordEnableMutex);
+            m_enabledWakewordSet.insert(toUpper(name));
+        }
+    } else {
+        //Disable 3P Wakeword
+        std::lock_guard<std::mutex> lock(m_wakewordEnableMutex);
+        if (m_enabledWakewordSet.find(name) != m_enabledWakewordSet.end()) {
+            m_enabledWakewordSet.erase(toUpper(name));
+
+            if (m_enabledWakewordSet.size() == 0) {
+                success = disable3PWakewordAdapter();
+            }
+        } else {
+            //already disabled
+            AACE_WARN(LX(TAG, "Wakeword already disabled").d("wakewod", name));
+            success = true;
+        }
+    }
+    return success;
+}
+
+bool SpeechRecognizerEngineImpl::enable3PWakewordAdapter() {
+    std::lock_guard<std::mutex> lock(m_wakewordAdapterMutex);
+    try {
+        // check to make sure wakeword is supported
+        ThrowIfNot(isWakewordSupported(), "wakewordNotSupported");
+
+        // check if adapater is already active
+        ReturnIf(m_wakeWordAdapterEnabled, true);
+
+        // enable the wakeword engine adapter
+        ThrowIfNot(m_wakewordEngineAdapter->enable(), "enableFailed");
+
+        // tell the platform interface to start providing audio input
+        ThrowIfNot(startAudioInput(), "startAudioInputFailed");
+
+        m_wakeWordAdapterEnabled = true;
+        return true;
+    } catch (std::exception& ex) {
+        //setExpectingAudioState( false );
+        AACE_ERROR(LX(TAG, "enable3PWakewordDetection").d("reason", ex.what()));
+        m_wakeWordAdapterEnabled = false;
+        return false;
+    }
+}
+
+bool SpeechRecognizerEngineImpl::disable3PWakewordAdapter() {
+    bool success = true;
+    std::lock_guard<std::mutex> lock(m_wakewordAdapterMutex);
+    try {
+        // check if wakeword detection is already disabled
+        ReturnIfNot(m_wakeWordAdapterEnabled, true);
+
+        //If Alexa wakeword is enabled then don't disable the adapter.
+        ReturnIf(m_wakewordEnabled, true);
+
+        // check to make sure wakeword is supported
+        ThrowIfNot(isWakewordSupported(), "wakewordNotSupported");
+
+        // tell the platform to stop providing audio input
+        ThrowIfNot(stopAudioInput(), "stopAudioInputFailed");
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "disableWakewordDetection").d("reason", ex.what()));
+        success = false;
+    }
+    m_wakewordEngineAdapter->disable();
+    m_wakeWordAdapterEnabled = false;
+    return success;
+}
+
+bool SpeechRecognizerEngineImpl::is3PWakewordEnabled(const std::string& name) {
+    AACE_INFO(LX(TAG));
+    std::lock_guard<std::mutex> lock(m_wakewordEnableMutex);
+    return (m_enabledWakewordSet.find(toUpper(name)) != m_enabledWakewordSet.end());
+}
+
+bool SpeechRecognizerEngineImpl::is3PWakewordConfigured(const std::string& name) {
+    return (m_wakewordConfig.find(toUpper(name)) != m_wakewordConfig.end());
+}
+
+void SpeechRecognizerEngineImpl::onDialogTerminated(
+    const std::string& assistantId,
+    const std::string& dialogId,
+    const std::string& reason) {
+    AACE_DEBUG(LX(TAG)
+                   .m("Dialog terminated by Arbitrator for")
+                   .d("assistantId", assistantId)
+                   .d("dialogId", dialogId)
+                   .d("reason", reason));
+    if (dialogId == m_registeredAgentDialogId) {
+
+        // reset dialog Id
+        std::lock_guard<std::mutex> lock(m_registeredAgentDialogIdMutex);
+        m_registeredAgentDialogId = "";
+
+        //reset AVS state and stop audio and video focus in case we have. 
+        //NOTE: also need to call cancelAlexaDialog once that code is checked in
+        if(m_audioFocusManager != nullptr)
+            m_audioFocusManager->stopForegroundActivity();
+        
+        if(m_visualFocusManager != nullptr)
+            m_visualFocusManager->stopForegroundActivity();
+        m_audioInputProcessor->resetState();
+
+    }
+}
+
+void SpeechRecognizerEngineImpl::onAgentStateUpdated(
+    const std::string& assistantId,
+    const std::string& name,
+    aace::arbitrator::ArbitratorEngineInterface::AgentState state) {
+    // no-op
+}
+
+// AuthObserverInterface
+void SpeechRecognizerEngineImpl::onAuthStateChange(
+    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
+    alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) {
+    std::stringstream authState;
+    std::stringstream authError;
+    authState << state;
+    authError << error;
+    AACE_INFO(LX(TAG).d("state", authState.str()).d("error", authError.str()));
+    // register/deregister agent with Arbitrator
+    try {
+        auto assistantId = std::to_string(ALEXA_ASSISTANT_ID);
+        if (state == alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED) {
+            if (!m_isAgentRegistered) {
+                ThrowIfNull(m_arbitratorService, "invalidArbitratorServiceInterface");
+                ThrowIfNot(
+                    m_arbitratorService->registerAgent(
+                        assistantId, ALEXA_ASSISTANT_NAME, getAlexaAgentDialogStateRules()),
+                    "registerAlexaAgentFailed");
+                m_isAgentRegistered = true;
+                AACE_DEBUG(LX(TAG).m("Registered Agent").d("assistantId", assistantId));
+            }
+        } else {
+            if (m_isAgentRegistered) {
+                ThrowIfNull(m_arbitratorService, "invalidArbitratorServiceInterface");
+                ThrowIfNot(m_arbitratorService->deregisterAgent(assistantId), "deregisterAlexaAgentFailed");
+                m_isAgentRegistered = false;
+            }
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "create").d("reason", "ex.what()"));
+    }
+}
+
+// DialogUXStateObserverInterface
+void SpeechRecognizerEngineImpl::onDialogUXStateChanged(
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    DialogUXState newState) {
+    AACE_INFO(LX(TAG).d("agentId", agentId).d("newState", newState));
+    try {
+        // set dialog state with the arbitrator
+        auto assistantId = std::to_string(ALEXA_ASSISTANT_ID);
+        AACE_DEBUG(
+            LX(TAG).m("Registered Agent").d("assistantId", assistantId).d("dialogId", m_registeredAgentDialogId));
+        if (m_isAgentRegistered && !m_registeredAgentDialogId.empty()) {
+            m_arbitratorService->setDialogState(
+                assistantId, m_registeredAgentDialogId, convertDialogStateToString(newState));
+            // stop the dialog with Arbitrator if state is IDLE or FINISHED
+            if (newState == DialogUXState::IDLE || newState == DialogUXState::FINISHED) {
+                m_arbitratorService->stopDialog(assistantId, m_registeredAgentDialogId);
+                m_registeredAgentDialogId = "";
+            }
+        }
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
+std::map<std::string, bool> SpeechRecognizerEngineImpl::getAlexaAgentDialogStateRules() {
+    std::map<std::string, bool> dialogStateRules;
+    dialogStateRules.insert(std::pair<std::string, bool>(convertDialogStateToString(DialogUXState::IDLE), true));
+    dialogStateRules.insert(std::pair<std::string, bool>(convertDialogStateToString(DialogUXState::LISTENING), false));
+    dialogStateRules.insert(std::pair<std::string, bool>(convertDialogStateToString(DialogUXState::THINKING), false));
+    dialogStateRules.insert(std::pair<std::string, bool>(convertDialogStateToString(DialogUXState::SPEAKING), true));
+    dialogStateRules.insert(std::pair<std::string, bool>(convertDialogStateToString(DialogUXState::EXPECTING), false));
+    dialogStateRules.insert(std::pair<std::string, bool>(convertDialogStateToString(DialogUXState::FINISHED), true));
+
+    return dialogStateRules;
 }
 
 }  // namespace alexa

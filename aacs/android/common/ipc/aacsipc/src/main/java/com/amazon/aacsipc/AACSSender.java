@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalLong;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,16 +43,16 @@ public class AACSSender {
     private static final String TAG = "AACS-" + AACSSender.class.getSimpleName();
     private static final int MAX_NUM_BYTES_IN_EMBEDDED_MESSAGE_INTENT = 400000;
 
-    private Messenger mSendMessenger = null;
-    private Messenger mFetchMessenger = null;
-    private Messenger mPushMessenger = null;
+    private final Messenger mSendMessenger;
+    private final Messenger mFetchMessenger;
+    private final Messenger mPushMessenger;
 
-    private Looper mLooper = null;
+    private final Looper mLooper;
 
-    private SenderMap mMap;
-    private int mCacheCapacity;
-    private ConcurrentHashMap<String, StreamFetchedFromReceiverCallback> mStreamFetchCallbackMap;
-    private ConcurrentHashMap<String, PushToStreamIdCallback> mStreamPushCallbackMap;
+    private final SenderMap mMap;
+    private final int mCacheCapacity;
+    private final ConcurrentHashMap<String, StreamFetchedFromReceiverCallback> mStreamFetchCallbackMap;
+    private final ConcurrentHashMap<String, PushToStreamIdCallback> mStreamPushCallbackMap;
     private final ExecutorService mExecutor = Executors.newFixedThreadPool(5);
 
     public interface StreamFetchedFromReceiverCallback {
@@ -107,8 +108,8 @@ public class AACSSender {
 
         mMap = new SenderMap(capacity);
         mCacheCapacity = capacity;
-        mStreamFetchCallbackMap = new ConcurrentHashMap<String, StreamFetchedFromReceiverCallback>();
-        mStreamPushCallbackMap = new ConcurrentHashMap<String, PushToStreamIdCallback>();
+        mStreamFetchCallbackMap = new ConcurrentHashMap<>();
+        mStreamPushCallbackMap = new ConcurrentHashMap<>();
     }
 
     public void shutDown() {
@@ -117,17 +118,9 @@ public class AACSSender {
             return;
         }
 
-        if (mExecutor != null) {
-            mExecutor.shutdown();
-        }
-
-        if (mStreamFetchCallbackMap != null) {
-            mStreamFetchCallbackMap.clear();
-        }
-
-        if (mStreamPushCallbackMap != null) {
-            mStreamPushCallbackMap.clear();
-        }
+        mExecutor.shutdown();
+        mStreamFetchCallbackMap.clear();
+        mStreamPushCallbackMap.clear();
     }
 
     // Requirement: message string must be less than 400KB.
@@ -268,6 +261,10 @@ public class AACSSender {
     }
 
     public void cancelFetch(String streamId, TargetComponent target, Context context) {
+        cancelFetch(streamId, target, context, OptionalLong.empty());
+    }
+
+    public void cancelFetch(String streamId, TargetComponent target, Context context, OptionalLong bytesWritten) {
         checkLogStringValid(streamId, "message", "fetch");
         checkLogArgNonNull(target, "target", "fetch");
         checkLogArgNonNull(context, "context", "fetch");
@@ -275,7 +272,7 @@ public class AACSSender {
         Log.d(TAG, "IPC: cancel fetching streamId=" + streamId);
         String intentAction = IPCConstants.ACTION_CANCEL_FETCH;
         String intentCategory = IPCConstants.CATEGORY_SERVICE;
-        Bundle bundle = constructFetchOrPushBundle(streamId, mFetchMessenger);
+        Bundle bundle = constructFetchOrPushBundle(streamId, mFetchMessenger, bytesWritten);
         Intent intent = constructIntent(intentAction, intentCategory, target, bundle);
         sendIntent(intent, target, context);
     }
@@ -286,7 +283,7 @@ public class AACSSender {
         checkLogArgNonNull(target, "target", "push");
         checkLogArgNonNull(context, "context", "push");
 
-        Log.d(TAG, "IPC: pushing to streamId" + streamId);
+        Log.d(TAG, "IPC: pushing to streamId=" + streamId);
         mStreamPushCallbackMap.put(streamId, pushCallback);
         String intentAction = IPCConstants.ACTION_PUSH;
         String intentCategory = IPCConstants.CATEGORY_SERVICE;
@@ -316,10 +313,16 @@ public class AACSSender {
     }
 
     private Bundle constructFetchOrPushBundle(String streamId, Messenger messenger) {
+        return constructFetchOrPushBundle(streamId, messenger, OptionalLong.empty());
+    }
+
+    private Bundle constructFetchOrPushBundle(String streamId, Messenger messenger, OptionalLong bytesWritten) {
         Bundle bundle = new Bundle();
         bundle.putString(IPCConstants.AACS_IPC_MESSAGE_TRANSFER_ID, UUID.randomUUID().toString());
         bundle.putString(IPCConstants.AACS_IPC_STREAM_ID, streamId);
         bundle.putBinder(IPCConstants.AACS_IPC_MESSENGER, messenger.getBinder());
+        if (bytesWritten.isPresent())
+            bundle.putLong(IPCConstants.AACS_IPC_BYTES_WRITTEN, bytesWritten.getAsLong());
         return bundle;
     }
 
@@ -453,11 +456,16 @@ public class AACSSender {
             if (fetchCallback != null) {
                 fetchCallback.onStreamFetchedFromServer(readPipe);
             } else {
-                Log.e(TAG, "IPC: FAILED to find fetch callback associated with streamId: " + streamId);
+                Log.e(TAG, "IPC: FAILED to find fetch callback associated with streamId=" + streamId);
+                if (readPipe != null) {
+                    try {
+                        readPipe.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to close read pipe: " + e.getMessage());
+                    }
+                }
             }
-            if (mStreamFetchCallbackMap.containsKey(streamId)) {
-                mStreamFetchCallbackMap.remove(streamId);
-            }
+            mStreamFetchCallbackMap.remove(streamId);
         }
     }
 
@@ -481,11 +489,16 @@ public class AACSSender {
             if (pushCallback != null) {
                 pushCallback.onPushToStreamId(streamId, writePipe);
             } else {
-                Log.e(TAG, "IPC: FAILED to find push callback associated with streamId: " + streamId);
+                Log.e(TAG, "IPC: FAILED to find push callback associated with streamId=" + streamId);
+                if (writePipe != null) {
+                    try {
+                        writePipe.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Failed to close write pipe: " + e.getMessage());
+                    }
+                }
             }
-            if (mStreamPushCallbackMap.containsKey(streamId)) {
-                mStreamPushCallbackMap.remove(streamId);
-            }
+            mStreamPushCallbackMap.remove(streamId);
         }
     }
 

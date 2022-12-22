@@ -16,12 +16,11 @@ package com.amazon.alexa.auto.settings.dependencies;
 
 import com.amazon.alexa.auto.settings.AACSLocaleReceiver;
 import com.amazon.alexa.auto.settings.AACSPreferenceFragment;
-import com.amazon.alexa.auto.settings.AlexaSettingsLanguagesFragment;
-import com.amazon.alexa.auto.settings.AlexaSoundPreferencesFragment;
-import com.amazon.alexa.auto.settings.AssistAppSelectionFragment;
 import com.amazon.alexa.auto.settings.SettingsActivityViewModel;
+import com.amazon.alexa.auto.settings.SettingsAlexaLanguageFragment;
+import com.amazon.alexa.auto.settings.SettingsLanguageFragment;
 import com.amazon.alexa.auto.settings.ThingsToTryDetailsFragment;
-import com.amazon.alexa.auto.settings.UpdateLanguageActivity;
+import com.amazon.alexa.auto.settings.home.AlexaLandingPageFragment;
 import com.amazon.alexa.auto.settings.home.AlexaSettingsHomeFragment;
 
 import javax.inject.Singleton;
@@ -49,33 +48,24 @@ public interface SettingsComponent {
     void inject(AlexaSettingsHomeFragment fragment);
 
     /**
-     * Inject to @{link AlexaSettingsLanguagesFragment}.
-     *
-     * @param fragment Object whose dependencies are resolved by dagger.
-     */
-    void inject(AlexaSettingsLanguagesFragment fragment);
-
-    /**
      * Inject to @{link AACSPreferenceFragment}.
      *
      * @param fragment Object whose dependencies are resolved by dagger.
      */
     void inject(AACSPreferenceFragment fragment);
 
-    /**
-     * Inject to @{link AlexaSoundPreferencesFragment}.
-     *
-     * @param fragment Object whose dependencies are resolved by dagger.
-     */
-    void inject(AlexaSoundPreferencesFragment fragment);
-
     void inject(AACSLocaleReceiver aacsLocaleReceiver);
 
-    void inject(UpdateLanguageActivity updateLanguageActivity);
     /**
      * Inject to @{link ThingsToTryDetailsFragment}.
      *
      * @param fragment Object whose dependencies are resolved by dagger.
      */
     void inject(ThingsToTryDetailsFragment fragment);
+
+    void inject(AlexaLandingPageFragment fragment);
+
+    void inject(SettingsLanguageFragment fragment);
+
+    void inject(SettingsAlexaLanguageFragment fragment);
 }

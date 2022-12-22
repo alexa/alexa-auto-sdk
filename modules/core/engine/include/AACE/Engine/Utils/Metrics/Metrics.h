@@ -218,6 +218,218 @@ void emitBufferedMetrics(
     const std::vector<std::pair<std::string, double>>& timerDatapoints = {});
 
 /**
+ * Emit a counter metric for each datapoint specified in the @ datapoints.
+ * Counter is 1 for each metric.
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param datapoints List of datapoint strings to be added to the metric.
+ * @param bufferType Enum to indicate whether to buffer this metric. Default is NO-BUFFER.
+ * @param identityType Enum to indicate whether to add unique identifier to this metric. Default is NON-UNIQUE.
+ */
+void emitCounterMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::vector<std::string>& datapoints,
+    MetricEvent::MetricBufferType bufferType = MetricEvent::MetricBufferType::NB,
+    MetricEvent::MetricIdentityType identityType = MetricEvent::MetricIdentityType::NUNI);
+
+/**
+ * Emit a unique counter metric for each datapoint specified in the @ datapoints.
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param datapoints List of datapoint strings to be added to the metric.
+ */
+void emitUniqueCounterMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::vector<std::string>& datapoints);
+
+/**
+ * Emit a counter metric for each datapoint specified in the @ datapoints that will be buffered
+ * if user is not authorized
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param datapoints List of datapoint strings to be added to the metric.
+ */
+void emitBufferedCounterMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::vector<std::string>& datapoints);
+
+/**
+ * Emit a counter metric with key as @c key and value as @c value
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param key Metric Name
+ * @param value Counter value of the metric
+ * @param bufferType Enum to indicate whether to buffer this metric. Default is NO-BUFFER.
+ * @param identityType Enum to indicate whether to add unique identifier to this metric. Default is NON-UNIQUE.
+ */
+void emitCounterMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::string& key,
+    const int value,
+    MetricEvent::MetricBufferType bufferType = MetricEvent::MetricBufferType::NB,
+    MetricEvent::MetricIdentityType identityType = MetricEvent::MetricIdentityType::NUNI);
+
+/**
+ * Emit a unique counter metric with key as @c key and value as @c value
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param key Metric Name
+ * @param value Counter value of the metric
+ */
+void emitUniqueCounterMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::string& key,
+    const int value);
+
+/**
+ * Emit a counter metric with key as @c key and value as @c value that will be buffered
+ * if user is not authorized
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param key Metric Name
+ * @param value Counter value of the metric
+ */
+void emitBufferedCounterMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::string& key,
+    const int value);
+
+/**
+ * Emit a timer metric with key as @c key and value as @c value
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param key Metric Name
+ * @param value Timer value of the metric
+ * @param bufferType Enum to indicate whether to buffer this metric. Default is NO-BUFFER.
+ * @param identityType Enum to indicate whether to add unique identifier to this metric. Default is NON-UNIQUE.
+ */
+void emitTimerMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::string& key,
+    const double value,
+    MetricEvent::MetricBufferType bufferType = MetricEvent::MetricBufferType::NB,
+    MetricEvent::MetricIdentityType identityType = MetricEvent::MetricIdentityType::NUNI);
+
+/**
+ * Emit a unique timer metric with key as @c key and value as @c value
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param key Metric Name
+ * @param value Timer value of the metric
+ */
+void emitUniqueTimerMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::string& key,
+    const double value);
+
+/**
+ * Emit a timer metric with key as @c key and value as @c value that will be buffered
+ * and emitted once the device is authorized.
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param key Metric Name
+ * @param value Timer value of the metric
+ */
+void emitBufferedTimerMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::string& key,
+    const double value);
+
+/**
+ * Emit metrics for each datapoint specified in the @ counterDatapoints, @c stringDatapoints and @c timerDatapoints.
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param counterDatapoints Datapoints of type COUNTER.
+ * @param stringDatapoints Timer Datapoints of type STRING.
+ * @param timerDatapoints Timer Datapoints of type TIMER.
+ * @param bufferType Enum to indicate whether to buffer this metric. Default is NO-BUFFER.
+ * @param identityType Enum to indicate whether to add unique identifier to this metric. Default is NON-UNIQUE.
+ */
+void emitMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::vector<std::pair<std::string, int>>& counterDatapoints,
+    const std::vector<std::pair<std::string, std::string>>& stringDatapoints,
+    const std::vector<std::pair<std::string, double>>& timerDatapoints,
+    MetricEvent::MetricBufferType bufferType = MetricEvent::MetricBufferType::NB,
+    MetricEvent::MetricIdentityType identityType = MetricEvent::MetricIdentityType::NUNI);
+
+/**
+ * Emit unique metrics for each datapoint specified in the @ counterDatapoints, @c stringDatapoints and @c timerDatapoints.
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param counterDatapoints Datapoints of type COUNTER. Default is empty array
+ * @param stringDatapoints Timer Datapoints of type STRING. Default is empty array
+ * @param timerDatapoints Timer Datapoints of type TIMER. Default is empty array
+ */
+void emitUniqueMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::vector<std::pair<std::string, int>>& counterDatapoints = {},
+    const std::vector<std::pair<std::string, std::string>>& stringDatapoints = {},
+    const std::vector<std::pair<std::string, double>>& timerDatapoints = {});
+
+/**
+ * Emit metrics for each datapoint specified in the @ counterDatapoints, @c stringDatapoints and @c timerDatapoints that will be buffered and emitted once device is authorized with a unique identifier.
+ *
+ * @param context The context of the metric.
+ * @param metricSuffix The suffix to add to the metric program name.
+ * @param methodName The name of the method that emits this metric.
+ * @param counterDatapoints Datapoints of type COUNTER. Default is empty array
+ * @param stringDatapoints Timer Datapoints of type STRING. Default is empty array
+ * @param timerDatapoints Timer Datapoints of type TIMER. Default is empty array
+ */
+void emitBufferedMetrics(
+    const std::string& context,
+    const std::string& metricSuffix,
+    const std::string& methodName,
+    const std::vector<std::pair<std::string, int>>& counterDatapoints = {},
+    const std::vector<std::pair<std::string, std::string>>& stringDatapoints = {},
+    const std::vector<std::pair<std::string, double>>& timerDatapoints = {});
+
+/**
  * Get the current time in  milliseconds
  */
 double getCurrentTimeInMs();

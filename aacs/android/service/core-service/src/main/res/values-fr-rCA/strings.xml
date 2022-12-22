@@ -5,4 +5,6 @@
     <string name="aacs_ready">Initialisation terminée.</string>
     <string name="aacs_title">AACS</string>
     <string name="component_registry_key">%1$s + %2$s</string>
+    <string name="general_notification_title">Nouvelle notification d\'Alexa</string>
+    <string name="general_notification_text">Essayez de dire&#160;: «&#160;Alexa, quelles sont mes notifications?&#160;»</string>
 </resources>

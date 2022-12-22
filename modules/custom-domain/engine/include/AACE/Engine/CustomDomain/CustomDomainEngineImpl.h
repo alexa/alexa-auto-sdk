@@ -16,6 +16,7 @@
 #ifndef AACE_ENGINE_CUSTOMDOMAIN_CUSTOMDOMAIN_ENGINE_IMPL_H
 #define AACE_ENGINE_CUSTOMDOMAIN_CUSTOMDOMAIN_ENGINE_IMPL_H
 
+#include <acsdk/MultiAgentInterface/AgentManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
@@ -70,7 +71,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        const std::string& customInterfaceMetadata);
+        const std::string& customInterfaceMetadata,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager);
 
 public:
     /**
@@ -80,7 +82,8 @@ public:
     static std::shared_ptr<CustomDomainEngineImpl> create(
         std::shared_ptr<aace::customDomain::CustomDomain> customDomainPlatformInterface,
         std::shared_ptr<aace::engine::core::EngineContext> engineContext,
-        const std::string& customInterfaceMetadata);
+        const std::string& customInterfaceMetadata,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager = nullptr);
 
     /// @name CustomDomainEngineInterface Function
     /// @{

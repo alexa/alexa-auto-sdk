@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_favorites_consent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:orientation="vertical"
-    android:theme="@style/Theme.Alexa.Standard">
+    android:layout_gravity="center">
 
     <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/setup_bottom_guideline"
         android:layout_width="wrap_content"
@@ -32,36 +30,25 @@
         app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
 
     <!--Alexa logo-->
-    <ImageView
-        android:id="@+id/alexa_img_view"
-        android:layout_width="@dimen/login_alexa_image_width"
-        android:layout_height="@dimen/login_alexa_image_height"
-        android:layout_gravity="center"
-        android:contentDescription="@string/alexa_logo_content_description"
-        android:src="@drawable/alexa_logo"
+
+    <!-- Title-->
+    <TextView
+        android:id="@+id/nav_favorites_permission_header_view"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="158dp"
+        android:text="@string/nav_favorites_permission_header_text"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Title-->
-    <TextView
-        android:id="@+id/nav_favorites_permission_header_view"
-        style="@style/Alexa.TitleText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/nav_favorites_permission_header_text"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/right_guideline"
-        app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
-        android:layout_marginTop="@dimen/login_item_margin_top"/>
-
     <!--Subtitle-->
     <TextView
         android:id="@+id/nav_favorites_permission_text_view"
-        style="@style/Alexa.SubtitleText"
+        style="?attr/bodyText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -75,7 +62,7 @@
     <!--Utterance-->
     <TextView
         android:id="@+id/alexa_hint2"
-        style="@style/Alexa.UtteranceText"
+        style="?attr/utteranceText"
         android:text="@string/nav_favorites_permission_hint_text"
         android:textAlignment="center"
         android:layout_width="0dp"
@@ -88,7 +75,7 @@
         <!-- Skip button-->
     <TextView
         android:id="@+id/setup_skip_button_view"
-        style="@style/Alexa.Button"
+        style="?attr/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/skip_permission_button_text"
@@ -99,7 +86,7 @@
     <!--Consent button-->
     <TextView
         android:id="@+id/use_nav_favorites_button_view"
-        style="@style/Alexa.Button2"
+        style="?attr/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/consent_agree_text"

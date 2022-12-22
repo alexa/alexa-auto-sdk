@@ -15,7 +15,7 @@
     <dimen name="weather_card_width">700dp</dimen>
     <dimen name="weather_card_header_height">80dp</dimen>
     <dimen name="weather_card_margin_top">5dp</dimen>
-    <dimen name="weather_card_title_textSize">30sp</dimen>
+    <dimen name="weather_card_title_textSize">20sp</dimen>
     <dimen name="weather_card_subtitle_textSize">24sp</dimen>
     <dimen name="weather_card_title_marginTop">10dp</dimen>
     <dimen name="weather_card_title_marginStart">40dp</dimen>

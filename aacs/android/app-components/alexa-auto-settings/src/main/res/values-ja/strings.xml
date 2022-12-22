@@ -15,35 +15,42 @@
     <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
     <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">車の位置情報へのアクセスを[Brandon]とAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
     <string name="setting_alexa_signin" tools:ignore="MissingTranslation">サインイン</string>
-    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexaハンズフリー</string>
+    <string name="setting_alexa_wake_word_title" tools:ignore="MissingTranslation">ウェイクワード</string>
+    <string name="setting_alexa_wake_word_summary" tools:ignore="MissingTranslation">「アレクサ」と言うと、Alexaが返事をします。</string>
     <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">リクエスト開始トーン</string>
     <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Alexaによる聞き取りの開始をサウンドで知らせます。</string>
     <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">リクエスト終了トーン</string>
     <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Alexaによる聞き取りの終了をサウンドで知らせます。</string>
-    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">「アレクサ」と言うと、Alexaが返事をします。</string>
     <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">位置情報の共有</string>
     <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">車の位置情報へのアクセスをAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
     <string name="setting_navigation_favorites_title">ナビゲーションの「お気に入り」を同期</string>
     <string name="setting_navigation_favorites_summary">よく行く場所を「お気に入り」として車に保存して、Alexaに簡単に道案内をリクエストできます。お気に入りの場所はAmazonサービスにアップロードされます。</string>
     <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">おやすみモード</string>
-    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">アラームやタイマー以外の通知がオフになります</string>
-    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">コミュニケーション</string>
+    <string name="setting_alexa_theme_title" tools:ignore="MissingTranslation">デバイステーマ</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Alexaの通知の受信を停止します</string>
+    <string name="setting_alexa_calling_title" tools:ignore="MissingTranslation">通話</string>
+    <string name="setting_alexa_calling_texting_title">通話・テキストメッセージ</string>
     <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">サウンド</string>
     <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexaの言語</string>
+    <string name="setting_alexa_language_continue">次へ</string>
+    <string name="setting_alexa_language_confirm">確定</string>
+    <string name="setting_language_title">言語</string>
+    <string name="setting_system_language_title">システム言語</string>
     <string name="setting_alexa_signout" tools:ignore="MissingTranslation">サインアウト</string>
     <string name="setting_alexa_things_to_try" tools:ignore="MissingTranslation">試してみよう!</string>
     <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Alexaをオフにする</string>
-    <string name="setting_alexa_language_mismatch" tools:ignore="MissingTranslation">でAlexaがサポートされていません</string>
+    <string name="setting_alexa_language_mismatch" tools:ignore="MissingTranslation">Alexaが未対応の言語: </string>
+    <string name="setting_alexa_current_language" tools:ignore="MissingTranslation">Alexaに%1$sで話しかけることはできます。または、Alexaの別の言語を選択してください。</string>
     <string name="setting_language_mismatch_title" tools:ignore="MissingTranslation">言語の不一致</string>
     <string name="setting_language_mismatch_content_1" tools:ignore="MissingTranslation">システム言語は%1$sに設定されています。&#160;</string>
-    <string name="setting_language_mismatch_content_2" tools:ignore="MissingTranslation">%1$sでAlexaを引き続き使用しますか?</string>
+    <string name="setting_language_mismatch_content_2" tools:ignore="MissingTranslation">Alexaを引き続き%1$sで使用しますか?</string>
     <string name="setting_alexa" tools:ignore="MissingTranslation">Alexaの設定</string>
     <string name="setting_continue" tools:ignore="MissingTranslation">次へ</string>
     <string name="setting_aacs" tools:ignore="MissingTranslation">Alexa Autoクライアントサービス</string>
     <string name="settings_alexa" tools:ignore="MissingTranslation">設定</string>
     <string name="logout" tools:ignore="MissingTranslation">サインアウトしますか?</string>
     <string name="disable_alexa" tools:ignore="MissingTranslation">Alexaをオフにしますか?</string>
-    <string name="logout_confirm" tools:ignore="MissingTranslation">Amazon Alexaからサインアウトしますか?</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">サインアウトしてAlexaをオフにしますか?</string>
     <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">サインアウト</string>
     <string name="confirm_yesno_no" tools:ignore="MissingTranslation">キャンセル</string>
     <string name="confirm_yesno_confirm" tools:ignore="MissingTranslation">はい</string>
@@ -64,71 +71,39 @@
     <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">AACSを起動して設定を適用</string>
     <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">AACSをシャットダウン</string>
     <string name="preference_aacs_start" tools:ignore="MissingTranslation">AACSを開始</string>
-    <string name="ttt_preview_mode_note" tools:ignore="MissingTranslation">注: 一部の機能は、Amazon Alexaへのサインインを必要とします。</string>
-
-    <!-- translatable="false" tag is used for things-to-try strings only. These strings need to be localized based on the country and region -->
-    <string name="ttt_getting_started" translatable="false">はじめましょう</string>
-    <string name="ttt_alexa_s_talents" translatable="false">Alexaの特技</string>
-    <string name="ttt_entertainment" translatable="false">エンターテイメント</string>
-    <string name="ttt_communication" translatable="false">コミュニケーション</string>
-    <string name="ttt_weather" translatable="false">天気</string>
-    <string name="ttt_smart_home" translatable="false">スマートホーム</string>
-    <string name="ttt_news_and_information" translatable="false">ニュースと情報</string>
-    <string name="ttt_navigation" translatable="false">ナビゲーション</string>
-    <string name="ttt_traffic_information" translatable="false">交通情報</string>
-    <string name="ttt_skills" translatable="false">スキル</string>
-    <string name="ttt_lists" translatable="false">リスト</string>
-    <string name="ttt_shopping" translatable="false">ショッピング</string>
-    <string name="ttt_questions_and_answers" translatable="false">質問をする</string>
-    <string name="ttt_sports" translatable="false">スポーツ</string>
-    <string name="ttt_calendar" translatable="false">カレンダー</string>
-    <string name="ttt_getting_started_text1" translatable="false">「アレクサ、近くのガソリンスタンドを探して。」</string>
-    <string name="ttt_getting_started_text2" translatable="false">「アレクサ、音楽をかけて。」</string>
-    <string name="ttt_getting_started_text3" translatable="false">「アレクサ、今日の天気は?」</string>
-    <string name="ttt_getting_started_text4" translatable="false">「アレクサ、フラッシュニュースは?」</string>
-    <string name="ttt_alexa_s_talents_text1" translatable="false">「アレクサ、おはよう。」</string>
-    <string name="ttt_alexa_s_talents_text2" translatable="false">「アレクサ、お話を聞かせて。」</string>
-    <string name="ttt_entertainment_text1" translatable="false">「アレクサ、音楽をかけて。」</string>
-    <string name="ttt_entertainment_text2" translatable="false">「アレクサ、70年代のロック音楽をかけて。」</string>
-    <string name="ttt_entertainment_text3" translatable="false">「アレクサ、ブルーノマーズの最新のアルバムを再生して。」</string>
-    <string name="ttt_entertainment_text4" translatable="false">「アレクサ、Audibleオーディオブックの続きを読んで。」</string>
-    <string name="ttt_communication_text1" translatable="false">「アレクサ、お父さんにメッセージを送って。」</string>
-    <string name="ttt_communication_text2" translatable="false">「アレクサ、お母さんの携帯にかけて。」</string>
-    <string name="ttt_communication_text3" translatable="false">「アレクサ、一二三の四五六七にかけて。」</string>
-    <string name="ttt_weather_text1" translatable="false">「アレクサ、天気はどう?」</string>
-    <string name="ttt_weather_text2" translatable="false">「アレクサ、今日は雨降る?」</string>
-    <string name="ttt_weather_text3" translatable="false">「アレクサ、ホノルルの天気はどう?」</string>
-    <string name="ttt_smart_home_text1" translatable="false">「アレクサ、玄関の電気をつけて。」</string>
-    <string name="ttt_smart_home_text2" translatable="false">「アレクサ、玄関のドアをロックして。」</string>
-    <string name="ttt_smart_home_text3" translatable="false">「アレクサ、リビングの温度を28度にして。」</string>
-    <string name="ttt_smart_home_text4" translatable="false">「アレクサ、ガレージドアを閉めて。」</string>
-    <string name="ttt_news_and_information_text1" translatable="false">「アレクサ、ニュースを再生して」</string>
-    <string name="ttt_news_and_information_text2" translatable="false">「アレクサ、スポーツニュースを教えて」</string>
-    <string name="ttt_news_and_information_text3" translatable="false">「アレクサ、ニッポン放送をかけて。」</string>
-    <string name="ttt_news_and_information_text4" translatable="false">「アレクサ、BBCをかけて。」</string>
-    <string name="ttt_navigation_text1" translatable="false">「アレクサ、近くで一番評価が高いピザ屋さんはどこ。」</string>
-    <string name="ttt_navigation_text2" translatable="false">「アレクサ、空港に連れて行って。」</string>
-    <string name="ttt_navigation_text3" translatable="false">「アレクサ、駅に連れて行って。」</string>
-    <string name="ttt_skills_text1" translatable="false">「アレクサ、新しいスキルを教えて」</string>
-    <string name="ttt_lists_text1" translatable="false">「アレクサ、やることリストには何がある?」</string>
-    <string name="ttt_lists_text2" translatable="false">「アレクサ、買い物リストに牛乳を追加して」</string>
-    <string name="ttt_lists_text3" translatable="false">「アレクサ、買い物リストには何がある?」</string>
-    <string name="ttt_lists_text4" translatable="false">「アレクサ、持ち物リストを作って。」</string>
-    <string name="ttt_shopping_text1" translatable="false">「アレクサ、配送状況を教えて?」</string>
-    <string name="ttt_shopping_text2" translatable="false">「アレクサ、車用芳香剤を購入して。」</string>
-    <string name="ttt_shopping_text3" translatable="false">「アレクサ、歯磨き粉をまた注文して。」</string>
-    <string name="ttt_questions_and_answers_text1" translatable="false">「アレクサ、東京は今何時?」</string>
-    <string name="ttt_questions_and_answers_text2" translatable="false">「アレクサ、月までの距離はどのくらい?」</string>
-    <string name="ttt_questions_and_answers_text3" translatable="false">「アレクサ、ワールドカップはいつ?」</string>
-    <string name="ttt_sports_text1" translatable="false">「アレクサ、スポーツニュースを教えて」</string>
-    <string name="ttt_sports_text2" translatable="false">「アレクサ、チャンピオンズリーグはいつ?」</string>
-    <string name="ttt_sports_text3" translatable="false">「アレクサ、ヒューストン・ロケッツの次の試合はいつ?」</string>
-    <string name="ttt_sports_text4" translatable="false">「アレクサ、クリケットのワールドカップはいつ?」</string>
-    <string name="ttt_sports_text5" translatable="false">「アレクサ、ウインブルドンはいつ?」</string>
-    <string name="ttt_sports_text6" translatable="false">「アレクサ、モナコ・グランプリはいつ?」</string>
-    <string name="ttt_sports_text7" translatable="false">「アレクサ、昨日のシアトル・シーホークスの得点は?」</string>
-    <string name="ttt_sports_text8" translatable="false">「アレクサ、フォーティーナイナーズのスーパーボールの優勝回数は?」</string>
-    <string name="ttt_calendar_text1" translatable="false">「アレクサ、今日はどんな予定がある?」</string>
-    <string name="ttt_calendar_text2" translatable="false">「アレクサ、次の予定は何?」</string>
-    <string name="ttt_calendar_text3" translatable="false">「アレクサ、午後2時に会議の予定を追加して。」</string>
+    <string name="comms_primary_device_none">スマートフォンが接続されていません</string>
+    <string name="ttt_preview_mode_note">注: 一部の機能は、Amazon Alexaへのサインインを必要とします。</string>
+    <string name="lp_blocker_mic_primary">マイクへのアクセスが必要です</string>
+    <string name="lp_blocker_mic_secondary">Alexaがコマンドを聞き取れるよう、マイクへのアクセスを許可してください。</string>
+    <string name="lp_blocker_assistant_primary">Alexaをメインの音声アシスタントに設定</string>
+    <string name="lp_blocker_assistant_secondary">Alexaを使用するには、Alexaをメインの音声アシスタントアプリに設定する必要があります。</string>
+    <string name="lp_carousel_ttt_primary">Alexaに話しかける</string>
+    <string name="lp_carousel_ttt_secondary_ww_ptt">音声認識ボタンを押すか、「アレクサ」と言ってください。</string>
+    <string name="lp_carousel_ttt_secondary_ptt">音声認識ボタンを押して、話しかけてください。</string>
+    <string name="lp_carousel_ttt_secondary_ww">「アレクサ」と言ってから、お話ください。</string>
+    <string name="lp_carousel_previewmode_primary">サインインすると、さらに豊富なAlexaの機能を利用できます</string>
+    <string name="lp_carousel_previewmode_secondary">音楽ストリーミング、ローカル検索などができます</string>
+    <string name="lp_carousel_smarthome_primary">スマートホームを確認</string>
+    <string name="lp_carousel_smarthome_secondary">上のスマートホームのアイコンをタップするか、「アレクサ、スマートホームダッシュボードを見せて」と言ってください。</string>
+    <string name="lp_carousel_location_primary">ローカル検索</string>
+    <string name="lp_carousel_location_secondary_alexa_system">Alexaに位置情報をシェアすると、近くのレストランなど、今いる場所に合わせた検索結果を得ることができます。</string>
+    <string name="lp_carousel_location_secondary_system">位置情報へのアクセスを許可すると、近くのレストランなど、今いる場所に合わせた検索結果を得ることができます。</string>
+    <string name="lp_carousel_contacts_primary">音声操作で友達や家族と通話</string>
+    <string name="lp_carousel_contacts_secondary_alexa_system">%1$sの連絡先は、Amazonのサービスにアップロードされます。</string>
+    <string name="lp_carousel_contacts_secondary_system">Alexaで通話するには、連絡先へのアクセスを許可してください。</string>
+    <string name="lp_carousel_sms_primary">テキストメッセージを聞く</string>
+    <string name="lp_carousel_sms_secondary_alexa_system">%1$sのSMSメッセージは、Amazonのサービスにアップロードされます。</string>
+    <string name="lp_carousel_sms_secondary_system">Alexaでテキストメッセージを送受信するには、SMSアクセスを許可してください。</string>
+    <string name="lp_carousel_lowdata_primary">データプランに登録してAlexaを最大限に活用しましょう</string>
+    <string name="lp_carousel_lowdata_secondary">データプランに登録すると、音楽、オーディオブック、ライブラジオステーションのストリーミング、スマートホームの制御などが可能になります。</string>
+    <string name="cta_label_fix">修正</string>
+    <string name="cta_label_set_as_default">デフォルトに設定</string>
+    <string name="cta_label_things_to_try">試してみよう!</string>
+    <string name="cta_label_sign_in">サインイン</string>
+    <string name="cta_label_enable">有効にする</string>
+    <string name="cta_label_allow">許可</string>
+    <string name="try_saying">「%1$s」と言ってみてください</string>
+    <string name="toggle_title">「Alexa」のウェイクワード</string>
+    <string name="cta_label_connect_phone">スマートフォンを接続</string>
+    <string name="lp_carousel_contacts_secondary_no_phone">開始するには、スマートフォンを接続してください。</string>
 </resources>

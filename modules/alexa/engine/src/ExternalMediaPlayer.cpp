@@ -125,40 +125,40 @@ static const std::chrono::milliseconds TIMEOUT{500};
 //#endif
 
 // The @c External media player play directive signature.
-static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Play"};
-static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login"};
-static const NamespaceAndName LOGOUT_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Logout"};
+static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Play", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName LOGOUT_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Logout", AgentId::AGENT_ID_ALL};
 static const NamespaceAndName AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE,
-                                                                   "AuthorizeDiscoveredPlayers"};
+                                                                   "AuthorizeDiscoveredPlayers", AgentId::AGENT_ID_ALL};
 
 // The @c Transport control directive signatures.
-static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play"};
-static const NamespaceAndName PAUSE_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Pause"};
-static const NamespaceAndName STOP_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Stop"};
-static const NamespaceAndName NEXT_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Next"};
-static const NamespaceAndName PREVIOUS_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Previous"};
-static const NamespaceAndName STARTOVER_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "StartOver"};
-static const NamespaceAndName REWIND_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Rewind"};
-static const NamespaceAndName FASTFORWARD_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "FastForward"};
+static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName PAUSE_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Pause", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName STOP_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Stop", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName NEXT_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Next", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName PREVIOUS_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Previous", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName STARTOVER_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "StartOver", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName REWIND_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Rewind", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName FASTFORWARD_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "FastForward", AgentId::AGENT_ID_ALL};
 
 // The @c PlayList control directive signature.
-static const NamespaceAndName ENABLEREPEATONE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableRepeatOne"};
-static const NamespaceAndName ENABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableRepeat"};
-static const NamespaceAndName DISABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "DisableRepeat"};
-static const NamespaceAndName ENABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableShuffle"};
-static const NamespaceAndName DISABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "DisableShuffle"};
+static const NamespaceAndName ENABLEREPEATONE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableRepeatOne", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ENABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableRepeat", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName DISABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "DisableRepeat", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ENABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableShuffle", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName DISABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "DisableShuffle", AgentId::AGENT_ID_ALL};
 
 // The @c Seek control directive signature.
-static const NamespaceAndName SEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE, "SetSeekPosition"};
-static const NamespaceAndName ADJUSTSEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE, "AdjustSeekPosition"};
+static const NamespaceAndName SEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE, "SetSeekPosition", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ADJUSTSEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE, "AdjustSeekPosition", AgentId::AGENT_ID_ALL};
 
 // The @c favorites control directive signature.
-static const NamespaceAndName FAVORITE_DIRECTIVE{FAVORITESCONTROLLER_NAMESPACE, "Favorite"};
-static const NamespaceAndName UNFAVORITE_DIRECTIVE{FAVORITESCONTROLLER_NAMESPACE, "Unfavorite"};
+static const NamespaceAndName FAVORITE_DIRECTIVE{FAVORITESCONTROLLER_NAMESPACE, "Favorite", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName UNFAVORITE_DIRECTIVE{FAVORITESCONTROLLER_NAMESPACE, "Unfavorite", AgentId::AGENT_ID_ALL};
 
 // The @c ExternalMediaPlayer context state signatures.
-static const NamespaceAndName SESSION_STATE{EXTERNALMEDIAPLAYER_STATE_NAMESPACE, EXTERNALMEDIAPLAYER_NAME};
-static const NamespaceAndName PLAYBACK_STATE{PLAYBACKSTATEREPORTER_STATE_NAMESPACE, PLAYBACKSTATEREPORTER_NAME};
+static const NamespaceAndName SESSION_STATE{EXTERNALMEDIAPLAYER_STATE_NAMESPACE, EXTERNALMEDIAPLAYER_NAME, AgentId::AGENT_ID_ALL};
+static const NamespaceAndName PLAYBACK_STATE{PLAYBACKSTATEREPORTER_STATE_NAMESPACE, PLAYBACKSTATEREPORTER_NAME, AgentId::AGENT_ID_ALL};
 
 /// The const char for the players key field in the context.
 static const char PLAYERS[] = "players";
@@ -178,9 +178,6 @@ static const char AGENT_KEY[] = "agent";
 /// The authorized key.
 static const char AUTHORIZED[] = "authorized";
 
-/// The deauthorized key.
-static const char DEAUTHORIZED[] = "deauthorized";
-
 /// The localPlayerId key.
 static const char LOCAL_PLAYER_ID[] = "localPlayerId";
 
@@ -188,25 +185,13 @@ static const char LOCAL_PLAYER_ID[] = "localPlayerId";
 static const char METADATA[] = "metadata";
 
 /// The playerId key.
-// static const char PLAYER_ID[] = "playerId";
+static const char PLAYER_ID_KEY[] = "playerId";
 
 /// The skillToken key.
-// static const char SKILL_TOKEN[] = "skillToken";
+static const char SKILL_TOKEN_KEY[] = "skillToken";
 
 /// The spiVersion key.
 static const char SPI_VERSION_KEY[] = "spiVersion";
-
-/// The validationMethod key.
-static const char VALIDATION_METHOD[] = "validationMethod";
-
-/// The validationData key.
-static const char VALIDATION_DATA[] = "validationData";
-
-/// The ReportDiscoveredPlayers Event key.
-static const char REPORT_DISCOVERED_PLAYERS[] = "ReportDiscoveredPlayers";
-
-/// The AuthorizationComplete Event key.
-static const char AUTHORIZATION_COMPLETE[] = "AuthorizationComplete";
 
 /**
  * Creates the ExternalMediaPlayer capability configuration.
@@ -307,9 +292,6 @@ static std::shared_ptr<CapabilityConfiguration> generateCapabilityConfiguration(
 
 std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
     const std::string& agentString,
-    const AdapterMediaPlayerMap& mediaPlayers,
-    const AdapterSpeakerMap& speakers,
-    const AdapterCreationMap& adapterCreationMap,
     std::shared_ptr<SpeakerManagerInterface> speakerManager,
     std::shared_ptr<MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
@@ -358,7 +340,7 @@ std::shared_ptr<ExternalMediaPlayer> ExternalMediaPlayer::create(
         playbackRouter,
         externalMediaAdapterRegistration));
 
-    if (!externalMediaPlayer->init(mediaPlayers, speakers, adapterCreationMap, focusManager)) {
+    if (!externalMediaPlayer->init(focusManager)) {
         AACE_ERROR(LX(TAG, "createFailed").d("reason", "initFailed"));
         return nullptr;
     }
@@ -421,11 +403,7 @@ ExternalMediaPlayer::ExternalMediaPlayer(
         FAVORITESCONTROLLER_CAPABILITY_INTERFACE_VERSION));
 }
 
-bool ExternalMediaPlayer::init(
-    const AdapterMediaPlayerMap& mediaPlayers,
-    const AdapterSpeakerMap& speakers,
-    const AdapterCreationMap& adapterCreationMap,
-    std::shared_ptr<FocusManagerInterface> focusManager) {
+bool ExternalMediaPlayer::init(std::shared_ptr<FocusManagerInterface> focusManager) {
     AACE_VERBOSE(LX(TAG));
 
     m_authorizedSender = AuthorizedSender::create(m_messageSender);
@@ -436,8 +414,6 @@ bool ExternalMediaPlayer::init(
 
     m_contextManager->setStateProvider(SESSION_STATE, shared_from_this());
     m_contextManager->setStateProvider(PLAYBACK_STATE, shared_from_this());
-
-    createAdapters(mediaPlayers, speakers, adapterCreationMap, m_authorizedSender, focusManager, m_contextManager);
 
     return true;
 }
@@ -480,12 +456,12 @@ void ExternalMediaPlayer::removeAdapterHandler(
     });
 }
 
-// adapter handler specific code
 void ExternalMediaPlayer::executeOnFocusChanged(aace::engine::alexa::FocusState newFocus, MixingBehavior behavior) {
     AACE_DEBUG(LX(TAG)
                    .d("from", m_focus)
                    .d("to", newFocus)
                    .d("m_currentActivity", m_currentActivity)
+                   .d("m_haltInitiator", m_haltInitiator)
                    .d("m_playerInFocus", m_playerInFocus));
     if (m_focus == newFocus && (m_mixingBehavior == behavior)) {
         m_focusAcquireInProgress = false;
@@ -700,7 +676,7 @@ void ExternalMediaPlayer::onContextAvailable(const std::string& jsonContext) {
             auto event = buildJsonEventString(nameAndPayload.first, "", nameAndPayload.second, jsonContext);
 
             AACE_VERBOSE(LX(TAG).d("event", event.second));
-            auto request = std::make_shared<MessageRequest>(event.second);
+            auto request = std::make_shared<MessageRequest>(AgentId::AGENT_ID_ALL, event.second);
             m_messageSender->sendMessage(request);
         }
     });
@@ -754,7 +730,7 @@ void ExternalMediaPlayer::handleDirective(std::shared_ptr<DirectiveInfo> info) {
         return;
     }
 
-    NamespaceAndName directiveNamespaceAndName(info->directive->getNamespace(), info->directive->getName());
+    NamespaceAndName directiveNamespaceAndName(info->directive->getNamespace(), info->directive->getName(), AgentId::AGENT_ID_ALL);
     auto handlerIt = m_directiveToHandlerMap.find(directiveNamespaceAndName);
     if (handlerIt == m_directiveToHandlerMap.end()) {
         AACE_ERROR(LX(TAG, "handleDirectivesFailed")
@@ -766,43 +742,29 @@ void ExternalMediaPlayer::handleDirective(std::shared_ptr<DirectiveInfo> info) {
         return;
     }
 
-    AACE_VERBOSE(LX(TAG).d("Payload", info->directive->getPayload()));
+    AACE_VERBOSE(LX(TAG)
+                     .d("nameSpace", info->directive->getNamespace())
+                     .d("name", info->directive->getName())
+                     .d("payload", info->directive->getPayload()));
 
     auto handler = (handlerIt->second.second);
     (this->*handler)(info, handlerIt->second.first);
 }
 
-std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::preprocessDirective(
+std::string ExternalMediaPlayer::preprocessDirective(
     std::shared_ptr<DirectiveInfo> info,
     rapidjson::Document* document) {
     AACE_VERBOSE(LX(TAG));
+    std::string playerId;
 
     if (!parseDirectivePayload(info, document)) {
-        return nullptr;
+        return playerId;
     }
 
-    std::string playerId;
     if (!jsonUtils::retrieveValue(*document, PLAYER_ID, &playerId)) {
         AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
-
-    // adapter handler specific code
-    if (m_adapters.empty()) {  // use handlers when there are no adapters
-        return nullptr;
-    }
-
-    auto adapter = getAdapterByPlayerId(playerId);
-
-    {
-        std::lock_guard<std::mutex> lock{m_adaptersMutex};
-        if (!adapter) {
-            AACE_ERROR(LX(TAG, "nullAdapterForThePlayer").d(PLAYER_ID, playerId));
-            sendExceptionEncounteredAndReportFailed(info, "nullAdapter.");
-            return nullptr;
-        }
-    }
-
-    return adapter;
+    return playerId;
 }
 
 void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<DirectiveInfo> info, RequestType request) {
@@ -865,17 +827,17 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
                     continue;
                 }
 
-                if (!json::jsonUtils::retrieveValue(metadataIt->value, PLAYER_ID, &playerId)) {
+                if (!json::jsonUtils::retrieveValue(metadataIt->value, PLAYER_ID_KEY, &playerId)) {
                     AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                    .d("reason", "missingAttribute")
-                                   .d("attribute", PLAYER_ID));
+                                   .d("attribute", PLAYER_ID_KEY));
                     continue;
                 } else
                     playerInfo.playerId = playerId;
-                if (!json::jsonUtils::retrieveValue(metadataIt->value, SKILL_TOKEN, &defaultSkillToken)) {
+                if (!json::jsonUtils::retrieveValue(metadataIt->value, SKILL_TOKEN_KEY, &defaultSkillToken)) {
                     AACE_ERROR(LX(TAG, "handleAuthorizeDiscoveredPlayersFailed")
                                    .d("reason", "missingAttribute")
-                                   .d("attribute", SKILL_TOKEN));
+                                   .d("attribute", SKILL_TOKEN_KEY));
                     continue;
                 } else
                     playerInfo.skillToken = defaultSkillToken;
@@ -891,7 +853,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
         }
     }
 
-    // adapter handler specific code
     m_executor.submit([this, info, playerInfoList]() {
         for (auto adapterHandler : m_adapterHandlers) {
             // adapterHandler->authorizeDiscoveredPlayer(localPlayerId, authorized, playerId, defaultSkillToken);
@@ -901,26 +862,6 @@ void ExternalMediaPlayer::handleAuthorizeDiscoveredPlayers(std::shared_ptr<Direc
     });
 
     return;
-}
-
-std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterByPlayerId(const std::string& playerId) {
-    AACE_VERBOSE(LX(TAG));
-
-    std::string localPlayerId;
-    {
-        auto lock = std::unique_lock<std::mutex>(m_authorizedMutex);
-        auto playerIdToLocalPlayerId = m_authorizedAdapters.find(playerId);
-
-        if (m_authorizedAdapters.end() == playerIdToLocalPlayerId) {
-            AACE_ERROR(LX(TAG, "getAdapterByPlayerIdFailed").d("reason", "noMatchingLocalId").d(PLAYER_ID, playerId));
-
-            return nullptr;
-        } else {
-            localPlayerId = playerIdToLocalPlayerId->second;
-        }
-    }
-
-    return getAdapterByLocalPlayerId(localPlayerId);
 }
 
 std::shared_ptr<ExternalMediaAdapterHandlerInterface> ExternalMediaPlayer::getAdapterHandlerByPlayerId(
@@ -937,73 +878,15 @@ std::shared_ptr<ExternalMediaAdapterHandlerInterface> ExternalMediaPlayer::getAd
     return nullptr;
 }
 
-std::shared_ptr<ExternalMediaAdapterInterface> ExternalMediaPlayer::getAdapterByLocalPlayerId(
-    const std::string& localPlayerId) {
-    AACE_VERBOSE(LX(TAG));
-    auto lock = std::unique_lock<std::mutex>(m_adaptersMutex);
-    auto localPlayerIdToAdapter = m_adapters.find(localPlayerId);
-
-    if (m_adapters.end() == localPlayerIdToAdapter) {
-        AACE_ERROR(LX(TAG, "getAdapterByLocalPlayerIdFailed")
-                       .d("reason", "noAdapterForLocalId")
-                       .d("localPlayerId", localPlayerId));
-        return nullptr;
-    }
-
-    return localPlayerIdToAdapter->second;
-}
-
 bool ExternalMediaPlayer::isRegisteredPlayerId(const std::string& playerId) {
     return (m_externalMediaAdapterRegistration != nullptr) &&
            (m_externalMediaAdapterRegistration->getPlayerId() == playerId);
 }
 
-void ExternalMediaPlayer::sendAuthorizationCompleteEvent(
-    const std::unordered_map<std::string, std::string>& authorized,
-    const std::unordered_set<std::string>& deauthorized) {
-    AACE_VERBOSE(LX(TAG));
-
-    rapidjson::Document payload(rapidjson::kObjectType);
-    rapidjson::Value authorizedJson(rapidjson::kArrayType);
-    rapidjson::Value deauthorizedJson(rapidjson::kArrayType);
-
-    for (const auto& playerIdToSkillToken : authorized) {
-        rapidjson::Value player(rapidjson::kObjectType);
-
-        player.AddMember(PLAYER_ID, playerIdToSkillToken.first, payload.GetAllocator());
-        player.AddMember(SKILL_TOKEN, playerIdToSkillToken.second, payload.GetAllocator());
-        authorizedJson.PushBack(player, payload.GetAllocator());
-    }
-
-    for (const auto& localPlayerId : deauthorized) {
-        rapidjson::Value player(rapidjson::kObjectType);
-
-        player.AddMember(LOCAL_PLAYER_ID, localPlayerId, payload.GetAllocator());
-        deauthorizedJson.PushBack(player, payload.GetAllocator());
-    }
-
-    payload.AddMember(AUTHORIZED, authorizedJson, payload.GetAllocator());
-    payload.AddMember(DEAUTHORIZED, deauthorizedJson, payload.GetAllocator());
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    if (!payload.Accept(writer)) {
-        AACE_ERROR(LX(TAG, "sendAuthorizationCompleteEventFailed").d("reason", "writerRefusedJsonObject"));
-        return;
-    }
-
-    // Request Context and wait.
-    m_eventQueue.push(std::make_pair(AUTHORIZATION_COMPLETE, buffer.GetString()));
-    m_contextManager->getContext(shared_from_this());
-}
-
 void ExternalMediaPlayer::handleLogin(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-
-    auto adapter = preprocessDirective(info, &payload);
-
-    std::string playerId;
-    if (!jsonUtils::retrieveValue(payload, "playerId", &playerId)) {
+    std::string playerId = preprocessDirective(info, &payload);
+    if (playerId.empty()) {
         AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "missing playerId in Login directive");
         return;
@@ -1035,58 +918,38 @@ void ExternalMediaPlayer::handleLogin(std::shared_ptr<DirectiveInfo> info, Reque
         return;
     }
 
-    if (!adapter) {
-        // adapter handler specific code
-        m_executor.submit([this, info, playerId, accessToken, userName, refreshInterval, forceLogin]() {
-            for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->login(
-                    playerId, accessToken, userName, forceLogin, std::chrono::milliseconds(refreshInterval));
-            }
-            setHandlingCompleted(info);
-        });
-        return;
-    }
-    // adapter specific code
-    /*
-    setHandlingCompleted(info);
-    adapter->handleLogin(accessToken, userName, forceLogin, std::chrono::milliseconds(refreshInterval));*/
+    m_executor.submit([this, info, playerId, accessToken, userName, refreshInterval, forceLogin]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            adapterHandler->login(
+                playerId, accessToken, userName, forceLogin, std::chrono::milliseconds(refreshInterval));
+        }
+        setHandlingCompleted(info);
+    });
+    return;
 }
 
 void ExternalMediaPlayer::handleLogout(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-
-    auto adapter = preprocessDirective(info, &payload);
-
-    std::string playerId;
-    if (!jsonUtils::retrieveValue(payload, "playerId", &playerId)) {
+    std::string playerId = preprocessDirective(info, &payload);
+    if (playerId.empty()) {
         AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "missing playerId in Logout directive");
         return;
     }
 
-    if (!adapter) {
-        // adapter handler specific code
-        m_executor.submit([this, info, playerId]() {
-            for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->logout(playerId);
-            }
-            setHandlingCompleted(info);
-        });
-        return;
-    }
-    // adapter specific code
-    /*
-    setHandlingCompleted(info);
-    adapter->handleLogout();*/
+    m_executor.submit([this, info, playerId]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            adapterHandler->logout(playerId);
+        }
+        setHandlingCompleted(info);
+    });
+    return;
 }
 
 void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-
-    auto adapter = preprocessDirective(info, &payload);
-
-    std::string playerId;
-    if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
+    std::string playerId = preprocessDirective(info, &payload);
+    if (playerId.empty()) {
         AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
         sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
         return;
@@ -1156,54 +1019,42 @@ void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, Reques
         }
     }
 
-    if (!adapter) {
-        // adapter handler specific code
-        m_executor.submit([this,
-                           request,
-                           playerId,
-                           playbackContextToken,
-                           index,
-                           offset,
-                           skillToken,
-                           playbackSessionId,
-                           navigation,
-                           preload,
-                           playRequestor]() {
-            for (auto adapterHandler : m_adapterHandlers) {
-                setHaltInitiatorRequestHelper(request);
-                if (adapterHandler->play(
-                        playerId,
-                        playbackContextToken,
-                        index,
-                        std::chrono::milliseconds(offset),
-                        skillToken,
-                        playbackSessionId,
-                        navigation,
-                        preload,
-                        playRequestor)) {
-                    // special case where player has not started playing, but should start on next focus change
-                    m_ignoreExternalPauseCheck = true;
-                    m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
-                }
+    m_executor.submit([this,
+                       request,
+                       playerId,
+                       playbackContextToken,
+                       index,
+                       offset,
+                       skillToken,
+                       playbackSessionId,
+                       navigation,
+                       preload,
+                       playRequestor]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            setHaltInitiatorRequestHelper(request);
+            if (adapterHandler->play(
+                    playerId,
+                    playbackContextToken,
+                    index,
+                    std::chrono::milliseconds(offset),
+                    skillToken,
+                    playbackSessionId,
+                    navigation,
+                    preload,
+                    playRequestor)) {
+                // special case where player has not started playing, but should start on next focus change
+                m_ignoreExternalPauseCheck = true;
+                m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
             }
-        });
-        setHandlingCompleted(info);
-        return;
-    }
-
-    // adapter specific code
-    /*
+        }
+    });
     setHandlingCompleted(info);
-    adapter->handlePlay(playbackContextToken, index, std::chrono::milliseconds(offset), skillToken, playbackSessionId, navigation, preload);*/
 }
 
 void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-
-    auto adapter = preprocessDirective(info, &payload);
-
-    std::string playerId;
-    if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
+    std::string playerId = preprocessDirective(info, &payload);
+    if (playerId.empty()) {
         AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
@@ -1214,29 +1065,19 @@ void ExternalMediaPlayer::handleSeek(std::shared_ptr<DirectiveInfo> info, Reques
         return;
     }
 
-    if (!adapter) {
-        // adapter handler specific code
-        m_executor.submit([this, info, playerId, position]() {
-            for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->seek(playerId, std::chrono::milliseconds(position));
-            }
-            setHandlingCompleted(info);
-        });
-        return;
-    }
-    // adapter specific code
-    /*
-    setHandlingCompleted(info);
-    adapter->handleSeek(std::chrono::milliseconds(position));*/
+    m_executor.submit([this, info, playerId, position]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            adapterHandler->seek(playerId, std::chrono::milliseconds(position));
+        }
+        setHandlingCompleted(info);
+    });
+    return;
 }
 
 void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-
-    auto adapter = preprocessDirective(info, &payload);
-
-    std::string playerId;
-    if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
+    std::string playerId = preprocessDirective(info, &payload);
+    if (playerId.empty()) {
         AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
@@ -1255,70 +1096,52 @@ void ExternalMediaPlayer::handleAdjustSeek(std::shared_ptr<DirectiveInfo> info, 
         return;
     }
 
-    if (!adapter) {
-        // adapter handler specific code
-        m_executor.submit([this, info, playerId, deltaPosition]() {
-            for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->adjustSeek(playerId, std::chrono::milliseconds(deltaPosition));
-            }
-            setHandlingCompleted(info);
-        });
-        return;
-    }
-
-    // adapter specific code
-    /*
-    setHandlingCompleted(info);
-    adapter->handleAdjustSeek(std::chrono::milliseconds(deltaPosition));*/
+    m_executor.submit([this, info, playerId, deltaPosition]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            adapterHandler->adjustSeek(playerId, std::chrono::milliseconds(deltaPosition));
+        }
+        setHandlingCompleted(info);
+    });
+    return;
 }
 
 void ExternalMediaPlayer::handlePlayControl(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
-    auto adapter = preprocessDirective(info, &payload);
 
-    std::string playerId;
-    if (!jsonUtils::retrieveValue(payload, PLAYER_ID, &playerId)) {
+    std::string playerId = preprocessDirective(info, &payload);
+    if (playerId.empty()) {
         AACE_DEBUG(LX(TAG, "directiveHasNoPlayerId"));
     }
 
-    if (!adapter) {
-        // registered adapter handler specific code
-        if (isRegisteredPlayerId(playerId)) {
-            m_executor.submit([this, info, playerId, request]() {
-                for (auto adapterHandler : m_adapterHandlers) {
-                    adapterHandler->playControl(playerId, request);
-                }
-                setHandlingCompleted(info);
-            });
-            return;
-        }
-        // adapter handler specific code
+    if (isRegisteredPlayerId(playerId)) {
         m_executor.submit([this, info, playerId, request]() {
             for (auto adapterHandler : m_adapterHandlers) {
-                // if in focus play control, other-wise use focus change pause mechanism to initiate resume
-                if (m_playerInFocus.compare(playerId) == 0) {
-                    setHaltInitiatorRequestHelper(request);
-                    adapterHandler->playControl(playerId, request);
-                } else if (request == RequestType::RESUME) {
-                    // special case where player has not started playing, but should start on next focus change
-                    m_ignoreExternalPauseCheck = true;
-                    m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
-                    setPlayerInFocus(playerId, true);
-                } else
-                    AACE_WARN(LX(TAG)
-                                  .d("reason", "cannot playControl non-RESUME request for non-in-focus player")
-                                  .d("playerId", playerId)
-                                  .d("RequestType", request));
+                adapterHandler->playControl(playerId, request);
             }
             setHandlingCompleted(info);
         });
         return;
     }
-
-    // adapter specific code
-    /*
-    setHandlingCompleted(info);
-    adapter->handlePlayControl(request);*/
+    m_executor.submit([this, info, playerId, request]() {
+        for (auto adapterHandler : m_adapterHandlers) {
+            // if in focus play control, other-wise use focus change pause mechanism to initiate resume
+            if (m_playerInFocus.compare(playerId) == 0) {
+                setHaltInitiatorRequestHelper(request);
+                adapterHandler->playControl(playerId, request);
+            } else if (request == RequestType::RESUME) {
+                // special case where player has not started playing, but should start on next focus change
+                m_ignoreExternalPauseCheck = true;
+                m_haltInitiator = HaltInitiator::FOCUS_CHANGE_PAUSE;
+                setPlayerInFocus(playerId, true);
+            } else
+                AACE_WARN(LX(TAG)
+                              .d("reason", "cannot playControl non-RESUME request for non-in-focus player")
+                              .d("playerId", playerId)
+                              .d("RequestType", request));
+        }
+        setHandlingCompleted(info);
+    });
+    return;
 }
 
 void ExternalMediaPlayer::cancelDirective(std::shared_ptr<DirectiveInfo> info) {
@@ -1332,60 +1155,54 @@ DirectiveHandlerConfiguration ExternalMediaPlayer::getConfiguration() const {
     return g_configuration;
 }
 
-// begin adapter handler specific code
 void ExternalMediaPlayer::setCurrentActivity(const alexaClientSDK::avsCommon::avs::PlayerActivity currentActivity) {
-    AACE_VERBOSE(LX(TAG).d("from", m_currentActivity).d("to", currentActivity));
     {
         std::lock_guard<std::mutex> lock(m_currentActivityMutex);
+        AACE_VERBOSE(LX(TAG).d("from", m_currentActivity).d("to", currentActivity));
         m_currentActivity = currentActivity;
     }
     m_currentActivityConditionVariable.notify_all();
 }
 
 void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus, bool focusAcquire) {
-    AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus).d("focusAcquire", focusAcquire ? "true" : "false"));
+    m_executor.submit([this, playerInFocus, focusAcquire] { executeSetPlayerInFocus(playerInFocus, focusAcquire); });
+}
+
+void ExternalMediaPlayer::executeSetPlayerInFocus(const std::string& playerInFocus, bool acquireFocus) {
+    AACE_VERBOSE(LX(TAG).d("playerId", playerInFocus).d("acquireFocus", acquireFocus ? "true" : "false"));
 
     // registered EMP adapter will not use this focus manger
     auto registered = isRegisteredPlayerId(playerInFocus);
 
-    //playerInFocus should different than m_playerInFocus. Extra Logic is required because
-    //the default value of a m_playerInFocus is "" when variable is created. Empty playerInFocus
-    //should not be ignored since playerInFocus and m_playerInFocus both are empty
-    if (((playerInFocus.empty() && m_playerInFocus.empty()) || playerInFocus.compare(m_playerInFocus) != 0) &&
-        focusAcquire) {
-        {
-            std::lock_guard<std::mutex> lock(m_inFocusAdapterMutex);
-            m_playerInFocus = playerInFocus;
-        }
-        m_playerInFocusConditionVariable.notify_all();
+    std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
+    if (m_playerInFocus == playerInFocus) {
+        AACE_WARN(LX(TAG).m("Player is already in focus").d("playerId", m_playerInFocus));
+    }
+    m_playerInFocus = playerInFocus;
 
+    if (acquireFocus) {
         m_adapterHandlerInFocus = nullptr;
-
-        // Acquire the channel and have this ExternalMediaPlayer manage the focus state.
-        if (m_focus == FocusState::NONE && m_focusAcquireInProgress != true && !registered) {
-            // m_currentActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
-            // m_haltInitiator = HaltInitiator::NONE;
+        if (registered) return;
+        if (m_focus == FocusState::NONE && m_focusAcquireInProgress == false) {
             m_focusAcquireInProgress = true;
             m_focusManager->acquireChannel(CHANNEL_NAME, shared_from_this(), FOCUS_MANAGER_ACTIVITY_ID);
         }
-    } else if (playerInFocus.compare(m_playerInFocus) == 0 && !focusAcquire && !registered) {
-        // We only release the channel when the player is the player in focus.
-        m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this());
-        m_haltInitiator = HaltInitiator::NONE;
-        m_currentActivity = alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE;
-    } else if (focusAcquire)
-        AACE_VERBOSE(LX(TAG, "no-op").d("reason", "playerId is already player in focus"));
-    else
-        AACE_VERBOSE(LX(TAG, "channel not released on unset focus").d("reason", "playerId is not player in focus"));
+    } else {
+        if (registered) return;
+        if (m_focus != FocusState::NONE) {
+            m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this());
+            m_haltInitiator = HaltInitiator::NONE;
+            setCurrentActivity(alexaClientSDK::avsCommon::avs::PlayerActivity::IDLE);
+        }
+    }
 }
 
 std::string ExternalMediaPlayer::getPlayerInFocus() {
     AACE_VERBOSE(LX(TAG).d("playerInFocus", m_playerInFocus));
+    std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
     return m_playerInFocus;
 }
-// end adapter handler specific code
 
-// begin Auto SDK specific change
 void ExternalMediaPlayer::onPlayerActivityChanged(
     alexaClientSDK::avsCommon::avs::PlayerActivity state,
     const alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface::Context& context) {
@@ -1409,7 +1226,6 @@ void ExternalMediaPlayer::onPlayerActivityChanged(
             break;
     }
 }
-// end Auto SDK specific change
 
 void ExternalMediaPlayer::setObserver(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface> observer) {
@@ -1421,18 +1237,15 @@ void ExternalMediaPlayer::setObserver(
 std::chrono::milliseconds ExternalMediaPlayer::getAudioItemOffset() {
     AACE_VERBOSE(LX(TAG));
     std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
-    if (!m_adapterInFocus) {
-        if (!m_adapterHandlerInFocus) {
-            AACE_ERROR(LX(TAG, "getAudioItemOffsetFailed").d("reason", "NoActiveAdapter").d("player", m_playerInFocus));
-            return std::chrono::milliseconds::zero();
-        }
-        return m_adapterHandlerInFocus->getOffset(m_playerInFocus);
+    if (!m_adapterHandlerInFocus) {
+        AACE_ERROR(LX(TAG, "getAudioItemOffsetFailed").d("reason", "NoActiveAdapter").d("player", m_playerInFocus));
+        return std::chrono::milliseconds::zero();
     }
-    return m_adapterInFocus->getOffset();
+    return m_adapterHandlerInFocus->getOffset(m_playerInFocus);
 }
 
 void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
-    AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus));
+    AACE_VERBOSE(LX(TAG).d("playerId", playerInFocus));
     // registered EMP adapter will not use this focus manger
     auto registered = isRegisteredPlayerId(playerInFocus);
     if (!registered) {
@@ -1443,14 +1256,8 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
             return;
         }
     }
-    AACE_VERBOSE(LX(TAG).d("playerInFocus", playerInFocus));
-    std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterInterface> adapterInFocus = nullptr;
-    std::shared_ptr<ExternalMediaAdapterHandlerInterface> adapterHandlerInFocus = nullptr;
-    if (!registered) {
-        adapterInFocus = getAdapterByPlayerId(playerInFocus);
-    } else {
-        adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus);
-    }
+    std::shared_ptr<ExternalMediaAdapterHandlerInterface> adapterHandlerInFocus =
+        getAdapterHandlerByPlayerId(playerInFocus);
 
     {
         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
@@ -1461,7 +1268,6 @@ void ExternalMediaPlayer::setPlayerInFocus(const std::string& playerInFocus) {
         m_playerInFocus = playerInFocus;
         m_playbackRouter->setHandler(shared_from_this());
         m_adapterHandlerInFocus = adapterHandlerInFocus;
-        m_adapterInFocus = adapterInFocus;
     }
 }
 
@@ -1471,6 +1277,7 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
         std::lock_guard<std::mutex> lock{m_inFocusAdapterMutex};
         playerInFocus = m_playerInFocus;
     }
+    AACE_INFO(LX(TAG).d("button", button).d("playerInFocus", playerInFocus));
 
     auto buttonIt = g_buttonToRequestType.find(button);
     if (g_buttonToRequestType.end() == buttonIt) {
@@ -1480,25 +1287,38 @@ void ExternalMediaPlayer::onButtonPressed(PlaybackButton button) {
 
     auto requestType = buttonIt->second;
 
-    if (isRegisteredPlayerId(playerInFocus)) {
-        if (requestType == RequestType::PAUSE || requestType == RequestType::RESUME) {
-            requestType = RequestType::PAUSE_RESUME_TOGGLE;  // registered adapter handler expects this
-        }
-        if (auto adapterHandlerInFocus = getAdapterHandlerByPlayerId(playerInFocus)) {
-            adapterHandlerInFocus->playControl(playerInFocus, requestType);
-        } else {
-            AACE_ERROR(LX("onButtonPressedFailed")
-                           .d("reason", "adapterHandlerInFocusNotFound")
-                           .d("playerInFocus", playerInFocus));
-        }
-    } else {
-        setHaltInitiatorRequestHelper(requestType);
-        m_executor.submit([this, playerInFocus, requestType]() {
-            for (auto adapterHandler : m_adapterHandlers) {
-                adapterHandler->playControl(playerInFocus, requestType);
-            }
-        });
+    // Route all button presses to the registered player, if one exists, regardless of whether it is the currently
+    // focused player. Only registered players manage their play queue through the SDK and share the Alexa UI (i.e.,
+    // other player IDs are separate apps with their own play queue and own UI), and hence only registered players
+    // are expected to be targeted through the PlaybackRouter component (i.e., other player IDs manage their own button
+    // presses without SDK involvement). We therefore safely assume the PlaybackRouter invocation happened due to the
+    // user interacting with the UI of the Alexa media app used by only AudioPlayer and EMP registered players.
+    // The button press would have routed to AudioPlayer capability if AudioPlayer had been playing more
+    // recently than the registered EMP player.
+
+    if (m_externalMediaAdapterRegistration == nullptr) {
+        AACE_WARN(LX(TAG).m("ignoring button press; no registered player ID for routing found"));
+        return;
     }
+    auto registeredPlayerId = m_externalMediaAdapterRegistration->getPlayerId();
+    if (playerInFocus.compare(registeredPlayerId) != 0) {
+        AACE_INFO(LX(TAG)
+                      .m("registered player is not the player in focus")
+                      .d("playerInFocus", playerInFocus)
+                      .d("registeredPlayer", registeredPlayerId));
+    }
+    auto registeredHandler = getAdapterHandlerByPlayerId(registeredPlayerId);
+    if (registeredHandler == nullptr) {
+        AACE_ERROR(LX("onButtonPressedFailed")
+                       .d("reason", "no adapter handler for registered player found")
+                       .d("registered playerId", registeredPlayerId));
+        return;
+    }
+
+    if (requestType == RequestType::PAUSE || requestType == RequestType::RESUME) {
+        requestType = RequestType::PAUSE_RESUME_TOGGLE;  // registered adapter handler expects this
+    }
+    registeredHandler->playControl(registeredPlayerId, requestType);
 }
 
 void ExternalMediaPlayer::onTogglePressed(PlaybackToggle toggle, bool action) {
@@ -1547,11 +1367,9 @@ void ExternalMediaPlayer::doShutdown() {
 
     m_executor.shutdown();
 
-    // adapter handler specific code
     m_adapterHandlers.clear();
     m_externalMediaAdapterRegistration.reset();
     m_focusManager.reset();
-    m_adapterInFocus.reset();
 
     // Reset the EMP from being a state provider. If not there would be calls from the adapter to provide context
     // which will try to add tasks to the executor thread.
@@ -1559,17 +1377,8 @@ void ExternalMediaPlayer::doShutdown() {
     m_contextManager->setStateProvider(PLAYBACK_STATE, nullptr);
 
     {
-        std::unique_lock<std::mutex> lock{m_adaptersMutex};
-        auto adaptersCopy = m_adapters;
-        m_adapters.clear();
-        lock.unlock();
-
-        for (const auto& adapter : adaptersCopy) {
-            if (!adapter.second) {
-                continue;
-            }
-            adapter.second->shutdown();
-        }
+        std::unique_lock<std::mutex> lock{m_inFocusAdapterMutex};
+        m_adapterHandlerInFocus.reset();
     }
 
     m_authorizedSender.reset();
@@ -1590,7 +1399,6 @@ void ExternalMediaPlayer::removeDirective(std::shared_ptr<DirectiveInfo> info) {
     }
 }
 
-// adapter handler specific code
 void ExternalMediaPlayer::setHaltInitiatorRequestHelper(RequestType request) {
     switch (request) {
         case RequestType::PAUSE:
@@ -1611,7 +1419,6 @@ void ExternalMediaPlayer::setHaltInitiatorRequestHelper(RequestType request) {
             break;
     }
 }
-// #endif
 
 void ExternalMediaPlayer::setHandlingCompleted(std::shared_ptr<DirectiveInfo> info) {
     if (info && info->result) {
@@ -1643,7 +1450,6 @@ void ExternalMediaPlayer::executeProvideState(
     AACE_DEBUG(LX(TAG).d("sendToken", sendToken).d("stateRequestToken", stateRequestToken));
     std::string state;
 
-    // adapter handler specific code
     std::vector<aace::engine::alexa::AdapterState> adapterStates;
     for (auto adapterHandler : m_adapterHandlers) {
         auto handlerAdapterStates = adapterHandler->getAdapterStates();
@@ -1670,7 +1476,6 @@ void ExternalMediaPlayer::executeProvideState(
     }
 }
 
-// adapter handler specific code
 std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::alexa::AdapterState> adapterStates) {
     rapidjson::Document state(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& stateAlloc = state.GetAllocator();
@@ -1692,19 +1497,6 @@ std::string ExternalMediaPlayer::provideSessionState(std::vector<aace::engine::a
         authorizedAdaptersCopy = m_authorizedAdapters;
     }
 
-    for (const auto& idToLocalId : authorizedAdaptersCopy) {
-        const auto& adapter = getAdapterByLocalPlayerId(idToLocalId.second);
-        if (!adapter) {
-            continue;
-        }
-        auto state = adapter->getState().sessionState;
-        rapidjson::Value playerJson = buildSessionState(state, stateAlloc);
-        players.PushBack(playerJson, stateAlloc);
-        ObservableSessionProperties update{state.loggedIn, state.userName};
-        notifyObservers(state.playerId, &update);
-    }
-
-    // adapter handler specific code
     for (auto adapterState : adapterStates) {
         if (!adapterState.sessionState.playerId.empty()) {
             rapidjson::Value playerJson = buildSessionState(adapterState.sessionState, stateAlloc);
@@ -1736,20 +1528,6 @@ std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::
     {
         std::lock_guard<std::mutex> lock(m_authorizedMutex);
         authorizedAdaptersCopy = m_authorizedAdapters;
-    }
-
-    for (const auto& idToLocalId : authorizedAdaptersCopy) {
-        const auto& adapter = getAdapterByLocalPlayerId(idToLocalId.second);
-        if (!adapter) {
-            continue;
-        }
-        auto playbackState = adapter->getState().playbackState;
-        auto sessionState = adapter->getState().sessionState;
-        rapidjson::Value playerJson = buildPlaybackState(sessionState.playerId, playbackState, stateAlloc);
-        players.PushBack(playerJson, stateAlloc);
-        ObservablePlaybackStateProperties update{
-            playbackState.state, playbackState.trackName, playbackState.playRequestor};
-        notifyObservers(sessionState.playerId, &update);
     }
 
     notifyRenderPlayerInfoCardsObservers();
@@ -1787,87 +1565,6 @@ std::string ExternalMediaPlayer::providePlaybackState(std::vector<aace::engine::
     }
 
     return buffer.GetString();
-}
-
-void ExternalMediaPlayer::createAdapters(
-    const AdapterMediaPlayerMap& mediaPlayers,
-    const AdapterSpeakerMap& speakers,
-    const AdapterCreationMap& adapterCreationMap,
-    std::shared_ptr<MessageSenderInterface> messageSender,
-    std::shared_ptr<FocusManagerInterface> focusManager,
-    std::shared_ptr<ContextManagerInterface> contextManager) {
-    AACE_DEBUG(LX(TAG));
-
-    for (auto& entry : adapterCreationMap) {
-        auto mediaPlayerIt = mediaPlayers.find(entry.first);
-        auto speakerIt = speakers.find(entry.first);
-
-        if (mediaPlayerIt == mediaPlayers.end()) {
-            AACE_ERROR(LX(TAG, "adapterCreationFailed").d(PLAYER_ID, entry.first).d("reason", "nullMediaPlayer"));
-            continue;
-        }
-
-        if (speakerIt == speakers.end()) {
-            AACE_ERROR(LX(TAG, "adapterCreationFailed").d(PLAYER_ID, entry.first).d("reason", "nullSpeaker"));
-            continue;
-        }
-
-        auto adapter = entry.second(
-            (*mediaPlayerIt).second,
-            (*speakerIt).second,
-            m_speakerManager,
-            messageSender,
-            focusManager,
-            contextManager,
-            shared_from_this());
-        if (adapter) {
-            std::lock_guard<std::mutex> lock{m_adaptersMutex};
-            m_adapters[entry.first] = adapter;
-        } else {
-            AACE_ERROR(LX(TAG, "adapterCreationFailed").d(PLAYER_ID, entry.first));
-        }
-    }
-}
-
-void ExternalMediaPlayer::sendReportDiscoveredPlayersEvent() {
-    rapidjson::Document payload(rapidjson::kObjectType);
-    payload.AddMember(AGENT_KEY, std::string(m_agentString), payload.GetAllocator());
-
-    rapidjson::Value players(rapidjson::kArrayType);
-
-    for (const auto& idToAdapter : m_adapters) {
-        rapidjson::Value player(rapidjson::kObjectType);
-        std::shared_ptr<ExternalMediaAdapterInterface> adapter = idToAdapter.second;
-
-        player.AddMember(LOCAL_PLAYER_ID, adapter->getState().sessionState.localPlayerId, payload.GetAllocator());
-
-        player.AddMember(SPI_VERSION_KEY, adapter->getState().sessionState.spiVersion, payload.GetAllocator());
-
-        // We do not currently support cloud based app validation.
-        player.AddMember(VALIDATION_METHOD, "NONE", payload.GetAllocator());
-        rapidjson::Value validationData(rapidjson::kArrayType);
-        player.AddMember(VALIDATION_DATA, validationData, payload.GetAllocator());
-
-        players.PushBack(player, payload.GetAllocator());
-    }
-
-    payload.AddMember(PLAYERS, players, payload.GetAllocator());
-
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-    if (!payload.Accept(writer)) {
-        AACE_ERROR(LX(TAG, "sendReportDiscoveredPlayersEventFailed").d("reason", "writerRefusedJsonObject"));
-        return;
-    }
-
-    auto event = buildJsonEventString(REPORT_DISCOVERED_PLAYERS, "", buffer.GetString());
-    auto request = std::make_shared<MessageRequest>(event.second);
-
-    /*
-     * CertifiedSender has a limit on the number of events it can store. This limit could be reached if
-     * ExternalMediaPlayer restarts excessively without a chance for the CertifiedSender to drain its internal queue.
-     */
-    m_certifiedMessageSender->sendJSONMessage(request->getJsonContent());
 }
 
 std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>> ExternalMediaPlayer::

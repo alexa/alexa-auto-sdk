@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `Address Book` module enables your Alexa Auto SDK client application to augment the communication and navigation capabilities of Alexa with the user's contacts and favorite addresses. By using this module in your application, the user can upload their phone contacts or navigation favorites to Alexa. 
+The `Address Book` module enables your Alexa Auto SDK client application to augment the communication and navigation capabilities of Alexa with the user's contacts and favorite addresses. By using this module in your application, the user can upload their phone contacts or navigation favorites to Alexa.
 
 This module works alongside the `Phone Control` module for calling contacts on a paired phone (e.g., "Alexa, call Mom") and the `Navigation` module for requesting directions to favorite destinations (e.g., "Alexa, take me to work"). Additionally, these features are supported offline if your application integrates with the modules of the Local Voice Control (LVC) extension.
 
@@ -26,7 +26,7 @@ Since uploading an address book might consume significant data, your `Address Bo
 
 If your integration disables the automatic address book deletion at Engine start, an address book might not need to be uploaded to Alexa at every start. Skip reuploading address books when all of the following conditions are true:
 
-* The last successful upload was less than 24 hours ago. Note that Alexa periodically removes uploaded address books to comply with the Alexa data retention policy, so Amazon recommends reuploading the address books after 24 hours.
+* The last successful upload was less than 30 days ago. Note that Alexa periodically removes uploaded address books to comply with the Alexa data retention policy, so Amazon recommends reuploading the address books after 30 days.
 * The user connects the same phone used for the last successful upload.
 * The phone contacts and navigation favorites on the phone are the same as the address book contents of the last successful upload.
 
@@ -79,27 +79,6 @@ To use the `Address Book` module Engine configuration with AACS, use *"aacs.addr
     }
 }
 ```
-
-<details markdown="1"><summary>Click to expand or collapse details for Android integration without AACS</summary>
-<br/>
-
-AACS is the recommended way to integrate Auto SDK for Android. However, if your integration does not use AACS, you can use the Java factory method [`com.amazon.aace.addressbook.config.createAddressBookConfig`](https://alexa.github.io/alexa-auto-sdk/docs/android/classcom_1_1amazon_1_1aace_1_1addressbook_1_1config_1_1_address_book_configuration.html) to programmatically construct the `EngineConfiguration` in the proper format.
-
-```java
-import com.amazon.aace.addressBook.config.AddressBookConfiguration;
-
-// Configure the Engine
-EngineConfiguration addressBookConfiguration = AddressBookConfiguration.createAddressBookConfig(false);
-
-mEngine.configure(new EngineConfiguration[]{
-    // other config objects,
-    addressBookConfiguration,
-    // ...
-});
-
-```
-
-</details>
 
 ## Using the Address Book Module AASB Messages
 
@@ -196,7 +175,7 @@ class MyAddressBookHandler {
 
         // ...Handle the removal result for the message...
     }
-    
+
     // To upload contacts to Alexa, publish an AddAddressBook message to the Engine
     bool MyAddressBookHandler::uploadContacts(
         const std::string& id,

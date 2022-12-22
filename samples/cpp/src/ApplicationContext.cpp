@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -40,9 +40,12 @@ namespace sampleApp {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ApplicationContext::ApplicationContext(const std::string& path) {
+    m_applicationPath = path;
     char buffer[PATH_MAX];
-    realpath(path.c_str(), buffer);
-    m_applicationPath = std::string(buffer);
+    if (realpath(path.c_str(), buffer)) {
+        m_applicationPath = buffer;
+    }
+
     auto pos = m_applicationPath.find_last_of('/');
     if (pos != std::string::npos) {
         // dir path does not include trailing slash
@@ -105,11 +108,6 @@ std::string ApplicationContext::getApplicationPath() {
 std::string ApplicationContext::getAudioInputDevice() {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_audioInputDevice;
-}
-
-std::string ApplicationContext::getBrowserCommand() {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    return m_browserCommand;
 }
 
 std::string ApplicationContext::getBuildIdentifier() {
@@ -408,11 +406,6 @@ void ApplicationContext::setAuthorizationInProgress(const std::string& service) 
 void ApplicationContext::setAuthProviderAvailability(bool available) {
     std::lock_guard<std::mutex> lock(m_mutex);
     m_authProviderAvailable = available;
-}
-
-void ApplicationContext::setBrowserCommand(const std::string& browserCommand) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_browserCommand = browserCommand;
 }
 
 void ApplicationContext::setDisableAutoAuthorizationCommand(bool disable) {

@@ -33,63 +33,6 @@ supports streaming audio data to and from an external application. It builds int
 9. The core of the **HMI application** that holds the business logic need not change with
 `AlexaAutoClientService`. However, you must modify the application so that it can interface with the APIs defined by AACS.
 
-## Obtaining the AACS AAR
-AACS is packaged as an Android library (AAR). You can obtain the AACS AAR in one of two ways:
-
-* To obtain the pre-built AACS AAR and the other dependency AARs which are required for using AACS, contact your Amazon Solutions Architect (SA) or Partner Manager for more information.
-
-* To build the AACS AAR from source code, following the steps below.
-
-    1. Enter the following command to change the directory:
-        ```
-        cd ${AAC_SDK_HOME}/aacs/android/service
-        ```  
-
-    2. Enter the following command to start the local build.
-        ```
-          ./gradlew assembleLocalRelease
-        ```
-    
-          This command builds AACS core service, as well as all the other needed dependencies (such as Auto SDK) required for AACS to function. It also generates AAR files that are used for communicating with AACS from your application.
-
-          To install all the generated AARs to your application, add the `installDeps` task after the build command. Specify the path you want the artifacts to be installed to by using the `-PinstallPath` option. If `-PinstallPath` is not specified, the artifacts will be copied to `alexa-auto-sdk/aacs/android/service/deploy` by default.
-          
-          ```
-              ./gradlew assembleLocalRelease installDeps -PinstallPath=<path/to/your/application/directory>
-          ```
-
-## Using AACS with Your Application
-This section provides information about how AACS works with your application.
-
-To build your application with AACS, you can either include AACS and the other dependencies as local sub-projects, or you can build them as AARs and copy to the libs folder of your application.
-
-1. Using AACS as a local module
-
-    Include AACS and the other dependency libraries as sub-projects in the `settings.gradle` file of your project.
-    In the `build.gradle` file of your application, add the following `implementation` statements:
-    ~~~
-      implementation project(':aacs')
-      implementation project(':aacs-extra')
-      implementation project(':aacs-maccandroid')
-      implementation project(':aacsconstants')
-      implementation project(':aacsipc')
-      implementation project(':aacscommonutils')
-      implementation project(':alexa-auto-tts')
-      
-      // replace the <path/to/Auto/SDK/AARs> placeholder with your path
-      implementation fileTree(include: ['*.aar'], dir: <path/to/Auto/SDK/AARs>)
-    ~~~
-    See the `${AUTO_SDK_HOME}/aacs/android/sample-app/settings.gradle` and `${AUTO_SDK_HOME}/aacs/android/sample-app/alexa-auto-app/build.gradle` files of the AACS Sample App for more information.
-
-2. Using AACS as a local binary
-
-    Include the AARs in the libs folder of your application. See [Obtaining the AACS AAR](#obtaining-the-aacs-aar) for instructions of how to obtain the AACS AARs.
-    
-    Add the following `implementation` statement to the `build.gradle` file of your application:
-    ~~~
-        implementation fileTree(dir: 'libs', include: ['*.aar'])
-    ~~~
-
 ### AACS as Foreground Service or System Service
 AACS runs as a started service on Android. The [Initialization](#initialization) section describes how it is started; this section describes what you do to run AACS as a foreground service or a system service. 
 
@@ -812,11 +755,3 @@ String payload = intent.getStringExtra(AACSConstants.PAYLOAD);
 You can use AACS instrumentation to log AASB messages for debugging purposes. For more information about how to use instrumentation, see the [AACS Instrumentation README](./service/core-service/src/debug/java/com/amazon/alexaautoclientservice/README.md).
 
 >**Note:** You can use instrumentation only if you use the debug option when building the Auto SDK with AACS.
-
-## Including App Components with AACS AAR in your application
-The Auto SDK provides packages (also called "app components") in the [`$AAC_SDK_HOME/aacs/android/app-components`](./app-components) directory. App components could be included in your application along with AACS AAR to speed up the Alexa integration.
-
->**Note:** Some app components implement the handling of AASB messages for certain topics, allowing your applications to interface with AACS by using standard Android APIs. If you include such app components in your application with AACS AAR, your application does not need to handle the AASB messages for those particular AASB topics.
-
-## AACS Sample App
-The Auto SDK includes an Android-based application that demonstrates how an application uses AACS. For more information about the AACS Sample App, see the [AACS Sample App README](sample-app/README.md).

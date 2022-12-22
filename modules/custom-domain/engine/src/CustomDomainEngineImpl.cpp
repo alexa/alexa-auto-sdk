@@ -58,7 +58,8 @@ bool CustomDomainEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    const std::string& customInterfaceMetadata) {
+    const std::string& customInterfaceMetadata,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     AACE_INFO(LX(TAG));
     try {
         ThrowIf(customInterfaceMetadata.empty(), "emptyCustomInterfaceMetadata");
@@ -95,7 +96,7 @@ bool CustomDomainEngineImpl::initialize(
                 LX(TAG).m("Creating Custom Domain capability agent").d("interfaceName", name).d("version", version));
 
             auto capabilityAgent = CustomDomainCapabilityAgent::create(
-                name, version, states, shared_from_this(), exceptionSender, contextManager, messageSender);
+                name, version, states, shared_from_this(), exceptionSender, contextManager, messageSender, agentManager);
             ThrowIfNull(capabilityAgent, "couldNotCreateCapabilityAgent");
 
             // Register capability with the default endpoint
@@ -116,7 +117,8 @@ bool CustomDomainEngineImpl::initialize(
 std::shared_ptr<CustomDomainEngineImpl> CustomDomainEngineImpl::create(
     std::shared_ptr<aace::customDomain::CustomDomain> customDomainPlatformInterface,
     std::shared_ptr<aace::engine::core::EngineContext> engineContext,
-    const std::string& customInterfaceMetadata) {
+    const std::string& customInterfaceMetadata,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     AACE_INFO(LX(TAG));
 
     try {
@@ -144,7 +146,7 @@ std::shared_ptr<CustomDomainEngineImpl> CustomDomainEngineImpl::create(
 
         ThrowIfNot(
             customDomainEngineImpl->initialize(
-                defaultCapabilitiesRegistrar, exceptionSender, contextManager, messageSender, customInterfaceMetadata),
+                defaultCapabilitiesRegistrar, exceptionSender, contextManager, messageSender, customInterfaceMetadata, agentManager),
             "initializeCustomDomainEngineImplFailed");
 
         // set the platform engine interface reference

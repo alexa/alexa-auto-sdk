@@ -184,7 +184,7 @@ bool AASBExternalMediaAdapter::initialize(
 
                         std::vector<std::string> validationDataVector;
                         for (auto data : player.validationData) {
-                            validationDataVector.push_back(data.toString());
+                            validationDataVector.push_back(data.certificate);
                         }
                         discoveredPlayer.validationData = validationDataVector;
 
@@ -493,68 +493,64 @@ bool AASBExternalMediaAdapter::getState(
     try {
         AACE_VERBOSE(LX(TAG));
 
-        auto m_messageBroker_lock = m_messageBroker.lock();
-        ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
+        auto messageBroker = m_messageBroker.lock();
+        ThrowIfNull(messageBroker, "invalidMessageBrokerReference");
         aasb::message::alexa::externalMediaAdapter::GetStateMessage message;
 
         message.payload.localPlayerId = localPlayerId;
 
-        // construct AASB ExternalMediaAdapterState
-        aasb::message::alexa::externalMediaAdapter::ExternalMediaAdapterState externalMediaAdapterState;
+        auto result = messageBroker->publish(message.toString()).get();
+        ThrowIfNot(result.valid(), "waitForReplyTimeout");
+
+        aasb::message::alexa::externalMediaAdapter::GetStateMessageReply::Payload payload =
+            nlohmann::json::parse(result.payload());
 
         // AASB SessionState
-        aasb::message::alexa::externalMediaAdapter::SessionStateExternal sessionState;
-        sessionState.endpointId = state.sessionState.endpointId;
-        sessionState.loggedIn = state.sessionState.loggedIn;
-        sessionState.isGuest = state.sessionState.isGuest;
-        sessionState.launched = state.sessionState.launched;
-        sessionState.active = state.sessionState.active;
-        sessionState.accessToken = state.sessionState.accessToken;
-        sessionState.tokenRefreshInterval = state.sessionState.tokenRefreshInterval.count();
-        sessionState.playerCookie = state.sessionState.playerCookie;
-        sessionState.spiVersion = state.sessionState.spiVersion;
-        externalMediaAdapterState.sessionState = sessionState;
+        auto& sessionState = payload.state.sessionState;
+        state.sessionState.endpointId = sessionState.endpointId;
+        state.sessionState.loggedIn = sessionState.loggedIn;
+        state.sessionState.isGuest = sessionState.isGuest;
+        state.sessionState.launched = sessionState.launched;
+        state.sessionState.active = sessionState.active;
+        state.sessionState.accessToken = sessionState.accessToken;
+        state.sessionState.tokenRefreshInterval = std::chrono::milliseconds{sessionState.tokenRefreshInterval};
+        state.sessionState.playerCookie = sessionState.playerCookie;
+        state.sessionState.spiVersion = sessionState.spiVersion;
 
         // AASB PlaybackState
-        aasb::message::alexa::externalMediaAdapter::PlaybackStateExternal playbackState;
-        playbackState.state = state.playbackState.state;
+        auto& playbackState = payload.state.playbackState;
+        state.playbackState.state = playbackState.state;
 
-        std::vector<aasb::message::alexa::externalMediaAdapter::SupportedPlaybackOperation> supportedOperations;
-        for (auto operation : state.playbackState.supportedOperations) {
+        std::vector<ExternalMediaAdapter::SupportedPlaybackOperation> supportedOperations;
+        for (auto operation : playbackState.supportedOperations) {
             supportedOperations.push_back(
-                static_cast<aasb::message::alexa::externalMediaAdapter::SupportedPlaybackOperation>(operation));
+                static_cast<ExternalMediaAdapter::SupportedPlaybackOperation>(operation));
         }
-        playbackState.supportedOperations = supportedOperations;
+        state.playbackState.supportedOperations = supportedOperations;
 
-        playbackState.trackOffset = state.playbackState.trackOffset.count();
-        playbackState.shuffleEnabled = state.playbackState.shuffleEnabled;
-        playbackState.repeatEnabled = state.playbackState.repeatEnabled;
-        playbackState.favorites =
-            static_cast<aasb::message::alexa::externalMediaAdapter::Favorites>(state.playbackState.favorites);
-        playbackState.type = state.playbackState.type;
-        playbackState.playbackSource = state.playbackState.playbackSource;
-        playbackState.playbackSourceId = state.playbackState.playbackSourceId;
-        playbackState.trackName = state.playbackState.trackName;
-        playbackState.trackId = state.playbackState.trackId;
-        playbackState.trackNumber = state.playbackState.trackNumber;
-        playbackState.artistName = state.playbackState.artistName;
-        playbackState.artistId = state.playbackState.artistId;
-        playbackState.albumName = state.playbackState.albumName;
-        playbackState.albumId = state.playbackState.albumId;
-        playbackState.tinyURL = state.playbackState.tinyURL;
-        playbackState.smallURL = state.playbackState.smallURL;
-        playbackState.mediumURL = state.playbackState.mediumURL;
-        playbackState.largeURL = state.playbackState.largeURL;
-        playbackState.coverId = state.playbackState.coverId;
-        playbackState.mediaProvider = state.playbackState.mediaProvider;
-        playbackState.mediaType =
-            static_cast<aasb::message::alexa::externalMediaAdapter::MediaType>(state.playbackState.mediaType);
-        playbackState.duration = state.playbackState.duration.count();
-        externalMediaAdapterState.playbackState = playbackState;
+        state.playbackState.trackOffset = std::chrono::milliseconds{playbackState.trackOffset};
+        state.playbackState.shuffleEnabled = playbackState.shuffleEnabled;
+        state.playbackState.repeatEnabled = playbackState.repeatEnabled;
+        state.playbackState.favorites = static_cast<ExternalMediaAdapter::Favorites>(playbackState.favorites);
+        state.playbackState.type = playbackState.type;
+        state.playbackState.playbackSource = playbackState.playbackSource;
+        state.playbackState.playbackSourceId = playbackState.playbackSourceId;
+        state.playbackState.trackName = playbackState.trackName;
+        state.playbackState.trackId = playbackState.trackId;
+        state.playbackState.trackNumber = playbackState.trackNumber;
+        state.playbackState.artistName = playbackState.artistName;
+        state.playbackState.artistId = playbackState.artistId;
+        state.playbackState.albumName = playbackState.albumName;
+        state.playbackState.albumId = playbackState.albumId;
+        state.playbackState.tinyURL = playbackState.tinyURL;
+        state.playbackState.smallURL = playbackState.smallURL;
+        state.playbackState.mediumURL = playbackState.mediumURL;
+        state.playbackState.largeURL = playbackState.largeURL;
+        state.playbackState.coverId = playbackState.coverId;
+        state.playbackState.mediaProvider = playbackState.mediaProvider;
+        state.playbackState.mediaType = static_cast<ExternalMediaAdapter::MediaType>(playbackState.mediaType);
+        state.playbackState.duration = std::chrono::milliseconds{playbackState.duration};
 
-        message.payload.state = externalMediaAdapterState;
-
-        m_messageBroker_lock->publish(message.toString()).send();
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));

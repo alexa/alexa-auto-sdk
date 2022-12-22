@@ -1,17 +1,17 @@
 project.logger.lifecycle("Building AACS library")
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+apply plugin: "org.jetbrains.kotlin.android"
+apply plugin: "org.jetbrains.kotlin.kapt"
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        targetSdkVersion 30
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -71,7 +71,7 @@ dependencies {
         compileOnly project(':aacsipc')
         compileOnly project(':aacscommonutils')
         compileOnly project(':aacs-annotation-api')
-        annotationProcessor project(':aacs-annotation-processor')
+        kapt project(':aacs-annotation-processor')
     } else if (tasks.any { it.toLowerCase().contains("remote") }) {
         remoteCompileOnly "com.amazon.alexa.aace:core:${remoteLibVersion}@aar"
         remoteCompileOnly "com.amazon.alexa.aace:alexa:${remoteLibVersion}@aar"
@@ -131,10 +131,11 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.3'
 }
 
-ext.auto_sdk_home = new File(gradle.ext.aacsRoot, "../..").getCanonicalPath()
-ext.conan_config_home = new File(auto_sdk_home, "conan/config").getCanonicalPath()
-ext.conan_home = new File(auto_sdk_home, "builder/.builder")
+ext.auto_sdk_home = file("$gradle.ext.aacsRootDir/../..")
+ext.conan_config_home = file("${auto_sdk_home}/conan/config")
+ext.conan_home = file("${auto_sdk_home}/builder/.builder")
 ext.env_params = []
+
 if (project.hasProperty("conanHome")) {
     conan_home = project.getProperties().get("conanHome")
     if (conan_home.contains("~")) {
@@ -146,6 +147,7 @@ if (project.hasProperty("conanHome")) {
 tasks.whenTaskAdded { task ->
     // if local build is used and "skip" is not specified in the project property,
     // invoke Conan to build Auto SDK AARs.
+
     if ((task.name == 'assembleLocalDebug' || task.name == 'assembleLocalRelease')
             && !project.hasProperty("skipDeps")) {
         task.dependsOn buildDeps
@@ -153,18 +155,18 @@ tasks.whenTaskAdded { task ->
 }
 
 task buildDeps(type: Exec) {
-    def jsonFile = file(new File(conan_home, ".conan/recipe_config.txt").getCanonicalPath())
+    def jsonFile = file("${conan_home}/.conan/recipe_config.txt")
     doFirst {
-        delete 'libs'
+         delete('libs')
 
         if (project.hasProperty("cleanDeps")) {
-            delete new File(conan_home, ".conan")
+            delete(file("${conan_home}/.conan"))
         }
 
         def recipes = [:]
         if (jsonFile.exists()) {
             def parsedJson = new JsonSlurper().parseText(jsonFile.text)
-            recipes = parsedJson.getAt("recipes")
+            recipes = parsedJson["recipes"]
             if (recipes == null) {
                 recipes = [:]
             }
@@ -181,10 +183,10 @@ task buildDeps(type: Exec) {
 
         def extra_modules = []
         for (directory in search_directories) {
-            def dir = new File(directory)
+            def dir = file("${directory}")
             if (!dir.exists()) continue
              dir.traverse(type: groovy.io.FileType.FILES, nameFilter: "conanfile.py") { itr ->
-                if (recipes.getAt(itr.getCanonicalPath()) == null || project.hasProperty("force")) {
+                if (recipes[itr.getCanonicalPath()] == null || project.hasProperty("force")) {
                     executeConan(["conan", "export", itr.getCanonicalPath()])
                     recipes.put(itr.getCanonicalPath(), getRecipeName("name", itr.getCanonicalPath()))
 
@@ -204,7 +206,7 @@ task buildDeps(type: Exec) {
         }
 
         def tasks = gradle.startParameter.getTaskNames()
-        def command = ['conan', 'install', gradle.ext.aacsRoot, '--build', 'outdated',
+        def command = ['conan', 'install', gradle.ext.aacsRootDir, '--build', 'outdated',
                    '-pr:h', 'aac-android', '-pr:b', 'default']
          // add extra modules
         if (extra_modules != null && extra_modules.size() != 0) {
@@ -215,7 +217,7 @@ task buildDeps(type: Exec) {
         if (tasks.empty || tasks.any { it.toLowerCase().contains("debug") }) {
             command << "-s:h" << "build_type=Debug"
             if (project.hasProperty("sensitiveLogs")) {
-                command << "-o" << "with_sensitive_logs=True"
+                command << "-o" << "avs-device-sdk:with_sensitive_logs=True" << "-o" << "aac-module-*:with_sensitive_logs=True"
             }
         }
 
@@ -232,7 +234,7 @@ task buildDeps(type: Exec) {
             }
         }
 
-        if(extra_modules.contains("coassistant") && extra_modules.contains("local-voice-control")) {
+        if (extra_modules.contains("coassistant") && extra_modules.contains("local-voice-control")) {
                 command << "-o" << "aac-module-local-voice-control:with_coassistant=True"
         }
 
@@ -250,7 +252,7 @@ task buildDeps(type: Exec) {
     }
 
     doLast {
-        if(execResult.exitValue == 0) {
+        if (execResult.exitValue == 0) {
             project.logger.lifecycle("Conan build succeeded!")
         } else {
             project.logger.lifecycle("Conan build failed!")

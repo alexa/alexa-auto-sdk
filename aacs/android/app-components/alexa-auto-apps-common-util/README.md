@@ -1,8 +1,8 @@
 # Alexa Auto Apps Common Util
 
-This package provides the AACS Sample App and app components with various helper classes to simplify the implementation. The provided utilities include:
+This package provides the Alexa Auto App and app components with various helper classes to simplify the implementation. The provided utilities include:
 
-*  Start, Stop and share files with AACS.
+*  Start, Stop and share files with the Alexa Auto App.
 *  Get and set the Alexa properties.
 *  Handle the file operations.
 *  Get the enabled Alexa Auto SDK extra modules.

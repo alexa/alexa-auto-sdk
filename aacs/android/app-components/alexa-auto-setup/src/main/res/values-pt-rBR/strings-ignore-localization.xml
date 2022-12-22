@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- These strings need to be localized based on the country and region -->
+    <string name="cbl_login_alexa_hint1">\"Alexa, ajuste a temperatura para 22\"</string>
+    <string name="cbl_login_alexa_hint2">\"Alexa, encontre uma cafeteria\"</string>
+    <string name="cbl_login_alexa_hint3">Alexa, toque músicas</string>
+    <string name="auth_provider_login_alexa_hint1">\"Alexa, ajuste a temperatura para 22\"</string>
+    <string name="auth_provider_login_alexa_hint2">\"Alexa, quero ir para o aeroporto\"</string>
+    <string name="auth_provider_login_alexa_hint3"></string>
+    <string name="auth_provider_sign_in_hint">Para ouvir música, saber a previsão do tempo, usar recursos de casa inteligente e muito mais, inicie a sessão.</string>
+    <string name="location_permission_hint_text">\"Alexa, encontre restaurantes por perto\"</string>
+    <string name="nav_favorites_permission_hint_text">\"Alexa, quero ir para casa\"</string>
+    <string name="enable_preview_mode_disclaimer">A Amazon processa as interações com a Alexa na nuvem para fornecer e melhorar nossos serviços. Ao selecionar \"Concordar e habilitar a Alexa\", você aceita os <annotation placeholder="">Termos de Uso da</annotation> e <annotation placeholder="">todos os termos encontrados aqui</annotation>. \n\n<annotation placeholder=""> Saiba como a Alexa é projetada para proteger sua privacidade</annotation>.</string>
+    <string name="enable_preview_mode_action_button">Concordar e habilitar a Alexa</string>
+    <string name="terms_of_use_url">https://www.amazon.com.br/gp/help/customer/display.html?nodeId=201809740</string>
+    <string name="all_terms_of_use_url">https://www.amazon.com.br/gp/help/customer/display.html?nodeId=201566380</string>
+    <string name="privacy_url">https://www.amazon.com.br/gp/help/customer/display.html/?nodeId=GVP69FUJ48X9DK8V</string>
+</resources>

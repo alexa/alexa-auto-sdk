@@ -292,6 +292,7 @@ std::shared_ptr<MessageBrokerImpl::SyncPromiseType> MessageBrokerImpl::getSyncMe
 
         return it->second;
     } catch (std::exception& ex) {
+        std::lock_guard<std::mutex> lock(m_promise_map_access_mutex);
         for (auto& next : m_syncMessagePromiseMap) {
             AACE_ERROR(LX(TAG).d("id", next.first));
         }

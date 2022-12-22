@@ -111,7 +111,7 @@ public class CBLLoginFinishFragment extends Fragment {
 
         View fragmentView = requireView();
 
-        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_heading);
+        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_header);
         String format = getResources().getString(R.string.login_finish_heading_text);
 
         String headingString = "";
@@ -126,7 +126,7 @@ public class CBLLoginFinishFragment extends Fragment {
         }
         loginFinishHeadingText.setText(headingString);
 
-        TextView loginCompletedButton = fragmentView.findViewById(R.id.cbl_login_finished_btn);
+        TextView loginCompletedButton = fragmentView.findViewById(R.id.cbl_login_finished_button);
         loginCompletedButton.setOnClickListener(view -> { mViewModel.userFinishedLogin(); });
 
         List<TextView> viewList = Arrays.asList(R.id.alexa_hint1, R.id.alexa_hint2, R.id.alexa_hint3)
@@ -138,6 +138,7 @@ public class CBLLoginFinishFragment extends Fragment {
         // Setup steps are completed and sending setup complete event.
         mViewModel.setupCompleted();
         sendSetupCompleteEvent();
+        mViewModel.userFinishedLogin();
     }
 
     /**

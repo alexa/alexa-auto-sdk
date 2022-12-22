@@ -13,7 +13,8 @@
         app:key="sms-consent-settings"
         app:title="@string/sms_consent_title"
         app:summary="@string/sms_consent_summary"
-        app:defaultValue="true"
-        app:layout="@layout/communication_preference_layout"
-        app:isPreferenceVisible="false"/>
+        app:defaultValue="false"
+        app:layout="@layout/communication_preference_layout_bottom"
+        app:isPreferenceVisible="true"/>
 </androidx.preference.PreferenceScreen>
+

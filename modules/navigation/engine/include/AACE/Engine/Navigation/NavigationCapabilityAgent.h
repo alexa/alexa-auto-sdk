@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@
 namespace aace {
 namespace engine {
 namespace navigation {
+
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
 
 class NavigationCapabilityAgent
         : public alexaClientSDK::avsCommon::avs::CapabilityAgent
@@ -73,7 +75,7 @@ public:
      *
      * @param [in] event The @c EventName corresponding to the type of event to be sent.
      */
-    void navigationEvent(aace::navigation::NavigationEngineInterface::EventName event);
+    void navigationEvent(AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::EventName event);
 
     /**
      * Send failure event corresponding to the @c ErrorType
@@ -83,6 +85,7 @@ public:
      * @param [in] description The @c string corresponding to the description of error to be sent.
      */
     void navigationError(
+        AgentId::IdType agentId,
         aace::navigation::NavigationEngineInterface::ErrorType type,
         aace::navigation::NavigationEngineInterface::ErrorCode code,
         const std::string& description);
@@ -170,8 +173,9 @@ private:
         const unsigned int stateRequestToken);
 
     // Executor functions for navigation event handling
-    void executeNavigationEvent(aace::navigation::NavigationEngineInterface::EventName event);
+    void executeNavigationEvent(AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::EventName event);
     void executeNavigationError(
+        AgentId::IdType agentId, 
         aace::navigation::NavigationEngineInterface::ErrorType type,
         aace::navigation::NavigationEngineInterface::ErrorCode code,
         const std::string& description);
@@ -181,14 +185,14 @@ private:
     std::string getWaypointErrorCode(aace::navigation::NavigationEngineInterface::ErrorCode code);
 
     // Sends event upon success event
-    void startNavigationSuccess();
-    void showPreviousWaypointsSuccess();
-    void navigateToPreviousWaypointSuccess();
+    void startNavigationSuccess(AgentId::IdType agentId);
+    void showPreviousWaypointsSuccess(AgentId::IdType agentId);
+    void navigateToPreviousWaypointSuccess(AgentId::IdType agentId);
 
     // Sends event upon fail event
-    void startNavigationError(std::string code, std::string description);
-    void showPreviousWaypointsError(std::string code, std::string description);
-    void navigateToPreviousWaypointError(std::string code, std::string description);
+    void startNavigationError(AgentId::IdType agentId, std::string code, std::string description);
+    void showPreviousWaypointsError(AgentId::IdType agentId, std::string code, std::string description);
+    void navigateToPreviousWaypointError(AgentId::IdType agentId, std::string code, std::string description);
 
     /**
      * Check Navigation State for validity

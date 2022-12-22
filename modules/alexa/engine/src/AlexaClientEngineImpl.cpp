@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -144,6 +144,7 @@ void AlexaClientEngineImpl::onConnectionStatusChanged(
             METRIC_PROGRAM_NAME_SUFFIX,
             "onConnectionStatusChanged",
             {METRIC_ALEXA_CLIENT_CONNECTION_STATUS_CHANGED, connectionStatus.str(), changedReason.str()});
+
         m_alexaClientPlatformInterface->connectionStatusChanged(convertConnectionStatus(status), convertReason(reason));
     }
 
@@ -154,14 +155,24 @@ void AlexaClientEngineImpl::onConnectionStatusChanged(
 
 // DialogUXStateObserverInterface
 void AlexaClientEngineImpl::onDialogUXStateChanged(
-    alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState state) {
-    std::stringstream dialogState;
-    dialogState << state;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onDialogUXStateChanged",
-        {METRIC_ALEXA_CLIENT_DIALOG_STATE_CHANGED, dialogState.str()});
-    m_alexaClientPlatformInterface->dialogStateChanged(static_cast<aace::alexa::AlexaClient::DialogState>(state));
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    DialogUXState newState) {
+    AACE_INFO(LX(TAG).d("agentId", agentId).d("newState", newState));
+    try {
+        std::stringstream dialogState;
+        dialogState << newState;
+        emitCounterMetrics(
+            METRIC_PROGRAM_NAME_SUFFIX,
+            "onDialogUXStateChanged",
+            {METRIC_ALEXA_CLIENT_DIALOG_STATE_CHANGED, dialogState.str()});
+        m_alexaClientPlatformInterface->dialogStateChanged(agentId, convertDialogState(newState));
+
+        // Still call the old API for backwards compatibility
+        m_alexaClientPlatformInterface->dialogStateChanged(convertDialogState(newState));
+
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
 }
 
 // AlexaClientEngineInterface

@@ -10,8 +10,10 @@ class GStPluginsBaseConan(ConanFile):
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
     name = "gst-plugins-base"
     version = "1.18.4"
-    description = "GStreamer is a development framework for creating applications like media players, video editors, " \
-                  "streaming media broadcasters and so on"
+    description = (
+        "GStreamer is a development framework for creating applications like media players, video editors, "
+        "streaming media broadcasters and so on"
+    )
     topics = ("conan", "gstreamer", "multimedia", "video", "audio", "broadcasting", "framework", "media")
     url = "https://github.com/bincrafters/conan-gst-plugins-base"
     homepage = "https://gstreamer.freedesktop.org/"
@@ -19,18 +21,8 @@ class GStPluginsBaseConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     build_requires = ["meson/0.56.2", "pkgconf/1.7.3"]
 
-    options = {
-        "shared": [True, False],
-        "fPIC": [True, False],
-        "with_libalsa": [True, False],
-        "with_gl": [True, False]
-    }
-    default_options = {
-        "shared": False,
-        "fPIC": True,
-        "with_libalsa": True,
-        "with_gl": True
-    }
+    options = {"shared": [True, False], "fPIC": [True, False], "with_libalsa": [True, False], "with_gl": [True, False]}
+    default_options = {"shared": False, "fPIC": True, "with_libalsa": True, "with_gl": True}
     _source_subfolder = "source_subfolder"
     _build_subfolder = "build_subfolder"
     exports_sources = ["patches/*.patch"]
@@ -40,13 +32,13 @@ class GStPluginsBaseConan(ConanFile):
     def configure(self):
         del self.settings.compiler.libcxx
         del self.settings.compiler.cppstd
-        self.options['gstreamer'].shared = self.options.shared
-        if tools.Version(self.version) >= "1.18.2" and\
-           self.settings.compiler == "gcc" and\
-           tools.Version(self.settings.compiler.version) < "5":
-            raise ConanInvalidConfiguration(
-                f"gst-plugins-base {self.version} does not support gcc older than 5"
-            )
+        self.options["gstreamer"].shared = self.options.shared
+        if (
+            tools.Version(self.version) >= "1.18.2"
+            and self.settings.compiler == "gcc"
+            and tools.Version(self.settings.compiler.version) < "5"
+        ):
+            raise ConanInvalidConfiguration(f"gst-plugins-base {self.version} does not support gcc older than 5")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -58,14 +50,14 @@ class GStPluginsBaseConan(ConanFile):
 
     def requirements(self):
         self.requires("opus/1.3.1#5132ab8db7b69dd8e26466e0b3b017dd")
-        self.requires("ogg/1.3.4")
+        self.requires("ogg/1.3.4#fa3dcc8997faf6f18b51b4286f9db7cf")
         self.requires(f"gstreamer/{self.version}@{self.user}/{self.channel}")
         if self.settings.os == "Linux":
             if self.options.with_libalsa:
                 self.requires("libalsa/1.1.9")
 
     def build_requirements(self):
-        if self.settings.os == 'Windows':
+        if self.settings.os == "Windows":
             self.build_requires("winflexbison/2.5.22")
         else:
             self.build_requires("bison/3.7.1")

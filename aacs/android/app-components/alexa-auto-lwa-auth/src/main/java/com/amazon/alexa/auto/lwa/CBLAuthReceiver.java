@@ -80,7 +80,7 @@ public class CBLAuthReceiver extends BroadcastReceiver {
                                 handleAuthorizationStateChanged(obj);
                                 break;
                             case Action.Authorization.AUTHORIZATION_ERROR:
-                                handleAuthorizationError(obj);
+                                handleAuthorizationError(context, obj);
                                 break;
                             case Action.Authorization.SET_AUTHORIZATION_DATA:
                                 handleSetAuthorizationData(context, obj);
@@ -149,7 +149,7 @@ public class CBLAuthReceiver extends BroadcastReceiver {
         }
     }
 
-    private void handleAuthorizationError(JSONObject obj) {
+    private void handleAuthorizationError(Context context, JSONObject obj) {
         try {
             String error = obj.getString("error");
 
@@ -165,6 +165,12 @@ public class CBLAuthReceiver extends BroadcastReceiver {
                     break;
                 case "LOGOUT_FAILED":
                     Log.e(TAG, "Logout Failed message");
+                    break;
+                case "CODE_PAIR_EXPIRED":
+                    Log.e(TAG, "Code pair expired");
+                    Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    context.startActivity(intent);
                     break;
                 case "AUTHORIZATION_EXPIRED":
                     EventBus.getDefault().post(

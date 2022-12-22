@@ -25,6 +25,10 @@ static const std::string TAG("MetricEvent");
 /// Default number of samples for metric.
 const std::string METRIC_NUM_SAMPLES_DEFAULT = "1";
 
+/// Empty context value for metric.
+const std::string METRIC_EMPTY_CONTEXT = "";
+const std::string METRIC_DEFAULT_CONTEXT = "0";
+
 MetricEvent::MetricEvent(const std::string& program, const std::string& source) :
         MetricEvent(program, source, MetricPriority::NR, MetricBufferType::NB, MetricIdentityType::NUNI) {
 }
@@ -73,11 +77,21 @@ void MetricEvent::addCounter(const std::string& name, int value) {
 }
 
 void MetricEvent::record() {
+    record(METRIC_EMPTY_CONTEXT);
+}
+
+void MetricEvent::record(const std::string& context) {
     std::string priorityStr = priorityToString(m_priority);
     m_metricLog.append(":").append(priorityStr);
     m_metricLog.append(":").append(bufferTypeToString(m_bufferType));
     m_metricLog.append(":").append(identityTypeToString(m_identityType));
-    AACE_METRIC(LX(TAG, m_metricLog));
+    if (context.empty()) {
+        AACE_WARN(LX(TAG).m("Empty context, using default value"));
+        AACE_METRIC(LX(TAG, METRIC_DEFAULT_CONTEXT + ":" + m_metricLog));
+    }
+    else {
+        AACE_METRIC(LX(TAG, context + ":" + m_metricLog));
+    }
 }
 
 void MetricEvent::addDataToLog(std::string name, std::string value, MetricDataType type, std::string sampleCount) {

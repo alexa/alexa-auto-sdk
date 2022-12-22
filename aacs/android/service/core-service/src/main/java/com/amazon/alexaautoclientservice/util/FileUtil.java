@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import com.amazon.aace.core.config.StreamConfiguration;
 import com.amazon.aace.storage.config.StorageConfiguration;
 import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsipc.IPCConstants;
+import com.amazon.alexaautoclientservice.aacs_extra.AACSModuleFactoryInterface;
 import com.amazon.alexaautoclientservice.constants.AudioSourceConstants;
 import com.amazon.alexaautoclientservice.modules.mediaManager.MediaSource;
 
@@ -76,6 +77,10 @@ public class FileUtil {
     public static final String AACS_CONFIG_EXTERNAL_MEDIA_ADAPTER = "ExternalMediaAdapter";
     public static final String AACS_CONFIG_PROPERTY_MANAGER = "PropertyManager";
     public static final String AACS_CONFIG_CUSTOM_DOMAIN_MESSAGE_DISPATCHER = "CustomDomainMessageDispatcher";
+
+    public static final String EXTRAS_FOLDER_NAME = "alexaautoclientservice";
+    public static final String EXTRAS_MODULE_FACTORY_KEY = "factory";
+    public static final String EXTRAS_NAME = "name";
 
     public static final HashMap<String, String> mInterfaceToModuleNames = new HashMap<String, String>() {
         {
@@ -156,20 +161,50 @@ public class FileUtil {
         File certsDir = new File(context.getCacheDir(), CERTS_DIR);
         File appDataDir = new File(context.getFilesDir(), APPDATA_DIR);
 
+        String proxyserver = null;
+
+        try {
+            proxyserver = mEngineConfiguration.getJSONObject("aace.alexa")
+                                  .getJSONObject("avsDeviceSDK")
+                                  .getJSONObject("proxyconfig")
+                                  .getString("proxyServer");
+
+        } catch (JSONException exe) {
+            Log.e(TAG, "proxyServer configuration not present: " + exe.getMessage());
+        }
+
         InputStream configStream =
                 new ByteArrayInputStream(mEngineConfiguration.toString().getBytes(StandardCharsets.UTF_8));
 
+        if (proxyserver != null) {
+            Log.d(TAG, "Using proxyServer = " + proxyserver);
+        } else {
+            proxyserver = "";
+        }
+
         // Construct and return EngineConfigurations list
-        return new ArrayList<EngineConfiguration>(Arrays.asList(AlexaConfiguration.createCurlConfig(certsDir.getPath()),
+        return new ArrayList<EngineConfiguration>(Arrays.asList(
+                AlexaConfiguration.createCurlConfig(certsDir.getPath(), "", proxyserver),
                 AlexaConfiguration.createMiscStorageConfig(appDataDir.getPath() + "/miscStorage.sqlite"),
                 AlexaConfiguration.createCertifiedSenderConfig(appDataDir.getPath() + "/certifiedSender.sqlite"),
                 AlexaConfiguration.createCapabilitiesDelegateConfig(
                         appDataDir.getPath() + "/capabilitiesDelegate.sqlite"),
-                AlexaConfiguration.createAlertsConfig(appDataDir.getPath() + "/alerts.sqlite"),
                 AlexaConfiguration.createNotificationsConfig(appDataDir.getPath() + "/notifications.sqlite"),
                 AlexaConfiguration.createDeviceSettingsConfig(appDataDir.getPath() + "/deviceSettings.sqlite"),
                 StorageConfiguration.createLocalStorageConfig(appDataDir.getPath() + "/localStorage.sqlite"),
                 AlexaConfiguration.createDuckingConfig(getDuckingConfig()), StreamConfiguration.create(configStream)));
+    }
+
+    public static String getConfigProxyHeader() {
+        try {
+            return mEngineConfiguration.getJSONObject("aace.alexa")
+                    .getJSONObject("avsDeviceSDK")
+                    .getJSONObject("proxyconfig")
+                    .getString("proxyHeader");
+        } catch (JSONException exe) {
+            Log.e(TAG, "getProxyHeaderIfPresent configuration Error: " + exe.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -308,22 +343,20 @@ public class FileUtil {
         }
 
         try {
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
-            String json = new String(buffer, "UTF-8");
-            obj = new JSONObject(json);
-        } catch (Exception e) {
-            Log.e(TAG, String.format("Cannot read from %s due to Error: %s", filepath, e.getMessage()));
-        } finally {
-            try {
-                if (inputStream != null)
-                    inputStream.close();
-            } catch (IOException e) {
-                Log.w(TAG,
-                        String.format("Failed to close InputStream after reading from %s. Error: %s", filepath,
-                                e.getMessage()));
-            }
+            obj = getJSONObjectFromInputStream(inputStream);
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage());
         }
+
+        try {
+            if (inputStream != null)
+                inputStream.close();
+        } catch (IOException e) {
+            Log.w(TAG,
+                    String.format("Failed to close InputStream after reading from %s. Error: %s", filepath,
+                            e.getMessage()));
+        }
+
         return obj;
     }
 
@@ -370,7 +403,7 @@ public class FileUtil {
         }
     }
 
-    private static JSONObject translateToEngineConfiguration(Context context, JSONObject config) {
+    private static JSONObject translateToEngineConfiguration(@NonNull Context context, JSONObject config) {
         if (config == null)
             return null;
         JSONObject translatedConfig = new JSONObject();
@@ -429,11 +462,11 @@ public class FileUtil {
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, String.format("Translation of configuration failed. Error: %s", e.getMessage()));
+            Log.e(TAG, String.format("Failed to translate AACS configuration to Auto SDK engine configuration. Error: %s", e.getMessage()));
             return null;
         }
 
-        Log.d(TAG, "Configuration successfully translated");
+        Log.i(TAG, "Successfully translated to Auto SDK engine configuration.");
         return translatedConfig;
     }
 
@@ -907,5 +940,40 @@ public class FileUtil {
                             AACS_CONFIG_LOCAL_MEDIA_SOURCE, e.getMessage()));
             return mLocalMediaSources;
         }
+    }
+
+    public static List<AACSModuleFactoryInterface> loadExtraModuleFactories(@NonNull Context context) {
+        List<AACSModuleFactoryInterface> extraModuleFactories = new ArrayList<>();
+
+        try {
+            String[] fileList = context.getAssets().list(EXTRAS_FOLDER_NAME);
+            Log.v(TAG, "Begin loading extras");
+            for (String f : fileList) {
+                InputStream is = context.getAssets().open(EXTRAS_FOLDER_NAME + "/" + f);
+                JSONObject obj = getJSONObjectFromInputStream(is);
+                String factoryName = obj.getJSONObject(EXTRAS_MODULE_FACTORY_KEY).getString(EXTRAS_NAME);
+                AACSModuleFactoryInterface instance =
+                        (AACSModuleFactoryInterface) Class.forName(factoryName).newInstance();
+                extraModuleFactories.add(instance);
+                Log.i(TAG, "Loaded extra module:" + factoryName);
+                is.close();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, String.format("Error while loading extras: %s", e.getMessage()));
+        }
+        return extraModuleFactories;
+    }
+
+    public static JSONObject getJSONObjectFromInputStream(InputStream inputStream) throws JSONException {
+        try {
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+            String json = new String(buffer, StandardCharsets.UTF_8);
+            return new JSONObject(json);
+        } catch (Exception e) {
+            Log.e(TAG, String.format("Error occurred while reading JSON from file: %s", e.getMessage()));
+        }
+
+        throw new JSONException("Failed to get JSON from input stream!");
     }
 }

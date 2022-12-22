@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -32,10 +32,6 @@ enum class Event {
     onStopActive,
     onTestAutomationConnect,
     onTestAutomationProcess,
-
-    // Alerts
-    onAlertsLocalStop,
-    onAlertsRemoveAllAlerts,
 
     // AudioManager
     onAudioManagerSpeaker,
@@ -73,6 +69,7 @@ enum class Event {
 
     // Audio Player
     onGetPlayerPositionAndDuration,
+    onSetAsForegroundActivity,
 
     // Speaker
     onSpeakerLocalVolumeSet,
@@ -135,6 +132,17 @@ enum class Event {
     onCancelAuthProviderAuthorization,
     onLogoutAuthProviderAuthorization,
 
+    // 3P Agent
+    onVAD,
+    onKWD,
+    onDeactivated,
+    registerSiriAgent,
+    onDeregisterAgent,
+    onPTT,
+    onTTT,
+    onSiriSPEAKING,
+    onSiriNONE,
+
     //Device Setup Completed
     onDeviceSetupCompleted,
 
@@ -153,10 +161,6 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onStopActive", Event::onStopActive},
     {"onTestAutomationConnect", Event::onTestAutomationConnect},
     {"onTestAutomationProcess", Event::onTestAutomationProcess},
-
-    // Alerts
-    {"onAlertsLocalStop", Event::onAlertsLocalStop},
-    {"onAlertsRemoveAllAlerts", Event::onAlertsRemoveAllAlerts},
 
     // AudioManager
     {"onAudioManagerSpeaker", Event::onAudioManagerSpeaker},
@@ -194,6 +198,7 @@ static const std::map<std::string, Event> EventEnumerator{
 
     // Audio Player
     {"onGetPlayerPositionAndDuration", Event::onGetPlayerPositionAndDuration},
+    {"onSetAsForegroundActivity", Event::onSetAsForegroundActivity},
 
     // Speaker
     {"onSpeakerLocalVolumeSet", Event::onSpeakerLocalVolumeSet},
@@ -244,6 +249,17 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onUpdateMessagesStatus", Event::onUpdateMessagesStatus},
     {"onShowMessagingInfo", Event::onShowMessagingInfo},
     {"onToggleAutomaticResponses", Event::onToggleAutomaticResponses},
+
+    // 3P Agent
+    {"onVAD" ,Event::onVAD},
+    {"onKWD" ,Event::onKWD},
+    {"onDeactivated" ,Event::onDeactivated},
+    {"registerSiriAgent" ,Event::registerSiriAgent},
+    {"onDeregisterAgent",Event::onDeregisterAgent},
+    {"onPTT" ,Event::onPTT},
+    {"onTTT" ,Event::onTTT},
+    {"onSiriSPEAKING" ,Event::onSiriSPEAKING},
+    {"onSiriNONE" ,Event::onSiriNONE},
 
     {"onPrepareSpeech", Event::onPrepareSpeech},
     {"onGetCapabilities", Event::onGetCapabilities},

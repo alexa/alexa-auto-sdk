@@ -27,6 +27,20 @@ messages:
         type: int
         desc: The audio player's playback duration in milliseconds.
 
+  - action: SetAsForegroundActivity
+    direction: incoming
+    desc: 
+      Sets the Alexa `AudioPlayer` interface as the foreground player the user sees on screen. This message is useful 
+      for scenarios in which the user played an `AudioPlayer` media source, then played a different Alexa-aware
+      `ExternalMediaPlayer` media source, such as a deep-linked media app or a local media source, and then manually
+      returned visual activity to the Alexa `AudioPlayer` GUI. This message ensures the next VUI command or
+      GUI interaction with the playback control buttons acts on the `AudioPlayer` source rather than the more recently
+      played `ExternalMediaPlayer` source.
+      <br><br>
+      **Note:** The `AudioPlayer` had to be previously playing at least once during this Engine cycle in order for this message to make
+      Alexa act on `AudioPlayer`.
+
+
 types:
   - name: PlayerActivity
     type: enum

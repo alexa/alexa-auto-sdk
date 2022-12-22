@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- These strings need to be localized based on the country and region -->
+    <string name="cbl_login_alexa_hint1">„Alexa, stell die Temperatur auf 22 Grad.“</string>
+    <string name="cbl_login_alexa_hint2">„Alexa, such ein Café.“</string>
+    <string name="cbl_login_alexa_hint3">„Alexa, spiel Musik.“</string>
+    <string name="auth_provider_login_alexa_hint1">„Alexa, stell die Temperatur auf 22 Grad.“</string>
+    <string name="auth_provider_login_alexa_hint2">„Alexa, bring mich zum Flughafen.“</string>
+    <string name="auth_provider_login_alexa_hint3"></string>
+    <string name="auth_provider_sign_in_hint">Melde dich für Musik, Wettervorhersagen, Smart Home-Funktionen und vieles mehr an.</string>
+    <string name="location_permission_hint_text">„Alexa, finde Restaurants in der Nähe.“</string>
+    <string name="nav_favorites_permission_hint_text">„Alexa, bring mich nach Hause.“</string>
+    <string name="enable_preview_mode_disclaimer">Für die Bereitstellung und Optimierung unserer Dienste verarbeitet Amazon die Interaktionen mit Alexa in der Cloud. Indem Sie „Zustimmen und Alexa aktivieren“ wählen, akzeptieren Sie die <annotation placeholder="">Nutzungsbedingungen von Alexa </annotation> und <annotation placeholder="">alle hier aufgeführten Bedingungen</annotation>. \n\n<annotation placeholder=""> Hier erfahren Sie, wie Alexa Ihre persönlichen Daten schützt</annotation>.</string>
+    <string name="enable_preview_mode_action_button">Zustimmen und Alexa aktivieren</string>
+    <string name="terms_of_use_url">https://www.amazon.de/-/en/gp/help/customer/display.html?nodeId=201809740</string>
+    <string name="all_terms_of_use_url">https://www.amazon.de/-/en/gp/help/customer/display.html?nodeId=201566380</string>
+    <string name="privacy_url">https://www.amazon.de/gp/help/customer/display.html?nodeId=GVP69FUJ48X9DK8V</string>
+</resources>

@@ -23,13 +23,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amazon.alexa.auto.aacs.common.WeatherForecast;
 import com.amazon.alexa.auto.aacs.common.WeatherTemplate;
 import com.amazon.alexa.auto.templateruntime.R;
 import com.squareup.picasso.Picasso;
-
+import com.amazon.aacsconstants.TemplateRuntimeConstants;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -46,7 +47,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     public static final int WEATHER_FORECAST_DAYS_COUNT = 4;
     public static final String IMAGE_SIZE_MEDIUM = "MEDIUM";
     public static final String IMAGE_SIZE_XL = "X-LARGE";
-    public static final int COLOR_WHITE = Color.argb(255, 255, 255, 255);
+    private static int COLOR_BLUE;
+    private static int COLOR_RED;
+    private static int COLOR_WHITE;
+
 
     private final WeatherTemplate weatherTemplate;
 
@@ -58,6 +62,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+        COLOR_BLUE = ResourcesCompat.getColor(parent.getContext().getResources(), R.color.weather_blue, null);
+        COLOR_RED = ResourcesCompat.getColor(parent.getContext().getResources(), R.color.weather_red, null);
+        COLOR_WHITE = ResourcesCompat.getColor(parent.getContext().getResources(), R.color.weather_white, null);
         return new ViewHolder(view);
     }
 
@@ -115,7 +122,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
                                     .get()
                                     .getDarkBackgroundUrl();
         Picasso.get().load(arrowUpUrl).into(holder.weatherArrowUpIconView);
-        holder.weatherArrowUpIconView.setColorFilter(COLOR_WHITE);
+        holder.weatherArrowUpIconView.setColorFilter(COLOR_RED);
 
         holder.highTempText.setText(weatherTemplate.getHighTemperature().getValue());
 
@@ -128,12 +135,25 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
                                       .get()
                                       .getDarkBackgroundUrl();
         Picasso.get().load(arrowDownUrl).into(holder.weatherArrowDownIconView);
-        holder.weatherArrowDownIconView.setColorFilter(COLOR_WHITE);
+        holder.weatherArrowDownIconView.setColorFilter(COLOR_BLUE);
 
         holder.lowTempText.setText(weatherTemplate.getLowTemperature().getValue());
+
+        TextView mainTitleText = holder.mainTitle;
+        mainTitleText.setText(weatherTemplate.getTitle().getMainTitle());
+
+        TextView subTitleText = holder.subTitle;
+        subTitleText.setText(weatherTemplate.getTitle().getSubTitle());
+
     }
 
     private void populateWeatherForecastData(@NotNull ViewHolder holder) {
+        TextView mainTitleText = holder.mainTitle;
+        mainTitleText.setText(weatherTemplate.getTitle().getMainTitle());
+
+        TextView subTitleText = holder.subTitle;
+        subTitleText.setText(weatherTemplate.getTitle().getSubTitle());
+
         for (int i = 0; i < WEATHER_FORECAST_DAYS_COUNT; i++) {
             View view = holder.itemView.findViewById(weatherForecastLayouts.get(i));
             List<WeatherForecast> weatherForecastList = weatherTemplate.getWeatherForecast();
@@ -157,6 +177,30 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
 
             TextView weatherForecastLowHigh = view.findViewById(R.id.weather_card_forecast_temp_low);
             weatherForecastLowHigh.setText(weatherForecastList.get(i).getLowTemperature());
+
+            ImageView weatherArrowUpIconView = view.findViewById(R.id.weather_card_arrow_up);
+            String arrowUpUrl = weatherTemplate.getHighTemperature()
+                    .getArrow()
+                    .getSources()
+                    .stream()
+                    .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
+                    .findFirst()
+                    .get()
+                    .getDarkBackgroundUrl();
+            Picasso.get().load(arrowUpUrl).into(weatherArrowUpIconView);
+            weatherArrowUpIconView.setColorFilter(COLOR_RED);
+
+            ImageView weatherArrowDownIconView = view.findViewById(R.id.weather_card_arrow_down);
+            String arrowDownUrl = weatherTemplate.getLowTemperature()
+                    .getArrow()
+                    .getSources()
+                    .stream()
+                    .filter(source -> source.getSize().equals(IMAGE_SIZE_MEDIUM))
+                    .findFirst()
+                    .get()
+                    .getDarkBackgroundUrl();
+            Picasso.get().load(arrowDownUrl).into(weatherArrowDownIconView);
+            weatherArrowDownIconView.setColorFilter(COLOR_BLUE);
         }
     }
 
@@ -167,7 +211,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
         public TextView highTempText;
         public ImageView weatherArrowDownIconView;
         public TextView lowTempText;
-
+        public TextView mainTitle;
+        public TextView subTitle;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             weatherIconView = itemView.findViewById(R.id.weather_card_weather_icon);
@@ -176,6 +221,8 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             highTempText = itemView.findViewById(R.id.weather_card_temp_high);
             weatherArrowDownIconView = itemView.findViewById(R.id.weather_card_arrow_down);
             lowTempText = itemView.findViewById(R.id.weather_card_temp_low);
+            mainTitle = itemView.findViewById(R.id.weather_card_mainTitle);
+            subTitle = itemView.findViewById(R.id.weather_card_subTitle);
         }
     }
 }

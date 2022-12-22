@@ -49,7 +49,8 @@ public class AACSConstants {
             AACSPropertyConstants.FIRMWARE_VERSION, AACSPropertyConstants.LOCALE,
             AACSPropertyConstants.COUNTRY_SUPPORTED, AACSPropertyConstants.TIMEZONE,
             AACSPropertyConstants.WAKEWORD_ENABLED, AACSPropertyConstants.OPERATING_COUNTRY,
-            AACSPropertyConstants.VERSION, AACSPropertyConstants.NETWORK_INTERFACE};
+            AACSPropertyConstants.VERSION, AACSPropertyConstants.NETWORK_INTERFACE,
+            AACSPropertyConstants.NETWORK_HTTP_PROXY_HEADERS};
 
     public static final String REPLY_TO_PACKAGE = "replyToPackage";
     public static final String REPLY_TO_CLASS = "replyToClass";
@@ -76,7 +77,7 @@ public class AACSConstants {
     }
 
     // AACS State
-    public enum State { STARTED, WAIT_FOR_LVC_CONFIG, CONFIGURED, ENGINE_INITIALIZED, STOPPED }
+    public enum State { STARTED, WAIT_FOR_LVC_CONFIG, CONFIGURED, ENGINE_INITIALIZED, CONNECTED, STOPPED }
     public static final String ACTION_STATE_CHANGE = "com.amazon.aacs.service.statechanged";
 
     // AACS Permission

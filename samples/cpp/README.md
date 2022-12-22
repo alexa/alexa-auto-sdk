@@ -16,7 +16,7 @@ After creating an Amazon developer account, you'll need to [register a product a
 
 When you follow the instructions to [fill in the product information](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#fill-in-product-information):
 
-* Use your own custom information, taking note of the **Product ID**, as this information is required to confingure the Sample App.
+* Use your own custom information, taking note of the **Product ID**, as this information is required to configure the Sample App.
 * Be sure to select **Automotive** from the **Product category** pull-down.
 
 When you follow the instructions to [set up your security profile](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/register-a-product.html#set-up-your-security-profile), generate a **Client ID** and take note of it, as this information is required to configure the Sample App.
@@ -116,7 +116,7 @@ $ DYLD_LIBRARY_PATH=lib:+:${DYLD_LIBRARY_PATH} \
 
 You can use the following command line options with the Conan install command. The options are defined in the Conan recipe:
 
-**`aac_modules`** - Specify default Auto SDK modules to build with the Sample App. This is a comma seperated list of modules that must be installed in the Conan local cache before building. If this option is not overridden, the default value will be `core, alexa, cbl, system-audio`.
+**`aac_modules`** - Specify default Auto SDK modules to build with the Sample App. This is a comma separated list of modules that must be installed in the Conan local cache before building. If this option is not overridden, the default value will be `core, alexa, cbl, system-audio`.
 
 **`extra_modules`** - Specify additional modules to build with the Sample App. This is a comma separated list of modules that must be installed in the Conan local cache before building. This is a useful option if you want to specify modules to build in addition to the default modules, rather than replacing the default modules entirely.
 
@@ -253,6 +253,115 @@ The Sample App does not configure SiriusXM as a local media source by default. I
 
 >**Note:** When SiriusXM is present as a local media source, the cloud defaults to local SiriusXM only and blocks any use of the cloud SiriusXM service even if the local implementation/service is unavailable or not enabled. 
 
+## Using Sample App with 3rd Party Wakewords
+
+The C++ Sample App provides a reference implementation to help OEMs integrate with Siri and Apple CarPlay. The app demonstrates how OEMs can use CarPlay in Voice Activity Detection (VAD) and Keyword Detection (KWD) modes. In the VAD mode, the sample app integrates with Amazon's PryonLite VAD APIs to showcase voice activity detection and time stamp calculations
+
+### Building Sample App
+
+To use the sample app with 3P CarPlay capabilities, build with the following flag:
+```shell
+$ builder/build.py -o aac-sampleapp:with_3pva=True --with-sampleapp
+```
+
+The sample app will include the `AgentHandler` and supporting files needed to demonstrate the CarpPlay features. You will also need to include the Amazonlite Extension in your build. 
+Contact your Amazon Solutions Architect (SA) or Partner Manager to obtain the correct Pryonlite package for Amazonlite to support VAD and corresponding Amazonlite Extension.
+
+
+
+### Features for CarPlay
+
+To access the CarPlay features, select Car Play or **“C”** from the main menu
+
+**[ C ]  Car Play Menu**
+
+The Car Play features allows you to: 
+
+1. Register/Deregister Siri as the 3P agent
+2. Trigger Siri interactions
+3. Set CarPlay modes (VAD, Keyword detection, Deactivated)
+
+```shell
+################################################################################
+#                                                                              #
+#                              Car Play Menu                                   #
+#                                                                              #
+################################################################################
+[A]    Agent registration
+[S]    SIRI Interaction
+[M]    Car Play Mode
+[esc]  Go back
+```
+
+### Agent Registration 
+
+```shell
+################################################################################
+#                                                                              #
+#                              Agent registration Menu                         #
+#                                                                              #
+################################################################################
+ [ 1 ]    Register SIRI Agent
+ [ 2 ]    Deregister SIRI Agent
+ [ esc ]  Go back
+
+```
+
+### Siri Interaction
+
+Once Siri is registered and in CarPlay Keyword mode (see CarPlay Modes section below), you can invoke Siri with the wake word or use the “Button Down” option to simulate a gesture (Push-to-talk/Tap-to-talk) in this Siri interaction menu
+
+```shell
+
+################################################################################
+#                                                                              #
+#                            SIRI Interaction Menu                             #
+#                                                                              #
+################################################################################
+
+ [ 1 ]    Button Down
+ [ 2 ]    Set State to SPEAKING
+ [ 3 ]    Set State to NONE
+ [ esc ]  Go back
+ ```
+When Siri is granted dialog, you can also use this menu to simulate dialog state changes on behalf of Siri. (*Note*: In an actual integration, the device will send dialog state changes to your application. Your application must publish the messages for setting the dialog states in Auto SDK).
+
+### CarPlay Modes
+
+You can use the following menu to set CarPlay in one of the three modes.
+```shell
+
+################################################################################
+#                                                                              #
+#                              Car Play Mode Menu                              #
+#                                                                              #
+################################################################################
+
+ [ 1 ]    VAD
+ [ 2 ]    Keyword
+ [ 3 ]    Deactivated
+ [ esc ]  Go back
+```
+
+The OEM application integrates with CarPlay APIs, handles the different modes, and communicates with the device (iPhone). The sample app demonstrates the following:
+
+In VAD mode, the sample app demonstrates how to:
+
+1. Create an instance of PryonLite VAD/SRD with parameters for SRD config and register for VAD detection callback.
+2. Feed audio to the PryonLite VAD/SRD instance (in 10 ms chunks), keep track of (save) the timestamps and the offsets of the chunks and calculate the Start Of Speech (SoS) timestamp using the offset given by the PryonLite instance and the saved timestamps.
+3. Create a requestSiri event with the SoS timestamp to send to the device.
+**Note** Items 2 and 3 above are not supported in Release 4.2        
+
+If the Keyword Detection mode, the app demonstrates how to:
+
+1. Stop the instance of PryonLite VAD/SRD if previously running.
+2. Publish AASB message to Auto SDK to enable "Siri" wakeword.
+3. Handle "Siri" keyword detected messages from Auto SDK.
+4. Publish message to Auto SDK (Arbitrator) to request dialog.
+5. If the dialog is granted, calculate the start of the keyword time stamp with the indices sent in the keyword detected callback.
+6. Create a requestSiri event with the start of the keyword timestamp to send to the device.
+
+
 ## Troubleshooting
 
 * When interacting with Alexa, if the Dialog State goes from `LISTENING` immediately to `IDLE`, you might not be logged in. Try [logging into your account via CBL](#authenticate-with-avs-using-code-based-linking-cbl) by tapping `A` from the Main Menu.
@@ -270,5 +379,6 @@ The Sample App does not configure SiriusXM as a local media source by default. I
     Connection status changed: PENDING ( SERVER_SIDE_DISCONNECT )
     ...
     ```
-    
+
 To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
+

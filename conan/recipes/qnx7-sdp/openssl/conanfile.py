@@ -72,8 +72,7 @@ class QNXOpenSSLConan(ConanFile):
 
     @property
     def _qnx_arch(self):
-        return {"x86_64": "x86_64",
-                "armv8": "aarch64le"}.get(str(self.settings.arch))
+        return {"x86_64": "x86_64", "armv8": "aarch64le"}.get(str(self.settings.arch))
 
     @property
     def _qnx_target_arch(self):
@@ -83,25 +82,27 @@ class QNXOpenSSLConan(ConanFile):
         if not os.path.exists(self._qnx_target_arch):
             raise Exception(f"QNX target for {self._qnx_arch} not found at {self._qnx_target_arch}")
 
-        shutil.copytree(
-            self._openssl_include_path,
-            os.path.join(self.package_folder, "include", "openssl"))
+        shutil.copytree(self._openssl_include_path, os.path.join(self.package_folder, "include", "openssl"))
 
         os.makedirs(os.path.join(self.package_folder, "lib"))
         if self.options.shared:
             shutil.copy(
                 os.path.join(self._qnx_target_arch, "usr", "lib", self._libssl_name + ".so"),
-                os.path.join(self.package_folder, "lib", "libssl.so"))
+                os.path.join(self.package_folder, "lib", "libssl.so"),
+            )
             shutil.copy(
                 os.path.join(self._qnx_target_arch, "usr", "lib", self._libcrypto_name + ".so"),
-                os.path.join(self.package_folder, "lib", "libcrypto.so"))
+                os.path.join(self.package_folder, "lib", "libcrypto.so"),
+            )
         else:
             shutil.copy(
                 os.path.join(self._qnx_target_arch, "usr", "lib", self._libssl_name + ".a"),
-                os.path.join(self.package_folder, "lib", "libssl.a"))
+                os.path.join(self.package_folder, "lib", "libssl.a"),
+            )
             shutil.copy(
                 os.path.join(self._qnx_target_arch, "usr", "lib", self._libcrypto_name + ".a"),
-                os.path.join(self.package_folder, "lib", "libcrypto.a"))
+                os.path.join(self.package_folder, "lib", "libcrypto.a"),
+            )
 
     def package_info(self):
         self.cpp_info.components["ssl"].libs = ["ssl"]

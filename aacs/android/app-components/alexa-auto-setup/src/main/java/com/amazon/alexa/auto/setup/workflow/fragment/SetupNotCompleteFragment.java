@@ -91,9 +91,6 @@ public class SetupNotCompleteFragment extends Fragment {
         View fragmentView = requireView();
 
         if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
-            ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
-            alexaImage.setVisibility(View.GONE);
-
             TextView setupNotCompleteText = fragmentView.findViewById(R.id.setup_not_complete_text);
             setupNotCompleteText.setText(R.string.setup_not_complete_text_with_alexa_custom_assistant);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,12 +26,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
+import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -58,6 +60,7 @@ import com.amazon.aacsipc.AACSReceiver.FetchStreamCallback;
 import com.amazon.aacsipc.AACSReceiver.MessageReceivedCallback;
 import com.amazon.aacsipc.IPCConstants;
 import com.amazon.aacsipc.IPCUtils;
+import com.amazon.aacsipc.TargetComponent;
 import com.amazon.alexaautoclientservice.aacs_extra.AACSContext;
 import com.amazon.alexaautoclientservice.aacs_extra.AACSModuleFactoryInterface;
 import com.amazon.alexaautoclientservice.aacs_extra.EngineStatusListener;
@@ -81,7 +84,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -277,6 +279,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     }
 
     private void unregisterBroadcastReceivers() {
+        Log.d(TAG, "unregisterBroadcastReceivers");
         Map<BroadcastReceiver, Pair<IntentFilter, String>> map =
                 mBroadcastReceiverScanner.getBroadcastReceivers(getApplicationContext());
         Iterator<BroadcastReceiver> itr = map.keySet().iterator();
@@ -396,9 +399,9 @@ public class AlexaAutoClientService extends Service implements AACSContext {
             }
 
             @Override
-            public void onStreamFetchCancelled(String streamId) {
-                Log.i(TAG, "onStreamFetchCancelled.");
-                cancelStream(streamId);
+            public void onStreamFetchCancelled(String streamID, long bytesWritten) {
+                Log.i(TAG, "onStreamFetchCancelled with bytesWritten.");
+                cancelStream(streamID);
             }
         };
 
@@ -471,35 +474,6 @@ public class AlexaAutoClientService extends Service implements AACSContext {
                                 .build();
     }
 
-    private List<AACSModuleFactoryInterface> getExtraModuleFactories() {
-        List<AACSModuleFactoryInterface> extraModuleFactories = new ArrayList<>();
-        try {
-            String folderName = "alexaautoclientservice";
-            String factoryKey = "factory";
-            String category = "name";
-            String[] fileList = getAssets().list(folderName);
-            Log.i(TAG, "Begin loading extras");
-            for (String f : fileList) {
-                InputStream is = getAssets().open(folderName + "/" + f);
-                byte[] buffer = new byte[is.available()];
-                is.read(buffer);
-                String json = new String(buffer, "UTF-8");
-                JSONObject obj = new JSONObject(json);
-                if (obj != null) {
-                    String factoryName = obj.getJSONObject(factoryKey).getString(category);
-                    AACSModuleFactoryInterface instance =
-                            (AACSModuleFactoryInterface) Class.forName(factoryName).newInstance();
-                    extraModuleFactories.add(instance);
-                    Log.i(TAG, "load extra module:" + factoryName);
-                }
-                is.close();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, String.format("Error while loading extras: %s", e.getMessage()));
-        }
-        return extraModuleFactories;
-    }
-
     private void getExtrasConfiguration(AACSContext aacsContext, List<AACSModuleFactoryInterface> extraFactories,
             ArrayList<EngineConfiguration> configuration) {
         for (AACSModuleFactoryInterface moduleFactory : extraFactories) {
@@ -522,7 +496,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
     }
 
     private boolean startEngine() {
-        List<AACSModuleFactoryInterface> extraFactories = getExtraModuleFactories();
+        List<AACSModuleFactoryInterface> extraFactories = FileUtil.loadExtraModuleFactories(this);
 
         // Generate extras config first, since this may require removing extras modules from OEM config.
         ArrayList<EngineConfiguration> extraConfiguration = new ArrayList<>();
@@ -558,32 +532,7 @@ public class AlexaAutoClientService extends Service implements AACSContext {
             Log.v(TAG, "registerPlatformInterface mMACCPlayer");
         }
 
-        if (isDefaultImplementationEnabled(FileUtil.AACS_CONFIG_LOCAL_MEDIA_SOURCE)) {
-            if (checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) != PackageManager.PERMISSION_GRANTED
-                    && !NotificationListener.isEnabled(getContext())) {
-                Log.w(TAG,
-                        "Cannot use LocalMediaSources because notification listener is not enabled or AACS is not at a system app");
-            } else {
-                mLocalSessionHandler = new LocalSessionHandler();
-                mLocalSessionHandler.onCreate(getContext());
-                List<MediaSource> sources = FileUtil.getLocalMediaSourceList();
-                for (MediaSource mediaSource : sources) {
-                    LocalMediaSourceHandler localMediaSource = new LocalMediaSourceHandler(getContext(), mediaSource);
-                    mLocalSessionHandler.add(localMediaSource);
-                    mEngine.registerPlatformInterface(localMediaSource);
-                    Log.v(TAG, "registerPlatformInterface LocalMediaSource for " + mediaSource.getSourceType());
-                }
-                if (mMACCPlayer != null) {
-                    mLocalSessionHandler.setDiscoveredPlayerProvider(mMACCPlayer);
-                }
-                if (!sources.isEmpty())
-                    mLocalSessionHandler.onInitialize();
-                else
-                    Log.w(TAG, "Cannot use LocalMediaSources because no source configured");
-            }
-        } else {
-            Log.w(TAG, "Default Local media is not added in the config");
-        }
+        initializeLocalSourceControl();
 
         if (isDefaultImplementationEnabled(FileUtil.AACS_CONFIG_PROPERTY_MANAGER)) {
             mPropertyManagerHandler = new PropertyManagerHandler(this);
@@ -736,14 +685,6 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         if (mLocalSessionHandler != null) {
             mLocalSessionHandler.onDestroy();
         }
-        mContext.unregisterReceiver(mPingReceiver);
-        mContext.unregisterReceiver(mServiceMetadataRequestReceiver);
-        mContext.unregisterReceiver(mShutdownActionReceiver);
-        unregisterBroadcastReceivers();
-
-        synchronized (mAACSStateObservers) {
-            mAACSStateObservers.clear();
-        }
 
         if (FileUtil.lvcEnabled() && LVCUtil.allowAACSToControlLVC()) {
             LVCUtil.stopLVCService(mContext);
@@ -752,7 +693,62 @@ public class AlexaAutoClientService extends Service implements AACSContext {
             mEngine.stop();
         }
         mStateMachine.setState(AACSConstants.State.STOPPED);
+
+        mContext.unregisterReceiver(mPingReceiver);
+        mContext.unregisterReceiver(mServiceMetadataRequestReceiver);
+        mContext.unregisterReceiver(mShutdownActionReceiver);
+        unregisterBroadcastReceivers();
+        synchronized (mAACSStateObservers) {
+            mAACSStateObservers.clear();
+        }
+
         super.onDestroy();
+    }
+
+    private void initializeLocalSourceControl() {
+        if (!isDefaultImplementationEnabled(FileUtil.AACS_CONFIG_LOCAL_MEDIA_SOURCE)) {
+            Log.d(TAG, "Default local media source control is not enabled");
+            return;
+        }
+        ComponentName notificationListenerName = null;
+        boolean mediaControlAllowed =
+                checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) == PackageManager.PERMISSION_GRANTED;
+        if (!mediaControlAllowed) {
+            Log.w(TAG,
+                    "MEDIA_CONTENT_CONTROL permission is not granted. Fall back to checking notification listener access");
+            notificationListenerName = new ComponentName(getContext(), NotificationListener.class);
+            mediaControlAllowed |= NotificationListener.isEnabled(getContext());
+        }
+        if (!mediaControlAllowed) {
+            Log.e(TAG,
+                    "Local media source control is enabled in config but required permissions are not granted; skipping");
+            return;
+        }
+
+        List<MediaSource> sources = FileUtil.getLocalMediaSourceList();
+        if (sources == null || sources.isEmpty()) {
+            Log.e(TAG, "Local media source control is enabled in config but no sources are configured; skipping");
+            return;
+        }
+
+        MediaSessionManager sessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+        if (sessionManager == null) {
+            Log.e(TAG, "Cannot initialize local media source control. MediaSessionManager is null");
+            return;
+        }
+
+        mLocalSessionHandler =
+                new LocalSessionHandler(sessionManager, getContext().getPackageName(), notificationListenerName);
+        for (MediaSource mediaSource : sources) {
+            LocalMediaSourceHandler localMediaSource = new LocalMediaSourceHandler(getContext(), mediaSource);
+            mLocalSessionHandler.add(localMediaSource);
+            Log.d(TAG, "Registering media source with Engine: " + mediaSource.getSourceType());
+            mEngine.registerPlatformInterface(localMediaSource);
+        }
+        if (mMACCPlayer != null) {
+            mLocalSessionHandler.setDiscoveredPlayerProvider(mMACCPlayer);
+        }
+        mLocalSessionHandler.onInitialize();
     }
 
     private interface AACSState {
@@ -952,11 +948,26 @@ public class AlexaAutoClientService extends Service implements AACSContext {
         private AACSState mState;
 
         private void sendAACSStateChangedIntent(String newState) {
+            Log.d(TAG, "Broadcasting AACS state change");
+            String action = AACSConstants.ACTION_STATE_CHANGE;
             Intent intent = new Intent();
 
-            intent.setAction(AACSConstants.ACTION_STATE_CHANGE);
+            intent.setAction(action);
             intent.putExtra("state", newState);
             mContext.sendBroadcast(intent, AACSConstants.AACS_PERMISSION);
+
+            // Explicit intents
+            List<TargetComponent> targets = ComponentRegistry.getInstance().findTargets(mContext, "", action, "");
+            if (targets != null) {
+                for (TargetComponent target : targets) {
+                    Intent targetIntent = new Intent();
+                    targetIntent.setComponent(target.component);
+                    targetIntent.setPackage(target.packageName);
+                    targetIntent.setAction(action);
+                    targetIntent.putExtra("state", newState);
+                    mContext.sendBroadcast(targetIntent, AACSConstants.AACS_PERMISSION);
+                }
+            }
         }
 
         public AACSStateMachine() {

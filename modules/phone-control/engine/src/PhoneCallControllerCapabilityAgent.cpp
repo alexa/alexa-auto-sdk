@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,32 +21,60 @@
 #include "rapidjson/stringbuffer.h"
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
+#include <unordered_set>
 
 namespace aace {
 namespace engine {
 namespace phoneCallController {
 
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+using NamespaceAndName = alexaClientSDK::avsCommon::avs::NamespaceAndName;
+
 static const std::string TAG("aace.phoneCallController.PhoneCallControllerCapabilityAgent");
 
 static const std::string NAMESPACE{"Alexa.Comms.PhoneCallController"};
 
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName DIAL{NAMESPACE, "Dial"};
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName REDIAL{NAMESPACE, "Redial"};
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName STOP{NAMESPACE, "Stop"};
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANSWER{NAMESPACE, "Answer"};
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName PLAY_RINGTONE{NAMESPACE, "PlayRingtone"};
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName SEND_DTMF{NAMESPACE, "SendDTMF"};
+static const NamespaceAndName DIAL{NAMESPACE, "Dial", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName REDIAL{NAMESPACE, "Redial", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName STOP{NAMESPACE, "Stop", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ANSWER{NAMESPACE, "Answer", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName PLAY_RINGTONE{NAMESPACE, "PlayRingtone", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName SEND_DTMF{NAMESPACE, "SendDTMF", AgentId::AGENT_ID_ALL};
 
 static const std::string PHONE_CONTROL_CAPABILITY_INTERFACE_TYPE = "AlexaInterface";
 static const std::string PHONE_CONTROL_CAPABILITY_INTERFACE_NAME = "Alexa.Comms.PhoneCallController";
 static const std::string PHONE_CONTROL_CAPABILITY_INTERFACE_VERSION = "2.0";
 
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName CONTEXT_MANAGER_PHONE_CONTROL_STATE{
+static const std::string CALL_TERMINATED = "CallTerminated";
+static const std::string CALL_FAILED = "CallFailed";
+static const std::string CALL_ACTIVATED = "CallActivated";
+static const std::string CALL_RECEIVED = "CallReceived";
+static const std::string REDIAL_STARTED = "RedialStarted";
+static const std::string DIAL_STARTED = "DialStarted";
+static const std::string OUTBOUND_RINGING_STARTED = "OutboundRingingStarted";
+static const std::string INBOUND_RINGING_STARTED = "InboundRingingStarted";
+static const std::string SEND_DTMF_SUCCEEDED = "SendDTMFSucceeded";
+static const std::string SEND_DTMF_FAILED = "SendDTMFFailed";
+static const std::string CALLER_ID_RECEIVED = "CallerIdReceived";
+
+static const NamespaceAndName CONTEXT_MANAGER_PHONE_CONTROL_STATE{
     NAMESPACE,
-    "PhoneCallControllerState"};
+    "PhoneCallControllerState",
+    AgentId::AGENT_ID_ALL};
 
 static const std::string CHANNEL_NAME =
     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::COMMUNICATIONS_CHANNEL_NAME;
+
+static const std::string CALL_ID_KEY = "callId";
+
+// Events that are only expected to be sent as responses to directives.
+static const std::unordered_set<std::string> REPLY_EVENTS({
+    CALL_FAILED,
+    DIAL_STARTED,
+    REDIAL_STARTED,
+    SEND_DTMF_SUCCEEDED,
+    SEND_DTMF_FAILED
+});
 
 static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>
 getPhoneCallControllerCapabilityConfiguration();
@@ -87,15 +115,6 @@ void PhoneCallControllerCapabilityAgent::preHandleDirective(std::shared_ptr<Dire
 void PhoneCallControllerCapabilityAgent::handleDirective(std::shared_ptr<DirectiveInfo> info) {
     try {
         ThrowIfNot(info && info->directive, "nullDirectiveInfo");
-
-        if (m_connectionState !=
-            aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::CONNECTED) {
-            sendExceptionEncounteredAndReportFailed(
-                info,
-                "Connection state is not CONNECTED",
-                alexaClientSDK::avsCommon::avs::ExceptionErrorType::INTERNAL_ERROR);
-            return;
-        }
 
         if (info->directive->getName() == DIAL.name) {
             handleDialDirective(info);
@@ -222,7 +241,7 @@ void PhoneCallControllerCapabilityAgent::handleDialDirective(std::shared_ptr<Dir
             return;
         }
 
-        if (!document.HasMember("callId")) {
+        if (!document.HasMember(CALL_ID_KEY)) {
             AACE_ERROR(LX(TAG, "handleDialDirective").d("reason", "missing callId"));
             sendExceptionEncounteredAndReportFailed(
                 info,
@@ -230,12 +249,14 @@ void PhoneCallControllerCapabilityAgent::handleDialDirective(std::shared_ptr<Dir
                 alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
             return;
         }
-        auto callId = document["callId"].GetString();
+        auto callId = document[CALL_ID_KEY].GetString();
         addCall(callId, CallState::IDLE);
 
         if (m_phoneCallController->dial(info->directive->getPayload())) {
+            auto agentId = info->directive->getAgentId();
             m_callMethodMap[callId] = CallMethod::DIAL;
             m_currentCallId = callId;
+            m_callAgentMap[callId] = agentId;
         } else {
             removeCall(callId);
         }
@@ -260,7 +281,7 @@ void PhoneCallControllerCapabilityAgent::handleRedialDirective(std::shared_ptr<D
             return;
         }
 
-        if (!document.HasMember("callId")) {
+        if (!document.HasMember(CALL_ID_KEY)) {
             AACE_ERROR(LX(TAG, "handleRedialDirective").d("reason", "missing callId"));
             sendExceptionEncounteredAndReportFailed(
                 info,
@@ -268,12 +289,14 @@ void PhoneCallControllerCapabilityAgent::handleRedialDirective(std::shared_ptr<D
                 alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
             return;
         }
-        auto callId = document["callId"].GetString();
+        auto callId = document[CALL_ID_KEY].GetString();
         addCall(callId, CallState::IDLE);
 
         if (m_phoneCallController->redial(info->directive->getPayload())) {
+            auto agentId = info->directive->getAgentId();
             m_callMethodMap[callId] = CallMethod::REDIAL;
             m_currentCallId = callId;
+            m_callAgentMap[callId] = agentId;
         } else {
             removeCall(callId);
         }
@@ -298,7 +321,19 @@ void PhoneCallControllerCapabilityAgent::handleAnswerDirective(std::shared_ptr<D
             return;
         }
 
+        if (!document.HasMember(CALL_ID_KEY)) {
+            AACE_ERROR(LX(TAG).d("reason", "missing callId"));
+            sendExceptionEncounteredAndReportFailed(
+                info,
+                "Missing callId",
+                alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
+            return;
+        }
+        auto callId = document[CALL_ID_KEY].GetString();
+
         m_phoneCallController->answer(info->directive->getPayload());
+        auto agentId = info->directive->getAgentId();
+        m_callAgentMap[callId] = agentId;
         setHandlingCompleted(info);
     });
 }
@@ -318,7 +353,19 @@ void PhoneCallControllerCapabilityAgent::handleStopDirective(std::shared_ptr<Dir
             return;
         }
 
+        if (!document.HasMember(CALL_ID_KEY)) {
+            AACE_ERROR(LX(TAG).d("reason", "missing callId"));
+            sendExceptionEncounteredAndReportFailed(
+                info,
+                "Missing callId",
+                alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
+            return;
+        }
+        auto callId = document[CALL_ID_KEY].GetString();
+
         m_phoneCallController->stop(info->directive->getPayload());
+        auto agentId = info->directive->getAgentId();
+        m_callAgentMap[callId] = agentId;
         setHandlingCompleted(info);
     });
 }
@@ -338,7 +385,19 @@ void PhoneCallControllerCapabilityAgent::handlePlayRingtoneDirective(std::shared
             return;
         }
 
+        if (!document.HasMember(CALL_ID_KEY)) {
+            AACE_ERROR(LX(TAG).d("reason", "missing callId"));
+            sendExceptionEncounteredAndReportFailed(
+                info,
+                "Missing callId",
+                alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
+            return;
+        }
+        auto callId = document[CALL_ID_KEY].GetString();
+
         m_phoneCallController->playRingtone(info->directive->getPayload());
+        auto agentId = info->directive->getAgentId();
+        m_callAgentMap[callId] = agentId;
         setHandlingCompleted(info);
     });
 }
@@ -358,7 +417,19 @@ void PhoneCallControllerCapabilityAgent::handleSendDTMFDirective(std::shared_ptr
             return;
         }
 
+        if (!document.HasMember(CALL_ID_KEY)) {
+            AACE_ERROR(LX(TAG).d("reason", "missing callId"));
+            sendExceptionEncounteredAndReportFailed(
+                info,
+                "Missing callId",
+                alexaClientSDK::avsCommon::avs::ExceptionErrorType::UNEXPECTED_INFORMATION_RECEIVED);
+            return;
+        }
+        auto callId = document[CALL_ID_KEY].GetString();
+
         m_phoneCallController->sendDTMF(info->directive->getPayload());
+        auto agentId = info->directive->getAgentId();
+        m_callAgentMap[callId] = agentId;
         setHandlingCompleted(info);
     });
 }
@@ -583,6 +654,7 @@ void PhoneCallControllerCapabilityAgent::executeCallStateChanged(
         addCall(callId, CallState::IDLE);
     }
     auto eventName = getEventName(state, callId);
+    auto agentId = executeGetAgentByCallId(callId, eventName);
     rapidjson::Document payload(rapidjson::kObjectType);
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -593,6 +665,7 @@ void PhoneCallControllerCapabilityAgent::executeCallStateChanged(
     if (state == CallState::IDLE) {
         removeCall(callId);
         m_callMethodMap.erase(callId);
+        m_callAgentMap.erase(callId);
     } else {
         setCallState(callId, state);
     }
@@ -637,7 +710,7 @@ void PhoneCallControllerCapabilityAgent::executeCallStateChanged(
         ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
         auto event = buildEventAndUpdateContext(eventName, buffer.GetString());
         ThrowIf(event.second.empty(), "failedToCreateEvent");
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
         m_messageSender->sendMessage(request);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -671,10 +744,12 @@ void PhoneCallControllerCapabilityAgent::executeCallFailed(
         m_callMethodMap.erase(callId);
         releaseCommunicationsChannelFocus();
 
-        auto event = buildEventAndUpdateContext("CallFailed", buffer.GetString());
+        auto event = buildEventAndUpdateContext(CALL_FAILED, buffer.GetString());
         ThrowIf(event.second.empty(), "failedToCreateEvent");
 
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        auto agentId = executeGetAgentByCallId(callId, CALL_FAILED);
+        m_callAgentMap.erase(callId);
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
         m_messageSender->sendMessage(request);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -705,7 +780,8 @@ void PhoneCallControllerCapabilityAgent::executeCallerIdReceived(
         auto event = buildEventAndUpdateContext("CallerIdReceived", buffer.GetString());
         ThrowIf(event.second.empty(), "failedToCreateEvent");
 
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        auto agentId = executeGetAgentByCallId(callId, CALLER_ID_RECEIVED);
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
         m_messageSender->sendMessage(request);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -724,7 +800,8 @@ void PhoneCallControllerCapabilityAgent::executeSendDTMFSucceeded(const std::str
         auto event = buildEventAndUpdateContext("SendDTMFSucceeded", buffer.GetString());
         ThrowIf(event.second.empty(), "failedToCreateEvent");
 
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        auto agentId = executeGetAgentByCallId(callId, SEND_DTMF_SUCCEEDED);
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
         m_messageSender->sendMessage(request);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -752,7 +829,8 @@ void PhoneCallControllerCapabilityAgent::executeSendDTMFFailed(
         auto event = buildEventAndUpdateContext("SendDTMFFailed", buffer.GetString());
         ThrowIf(event.second.empty(), "failedToCreateEvent");
 
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+        auto agentId = executeGetAgentByCallId(callId, SEND_DTMF_FAILED);
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
         m_messageSender->sendMessage(request);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -771,31 +849,46 @@ void PhoneCallControllerCapabilityAgent::releaseCommunicationsChannelFocus() {
     m_executor.submit([this] { m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this()); });
 }
 
+alexaClientSDK::avsCommon::avs::AgentId::IdType PhoneCallControllerCapabilityAgent::executeGetAgentByCallId(const std::string& callId, const std::string& eventName) {
+    if (m_callAgentMap.find(callId) != m_callAgentMap.end()) {
+        return m_callAgentMap[callId];;
+    }
+    AACE_INFO(LX(TAG).m("No agent is specified for the event."));
+    if (REPLY_EVENTS.find(eventName) == REPLY_EVENTS.end()) {
+        AACE_INFO(LX(TAG).m("Sending the event to all agents."));
+        return AgentId::AGENT_ID_ALL;
+    }
+
+    // REPLY_EVENTS should always be in response to directives, meaning their callIds are known by this capability agent.
+    // Tagging REPLY_EVENTS with unknown callId with Alexa's agentId helps create metrics in this unexpected case.
+    return AgentId::getAlexaAgentId();
+}
+
 std::string PhoneCallControllerCapabilityAgent::getEventName(CallState state, const std::string& callId) {
     std::string eventName;
     switch (state) {
         case CallState::ACTIVE:
-            eventName = "CallActivated";
+            eventName = CALL_ACTIVATED;
             break;
         case CallState::TRYING:
             if (m_callMethodMap.find(callId) != m_callMethodMap.end() &&
                 m_callMethodMap[callId] == CallMethod::REDIAL) {
-                eventName = "RedialStarted";
+                eventName = REDIAL_STARTED;
             } else {
-                eventName = "DialStarted";
+                eventName = DIAL_STARTED;
             }
             break;
         case CallState::OUTBOUND_RINGING:
-            eventName = "OutboundRingingStarted";
+            eventName = OUTBOUND_RINGING_STARTED;
             break;
         case CallState::INBOUND_RINGING:
-            eventName = "InboundRingingStarted";
+            eventName = INBOUND_RINGING_STARTED;
             break;
         case CallState::IDLE:
-            eventName = "CallTerminated";
+            eventName = CALL_TERMINATED;
             break;
         case CallState::INVITED:
-            eventName = "CallReceived";
+            eventName = CALL_RECEIVED;
             break;
     }
     return eventName;

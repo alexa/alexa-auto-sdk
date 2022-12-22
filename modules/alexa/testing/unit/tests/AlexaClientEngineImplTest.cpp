@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <AVSCommon/AVS/AgentId.h>
 #include <AVSCommon/AVS/Initialization/AlexaClientSDKInit.h>
 #include <AVSCommon/SDKInterfaces/ConnectionStatusObserverInterface.h>
 
@@ -71,26 +72,36 @@ TEST_F(AlexaClientEngineImplTest, verifyDialogStateCallbacks) {
         m_alexaMockFactory->getFocusManagerInterfaceMock());
     ASSERT_NE(alexaEngineClientImpl, nullptr) << "AlexaClientEngineImpl pointer is null!";
 
+    auto alexaAgentId = alexaClientSDK::avsCommon::avs::AgentId::getAlexaAgentId();
+
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(aace::alexa::AlexaClient::DialogState::IDLE));
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(alexaAgentId, aace::alexa::AlexaClient::DialogState::IDLE));
     alexaEngineClientImpl->onDialogUXStateChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::IDLE);
+        alexaAgentId, alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::IDLE);
 
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(),
         dialogStateChanged(aace::alexa::AlexaClient::DialogState::LISTENING));
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(alexaAgentId, aace::alexa::AlexaClient::DialogState::LISTENING));
     alexaEngineClientImpl->onDialogUXStateChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::LISTENING);
+        alexaAgentId, alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::LISTENING);
 
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(aace::alexa::AlexaClient::DialogState::THINKING));
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(alexaAgentId, aace::alexa::AlexaClient::DialogState::THINKING));
     alexaEngineClientImpl->onDialogUXStateChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::THINKING);
+        alexaAgentId, alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::THINKING);
 
     EXPECT_CALL(
         *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(aace::alexa::AlexaClient::DialogState::SPEAKING));
+    EXPECT_CALL(
+        *m_alexaMockFactory->getAlexaClientMock(), dialogStateChanged(alexaAgentId, aace::alexa::AlexaClient::DialogState::SPEAKING));
     alexaEngineClientImpl->onDialogUXStateChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::SPEAKING);
+        alexaAgentId, alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::SPEAKING);
 }
 
 TEST_F(AlexaClientEngineImplTest, verifyAuthStateCallbacks) {

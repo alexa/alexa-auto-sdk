@@ -11,13 +11,13 @@
     <application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
-        android:label="@string/app_name"
+        android:label="@string/alexa_media_app_name"
         android:supportsRtl="true">
 
-
         <service
-            android:label="@string/app_name"
-            android:name=".browse.AlexaMediaBrowseService">
+            android:label="@string/alexa_media_app_name"
+            android:name=".browse.AlexaMediaBrowseService"
+            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
@@ -40,10 +40,6 @@
                 <action android:name="com.amazon.aacs.aasb.MutedStateChanged" />
                 <action android:name="com.amazon.aacs.aasb.VolumeChanged" />
             </intent-filter>
-            <intent-filter>
-                <category android:name="com.amazon.aacs.aasb.TemplateRuntime" />
-                <action android:name="com.amazon.aacs.aasb.RenderPlayerInfo" />
-            </intent-filter>
 
             <intent-filter>
                 <category android:name="com.amazon.aacs.aasb.LocalMediaSource" />
@@ -60,27 +56,30 @@
 
             <intent-filter>
                 <category android:name="com.amazon.aacs.aasb.MediaPlaybackRequestor" />
-
                 <action android:name="com.amazon.aacs.aasb.MediaPlaybackResponse" />
             </intent-filter>
-            <intent-filter>
-                <category android:name="com.amazon.aacs.aasb.AlexaClient" />
-                <action android:name="com.amazon.aacs.aasb.ConnectionStatusChanged"/>
-            </intent-filter>
         </service>
-
-        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
 
         <provider
             android:name="com.amazon.alexa.auto.media.content.AlbumArtContentProvider"
             android:authorities="com.amazon.alexa.auto.media.provider"
             android:exported="true" />
 
-        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+        <receiver android:name="com.amazon.alexa.auto.media.session.PlayerInfoReceiver"
+            android:exported="false">
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.AudioOutput" />
+                <action android:name="com.amazon.aacs.aasb.Prepare" />
+            </intent-filter>
+            <intent-filter>
+                <category android:name="com.amazon.aacs.aasb.TemplateRuntime" />
+                <action android:name="com.amazon.aacs.aasb.RenderPlayerInfo" />
+                <action android:name="com.amazon.aacs.aasb.ClearPlayerInfo" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name="androidx.media.session.MediaButtonReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>

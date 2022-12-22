@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- These strings need to be localized based on the country and region -->
+    <string name="cbl_login_alexa_hint1">«&#160;Alexa, règle la température sur 22&#160;degrés.&#160;»</string>
+    <string name="cbl_login_alexa_hint2">«&#160;Alexa, trouve un café.&#160;»</string>
+    <string name="cbl_login_alexa_hint3">«&#160;Alexa, joue de la musique.&#160;»</string>
+    <string name="auth_provider_login_alexa_hint1">«&#160;Alexa, règle la température sur 22&#160;degrés.&#160;»</string>
+    <string name="auth_provider_login_alexa_hint2">«&#160;Alexa, emmène-moi à l\'aéroport.&#160;»</string>
+    <string name="auth_provider_login_alexa_hint3"></string>
+    <string name="auth_provider_sign_in_hint">Connectez-vous pour écouter de la musique, obtenir la météo, contrôler des appareils connectés et bien plus.</string>
+    <string name="location_permission_hint_text">«&#160;Alexa, trouve des restaurants à proximité.&#160;»</string>
+    <string name="nav_favorites_permission_hint_text">«&#160;Alexa, emmène-moi à la maison.&#160;»</string>
+    <string name="enable_preview_mode_disclaimer">Amazon traite les interactions d\'Alexa dans le cloud pour fournir et améliorer nos services. En sélectionnant « Accepter et Autoriser Alexa » vous acceptez les <annotation placeholder="">Conditions d’Utilisation d\'Alexa</annotation> et <annotation placeholder="">toutes les conditions qui se trouvent ici</annotation>. \n\n<annotation placeholder="">Découvrez comment Alexa est conçu pour protéger votre confidentialité</annotation>.</string>
+    <string name="enable_preview_mode_action_button">Accepter et Autoriser Alexa</string>
+    <string name="terms_of_use_url">https://www.amazon.fr/gp/help/customer/display.html?nodeId=201809740</string>
+    <string name="all_terms_of_use_url">https://www.amazon.fr/gp/help/customer/display.html?nodeId=201566380</string>
+    <string name="privacy_url">https://www.amazon.fr/gp/help/customer/display.html/?nodeId=GVP69FUJ48X9DK8V</string>
+</resources>

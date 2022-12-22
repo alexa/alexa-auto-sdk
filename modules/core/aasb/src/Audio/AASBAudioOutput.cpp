@@ -66,7 +66,7 @@ std::shared_ptr<AASBAudioOutput> AASBAudioOutput::create(
     std::shared_ptr<aace::engine::messageBroker::StreamManagerInterface> streamManager) {
     try {
         ThrowIfNull(messageBroker, "invalidMessageBroker");
-        ThrowIfNull(streamManager, "invalidstreamManager");
+        ThrowIfNull(streamManager, "invalidStreamManager");
 
         auto audioOutput = std::shared_ptr<AASBAudioOutput>(new AASBAudioOutput(name, type));
         ThrowIfNot(audioOutput->initialize(messageBroker, streamManager), "initializeAudioOutputFailed");
@@ -171,7 +171,7 @@ bool AASBAudioOutput::prepare(std::shared_ptr<aace::audio::AudioStream> stream, 
         ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
 
         auto m_streamManager_lock = m_streamManager.lock();
-        ThrowIfNull(m_streamManager_lock, "invalidstreamManagerReference");
+        ThrowIfNull(m_streamManager_lock, "invalidStreamManagerReference");
 
         // generate a unique stream id
         auto streamId = aace::engine::utils::uuid::generateUUID();

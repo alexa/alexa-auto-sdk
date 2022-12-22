@@ -130,7 +130,7 @@ bool MessageBrokerEngineService::setup() {
 }
 
 //
-// aace::egnine::message::MessageBrokerServiceInterface
+// aace::engine::message::MessageBrokerServiceInterface
 //
 
 std::shared_ptr<MessageBrokerInterface> MessageBrokerEngineService::getMessageBroker() {

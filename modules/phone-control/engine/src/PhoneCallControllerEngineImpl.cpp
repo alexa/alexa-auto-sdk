@@ -102,10 +102,6 @@ bool PhoneCallControllerEngineImpl::initialize(
         capabilitiesRegistrar->withCapability(
             m_phoneCallControllerCapabilityAgent, m_phoneCallControllerCapabilityAgent);
 
-        // Start with phone connection state as DISCONNECTED.
-        m_connectionState =
-            aace::phoneCallController::PhoneCallControllerEngineInterface::ConnectionState::DISCONNECTED;
-
         m_autoProvisioningThread = std::thread(&PhoneCallControllerEngineImpl::autoProvisioningThread, this);
 
         return true;

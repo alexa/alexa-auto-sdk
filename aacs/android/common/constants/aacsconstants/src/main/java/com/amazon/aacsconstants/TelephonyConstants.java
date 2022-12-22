@@ -42,4 +42,8 @@ public class TelephonyConstants {
 
     public static final String DEVICE_PROPERTY = "deviceProperty";
     public static final String ENABLE = "enable";
+
+    public static final String device_bundle = "device";
+    public static final String device_found = "true";
+    public static final String device_not_found = "false";
 }

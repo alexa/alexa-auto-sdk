@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -375,8 +375,23 @@ abstract public class AlexaClient extends PlatformInterface {
      * @note It is the responsibility of the platform implementation to provide a familiar Alexa experience for the
      * user. See the AVS UX Attention System guidelines for recommendations on communicating Alexa attention states:
      * https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
+     * 
+     * @deprecated
+     * Use dialogStateChanged(int id, DialogState state)
      */
     public void dialogStateChanged(DialogState state) {}
+
+    /**
+     * Notifies the platform implementation of a dialog state change
+     *
+     * @param [in] id The id of the assistant that the dialog state change associated with
+     * @param [in] state The new dialog state
+     *
+     * @note The platform implementation is responsible for providing a familiar Alexa and/or custom assistant (if applicable) experience for the user.
+     * See the AVS UX Attention System guidelines for recommendations on communicating 
+     * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
+     */
+    public void dialogStateChanged(int id, DialogState state) {}
 
     /**
      * Notifies the platform implementation of an AVS authorization state change

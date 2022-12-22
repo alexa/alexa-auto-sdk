@@ -2,4 +2,14 @@
 <resources>
     <string name="aacs_telephony_description">Androidデバイスで通話機能を提供する</string>
     <string name="aacs_telephony_title">AACS電話サービス</string>
+
+    <string name="comms_toast_contacts_syncing">%1$sの連絡先を同期中…</string>
+    <string name="comms_toast_contacts_synced">%1$sの連絡先を同期しました</string>
+    <string name="comms_toast_contacts_removing">Amazonのサービスから連絡先を削除中…</string>
+    <string name="comms_toast_contacts_removed">Amazonのサービスから連絡先を削除しました</string>
+
+    <string name="aacs_telephony_toast_sms_syncing">%1$sのSMSメッセージを同期中…</string>
+    <string name="aacs_telephony_toast_sms_synced">%1$sのSMSメッセージを同期しました</string>
+    <string name="aacs_telephony_toast_sms_removing">AmazonのサービスからSMSメッセージを削除中…</string>
+    <string name="aacs_telephony_toast_sms_removed">AmazonのサービスからSMSメッセージを削除しました</string>
 </resources>

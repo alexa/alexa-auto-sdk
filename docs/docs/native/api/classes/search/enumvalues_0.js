@@ -2,7 +2,7 @@ var searchData=
 [
   ['acl_5fclient_5frequest',['ACL_CLIENT_REQUEST',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a5cd351b726751149c0464e3d9c23dcf1',1,'aace::alexa::AlexaClient']]],
   ['acl_5fdisabled',['ACL_DISABLED',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05aa81589ff9e0102b95f3eafce18463d1a',1,'aace::alexa::AlexaClient']]],
-  ['active',['ACTIVE',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#aca981e480f3b8704f5c50c6f859b8432a18ff74f43da410c5529f7d6fca84f115',1,'aace::phoneCallController::PhoneCallControllerEngineInterface']]],
+  ['active',['ACTIVE',['../classaace_1_1arbitrator_1_1_arbitrator_engine_interface.html#a23d473f4514a6d691f6f59de6b2fbd39a18ff74f43da410c5529f7d6fca84f115',1,'aace::arbitrator::ArbitratorEngineInterface::ACTIVE()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#aca981e480f3b8704f5c50c6f859b8432a18ff74f43da410c5529f7d6fca84f115',1,'aace::phoneCallController::PhoneCallControllerEngineInterface::ACTIVE()']]],
   ['ad',['AD',['../classaace_1_1alexa_1_1_external_media_adapter.html#a743163f79b264acddbcbac96a3d06836ae182ebbc166d73366e7986813a7fc5f1',1,'aace::alexa::ExternalMediaAdapter']]],
   ['adjust_5fseek',['ADJUST_SEEK',['../classaace_1_1alexa_1_1_external_media_adapter.html#ad404e42d4033d44e53c1e09734312a6ea1b6236451a19ee2e11ae9fb2f1185059',1,'aace::alexa::ExternalMediaAdapter']]],
   ['alerts_5fvolume',['ALERTS_VOLUME',['../classaace_1_1alexa_1_1_alexa_speaker_engine_interface.html#a201c4dce279b98ad5e622ceabfbd8d37ae191df18ea126ad075083ed3967ee9c3',1,'aace::alexa::AlexaSpeakerEngineInterface']]],

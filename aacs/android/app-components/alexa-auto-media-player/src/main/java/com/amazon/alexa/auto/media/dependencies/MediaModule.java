@@ -16,8 +16,8 @@ package com.amazon.alexa.auto.media.dependencies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 
 import com.amazon.aacsconstants.PlaybackConstants;
 import com.amazon.alexa.auto.aacs.common.PlaybackControlMessages;
@@ -45,6 +45,8 @@ import dagger.Provides;
  */
 @Module
 public class MediaModule {
+    private static final String TAG = MediaModule.class.getSimpleName();
+
     /**
      * Provides the Media Session Manager.
      *
@@ -56,13 +58,13 @@ public class MediaModule {
     public MediaSessionManager provideMediaSessionComponents(WeakReference<Context> context, MediaPlayerExo mediaPlayer,
             MediaSessionCompat mediaSession, PlaybackControlMessages messageSender,
             SharedPreferences sharedPreferences) {
+        Log.v(TAG, "provideMediaSessionComponents");
         Context contextStrong = context.get();
         Preconditions.checkNotNull(contextStrong);
-        AudioManager audioManager = (AudioManager) context.get().getSystemService(Context.AUDIO_SERVICE);
 
         return new MediaSessionManager(mediaPlayer, mediaSession,
                 new MediaMetadataProvider(Glide.with(contextStrong), context), new PlaybackController(messageSender),
-                new CustomActionProviders(contextStrong, messageSender), sharedPreferences, audioManager);
+                new CustomActionProviders(contextStrong, messageSender), sharedPreferences);
     }
 
     /**
@@ -74,6 +76,7 @@ public class MediaModule {
     @Provides
     @Singleton
     public MediaPlayerExo provideMediaPlayer(WeakReference<Context> contextWk) {
+        Log.v(TAG, "provideMediaPlayer");
         Context context = contextWk.get();
         if (context == null) {
             throw new RuntimeException("Invalid Context");

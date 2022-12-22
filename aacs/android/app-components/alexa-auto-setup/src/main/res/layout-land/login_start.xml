@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@id/login_start_layout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_start_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -30,33 +31,21 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
 
-    <!--Alexa logo-->
-    <ImageView
-        android:id="@+id/alexa_img_view"
-        android:layout_width="@dimen/login_alexa_image_width"
-        android:layout_height="@dimen/login_alexa_image_height"
-        android:layout_gravity="center"
-        android:contentDescription="@string/alexa_logo_content_description"
-        android:src="@drawable/alexa_logo"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/right_guideline"
-        app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!--Alexa logo-->
 
     <!--Main text box-->
     <TextView
         android:id="@+id/login_dialog_text_view"
-        style="@style/Alexa.TitleText"
+        style="?attr/headerText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="133dp"
         android:text="@string/login_message"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
-        android:layout_marginTop="@dimen/login_item_margin_top"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/login_progress_spinner"
@@ -71,7 +60,7 @@
     <!--Preview Mode Button-->
     <TextView
         android:id="@+id/try_alexa_action_button"
-        style="@style/Alexa.Button"
+        style="?attr/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/try_alexa_button"
@@ -83,7 +72,7 @@
     <!--CBL Button-->
     <TextView
         android:id="@+id/sign_in_action_button"
-        style="@style/Alexa.Button2"
+        style="?attr/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/sign_in_action_button"

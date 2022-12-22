@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.NoSuchPropertyException;
 
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.Topic;
@@ -120,6 +121,9 @@ public class AACSCarControlReceiver extends BroadcastReceiver {
             }
         } catch (JSONException e) {
             Log.e(TAG, String.format("Error occurred when parsing Car Control message payload JSON: %s", payload));
+        } catch (NoSuchPropertyException e) {
+            Log.i(TAG, "Controller endpoint property not found, ignoring reply. Error: " + e.getMessage());
+            return;
         } catch (RuntimeException e) {
             Log.e(TAG, String.format("Unable to perform set value for %s, %s due to %s", endpointId, instance, e));
         }
@@ -186,6 +190,9 @@ public class AACSCarControlReceiver extends BroadcastReceiver {
                     Log.e(TAG, "Unsupported ControllerType/Capability caught in adjustControllerValue: " + capability);
                     break;
             }
+        } catch (NoSuchPropertyException e) {
+            Log.i(TAG, "Controller endpoint property not found, ignoring reply. Error: " + e.getMessage());
+            return;
         } catch (RuntimeException e) {
             Log.e(TAG, String.format("Unable to perform adjust value for %s, %s due to %s", endpointId, instance, e));
         }

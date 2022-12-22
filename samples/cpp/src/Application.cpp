@@ -307,9 +307,6 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     auto card = ContentView::create("id:card");
     views.push_back(card);
 
-    // AlertsHandler view example
-    views.push_back(TextView::create("id:AlertState"));
-
     // AlexaClientHandler view example
     views.push_back(TextView::create("id:AuthState"));
     views.push_back(TextView::create("id:ConnectionStatus"));
@@ -459,14 +456,15 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     Ensures(authorizationHandler != nullptr);
     authorizationHandler->saveDeviceInfo(jsonConfigs);
 
+#ifdef AAC_VAD_ENABLE
+    auto agentHandler = arbitrator::AgentHandler::create(activity, loggerHandler, messageBroker);
+    Ensures(agentHandler != nullptr);
+#endif
+
 #ifdef AAC_ALEXA
     // Audio Player
     auto audioPlayerHandler = alexa::AudioPlayerHandler::create(activity, loggerHandler, messageBroker);
     Ensures(audioPlayerHandler != nullptr);
-
-    // Alerts
-    auto alertsHandler = alexa::AlertsHandler::create(activity, loggerHandler, messageBroker);
-    Ensures(alertsHandler != nullptr);
 
     // Alexa Client
     auto alexaClientHandler = alexa::AlexaClientHandler::create(activity, loggerHandler, messageBroker);
@@ -978,8 +976,8 @@ void Application::setupMenu(
              * https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales
              */
             std::string supportedLocales =
-                "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR,en-CA/"
-                "fr-CA,en-IN/hi-IN,en-US/es-US,es-US/en-US,fr-CA/en-CA,hi-IN/en-IN,en-US/fr-FR,fr-FR/en-US,en-US/"
+                "de-DE,en-AU,en-CA,en-GB,en-IN,en-US,es-ES,es-MX,es-US,fr-CA,fr-FR,hi-IN,it-IT,ja-JP,pt-BR,ar-SA,"
+                "en-CA/fr-CA,en-IN/hi-IN,en-US/es-US,es-US/en-US,fr-CA/en-CA,hi-IN/en-IN,en-US/fr-FR,fr-FR/en-US,en-US/"
                 "de-DE,de-DE/en-US,en-US/ja-JP,ja-JP/en-US,en-US/it-IT,it-IT/en-US,en-US/es-ES,es-ES/en-US";
             std::istringstream iss{supportedLocales};
             auto token = std::string();

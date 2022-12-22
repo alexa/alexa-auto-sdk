@@ -123,6 +123,18 @@ public class AlexaLocalesProvider {
         });
     }
 
+    public Single<Boolean> isCurrentLanguageSupportedByAlexa(String currentLanguage) {
+        return fetchAlexaSupportedLocales().map(supportedLocaleList -> {
+            for ( Map.Entry<String, Pair<String, String>> entry : supportedLocaleList.entrySet()) {
+                if (currentLanguage.equals(entry.getValue().second.split("/")[0])) {
+                    Log.d(TAG, currentLanguage + " is supported by Alexa");
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
     /**
      * Fetch all Alexa supported locales and put into locale list.
      */

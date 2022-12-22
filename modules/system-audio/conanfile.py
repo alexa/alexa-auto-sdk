@@ -1,6 +1,7 @@
 from conans import ConanFile
 import logging, json, os
 
+
 class AutoSdkModulePkg(ConanFile):
     python_requires = "aac-sdk-tools/1.0"
     python_requires_extend = "aac-sdk-tools.BaseSdkModule"
@@ -21,16 +22,21 @@ class AutoSdkModulePkg(ConanFile):
             super(AutoSdkModulePkg, self).build()
         else:
             logging.warning(
-                f"Operating system not supported (settings.os={self.settings.os}). Module is being skipped.")
+                f"Operating system not supported (settings.os={self.settings.os}). Module is being skipped."
+            )
 
     def package(self):
-        super(AutoSdkModulePkg,self).package()
+        super(AutoSdkModulePkg, self).package()
         self.copy("*", src=f"configs/{str(self.settings.os).lower()}", dst="config", keep_path=False)
 
     def package_info(self):
-        super(AutoSdkModulePkg,self).package_info()
-        self.user_info.aac_export_shared = json.dumps([{
-            "pattern": "*.json",
-            "src": os.path.abspath(os.path.join(self.package_folder,"config")),
-            "dst": "system-audio/config"
-        }])
+        super(AutoSdkModulePkg, self).package_info()
+        self.user_info.aac_export_shared = json.dumps(
+            [
+                {
+                    "pattern": "*.json",
+                    "src": os.path.abspath(os.path.join(self.package_folder, "config")),
+                    "dst": "system-audio/config",
+                }
+            ]
+        )

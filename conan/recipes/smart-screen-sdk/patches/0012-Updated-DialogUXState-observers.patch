@@ -1,0 +1,88 @@
+From c660b10b95308ac22737c5ac520faf3bc29818d0 Mon Sep 17 00:00:00 2001
+From: Sherry Yang <yanyidi@amazon.com>
+Date: Thu, 18 Aug 2022 22:22:04 -0700
+Subject: [PATCH 12/14] Updated DialogUXState observers
+
+---
+ modules/Alexa/CMakeLists.txt                              | 1 +
+ .../include/AlexaPresentation/AlexaPresentation.h         | 2 +-
+ .../AlexaPresentation/src/AlexaPresentation.cpp           | 3 +++
+ .../TemplateRuntimeCapabilityAgent/TemplateRuntime.h      | 1 +
+ .../TemplateRuntime/src/TemplateRuntime.cpp               | 8 ++++++--
+ 5 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/modules/Alexa/CMakeLists.txt b/modules/Alexa/CMakeLists.txt
+index 9fef1f6..a7e4418 100644
+--- a/modules/Alexa/CMakeLists.txt
++++ b/modules/Alexa/CMakeLists.txt
+@@ -50,6 +50,7 @@ else()
+ 		"${ASDK_LIB_DIR}/acsdkShutdownManager.lib"
+ 		"${ASDK_LIB_DIR}/acsdkStartupManager.lib"
+ 		"${ASDK_LIB_DIR}/acsdkSystemClockMonitor.lib"
++		"${ASDK_LIB_DIR}/acsdkDUXSA.lib"
+ 		"${ASDK_LIB_DIR}/ADSL.lib"
+ 		"${ASDK_LIB_DIR}/AFML.lib"
+ 		"${ASDK_LIB_DIR}/AIP.lib"
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
+index 05bb351..bda0fa9 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
++++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/include/AlexaPresentation/AlexaPresentation.h
+@@ -147,7 +147,7 @@ public:
+     /// @name DialogUXStateObserverInterface Functions
+     /// @{
+     void onDialogUXStateChanged(
+-        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) override;
++        alexaClientSDK::avsCommon::avs::AgentId::IdType agentId, alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) override;
+     /// @}
+ 
+     /// @name ContextRequesterInterface Functions
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
+index 3c3ea54..a864e35 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
++++ b/modules/Alexa/SmartScreenCapabilityAgents/AlexaPresentation/src/AlexaPresentation.cpp
+@@ -389,8 +389,11 @@ void AlexaPresentation::onFocusChanged(
+ }
+ 
+ void AlexaPresentation::onDialogUXStateChanged(
++    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+     avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) {
+     ACSDK_DEBUG5(LX(__func__).d("state", newState));
++
++    // Note: agentId is not used
+     m_executor->submit([this, newState]() {
+         m_dialogUxState = newState;
+         if (avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState::IDLE == newState &&
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/include/TemplateRuntimeCapabilityAgent/TemplateRuntime.h b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/include/TemplateRuntimeCapabilityAgent/TemplateRuntime.h
+index c2f4d7e..21676cf 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/include/TemplateRuntimeCapabilityAgent/TemplateRuntime.h
++++ b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/include/TemplateRuntimeCapabilityAgent/TemplateRuntime.h
+@@ -127,6 +127,7 @@ public:
+     /// @name DialogUXStateObserverInterface Functions
+     /// @{
+     void onDialogUXStateChanged(
++        alexaClientSDK::avsCommon::avs::AgentId::IdType agentId, 
+         alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) override;
+     /// @}
+ 
+diff --git a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+index 87aef65..6ddcf71 100644
+--- a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
++++ b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
+@@ -239,8 +239,12 @@ void TemplateRuntime::onRenderPlayerCardsInfoChanged(
+     });
+ }
+ 
+-void TemplateRuntime::onDialogUXStateChanged(DialogUXStateObserverInterface::DialogUXState newState) {
+-    ACSDK_DEBUG5(LX("onDialogUXStateChanged").d("state", newState));
++void TemplateRuntime::onDialogUXStateChanged(
++        alexaClientSDK::avsCommon::avs::AgentId::IdType agentId, 
++        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState newState) {
++    ACSDK_DEBUG5(LX("onDialogUXStateChanged").d("agentId", agentId).d("state", newState));
++
++    // TODO: make use of the agentId.
+     m_executor->submit([this, newState]() {
+         if (smartScreenSDKInterfaces::State::DISPLAYING == m_state && m_lastDisplayedDirective &&
+             RENDER_TEMPLATE == m_lastDisplayedDirective->directive->getName()) {
+-- 
+2.36.0
+

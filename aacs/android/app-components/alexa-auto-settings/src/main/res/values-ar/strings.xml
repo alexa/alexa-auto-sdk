@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="alexa_settings_label" tools:ignore="MissingTranslation">Alexa</string>
+    <string name="setting_voice_assistance_nonalexa" tools:ignore="MissingTranslation">إعدادات [Acme Brandon]</string>
+    <string name="setting_voice_assistance_alexa" tools:ignore="MissingTranslation">إعدادات Amazon Alexa</string>
+    <string name="setting_voice_assistance_enable_nonalexa" tools:ignore="MissingTranslation">تفعيل [Acme Brandon]</string>
+    <string name="setting_voice_assistance_enable_alexa" tools:ignore="MissingTranslation">تفعيل Amazon Alexa</string>
+    <string name="setting_voice_assistance_wake_word" tools:ignore="MissingTranslation">كلمات التفعيل</string>
+    <string name="setting_voice_assistance_wake_word_summary" tools:ignore="MissingTranslation">احصل على المساعدة عندما تقول ببساطة \"[Brandon]\" أو \"أليكسا\"</string>
+    <string name="setting_voice_assistance_sounds_request_start_summary" tools:ignore="MissingTranslation">يصدر [Brandon] و Alexa صوت عند بدء الاستماع</string>
+    <string name="setting_voice_assistance_sounds_request_end_summary" tools:ignore="MissingTranslation">يصدر [Brandon] و Alexa صوت عند ايقاف الاستماع</string>
+    <string name="setting_voice_assistance_language" tools:ignore="MissingTranslation">اللغة</string>
+    <string name="setting_voice_assistance_setting_push_to_talk" tools:ignore="MissingTranslation">اضغط للتحدث</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_alexa" tools:ignore="MissingTranslation">Amazon Alexa</string>
+    <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
+    <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">شارك موقع سيارتك الحالي مع [Brandon] و Alexa لتحصل على استجابة أذكى للمطاعم القريبة وحالة الجو والمزيد.</string>
+    <string name="setting_alexa_signin" tools:ignore="MissingTranslation">تسجيل الدخول</string>
+    <string name="setting_alexa_wake_word_title" tools:ignore="MissingTranslation">كلمة التفعيل</string>
+    <string name="setting_alexa_wake_word_summary" tools:ignore="MissingTranslation">Alexa تستجيب في أي وقت تقول فيه \"أليكسا\"</string>
+    <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">نغمة بداية الطلب</string>
+    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">يصدر نغمة عندما تبدأ Alexa في الاستماع</string>
+    <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">نغمة نهاية الطلب</string>
+    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">يصدر نغمة عندما تتوقف Alexa عن الاستماع</string>
+    <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">مشاركة الموقع الجغرافي</string>
+    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">شارك موقع سيارتك الحالي مع Alexa للحصول على استجابات أذكى للمطاعم القريبة وحالة الجو والمزيد.</string>
+    <string name="setting_navigation_favorites_title">شارك جهات الوصول المفضلة</string>
+    <string name="setting_navigation_favorites_summary">يمكن لـ Alexa مساعدتك على الوصول إلى أماكنك المفضلة المحفوظة في سيارتك. سيتم تحميل المفضلات على خدمة Amazon.</string>
+    <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">وضع عدم الإزعاج</string>
+    <string name="setting_alexa_theme_title" tools:ignore="MissingTranslation">موضوع الجهاز</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">إيقاف إشعارات Alexa</string>
+    <string name="setting_alexa_calling_title" tools:ignore="MissingTranslation">الاتصال</string>
+    <string name="setting_alexa_calling_texting_title">الاتصال والمراسلة</string>
+    <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">النغمات</string>
+    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">لغة Alexa</string>
+    <string name="setting_alexa_language_continue">متابعة</string>
+    <string name="setting_alexa_language_confirm">تأكيد</string>
+    <string name="setting_language_title">اللغة</string>
+    <string name="setting_system_language_title">لغة نظام التشغيل</string>
+    <string name="setting_alexa_signout" tools:ignore="MissingTranslation">تسجيل الخروج</string>
+    <string name="setting_alexa_things_to_try" tools:ignore="MissingTranslation">أشياء للتجربة</string>
+    <string name="setting_alexa_disable" tools:ignore="MissingTranslation">إيقاف Alexa</string>
+    <string name="setting_alexa_language_mismatch" tools:ignore="MissingTranslation">Alexa غير مدعومة في</string>
+    <string name="setting_alexa_current_language" tools:ignore="MissingTranslation">لا يزال بإمكانك التحدث إلى Alexa باللغة %1$s، أو حدد لغة لـ Alexa.</string>
+    <string name="setting_language_mismatch_title" tools:ignore="MissingTranslation">اللغة غير متطابقة</string>
+    <string name="setting_language_mismatch_content_1" tools:ignore="MissingTranslation">تم ضبط لغة النظام على %1$s.&#160;</string>
+    <string name="setting_language_mismatch_content_2" tools:ignore="MissingTranslation">هل تريد الاستمرار باستخدام Alexa باللغة %1$s؟</string>
+    <string name="setting_alexa" tools:ignore="MissingTranslation">إعدادات ALEXA</string>
+    <string name="setting_continue" tools:ignore="MissingTranslation">متابعة</string>
+    <string name="setting_aacs" tools:ignore="MissingTranslation">خدمة عملاء Alexa Auto</string>
+    <string name="settings_alexa" tools:ignore="MissingTranslation">الإعدادات</string>
+    <string name="logout" tools:ignore="MissingTranslation">تسجيل الخروج؟</string>
+    <string name="disable_alexa" tools:ignore="MissingTranslation">هل تريد إيقاف Alexa؟</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">تسجيل الخروج وإيقاف Alexa؟</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">تسجيل الخروج</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">إلغاء</string>
+    <string name="confirm_yesno_confirm" tools:ignore="MissingTranslation">نعم</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">إيقاف</string>
+    <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">لن تكون Alexa متاحة بعد الآن في هذه السيارة.</string>
+    <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">تجاوز الإعدادات الأساسية</string>
+    <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">سيتم تطبيق جميع الإعدادات أدناه إذا تم تحديد ذلك</string>
+    <string name="preference_category_alexa_device" tools:ignore="MissingTranslation">جهاز يعمل مع Alexa</string>
+    <string name="preference_avsdevice_clientid" tools:ignore="MissingTranslation">مُعرّف العميل</string>
+    <string name="preference_avsdevice_productid" tools:ignore="MissingTranslation">مُعرّف المنتج</string>
+    <string name="preference_avsdevice_dsn" tools:ignore="MissingTranslation">الرقم المسلسل للجهاز</string>
+    <string name="preference_avsdevice_manufacturer" tools:ignore="MissingTranslation">الشركة المصنعة</string>
+    <string name="preference_category_aacs_service" tools:ignore="MissingTranslation">AACS عام</string>
+    <string name="preference_aacs_startonboot" tools:ignore="MissingTranslation">تشغيل AACS عند تشغيل الجهاز</string>
+    <string name="preference_category_aacs_defaults" tools:ignore="MissingTranslation">إعدادات AACS الافتراضية</string>
+    <string name="preference_aacs_use_aacs_audio_input" tools:ignore="MissingTranslation">استخدم إدخال الصوت من AACS</string>
+    <string name="preference_category_aacs_control" tools:ignore="MissingTranslation">التحكم في AACS</string>
+    <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">إعادة تشغيل AACS وتطبيق التغييرات</string>
+    <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">إيقاف تشغيل AACS</string>
+    <string name="preference_aacs_start" tools:ignore="MissingTranslation">بدء AACS</string>
+    <string name="comms_primary_device_none">لا يوجد هاتف متصل</string>
+    <string name="ttt_preview_mode_note">ملاحظة: بعض الخواص تتطلب تسجيل الدخول من خلال Amazon Alexa.</string>
+    <string name="lp_blocker_mic_primary">يلزم الوصول إلى الميكروفون</string>
+    <string name="lp_blocker_mic_secondary">اسمح بالوصول إلى الميكروفون حتى تتمكن Alexa من سماع أوامرك.</string>
+    <string name="lp_blocker_assistant_primary">ضبط Alexa كمساعد افتراضي</string>
+    <string name="lp_blocker_assistant_secondary">لاستخدام Alexa، تحتاج إلى ضبط Alexa كتطبيق مساعد افتراضي.</string>
+    <string name="lp_carousel_ttt_primary">التحدث إلى Alexa</string>
+    <string name="lp_carousel_ttt_secondary_ww_ptt">اضغط على زر الصوت، أو فقط قل \"أليكسا\".</string>
+    <string name="lp_carousel_ttt_secondary_ptt">اضغط على زر الصوت واسأل عن أي شيء.</string>
+    <string name="lp_carousel_ttt_secondary_ww">فقط قل "أليكسا" واطلب أي شيء.</string>
+    <string name="lp_carousel_previewmode_primary">يمكن لـ Alexa فعل المزيد عند تسجيل الدخول</string>
+    <string name="lp_carousel_previewmode_secondary">احصل على بث الموسيقى والمعلومات المحلية والمزيد غير ذلك.</string>
+    <string name="lp_carousel_smarthome_primary">اطمئن على منزلك الذكي</string>
+    <string name="lp_carousel_smarthome_secondary">اضغط على رمز المنزل الذكي في الأعلى أو قل "أليكسا، اعرضي لوحة تحكم المنزل الذكي".</string>
+    <string name="lp_carousel_location_primary">ماذا يوجد بالقرب مني؟</string>
+    <string name="lp_carousel_location_secondary_alexa_system">شارك الموقع مع Alexa للحصول على استجابات أذكى للمطاعم القريبة والمزيد.</string>
+    <string name="lp_carousel_location_secondary_system">اسمح بالوصول إلى الموقع للحصول على استجابات أذكى للمطاعم القريبة والمزيد.</string>
+    <string name="lp_carousel_contacts_primary">اتصل بالأصدقاء والعائلة بصوتك</string>
+    <string name="lp_carousel_contacts_secondary_alexa_system">سيتم تحميل جهات الاتصال من %1$s إلى خدمة Amazon.</string>
+    <string name="lp_carousel_contacts_secondary_system">لإجراء مكالمات مع Alexa، اسمح بالوصول إلى جهات الاتصال.</string>
+    <string name="lp_carousel_sms_primary">استمع إلى رسائلك النصية</string>
+    <string name="lp_carousel_sms_secondary_alexa_system">سيتم تحميل رسائل SMS من %1$s إلى خدمة Amazon.</string>
+    <string name="lp_carousel_sms_secondary_system">لإرسال واستقبال الرسائل النصية باستخدام Alexa، اسمح بالوصول إلى الرسائل القصيرة.</string>
+    <string name="lp_carousel_lowdata_primary">قم بالتسجيل في باقة إنترنت لتحقيق أقصى استفادة من Alexa</string>
+    <string name="lp_carousel_lowdata_secondary">قم بالتسجيل في باقة إنترنت لتشغيل الموسيقى والكتب الصوتية ومحطات الراديو والتحكم في المنزل الذكي والمزيد.</string>
+    <string name="cta_label_fix">إصلاح</string>
+    <string name="cta_label_set_as_default">ضبط كافتراضي</string>
+    <string name="cta_label_things_to_try">أشياء للتجربة</string>
+    <string name="cta_label_sign_in">تسجيل الدخول</string>
+    <string name="cta_label_enable">تفعيل</string>
+    <string name="cta_label_allow">السماح</string>
+    <string name="try_saying">جرّب قول: %1$s</string>
+    <string name="toggle_title">كلمة التفعيل \"أليكسا\"</string>
+    <string name="cta_label_connect_phone">قم بتوصيل هاتف</string>
+    <string name="lp_carousel_contacts_secondary_no_phone">للبدء، قم بتوصيل الهاتف.</string>
+</resources>

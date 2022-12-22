@@ -8,6 +8,27 @@
       }
     },
     {
+      "event": "Network_Connected",
+      "next": {
+        "type": "action",
+        "resource": "CheckDrivingStatusCommand"
+      }
+    },
+    {
+      "event": "Car_State_Drive",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_blockSetupDrive"
+      }
+    },
+    {
+      "event": "Car_State_Park",
+      "next": {
+        "type": "action",
+        "resource": "CheckDefaultAssistAppCommand"
+      }
+    },
+    {
       "event": "Alexa_Not_Selected_Default",
       "next": {
         "type": "view",
@@ -18,14 +39,21 @@
       "event": "Alexa_Is_Selected_Default",
       "next": {
         "type": "action",
-        "resource": "CheckLanguageCommand"
+        "resource": "CheckAACSStatusCommand"
       }
     },
     {
-      "event": "Network_Connected",
+      "event": "AACS_Not_Connected_Event",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_loadingScreen"
+      }
+    },
+    {
+      "event": "AACS_Connected_Event",
       "next": {
         "type": "action",
-        "resource": "CheckDrivingStatusCommand"
+        "resource": "CheckLanguageCommand"
       }
     },
     {
@@ -52,8 +80,8 @@
     {
       "event": "Language_Selection_Is_Complete",
       "next": {
-        "type": "action",
-        "resource": "CheckLoginRequiredCommand"
+        "type": "view",
+        "resource": "navigation_fragment_login"
       }
     },
     {
@@ -126,20 +154,6 @@
       }
     },
     {
-      "event": "PreviewMode_Flow_Setup_Completed",
-      "next": {
-        "type": "view",
-        "resource": "navigation_fragment_authProviderAuthenticatedFinish"
-      }
-    },
-    {
-      "event": "CBL_Flow_Setup_Completed",
-      "next": {
-        "type": "view",
-        "resource": "navigation_fragment_cblLoginFinish"
-      }
-    },
-    {
       "event": "CBL_Auth_Restarted",
       "next": {
         "type": "view",
@@ -158,20 +172,6 @@
       "next": {
         "type": "view",
         "resource": "navigation_fragment_setupNotComplete"
-      }
-    },
-    {
-      "event": "Car_State_Drive",
-      "next": {
-        "type": "view",
-        "resource": "navigation_fragment_blockSetupDrive"
-      }
-    },
-    {
-      "event": "Car_State_Park",
-      "next": {
-        "type": "action",
-        "resource": "CheckDefaultAssistAppCommand"
       }
     }
   ],

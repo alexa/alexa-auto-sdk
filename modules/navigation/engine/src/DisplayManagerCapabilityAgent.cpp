@@ -29,6 +29,8 @@ namespace aace {
 namespace engine {
 namespace navigation {
 
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("DisplayManagerCapabilityAgent");
 
@@ -36,11 +38,11 @@ static const std::string TAG("DisplayManagerCapabilityAgent");
 static const std::string NAMESPACE{"Navigation.DisplayManager"};
 
 /// The @c ControlDisplay directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName CONTROL_DISPLAY{NAMESPACE, "ControlDisplay"};
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName CONTROL_DISPLAY{NAMESPACE, "ControlDisplay", AgentId::AGENT_ID_ALL};
 
 /// The @c ShowAlternativeRoutes directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName SHOW_ALTERNATIVE_ROUTES{NAMESPACE,
-                                                                                      "ShowAlternativeRoutes"};
+                                                                                      "ShowAlternativeRoutes", AgentId::AGENT_ID_ALL};
 /// @c AlexaInterface interface name.
 static const std::string ALEXA_INTERFACE_TYPE = "AlexaInterface";
 
@@ -239,6 +241,9 @@ void DisplayManagerCapabilityAgent::handleControlDisplayDirective(std::shared_pt
         m_executor.submit([this, info, control]() {
             m_displayHandler->controlDisplay(control);
             setHandlingCompleted(info);
+            auto agentId = info->directive->getAgentId();
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            setEventAgentByDirective(info->directive->getName(), agentId);
         });
     } else {
         AACE_ERROR(LX(TAG).d("invalidModeValue", mode));
@@ -286,6 +291,9 @@ void DisplayManagerCapabilityAgent::handleShowAlternativeRoutesDirective(std::sh
     m_executor.submit([this, info, alternateRouteType]() {
         m_displayHandler->showAlternativeRoutes(alternateRouteType);
         setHandlingCompleted(info);
+        auto agentId = info->directive->getAgentId();
+        AACE_DEBUG(LX(TAG).d("agentId", agentId));
+        setEventAgentByDirective(info->directive->getName(), agentId);
     });
 }
 
@@ -317,7 +325,9 @@ void DisplayManagerCapabilityAgent::controlDisplaySucceeded(aace::engine::naviga
             };
             // clang-format on
             auto event = buildJsonEventString(CONTROL_DISPLAY_SUCCEEDED, "", payload.dump());
-            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+            auto agentId = getEventAgent(CONTROL_DISPLAY_SUCCEEDED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
             AACE_ERROR(LX(TAG).m("Error constructing event").d("error", ex.what()));
@@ -343,7 +353,9 @@ void DisplayManagerCapabilityAgent::controlDisplayFailed(
                 payload["description"] = description;
             }
             auto event = buildJsonEventString(CONTROL_DISPLAY_FAILED, "", payload.dump());
-            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+            auto agentId = getEventAgent(CONTROL_DISPLAY_FAILED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
             AACE_ERROR(LX(TAG).m("Error constructing event").d("error", ex.what()));
@@ -364,7 +376,9 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesSucceeded(
             };
             // clang-format on
             auto event = buildJsonEventString(SHOW_ALTERNATIVE_ROUTES_SUCCEEDED, "", payload.dump());
-            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+            auto agentId = getEventAgent(SHOW_ALTERNATIVE_ROUTES_SUCCEEDED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
             AACE_ERROR(LX(TAG).m("Error constructing event").d("error", ex.what()));
@@ -390,7 +404,9 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesFailed(
                 payload["description"] = description;
             }
             auto event = buildJsonEventString(SHOW_ALTERNATIVE_ROUTES_FAILED, "", payload.dump());
-            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event.second);
+            auto agentId = getEventAgent(SHOW_ALTERNATIVE_ROUTES_FAILED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
             AACE_ERROR(LX(TAG).m("Error constructing event").d("error", ex.what()));
@@ -401,6 +417,28 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesFailed(
 std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
 DisplayManagerCapabilityAgent::getCapabilityConfigurations() {
     return m_capabilityConfigurations;
+}
+
+void DisplayManagerCapabilityAgent::setEventAgentByDirective(
+    const std::string& directiveName, 
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId) {
+    if (directiveName == CONTROL_DISPLAY.name) {
+        m_eventAgentMap[CONTROL_DISPLAY_SUCCEEDED] = agentId;
+        m_eventAgentMap[CONTROL_DISPLAY_FAILED] = agentId;
+    } else if (directiveName == SHOW_ALTERNATIVE_ROUTES.name) {
+        m_eventAgentMap[SHOW_ALTERNATIVE_ROUTES_SUCCEEDED] = agentId;
+        m_eventAgentMap[SHOW_ALTERNATIVE_ROUTES_FAILED] = agentId;
+    } else {
+        AACE_WARN(LX(TAG).d("Directive name not found", directiveName));
+    }
+}
+
+alexaClientSDK::avsCommon::avs::AgentId::IdType DisplayManagerCapabilityAgent::getEventAgent(const std::string& eventName) {
+    if (m_eventAgentMap.find(eventName) != m_eventAgentMap.end()) {
+        return m_eventAgentMap[eventName];
+    }
+    AACE_INFO(LX(TAG).m("No agent is specified for the event. Sending the event to none of agents."));
+    return AgentId::AGENT_ID_NONE;
 }
 
 }  // namespace navigation

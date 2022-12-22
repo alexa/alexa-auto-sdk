@@ -19,6 +19,9 @@
     <uses-permission android:name="android.car.permission.READ_CAR_INTERIOR_LIGHTS" />
     <uses-permission android:name="android.car.permission.CAR_DYNAMICS_STATE" />
     <uses-permission android:name="android.car.permission.CONTROL_CAR_DISPLAY_UNITS" />
+    <uses-permission android:name="android.car.permission.CAR_VENDOR_EXTENSION" />
+    <uses-permission android:name="android.car.permission.CAR_POWER" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_ENERGY_PORTS" />
 
     <permission android:name="com.amazon.aacscarcontrol" android:protectionLevel= "signature|privileged"/>
     <application

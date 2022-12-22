@@ -1,0 +1,30 @@
+From dcfbb3bfa4f21a9e47d8963f462fea33c104c763 Mon Sep 17 00:00:00 2001
+From: Sherry Yang <yanyidi@amazon.com>
+Date: Sat, 6 Aug 2022 15:30:00 -0700
+Subject: [PATCH 11/14] Exporting pkginfo for Crypto
+
+---
+ modules/Alexa/build/cmake/Crypto.cmake | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/modules/Alexa/build/cmake/Crypto.cmake b/modules/Alexa/build/cmake/Crypto.cmake
+index 5f995d6..81e0c7a 100644
+--- a/modules/Alexa/build/cmake/Crypto.cmake
++++ b/modules/Alexa/build/cmake/Crypto.cmake
+@@ -13,8 +13,11 @@ set(CRYPTO_INCLUDE_DIR "" CACHE PATH "Crypto include directory.")
+ mark_as_advanced(CRYPTO_INCLUDE_DIR CRYPTO_LIBRARY)
+ 
+ if (("${CRYPTO_LIBRARY}" STREQUAL "") OR ("${CRYPTO_INCLUDE_DIR}" STREQUAL ""))
+-    find_package(PkgConfig)
+-    pkg_check_modules(CRYPTO REQUIRED libcrypto)
++    find_package(OpenSSL ${OPENSSL_PACKAGE_CONFIG})
++    set(CRYPTO_LDFLAGS ${OpenSSL_LIBS})
++    set(CRYPTO_INCLUDE_DIRS ${OpenSSL_SSL_INCLUDE_DIR})
++    message("CRYPTO LIBRARY IS: ${CRYPTO_LDFLAGS}")
++    message("CRYPTO INCLUDE DIR IS: ${CRYPTO_INCLUDE_DIRS}")
+ else()
+     set(CRYPTO_LDFLAGS ${CRYPTO_LIBRARY})
+     set(CRYPTO_INCLUDE_DIRS ${CRYPTO_INCLUDE_DIR})
+-- 
+2.36.0
+

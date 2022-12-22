@@ -36,6 +36,12 @@ int64_t AudioPlayer::getPlayerDuration() {
     }
 }
 
+void AudioPlayer::setAsForegroundActivity() {
+    if (auto m_audioPlayerEngineInterface_lock = m_audioPlayerEngineInterface.lock()) {
+        m_audioPlayerEngineInterface_lock->onSetAsForegroundActivity();
+    }
+}
+
 void AudioPlayer::setEngineInterface(
     std::shared_ptr<aace::alexa::AudioPlayerEngineInterface> audioPlayerEngineInterface) {
     m_audioPlayerEngineInterface = audioPlayerEngineInterface;

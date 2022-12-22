@@ -34,7 +34,7 @@
 
             <TextView
                 android:id="@android:id/title"
-                style="@style/Alexa.TitleText"
+                style="?attr/headerText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="marquee"
@@ -42,7 +42,7 @@
                 android:singleLine="true" />
 
             <TextView android:id="@android:id/summary"
-                style="@style/Alexa.HintText"
+                style="?attr/bodyText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@android:id/title"
@@ -60,7 +60,7 @@
             android:orientation="vertical" />
     </LinearLayout>
     <View
-        android:background="?attr/dividerColorOnBackground"
+        android:background="@android:color/darker_gray"
         android:layout_height="1dp"
         android:layout_width="fill_parent"/>
 </LinearLayout>

@@ -69,10 +69,12 @@ bool LoopbackDetectorEngineService::preRegister() {
         ThrowIfNull(alexaEngineService, "AlexaEngineService is not available");
 
         auto initiatorVerifierFactory = [this]() {
-            if (!m_initiatorVerifier) {
+            if (!m_loopbackDetector) {
                 prepareVerifier();
             }
-            return m_initiatorVerifier;
+            // We need the caller to use the overloaded methods in InitiatorVerifier interface rather than LoopbackDetector
+            std::shared_ptr<aace::engine::alexa::InitiatorVerifier> initiatorVerifier = m_loopbackDetector;
+            return initiatorVerifier;
         };
 
         ThrowIfNot(
@@ -112,14 +114,22 @@ bool LoopbackDetectorEngineService::prepareVerifier() {
         ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
         auto locale = propertyManager->getProperty(aace::alexa::property::LOCALE);
 
-        m_initiatorVerifier = LoopbackDetector::create(locale, audioFormat, audioManager, secondaryAdapter);
-        ThrowIfNull(m_initiatorVerifier, "Failed to create LoopbackDetector");
+        m_loopbackDetector = LoopbackDetector::create(locale, audioFormat, audioManager, secondaryAdapter);
+        ThrowIfNull(m_loopbackDetector, "Failed to create LoopbackDetector");
 
         return true;
     } catch (std::exception& ex) {
         AACE_WARN(LX(TAG).d("reason", ex.what()));
         return false;
     }
+}
+
+bool LoopbackDetectorEngineService::shutdown() {
+    if (m_loopbackDetector) {
+        m_loopbackDetector->shutdown();
+    }
+    m_loopbackDetector.reset();
+    return true;
 }
 
 }  // namespace loopbackDetector

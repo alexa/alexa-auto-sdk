@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -156,8 +156,6 @@ private:
     std::string createAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity);
     bool deleteAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity);
 
-    bool cleanAllCloudAddressBooks();
-
     bool isEventEnqueuedLocked(Event::Type type, std::shared_ptr<AddressBookEntity> addressBookEntity);
     void removeMatchingAddEventFromQueueLocked(std::shared_ptr<AddressBookEntity> addressBookEntity);
 
@@ -175,7 +173,7 @@ private:
     friend std::ostream& operator<<(std::ostream& stream, const UploadFlowState& state);
 
 private:
-    /// Serialize access to address book event queue
+    /// Serialize access to member variables  m_authDelegate, m_networkStatus and m_addressBookEventQ
     std::mutex m_mutex;
 
     /// reference to AddressBookService
@@ -187,8 +185,8 @@ private:
     /// Indicates whether the internal main loop should keep running.
     std::atomic<bool> m_isShuttingDown;
 
-    /// Condition Variable to wait on external actions
-    std::condition_variable m_waitStatusChange;
+    /// Condition Variable to wait on external events
+    std::condition_variable m_waitForEvent;
 
     /// Queue holding the address book events.
     std::deque<Event> m_addressBookEventQ;

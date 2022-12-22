@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/network_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:orientation="vertical"
-    android:theme="@style/Theme.Alexa.Standard">
+    android:orientation="vertical">
 
     <!--Next 3 guidelines describe the default margins that the visible elements are constrained to-->
 
@@ -32,35 +32,24 @@
         app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
 
     <!--Alexa logo-->
-    <ImageView
-        android:id="@+id/alexa_img_view"
-        android:layout_width="@dimen/login_alexa_image_width"
-        android:layout_height="@dimen/login_alexa_image_height"
-        android:layout_gravity="center"
-        android:contentDescription="@string/alexa_logo_content_description"
-        android:src="@drawable/alexa_logo"
+
+    <!--Title text-->
+    <TextView
+        android:id="@+id/network_error_header"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="158dp"
+        android:text="@string/login_network_error_heading_text"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--Title text-->
-    <TextView
-        android:id="@+id/network_error_header"
-        style="@style/Alexa.TitleText"
-        android:text="@string/login_network_error_heading_text"
-        android:textAlignment="center"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/right_guideline"
-        app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
-        android:layout_marginTop="@dimen/login_item_margin_top"/>
-
     <!--Subtitle text-->
     <TextView
         android:id="@+id/network_error_body"
-        style="@style/Alexa.SubtitleText"
+        style="?attr/bodyText"
         android:text="@string/login_network_error_body_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -73,7 +62,7 @@
 
     <!-- Image-->
     <ImageButton
-        android:id="@id/network_error_img"
+        android:id="@id/network_error_image"
         android:layout_width="@dimen/network_error_img_width"
         android:layout_height="@dimen/network_error_img_height"
         android:layout_gravity="center"
@@ -83,15 +72,15 @@
         android:src="@drawable/ic_wifi_help"
         android:tint="#FFFFFF"
         android:alpha="0.4"
-        app:layout_constraintBottom_toTopOf="@id/network_settings_btn"
+        app:layout_constraintBottom_toTopOf="@id/network_settings_button"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toEndOf="@id/left_guideline"
         app:layout_constraintTop_toBottomOf="@id/network_error_body" />
 
     <!--Network Settings button-->
     <TextView
-        android:id="@+id/network_settings_btn"
-        style="@style/Alexa.Button2"
+        android:id="@+id/network_settings_button"
+        style="?attr/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/login_network_settings"

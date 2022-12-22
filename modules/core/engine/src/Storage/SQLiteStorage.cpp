@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ std::string SQLiteStorage::createStatement(const char* stmt, ...) {
         std::string output(size + 1, 0);
 
         va_start(args, stmt);
-        std::vsprintf(&output[0], stmt, args);
+        std::vsnprintf(&output[0], size + 1, stmt, args);
 
         va_end(args);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public:
         m_index += delta;
         if (m_index < 0) {
             m_index = 0;
-        } else if (m_index >= m_modes.size()) {
+        } else if ((size_t)m_index >= m_modes.size()) {
             m_index = m_modes.size() - 1;
         }
     }

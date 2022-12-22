@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #ifndef AACE_ENGINE_ALEXA_INTERFACE_ALEXA_COMPONENT_INTERFACE_H
 #define AACE_ENGINE_ALEXA_INTERFACE_ALEXA_COMPONENT_INTERFACE_H
 
+#include <acsdk/MultiAgentInterface/AgentManagerInterface.h>
 #include <ACL/AVSConnectionManager.h>
 #include <ACL/Transport/PostConnectSequencerFactory.h>
 #include <ACL/Transport/TransportFactoryInterface.h>
@@ -100,6 +101,7 @@ public:
     virtual std::shared_ptr<AuthorizationManager> getAuthorizationManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> getDeviceSettingsManager() = 0;
     virtual std::shared_ptr<alexaClientSDK::acl::PostConnectSequencerFactory> getPostConnectSequencerFactory() = 0;
+    virtual std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> getAgentManager() = 0;
 };
 
 }  // namespace alexa

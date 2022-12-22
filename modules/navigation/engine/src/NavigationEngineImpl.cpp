@@ -22,6 +22,15 @@
 #include <string>
 #include <vector>
 
+namespace std {
+
+size_t hash<aace::navigation::NavigationEngineInterface::EventName>::operator()(
+    const aace::navigation::NavigationEngineInterface::EventName& in) const {
+    return static_cast<std::size_t>(in);
+};
+
+}  // namespace std
+
 namespace aace {
 namespace engine {
 namespace navigation {
@@ -153,16 +162,18 @@ void NavigationEngineImpl::doShutdown() {
     }
 }
 
-void NavigationEngineImpl::showPreviousWaypoints() {
+void NavigationEngineImpl::showPreviousWaypoints(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(
+    setEventAgent(NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN, agentId);
+    emitCounterMetrics(std::to_string(agentId), 
         METRIC_PROGRAM_NAME_SUFFIX, "showPreviousWaypoints", {METRIC_NAVIGATION_SHOW_PREVIOUS_WAYPOINTS});
     m_navigationPlatformInterface->showPreviousWaypoints();
 }
 
-void NavigationEngineImpl::navigateToPreviousWaypoint() {
+void NavigationEngineImpl::navigateToPreviousWaypoint(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(
+    setEventAgent(NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED, agentId);
+    emitCounterMetrics(std::to_string(agentId), 
         METRIC_PROGRAM_NAME_SUFFIX, "navigateToPreviousWaypoint", {METRIC_NAVIGATION_NAVIGATE_TO_PREVIOUS_WAYPOINT});
     m_navigationPlatformInterface->navigateToPreviousWaypoint();
 }
@@ -257,9 +268,10 @@ void NavigationEngineImpl::controlDisplay(aace::engine::navigation::DisplayMode 
     m_navigationPlatformInterface->controlDisplay(type);
 }
 
-void NavigationEngineImpl::startNavigation(const std::string& payload) {
+void NavigationEngineImpl::startNavigation(AgentId::IdType agentId, const std::string& payload) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "startNavigation", {METRIC_NAVIGATION_START_NAVIGATION});
+    setEventAgent(NavigationEngineInterface::EventName::NAVIGATION_STARTED, agentId);
+    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "startNavigation", {METRIC_NAVIGATION_START_NAVIGATION});
     m_navigationPlatformInterface->startNavigation(payload);
 }
 
@@ -279,15 +291,15 @@ void NavigationEngineImpl::announceRoadRegulation(aace::navigation::Navigation::
     m_navigationPlatformInterface->announceRoadRegulation(roadRegulation);
 }
 
-void NavigationEngineImpl::cancelNavigation() {
+void NavigationEngineImpl::cancelNavigation(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "cancelNavigation", {METRIC_NAVIGATION_CANCEL_NAVIGATION});
+    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "cancelNavigation", {METRIC_NAVIGATION_CANCEL_NAVIGATION});
     m_navigationPlatformInterface->cancelNavigation();
 }
 
-std::string NavigationEngineImpl::getNavigationState() {
+std::string NavigationEngineImpl::getNavigationState(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "getNavigationState", {METRIC_NAVIGATION_GET_NAVIGATION_STATE});
+    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "getNavigationState", {METRIC_NAVIGATION_GET_NAVIGATION_STATE});
     return m_navigationPlatformInterface->getNavigationState();
 }
 
@@ -295,38 +307,40 @@ void NavigationEngineImpl::onNavigationEvent(EventName event) {
     AACE_DEBUG(LX(TAG));
     std::stringstream ss;
     ss << event;
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onNavigationEvent", {METRIC_NAVIGATION_NAVIGATION_EVENT, ss.str()});
+    AgentId::IdType agentId = getEventAgent(event);
+    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "onNavigationEvent", {METRIC_NAVIGATION_NAVIGATION_EVENT, ss.str()});
     switch (event) {
-        case aace::navigation::NavigationEngineInterface::EventName::NAVIGATION_STARTED:
-        case aace::navigation::NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN:
-        case aace::navigation::NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED:
-            m_navigationCapabilityAgent->navigationEvent(event);
+        case NavigationEngineInterface::EventName::NAVIGATION_STARTED:
+        case NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN:
+        case NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED:
+            m_navigationCapabilityAgent->navigationEvent(agentId, event);
+            setEventAgent(event, AgentId::AGENT_ID_NONE);
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::ROUTE_OVERVIEW_SHOWN:
-        case aace::navigation::NavigationEngineInterface::EventName::DIRECTIONS_LIST_SHOWN:
-        case aace::navigation::NavigationEngineInterface::EventName::ZOOMED_IN:
-        case aace::navigation::NavigationEngineInterface::EventName::ZOOMED_OUT:
-        case aace::navigation::NavigationEngineInterface::EventName::MAP_CENTERED:
-        case aace::navigation::NavigationEngineInterface::EventName::ORIENTED_NORTH:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_NORTH:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_UP:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_EAST:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_RIGHT:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_SOUTH:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_DOWN:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_WEST:
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_LEFT:
-        case aace::navigation::NavigationEngineInterface::EventName::ROUTE_GUIDANCE_MUTED:
-        case aace::navigation::NavigationEngineInterface::EventName::ROUTE_GUIDANCE_UNMUTED:
+        case NavigationEngineInterface::EventName::ROUTE_OVERVIEW_SHOWN:
+        case NavigationEngineInterface::EventName::DIRECTIONS_LIST_SHOWN:
+        case NavigationEngineInterface::EventName::ZOOMED_IN:
+        case NavigationEngineInterface::EventName::ZOOMED_OUT:
+        case NavigationEngineInterface::EventName::MAP_CENTERED:
+        case NavigationEngineInterface::EventName::ORIENTED_NORTH:
+        case NavigationEngineInterface::EventName::SCROLLED_NORTH:
+        case NavigationEngineInterface::EventName::SCROLLED_UP:
+        case NavigationEngineInterface::EventName::SCROLLED_EAST:
+        case NavigationEngineInterface::EventName::SCROLLED_RIGHT:
+        case NavigationEngineInterface::EventName::SCROLLED_SOUTH:
+        case NavigationEngineInterface::EventName::SCROLLED_DOWN:
+        case NavigationEngineInterface::EventName::SCROLLED_WEST:
+        case NavigationEngineInterface::EventName::SCROLLED_LEFT:
+        case NavigationEngineInterface::EventName::ROUTE_GUIDANCE_MUTED:
+        case NavigationEngineInterface::EventName::ROUTE_GUIDANCE_UNMUTED:
             handleControlDisplaySuccess(event);
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::TURN_GUIDANCE_ANNOUNCED:
-        case aace::navigation::NavigationEngineInterface::EventName::EXIT_GUIDANCE_ANNOUNCED:
-        case aace::navigation::NavigationEngineInterface::EventName::ENTER_GUIDANCE_ANNOUNCED:
-        case aace::navigation::NavigationEngineInterface::EventName::MERGE_GUIDANCE_ANNOUNCED:
-        case aace::navigation::NavigationEngineInterface::EventName::LANE_GUIDANCE_ANNOUNCED:
-        case aace::navigation::NavigationEngineInterface::EventName::SPEED_LIMIT_REGULATION_ANNOUNCED:
-        case aace::navigation::NavigationEngineInterface::EventName::CARPOOL_RULES_REGULATION_ANNOUNCED:
+        case NavigationEngineInterface::EventName::TURN_GUIDANCE_ANNOUNCED:
+        case NavigationEngineInterface::EventName::EXIT_GUIDANCE_ANNOUNCED:
+        case NavigationEngineInterface::EventName::ENTER_GUIDANCE_ANNOUNCED:
+        case NavigationEngineInterface::EventName::MERGE_GUIDANCE_ANNOUNCED:
+        case NavigationEngineInterface::EventName::LANE_GUIDANCE_ANNOUNCED:
+        case NavigationEngineInterface::EventName::SPEED_LIMIT_REGULATION_ANNOUNCED:
+        case NavigationEngineInterface::EventName::CARPOOL_RULES_REGULATION_ANNOUNCED:
             m_navigationAssistanceCapabilityAgent->navigationEvent(event);
             break;
         default:
@@ -344,7 +358,9 @@ void NavigationEngineImpl::onNavigationError(
     std::stringstream errorCode;
     errorType << type;
     errorCode << code;
+    AgentId::IdType agentId = getErrorAgent(type);
     emitCounterMetrics(
+        std::to_string(agentId), 
         METRIC_PROGRAM_NAME_SUFFIX,
         "onNavigationError",
         {METRIC_NAVIGATION_NAVIGATION_ERROR, errorType.str(), errorCode.str()});
@@ -352,7 +368,8 @@ void NavigationEngineImpl::onNavigationError(
         case aace::navigation::NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED:
         case aace::navigation::NavigationEngineInterface::ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED:
         case aace::navigation::NavigationEngineInterface::ErrorType::PREVIOUS_NAVIGATION_START_FAILED:
-            m_navigationCapabilityAgent->navigationError(type, code, description);
+            m_navigationCapabilityAgent->navigationError(agentId, type, code, description);
+            setErrorAgent(type, AgentId::AGENT_ID_NONE);
             break;
         case aace::navigation::NavigationEngineInterface::ErrorType::ROUTE_OVERVIEW_FAILED:
         case aace::navigation::NavigationEngineInterface::ErrorType::DIRECTIONS_LIST_FAILED:
@@ -473,55 +490,55 @@ void NavigationEngineImpl::onShowAlternativeRoutesSucceeded(const std::string& p
     }
 }
 
-void NavigationEngineImpl::handleControlDisplaySuccess(aace::navigation::NavigationEngineInterface::EventName event) {
+void NavigationEngineImpl::handleControlDisplaySuccess(NavigationEngineInterface::EventName event) {
     aace::engine::navigation::DisplayMode mode;
     switch (event) {
-        case aace::navigation::NavigationEngineInterface::EventName::ROUTE_OVERVIEW_SHOWN:
+        case NavigationEngineInterface::EventName::ROUTE_OVERVIEW_SHOWN:
             mode = aace::engine::navigation::DisplayMode::SHOW_ROUTE_OVERVIEW;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::DIRECTIONS_LIST_SHOWN:
+        case NavigationEngineInterface::EventName::DIRECTIONS_LIST_SHOWN:
             mode = aace::engine::navigation::DisplayMode::SHOW_DIRECTIONS_LIST;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::ZOOMED_IN:
+        case NavigationEngineInterface::EventName::ZOOMED_IN:
             mode = aace::engine::navigation::DisplayMode::ZOOM_IN;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::ZOOMED_OUT:
+        case NavigationEngineInterface::EventName::ZOOMED_OUT:
             mode = aace::engine::navigation::DisplayMode::ZOOM_OUT;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::MAP_CENTERED:
+        case NavigationEngineInterface::EventName::MAP_CENTERED:
             mode = aace::engine::navigation::DisplayMode::CENTER_MAP_ON_CURRENT_LOCATION;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::ORIENTED_NORTH:
+        case NavigationEngineInterface::EventName::ORIENTED_NORTH:
             mode = aace::engine::navigation::DisplayMode::ORIENT_NORTH;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_NORTH:
+        case NavigationEngineInterface::EventName::SCROLLED_NORTH:
             mode = aace::engine::navigation::DisplayMode::SCROLL_NORTH;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_UP:
+        case NavigationEngineInterface::EventName::SCROLLED_UP:
             mode = aace::engine::navigation::DisplayMode::SCROLL_UP;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_EAST:
+        case NavigationEngineInterface::EventName::SCROLLED_EAST:
             mode = aace::engine::navigation::DisplayMode::SCROLL_EAST;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_RIGHT:
+        case NavigationEngineInterface::EventName::SCROLLED_RIGHT:
             mode = aace::engine::navigation::DisplayMode::SCROLL_RIGHT;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_SOUTH:
+        case NavigationEngineInterface::EventName::SCROLLED_SOUTH:
             mode = aace::engine::navigation::DisplayMode::SCROLL_SOUTH;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_DOWN:
+        case NavigationEngineInterface::EventName::SCROLLED_DOWN:
             mode = aace::engine::navigation::DisplayMode::SCROLL_DOWN;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_WEST:
+        case NavigationEngineInterface::EventName::SCROLLED_WEST:
             mode = aace::engine::navigation::DisplayMode::SCROLL_WEST;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::SCROLLED_LEFT:
+        case NavigationEngineInterface::EventName::SCROLLED_LEFT:
             mode = aace::engine::navigation::DisplayMode::SCROLL_LEFT;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::ROUTE_GUIDANCE_MUTED:
+        case NavigationEngineInterface::EventName::ROUTE_GUIDANCE_MUTED:
             mode = aace::engine::navigation::DisplayMode::MUTE_ROUTE_GUIDANCE;
             break;
-        case aace::navigation::NavigationEngineInterface::EventName::ROUTE_GUIDANCE_UNMUTED:
+        case NavigationEngineInterface::EventName::ROUTE_GUIDANCE_UNMUTED:
             mode = aace::engine::navigation::DisplayMode::UNMUTE_ROUTE_GUIDANCE;
             break;
         default:
@@ -660,6 +677,132 @@ void NavigationEngineImpl::handleShowAlternativeRoutesError(
             return;
     }
     m_displayManagerCapabilityAgent->showAlternativeRoutesFailed(queryType, queryError, description);
+}
+
+void NavigationEngineImpl::setEventAgent(NavigationEngineInterface::EventName event, AgentId::IdType agentId) {
+    m_eventAgentMap[event] = agentId;
+}
+
+AgentId::IdType NavigationEngineImpl::getEventAgent(NavigationEngineInterface::EventName event) {
+    if (m_eventAgentMap.find(event) != m_eventAgentMap.end()) {
+        return m_eventAgentMap[event];
+    }
+    AACE_DEBUG(LX(TAG).m("Assign AGENT_ID_NONE to the event as no agent is found."));
+    return AgentId::AGENT_ID_NONE;
+}
+
+NavigationEngineInterface::EventName NavigationEngineImpl::getEventFromError(NavigationEngineInterface::ErrorType type) {
+    NavigationEngineInterface::EventName event;
+    switch (type) {
+        case NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED:
+            event = NavigationEngineInterface::EventName::NAVIGATION_STARTED;
+            break;
+        case NavigationEngineInterface::ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED:
+            event = NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::PREVIOUS_NAVIGATION_START_FAILED:
+            event = NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED;
+            break;
+        case NavigationEngineInterface::ErrorType::ROUTE_OVERVIEW_FAILED:
+            event = NavigationEngineInterface::EventName::ROUTE_OVERVIEW_SHOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::DIRECTIONS_LIST_FAILED:
+            event = NavigationEngineInterface::EventName::DIRECTIONS_LIST_SHOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::ZOOM_IN_FAILED:
+            event = NavigationEngineInterface::EventName::ZOOMED_IN;
+            break;
+        case NavigationEngineInterface::ErrorType::ZOOM_OUT_FAILED:
+            event = NavigationEngineInterface::EventName::ZOOMED_OUT;
+            break;
+        case NavigationEngineInterface::ErrorType::CENTER_FAILED:
+            event = NavigationEngineInterface::EventName::MAP_CENTERED;
+            break;
+        case NavigationEngineInterface::ErrorType::ORIENT_NORTH_FAILED:
+            event = NavigationEngineInterface::EventName::ORIENTED_NORTH;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_NORTH_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_NORTH;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_UP_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_UP;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_EAST_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_EAST;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_RIGHT_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_RIGHT;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_SOUTH_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_SOUTH;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_DOWN_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_DOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_WEST_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_WEST;
+            break;
+        case NavigationEngineInterface::ErrorType::SCROLL_LEFT_FAILED:
+            event = NavigationEngineInterface::EventName::SCROLLED_LEFT;
+            break;
+        case NavigationEngineInterface::ErrorType::MUTED_ROUTE_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::ROUTE_GUIDANCE_MUTED;
+            break;
+        case NavigationEngineInterface::ErrorType::UNMUTED_ROUTE_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::ROUTE_GUIDANCE_UNMUTED;
+            break;
+        case NavigationEngineInterface::ErrorType::DEFAULT_ALTERNATE_ROUTES_FAILED:
+            event = NavigationEngineInterface::EventName::DEFAULT_ALTERNATE_ROUTES_SHOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::SHORTER_TIME_ROUTES_FAILED:
+            event = NavigationEngineInterface::EventName::SHORTER_TIME_ROUTES_SHOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::SHORTER_DISTANCE_ROUTES_FAILED:
+            event = NavigationEngineInterface::EventName::SHORTER_DISTANCE_ROUTES_SHOWN;
+            break;
+        case NavigationEngineInterface::ErrorType::TURN_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::TURN_GUIDANCE_ANNOUNCED;
+            break;
+        case NavigationEngineInterface::ErrorType::EXIT_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::EXIT_GUIDANCE_ANNOUNCED;
+            break;
+        case NavigationEngineInterface::ErrorType::ENTER_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::ENTER_GUIDANCE_ANNOUNCED;
+            break;
+        case NavigationEngineInterface::ErrorType::MERGE_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::MERGE_GUIDANCE_ANNOUNCED;
+            break;
+        case NavigationEngineInterface::ErrorType::LANE_GUIDANCE_FAILED:
+            event = NavigationEngineInterface::EventName::LANE_GUIDANCE_ANNOUNCED;
+            break;
+        case NavigationEngineInterface::ErrorType::SPEED_LIMIT_REGULATION_FAILED:
+            event = NavigationEngineInterface::EventName::SPEED_LIMIT_REGULATION_ANNOUNCED;
+            break;
+        case NavigationEngineInterface::ErrorType::CARPOOL_RULES_REGULATION_FAILED:
+            event = NavigationEngineInterface::EventName::CARPOOL_RULES_REGULATION_ANNOUNCED;
+            break;
+        default:
+            throw ("Invalid Navigation ErrorType");
+            break;
+    }
+    return event;
+}
+
+AgentId::IdType NavigationEngineImpl::getErrorAgent(NavigationEngineInterface::ErrorType type) {
+    try {
+        return getEventAgent(getEventFromError(type));
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("exception", ex.what()));
+        return AgentId::AGENT_ID_NONE;
+    }
+}
+
+void NavigationEngineImpl::setErrorAgent(NavigationEngineInterface::ErrorType type, AgentId::IdType agentId) {
+    try {
+        return setEventAgent(getEventFromError(type), agentId);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("exception", ex.what()));
+    }
 }
 
 }  // namespace navigation

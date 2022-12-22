@@ -25,4 +25,5 @@
 
     <!--Preference item minimum height-->
     <dimen name="settings_pref_item_min_height">100dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

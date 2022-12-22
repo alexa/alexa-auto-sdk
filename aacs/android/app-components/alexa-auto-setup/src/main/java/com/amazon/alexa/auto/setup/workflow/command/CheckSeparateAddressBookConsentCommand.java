@@ -14,6 +14,8 @@
  */
 package com.amazon.alexa.auto.setup.workflow.command;
 
+import static com.amazon.aacsconstants.AssistantConstants.ON_DEVICE_POLICY;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -28,7 +30,6 @@ import com.amazon.alexa.auto.setup.workflow.event.VoiceAssistanceEvent;
  */
 public class CheckSeparateAddressBookConsentCommand extends Command {
     private static final String TAG = CheckSeparateAddressBookConsentCommand.class.getSimpleName();
-    private static final String LVC_POLICY = "LVC";
     private final Context mContext;
 
     public CheckSeparateAddressBookConsentCommand(Context context) {
@@ -40,17 +41,22 @@ public class CheckSeparateAddressBookConsentCommand extends Command {
     public void execute() {
         if (ModuleProvider.isAlexaCustomAssistantEnabled(mContext)) {
             AlexaApp mApp = AlexaApp.from(mContext);
+            if (mApp == null) {
+                Log.e(TAG, "Invalid AlexaApp.");
+                return;
+            }
+
             if (mApp.getRootComponent().getComponent(AssistantManager.class).isPresent()) {
                 AssistantManager assistantManager = mApp.getRootComponent().getComponent(AssistantManager.class).get();
-                if (LVC_POLICY.equals(assistantManager.getCoAssistantPolicy())) {
+                if (ON_DEVICE_POLICY.equals(assistantManager.getCoAssistantPolicy())) {
+                    Log.i(TAG, "Using ON_DEVICE policy. Asking for separate address book consent.");
                     publishEvent(
                             new WorkflowMessage(VoiceAssistanceEvent.SEPARATE_ADDRESSBOOK_CONSENT_SETUP_NOT_FINISHED));
-                } else {
-                    publishEvent(new WorkflowMessage(VoiceAssistanceEvent.SEPARATE_ADDRESSBOOK_CONSENT_SETUP_FINISHED));
-                }
-            } else {
-                publishEvent(new WorkflowMessage(VoiceAssistanceEvent.SEPARATE_ADDRESSBOOK_CONSENT_SETUP_FINISHED));
-            }
+                    return;
+                } 
+            } 
+            Log.i(TAG, "Skipping separate address book consent.");
+            publishEvent(new WorkflowMessage(VoiceAssistanceEvent.SEPARATE_ADDRESSBOOK_CONSENT_SETUP_FINISHED));
         }
     }
 }

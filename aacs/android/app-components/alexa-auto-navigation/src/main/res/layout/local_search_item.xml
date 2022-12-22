@@ -1,97 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-<LinearLayout
-    android:id="@+id/poi_item_root"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:layout_marginBottom="20dp"
-    android:layout_weight="1"
-    >
-    <TextView
-        android:id="@+id/poi_ordinal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/poi_ordinal_card_margin_top"
-        android:layout_marginStart="@dimen/poi_card_margin_start"
-        tools:text="1"
-        style="@style/LocalSearchListItemOrdinal"/>
+    android:orientation="vertical"
+    android:theme="@style/DeviceDefaults">
+
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-    <TextView
-        android:id="@+id/poi_name"
-        android:layout_marginStart="@dimen/poi_card_margin_start"
-        android:layout_marginEnd="@dimen/poi_name_margin_end"
-        android:layout_marginTop="@dimen/poi_card_margin_top"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="Poi Name"
-        style="@style/LocalSearchListItemName"/>
-
-    </LinearLayout>
-        <TextView
-            android:id="@+id/poi_address"
-            android:layout_width="@dimen/poi_list_address_width"
-            android:layout_height="wrap_content"
-            tools:text="1414 11th Ave, City STATE"
-            android:layout_marginTop="@dimen/poi_address_margin_top"
-            android:layout_marginStart="@dimen/poi_card_margin_start"
-            style="@style/LocalSearchListItemAddress"/>
-
-        <LinearLayout
-            android:id="@+id/yelp_rating_row"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/poi_address_margin_top">
-
-            <ImageView
-                android:id="@+id/yelp_rating_image"
-                android:layout_width="@dimen/local_search_list_yelp_star_width"
-                android:layout_height="@dimen/local_search_list_yelp_star_height"
-                android:scaleType="centerCrop"
-                android:layout_marginStart="@dimen/poi_card_margin_start"
-                android:layout_marginTop="@dimen/local_search_list_yelp_star_margin_top"/>
-            <TextView
-                android:id="@+id/yelp_rating_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                tools:text="257"
-                android:layout_marginStart="@dimen/local_search_list_yelp_row_spacing"
-                style="@style/LocalSearchListItemAddress"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/yelp_provider"
-                android:layout_marginStart="@dimen/local_search_list_yelp_row_spacing"
-                style="@style/LocalSearchListItemAddress"/>
-        </LinearLayout>
-    </LinearLayout>
-    <TextView
-        android:id="@+id/poi_list_eta"
+        android:id="@+id/poi_item_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/poi_item_margin_end"
-        android:layout_marginTop="@dimen/poi_eta_margin_top"
-        android:gravity="end"
-        tools:text="9 mins"
-        style="@style/LocalSearchListItemEta"/>
-</LinearLayout>
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/poi_ordinal"
+            style="@style/LocalSearchListItemOrdinal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/poi_card_margin_start"
+            android:layout_marginTop="@dimen/poi_ordinal_card_margin_top"
+            tools:text="1" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/poi_name"
+                    style="@style/LocalSearchListItemName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/poi_card_margin_start"
+                    android:layout_marginTop="@dimen/poi_card_margin_top"
+                    android:layout_marginEnd="@dimen/poi_name_margin_end"
+                    tools:text="Poi Name" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/poi_address"
+                style="@style/LocalSearchListItemAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/poi_card_margin_start"
+                android:layout_marginTop="@dimen/poi_address_margin_top"
+                tools:text="1414 11th Ave, City STATE" />
+
+            <LinearLayout
+                android:id="@+id/yelp_rating_row"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/poi_address_margin_top"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/yelp_rating_image"
+                    android:layout_width="@dimen/local_search_list_yelp_star_width"
+                    android:layout_height="@dimen/local_search_list_yelp_star_height"
+                    android:layout_marginStart="@dimen/poi_card_margin_start"
+                    android:layout_marginTop="@dimen/local_search_list_yelp_star_margin_top"
+                    android:scaleType="centerCrop" />
+
+                <TextView
+                    android:id="@+id/yelp_rating_count"
+                    style="@style/LocalSearchListItemAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/local_search_list_yelp_row_spacing"
+                    tools:text="257" />
+
+                <TextView
+                    style="@style/LocalSearchListItemAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/local_search_list_yelp_row_spacing"
+                    android:text="@string/yelp_provider" />
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/etadist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/poi_list_eta"
+                style="@style/LocalSearchListItemEta"
+                android:layout_width="216dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="300dp"
+                android:layout_marginRight="300dp"
+                android:gravity="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="9 mins" />
+
+            <TextView
+                android:id="@+id/poi_list_dist"
+                style="@style/LocalSearchListItemEta"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="300dp"
+                android:layout_marginRight="300dp"
+                android:gravity="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="9 miles" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
     <View
         android:id="@+id/poi_splitter"
         android:layout_width="match_parent"
         android:layout_height="@dimen/splitter_height"
-        android:layout_marginEnd="@dimen/splitter_begin_end_margin"
-        android:layout_marginStart="@dimen/splitter_begin_end_margin"
-        android:background="@color/poi_circle_background_color" />
-</LinearLayout>
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="60dp"
+        android:background="@color/poi_circle_background_color"
+        app:layout_constraintBottom_toBottomOf="@+id/poi_item_root"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -36,7 +36,8 @@ class AlexaClientEngineImpl
         : public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface
-        , public aace::alexa::AlexaClientEngineInterface {
+        , public aace::alexa::AlexaClientEngineInterface
+        , public std::enable_shared_from_this<AlexaClientEngineImpl> {
 private:
     AlexaClientEngineImpl(
         std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface,
@@ -66,8 +67,8 @@ public:
             engineStatuses) override;
 
     // DialogUXStateObserverInterface
-    void onDialogUXStateChanged(
-        alexaClientSDK::avsCommon::sdkInterfaces::DialogUXStateObserverInterface::DialogUXState state) override;
+    void onDialogUXStateChanged(alexaClientSDK::avsCommon::avs::AgentId::IdType agentId, DialogUXState newState)
+        override;
 
     // AlexaClientEngineInterface
     void onStopForegroundActivity() override;
@@ -171,6 +172,31 @@ private:
             default:
                 return aace::alexa::AlexaClient::ConnectionChangedReason::NONE;
                 break;
+        }
+    }
+
+    static inline aace::alexa::AlexaClient::DialogState convertDialogState(DialogUXState dialogState) {
+        switch (dialogState) {
+            case DialogUXState::IDLE:
+                return aace::alexa::AlexaClient::DialogState::IDLE;
+                break;
+            case DialogUXState::LISTENING:
+                return aace::alexa::AlexaClient::DialogState::LISTENING;
+                break;
+            case DialogUXState::EXPECTING:
+                return aace::alexa::AlexaClient::DialogState::EXPECTING;
+                break;
+            case DialogUXState::THINKING:
+                return aace::alexa::AlexaClient::DialogState::THINKING;
+                break;
+            case DialogUXState::SPEAKING:
+                return aace::alexa::AlexaClient::DialogState::SPEAKING;
+                break;
+            case DialogUXState::FINISHED:
+                return aace::alexa::AlexaClient::DialogState::FINISHED;
+                break;
+            default:
+                throw("Unknown DialogState.");
         }
     }
 };

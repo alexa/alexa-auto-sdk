@@ -51,6 +51,10 @@ static const std::string REQUEST_VERSION_TAG_PREFIX = "AUTO_SDK_";
 static const std::string REQUEST_VERSION_TAG_SEPARATOR = "_";
 static const int REQUEST_LIMIT_DEFAULT = 1;
 
+// TODO: Temporary Fix For Hinty Issues With 4.2. Please remove once fixed.
+static const int REQUEST_VERSION_FALLBACK_MAJOR = 4;
+static const int REQUEST_VERSION_FALLBACK_MINOR = 1;
+
 // Supported domains
 static const std::string DOMAIN_GETTING_STARTED = "GETTING_STARTED";
 static const std::string DOMAIN_TALENTS = "TALENTS";
@@ -119,8 +123,17 @@ bool FeatureDiscoveryEngineImpl::initialize(std::shared_ptr<aace::engine::core::
 
         // initialize the software version tag
         aace::engine::core::Version engineVersion = aace::engine::core::version::getEngineVersion();
-        m_tag = REQUEST_VERSION_TAG_PREFIX + std::to_string(engineVersion.major_version()) +
-                REQUEST_VERSION_TAG_SEPARATOR + std::to_string(engineVersion.minor_version());
+
+        // TODO: Remove checking with Fallback versions once Hinty works with 4.2 tags
+        if ((engineVersion.major_version() > REQUEST_VERSION_FALLBACK_MAJOR) ||
+            (engineVersion.minor_version() > REQUEST_VERSION_FALLBACK_MINOR)) {
+                m_tag = REQUEST_VERSION_TAG_PREFIX + std::to_string(REQUEST_VERSION_FALLBACK_MAJOR) +
+                        REQUEST_VERSION_TAG_SEPARATOR + std::to_string(REQUEST_VERSION_FALLBACK_MINOR);
+            }
+        else {
+            m_tag = REQUEST_VERSION_TAG_PREFIX + std::to_string(engineVersion.major_version()) +
+                    REQUEST_VERSION_TAG_SEPARATOR + std::to_string(engineVersion.minor_version());
+        }
 
         // initialize the domain and eventType combinations set
         std::vector<std::string> validDomains{DOMAIN_GETTING_STARTED,

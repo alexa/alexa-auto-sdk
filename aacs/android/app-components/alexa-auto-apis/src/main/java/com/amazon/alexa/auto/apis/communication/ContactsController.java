@@ -43,6 +43,13 @@ public interface ContactsController extends ScopedComponent {
     void setContactsUploadPermission(String deviceAddress, String permission);
 
     /**
+     * Set messaging permission.
+     * @param deviceAddress device unique address
+     * @param permission messaging permission
+     */
+    void setMessagingPermission(String deviceAddress, String permission);
+
+    /**
      * Observe contacts upload consent.
      * @return contacts consent observable, returning true if contacts consent is needed.
      */

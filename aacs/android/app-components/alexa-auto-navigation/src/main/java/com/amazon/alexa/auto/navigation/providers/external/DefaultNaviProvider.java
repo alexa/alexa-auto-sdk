@@ -111,7 +111,7 @@ public class DefaultNaviProvider implements NaviProvider, NaviDataListener {
         Intent intent = new Intent();
         intent.setAction(NaviProviderConstants.ACTION_REQUEST_CONTROL_DISPLAY);
         intent.putExtra(
-                NaviProviderConstants.PAYLOAD_CONTROL_DISPLAY, controlDisplayData.getControlDisplay().toString());
+                NaviProviderConstants.PAYLOAD_CONTROL_DISPLAY, NavigationMessages.convertToJSON(controlDisplayData));
         mWeakContext.get().sendBroadcast(intent);
     }
 

@@ -20,7 +20,6 @@ import com.amazon.alexa.auto.apis.auth.UserIdentity
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController
 import com.amazon.alexa.auto.media.R
 import com.amazon.alexa.auto.media.aacs.handlers.AudioPlayerHandler
-import com.amazon.alexa.auto.media.aacs.handlers.TemplateRuntimeHandler
 import com.amazon.alexa.auto.media.player.MediaPlayerExo
 import com.amazon.alexa.auto.media.player.NotificationController
 import com.amazon.alexa.auto.media.session.MediaSessionManager
@@ -70,7 +69,6 @@ class AlexaMediaBrowseServiceTest {
     @Mock lateinit var mMockNotificationController: NotificationController
     @Mock lateinit var mMockAACSMessageSender: AACSMessageSender
     @Mock lateinit var mMockAudioPlayerHandler: AudioPlayerHandler
-    @Mock lateinit var mMockTemplateruntimeHandler: TemplateRuntimeHandler
 
     @Mock lateinit var mMockMediaSession: MediaSessionCompat
     @Mock lateinit var mMockNotification: Notification
@@ -96,7 +94,6 @@ class AlexaMediaBrowseServiceTest {
         service.mNotificationController = mMockNotificationController
         service.mAACSMessageSender = mMockAACSMessageSender
         service.mAudioPlayerHandler = mMockAudioPlayerHandler
-        service.mTemplateruntimeHandler = mMockTemplateruntimeHandler
 
         Mockito.`when`(mMockMediaSessionManager.mediaSession).thenReturn(mMockMediaSession)
         Mockito.`when`(mMockNotificationController.createServiceStartNotification(Mockito.any()))
@@ -255,23 +252,8 @@ class AlexaMediaBrowseServiceTest {
     }
 
     @Test
-    fun testTemplateRuntimeCommandsAreDispatchedToHandler() {
-        val action = "any-action"
-        val intent = AACSMessageBuilder.buildEmbeddedMessageIntent(
-            Topic.TEMPLATE_RUNTIME, action, null)
-
-        mServiceController.get().onStartCommand(intent.get(), 0, 0)
-
-        val commandCaptor = ArgumentCaptor.forClass(AACSMessage::class.java)
-        verify(mMockTemplateruntimeHandler, times(1)).handleAACSCommand(commandCaptor.capture())
-
-        assertEquals(action, commandCaptor.value.action)
-        assertEquals(Topic.TEMPLATE_RUNTIME, commandCaptor.value.topic)
-    }
-
-    @Test
     fun testThatServiceIsInitializedWithAuthErrorOnLogout() {
-        mServiceController.get().initializeMediaSessionWithErrorForGuidingUser()
+        mServiceController.get().initializeMediaSession()
 
         mAuthStatusSubject.onNext(AuthStatus(false, null))
 
@@ -284,7 +266,7 @@ class AlexaMediaBrowseServiceTest {
 
     @Test
     fun testThatServiceIsInitializedWithVASelectionErrorOnLogin() {
-        mServiceController.get().initializeMediaSessionWithErrorForGuidingUser()
+        mServiceController.get().initializeMediaSession()
 
         mVASelectionSubject.onNext(false)
         mAuthStatusSubject.onNext(AuthStatus(true, UserIdentity("user1")))
@@ -298,7 +280,7 @@ class AlexaMediaBrowseServiceTest {
 
     @Test
     fun testThatServiceIsInitializedWithHintsErrorOnLoginAndVASelection() {
-        mServiceController.get().initializeMediaSessionWithErrorForGuidingUser()
+        mServiceController.get().initializeMediaSession()
 
         mVASelectionSubject.onNext(true)
         mAuthStatusSubject.onNext(AuthStatus(true, UserIdentity("user1")))

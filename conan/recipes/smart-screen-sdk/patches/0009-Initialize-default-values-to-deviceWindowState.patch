@@ -1,7 +1,7 @@
-From 83f679b5ab0eb0671357cf479d0b7fbb93208c54 Mon Sep 17 00:00:00 2001
+From a3516f099f6911d6747333906eab7e71c63bef67 Mon Sep 17 00:00:00 2001
 From: Raghavendra Bilamkar <bilamkar@amazon.com>
 Date: Thu, 12 May 2022 19:56:51 -0700
-Subject: [PATCH] Initialize default values to deviceWindowState
+Subject: [PATCH 09/14] Initialize default values to deviceWindowState
 
 ---
  .../VisualCharacteristics.h                   |  2 +
@@ -145,5 +145,5 @@ index 642999a..f5b444c 100644
      getCapabilityConfigurations() {
      return m_capabilityConfigurations;
 -- 
-2.33.0
+2.36.0
 

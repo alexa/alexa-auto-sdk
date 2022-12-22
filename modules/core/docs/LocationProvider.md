@@ -4,7 +4,7 @@ Sometimes the user asks Alexa a question that requires she know the location in 
 
 To provide the user with accurate responses to local search commands, weather questions, and more, obtain the user's consent to share their location with Alexa and use the [`LocationProvider`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/LocationProvider/index.html) interface.
 
-> **Note:** For Android applications, AACS provides a default implementation of `LocationProvider`. See the [AACS Default Implementation](https://alexa.github.io/alexa-auto-sdk/aacs/android#default-platform-implementation) documentation for more information.
+> **Note:** For Android applications, AACS provides a default implementation of `LocationProvider`. See the [AACS Default Implementation](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/#default-platform-implementation) documentation for more information.
 
 Your application should subscribe to the [`LocationProvider.GetLocation`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/LocationProvider/index.html#getlocation) and [`LocationProvider.GetCountry`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/LocationProvider/index.html#getcountry) messages to provide location data, such as geographic coordinates and vehicle operating country, when the Engine requests it. These messages are synchronous-style and require your application to send the corresponding reply messages right away. To avoid blocking the MessageBroker outgoing thread and delaying user requests to Alexa, your application should keep the location data in a cache that you update frequently. Pull the location from the cache when the Engine requests it.
 

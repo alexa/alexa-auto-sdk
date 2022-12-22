@@ -1,0 +1,1794 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--Next 2 guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/left_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/left_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/right_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/top_app_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0756" />
+
+    <LinearLayout
+        android:id="@+id/preference_host_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@id/left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/top_app_bar"
+        app:layout_constraintEnd_toStartOf="@id/continueButtonLayout"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/setting_item_horizontal_margin"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/deDELayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/deDEImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/deDE"
+                        app:layout_constraintStart_toEndOf="@+id/deDE"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/deDE"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/deDEImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/deDETitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/deDESummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/deDEenUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/deDEenUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/deDEenUS"
+                        app:layout_constraintStart_toEndOf="@+id/deDEenUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/deDEenUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/deDEenUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/deDEenUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/deDEenUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enAULayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enAUImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enAU"
+                        app:layout_constraintStart_toEndOf="@+id/enAU"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enAU"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enAUImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enAUTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enAUSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enCALayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enCAImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enCA"
+                        app:layout_constraintStart_toEndOf="@+id/enCA"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enCA"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enCAImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enCATitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enCASummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enCAfrCALayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enCAfrCAImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enCAfrCA"
+                        app:layout_constraintStart_toEndOf="@+id/enCAfrCA"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enCAfrCA"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enCAfrCAImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enCAfrCATitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enCAfrCASummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enINLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enINImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enIN"
+                        app:layout_constraintStart_toEndOf="@+id/enIN"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enIN"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enINImage"
+                        app:layout_constraintHorizontal_weight="10"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="1.0">
+
+                        <TextView
+                            android:id="@+id/enINTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin"
+                            android:textAppearance="?attr/headerText">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enINSummary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/bodyText">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enINhiINLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enINhiINImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enINhiIN"
+                        app:layout_constraintStart_toEndOf="@+id/enINhiIN"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enINhiIN"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enINhiINImage"
+                        app:layout_constraintHorizontal_weight="10"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="1.0">
+
+                        <TextView
+                            android:id="@+id/enINhiINTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin"
+                            android:textAppearance="?attr/headerText">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enINhiINSummary"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?attr/bodyText">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enGBLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enGBImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enGB"
+                        app:layout_constraintStart_toEndOf="@+id/enGB"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enGB"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enGBImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enGBTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enGBSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUS"
+                        app:layout_constraintStart_toEndOf="@+id/enUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSdeDELayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSdeDEImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUSdeDE"
+                        app:layout_constraintStart_toEndOf="@+id/enUSdeDE"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUSdeDE"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSdeDEImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSdeDETitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSdeDESummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSesESLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSesESImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUSesES"
+                        app:layout_constraintStart_toEndOf="@+id/enUSesES"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUSesES"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSesESImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSesESTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSesESSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSesUsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSesUsImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUSesUs"
+                        app:layout_constraintStart_toEndOf="@+id/enUSesUs"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUSesUs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSesUsImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSesUsTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSesUsSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="fill_parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSfrFRLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSfrFRImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUSfrFR"
+                        app:layout_constraintStart_toEndOf="@+id/enUSfrFR"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUSfrFR"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSfrFRImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSfrFRTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSfrFRSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSitITLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSitITImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUSitIT"
+                        app:layout_constraintStart_toEndOf="@+id/enUSitIT"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUSitIT"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSitITImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSitITTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSitITSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/enUSjaJPLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/enUSjaJPImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/enUSjaJP"
+                        app:layout_constraintStart_toEndOf="@+id/enUSjaJP"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/enUSjaJP"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/enUSjaJPImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/enUSjaJPTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/enUSjaJPSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/esESLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/esESImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/esES"
+                        app:layout_constraintStart_toEndOf="@+id/esES"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/esES"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/esESImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/esESTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/esESSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/esESenUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/esESenUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/esESenUS"
+                        app:layout_constraintStart_toEndOf="@+id/esESenUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/esESenUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/esESenUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/esESenUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/esESenUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/esUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/esUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/esUS"
+                        app:layout_constraintStart_toEndOf="@+id/esUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/esUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/esUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/esUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/esUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/esUsenUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/esUsenUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/esUsenUS"
+                        app:layout_constraintStart_toEndOf="@+id/esUsenUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/esUsenUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/esUsenUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/esUsenUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/esUsenUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/esMXLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/esMXImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/esMX"
+                        app:layout_constraintStart_toEndOf="@+id/esMX"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/esMX"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/esMXImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/esMXTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/esMXSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/frCALayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/frCAImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/frCA"
+                        app:layout_constraintStart_toEndOf="@+id/frCA"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/frCA"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/frCAImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/frCATitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/frCASummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/frCAenCALayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/frCAenCAImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/frCAenCA"
+                        app:layout_constraintStart_toEndOf="@+id/frCAenCA"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/frCAenCA"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/frCAenCAImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/frCAenCATitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/frCAenCASummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/frFRLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/frFRImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/frFR"
+                        app:layout_constraintStart_toEndOf="@+id/frFR"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/frFR"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/frFRImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/frFRTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/frFRSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/frFRenUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/frFRenUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/frFRenUS"
+                        app:layout_constraintStart_toEndOf="@+id/frFRenUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/frFRenUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/frFRenUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/frFRenUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/frFRenUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/itITLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/itITImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/itIT"
+                        app:layout_constraintStart_toEndOf="@+id/itIT"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/itIT"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/itITImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/itITTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/itITSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/itITenUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/itITenUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/itITenUS"
+                        app:layout_constraintStart_toEndOf="@+id/itITenUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/itITenUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/itITenUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/itITenUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/itITenUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/ptBRLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/ptBRImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/ptBR"
+                        app:layout_constraintStart_toEndOf="@+id/ptBR"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/ptBR"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/ptBRImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/ptBRTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/ptBRSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/hiINLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/hiINImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/hiIN"
+                        app:layout_constraintStart_toEndOf="@+id/hiIN"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/hiIN"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/hiINImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/hiINTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/hiINSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/hiINenINLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/hiINenINImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/hiINenIN"
+                        app:layout_constraintStart_toEndOf="@+id/hiINenIN"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/hiINenIN"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/hiINenINImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/hiINenINTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/hiINenINSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/jaJPLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/jaJPImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/jaJP"
+                        app:layout_constraintStart_toEndOf="@+id/jaJP"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/jaJP"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/jaJPImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/jaJPTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/jaJPSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:background="@android:color/darker_gray"
+                        android:layout_height="@dimen/setting_item_divider_height"
+                        android:layout_width="0dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/jaJPenUSLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/jaJPenUSImage"
+                        android:layout_width="@dimen/nav_bar_icon_height_width"
+                        android:layout_height="@dimen/nav_bar_icon_height_width"
+                        android:src="@drawable/ic_check"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin_double"
+                        app:layout_constraintTop_toTopOf="@+id/jaJPenUS"
+                        app:layout_constraintStart_toEndOf="@+id/jaJPenUS"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="2" />
+
+                    <LinearLayout
+                        android:id="@+id/jaJPenUS"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="@dimen/setting_item_horizontal_margin"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/jaJPenUSImage"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintHorizontal_weight="10"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/jaJPenUSTitle"
+                            android:textAppearance="?attr/headerText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/setting_item_vertical_margin">
+                        </TextView>
+
+                        <TextView
+                            android:id="@+id/jaJPenUSSummary"
+                            android:textAppearance="?attr/bodyText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+                        </TextView>
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/bottomMargin"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/setting_item_horizontal_bottom"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/ptBRLayout"
+                    app:layout_constraintEnd_toStartOf="@+id/ptBRLayout"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:orientation="vertical">
+                </LinearLayout>
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/continueButtonLayout"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintWidth_percent="0.25"
+        android:clickable="true"
+        android:gravity="bottom"
+        android:layout_marginStart="@dimen/login_item_margin_bottom"
+        android:layout_marginBottom="@dimen/login_margin_start_double"
+        app:layout_constraintTop_toTopOf="@id/preference_host_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/continueButton"
+            style="?attr/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/select_language_continue_button"
+            android:visibility="gone"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

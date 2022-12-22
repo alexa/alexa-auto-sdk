@@ -15,25 +15,32 @@
     <string name="setting_voice_assistance_setting_push_to_talk_non_alexa" tools:ignore="MissingTranslation">[Acme Brandon]</string>
     <string name="setting_voice_assistance_setting_location_consent_summary" tools:ignore="MissingTranslation">Share your vehicle\'s current location with [Brandon] and Alexa to get better responses for nearby restaurants, local weather and more.</string>
     <string name="setting_alexa_signin" tools:ignore="MissingTranslation">Sign in</string>
-    <string name="setting_alexa_hands_free_title" tools:ignore="MissingTranslation">Alexa Hands Free</string>
+    <string name="setting_alexa_wake_word_title" tools:ignore="MissingTranslation">Wake Word</string>
+    <string name="setting_alexa_wake_word_summary" tools:ignore="MissingTranslation">Alexa responds any time you say \"Alexa\"</string>
     <string name="setting_alexa_sounds_request_start_title" tools:ignore="MissingTranslation">Start of request sound</string>
-    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Play a sound when Alexa starts listening</string>
+    <string name="setting_alexa_sounds_request_start_summary" tools:ignore="MissingTranslation">Plays a sound when Alexa starts listening.</string>
     <string name="setting_alexa_sounds_request_end_title" tools:ignore="MissingTranslation">End of request sound</string>
-    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Play a sound when Alexa stops listening</string>
-    <string name="setting_alexa_hands_free_summary" tools:ignore="MissingTranslation">Alexa responds any time you say \"Alexa\"</string>
-    <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">Location sharing</string>
-    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">Share your vehicle\'s current location with Alexa to get better responses for nearby restaurants, local weather and more.</string>
+    <string name="setting_alexa_sounds_request_end_summary" tools:ignore="MissingTranslation">Plays a sound when Alexa stops listening.</string>
+    <string name="setting_location_sharing_title" tools:ignore="MissingTranslation">Location Sharing</string>
+    <string name="setting_location_sharing_summary" tools:ignore="MissingTranslation">Share your vehicle\'s current location with Alexa to get smarter responses for nearby restaurants, local weather and more.</string>
     <string name="setting_navigation_favorites_title">Sync navigation favourites</string>
     <string name="setting_navigation_favorites_summary">Alexa can help you navigate to the favourite locations stored in your vehicle. Favourites will be uploaded to the Amazon service.</string>
     <string name="setting_alexa_dnd_title" tools:ignore="MissingTranslation">Do Not Disturb</string>
-    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Alexa won’t disturb you except for timers and alarms</string>
-    <string name="setting_alexa_communication" tools:ignore="MissingTranslation">Communication</string>
+    <string name="setting_alexa_theme_title" tools:ignore="MissingTranslation">Device Theme</string>
+    <string name="setting_alexa_dnd_summary" tools:ignore="MissingTranslation">Disables Alexa notifications</string>
+    <string name="setting_alexa_calling_title" tools:ignore="MissingTranslation">Calling</string>
+    <string name="setting_alexa_calling_texting_title">Calling and Texting</string>
     <string name="setting_alexa_sounds" tools:ignore="MissingTranslation">Sounds</string>
-    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexa\'s language</string>
+    <string name="setting_alexa_language_title" tools:ignore="MissingTranslation">Alexa\'s Language</string>
+    <string name="setting_alexa_language_continue">Continue</string>
+    <string name="setting_alexa_language_confirm">Confirm</string>
+    <string name="setting_language_title">Language</string>
+    <string name="setting_system_language_title">System Language</string>
     <string name="setting_alexa_signout" tools:ignore="MissingTranslation">Sign out</string>
-    <string name="setting_alexa_things_to_try" tools:ignore="MissingTranslation">Things to try</string>
+    <string name="setting_alexa_things_to_try" tools:ignore="MissingTranslation">Things to Try</string>
     <string name="setting_alexa_disable" tools:ignore="MissingTranslation">Disable Alexa</string>
     <string name="setting_alexa_language_mismatch" tools:ignore="MissingTranslation">Alexa isn\'t supported in</string>
+    <string name="setting_alexa_current_language" tools:ignore="MissingTranslation">You can still talk to Alexa in %1$s or select a different language for Alexa.</string>
     <string name="setting_language_mismatch_title" tools:ignore="MissingTranslation">Language Mismatch</string>
     <string name="setting_language_mismatch_content_1" tools:ignore="MissingTranslation">The system language is set to %1$s.&#160;</string>
     <string name="setting_language_mismatch_content_2" tools:ignore="MissingTranslation">Would you like to continue using Alexa in %1$s?</string>
@@ -43,11 +50,11 @@
     <string name="settings_alexa" tools:ignore="MissingTranslation">Settings</string>
     <string name="logout" tools:ignore="MissingTranslation">Sign out?</string>
     <string name="disable_alexa" tools:ignore="MissingTranslation">Disable Alexa?</string>
-    <string name="logout_confirm" tools:ignore="MissingTranslation">Do you want to sign out of Amazon Alexa?</string>
-    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">SIGN OUT</string>
-    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">CANCEL</string>
+    <string name="logout_confirm" tools:ignore="MissingTranslation">Sign out and disable Alexa?</string>
+    <string name="confirm_yesno_yes" tools:ignore="MissingTranslation">Sign out</string>
+    <string name="confirm_yesno_no" tools:ignore="MissingTranslation">Cancel</string>
     <string name="confirm_yesno_confirm" tools:ignore="MissingTranslation">YES</string>
-    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">DISABLE</string>
+    <string name="confirm_yesno_disable" tools:ignore="MissingTranslation">Disable</string>
     <string name="disable_alexa_confirm" tools:ignore="MissingTranslation">Alexa will no longer be available in this vehicle.</string>
     <string name="preference_aacs_override_base_config_title" tools:ignore="MissingTranslation">Override Base Configuration</string>
     <string name="preference_aacs_override_base_config_summary" tools:ignore="MissingTranslation">All configurations below will be applied if this is selected</string>
@@ -64,76 +71,39 @@
     <string name="preference_aacs_reboot_now" tools:ignore="MissingTranslation">REBOOT AACS &amp; APPLY CONFIGURATION</string>
     <string name="preference_aacs_shutdown" tools:ignore="MissingTranslation">SHUT DOWN AACS</string>
     <string name="preference_aacs_start" tools:ignore="MissingTranslation">START AACS</string>
-    <string name="ttt_preview_mode_note" tools:ignore="MissingTranslation">Note: some features require signing in with Amazon Alexa.</string>
-
-    <!-- translatable="false" tag is used for things-to-try strings only. These strings need to be localized based on the country and region -->
-    <string name="ttt_getting_started" translatable="false">Getting Started</string>
-    <string name="ttt_alexa_s_talents" translatable="false">Alexa\'s Talents</string>
-    <string name="ttt_entertainment" translatable="false">Entertainment</string>
-    <string name="ttt_communication" translatable="false">Communication</string>
-    <string name="ttt_weather" translatable="false">Weather</string>
-    <string name="ttt_smart_home" translatable="false">Smart Home</string>
-    <string name="ttt_news_and_information" translatable="false">News and Information</string>
-    <string name="ttt_navigation" translatable="false">Navigation</string>
-    <string name="ttt_traffic_information" translatable="false">Traffic Information</string>
-    <string name="ttt_skills" translatable="false">Skills</string>
-    <string name="ttt_lists" translatable="false">Lists</string>
-    <string name="ttt_shopping" translatable="false">Shopping</string>
-    <string name="ttt_questions_and_answers" translatable="false">Questions and Answers</string>
-    <string name="ttt_sports" translatable="false">Sports</string>
-    <string name="ttt_calendar" translatable="false">Calendar</string>
-    <string name="ttt_getting_started_text1" translatable="false">\"Alexa, find a nearby petrol station.\"</string>
-    <string name="ttt_getting_started_text2" translatable="false">\"Alexa, play music.\"</string>
-    <string name="ttt_getting_started_text3" translatable="false">\"Alexa, what\'s the weather?\"</string>
-    <string name="ttt_getting_started_text4" translatable="false">\"Alexa, how\'s my commute?\"</string>
-    <string name="ttt_getting_started_text5" translatable="false">\"Alexa, what\'s my Flash Briefing?\"</string>
-    <string name="ttt_alexa_s_talents_text1" translatable="false">\"Alexa, good morning.\"</string>
-    <string name="ttt_alexa_s_talents_text2" translatable="false">\"Alexa, tell me a story.\"</string>
-    <string name="ttt_alexa_s_talents_text3" translatable="false">\"Alexa, what can you remember?\"</string>
-    <string name="ttt_entertainment_text1" translatable="false">\"Alexa, play music.\"</string>
-    <string name="ttt_entertainment_text2" translatable="false">\"Alexa, play rock music from the 70s.\"</string>
-    <string name="ttt_entertainment_text3" translatable="false">\"Alexa, play the latest Bruno Mars album.\"</string>
-    <string name="ttt_entertainment_text4" translatable="false">\"Alexa, resume my Audible book.\"</string>
-    <string name="ttt_communication_text1" translatable="false">\"Alexa, send a message to John.\"</string>
-    <string name="ttt_communication_text2" translatable="false">\"Alexa, how do I send a message?\"</string>
-    <string name="ttt_communication_text3" translatable="false">\"Alexa, call Erin\'s mobile.\"</string>
-    <string name="ttt_communication_text4" translatable="false">\"Alexa, call 020 5558 7319.\"</string>
-    <string name="ttt_weather_text1" translatable="false">\"Alexa, how\'s the weather?\"</string>
-    <string name="ttt_weather_text2" translatable="false">\"Alexa, will it rain today?\"</string>
-    <string name="ttt_weather_text3" translatable="false">\"Alexa, what\'s the weather in Bournemouth?\"</string>
-    <string name="ttt_smart_home_text1" translatable="false">\"Alexa, turn on the porch lights.\"</string>
-    <string name="ttt_smart_home_text2" translatable="false">\"Alexa, lock the front door.\"</string>
-    <string name="ttt_smart_home_text3" translatable="false">\"Alexa, set my house to 21 degrees.\"</string>
-    <string name="ttt_smart_home_text4" translatable="false">\"Alexa, close the garage door.\"</string>
-    <string name="ttt_news_and_information_text1" translatable="false">\"Alexa, what\'s the news?\"</string>
-    <string name="ttt_news_and_information_text2" translatable="false">\"Alexa, what\'s my sports update?\"</string>
-    <string name="ttt_news_and_information_text3" translatable="false">\"Alexa, play NPR.\"</string>
-    <string name="ttt_news_and_information_text4" translatable="false">\"Alexa, play BBC.\"</string>
-    <string name="ttt_navigation_text1" translatable="false">\"Alexa, find a top-rated Thai restaurant nearby.\"</string>
-    <string name="ttt_navigation_text2" translatable="false">\"Alexa, take me to the airport.\"</string>
-    <string name="ttt_navigation_text3" translatable="false">\"Alexa, take me to the train station.\"</string>
-    <string name="ttt_traffic_information_text1" translatable="false">\"Alexa, how\'s my commute to work?\"</string>
-    <string name="ttt_traffic_information_text2" translatable="false">\"Alexa, how\'s the traffic to the airport?\"</string>
-    <string name="ttt_skills_text1" translatable="false">\"Alexa, what new skills do you have?\"</string>
-    <string name="ttt_lists_text1" translatable="false">\"Alexa, what\'s on my to-do list?\"</string>
-    <string name="ttt_lists_text2" translatable="false">\"Alexa, add milk to my shopping list\"</string>
-    <string name="ttt_lists_text3" translatable="false">\"Alexa, what\'s on my shopping list?\"</string>
-    <string name="ttt_lists_text4" translatable="false">\"Alexa, create a packing list.\"</string>
-    <string name="ttt_shopping_text1" translatable="false">\"Alexa, where\'s my stuff?\"</string>
-    <string name="ttt_shopping_text2" translatable="false">\"Alexa, buy air freshener for my car.\"</string>
-    <string name="ttt_shopping_text3" translatable="false">\"Alexa, reorder toothpaste.\"</string>
-    <string name="ttt_questions_and_answers_text1" translatable="false">\"Alexa, what time is it in Tokyo?\"</string>
-    <string name="ttt_questions_and_answers_text2" translatable="false">\"Alexa, how far away is the moon?\"</string>
-    <string name="ttt_questions_and_answers_text3" translatable="false">\"Alexa, when is the World Cup?\"</string>
-    <string name="ttt_sports_text1" translatable="false">\"Alexa, what\'s my sports update?\"</string>
-    <string name="ttt_sports_text2" translatable="false">\"Alexa, when is the Champions League final?\"</string>
-    <string name="ttt_sports_text3" translatable="false">\"Alexa, when\'s the next Manchester United game?\"</string>
-    <string name="ttt_sports_text4" translatable="false">\"Alexa, when is the cricket world cup?\"</string>
-    <string name="ttt_sports_text5" translatable="false">\"Alexa, when is Wimbledon?\"</string>
-    <string name="ttt_sports_text6" translatable="false">\"Alexa, when is the Monaco Grand Prix?\"</string>
-    <string name="ttt_sports_text7" translatable="false">\"Alexa, what was the score at the last ICC Men\'s Cricket World Cup final?\"</string>
-    <string name="ttt_sports_text8" translatable="false">\"Alexa, how many times has Serena Williams been a Wimbledon Ladies\' Singles champion?\"</string>
-    <string name="ttt_calendar_text1" translatable="false">\"Alexa, how does my day look?\"</string>
-    <string name="ttt_calendar_text2" translatable="false">\"Alexa, what\'s my next appointment?\"</string>
-    <string name="ttt_calendar_text3" translatable="false">\"Alexa, add a 2.00 pm coffee chat to my calendar.\"</string>
+    <string name="comms_primary_device_none">No phone connected</string>
+    <string name="ttt_preview_mode_note">Note: some features require signing in with Amazon Alexa.</string>
+    <string name="lp_blocker_mic_primary">Microphone access required</string>
+    <string name="lp_blocker_mic_secondary">Allow microphone access so Alexa can hear your commands.</string>
+    <string name="lp_blocker_assistant_primary">Set Alexa as your default assistant</string>
+    <string name="lp_blocker_assistant_secondary">To use Alexa, you need to set Alexa as the default assistant app.</string>
+    <string name="lp_carousel_ttt_primary">Talking to Alexa</string>
+    <string name="lp_carousel_ttt_secondary_ww_ptt">Press the voice button or just say \"Alexa\".</string>
+    <string name="lp_carousel_ttt_secondary_ptt">Press the voice button and ask anything.</string>
+    <string name="lp_carousel_ttt_secondary_ww">Just say "Alexa" and ask anything.</string>
+    <string name="lp_carousel_previewmode_primary">Alexa can do more when you sign in</string>
+    <string name="lp_carousel_previewmode_secondary">Get streaming music, local information and much more.</string>
+    <string name="lp_carousel_smarthome_primary">Check on your Smart Home</string>
+    <string name="lp_carousel_smarthome_secondary">Tap the Smart Home icon above or say "Alexa, show my Smart Home dashboard".</string>
+    <string name="lp_carousel_location_primary">What\'s nearby?</string>
+    <string name="lp_carousel_location_secondary_alexa_system">Share location with Alexa to get smarter responses for nearby restaurants and more.</string>
+    <string name="lp_carousel_location_secondary_system">Allow location access to get smarter responses for nearby restaurants and more.</string>
+    <string name="lp_carousel_contacts_primary">Call friends and family using your voice</string>
+    <string name="lp_carousel_contacts_secondary_alexa_system">Contacts from %1$s will be uploaded to the Amazon service.</string>
+    <string name="lp_carousel_contacts_secondary_system">To make calls with Alexa, allow contacts access.</string>
+    <string name="lp_carousel_sms_primary">Hear your text messages</string>
+    <string name="lp_carousel_sms_secondary_alexa_system">SMS messages from %1$s will be uploaded to the Amazon service.</string>
+    <string name="lp_carousel_sms_secondary_system">To send and receive text messages with Alexa, allow SMS access.</string>
+    <string name="lp_carousel_lowdata_primary">Enrol in a data plan to make the most of Alexa</string>
+    <string name="lp_carousel_lowdata_secondary">Enrol in a data plan to stream music, audiobooks, live radio stations, control smart home and much more.</string>
+    <string name="cta_label_fix">Fix</string>
+    <string name="cta_label_set_as_default">Set as Default</string>
+    <string name="cta_label_things_to_try">Things to Try</string>
+    <string name="cta_label_sign_in">Sign In</string>
+    <string name="cta_label_enable">Enable</string>
+    <string name="cta_label_allow">Allow</string>
+    <string name="try_saying">Try saying: %1$s</string>
+    <string name="toggle_title">\"Alexa\" Wake Word</string>
+    <string name="cta_label_connect_phone">Connect a phone</string>
+    <string name="lp_carousel_contacts_secondary_no_phone">To get started, connect a phone.</string>
 </resources>

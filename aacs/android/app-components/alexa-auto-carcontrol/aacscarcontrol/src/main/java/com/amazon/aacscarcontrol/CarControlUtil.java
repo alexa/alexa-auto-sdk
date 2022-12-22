@@ -121,4 +121,8 @@ public class CarControlUtil {
     public static float celcius(float f) {
         return (float) ((f - 32) / 1.8);
     }
+
+    public static float fahrenheit(float f) {
+        return (float) ((f * 1.8) + 32);
+    }
 }

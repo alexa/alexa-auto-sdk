@@ -20,24 +20,14 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.amazon.aacsconstants.AACSConstants;
-import com.amazon.alexa.auto.aacs_annotation_api.ContextBroadcastReceiver;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 
-@ContextBroadcastReceiver(actions = {AACSConstants.ACTION_STATE_CHANGE})
 public class AACSStateReceiver extends BroadcastReceiver {
     private static final String TAG = AACSStateReceiver.class.getSimpleName();
-    private static AACSStateReceiver INSTANCE;
-
-    private AACSStateReceiver() {}
-    public static AACSStateReceiver getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new AACSStateReceiver();
-        }
-        return INSTANCE;
-    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive: " + intent.getAction());
         if (intent == null || intent.getAction() == null) {
             return;
         }

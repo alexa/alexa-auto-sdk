@@ -34,7 +34,6 @@ import com.amazon.alexa.auto.apps.common.ui.R;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 
 import org.greenrobot.eventbus.EventBus;
-import org.w3c.dom.Text;
 
 /**
  * Dialog class to present confirmation screen with two choices.
@@ -49,7 +48,7 @@ public class TwoChoiceDialog extends DialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Alexa_DialogStyle);
+        setStyle(DialogFragment.STYLE_NO_TITLE, R.style.DeviceDefaults_Dialog);
     }
 
     @Override
@@ -85,10 +84,10 @@ public class TwoChoiceDialog extends DialogFragment {
         TextView contentTxt = view.findViewById(R.id.content_text);
         contentTxt.setText(params.content);
 
-        mBtn1 = view.findViewById(R.id.btn1);
+        mBtn1 = view.findViewById(R.id.button1);
         mBtn1.setText(params.button1Text);
 
-        mBtn2 = view.findViewById(R.id.btn2);
+        mBtn2 = view.findViewById(R.id.button2);
         mBtn2.setText(params.button2Text);
 
         mBtn1.setOnClickListener(btn1View -> {

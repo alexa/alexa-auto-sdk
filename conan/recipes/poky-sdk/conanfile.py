@@ -14,14 +14,11 @@ class PokySDKConan(ConanFile):
     no_copy_source = True
     exports_sources = "packages/*"
 
-    settings = {
-        "os": ["Linux", "Macos"],
-        "arch": ["x86", "x86_64", "armv7hf", "armv8"]
-    }
+    settings = {"os": ["Linux", "Macos"], "arch": ["x86", "x86_64", "armv7hf", "armv8"]}
 
     @staticmethod
     def _chmod_plus_x(filename):
-        if os.name == 'posix':
+        if os.name == "posix":
             os.chmod(filename, os.stat(filename).st_mode | 0o111)
 
     def configure(self):
@@ -43,7 +40,9 @@ class PokySDKConan(ConanFile):
             return
 
         local_installer = self._local_installer
-        tools.download(**self.conan_data["toolchains"][self.version][str(self.settings_target.arch)], filename=local_installer)
+        tools.download(
+            **self.conan_data["toolchains"][self.version][str(self.settings_target.arch)], filename=local_installer
+        )
         self._chmod_plus_x(local_installer)
 
     def build(self):
@@ -65,7 +64,9 @@ class PokySDKConan(ConanFile):
             return
 
         toolchain_path = os.path.join(self.package_folder, self._toolchain_path)
-        oetoolchainconfig_path = os.path.join(toolchain_path, "sysroots/x86_64-pokysdk-linux/usr/share/cmake/OEToolchainConfig.cmake")
+        oetoolchainconfig_path = os.path.join(
+            toolchain_path, "sysroots/x86_64-pokysdk-linux/usr/share/cmake/OEToolchainConfig.cmake"
+        )
 
         # check the license acceptance
         auto_accept_licenses = os.getenv("BUILDER_ACCEPT_LICENSES", "False").lower() == "true"
@@ -106,14 +107,29 @@ class PokySDKConan(ConanFile):
         self._append_path(self.env_info.PATH, os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/sbin"))
 
         if self.settings_target.arch == "armv7hf":
-            self._append_path(self.env_info.PATH, os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi"))
-            self._append_path(self.env_info.PATH, os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/arm-poky-linux-musl"))
+            self._append_path(
+                self.env_info.PATH,
+                os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi"),
+            )
+            self._append_path(
+                self.env_info.PATH,
+                os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/arm-poky-linux-musl"),
+            )
             self.env_info.CONFIG_SITE = self.env_info.TOOLCHAIN_ROOT + "/site-config-cortexa8hf-neon-poky-linux-gnueabi"
             self.env_info.OECORE_TARGET_ARCH = "arm"
             self.env_info.OECORE_TARGET_OS = "linux-gnueabi"
-            self.env_info.CC = "arm-poky-linux-gnueabi-gcc -march=armv7-a -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a8 --sysroot=" + self.env_info.SDKTARGETSYSROOT
-            self.env_info.CXX = "arm-poky-linux-gnueabi-g++ -march=armv7-a -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a8 --sysroot=" + self.env_info.SDKTARGETSYSROOT
-            self.env_info.CPP = "arm-poky-linux-gnueabi-gcc -E -march=armv7-a -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a8 --sysroot=" + self.env_info.SDKTARGETSYSROOT
+            self.env_info.CC = (
+                "arm-poky-linux-gnueabi-gcc -march=armv7-a -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a8 --sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
+            self.env_info.CXX = (
+                "arm-poky-linux-gnueabi-g++ -march=armv7-a -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a8 --sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
+            self.env_info.CPP = (
+                "arm-poky-linux-gnueabi-gcc -E -march=armv7-a -mfpu=neon -mfloat-abi=hard -mcpu=cortex-a8 --sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
             self.env_info.AS = "arm-poky-linux-gnueabi-as"
             self.env_info.LD = "arm-poky-linux-gnueabi-ld --sysroot=" + self.env_info.SDKTARGETSYSROOT
             self.env_info.GDB = "arm-poky-linux-gnueabi-gdb"
@@ -125,18 +141,36 @@ class PokySDKConan(ConanFile):
             self.env_info.NM = "arm-poky-linux-gnueabi-nm"
             self.env_info.M4 = "m4"
             self.env_info.TARGET_PREFIX = "arm-poky-linux-gnueabi-"
-            self.env_info.CONFIGURE_FLAGS = "--target=arm-poky-linux-gnueabi --host=arm-poky-linux-gnueabi --build=x86_64-linux --with-libtool-sysroot=" + self.env_info.SDKTARGETSYSROOT
+            self.env_info.CONFIGURE_FLAGS = (
+                "--target=arm-poky-linux-gnueabi --host=arm-poky-linux-gnueabi --build=x86_64-linux --with-libtool-sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
             self.env_info.LDFLAGS = "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed"
             self.env_info.ARCH = "arm"
         else:
-            self._append_path(self.env_info.PATH, os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux"))
-            self._append_path(self.env_info.PATH, os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux-musl"))
+            self._append_path(
+                self.env_info.PATH,
+                os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux"),
+            )
+            self._append_path(
+                self.env_info.PATH,
+                os.path.join(self.env_info.SYSROOT, "x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux-musl"),
+            )
             self.env_info.CONFIG_SITE = self.env_info.TOOLCHAIN_ROOT + "/site-config-aarch64-poky-linux"
             self.env_info.OECORE_TARGET_ARCH = "aarch64"
             self.env_info.OECORE_TARGET_OS = "linux"
-            self.env_info.CC = "aarch64-poky-linux-gcc -march=armv8-a+crc -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=" + self.env_info.SDKTARGETSYSROOT
-            self.env_info.CXX = "aarch64-poky-linux-g++ -march=armv8-a+crc -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=" + self.env_info.SDKTARGETSYSROOT
-            self.env_info.CPP = "aarch64-poky-linux-gcc -E -march=armv8-a+crc -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=" + self.env_info.SDKTARGETSYSROOT
+            self.env_info.CC = (
+                "aarch64-poky-linux-gcc -march=armv8-a+crc -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
+            self.env_info.CXX = (
+                "aarch64-poky-linux-g++ -march=armv8-a+crc -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
+            self.env_info.CPP = (
+                "aarch64-poky-linux-gcc -E -march=armv8-a+crc -fstack-protector-strong -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
             self.env_info.AS = "aarch64-poky-linux-as"
             self.env_info.LD = "aarch64-poky-linux-ld --sysroot=" + self.env_info.SDKTARGETSYSROOT
             self.env_info.GDB = "aarch64-poky-linux-gdb"
@@ -149,14 +183,23 @@ class PokySDKConan(ConanFile):
             self.env_info.NM = "aarch64-poky-linux-nm"
             self.env_info.M4 = "m4"
             self.env_info.TARGET_PREFIX = "aarch64-poky-linux-"
-            self.env_info.CONFIGURE_FLAGS = "--target=aarch64-poky-linux --host=aarch64-poky-linux --build=x86_64-linux --with-libtool-sysroot=" + self.env_info.SDKTARGETSYSROOT
-            self.env_info.LDFLAGS = "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -fstack-protector-strong -Wl,-z,relro,-z,now"
+            self.env_info.CONFIGURE_FLAGS = (
+                "--target=aarch64-poky-linux --host=aarch64-poky-linux --build=x86_64-linux --with-libtool-sysroot="
+                + self.env_info.SDKTARGETSYSROOT
+            )
+            self.env_info.LDFLAGS = (
+                "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed -fstack-protector-strong -Wl,-z,relro,-z,now"
+            )
             self.env_info.ARCH = "arm64"
 
         # Common config between armv7hf and armv8
 
-        self._append_path(self.env_info.PKG_CONFIG_PATH, os.path.join(self.env_info.SDKTARGETSYSROOT, "usr/lib/pkgconfig"))
-        self._append_path(self.env_info.PKG_CONFIG_PATH, os.path.join(self.env_info.SDKTARGETSYSROOT, "usr/share/pkgconfig"))
+        self._append_path(
+            self.env_info.PKG_CONFIG_PATH, os.path.join(self.env_info.SDKTARGETSYSROOT, "usr/lib/pkgconfig")
+        )
+        self._append_path(
+            self.env_info.PKG_CONFIG_PATH, os.path.join(self.env_info.SDKTARGETSYSROOT, "usr/share/pkgconfig")
+        )
 
         self.env_info.CONFIG_SITE = self.env_info.TOOLCHAIN_ROOT + "/site-config-aarch64-poky-linux"
         self.env_info.OECORE_NATIVE_SYSROOT = self.env_info.SYSROOT + "/x86_64-pokysdk-linux"
@@ -170,4 +213,6 @@ class PokySDKConan(ConanFile):
         self.env_info.OECORE_DISTRO_VERSION = self.version
         self.env_info.OECORE_SDK_VERSION = self.version
 
-        self.env_info.OE_CMAKE_TOOLCHAIN_FILE = self.env_info.OECORE_NATIVE_SYSROOT + "/usr/share/cmake/OEToolchainConfig.cmake"
+        self.env_info.OE_CMAKE_TOOLCHAIN_FILE = (
+            self.env_info.OECORE_NATIVE_SYSROOT + "/usr/share/cmake/OEToolchainConfig.cmake"
+        )

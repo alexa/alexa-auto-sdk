@@ -18,7 +18,6 @@ package com.amazon.aacsconstants;
 public class Topic {
     public static final String AASB = "AASB";
     public static final String ADDRESS_BOOK = "AddressBook";
-    public static final String ALERTS = "Alerts";
     public static final String ALEXA_CLIENT = "AlexaClient";
     public static final String ALEXA_SPEAKER = "AlexaSpeaker";
     public static final String AUDIO_PLAYER = "AudioPlayer";

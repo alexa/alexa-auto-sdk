@@ -31,11 +31,15 @@ messages:
 
   - action: DialogStateChanged
     direction: outgoing
-    desc: Notifies the platform implementation of an Alexa dialog state change.
+    desc: Notifies the platform implementation of a dialog state change.
     payload:
       - name: state
         type: DialogState
-        desc: The new Alexa dialog state.
+        desc: The new dialog state.
+      - name: assistantId
+        type: int
+        desc: The ID of the assistant that the dialog state change is associated with. The assistantId is 2 for Alexa dialog state changes; For applications using multiple assistants, the value will be an integer greater than 2, corresponding to the assistant ID in Engine configuration field "aace.coassistant.assistants[i].id" for each additional assistant.        
+        example: 2
 
   - action: AuthStateChanged
     direction: outgoing
@@ -74,6 +78,8 @@ types:
         desc: A user request has completed, and no more user input is being accepted. Alexa is waiting for a response from AVS.
       - name: SPEAKING
         desc: Alexa is responding to a request with speech.
+      - name: FINISHED
+        desc: Alexa has finished processing a single Speak directive. If the Speak directive is part of a speech burst, the state will transition back to SPEAKING; if the Speak directive was the last in the burst, the state will transition back to IDLE.
 
   - name: ConnectionStatus
     type: enum

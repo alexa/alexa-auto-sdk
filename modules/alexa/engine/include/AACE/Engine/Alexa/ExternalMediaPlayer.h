@@ -40,13 +40,11 @@
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <CertifiedSender/CertifiedSender.h>
-// brought up to Auto SDK
 #include "ExternalMediaAdapterHandlerInterface.h"
 #include "ExternalMediaAdapterInterface.h"
 #include "ExternalMediaAdapterRegistrationInterface.h"
 #include "ExternalMediaPlayerInterface.h"
 #include "AuthorizedSender.h"
-// unused
 #include "ExternalMediaPlayerObserverInterface.h"
 
 namespace aace {
@@ -103,28 +101,6 @@ class ExternalMediaPlayer
         , public alexaClientSDK::avsCommon::sdkInterfaces::PlaybackHandlerInterface
         , public std::enable_shared_from_this<ExternalMediaPlayer> {
 public:
-    // Map of adapter business names to their mediaPlayers.
-    using AdapterMediaPlayerMap = std::unordered_map<
-        std::string,
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface>>;
-
-    // Map of adapter business names to their speakers.
-    using AdapterSpeakerMap =
-        std::unordered_map<std::string, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface>>;
-
-    // Signature of functions to create an ExternalMediaAdapter.
-    using AdapterCreateFunction = std::shared_ptr<ExternalMediaAdapterInterface> (*)(
-        std::shared_ptr<alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface> mediaPlayer,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface> speaker,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<ExternalMediaPlayerInterface> externalMediaPlayer);
-
-    // Map of adapter business names to their creation method.
-    using AdapterCreationMap = std::unordered_map<std::string, AdapterCreateFunction>;
-
     /// The spiVersion of this implementation of ExternalMediaPlayer.
     static constexpr const char* SPI_VERSION = "1.0";
 
@@ -132,11 +108,6 @@ public:
      * Creates a new @c ExternalMediaPlayer instance.
      *
      * @param agentString agent identifier for this device type's implementation.
-     * @param mediaPlayers The map of <PlayerId, MediaPlayer> to be used to find the mediaPlayer to use for this
-     * adapter.
-     * @param speakers The map of <PlayerId, SpeakerInterface> to be used to find the speaker to use for this
-     * adapter.
-     * @param adapterCreationMap The map of <PlayerId, AdapterCreateFunction> to be used to create the adapters.
      * @param speakerManager A @c SpeakerManagerInterface to perform volume changes requested by adapters.
      * @param messageSender The object to use for sending events.
      * @param certifiedMessageSender Used to send messages that must be guaranteed.
@@ -148,9 +119,6 @@ public:
      */
     static std::shared_ptr<ExternalMediaPlayer> create(
         const std::string& agentString,
-        const AdapterMediaPlayerMap& mediaPlayers,
-        const AdapterSpeakerMap& speakers,
-        const AdapterCreationMap& adapterCreationMap,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::certifiedSender::CertifiedSender> certifiedMessageSender,
@@ -252,21 +220,11 @@ public:
 
     /**
      * Initialize the ExternalMediaAdapter.
-     *
-     * @param mediaPlayers The map of <PlayerId, MediaPlayer> to be used to find the mediaPlayer to use for this
-     * adapter.
-     * @param speakers The map of <PlayerId, SpeakerInterface> to be used to find the speaker to use for this
-     * adapter.
-     * @param adapterCreationMap The map of <PlayerId, AdapterCreateFunction> to be used to create the adapters.
      * @param focusManager Used to control channel focus.
      *
      * @return true if successful, otherwise false.
      */
-    bool init(
-        const AdapterMediaPlayerMap& mediaPlayers,
-        const AdapterSpeakerMap& speakers,
-        const AdapterCreationMap& adapterCreationMap,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager);
+    bool init(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager);
 
 private:
     /**
@@ -326,47 +284,10 @@ private:
     /// @}
 
     /**
-     * Sends an event which reveals all the discovered players.
-     */
-    void sendReportDiscoveredPlayersEvent();
-
-    /**
-     * Sends an event indicating that the authorization workflow has completed.
-     *
-     * @param authorized A map of playerId to skillToken for authorized adapters.
-     * The attributes should be the one in the corresponding @c AuthorizedPlayers directive
-     * @param deauthorized A set of deauthorized localPlayerId.
-     */
-    void sendAuthorizationCompleteEvent(
-        const std::unordered_map<std::string, std::string>& authorized,
-        const std::unordered_set<std::string>& deauthorized);
-
-    /**
-     * Method to create all the adapters registered.
-     *
-     * @param mediaPlayers The map of <PlayerId, MediaPlayer> to be used to find the mediaPlayer to use for this
-     * adapter.
-     * @param speakers The map of <PlayerId, SpeakerInterface> to be used to find the speaker to use for this
-     * adapter.
-     * @param adapterCreationMap The map of <PlayerId, AdapterCreateFunction> to be used to create the adapters.
-     * @param messageSender The message sender of the adapter.
-     * @param focusManager The focus manager to be used by the adapter to acquire/release channel.
-     * @param contextManager The context manager of the ExternalMediaPlayer and adapters.
-     */
-    void createAdapters(
-        const AdapterMediaPlayerMap& mediaPlayers,
-        const AdapterSpeakerMap& speakers,
-        const AdapterCreationMap& adapterCreationMap,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
-
-    /**
      * Set the appropriate halt initiator for the request.
      *
      * @param The type of the request.
      */
-    // adapterHandler specific code
     void setHaltInitiatorRequestHelper(RequestType request);
 
     /**
@@ -412,6 +333,8 @@ private:
         const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName,
         bool sendToken = false,
         unsigned int stateRequestToken = 0);
+
+    void executeSetPlayerInFocus(const std::string& playerInFocus, bool acquireFocus);
     /// @}
 
     /**
@@ -419,12 +342,9 @@ private:
      *
      * @param info The DirectiveInfo to be preprocessed
      * @param document The rapidjson document resulting from parsing the directive in directiveInfo.
-     * @return A shared-ptr to the ExternalMediaAdapterInterface on which the actual
-     *        adapter method has to be invoked.
+     * @return The playerId in the directive payload
      */
-    std::shared_ptr<ExternalMediaAdapterInterface> preprocessDirective(
-        std::shared_ptr<DirectiveInfo> info,
-        rapidjson::Document* document);
+    std::string preprocessDirective(std::shared_ptr<DirectiveInfo> info, rapidjson::Document* document);
 
     /**
      * Handler for AuthorizeDiscoveredPlayers directive.
@@ -516,15 +436,6 @@ private:
         const aace::engine::alexa::ObservablePlaybackStateProperties* playbackProperties);
 
     /**
-     * Helper method to get an adapter by playerId.
-     *
-     * @param playerId The cloud assigned playerId.
-     *
-     * @return An instance of the adapter if found, else a nullptr.
-     */
-    std::shared_ptr<ExternalMediaAdapterInterface> getAdapterByPlayerId(const std::string& playerId);
-
-    /**
      * Helper method to get an adapter handler by playerId.
      *
      * @param playerId The cloud assigned playerId.
@@ -532,15 +443,6 @@ private:
      * @return An instance of the adapter handler if found, else a nullptr.
      */
     std::shared_ptr<ExternalMediaAdapterHandlerInterface> getAdapterHandlerByPlayerId(const std::string& playerId);
-
-    /**
-     * Helper method to get an adapter by localPlayerId.
-     *
-     * @param localPlayerId The local player id associated with a player.
-     *
-     * @return An instance of the adapter if found, else a nullptr.
-     */
-    std::shared_ptr<ExternalMediaAdapterInterface> getAdapterByLocalPlayerId(const std::string& playerId);
 
     /**
      * Helper method to test if the player id belongs to registered adapter handler.
@@ -575,23 +477,16 @@ private:
     /// The @c ExternalMediaAdapterRegistrationInterface instance to use when testing for an external media adapter player id.
     std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface> m_externalMediaAdapterRegistration;
 
-    /// The @c m_adapters Map of @c localPlayerId (business names) to adapters.
-    std::map<std::string, std::shared_ptr<ExternalMediaAdapterInterface>> m_adapters;
-
     /// Protects access to @c m_authorizedAdapters.
     std::mutex m_authorizedMutex;
 
     /// A map of cloud assigned @c playerId to localPlayerId. Unauthorized adapters will not be in this map.
     std::unordered_map<std::string, std::string> m_authorizedAdapters;
 
-    /// The id of the player which currently has focus.  Access to @c m_playerInFocus is protected by @c
-    /// m_inFocusAdapterMutex.
-    /// TODO: Consolidate m_playerInFocus and m_adapterInFocus.
+    /// The id of the player which currently has focus.  Access to @c m_playerInFocus is protected by
+    /// @c m_inFocusAdapterMutex.
+    /// TODO: Consolidate m_playerInFocus and m_adapterHandlerInFocus.
     std::string m_playerInFocus;
-
-    /// The adapter with the @c m_playerInFocus which currently has focus.  Access to @c m_adapterInFocus is
-    // protected by @c m_inFocusAdapterMutex.
-    std::shared_ptr<ExternalMediaAdapterInterface> m_adapterInFocus;
 
     /// The adapter handler with the @c m_playerInFocus which currently has focus.
     /// Access to @c m_adapterHandlerInFocus is protected by @c m_inFocusAdapterMutex.
@@ -599,12 +494,6 @@ private:
 
     /// Mutex to serialize access to the @c m_playerInFocus.
     std::mutex m_inFocusAdapterMutex;
-
-    /// Provides notifications of changes to @c m_playerInFocus.
-    std::condition_variable m_playerInFocusConditionVariable;
-
-    /// Mutex to serialize access to @c m_adapters.
-    std::mutex m_adaptersMutex;
 
     /// The @c AuthorizedSender that will only allow authorized players to send events.
     std::shared_ptr<AuthorizedSender> m_authorizedSender;
@@ -619,16 +508,15 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
         m_renderPlayerObserver;
 
-    // adapterHandler specific code
     std::unordered_set<std::shared_ptr<ExternalMediaAdapterHandlerInterface>> m_adapterHandlers;
 
     /// The @c FocusManager used to manage usage of the channel.
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_focusManager;
 
-    /// The current focus state of the @c AudioPlayer on the content channel.
+    /// The current focus state of the @c AudioPlayer on the content channel. Access serialized by @c m_executor thread.
     alexaClientSDK::avsCommon::avs::FocusState m_focus;
 
-    /// bool to identify if acquire of focus is currently in progress.
+    /// bool to identify if acquire of focus is currently in progress. Access serialized by @c m_executor thread.
     bool m_focusAcquireInProgress;
 
     /// Enum to identify the type and source of the halt request.

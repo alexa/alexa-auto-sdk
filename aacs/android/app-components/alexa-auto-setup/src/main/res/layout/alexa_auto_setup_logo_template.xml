@@ -36,7 +36,7 @@
 
     <!--Alexa logo-->
     <ImageView
-        android:id="@+id/alexa_img_view"
+        android:id="@+id/alexa_image_view"
         android:layout_width="@dimen/login_alexa_image_width"
         android:layout_height="@dimen/login_alexa_image_height"
         android:layout_gravity="center"

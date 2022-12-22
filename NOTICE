@@ -40,6 +40,17 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
 or implied. See the License for the specific language governing permissions and
 limitations under the License.
 
+***************************
+ALEXA AUTO SDK COMPONENTS
+***************************
+The following Alexa Auto SDK sub-component is licensed under the Amazon Software License:
+- modules/core/Arbitrator
+
+You may not use this file except in compliance with the Amazon Software License. A copy
+of the Amazon Software License is located at:
+
+      http://aws.amazon.com/asl/
+  
 **********************
 THIRD PARTY COMPONENTS
 **********************
@@ -126,7 +137,7 @@ http://vadikom.com
 Licensed MIT
 ----------------------------------------
 
-AACS Sample App includes the following open source Google material design icons:
+Alexa Auto App includes the following open source Google material design icons:
 
 Google material design icons - v4.0.0 - August 31, 2020
 https://github.com/google/material-design-icons/blob/master/android/av/album/materialicons/black/res/drawable/baseline_album_24.xml

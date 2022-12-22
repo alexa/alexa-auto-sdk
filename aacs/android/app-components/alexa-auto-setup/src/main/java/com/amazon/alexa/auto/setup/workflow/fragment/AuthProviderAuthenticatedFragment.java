@@ -91,13 +91,13 @@ public class AuthProviderAuthenticatedFragment extends Fragment {
 
         View fragmentView = requireView();
 
-        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_heading);
+        TextView loginFinishHeadingText = fragmentView.findViewById(R.id.login_finish_header);
         String format = getResources().getString(R.string.login_finish_heading_text);
         loginFinishHeadingText.setText(String.format(format, ""));
 
         mController = findNavController(fragmentView);
 
-        TextView finishLoginButtonText = fragmentView.findViewById(R.id.auth_provider_login_finished_btn);
+        TextView finishLoginButtonText = fragmentView.findViewById(R.id.auth_provider_login_finished_button);
         finishLoginButtonText.setOnClickListener(view -> mViewModel.userFinishedLogin());
 
         TextView signIndButtonText = fragmentView.findViewById(R.id.sign_in_action_button);
@@ -105,6 +105,7 @@ public class AuthProviderAuthenticatedFragment extends Fragment {
 
         // Setup steps are completed and showing the finish screen.
         mViewModel.setupCompleted();
+        mViewModel.userFinishedLogin();
     }
 
     @VisibleForTesting

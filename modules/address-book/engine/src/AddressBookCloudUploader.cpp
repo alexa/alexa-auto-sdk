@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
+#include <AVSCommon/Utils/HTTP/HttpResponseCode.h>
+
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <AACE/Engine/Network/NetworkEngineService.h>
@@ -33,6 +35,7 @@ namespace engine {
 namespace addressBook {
 
 using namespace aace::engine::utils::metrics;
+using namespace alexaClientSDK::avsCommon::utils::http;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBook.addressBookCloudUploader");
@@ -52,7 +55,7 @@ static const int MAX_ALLOWED_ENTRY_ID_SIZE = 200;
 /// Max allowed EntryId size
 static const int MAX_ALLOWED_ADDRESS_LINE_SIZE = 60;
 
-/// Max event retry
+/// Max event retry before event being dropped from the queue.
 static const int MAX_EVENT_RETRY = 3;
 
 /// Invalid Address Id
@@ -164,7 +167,9 @@ bool AddressBookCloudUploader::initialize(
 
 void AddressBookCloudUploader::doShutdown() {
     m_isShuttingDown = true;
-    m_waitStatusChange.notify_all();
+    m_waitForEvent.notify_all();
+
+    m_addressBookCloudUploaderRESTAgent->shutdown();
 
     if (m_eventThread.joinable()) {
         m_eventThread.join();
@@ -193,7 +198,7 @@ void AddressBookCloudUploader::onAuthStateChange(
             m_addressBookCloudUploaderRESTAgent->reset();
             break;
         case AuthObserverInterface::State::REFRESHED:
-            m_waitStatusChange.notify_all();
+            m_waitForEvent.notify_all();
             break;
         case AuthObserverInterface::State::EXPIRED:
         default:
@@ -207,7 +212,7 @@ void AddressBookCloudUploader::onNetworkInfoChanged(NetworkInfoObserver::Network
         m_networkStatus = status;
         AACE_DEBUG(LX(TAG, "onNetworkInfoChanged").d("m_networkStatus", m_networkStatus));
         if (status == NetworkInfoObserver::NetworkStatus::CONNECTED) {
-            m_waitStatusChange.notify_all();
+            m_waitForEvent.notify_all();
         }
     }
 }
@@ -215,7 +220,7 @@ void AddressBookCloudUploader::onNetworkInfoChanged(NetworkInfoObserver::Network
 void AddressBookCloudUploader::onNetworkInterfaceChangeStatusChanged(
     const std::string& networkInterface,
     NetworkInterfaceChangeStatus status) {
-    // No action required as we don't create and persist network connection using AVS LibCurlUtils.
+    // No action required as we don't create a persistent network connection using AVS LibCurlUtils.
 }
 
 bool AddressBookCloudUploader::addressBookAdded(std::shared_ptr<AddressBookEntity> addressBookEntity) {
@@ -234,7 +239,7 @@ bool AddressBookCloudUploader::addressBookAdded(std::shared_ptr<AddressBookEntit
         std::lock_guard<std::mutex> guard(m_mutex);
         m_addressBookEventQ.emplace_back(Event::Type::ADD, addressBookEntity);
 
-        m_waitStatusChange.notify_all();
+        m_waitForEvent.notify_all();
 
         return true;
     } catch (std::exception& ex) {
@@ -270,7 +275,7 @@ bool AddressBookCloudUploader::addressBookRemoved(std::shared_ptr<AddressBookEnt
 
         m_addressBookEventQ.emplace_back(Event::Type::REMOVE, addressBookEntity);
 
-        m_waitStatusChange.notify_all();
+        m_waitForEvent.notify_all();
 
         return true;
     } catch (std::exception& ex) {
@@ -633,7 +638,7 @@ public:
                         rapidjson::Value coordinate(rapidjson::kObjectType);
                         coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
                         coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
-                        if (accuracyInMeters > 0) coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
+                        coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
                         postalAddressValue.AddMember("coordinate", coordinate, allocator);
 
                         address.AddMember("postalAddress", postalAddressValue, allocator);
@@ -958,17 +963,18 @@ bool AddressBookCloudUploader::handleRemove(std::shared_ptr<AddressBookEntity> a
 
 void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
     AACE_INFO(LX(TAG));
-    bool cleanAllAddressBooks = cleanAllAddressBooksAtStart;
-    while (!m_isShuttingDown) {
-        // Clean up previous address books in cloud.
-        if (cleanAllAddressBooks) {
-            if (cleanAllCloudAddressBooks()) {
-                cleanAllAddressBooks = false;
-            } else {
-                continue;
-            }
-        }
+    if (cleanAllAddressBooksAtStart) {
+        AACE_DEBUG(LX(TAG).m("addingAddressBookCleanUpEvents"));
 
+        // At the engine start, delete any contact or nav fav address book in the cloud that might not have been deleted
+        // previously. We do this by adding dummy events at the start to clean up any Contact or Navigation favorites.
+        std::lock_guard<std::mutex> guard(m_mutex);
+        m_addressBookEventQ.emplace_back(
+            Event::Type::REMOVE, std::make_shared<AddressBookEntity>("dummyContact", "", AddressBookType::CONTACT));
+        m_addressBookEventQ.emplace_back(
+            Event::Type::REMOVE, std::make_shared<AddressBookEntity>("dummyNavFav", "", AddressBookType::NAVIGATION));
+    }
+    while (!m_isShuttingDown) {
         AACE_DEBUG(LX(TAG).m("waitingForEvents"));
         auto event = popNextEventFromQ();  // blocking call.
         if (m_isShuttingDown) {
@@ -987,7 +993,7 @@ void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
             bool enqueueBackPoppedEvent = false;
             if (!result) {
                 if (m_networkStatus != NetworkStatus::CONNECTED) {
-                    // If network lost, add back to queue.
+                    // On network lost add back event to queue for later retry.
                     enqueueBackPoppedEvent = true;
                 } else {
                     event.incrementRetryCount();
@@ -1042,7 +1048,7 @@ const Event AddressBookCloudUploader::popNextEventFromQ() {
     };
 
     if (!shouldNotWait()) {
-        m_waitStatusChange.wait(queueLock, shouldNotWait);
+        m_waitForEvent.wait(queueLock, shouldNotWait);
     }
 
     if (!m_addressBookEventQ.empty()) {
@@ -1143,16 +1149,8 @@ AddressBookCloudUploader::UploadFlowState AddressBookCloudUploader::handleUpload
         switch (httpResponse.code) {
             case HTTPResponseCode::SUCCESS_OK:
                 return UploadFlowState::PARSE;
-            case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
-            case HTTPResponseCode::SUCCESS_NO_CONTENT:
-            case HTTPResponseCode::REDIRECTION_START_CODE:
-            case HTTPResponseCode::REDIRECTION_END_CODE:
-            case HTTPResponseCode::BAD_REQUEST:
-            case HTTPResponseCode::FORBIDDEN:
-            case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-                Throw(
-                    "handleUploadEntriesFailed" +
-                    m_addressBookCloudUploaderRESTAgent->getHTTPErrorString(httpResponse));
+            default:
+                Throw("handleUploadEntriesFailed:" + responseCodeToString((HTTPResponseCode)httpResponse.code));
                 break;
         }
         return UploadFlowState::ERROR;
@@ -1187,23 +1185,19 @@ void AddressBookCloudUploader::logNetworkMetrics(const HTTPResponse& httpRespons
         case HTTPResponseCode::SUCCESS_OK:
             // Do Nothing
             break;
-        case HTTPResponseCode::BAD_REQUEST:
+        case HTTPResponseCode::CLIENT_ERROR_BAD_REQUEST:
             emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "logNetworkMetrics", METRIC_NETWORK_BAD_USER_INPUT, 1);
             break;
-        case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
-        case HTTPResponseCode::SUCCESS_NO_CONTENT:
-        case HTTPResponseCode::REDIRECTION_START_CODE:
-        case HTTPResponseCode::REDIRECTION_END_CODE:
-        case HTTPResponseCode::FORBIDDEN:
-        case HTTPResponseCode::SERVER_INTERNAL_ERROR:
+        default:
             emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "logNetworkMetrics", METRIC_NETWORK_ERROR, 1);
     }
 }
 
 std::string AddressBookCloudUploader::createAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+    AACE_DEBUG(LX(TAG));
     try {
-        // At the time of ER, AVS selects the address book using the DSN instead of the provided addressBookSourceId.
-        // This is because at the time of utterance, Alexa does not know about the addressBookSourceId.
+        // Here DSN is used instead of addressBookSourceId as ER resoluton happens in cloud depends on the DSN
+        // present in the utterance request.
         auto dsn = m_deviceInfo->getDeviceSerialNumber();
 
         auto cloudAddressBookId = m_addressBookCloudUploaderRESTAgent->createAndGetCloudAddressBook(
@@ -1219,9 +1213,9 @@ std::string AddressBookCloudUploader::createAddressBook(std::shared_ptr<AddressB
 }
 
 bool AddressBookCloudUploader::deleteAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+    AACE_DEBUG(LX(TAG));
     try {
-        // DSN is used to get the cloud address book Id. See above comment on
-        // why DSN is used instead of addressBookSourceId
+        // Use DSN to get the cloud address book Id. See above comment on why addressBookSourceId is not used.
         auto dsn = m_deviceInfo->getDeviceSerialNumber();
 
         std::string cloudAddressBookId;
@@ -1234,70 +1228,14 @@ bool AddressBookCloudUploader::deleteAddressBook(std::shared_ptr<AddressBookEnti
             ThrowIfNot(
                 m_addressBookCloudUploaderRESTAgent->deleteCloudAddressBook(cloudAddressBookId),
                 "deleteCloudAddressBookFailed");
+        } else {
+            AACE_DEBUG(LX(TAG).m("emptyCloudAddressBookId"));
         }
 
         return true;
 
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "deleteAddressBook").d("reason", ex.what()));
-        return false;
-    }
-}
-
-bool AddressBookCloudUploader::cleanAllCloudAddressBooks() {
-    AACE_DEBUG(LX(TAG));
-    try {
-        {
-            std::unique_lock<std::mutex> queueLock{m_mutex};
-            auto shouldNotWait = [this]() {
-                return m_isShuttingDown || (m_networkStatus == NetworkStatus::CONNECTED && m_isAuthRefreshed);
-            };
-
-            if (!shouldNotWait()) {
-                m_waitStatusChange.wait(queueLock, shouldNotWait);
-            }
-        }
-
-        if (m_isShuttingDown) {
-            AACE_INFO(LX(TAG).m("shutdownTriggered"));
-            return false;
-        }
-
-        if (!m_addressBookCloudUploaderRESTAgent->isAccountProvisioned()) {
-            // Account not provisioned, no further action required.
-            AACE_DEBUG(LX(TAG).m("accountNotProvisioned"));
-            return true;
-        }
-
-        auto dsn = m_deviceInfo->getDeviceSerialNumber();
-
-        // Delete Contact Address book
-        std::string cloudAddressBookId;
-        ThrowIfNot(
-            m_addressBookCloudUploaderRESTAgent->getCloudAddressBookId(dsn, "automotive", cloudAddressBookId),
-            "getCloudAddressBookIdFailed");
-        if (!cloudAddressBookId.empty()) {
-            ThrowIfNot(
-                m_addressBookCloudUploaderRESTAgent->deleteCloudAddressBook(cloudAddressBookId),
-                "deleteCloudAddressBookFailed");
-        }
-
-        // Delete Navigation Address book
-        cloudAddressBookId = "";
-        ThrowIfNot(
-            m_addressBookCloudUploaderRESTAgent->getCloudAddressBookId(
-                dsn, "automotivePostalAddress", cloudAddressBookId),
-            "getCloudAddressBookIdFailed");
-        if (!cloudAddressBookId.empty()) {
-            ThrowIfNot(
-                m_addressBookCloudUploaderRESTAgent->deleteCloudAddressBook(cloudAddressBookId),
-                "deleteCloudAddressBookFailed");
-        }
-
-        return true;
-
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "cleanAllCloudAddressBooks").d("reason", ex.what()));
         return false;
     }
 }

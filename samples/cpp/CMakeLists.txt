@@ -18,9 +18,15 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Werror")
+
 if(NOT CMAKE_SYSTEM_NAME MATCHES "(Darwin)")
     # AACE modules must be explicitly linked
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-as-needed")
+endif()
+
+if(AAC_VAD_ENABLE)
+    add_definitions(-DAAC_VAD_ENABLE)
 endif()
 
 include_directories(SampleApp include)

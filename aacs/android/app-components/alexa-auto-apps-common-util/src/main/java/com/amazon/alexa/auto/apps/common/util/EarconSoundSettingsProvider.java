@@ -16,6 +16,7 @@ package com.amazon.alexa.auto.apps.common.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -31,9 +32,10 @@ public class EarconSoundSettingsProvider {
     public static final boolean DEFAULT_SOUND_PREFERENCE = true;
 
     public static void setStartEarconSetting(@NonNull Context context, boolean value) {
+        Log.d(TAG, "SETTING START SOUND EARCON VALUE TO: " + value);
         SharedPreferences.Editor editor = context.getSharedPreferences(EARCON_SETTINGS, 0).edit();
         editor.putBoolean(EARCON_SETTINGS_START, value);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean isStartEarconSettingEnabled(@NonNull Context context) {
@@ -42,9 +44,10 @@ public class EarconSoundSettingsProvider {
     }
 
     public static void setEndEarconSetting(@NonNull Context context, boolean value) {
+        Log.d(TAG, "SETTING END SOUND EARCON VALUE TO: " + value);
         SharedPreferences.Editor editor = context.getSharedPreferences(EARCON_SETTINGS, 0).edit();
         editor.putBoolean(EARCON_SETTINGS_END, value);
-        editor.commit();
+        editor.apply();
     }
 
     public static boolean isEndEarconSettingEnabled(@NonNull Context context) {

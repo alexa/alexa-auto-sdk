@@ -17,11 +17,13 @@ package com.amazon.alexaautoclientservice.modules.audioInput;
 import static com.amazon.alexaautoclientservice.util.FileUtil.getAudioExternalSourceForAudioType;
 import static com.amazon.alexaautoclientservice.util.FileUtil.getAudioSourceForAudioType;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
@@ -42,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.OptionalLong;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -52,6 +55,10 @@ public class AudioInputMessageHandler {
     private static final int SAMPLE_RATE_HZ = 16000;
     private static final int AUDIO_RECORD_BUFFER_SIZE = 1024;
     private static final int AUDIO_READER_BUFFER_SIZE = 300;
+
+    private static boolean mRunning = false;
+    private static Object mPermissionSync = new Object();
+    private static long POLL_WAIT_TIME = 5000L;
 
     private Context mContext;
     private AudioRecord mAudioInput;
@@ -67,6 +74,7 @@ public class AudioInputMessageHandler {
     private HashMap<String, String> mStreamIdToTypeMap;
     private HashMap<String, AudioReader> mStreamIdToReaderMap; // EXTERNAL case only
     private AudioInputFocusManager mAudioInputFocusManager;
+    private long mBytesWritten = 0;
 
     public AudioInputMessageHandler(@NonNull Context context, @NonNull AACSSender aacsSender,
             @NonNull AudioInputFocusManager inputFocusManager) {
@@ -130,20 +138,69 @@ public class AudioInputMessageHandler {
         }
 
         Log.d(TAG, "handleStartAudioInput: use internal audio source.");
-        if (mAudioInput == null) {
-            Log.d(TAG, "Creating AudioRecorder");
-            mAudioInput = createAudioInput(audioType);
+        tryStartRecording(audioType, streamId);
+    }
+
+    // clang-format off
+
+    /**
+     * If @c Manifest.permission.RECORD_AUDIO permission is currently revoked,
+     * then setup a polling thread that will invoke the @c startRecording() once permission
+     * is granted. Note that when the permission is revoked, Android restarts
+     * our processes, so the permission check is only done once when handling
+     * the start audio input.
+     *
+     * @param audioType Audio type for input stream.
+     * @param streamId  The stream id.
+     */
+    private void tryStartRecording(String audioType, String streamId) {
+        Log.d(TAG, String.format("tryStartRecording: audioType: %s streamId: %s", audioType, streamId));
+        if (!canRecordAudio()) {
+            mRunning = true;
+
+            mExecutor.submit(() -> {
+                synchronized (mPermissionSync) {
+                    Log.d(TAG, "Monitor microphone permission");
+                    while (mRunning) {
+                        try {
+                            if (canRecordAudio()) {
+                                Log.d(TAG, "createAudioInput after microphone permission granted");
+                                if (mAudioInput != null) {
+                                    stopAudioRecord();
+                                }
+                                mAudioInput = createAudioInput(audioType);
+                                startRecording(audioType, streamId);
+                                return;
+                            } else {
+                                mPermissionSync.wait(POLL_WAIT_TIME);
+                            }
+                        } catch (InterruptedException e) {
+                            Log.e(TAG, "Sync wait issue", e);
+                        }
+                    }
+                }
+            });
+        } else {
+            if (mAudioInput == null) {
+                Log.d(TAG, "Creating AudioRecorder");
+                mAudioInput = createAudioInput(audioType);
+            }
+            startRecording(audioType, streamId);
+        }
+    }
+
+    private boolean canRecordAudio() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return mContext.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            Log.i(TAG, "canRecordAudio Old SDK level");
         }
 
-        if (mAudioInput.getState() != AudioRecord.STATE_INITIALIZED) {
-            if (ActivityCompat.checkSelfPermission(mContext, android.Manifest.permission.RECORD_AUDIO)
-                    == PackageManager.PERMISSION_DENIED) {
-                Log.e(TAG, "Cannot start audio input. Microphone permission not granted");
-                return;
-            }
-        }
-        startRecording(audioType, streamId);
+        return true;
     }
+
+// clang-format on
+
 
     private void startRecording(String audioType, String streamId) {
         Log.i(TAG, "startRecording() ");
@@ -247,17 +304,6 @@ public class AudioInputMessageHandler {
             stopAudioRecord();
         }
 
-        if (mStreamIdToTypeMap.containsKey(streamId)) {
-            String type = mStreamIdToTypeMap.get(streamId);
-            if (type != null) {
-                if (type.equals(AASBConstants.AudioInput.AudioType.COMMUNICATION)) {
-                    mCommsStream = null;
-                } else if (type.equals(AASBConstants.AudioInput.AudioType.VOICE)) {
-                    mVoiceStream = null;
-                }
-            }
-            mStreamIdToTypeMap.remove(streamId);
-        }
     }
 
     private void stopAudioRecord() {
@@ -347,7 +393,7 @@ public class AudioInputMessageHandler {
                     int bytesAvailable = Math.max(
                             FETCH_READ_BUFFER_MIN_CHUNK_SIZE, Math.min(inputStream.available(), mBuffer.length));
                     int bytesRead;
-                    while (mRunning && (bytesRead = inputStream.read(mBuffer, 0, bytesAvailable)) > 0) {
+                    while ((bytesRead = inputStream.read(mBuffer, 0, bytesAvailable)) > 0) {
                         if (mStreamId != null) {
                             String type = mStreamIdToTypeMap.get(mStreamId);
                             if (type != null) {
@@ -358,7 +404,7 @@ public class AudioInputMessageHandler {
 
                                 } else if (type.equals(AASBConstants.AudioInput.AudioType.VOICE)) {
                                     if (mVoiceStream != null) {
-                                        mVoiceStream.write(mBuffer, 0, bytesRead);
+                                        mBytesWritten += mVoiceStream.write(mBuffer, 0, bytesRead);
                                     }
                                 }
                             } else {
@@ -376,6 +422,20 @@ public class AudioInputMessageHandler {
                     Log.d(TAG, "AudioReader.onStreamFetchedFromServer: IPC disconnected. Retry fetching...");
                     fetchExternalAudioSource(mStreamIdToTypeMap.get(mStreamId), mStreamId, this);
                 }
+                else if (mStreamId != null) {
+                    Log.d(TAG, "Stream closed.");
+                    if (mStreamIdToTypeMap.containsKey(mStreamId)) {
+                        String type = mStreamIdToTypeMap.get(mStreamId);
+                        if (type != null) {
+                            if (type.equals(AASBConstants.AudioInput.AudioType.COMMUNICATION) && mCommsStream != null) {
+                                mCommsStream = null;
+                            } else if (type.equals(AASBConstants.AudioInput.AudioType.VOICE) && mVoiceStream != null) {
+                                mVoiceStream = null;
+                            }
+                        }
+                        mStreamIdToTypeMap.remove(mStreamId);
+                    }
+                }
             });
         }
 
@@ -390,7 +450,7 @@ public class AudioInputMessageHandler {
                 TargetComponent externalSourceTarget = getExternalSourceTargetByType(type);
                 if (externalSourceTarget != null) {
                     Log.d(TAG, "AudioReader.cancelFetch started");
-                    mAACSSender.cancelFetch(mStreamId, externalSourceTarget, mContext);
+                    mAACSSender.cancelFetch(mStreamId, externalSourceTarget, mContext, OptionalLong.of(mBytesWritten));
                 } else {
                     Log.e(TAG, "AudioReader.cancelFetch failed because the externalSource was not valid");
                 }

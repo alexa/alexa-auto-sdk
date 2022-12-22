@@ -2,6 +2,7 @@ var searchData=
 [
   ['iaddressbookentriesfactory',['IAddressBookEntriesFactory',['../classaace_1_1address_book_1_1_address_book_1_1_i_address_book_entries_factory.html',1,'aace::addressBook::AddressBook']]],
   ['idle',['IDLE',['../classaace_1_1alexa_1_1_alexa_client.html#a5f3b9fc09843bc68b5bb9f0ed6b8586eaa5daf7f2ebbba4975d61dab1c40188c7',1,'aace::alexa::AlexaClient::IDLE()'],['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#aca981e480f3b8704f5c50c6f859b8432aa5daf7f2ebbba4975d61dab1c40188c7',1,'aace::phoneCallController::PhoneCallControllerEngineInterface::IDLE()'],['../namespaceaace_1_1alexa.html#a37ae7d120b16c200f504fbb646c98a0aaa5daf7f2ebbba4975d61dab1c40188c7',1,'aace::alexa::IDLE()']]],
+  ['inactive',['INACTIVE',['../classaace_1_1arbitrator_1_1_arbitrator_engine_interface.html#a23d473f4514a6d691f6f59de6b2fbd39a6b273343c454f9c53dcfc9c4ccf171d2',1,'aace::arbitrator::ArbitratorEngineInterface']]],
   ['inbound_5fringing',['INBOUND_RINGING',['../classaace_1_1phone_call_controller_1_1_phone_call_controller_engine_interface.html#aca981e480f3b8704f5c50c6f859b8432aecd9ce56920e4a6362a315ae02d3b938',1,'aace::phoneCallController::PhoneCallControllerEngineInterface']]],
   ['indicatorstate',['IndicatorState',['../classaace_1_1alexa_1_1_notifications.html#a745c257147c726a31f30ccf52c4f83d1',1,'aace::alexa::Notifications']]],
   ['info',['INFO',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786a551b723eafd6a31d444fcb2f5920fbd3',1,'aace::logger::LoggerEngineInterface']]],

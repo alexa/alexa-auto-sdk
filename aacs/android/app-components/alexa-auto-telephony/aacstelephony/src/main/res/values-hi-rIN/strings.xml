@@ -1,5 +1,15 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="aacs_telephony_description">अपने Android डिवाइस पर फ़ोन कॉलिंग फ़ंक्शनालिटी उपलब्ध कराना</string>
+    <string name="aacs_telephony_description">आपके Android डिवाइस पर फ़ोन कॉलिंग की सुविधा उपलब्ध कराना</string>
     <string name="aacs_telephony_title">AACS टेलीफ़ोन संबंधी सेवा</string>
+
+    <string name="comms_toast_contacts_syncing">%1$s से कॉन्टैक्ट्स सिंक किए जा रहे हैं…</string>
+    <string name="comms_toast_contacts_synced">%1$s से कॉन्टैक्ट्स सिंक किए गए</string>
+    <string name="comms_toast_contacts_removing">Amazon सेवा से कॉन्टैक्ट्स हटाए जा रहे हैं…</string>
+    <string name="comms_toast_contacts_removed">Amazon सेवा से कॉन्टैक्ट्स हटा दिए गए</string>
+
+    <string name="aacs_telephony_toast_sms_syncing">%1$s से SMS मैसेज सिंक किए जा रहे हैं…</string>
+    <string name="aacs_telephony_toast_sms_synced">%1$s से SMS मैसेज सिंक किए गए</string>
+    <string name="aacs_telephony_toast_sms_removing">Amazon सेवा से SMS मैसेज हटाए जा रहे हैं…</string>
+    <string name="aacs_telephony_toast_sms_removed">Amazon सेवा से SMS मैसेज हटा दिए गए</string>
 </resources>

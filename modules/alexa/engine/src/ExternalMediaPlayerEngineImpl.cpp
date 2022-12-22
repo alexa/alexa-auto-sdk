@@ -71,9 +71,6 @@ bool ExternalMediaPlayerEngineImpl::initialize(
 
         m_externalMediaPlayerCapabilityAgent = aace::engine::alexa::ExternalMediaPlayer::create(
             m_agent,
-            {},
-            {},
-            {},
             speakerManager,
             messageSender,
             certifiedMessageSender,
@@ -654,6 +651,7 @@ void ExternalMediaPlayerEngineImpl::removeDiscoveredPlayer(const std::string& lo
     AACE_VERBOSE(LX(TAG).d("removingPlayerId", localPlayerId));
     // if the player is removed while in focus, drop focus
     if (localPlayerId.compare(m_externalMediaPlayerCapabilityAgent->getPlayerInFocus()) == 0) {
+        AACE_VERBOSE(LX(TAG).m("removing focus in capability agent").d("local)layerId", localPlayerId));
         m_externalMediaPlayerCapabilityAgent->setPlayerInFocus(m_authorizationStateMap[localPlayerId].playerId, false);
         AACE_VERBOSE(
             LX(TAG, "setPlayerInFocus to false for player due to discovery removal").d("localPlayerId", localPlayerId));
@@ -737,7 +735,7 @@ std::string ExternalMediaPlayerEngineImpl::getLocalPlayerIdForSource(aace::alexa
 
 // FocusHandlerInterface
 void ExternalMediaPlayerEngineImpl::setFocus(const std::string& playerId, bool focusAcquire) {
-    AACE_VERBOSE(LX(TAG).d("playerId", playerId));
+    AACE_INFO(LX(TAG).d("playerId", playerId).d("focusAcquire", focusAcquire));
     // TBD implement better association on localPlayerId and playerId
     for (auto& nextAdapter : m_authorizationStateMap) {
         if (nextAdapter.second.playerId.compare(playerId) == 0) {
@@ -758,6 +756,7 @@ void ExternalMediaPlayerEngineImpl::setFocus(const std::string& playerId, bool f
                     std::unique_lock<std::mutex> lock(m_mutex);
                     if (m_attemptedSetFocusPlayerInFocusCondition.wait_for(lock, SET_FOCUS_TIMEOUT, predicate)) {
                         // not already in focus
+                        AACE_VERBOSE(LX(TAG).m("setting focus in capability agent").d("playerId", playerId));
                         m_externalMediaPlayerCapabilityAgent->setPlayerInFocus(playerId, focusAcquire);
                     } else {
                         AACE_ERROR(LX(TAG, "setPlayerInFocusFailed")
@@ -766,8 +765,10 @@ void ExternalMediaPlayerEngineImpl::setFocus(const std::string& playerId, bool f
                     }
                 });
                 // not already in focus
-            } else
+            } else {
+                AACE_VERBOSE(LX(TAG).m("setting focus in capability agent").d("playerId", playerId));
                 m_externalMediaPlayerCapabilityAgent->setPlayerInFocus(playerId, focusAcquire);
+            }
         }
     }
 }

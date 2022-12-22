@@ -31,9 +31,15 @@ set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PropertyManager/PropertyManagerHandler.cpp
 )
 
+if(AAC_VAD_ENABLE)
+    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/3PAgent/AgentHandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/3PAgent/PryonLiteVAD.cpp
+    )
+endif()
+
 if(AAC_ALEXA)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlertsHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlexaClientHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AudioPlayerHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/DeviceSetupHandler.cpp

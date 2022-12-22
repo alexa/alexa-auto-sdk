@@ -27,14 +27,29 @@
 #include "DisplayManagerCapabilityAgent.h"
 #include "NavigationAssistanceCapabilityAgent.h"
 
+namespace std {
+
+/**
+ * @ std::hash() specialization defined to allow @c NavigationEngineInterface::EventName to be used as a key in @c std::unordered_map.
+ */
+template <>
+struct hash<aace::navigation::NavigationEngineInterface::EventName> {
+    size_t operator()(const aace::navigation::NavigationEngineInterface::EventName& in) const;
+};
+
+}  // namespace std
+
 namespace aace {
 namespace engine {
 namespace navigation {
 
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+using NavigationEngineInterface = aace::navigation::NavigationEngineInterface;
+
 class NavigationEngineImpl
         : public NavigationHandlerInterface
         , public DisplayHandlerInterface
-        , public aace::navigation::NavigationEngineInterface
+        , public NavigationEngineInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<NavigationEngineImpl> {
 private:
@@ -63,13 +78,13 @@ public:
 
     /// @name @c NavigationHandlerInterface functions.
     /// @{
-    void showPreviousWaypoints() override;
-    void navigateToPreviousWaypoint() override;
-    void startNavigation(const std::string& payload) override;
+    void showPreviousWaypoints(AgentId::IdType agentId) override;
+    void navigateToPreviousWaypoint(AgentId::IdType agentId) override;
+    void startNavigation(AgentId::IdType agentId, const std::string& payload) override;
     void announceManeuver(const std::string& payload) override;
     void announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) override;
-    void cancelNavigation() override;
-    std::string getNavigationState() override;
+    void cancelNavigation(AgentId::IdType agentId) override;
+    std::string getNavigationState(AgentId::IdType agentId) override;
     /// @}
 
     /// @name @c DisplayHandlerInterface functions.
@@ -82,8 +97,8 @@ public:
     /// @{
     void onNavigationEvent(EventName event) override;
     void onNavigationError(
-        aace::navigation::NavigationEngineInterface::ErrorType type,
-        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        NavigationEngineInterface::ErrorType type,
+        NavigationEngineInterface::ErrorCode code,
         const std::string& description) override;
     void onShowAlternativeRoutesSucceeded(const std::string& payload) override;
     /// @}
@@ -92,16 +107,16 @@ protected:
     void doShutdown() override;
 
 private:
-    void handleControlDisplaySuccess(aace::navigation::NavigationEngineInterface::EventName event);
+    void handleControlDisplaySuccess(EventName event);
 
     void handleControlDisplayError(
-        aace::navigation::NavigationEngineInterface::ErrorType type,
-        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        NavigationEngineInterface::ErrorType type,
+        NavigationEngineInterface::ErrorCode code,
         const std::string& description);
 
     void handleShowAlternativeRoutesError(
-        aace::navigation::NavigationEngineInterface::ErrorType type,
-        aace::navigation::NavigationEngineInterface::ErrorCode code,
+        NavigationEngineInterface::ErrorType type,
+        NavigationEngineInterface::ErrorCode code,
         const std::string& description);
 
     std::shared_ptr<aace::navigation::Navigation> m_navigationPlatformInterface;
@@ -109,6 +124,14 @@ private:
     std::shared_ptr<DisplayManagerCapabilityAgent> m_displayManagerCapabilityAgent;
     std::shared_ptr<navigationassistance::NavigationAssistanceCapabilityAgent> m_navigationAssistanceCapabilityAgent;
     std::string m_navigationProviderName;
+
+    NavigationEngineInterface::EventName getEventFromError(NavigationEngineInterface::ErrorType type);
+    void setEventAgent(NavigationEngineInterface::EventName event, AgentId::IdType agentId);
+    AgentId::IdType getEventAgent(NavigationEngineInterface::EventName event);
+    void setErrorAgent(NavigationEngineInterface::ErrorType type, AgentId::IdType agentId);
+    AgentId::IdType getErrorAgent(NavigationEngineInterface::ErrorType type);
+    private:
+    std::unordered_map<NavigationEngineInterface::EventName, AgentId::IdType> m_eventAgentMap;
 };
 
 }  // namespace navigation

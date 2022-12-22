@@ -17,12 +17,10 @@ package com.amazon.alexa.auto.setup.workflow.fragment;
 import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
 import static com.amazon.alexa.auto.app.common.util.PopupDialogUtil.embedUrlInPopupDialog;
 import static com.amazon.alexa.auto.app.common.util.ViewUtils.toggleViewVisibility;
-import static com.amazon.alexa.auto.apps.common.util.LocaleUtil.getLocalizedDomain;
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.LocaleList;
 import android.text.Annotation;
 import android.text.SpannedString;
 import android.util.Log;
@@ -48,8 +46,6 @@ import com.amazon.alexa.auto.setup.workflow.event.LoginEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.Locale;
-
 import javax.inject.Inject;
 
 /**
@@ -58,18 +54,11 @@ import javax.inject.Inject;
 public class EnablePreviewModeFragment extends Fragment {
     private static final String TAG = EnablePreviewModeFragment.class.getSimpleName();
 
-    private static final String CONDITIONS_OF_USE_URL =
-            "https://www.%s/gp/help/customer/display.html?nodeId=201909000&pop-up=1";
-    private static final String TERMS_OF_USE_URL =
-            "https://www.%s/gp/help/customer/display.html?nodeId=201566380&pop-up=1";
-    private static final String PRIVACY_INFO_URL =
-            "https://www.%s/gp/help/customer/display.html?nodeId=468496&pop-up=1";
-    private static final String PRIVACY_INFO_URL_JA_JP =
-            "https://www.%s/gp/help/customer/display.html?nodeId=643000&pop-up=1";
-
-    private static final Locale JA_JP_LOCALE = new Locale("ja");
+    private static final String POP_UP = "&pop-up=1";
 
     private EnablePreviewModeViewModel mViewModel;
+
+    private static final int HYPERLINK_TEXT_COLOR = Color.parseColor("#00A8E1");
 
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
@@ -96,8 +85,6 @@ public class EnablePreviewModeFragment extends Fragment {
         }
         mViewModel =
                 mViewModel == null ? new ViewModelProvider(this).get(EnablePreviewModeViewModel.class) : mViewModel;
-
-        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
     }
 
     @Override
@@ -126,23 +113,18 @@ public class EnablePreviewModeFragment extends Fragment {
         Annotation[] spans = spannedString.getSpans(0, spannedString.length(), Annotation.class);
 
         if (spans.length > 0) {
-            Locale locale = LocaleList.getDefault().get(0);
+            String termsOfUseUrl = getResources().getString(R.string.terms_of_use_url) + POP_UP;
+            String allTermsOfUseUrl = getResources().getString(R.string.all_terms_of_use_url) + POP_UP;
+            String privacyInfoUrl = getResources().getString(R.string.privacy_url) + POP_UP;
+
             embedUrlInPopupDialog(getContext(), enablePreviewModeDisclaimer, spannedString.getSpanStart(spans[0]),
-                    spannedString.getSpanEnd(spans[0]),
-                    String.format(CONDITIONS_OF_USE_URL, getLocalizedDomain(locale)), Color.CYAN);
+                    spannedString.getSpanEnd(spans[0]), termsOfUseUrl, HYPERLINK_TEXT_COLOR);
 
             embedUrlInPopupDialog(getContext(), enablePreviewModeDisclaimer, spannedString.getSpanStart(spans[1]),
-                    spannedString.getSpanEnd(spans[1]), String.format(TERMS_OF_USE_URL, getLocalizedDomain(locale)),
-                    Color.CYAN);
-
-            String privacyInfoUrl = String.format(PRIVACY_INFO_URL, getLocalizedDomain(locale));
-
-            if (JA_JP_LOCALE.getLanguage().equals(locale.getLanguage())) {
-                privacyInfoUrl = String.format(PRIVACY_INFO_URL_JA_JP, getLocalizedDomain(locale));
-            }
+                    spannedString.getSpanEnd(spans[1]), allTermsOfUseUrl, HYPERLINK_TEXT_COLOR);
 
             embedUrlInPopupDialog(getContext(), enablePreviewModeDisclaimer, spannedString.getSpanStart(spans[2]),
-                    spannedString.getSpanEnd(spans[2]), privacyInfoUrl, Color.CYAN);
+                    spannedString.getSpanEnd(spans[2]), privacyInfoUrl, HYPERLINK_TEXT_COLOR);
         }
     }
 

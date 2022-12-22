@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="aacs_telephony_description">توفير وظيفة الاتصال الهاتفي على جهازك الـ Android</string>
+    <string name="aacs_telephony_title">خدمة AACS الهاتفية</string>
+
+    <string name="comms_toast_contacts_syncing">جار مزامنة جهات الاتصال من %1$s…</string>
+    <string name="comms_toast_contacts_synced">تم مزامنة جهات الاتصال من %1$s</string>
+    <string name="comms_toast_contacts_removing">جار إزالة جهات الاتصال من خدمة Amazon…</string>
+    <string name="comms_toast_contacts_removed">تم إزالة جهات الاتصال من خدمة Amazon</string>
+    
+    <string name="aacs_telephony_toast_sms_syncing">مزامنة الرسائل النصية من %1$s…</string>
+    <string name="aacs_telephony_toast_sms_synced">تم مزامنة الرسائل النصية من %1$s</string>
+    <string name="aacs_telephony_toast_sms_removing">جار إزالة الرسائل النصية من خدمة Amazon…</string>
+    <string name="aacs_telephony_toast_sms_removed">تم إزالة الرسائل النصية من خدمة Amazon</string>
+</resources>

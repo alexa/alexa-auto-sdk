@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">4.1.1</span>
+   &#160;<span id="projectnumber">4.2</span>
    </div>
   </td>
  </tr>
@@ -78,6 +78,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a8b16159c547ae8f0703d3a8385fa6ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a380a99414e5f66c1ab1ed771e92a64cd"><td class="memItemLeft" align="right" valign="top">virtual int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html#a380a99414e5f66c1ab1ed771e92a64cd">onGetPlayerDuration</a> ()=0</td></tr>
 <tr class="separator:a380a99414e5f66c1ab1ed771e92a64cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a770de8bb361f4984b9e2cda23b4f69f0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html#a770de8bb361f4984b9e2cda23b4f69f0">onSetAsForegroundActivity</a> ()=0</td></tr>
+<tr class="separator:a770de8bb361f4984b9e2cda23b4f69f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="classaace_1_1alexa_1_1_audio_player_engine_interface.html">AudioPlayerEngineInterface</a> </p>
@@ -136,12 +138,38 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a770de8bb361f4984b9e2cda23b4f69f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a770de8bb361f4984b9e2cda23b4f69f0">&#9670;&nbsp;</a></span>onSetAsForegroundActivity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void aace::alexa::AudioPlayerEngineInterface::onSetAsForegroundActivity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Sets the Alexa <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> interface as the active player the user sees on screen. This function is useful for scenarios in which the user most recently played a different Alexa-aware <code>ExternalMediaPlayer</code> media source, such as a deep-linked media app or a local media source, and then manually returned the head unit visual focus to the Alexa <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> GUI. Calling this function ensures the next VUI command or GUI interaction with the playback control buttons acts on the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> source rather than the more recently played <code>ExternalMediaPlayer</code> source. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 4.1.1 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.2 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

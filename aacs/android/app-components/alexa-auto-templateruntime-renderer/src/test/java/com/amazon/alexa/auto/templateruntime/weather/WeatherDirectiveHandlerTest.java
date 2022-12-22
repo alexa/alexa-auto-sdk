@@ -16,6 +16,7 @@ import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.apis.session.SessionViewController;
 import com.amazon.alexa.auto.templateruntime.common.TestResourceFileReader;
+import com.amazon.alexa.auto.templateruntime.dependencies.TemplateDirectiveHandler;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,6 +45,12 @@ public class WeatherDirectiveHandlerTest {
     @Mock
     private ViewGroup mViewGroup;
     private WeatherDirectiveHandler mClassUnderTest;
+    @Mock
+    private final WeakReference<Context> mWContext;
+
+    public WeatherDirectiveHandlerTest(WeakReference<Context> mWContext) {
+        this.mWContext = mWContext;
+    }
 
     @Before
     public void setup() {
@@ -81,7 +88,7 @@ public class WeatherDirectiveHandlerTest {
     public void testOnClearTemplate_shouldInvokeUnderlyingFunction() {
         try (MockedStatic<AlexaApp> staticMock = Mockito.mockStatic(AlexaApp.class)) {
             staticMock.when(() -> AlexaApp.from(any(Context.class))).thenReturn(mMockAlexaApp);
-            mClassUnderTest.clearTemplate();
+            TemplateDirectiveHandler.clearTemplate(mWContext);
             Mockito.verify(mMockSessionController, times(1)).clearTemplate();
         }
     }

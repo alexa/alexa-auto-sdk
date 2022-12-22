@@ -14,7 +14,7 @@ The `Address Book` module personalizes the communications and navigation capabil
 
 ### Alexa module
 
-The `Alexa` module provides the core Alexa client implementation to your application. The Engine components of the Alexa module manage the connection to the [Alexa Voice Service (AVS)](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/get-started-with-alexa-voice-service.html) and support the standard AVS capabilities such as speaking to Alexa, streaming media, viewing visual content, setting alerts, and more.
+The `Alexa` module provides the core Alexa client implementation to your application. The Engine components of the Alexa module manage the connection to the [Alexa Voice Service (AVS)](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/get-started-with-alexa-voice-service.html) and support the standard AVS capabilities such as speaking to Alexa, streaming media, viewing visual content and more.
 
 **[>> Alexa module reference](./alexa/index.md)**
 

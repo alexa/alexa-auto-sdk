@@ -24,6 +24,7 @@
         tools:replace="android:label"
         tools:ignore="GoogleAppIndexingWarning"
         android:requestLegacyExternalStorage="true"
+        android:localeConfig="@xml/supported_locales"
         android:preserveLegacyExternalStorage="true">
 
         <service android:name=".audio.AudioIOService"
@@ -32,6 +33,16 @@
                  fetch intents to the service, because we send the service info
                  in the configuration to AACS. -->
         </service>
+
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

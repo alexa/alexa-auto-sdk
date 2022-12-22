@@ -3,8 +3,7 @@
 ## Overview
 
 The `Core` module is the heart of the Alexa Auto SDK. The `Core` module provides the following elements that are the foundation for all Auto SDK features:
-
-- **Defining core API for your application to access the features of Auto SDK—** `Core` defines the `Engine` and `MessageBroker` components. Alongside the Alexa Auto Services Bridge (AASB) messages defined by each Auto SDK module, these components comprise the core API for your application to access the features of Auto SDK. To learn about the API, see [Auto SDK Core API Overview](https://alexa.github.io/alexa-auto-sdk/docs/explore/concepts/core-api-overview/).
+ - **Defining core API for your application to access the features of Auto SDK—** `Core` defines the `Engine` and `MessageBroker` components. Alongside the Alexa Auto Services Bridge (AASB) messages defined by each Auto SDK module, these components comprise the core API for your application to access the features of Auto SDK. To learn about the API, see [Auto SDK Core API Overview](https://alexa.github.io/alexa-auto-sdk/docs/explore/concepts/core-api-overview/).
 
 - **Providing an infrastructure to other modules—** `Core` provides the base infrastructure of the Engine, which each Auto SDK module extends to add module-specific features. 
 
@@ -403,3 +402,18 @@ To adapt the Engine behavior dynamically based on the state of the head unit's n
 Report metrics about the head unit's data usage with `DeviceUsage`.
 
 **[>> DeviceUsage interface](./DeviceUsage.md)**
+
+### (Optional) Manage multiple voice assistants dialog requests and status
+
+The Arbitrator interface manages the voice assistant agents for both Alexa and 3rd parties. You can control how arbitration is handled for multiple voice assistant requests based on the rules you configure at the system level or at agent registration.
+
+**[>> Arbitrator interface](./Arbitrator.md)**
+
+### (Optional) Provide 3rd Party Wakeword Support
+
+The Wakeword interface manages the voice assistant agents for both Alexa and 3rd party assistants. Using the Wakeword module, OEM partners can simultaneously support multiple voice assistant wake words like Siri on the same in-vehicle infotainment system. 
+
+**[>> Wakeword interface](./Wakeword.md)**
+
+
+

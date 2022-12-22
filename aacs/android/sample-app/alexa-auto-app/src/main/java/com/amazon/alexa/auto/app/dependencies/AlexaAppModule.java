@@ -18,10 +18,12 @@ import android.content.Context;
 
 import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.apis.auth.AuthController;
+import com.amazon.alexa.auto.apis.media.PlayerInfoCache;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.app.DefaultAlexaAppRootComponent;
 import com.amazon.alexa.auto.app.setup.AlexaSetupControllerImpl;
 import com.amazon.alexa.auto.lwa.LWAAuthController;
+import com.amazon.alexa.auto.media.session.PlayerInfoCacheImpl;
 
 import java.lang.ref.WeakReference;
 
@@ -60,6 +62,18 @@ public class AlexaAppModule {
     }
 
     /**
+     * Provides {@link PlayerInfoCache} implementation for Alexa App.
+     *
+     * @param context Android Context.
+     * @return an instance of {@link PlayerInfoCache}.
+     */
+    @Provides
+    @AlexaAppScope
+    public PlayerInfoCache providePlayerInfoCache(WeakReference<Context> context) {
+        return new PlayerInfoCacheImpl(context);
+    }
+
+    /**
      * Provides {@link AlexaAppRootComponent} implementation for Alexa App.
      *
      * @param setupController Setup controller.
@@ -68,8 +82,8 @@ public class AlexaAppModule {
      */
     @Provides
     @AlexaAppScope
-    public AlexaAppRootComponent provideApplicationRootComponent(
-            Lazy<AlexaSetupController> setupController, Lazy<AuthController> authController) {
-        return new DefaultAlexaAppRootComponent(setupController, authController);
+    public AlexaAppRootComponent provideApplicationRootComponent(Lazy<AlexaSetupController> setupController,
+            Lazy<AuthController> authController, Lazy<PlayerInfoCache> playerInfoCache) {
+        return new DefaultAlexaAppRootComponent(setupController, authController, playerInfoCache);
     }
 }

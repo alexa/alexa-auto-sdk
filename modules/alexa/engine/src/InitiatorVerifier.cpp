@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ bool InitiatorVerifier::shouldBlock(const std::string& wakeword, const std::chro
     return false;
 }
 
-bool InitiatorVerifier::shouldBlock(const alexaClientSDK::capabilityAgents::aip::Initiator& initiator) {
+bool InitiatorVerifier::shouldBlock(const alexaClientSDK::avsCommon::avs::AgentInitiator& initiator) {
     // Should not block by default if this function is not implemented
     return false;
 }

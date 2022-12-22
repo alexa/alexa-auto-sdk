@@ -76,7 +76,7 @@ public class NetworkFragment extends Fragment {
 
         View fragmentView = requireView();
 
-        TextView getStartedButtonText = fragmentView.findViewById(R.id.network_settings_btn);
+        TextView getStartedButtonText = fragmentView.findViewById(R.id.network_settings_button);
         getStartedButtonText.setOnClickListener(view -> mViewModel.goToNetworkSettings());
     }
 }

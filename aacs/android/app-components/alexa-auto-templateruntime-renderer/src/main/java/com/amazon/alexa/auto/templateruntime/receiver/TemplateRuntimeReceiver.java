@@ -58,7 +58,6 @@ public class TemplateRuntimeReceiver extends BroadcastReceiver {
                         try {
                             TemplateDirectiveHandler templateDirectiveHandler =
                                     handlerFactory.getHandler(context, type);
-                            templateDirectiveHandler.clearTemplate();
                             templateDirectiveHandler.renderTemplate(message);
                         } catch (IllegalArgumentException e) {
                             Log.i(TAG, "Unknown template type: " + type);

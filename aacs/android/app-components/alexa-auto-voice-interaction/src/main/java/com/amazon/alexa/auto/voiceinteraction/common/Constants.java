@@ -18,6 +18,7 @@ public class Constants {
     // Voice Interaction Topic
     public static final String TOPIC_VOICE_ANIMATION = "VOICE_ANIMATION";
     public static final String TOPIC_ALEXA_CONNECTION = "ALEXA_CONNECTION";
+    public static final String TOPIC_RELAUNCH_SESSION = "RELAUNCH_SESSION";
 
     // Voice Interaction Action
     public static final String ACTION_ALEXA_NOT_CONNECTED = "ALEXA_NOT_CONNECTED";

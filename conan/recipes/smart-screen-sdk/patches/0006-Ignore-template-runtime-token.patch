@@ -1,32 +1,32 @@
-From 4ebd236fa6490a6c07541638d763b630251b951b Mon Sep 17 00:00:00 2001
+From 9896df584247eae8adaf64adbdfd26feaebbe0d0 Mon Sep 17 00:00:00 2001
 From: Eze Cervantes <ezeqc@amazon.com>
 Date: Fri, 3 Dec 2021 14:52:44 -0800
-Subject: [PATCH] Ignore template runtime token
+Subject: [PATCH 06/14] Ignore template runtime token
 
 ---
  .../TemplateRuntime/src/TemplateRuntime.cpp                 | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
-index 08e6fc1..fc1af08 100644
+index fb8d2ec..87aef65 100644
 --- a/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
 +++ b/modules/Alexa/SmartScreenCapabilityAgents/TemplateRuntime/src/TemplateRuntime.cpp
-@@ -661,13 +661,11 @@ void TemplateRuntime::executeRenderPlayerInfoCallbacks(bool isClearCard) {
+@@ -657,13 +657,11 @@ void TemplateRuntime::executeRenderPlayerInfoCallbacks(bool isClearCard) {
  }
  
  void TemplateRuntime::executeRenderTemplateCallbacks(bool isClearCard) {
 -    ACSDK_DEBUG3(LX("executeRenderTemplateCallbacks").d("isClear", isClearCard ? "True" : "False"));
-+    ACSDK_DEBUG3(LX("executeRenderTemplateCallbacks").d("isClear", isClearCard ? "True" : "False").d("token", m_nonPlayerInfoCardToken));
++    ACSDK_DEBUG3(LX("executeRenderTemplateCallbacks").d("isClear", isClearCard ? "True" : "False").d("token", m_renderTemplateCardToken));
      for (auto& observer : m_observers) {
          if (isClearCard) {
              executeNonPlayerInfoCardCleared(NonPlayerInfoDisplayType::RENDER_TEMPLATE);
--            if (!m_nonPlayerInfoCardToken.empty()) {
--                observer->clearTemplateCard(m_nonPlayerInfoCardToken);
+-            if (!m_renderTemplateCardToken.empty()) {
+-                observer->clearTemplateCard(m_renderTemplateCardToken);
 -            }
-+            observer->clearTemplateCard(m_nonPlayerInfoCardToken);
- 
-             m_nonPlayerInfoCardToken = "";
++            observer->clearTemplateCard(m_renderTemplateCardToken);
+             m_renderTemplateCardToken.clear();
          } else {
+             m_activeNonPlayerInfoType = NonPlayerInfoDisplayType::RENDER_TEMPLATE;
 -- 
-2.30.1 (Apple Git-130)
+2.36.0
 

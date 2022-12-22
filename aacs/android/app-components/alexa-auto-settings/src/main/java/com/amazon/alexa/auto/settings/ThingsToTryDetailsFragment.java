@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,6 +47,7 @@ public class ThingsToTryDetailsFragment extends Fragment {
     private static final String TAG = ThingsToTryDetailsFragment.class.getSimpleName();
     public static final String BUNDLE_KEY_DOMAIN_INDEX = "domainIndex";
     public static final String BUNDLE_KEY_STRING_RESOURCE_ID = "stringResId";
+    public static final String BUNDLE_KEY_STRING_TITLE = "stringTitle";
 
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
@@ -78,7 +80,7 @@ public class ThingsToTryDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.settings_things_to_try_layout, container, false);
+        View view = inflater.inflate(R.layout.settings_things_to_try_detail_layout, container, false);
         return view;
     }
 
@@ -87,6 +89,7 @@ public class ThingsToTryDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         int domainIndex = getArguments().getInt(BUNDLE_KEY_DOMAIN_INDEX);
         int stringResId = getArguments().getInt(BUNDLE_KEY_STRING_RESOURCE_ID);
+        String stringTitle = getArguments().getString(BUNDLE_KEY_STRING_TITLE);
         mAlexaPropertyManager.getAlexaProperty(AACSPropertyConstants.LOCALE)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -110,7 +113,8 @@ public class ThingsToTryDetailsFragment extends Fragment {
                         utteranceArray = typedArray.getTextArray(domainIndex);
                         typedArray.recycle();
                     }
-
+                    TextView title = view.findViewById(R.id.ttt_title);
+                    title.setText(stringTitle);
                     RecyclerView recyclerView = view.findViewById(R.id.ttt_recyclerView);
                     LinearLayoutManager layoutManager =
                             new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);

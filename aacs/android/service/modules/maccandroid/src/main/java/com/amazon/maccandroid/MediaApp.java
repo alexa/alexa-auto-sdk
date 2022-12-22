@@ -125,32 +125,28 @@ public class MediaApp extends MediaBrowserCompat.ConnectionCallback {
         mHandler.removeCallbacksAndMessages(null);
 
         MediaSessionCompat.Token token = mMediaBrowser.getSessionToken();
-        try {
-            mMediaController = new MediaControllerCompat(mContext, token);
-            Bundle extras = mMediaController.getExtras();
-            if (extras != null) {
-                if (extras.containsKey(APIConstants.ExtrasKeys.SPI_VERSION_KEY)) {
-                    mSpiVersion = extras.getString(APIConstants.ExtrasKeys.SPI_VERSION_KEY);
-                }
-
-                if (extras.containsKey(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY)) {
-                    mPlayerCookie = extras.getString(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY);
-                }
-            } else
-                Log.e(TAG, "MediaControllerCompat extras is null");
-
-            mSessionReady = true; // mMediaController.isSessionReady();
-
-            if (mMediaAppsConnectionListener != null) {
-                mMediaAppsConnectionListener.onConnectionSuccessful();
+        mMediaController = new MediaControllerCompat(mContext, token);
+        Bundle extras = mMediaController.getExtras();
+        if (extras != null) {
+            if (extras.containsKey(APIConstants.ExtrasKeys.SPI_VERSION_KEY)) {
+                mSpiVersion = extras.getString(APIConstants.ExtrasKeys.SPI_VERSION_KEY);
             }
 
-            registerCallback();
-            refreshPlaybackState();
+            if (extras.containsKey(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY)) {
+                mPlayerCookie = extras.getString(APIConstants.ExtrasKeys.PLAYER_COOKIE_KEY);
+            }
+        } else
+            Log.e(TAG, "MediaControllerCompat extras is null");
 
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        mSessionReady = true; // mMediaController.isSessionReady();
+
+        if (mMediaAppsConnectionListener != null) {
+            mMediaAppsConnectionListener.onConnectionSuccessful();
         }
+
+        registerCallback();
+        refreshPlaybackState();
+
     }
 
     public void refreshPlaybackState() {

@@ -1,5 +1,6 @@
 from conans import ConanFile
 
+
 class AutoSdkModulePkg(ConanFile):
     python_requires = "aac-sdk-tools/1.0"
     python_requires_extend = "aac-sdk-tools.BaseSdkModule"

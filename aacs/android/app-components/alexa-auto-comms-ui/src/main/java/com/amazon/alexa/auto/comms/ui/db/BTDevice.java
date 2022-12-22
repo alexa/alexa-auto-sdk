@@ -31,12 +31,14 @@ public class BTDevice implements Serializable {
     public String deviceAddress;
     private String deviceName;
     private String contactsUploadPermission;
+    private String messagingPermission;
     private Boolean firstPair;
 
     public BTDevice() {
         deviceAddress = "";
         deviceName = "";
-        contactsUploadPermission = "NO";
+        contactsUploadPermission = Constants.CONTACTS_PERMISSION_NO;
+        messagingPermission = Constants.CONTACTS_PERMISSION_NO;
         firstPair = false;
     }
 
@@ -71,5 +73,13 @@ public class BTDevice implements Serializable {
 
     public void setContactsUploadPermission(String contactsUploadPermission) {
         this.contactsUploadPermission = contactsUploadPermission;
+    }
+
+    public String getMessagingPermission() {
+        return messagingPermission;
+    }
+
+    public void setMessagingPermission(String messagingPermission) {
+        this.messagingPermission = messagingPermission;
     }
 }

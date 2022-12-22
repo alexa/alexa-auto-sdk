@@ -184,7 +184,7 @@ void APLEngineImpl::renderDocument(
     }
 }
 
-void APLEngineImpl::clearDocument(const std::string& token, bool focusCleared) {
+void APLEngineImpl::clearDocument(const std::string& token) {
     AACE_INFO(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearDocument", METRIC_APL_CLEAR_DOCUMENT, 1);
     if (m_aplPlatformInterface != nullptr) {
@@ -311,8 +311,15 @@ void APLEngineImpl::onRenderDocumentResult(const std::string& token, bool result
 void APLEngineImpl::onExecuteCommandsResult(const std::string& token, bool result, const std::string& error) {
     AACE_INFO(LX(TAG));
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onExecuteCommandsResult", METRIC_APL_EXECUTE_COMMANDS_RESULT, 1);
+
     if (m_aplCapabilityAgent != nullptr) {
-        m_aplCapabilityAgent->processExecuteCommandsResult(token, result, error);
+        if (result) {
+            m_aplCapabilityAgent->processExecuteCommandsResult(
+                token, alexaSmartScreenSDK::smartScreenCapabilityAgents::alexaPresentation::AplCommandExecutionEvent::RESOLVED, error);
+        } else {
+            m_aplCapabilityAgent->processExecuteCommandsResult(
+                token, alexaSmartScreenSDK::smartScreenCapabilityAgents::alexaPresentation::AplCommandExecutionEvent::FAILED, error);
+        }
     }
 }
 

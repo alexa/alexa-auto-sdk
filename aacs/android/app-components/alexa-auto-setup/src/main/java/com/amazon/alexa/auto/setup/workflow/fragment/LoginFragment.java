@@ -16,7 +16,6 @@ package com.amazon.alexa.auto.setup.workflow.fragment;
 
 import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_ENABLED;
 import static com.amazon.alexa.auto.app.common.util.ViewUtils.toggleViewVisibility;
-import static com.amazon.alexa.auto.apps.common.util.LocaleUtil.getLocalizedDomain;
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
 
 import android.app.Application;
@@ -25,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.LocaleList;
 import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
@@ -41,6 +39,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -132,7 +131,7 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (mApp == null) { // It would be non-null for test injected dependencies.
-            mApp = AlexaApp.from(getContext());
+            mApp = AlexaApp.from(requireContext());
         }
 
         mViewModel.loginWorkflowState().observe(getViewLifecycleOwner(), this::authWorkflowStateChanged);
@@ -156,7 +155,7 @@ public class LoginFragment extends Fragment {
         spinner.getIndeterminateDrawable().setColorFilter(
                 ResourcesCompat.getColor(getResources(), R.color.Cyan, null), PorterDuff.Mode.MULTIPLY);
 
-        if (isPreviewModeEnabled(getContext())) {
+        if (isPreviewModeEnabled(requireContext())) {
             TextView tryAlexaButtonView = fragmentView.findViewById(R.id.try_alexa_action_button);
             tryAlexaButtonView.setVisibility(View.VISIBLE);
             tryAlexaButtonView.setOnClickListener(view -> {
@@ -170,7 +169,6 @@ public class LoginFragment extends Fragment {
     private void authWorkflowStateChanged(AuthWorkflowData loginData) {
         switch (loginData.getAuthState()) {
             case CBL_Auth_Started:
-                setContentForCBLViewTitle();
                 updateQRCodeContainerVisibility(View.GONE);
                 updateSpinnerVisibility(View.VISIBLE);
                 updateLoginInContainerVisibility(View.VISIBLE);
@@ -204,7 +202,8 @@ public class LoginFragment extends Fragment {
         String URL_PARAM = "?cbl-code=";
         Bitmap qrCodeBitmap =
                 mQRCodeGenerator.generateQRCode(codePair.getValidationUrl() + URL_PARAM + codePair.getValidationCode());
-        showQRCodeScreen(codePair.getValidationCode(), qrCodeBitmap);
+        showQRCodeScreen(qrCodeBitmap);
+        setContentForCBLViewTitle(codePair.getValidationUrl(), codePair.getValidationCode());
     }
 
     private void updateSpinnerVisibility(int visible) {
@@ -230,17 +229,10 @@ public class LoginFragment extends Fragment {
      * the same fragment
      */
     private void modifyBackButtonVisibility(int visible) {
-        View view = requireView();
-        ((LinearLayout) view.getParent().getParent().getParent())
-                .findViewWithTag("navbar")
-                .findViewWithTag("nav_back_button")
+        Log.d(TAG, "MODIFYING VISIBILITY");
+        ((ConstraintLayout)requireView().getParent().getParent().getParent())
+                .findViewWithTag("back_button")
                 .setVisibility(visible);
-    }
-
-    private void setCBLCodeText(String cblCode) {
-        View view = requireView();
-        TextView cblCodeTextView = view.findViewById(R.id.cbl_code);
-        cblCodeTextView.setText(cblCode);
     }
 
     private void setQRCodeImage(Bitmap qrCode) {
@@ -254,18 +246,17 @@ public class LoginFragment extends Fragment {
         view.findViewById(R.id.login_start_layout).setVisibility(visible);
     }
 
-    private void showQRCodeScreen(String cblCode, Bitmap qrCodeBitmap) {
-        setCBLCodeText(cblCode);
+    private void showQRCodeScreen(Bitmap qrCodeBitmap) {
         setQRCodeImage(qrCodeBitmap);
     }
 
-    private void setContentForCBLViewTitle() {
+    private void setContentForCBLViewTitle(String verificationUri, String cblCode) {
         View view = requireView();
 
         // Make multicolor text for title.
         TextView titleTextView = view.findViewById(R.id.qr_code_title_textview);
-        String titleText = getResources().getString(R.string.login_qr_code_message);
-        titleText = String.format(titleText, getLocalizedDomain(LocaleList.getDefault().get(0)) + "/code");
+        String titleText = getResources().getString(R.string.login_qr_code_message_with_code) ;
+        titleText = String.format(titleText, verificationUri, cblCode);
         Spanned spanned = Html.fromHtml(titleText, Html.FROM_HTML_MODE_COMPACT);
         titleTextView.setText(spanned);
     }

@@ -65,10 +65,10 @@ inline std::ostream& operator<<(std::ostream& stream, const CoreMetrics::Locatio
 }  // namespace engine
 }  // namespace aace
 
-#ifdef AAC_LATENCY_LOGS_ENABLED
+#ifdef AAC_METRICS_ENABLED
 #define CORE_METRIC(entry, location) AACE_LOG(AACE_LOG_LEVEL::METRIC, entry.d("Location", location))
-#else  // AAC_LATENCY_LOGS_ENABLED
+#else  // AAC_METRICS_ENABLED
 #define CORE_METRIC(entry, location)
-#endif  // AAC_LATENCY_LOGS_ENABLED
+#endif  // AAC_METRICS_ENABLED
 
 #endif  // AACE_ENGINE_CORE_CORE_METRICS_H

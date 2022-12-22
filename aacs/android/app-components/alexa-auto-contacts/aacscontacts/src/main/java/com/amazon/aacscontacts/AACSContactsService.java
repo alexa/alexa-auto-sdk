@@ -35,6 +35,7 @@ import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.ContactsConstants;
 import com.amazon.aacsipc.IPCConstants;
+import com.amazon.aacstelephony.Util;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.AACSReplyMessage;
 
@@ -101,6 +102,9 @@ public class AACSContactsService extends Service {
                             String.format(
                                     "AddressBook Adding %s with ReplyToId: %s", message.payload, message.replyToId));
                     if (message.payload.contains("true")) {
+                        String deviceAddress = Util.getPrimaryDevice(getApplicationContext());
+                        String deviceName = Util.getBluetoothDeviceName(getApplicationContext(), deviceAddress);
+                        Util.toast(getApplicationContext(), getApplicationContext().getString(R.string.comms_toast_contacts_synced, deviceName));
                         mPhoneBookController.completeAddressBookUpdate(message.replyToId, true);
                     } else {
                         mPhoneBookController.completeAddressBookUpdate(message.replyToId, false);
@@ -112,6 +116,7 @@ public class AACSContactsService extends Service {
                             String.format(
                                     "AddressBook Removing %s with ReplyToId: %s", message.payload, message.replyToId));
                     if (message.payload.contains("true")) {
+                        Util.toast(getApplicationContext(), getApplicationContext().getString(R.string.comms_toast_contacts_removed));
                         mPhoneBookController.completeAddressBookUpdate(message.replyToId, true);
                     } else {
                         mPhoneBookController.completeAddressBookUpdate(message.replyToId, false);

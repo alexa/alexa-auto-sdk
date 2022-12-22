@@ -15,6 +15,7 @@ import com.amazon.aacsconstants.Topic;
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.templateruntime.common.TestResourceFileReader;
 import com.amazon.alexa.auto.templateruntime.dependencies.HandlerFactory;
+import com.amazon.alexa.auto.templateruntime.dependencies.TemplateDirectiveHandler;
 import com.amazon.alexa.auto.templateruntime.weather.WeatherDirectiveHandler;
 
 import org.json.JSONException;
@@ -23,16 +24,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 
 @RunWith(RobolectricTestRunner.class)
 public class TemplateRuntimeReceiverTest {
     private TemplateRuntimeReceiver mClassUnderTest;
     private WeatherDirectiveHandler mWeatherDirectiveHandler;
+    @Mock
+    private final WeakReference<Context> mWContext;
 
+    public TemplateRuntimeReceiverTest(WeakReference<Context> mWContext) {
+        this.mWContext = mWContext;
+    }
     @Before
     public void setup() {
         mClassUnderTest = new TemplateRuntimeReceiver();
@@ -49,7 +57,8 @@ public class TemplateRuntimeReceiverTest {
                 generateIntent("aacs/RenderTemplateWeather.json", "com.amazon.aacs.aasb.RenderTemplate");
         mClassUnderTest.onReceive(Mockito.mock(Context.class), renderTemplateIntent);
         ArgumentCaptor<AACSMessage> aacsMessageArgumentCaptor = ArgumentCaptor.forClass(AACSMessage.class);
-        Mockito.verify(mWeatherDirectiveHandler, Mockito.times(1)).clearTemplate();
+        Mockito.verify(mWeatherDirectiveHandler, Mockito.times(1));
+        TemplateDirectiveHandler.clearTemplate(mWContext);
         Mockito.verify(mWeatherDirectiveHandler, Mockito.times(1)).renderTemplate(aacsMessageArgumentCaptor.capture());
         AACSMessage aacsMessage = aacsMessageArgumentCaptor.getValue();
         assertEquals(aacsMessage.topic, Topic.TEMPLATE_RUNTIME);

@@ -58,11 +58,6 @@
         "package": ["com.amazon.aacssampleapp1"],
         "class": [".IntentReceiver"]
       },
-      "Alerts" : {
-        "type": ["RECEIVER"],
-        "package": ["com.amazon.aacssampleapp1"],
-        "class": [".IntentReceiver"]
-      },
       "AlexaClient" : {
         "type": ["RECEIVER"],
         "package": ["com.amazon.aacssampleapp1"],

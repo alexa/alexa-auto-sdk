@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/setup_not_complete"
+    android:id="@+id/enable_preview_mode"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -32,36 +32,25 @@
         app:layout_constraintGuide_percent="@dimen/right_margin_percentage" />
 
     <!--Alexa logo-->
-    <ImageView
-        android:id="@+id/alexa_img_view"
-        android:layout_width="@dimen/login_alexa_image_width"
-        android:layout_height="@dimen/login_alexa_image_height"
-        android:layout_gravity="center"
-        android:contentDescription="@string/alexa_logo_content_description"
-        android:src="@drawable/alexa_logo"
+
+    <!--Title text-->
+    <TextView
+        android:id="@+id/enable_preview_mode_header"
+        style="?attr/headerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="133dp"
+        android:text="@string/enable_preview_mode_header"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@id/right_guideline"
         app:layout_constraintStart_toStartOf="@id/left_guideline"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!--Title text-->
-    <TextView
-        android:id="@+id/enable_preview_mode_header"
-        style="@style/Alexa.TitleText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/enable_preview_mode_header"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toStartOf="@id/right_guideline"
-        app:layout_constraintStart_toStartOf="@id/left_guideline"
-        app:layout_constraintTop_toBottomOf="@id/alexa_img_view"
-        android:layout_marginTop="@dimen/login_item_margin_top"/>
-
     <!-- Subtitle text-->
     <TextView
         android:id="@+id/enable_preview_mode_text_view"
-        style="@style/Alexa.SubtitleText"
+        style="?attr/bodyText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -75,7 +64,7 @@
     <!--Disclaimer text-->
     <TextView
         android:id="@+id/enable_preview_mode_disclaimer"
-        style="@style/Alexa.SmallBodyText"
+        style="?attr/smallBoldText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -99,7 +88,7 @@
 
     <TextView
         android:id="@+id/enable_preview_mode_action_button"
-        style="@style/Alexa.Button2"
+        style="?attr/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/enable_preview_mode_action_button"

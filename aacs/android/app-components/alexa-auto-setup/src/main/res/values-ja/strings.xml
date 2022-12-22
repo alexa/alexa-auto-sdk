@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-     <string name="login_qr_code_message">
-         <![CDATA[
-             <font color=\'#33B5E5\'>%1$s</font>でサインインしてください。
-         ]]>
-     </string>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            <font color=\'#33B5E5\'>%1$s</font>でサインインしてください。
+        ]]>
+    </string>
     <string name="confirm_yes_button">はい</string>
     <string name="confirm_exit_button">終了</string>
     <string name="settings_button">設定</string>
@@ -14,12 +14,9 @@
     <string name="login_action_retry_button">もう一度試す</string>
     <string name="sign_in_action_button">サインイン</string>
     <string name="login_later_action_button">後でサインイン</string>
-    <string name="login_connect_to_aacs">AACSに接続中です。お待ちください…</string>
     <string name="login_message">音声操作で快適にドライブ。Alexaに話しかけるだけで道案内、音楽再生、通話などを開始できます。</string>
-    <string name="enable_preview_mode_header">Alexaにサインインせずにオンにしますか?</string>
-    <string name="enable_preview_mode_action_button">同意してAlexaをオンにする</string>
-    <string name="enable_preview_mode_message">サインインしなくても、Alexaに情報や道順などを尋ねることはできます。音楽再生、天気予報、スマートホームの操作などにはサインインが必要です。</string>
-    <string name="enable_preview_mode_disclaimer">Amazonは、サービスの提供と改善のため、Amazon Alexaとの会話やその他のデータをAmazonのクラウドで処理および保存します。お客様は、「同意してAlexaをオンにする」を選択することでAmazonの<annotation placeholder="">利用規約</annotation>と<annotation placeholder="">ここ</annotation>に記載されているすべての規約に同意したものとみなされます。\n\n<annotation placeholder="">Alexaが、お客様のプライバシーを重視するためにどのように設計されているかの詳細については、こちらをご覧ください</annotation>。</string>
+    <string name="enable_preview_mode_header">サインインせずにAlexaを有効にしますか?</string>
+    <string name="enable_preview_mode_message">サインインしなくても、Alexaに天気や道順を尋ねることはできます。音楽を再生したり、最寄りのレストランを検索したりするには、サインインしてください。</string>
     <string name="enable_preview_mode_error_message">プレビューモードをオンにできませんでした。もう一度試してください。</string>
     <string name="login_method_or_text">または、このコードをスキャンしてください。</string>
     <string name="login_finish_heading_text">これで完了です%1$s!</string>
@@ -31,7 +28,10 @@
     <string name="login_all_done_btn_text">完了</string>
     <string name="setting_alexa_language_title">Alexaの言語</string>
     <string name="select_language_action_button">言語を選択</string>
-    <string name="select_language_body">Alexaは%1$sで利用できません。他の言語を選択してください。</string>
+    <string name="select_language_body">%1$sではAlexaを使用できません。</string>
+    <string name="unsupported_country_title">Alexaは%1$sに対応していません。</string>
+    <string name="unsupported_country_body">お住まいの地域では、車両内でのAlexaの利用はまだサポートされていません。</string>
+    <string name="unsupported_country_cta">OK</string>
     <string name="select_language_continue_button">次へ</string>
     <string name="setup_not_complete_header">うまくいきませんでした</string>
     <string name="setup_not_complete_text">Alexaをセットアップできませんでした。もう一度試してください。</string>
@@ -45,22 +45,29 @@
     <string name="location_permission_body_text">車の位置情報へのアクセスをAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
     <string name="location_permission_body_text_with_alexa_custom_assistant">車の位置情報へのアクセスを[Brandon]とAlexaに許可すると、最寄りのレストランや地域の天気予報など、状況に合った情報を得ることができます。</string>
     <string name="nav_favorites_permission_header_text">お気に入りの場所へルート案内</string>
-    <string name="nav_favorites_permission_body_text">よく行く場所を「お気に入り」として車に保存して、Alexaに簡単に道案内をリクエストできます。お気に入りの場所はAmazonサービスにアップロードされます。</string>
+    <string name="nav_favorites_permission_body_text">よく行く場所を「お気に入り」として保存して、手軽に道案内をリクエストすることができます。お気に入りの場所はAmazonサービスにアップロードされます。</string>
     <string name="consent_agree_text">同意して許可</string>
+    <string name="use_nav_favorites_button_text">同意して許可</string>
     <string name="assist_selection_title">Alexaをメインの音声アシスタントに設定</string>
     <string name="assist_selection_in_app">Alexaを使用するには、Alexaをメインの音声アシスタントアプリに設定する必要があります。これにより、現在の音声アシスタントが置き換えられます。</string>
     <string name="assist_selection_in_system_settings">Alexaを使用するには、設定画面でAlexaをメインの音声アシスタントアプリに設定する必要があります。\n下の「<b>設定</b>」をタップして、「<b>アシスタントアプリ</b>」、「<b>Alexa</b>」の順に選択します。</string>
     <string name="block_setup_on_drive_text">Alexaのセットアップは、駐車してから行ってください。</string>
     <string name="alexa_logo_content_description">Alexaスマイルロゴ</string>
-
-    <!-- translatable="false" tag is used for things-to-try (hint) strings only. These strings need to be localized based on the country and region -->
-    <string name="cbl_login_alexa_hint1" translatable="false">「アレクサ、温度を26度に設定して」</string>
-    <string name="cbl_login_alexa_hint2" translatable="false">「アレクサ、カフェを探して」</string>
-    <string name="cbl_login_alexa_hint3" translatable="false">「アレクサ、音楽をかけて」</string>
-    <string name="auth_provider_login_alexa_hint1" translatable="false">「アレクサ、温度を22度に設定して」</string>
-    <string name="auth_provider_login_alexa_hint2" translatable="false">「アレクサ、空港まで連れて行って」</string>
-    <string name="auth_provider_login_alexa_hint3" translatable="false"></string>
-    <string name="auth_provider_sign_in_hint" translatable="false">サインインして、音楽再生、天気予報、スマートホームの操作などをお試しください。</string>
-    <string name="location_permission_hint_text" translatable="false">「アレクサ、近くのレストランを検索して」</string>
-    <string name="nav_favorites_permission_hint_text" translatable="false">「アレクサ、自宅まで案内して」</string>
+    <string name="login_qr_code_url_message">
+        <![CDATA[
+            <font color=\'#0000FF\'>%1$s</font>でサインインしてください。\nその後、このコードを入力してください。
+        ]]>
+    </string>
+    <string name="login_qr_code_message_with_code">
+        <![CDATA[
+            <font color=\'#33B5E5\'>%1$s</font>でサインインしてください。その後、このコードを入力してください。<b>        %2$s</b>
+]]>
+    </string>
+    <string name="login_qr_code_scan_message">または、以下のQRコードをスキャンしてください。</string>
+    <string name="enable_push_to_talk_header">プッシュトゥトークでAlexaに話かけますか?</string>
+    <string name="enable_push_to_talk_message">ハンドルの音声認識ボタンをタップして、Alexaに話しかけることができます。この操作により、メイン音声アシスタントが置き換えられます。</string>
+    <string name="choose_language_action_button">言語を選択</string>
+    <string name="choose_language_body">Alexaの言語を選択してください。</string>
+    <string name="select_a_language_body">%1$sではAlexaを使用できません。</string>
+    <string name="select_language_confirm_button">確定</string>
 </resources>

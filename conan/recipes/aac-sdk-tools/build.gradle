@@ -23,12 +23,12 @@ allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 22
-        targetSdkVersion 26
-        versionCode 1
-        versionName '3.2'
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName '4.2'
     }
     buildTypes {
         release {
@@ -54,13 +54,5 @@ android {
         compileOnly fileTree( dir: 'android/libs', include: ['*.aar'] )
     }
 
-    // Disable stripping to prevent known NDK r20 issues:
-    // - https://github.com/android/ndk/issues/843
-    // - https://github.com/android/ndk/issues/1148
-    packagingOptions {
-        doNotStrip '**/*'
-    }
-
     ndkPath "${System.env.ANDROID_NDK_ROOT}"
 }
-

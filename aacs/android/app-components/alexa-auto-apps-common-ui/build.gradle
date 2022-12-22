@@ -1,10 +1,11 @@
 apply plugin: 'com.android.library'
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -19,10 +20,10 @@ android {
     }
     sourceSets {
         main {
-            def restrictedAssets = new File(gradle.ext.aacsRoot, "restrictedAssets")
-            if (restrictedAssets.exists()) {
+            def restrictedAssetsDir = file("$gradle.ext.aacsRootDir/restrictedAssets")
+            if (restrictedAssetsDir.exists()) {
                 project.logger.lifecycle("Building alexa-auto-apps-common-ui using Alexa assets..")
-                res.srcDirs = ['src/main/res', restrictedAssets.getCanonicalPath()]
+                res.srcDirs = ['src/main/res', restrictedAssetsDir]
             } else {
                 project.logger.lifecycle("Building alexa-auto-apps-common-ui using placeholders..")
                 res.srcDirs = ['src/main/res', 'src/main/res-placeholders']
@@ -47,7 +48,7 @@ android {
             def separator = "_"
             def buildType = variant.buildType.name
             def apkName = project + separator + buildType + ".aar"
-            outputFileName = new File(apkName)
+            outputFileName = file(apkName).name
         }
     }
 

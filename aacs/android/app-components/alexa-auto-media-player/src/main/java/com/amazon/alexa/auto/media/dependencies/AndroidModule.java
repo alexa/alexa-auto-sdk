@@ -17,9 +17,11 @@ package com.amazon.alexa.auto.media.dependencies;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.amazon.alexa.auto.media.Constants;
 import com.amazon.alexa.auto.media.MusicStreamAttributeUpdater;
 import com.amazon.alexa.auto.media.ShutdownActionReceiver;
 import com.amazon.alexa.auto.media.player.NotificationController;
@@ -36,8 +38,9 @@ import dagger.Provides;
  */
 @Module
 public class AndroidModule {
+    private static final String TAG = AndroidModule.class.getSimpleName();
+
     private WeakReference<Context> mContext;
-    private static final String MEDIA_STATE_KEY = "MEDIA_STATE_KEY";
 
     /**
      * Constructs the @c AndroidModule.
@@ -55,6 +58,7 @@ public class AndroidModule {
      */
     @Provides
     public WeakReference<Context> provideContext() {
+        Log.v(TAG, "provideContext");
         return this.mContext;
     }
 
@@ -66,6 +70,7 @@ public class AndroidModule {
     @Provides
     @Singleton
     public MediaSessionCompat provideMediaSession() {
+        Log.v(TAG, "provideMediaSession");
         Context context = this.mContext.get();
         if (context == null) {
             throw new RuntimeException("Invalid Context");
@@ -82,6 +87,7 @@ public class AndroidModule {
     @Provides
     @Singleton
     public NotificationController provideNotificationController() {
+        Log.v(TAG, "provideNotificationController");
         Context context = this.mContext.get();
         if (context == null) {
             throw new RuntimeException("Invalid Context");
@@ -97,19 +103,22 @@ public class AndroidModule {
      */
     @Provides
     public MusicStreamAttributeUpdater provideMusicStreamUpdater() {
+        Log.v(TAG, "provideMusicStreamUpdater");
         return new MusicStreamAttributeUpdater(mContext);
     }
 
     @Provides
     @Singleton
     public SharedPreferences provideSharedPreferences() {
+        Log.v(TAG, "provideSharedPreferences");
         Context context = this.mContext.get();
-        return context.getSharedPreferences(MEDIA_STATE_KEY, Context.MODE_PRIVATE);
+        return context.getSharedPreferences(Constants.MEDIA_PREFERENCES, Context.MODE_PRIVATE);
     }
 
     @Provides
     @Singleton
     public ShutdownActionReceiver provideShutdownObserver() {
+        Log.v(TAG, "provideShutdownObserver");
         return new ShutdownActionReceiver(mContext);
     }
 }

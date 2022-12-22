@@ -2,22 +2,25 @@
 
 ## Table of Contents
 - [Alexa Auto Media Player](#alexa-auto-media-player)
-- [Include Alexa Auto Media Player in the Application](#include-alexa-auto-media-player-in-the-application)
-- [Enable Media Ducking](#enable-media-ducking)
-- [Media Resume Alexa Music After Reboot](#media-resume-alexa-music-after-reboot)
-- [Login from Android Automotive Media UI](#login-from-android-automotive-media-ui)
-- [Alexa Music Certification](#alexa-music-certification)
+    - [Table of Contents](#table-of-contents)
+    - [Alexa Auto Media Player](#alexa-auto-media-player-1)
+    - [Include Alexa Auto Media Player in the Application](#include-alexa-auto-media-player-in-the-application)
+    - [Enable Media Ducking](#enable-media-ducking)
+    - [Media Resume Alexa Music After Reboot](#media-resume-alexa-music-after-reboot)
+    - [Login from Android Automotive Media UI](#login-from-android-automotive-media-ui)
+    - [Alexa Music Certification](#alexa-music-certification)
+    - [Known Issues](#known-issues)
 
 ## Alexa Auto Media Player
 The following list describes the purposes of this package:
 
-* It provides the audio player capability for Alexa Auto Client Service (AACS) by receiving all audio player intents and notifying AACS about the progress of media playback.
+* It provides the audio player capability for the Alexa Auto App by receiving all audio player intents and notifying the app about the progress of media playback.
 * It manages the underlying media player, which is ExoPlayer.
 * It handles audio focus.
 * It implements a media session on top of the media player so that media can be controlled with standard Android Media Session APIs. This capability allows Alexa Media to integrate with the Android Automotive Media UI.
 
 ## Include Alexa Auto Media Player in the Application
-The Alexa Auto Media Player is by default enabled in the AACS Sample App. See the [AACS Sample App README](../../sample-app/README.md#building-and-signing-the-aacs-sample-app-apk) for build instructions.
+The Alexa Auto Media Player is by default enabled in the Alexa Auto App. See the [Alexa Auto App README](../../sample-app/README.md#building-and-signing-the-aacs-sample-app-apk) for build instructions.
 
 If you want to use Alexa Auto Media Player in your application, build the following app components and include all the generated AARs in your application:
 

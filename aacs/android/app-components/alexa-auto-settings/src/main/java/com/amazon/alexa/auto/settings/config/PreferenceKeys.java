@@ -38,6 +38,7 @@ public class PreferenceKeys {
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK = "voice-assistance-push-to-talk";
     public static final String ALEXA_SETTINGS_VOICE_ASSISTANCE_PUSH_TO_TALK_SELECTION =
             "voice-assistance-push-to-talk-selection";
+    public static final String ALEXA_SETTINGS_POWERED_BY_ALEXA_POLICY= "POWERED_BY_ALEXA";
     public static final String ALEXA_SETTINGS_ACA_ADDRESSBOOK_CONSENT = "aca-addressbook-consent";
     public static final String ALEXA_SETTINGS_ADDRESSBOOK_CONSENT = "alexa-addressbook-consent";
     public static final String ALEXA_SETTINGS_HANDS_FREE = "alexa-hands-free-settings";
@@ -53,6 +54,9 @@ public class PreferenceKeys {
     public static final String ALEXA_SETTINGS_NAVI_FAVORITES = "alexa-nav_favorite-consent-setting";
     public static final String ALEXA_SETTINGS_COMMUNICATION = "alexa-communication";
     public static final String ALEXA_SETTINGS_SOUNDS = "alexa-sounds";
+
+    public static final String ALEXA_SETTINGS_PERMISSIONS_CATEGORY = "permissions-category";
+    public static final String ALEXA_SETTINGS_ETC_CATEGORY = "etc-settings-category";
 
     public static final String ALEXA_SETTINGS_SOUND_START = "alexa-sound-start";
     public static final String ALEXA_SETTINGS_SOUND_END = "alexa-sound-end";

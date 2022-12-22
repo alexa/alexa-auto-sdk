@@ -14,5 +14,5 @@ var searchData=
   ['processactivityevent',['processActivityEvent',['../classaace_1_1apl_1_1_a_p_l.html#a1e382051d18bc09a39e1f3cd9b9ddb9a',1,'aace::apl::APL']]],
   ['propertychanged',['propertyChanged',['../classaace_1_1property_manager_1_1_property_manager.html#a71d433e4f3149f96ce2b3df3a51d1aa5',1,'aace::propertyManager::PropertyManager']]],
   ['propertystatechanged',['propertyStateChanged',['../classaace_1_1property_manager_1_1_property_manager.html#acfe5b9136c08b87e35c55045129e5aa3',1,'aace::propertyManager::PropertyManager']]],
-  ['publish',['publish',['../classaace_1_1core_1_1_message_broker.html#a1d13752c762535554c5b195d77f7593f',1,'aace::core::MessageBroker']]]
+  ['publish',['publish',['../classaace_1_1aasb_1_1_a_a_s_b.html#a08713e3de4b4dc2186be22e751558398',1,'aace::aasb::AASB::publish()'],['../classaace_1_1core_1_1_message_broker.html#a1d13752c762535554c5b195d77f7593f',1,'aace::core::MessageBroker::publish()']]]
 ];

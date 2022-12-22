@@ -32,6 +32,7 @@ import com.amazon.aacsconstants.AACSConstants;
 import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.communication.ContactsController;
+import com.amazon.aacstelephony.Util;
 import com.amazon.alexa.auto.comms.ui.db.BTDevice;
 import com.amazon.alexa.auto.comms.ui.db.BTDeviceRepository;
 import com.amazon.alexa.auto.comms.ui.db.ConnectedBTDevice;
@@ -74,11 +75,12 @@ public class ContactsControllerImpl implements ContactsController {
         if (!EventBus.getDefault().isRegistered(this)) {
             EventBus.getDefault().register(this);
         }
-        resetContactPermissionsWhenLogOut();
+        resetPermissionsWhenLogOut();
     }
 
     @Override
     public void uploadContacts(String deviceAddress) {
+        Log.d(TAG, "Uploading contacts for device " + deviceAddress);
         String aacsContactsPackageName = getAACSContactsPackageName(mContextWk);
         if (aacsContactsPackageName == null) {
             Log.e(TAG, "AACS contacts service is not available, skip to upload contacts.");
@@ -88,6 +90,8 @@ public class ContactsControllerImpl implements ContactsController {
                             + "The current primary device is " + mPrimaryDeviceAddress);
         } else {
             Log.d(TAG, "Uploading contacts...");
+            String deviceName = Util.getBluetoothDeviceName(mContextWk.get(), deviceAddress);
+            Util.toast(mContextWk.get(), mContextWk.get().getString(R.string.comms_toast_contacts_syncing, deviceName));
             Intent intentStartService = new Intent();
             intentStartService.setComponent(
                     new ComponentName(aacsContactsPackageName, Constants.AACS_CONTACTS_SERVICE));
@@ -104,6 +108,7 @@ public class ContactsControllerImpl implements ContactsController {
         Log.d(TAG, "Removing contacts...");
         String aacsContactsPackageName = getAACSContactsPackageName(mContextWk);
         if (aacsContactsPackageName != null) {
+            Util.toast(mContextWk.get(), mContextWk.get().getString(R.string.comms_toast_contacts_removing));
             Intent intentStartService = new Intent();
             intentStartService.setComponent(
                     new ComponentName(aacsContactsPackageName, Constants.AACS_CONTACTS_SERVICE));
@@ -123,6 +128,15 @@ public class ContactsControllerImpl implements ContactsController {
     }
 
     @Override
+    public void setMessagingPermission(String deviceAddress, String permission) {
+        mBTDeviceRepository.getBTDeviceByAddress(deviceAddress);
+        mBTDeviceRepository.updateMessagingPermission(deviceAddress, permission);
+        mConnectedBTDeviceRepository.updateMessagingPermission(deviceAddress, permission);
+        Util.saveMessagingConsent(
+                mContextWk.get(), CONTACTS_PERMISSION_YES.equals(permission), deviceAddress, mPrimaryDeviceAddress);
+    }
+
+    @Override
     public Observable<Boolean> observeContactsConsent() {
         mBTDeviceRepository.findPrimaryBTDeviceEntry();
         return mContactsUploadConsentSubject;
@@ -136,6 +150,7 @@ public class ContactsControllerImpl implements ContactsController {
      */
     @Subscribe
     public void onBTDeviceDiscoveryChange(BTDeviceRepository.BTDeviceDiscoveryMessage message) {
+        Log.d(TAG, "onBTDeviceDiscoveryChange: " + message);
         Boolean isLoggedIn = AlexaApp.from(mContextWk.get()).getRootComponent().getAuthController().isAuthenticated();
         if (message.getFirstPair() == true && isLoggedIn) {
             Log.d(TAG, "Contacts consent not granted, popping up consent screen");
@@ -146,11 +161,19 @@ public class ContactsControllerImpl implements ContactsController {
         }
         if (message.isFound()) {
             BTDevice device = message.getBTDevice();
+            Log.d(TAG,
+                    "onBTDeviceDiscoveryChange: contacts upload permission: " + device.getContactsUploadPermission());
             if (device.getContactsUploadPermission().equals(Constants.CONTACTS_PERMISSION_NO)) {
                 mContactsUploadConsentSubject.onNext(true);
             } else {
                 mContactsUploadConsentSubject.onNext(false);
                 uploadContacts(device.getDeviceAddress());
+            }
+            Log.d(TAG, "onBTDeviceDiscoveryChange: messaging permission: " + device.getMessagingPermission());
+            if (device.getMessagingPermission().equals(Constants.CONTACTS_PERMISSION_YES)) {
+                Util.saveMessagingConsent(mContextWk.get(), true, device.getDeviceAddress(), mPrimaryDeviceAddress);
+            } else {
+                Util.saveMessagingConsent(mContextWk.get(), false, device.getDeviceAddress(), mPrimaryDeviceAddress);
             }
         } else {
             Log.d(TAG, "Bluetooth device is not found, skipping contacts upload consent step.");
@@ -175,8 +198,12 @@ public class ContactsControllerImpl implements ContactsController {
         ConnectedBTDevice connectedBTDevice = primaryPhoneChangeMessage.getConnectedBTDevice();
 
         if (connectedBTDevice != null) {
-            String permission = primaryPhoneChangeMessage.getContactsPermission();
-            mConnectedBTDeviceRepository.updateContactsPermission(connectedBTDevice.getDeviceAddress(), permission);
+            String contactUploadPermission = primaryPhoneChangeMessage.getContactsPermission();
+            String messagingPermission = primaryPhoneChangeMessage.getMessagingPermission();
+            mConnectedBTDeviceRepository.updateContactsPermission(
+                    connectedBTDevice.getDeviceAddress(), contactUploadPermission);
+            mConnectedBTDeviceRepository.updateMessagingPermission(
+                    connectedBTDevice.getDeviceAddress(), messagingPermission);
         }
         updatePrimaryDeviceAddress(
                 primaryPhoneChangeMessage.getConnectedBTDevice(), primaryPhoneChangeMessage.getIsNewDevice());
@@ -184,8 +211,9 @@ public class ContactsControllerImpl implements ContactsController {
 
     /**
      * Start AACS service with intent.
+     *
      * @param context Android context.
-     * @param intent Android intent.
+     * @param intent  Android intent.
      */
     private void startAACSService(Context context, Intent intent) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -200,6 +228,7 @@ public class ContactsControllerImpl implements ContactsController {
      * If AACS Contacts Service is running in AACS as separate application, it returns value of AACS package name.
      * Otherwise if AACS Contacts Service is included in the client app as an AAR, it returns the client app
      * package name.
+     *
      * @param contextWk Weak reference of Android context for getting a package manager
      * @return AACS Contacts Service package name
      */
@@ -270,7 +299,7 @@ public class ContactsControllerImpl implements ContactsController {
      * Reset the contact sync permissions
      * logout event was detected.
      */
-    private void resetContactPermissionsWhenLogOut() {
+    private void resetPermissionsWhenLogOut() {
         @NonNull
         AuthController authController = AlexaApp.from(mContextWk.get()).getRootComponent().getAuthController();
 
@@ -287,6 +316,8 @@ public class ContactsControllerImpl implements ContactsController {
                                 String address = btDevice.getDeviceAddress();
                                 mBTDeviceRepository.updateContactsPermission(address, CONTACTS_PERMISSION_NO);
                                 mConnectedBTDeviceRepository.updateContactsPermission(address, CONTACTS_PERMISSION_NO);
+                                mBTDeviceRepository.updateMessagingPermission(address, CONTACTS_PERMISSION_NO);
+                                mConnectedBTDeviceRepository.updateMessagingPermission(address, CONTACTS_PERMISSION_NO);
                             }
                         }
                         return null;

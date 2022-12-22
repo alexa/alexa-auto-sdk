@@ -29,19 +29,12 @@ public class Action {
         public static final String REMOVE_ADDRESS_BOOK = "RemoveAddressBook";
     }
 
-    public static class Alerts {
-        public static final String ALERT_CREATED = "AlertCreated";
-        public static final String ALERT_DELETED = "AlertDeleted";
-        public static final String ALERT_STATE_CHANGED = "AlertStateChanged";
-        public static final String LOCAL_STOP = "LocalStop";
-        public static final String REMOVE_ALL_ALERTS = "RemoveAllAlerts";
-    }
-
     public static class AlexaClient {
         public static final String AUTH_STATE_CHANGED = "AuthStateChanged";
         public static final String CONNECTION_STATUS_CHANGED = "ConnectionStatusChanged";
         public static final String DIALOG_STATE_CHANGED = "DialogStateChanged";
         public static final String STOP_FOREGROUND_ACTIVITY = "StopForegroundActivity";
+        public static final String CLOSE_DISPLAY_CARD = "CloseDisplayCard";
     }
 
     public static class AlexaSpeaker {
@@ -55,6 +48,7 @@ public class Action {
         public static final String GET_PLAYER_DURATION = "GetPlayerDuration";
         public static final String GET_PLAYER_POSITION = "GetPlayerPosition";
         public static final String PLAYER_ACTIVITY_CHANGED = "PlayerActivityChanged";
+        public static final String SET_AS_FOREGROUND_ACTIVITY = "SetAsForegroundActivity";
     }
 
     public static class AuthProvider {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * permissions and limitations under the License.
  */
 
+#include "AACE/Engine/Alexa/ExternalMediaAdapterConstants.h"
 #include "AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Utils/Metrics/Metrics.h"
@@ -232,7 +233,7 @@ bool LocalMediaSourceEngineImpl::handlePlayControl(
     aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlayControl", {METRIC_LOCAL_MEDIA_SOURCE_PLAY_CONTROL});
     try {
-        AACE_VERBOSE(LX(TAG));
+        AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId).d("playControlType", playControlType));
 
         ThrowIfNot(m_platformLocalMediaSource->playControl(playControlType), "platformMediaAdapterPlayControlFailed");
         // set focus on successful RESUME control
@@ -513,28 +514,27 @@ bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
 void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName, const std::string& sessionId) {
     emitCounterMetrics(
         METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_EVENT, eventName});
-    AACE_VERBOSE(LX(TAG).d("eventName", eventName));
+    AACE_INFO(LX(TAG).d("eventName", eventName).d("localPlayerId", m_localPlayerId));
     if (m_localPlayerId.empty()) {
-        if (eventName == "PlaybackSessionStarted") {
+        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
+            eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
             setDefaultPlayerFocus();
         }
-        AACE_VERBOSE(LX(TAG).d("onPlayerEvent", "Skipping events for the DEFAULT player"));
+        AACE_VERBOSE(LX(TAG).m("DEFAULT player does not send events"));
         return;
     }
-    if (eventName == "PlaybackSessionStarted") {
-        try {
-            ThrowIfNot(setFocus(m_localPlayerId, true), "setFocusFailed");
-        } catch (std::exception& ex) {
-            AACE_ERROR(LX(TAG).d("eventName", eventName).d("reason", ex.what()));
+    reportPlaybackSessionId(m_localPlayerId, sessionId);
+    if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
+        eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
+        if (!setFocus(m_localPlayerId, true)) {
+            AACE_ERROR(LX(TAG).m("setFocus(true) failed"));
         }
-        reportPlaybackSessionId(m_localPlayerId, sessionId);
-    } else if (eventName == "PlaybackSessionEnded") {
-        try {
-            ThrowIfNot(setFocus(m_localPlayerId, false), "setFocusFailed");
-        } catch (std::exception& ex) {
-            AACE_ERROR(LX(TAG).d("eventName", eventName).d("reason", ex.what()));
+    } else if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_ENDED) == 0) {
+        if (!setFocus(m_localPlayerId, false)) {
+            AACE_ERROR(LX(TAG).m("setFocus(false) failed"));
         }
     }
+
     try {
         auto event = createExternalMediaPlayerEvent(
             m_localPlayerId,
@@ -551,7 +551,7 @@ void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName, con
 
         m_messageSender_lock->sendMessage(request);
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onPlayerEvent").d("reason", ex.what()).d("eventName", eventName));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("eventName", eventName));
     }
 }
 
@@ -566,10 +566,11 @@ void LocalMediaSourceEngineImpl::onPlayerError(
         "onPlayerError",
         {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_ERROR, errorName, std::to_string(code)});
     try {
-        AACE_VERBOSE(LX(TAG).d("errorName", errorName).d("code", code).d("description", description).d("fatal", fatal));
+        AACE_INFO(
+            LX(TAG).d("errorName", errorName).d("localPlayerId", m_localPlayerId).d("code", code).d("fatal", fatal));
 
         if (m_localPlayerId.empty()) {
-            AACE_VERBOSE(LX(TAG).d("onPlayerEvent", "Skipping errors for the DEFAULT player"));
+            AACE_VERBOSE(LX(TAG).m("DEFAULT player does not send events"));
             return;
         }
         auto event = createExternalMediaPlayerEvent(
@@ -592,12 +593,7 @@ void LocalMediaSourceEngineImpl::onPlayerError(
 
         m_messageSender_lock->sendMessage(request);
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onPlayerError")
-                       .d("reason", ex.what())
-                       .d("errorName", errorName)
-                       .d("code", code)
-                       .d("description", description)
-                       .d("fatal", fatal));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 
@@ -612,6 +608,7 @@ void LocalMediaSourceEngineImpl::onSetFocus(bool focusAcquire) {
 
 void LocalMediaSourceEngineImpl::setDefaultPlayerFocus() {
     try {
+        AACE_DEBUG(LX(TAG).m("Setting focus for default player"));
         auto focusHandler_lock = m_focusHandler.lock();
         ThrowIfNull(focusHandler_lock, "invalidFocusHandler");
         m_executor.submit([focusHandler_lock]() { focusHandler_lock->setDefaultPlayerFocus(); });

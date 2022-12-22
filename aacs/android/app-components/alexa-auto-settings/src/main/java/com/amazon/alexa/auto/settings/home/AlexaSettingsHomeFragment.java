@@ -21,12 +21,17 @@ import static com.amazon.aacsconstants.AACSPropertyConstants.WAKEWORD_SUPPORTED;
 import static com.amazon.alexa.auto.apps.common.util.DNDSettingsProvider.updateDNDInPreferences;
 import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.DISABLED;
 import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.ENABLED;
+import static com.amazon.aacsconstants.TelephonyConstants.device_bundle;
+import static com.amazon.aacsconstants.TelephonyConstants.device_found;
+import static com.amazon.aacsconstants.TelephonyConstants.device_not_found;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,8 +52,6 @@ import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
-import com.amazon.alexa.auto.comms.ui.db.BTDevice;
-import com.amazon.alexa.auto.comms.ui.db.BTDeviceRepository;
 import com.amazon.alexa.auto.comms.ui.db.ConnectedBTDevice;
 import com.amazon.alexa.auto.comms.ui.db.ConnectedBTDeviceRepository;
 import com.amazon.alexa.auto.settings.DNDChangeMessage;
@@ -63,6 +66,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -73,7 +77,8 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
  */
 public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
     private static final String TAG = AlexaSettingsHomeFragment.class.getSimpleName();
-
+    BluetoothManager mBluetoothManager;
+    BluetoothAdapter mBluetoothAdapter;
     @Inject
     AlexaPropertyManager mAlexaPropertyManager;
     @Inject
@@ -83,6 +88,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
 
     private AuthController mAuthController;
     private CompositeDisposable mInFlightOperations;
+
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -127,19 +133,6 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
         PreferenceScreen screen = getPreferenceScreen();
         mScreenBuilders.forEach(processor -> processor.installEventHandlers(screen, view));
 
-        // Decorate the last item to not have bottom bar.
-        Preference lastPreference = screen.getPreference(screen.getPreferenceCount() - 1);
-        lastPreference.setLayoutResource(R.layout.alexa_last_preference_layout);
-
-        // Add margin per UI spec.
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        if (layoutParams instanceof ViewGroup.MarginLayoutParams) {
-            ViewGroup.MarginLayoutParams marginLayoutParams = (ViewGroup.MarginLayoutParams) layoutParams;
-            marginLayoutParams.setMarginStart(
-                    (int) getResources().getDimension(R.dimen.item_horizontal_margin_quadruple));
-            marginLayoutParams.setMarginEnd((int) getResources().getDimension(R.dimen.item_horizontal_margin_double));
-            view.setLayoutParams(layoutParams);
-        }
         EventBus.getDefault().register(this);
     }
 
@@ -226,30 +219,14 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
     }
 
     private void installLanguageEventHandler() {
-        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
-
         Preference defaultAlexaLanguages = findPreference(PreferenceKeys.ALEXA_SETTINGS_LANGUAGES);
         Preconditions.checkNotNull(defaultAlexaLanguages);
-
-        mInFlightOperations.add(mAlexaPropertyManager.getAlexaProperty(LOCALE)
-                                        .filter(Optional::isPresent)
-                                        .map(Optional::get)
-                                        .subscribe(propValue -> {
-                                            mInFlightOperations.add(
-                                                    mLocalesProvider.fetchAlexaSupportedLocaleWithId(propValue)
-                                                            .filter(Optional::isPresent)
-                                                            .map(Optional::get)
-                                                            .subscribe(localeValue -> {
-                                                                defaultAlexaLanguages.setSummary(localeValue.first
-                                                                        + " (" + localeValue.second + ")");
-                                                            }));
-                                        }));
 
         defaultAlexaLanguages.setOnPreferenceClickListener(preference -> {
             View view = getView();
             if (view != null) {
                 NavController navController = findNavController(view);
-                navController.navigate(R.id.navigation_fragment_alexa_settings_languages);
+                navController.navigate(R.id.navigation_fragment_settings_languages);
             }
             return false;
         });
@@ -267,7 +244,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
                 return false;
             });
         } else {
-            Log.i(TAG, "defaultTTT is null");
+            Log.i(TAG, "default TTT is null");
         }
     }
 
@@ -278,7 +255,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
             View view = getView();
             if (view != null) {
                 NavController navController = findNavController(view);
-                navController.navigate(R.id.navigation_fragment_alexa_settings_sounds);
+                navController.navigate(R.id.navigation_fragment_settings_sounds);
             }
             return false;
         });
@@ -287,33 +264,39 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
     private void installCommunicationsEventHandler() {
         Preference defaultAlexaComms = findPreference(PreferenceKeys.ALEXA_SETTINGS_COMMUNICATION);
         Preconditions.checkNotNull(defaultAlexaComms);
+        mBluetoothManager = (BluetoothManager) getContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        Bundle newBundle = new Bundle();
 
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         LiveData<List<ConnectedBTDevice>> listData =
                 ConnectedBTDeviceRepository.getInstance(getContext()).getConnectedDevices();
         listData.observe(getViewLifecycleOwner(), listObserver -> {
-            if (listData.getValue() != null && listData.getValue().size() > 0) {
+            //We need to clear the ConnectedBTRepository if bluetooth is disabled meaning there are no device
+            //connected
+            if (!mBluetoothAdapter.isEnabled()) {
+                Log.d(TAG, "This is Bluetooth is disabled");
+                ConnectedBTDeviceRepository.getInstance(getContext()).nukeTable();
+            }
+            //We need to check the number of paired devices using paired devices because even when bluetooth
+            // is off, the listData will have the devices that was connected before BT was turned off.
+            if (listData.getValue() != null && listData.getValue().size() > 0 && pairedDevices.size()>0) {
+                newBundle.putString(device_bundle, device_found);
                 // Per Android telephony, it uses last paired bluetooth device for calling and handle messages.
-                String deviceAddress = listData.getValue().get(listData.getValue().size() - 1).getDeviceAddress();
-                LiveData<BTDevice> device =
-                        BTDeviceRepository.getInstance(getContext()).getBTDeviceByAddress(deviceAddress);
-                device.observe(getViewLifecycleOwner(), observer -> {
-                    if (device.getValue() != null) {
-                        defaultAlexaComms.setSummary(device.getValue().getDeviceName());
-                    } else {
-                        Log.d(TAG, "Primary device is not found.");
-                        defaultAlexaComms.setSummary("None");
-                    }
-                });
+                ConnectedBTDevice primaryDevice = listData.getValue().get(listData.getValue().size() - 1);
+                String name = primaryDevice.getDeviceName();
+                defaultAlexaComms.setSummary(name);
             } else {
+                newBundle.putString(device_bundle, device_not_found);
                 Log.d(TAG, "Device is not found.");
-                defaultAlexaComms.setSummary("None");
+                defaultAlexaComms.setSummary(R.string.comms_primary_device_none);
             }
 
             defaultAlexaComms.setOnPreferenceClickListener(preference -> {
                 View view = getView();
                 if (view != null) {
                     NavController navController = findNavController(view);
-                    navController.navigate(R.id.navigation_fragment_alexa_settings_communication);
+                    navController.navigate(R.id.navigation_fragment_alexa_settings_communication, newBundle);
                 }
                 return false;
             });
@@ -326,7 +309,7 @@ public class AlexaSettingsHomeFragment extends PreferenceFragmentCompat {
         if (defaultAlexaDNDSetting != null) {
             if (defaultAlexaDNDSetting.isChecked() != message.isChecked()) {
                 defaultAlexaDNDSetting.setChecked(message.isChecked());
-                updateDNDInPreferences(getContext(), message.isChecked());
+                updateDNDInPreferences(requireContext(), message.isChecked());
             }
         }
     }

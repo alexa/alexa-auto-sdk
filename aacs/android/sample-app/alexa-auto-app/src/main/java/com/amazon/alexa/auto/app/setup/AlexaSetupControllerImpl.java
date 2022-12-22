@@ -48,6 +48,7 @@ public class AlexaSetupControllerImpl implements AlexaSetupController {
     private final WeakReference<Context> mContextWk;
     private final BehaviorSubject<Boolean> mAlexaSelectedVASubject;
     private final BehaviorSubject<Boolean> mAACSReadinessSubject;
+    private final BehaviorSubject<Boolean> mAlexaCloudConnectionSubject;
     /**
      * Constructs an instance of AlexaSetupControllerImpl.
      *
@@ -59,6 +60,7 @@ public class AlexaSetupControllerImpl implements AlexaSetupController {
         mAlexaSelectedVASubject.onNext(isAlexaCurrentlySelectedVoiceAssistant());
 
         mAACSReadinessSubject = BehaviorSubject.createDefault(false);
+        mAlexaCloudConnectionSubject = BehaviorSubject.createDefault(false);
     }
 
     @Override
@@ -110,5 +112,16 @@ public class AlexaSetupControllerImpl implements AlexaSetupController {
     @Override
     public void setAACSReadiness(boolean isReady) {
         mAACSReadinessSubject.onNext(isReady);
+    }
+
+    @Override
+    public Observable<Boolean> observeAlexaCloudConnectionStatus() {
+        return mAlexaCloudConnectionSubject;
+    }
+
+    @Override
+    public void setAlexaCloudConnectionStatus(boolean isConnected) {
+        Log.d(TAG, "setAlexaCloudConnectionStatus. isConnected: " + isConnected);
+        mAlexaCloudConnectionSubject.onNext(isConnected);
     }
 }

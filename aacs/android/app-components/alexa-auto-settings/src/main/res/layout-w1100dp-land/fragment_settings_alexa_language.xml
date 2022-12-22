@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/content_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.084" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/content_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9160" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/toolbar_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1575"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/title_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.2418" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/content_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.8669" />
+
+    <TextView
+        android:id="@android:id/title"
+        style="?attr/headerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/setting_alexa_language_title"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_bottom"
+        app:layout_constraintBottom_toTopOf="@id/title_bottom"
+        app:layout_constraintStart_toStartOf="@id/content_start"
+        app:layout_constraintEnd_toEndOf="@id/content_end"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="@drawable/carousel_center_frame"
+        app:layout_constraintTop_toBottomOf="@id/title_bottom"
+        app:layout_constraintBottom_toTopOf="@id/content_bottom"
+        app:layout_constraintStart_toStartOf="@id/content_start"
+        app:layout_constraintEnd_toEndOf="@id/content_end"
+        >
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/list_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.0449" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/list_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9551" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/alexa_language_list"
+            android:name="com.amazon.alexa.auto.settings.SettingsAlexaLanguageFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/list_start"
+            app:layout_constraintEnd_toEndOf="@id/list_end"
+            app:layoutManager="LinearLayoutManager"
+            android:theme="@style/AlexaDeviceDefault"
+            tools:context=".SettingsAlexaLanguageFragment"
+            tools:listitem="@layout/fragment_settings_language_item" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/selection_button"
+        style="?attr/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Continue/Confirm"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/content_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

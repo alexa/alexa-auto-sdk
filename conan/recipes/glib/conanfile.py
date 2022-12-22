@@ -36,7 +36,7 @@ class GLibConan(ConanFile):
     _build_subfolder = "build_subfolder"
     short_paths = True
     generators = "pkg_config"
-    requires = ["libffi/3.3"]
+    requires = ["libffi/3.3#ffae58cd59893a5e077a16c473adf8b5"]
     build_requires = ["meson/0.56.2", "pkgconf/1.7.3"]
 
     @property
@@ -75,10 +75,10 @@ class GLibConan(ConanFile):
             self.requires("libselinux/3.1")
         if self.settings.os != "Linux":
             # for Linux, gettext is provided by libc
-            self.requires("libgettext/0.20.1")
+            self.requires("libgettext/0.20.1#78b03f9a69ec94e302bd4d352579ccf7")
 
         if tools.is_apple_os(self.settings.os):
-            self.requires("libiconv/1.16")
+            self.requires("libiconv/1.16#eae489614aa6b1b8ca652cc33d3c26a9")
 
     def source(self):
         tools.get(**self.conan_data["sources"][self.version])
@@ -154,9 +154,7 @@ class GLibConan(ConanFile):
 
     def build(self):
         self._patch_sources()
-        with tools.environment_append(
-            VisualStudioBuildEnvironment(self).vars
-        ) if self._is_msvc else tools.no_op():
+        with tools.environment_append(VisualStudioBuildEnvironment(self).vars) if self._is_msvc else tools.no_op():
             meson = self._configure_meson()
             meson.build()
 
@@ -170,9 +168,7 @@ class GLibConan(ConanFile):
 
     def package(self):
         self.copy(pattern="COPYING", dst="licenses", src=self._source_subfolder)
-        with tools.environment_append(
-            VisualStudioBuildEnvironment(self).vars
-        ) if self._is_msvc else tools.no_op():
+        with tools.environment_append(VisualStudioBuildEnvironment(self).vars) if self._is_msvc else tools.no_op():
             meson = self._configure_meson()
             meson.install()
             self._fix_library_names()
@@ -195,47 +191,29 @@ class GLibConan(ConanFile):
             )
         if self.settings.os == "Macos":
             self.cpp_info.components["glib-2.0"].system_libs.append("resolv")
-            self.cpp_info.components["glib-2.0"].frameworks.extend(
-                ["Foundation", "CoreServices", "CoreFoundation"]
-            )
-        self.cpp_info.components["glib-2.0"].includedirs.append(
-            os.path.join("include", "glib-2.0")
-        )
-        self.cpp_info.components["glib-2.0"].includedirs.append(
-            os.path.join("lib", "glib-2.0", "include")
-        )
+            self.cpp_info.components["glib-2.0"].frameworks.extend(["Foundation", "CoreServices", "CoreFoundation"])
+        self.cpp_info.components["glib-2.0"].includedirs.append(os.path.join("include", "glib-2.0"))
+        self.cpp_info.components["glib-2.0"].includedirs.append(os.path.join("lib", "glib-2.0", "include"))
         if self.options.with_pcre:
             self.cpp_info.components["glib-2.0"].requires.append("pcre::pcre")
         if self.settings.os != "Linux":
-            self.cpp_info.components["glib-2.0"].requires.append(
-                "libgettext::libgettext"
-            )
+            self.cpp_info.components["glib-2.0"].requires.append("libgettext::libgettext")
         if tools.is_apple_os(self.settings.os):
             self.cpp_info.components["glib-2.0"].requires.append("libiconv::libiconv")
 
         self.cpp_info.components["gmodule-no-export-2.0"].libs = ["gmodule-2.0"]
         if self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.components["gmodule-no-export-2.0"].system_libs.append(
-                "pthread"
-            )
+            self.cpp_info.components["gmodule-no-export-2.0"].system_libs.append("pthread")
             self.cpp_info.components["gmodule-no-export-2.0"].system_libs.append("dl")
         self.cpp_info.components["gmodule-no-export-2.0"].requires.append("glib-2.0")
 
-        self.cpp_info.components["gmodule-export-2.0"].requires.extend(
-            ["gmodule-no-export-2.0", "glib-2.0"]
-        )
+        self.cpp_info.components["gmodule-export-2.0"].requires.extend(["gmodule-no-export-2.0", "glib-2.0"])
         if self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.components["gmodule-export-2.0"].sharedlinkflags.append(
-                "-Wl,--export-dynamic"
-            )
+            self.cpp_info.components["gmodule-export-2.0"].sharedlinkflags.append("-Wl,--export-dynamic")
 
-        self.cpp_info.components["gmodule-2.0"].requires.extend(
-            ["gmodule-no-export-2.0", "glib-2.0"]
-        )
+        self.cpp_info.components["gmodule-2.0"].requires.extend(["gmodule-no-export-2.0", "glib-2.0"])
         if self.settings.os in ["Linux", "FreeBSD"]:
-            self.cpp_info.components["gmodule-2.0"].sharedlinkflags.append(
-                "-Wl,--export-dynamic"
-            )
+            self.cpp_info.components["gmodule-2.0"].sharedlinkflags.append("-Wl,--export-dynamic")
 
         self.cpp_info.components["gobject-2.0"].libs = ["gobject-2.0"]
         self.cpp_info.components["gobject-2.0"].requires.append("glib-2.0")
@@ -251,47 +229,33 @@ class GLibConan(ConanFile):
             self.cpp_info.components["gio-2.0"].system_libs.append("resolv")
         if self.settings.os in ["Linux", "FreeBSD"]:
             self.cpp_info.components["gio-2.0"].system_libs.append("dl")
-        self.cpp_info.components["gio-2.0"].requires.extend(
-            ["glib-2.0", "gobject-2.0", "gmodule-2.0"]
-        )
+        self.cpp_info.components["gio-2.0"].requires.extend(["glib-2.0", "gobject-2.0", "gmodule-2.0"])
         if self.settings.os == "Macos":
             self.cpp_info.components["gio-2.0"].frameworks.append("AppKit")
         if self.options.get_safe("with_mount"):
             self.cpp_info.components["gio-2.0"].requires.append("libmount::libmount")
         if self.options.get_safe("with_selinux"):
-            self.cpp_info.components["gio-2.0"].requires.append(
-                "libselinux::libselinux"
-            )
+            self.cpp_info.components["gio-2.0"].requires.append("libselinux::libselinux")
         if self.settings.os == "Windows":
             self.cpp_info.components["gio-windows-2.0"].requires = [
                 "gobject-2.0",
                 "gmodule-no-export-2.0",
                 "gio-2.0",
             ]
-            self.cpp_info.components["gio-windows-2.0"].includedirs = [
-                os.path.join("include", "gio-win32-2.0")
-            ]
+            self.cpp_info.components["gio-windows-2.0"].includedirs = [os.path.join("include", "gio-win32-2.0")]
         else:
-            self.cpp_info.components["gio-unix-2.0"].requires.extend(
-                ["gobject-2.0", "gio-2.0"]
-            )
-            self.cpp_info.components["gio-unix-2.0"].includedirs = [
-                os.path.join("include", "gio-unix-2.0")
-            ]
+            self.cpp_info.components["gio-unix-2.0"].requires.extend(["gobject-2.0", "gio-2.0"])
+            self.cpp_info.components["gio-unix-2.0"].includedirs = [os.path.join("include", "gio-unix-2.0")]
 
         # giomoduledir variable is necessary for glib-networking to build successfully
         gio_custom_content = "giomoduledir=${libdir}/gio/modules"
         self.cpp_info.components["gio-2.0"].set_property("pkg_config_custom_content", gio_custom_content)
 
-        self.env_info.GLIB_COMPILE_SCHEMAS = os.path.join(
-            self.package_folder, "bin", "glib-compile-schemas"
-        )
+        self.env_info.GLIB_COMPILE_SCHEMAS = os.path.join(self.package_folder, "bin", "glib-compile-schemas")
 
         self.cpp_info.components["gresource"].libs = []  # this is actually an executable
         if self.options.get_safe("with_elf", True):
-            self.cpp_info.components["gresource"].requires.append(
-                "libelf::libelf"
-            )  # this is actually an executable
+            self.cpp_info.components["gresource"].requires.append("libelf::libelf")  # this is actually an executable
 
         bin_path = os.path.join(self.package_folder, "bin")
         self.output.info("Appending PATH env var with: {}".format(bin_path))

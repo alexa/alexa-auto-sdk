@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 namespace aace {
 namespace alexa {
 
+using AssistantIdType = unsigned int;
+
 /**
  * AlexaClient should be extended to handle Alexa state changes on the platform.
  *
@@ -38,6 +40,22 @@ protected:
 
 public:
     virtual ~AlexaClient();
+
+    /**
+     * A pre-defined value to express that no assistant is associated.
+     */
+    static constexpr AssistantIdType ASSISTANT_ID_NONE = 0;
+
+    /**
+     * A pre-defined value to express that all assistant is associated.
+     */
+    static constexpr AssistantIdType ASSISTANT_ID_ALL = 1;
+
+    /**
+     * A pre-defined value for Alexa's assistant Id. 
+     */
+    static constexpr AssistantIdType ASSISTANT_ID_ALEXA = 2;
+
 
     /**
      * Describes the state of Alexa dialog interaction
@@ -68,7 +86,15 @@ public:
         /**
          * Alexa is responding to a request with speech.
          */
-        SPEAKING
+        SPEAKING,
+
+        /**
+         * Alexa has finished processing a single Speak directive. If the 
+         * Speak directive is part of a speech burst, the state will transition
+         * back to SPEAKING; if the Speak directive was the last in the burst,
+         * the state will transition back to IDLE.
+         */
+        FINISHED
     };
 
     /**
@@ -79,8 +105,24 @@ public:
      * @note The platform implementation is responsible for providing a familiar Alexa experience for the user.
      * See the AVS UX Attention System guidelines for recommendations on communicating 
      * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
+     * 
+     * @deprecated
+     * Use dialogStateChanged(AssistantIdType id, DialogState state)
      */
     virtual void dialogStateChanged(DialogState state) {
+    }
+
+    /**
+     * Notifies the platform implementation of a dialog state change
+     *
+     * @param [in] id The id of the assistant that the dialog state change associated with
+     * @param [in] state The new dialog state
+     *
+     * @note The platform implementation is responsible for providing a familiar Alexa experience for the user.
+     * See the AVS UX Attention System guidelines for recommendations on communicating 
+     * Alexa attention states: https://developer.amazon.com/docs/alexa-voice-service/ux-design-attention.html#implement
+     */
+    virtual void dialogStateChanged(AssistantIdType id, DialogState state){
     }
 
     using AuthState = aace::alexa::AuthProviderEngineInterface::AuthState;
@@ -296,6 +338,9 @@ inline std::ostream& operator<<(std::ostream& stream, const AlexaClient::DialogS
             break;
         case AlexaClient::DialogState::SPEAKING:
             stream << "SPEAKING";
+            break;
+        case AlexaClient::DialogState::FINISHED:
+            stream << "FINISHED";
             break;
     }
     return stream;

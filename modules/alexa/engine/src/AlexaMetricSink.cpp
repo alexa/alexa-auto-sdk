@@ -91,7 +91,8 @@ void AlexaMetricSink::emitAllDatapointsMetric(
                 AACE_WARN(LX(TAG).m("Empty datapoint. Skipping record"));
             }
         }
-        metricEvent->record();
+        auto agentId = avsMetricEvent->getMetricContext().agentId;
+        metricEvent->record(std::to_string(agentId));
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }

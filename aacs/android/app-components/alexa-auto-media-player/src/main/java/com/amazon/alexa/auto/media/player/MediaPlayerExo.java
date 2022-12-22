@@ -99,17 +99,29 @@ public class MediaPlayerExo {
         return new MediaState(getPlayWhenReady(), getPlaybackState());
     }
 
+    public void addListener(Player.EventListener listener) {
+        Log.d(TAG, "addListener");
+        mMainPlayer.addListener(listener);
+    }
+
+    public void removeListener(Player.EventListener listener) {
+        Log.d(TAG, "removeListener");
+        mMainPlayer.removeListener(listener);
+    }
+
     /**
      * Prepares the Media Player for playing the given source.
      *
      * @param uri {@link Uri} of the source.
+     * @param positionMs Position in ms to start playback from
      */
-    public void prepare(Uri uri) throws Exception {
-        Log.d(TAG, "prepare with " + uri);
+    public void prepare(Uri uri, long positionMs) throws Exception {
+        Log.d(TAG, "prepare with " + uri + " and position " + positionMs);
 
         MediaSource mediaSource = mMediaSourceFactory.createHttpMediaSource(uri);
         Log.d(TAG, "mediaSource " + mediaSource.toString());
-        mMainPlayer.setMediaSource(mediaSource);
+        mMainPlayer.setPlayWhenReady(false);
+        mMainPlayer.setMediaSource(mediaSource, positionMs);
         mMainPlayer.prepare();
     }
 
@@ -225,5 +237,14 @@ public class MediaPlayerExo {
      */
     public void setRepeatMode(@Player.RepeatMode int repeatMode) {
         mMainPlayer.setRepeatMode(repeatMode);
+    }
+
+    /**
+     * Stop the player and clear its buffered and enqueued data.
+     */
+    public void stopAndFlushPlayer() {
+        Log.i(TAG, "stopAndFlushPlayer");
+        mMainPlayer.setPlayWhenReady(false);
+        mMainPlayer.stop(true);
     }
 }

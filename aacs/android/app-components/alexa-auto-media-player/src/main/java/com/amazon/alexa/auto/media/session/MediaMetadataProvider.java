@@ -16,6 +16,7 @@ package com.amazon.alexa.auto.media.session;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,6 +32,7 @@ import com.amazon.alexa.auto.aacs.common.ImageSource;
 import com.amazon.alexa.auto.aacs.common.PlaybackControl;
 import com.amazon.alexa.auto.aacs.common.RenderPlayerContent;
 import com.amazon.alexa.auto.aacs.common.RenderPlayerInfo;
+import com.amazon.alexa.auto.apps.common.util.FileUtil;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.media.Constants;
 import com.amazon.alexa.auto.media.R;
@@ -44,7 +46,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Objects;
@@ -69,6 +76,11 @@ public class MediaMetadataProvider {
     public static final String MEDIA_PROVIDER_PANDORA = "Pandora";
     public static final String MEDIA_PROVIDER_KINDLE = "Kindle Books";
     public static final String MEDIA_PROVIDER_I_HEART_RADIO = "iHeartRadio";
+
+    // Configuration file keys
+    private static final String ALBUM_ART_IMAGE_SIZE = "albumArtImageSize";
+    private static final String MEDIA_CONFIG = "mediaPlayer";
+    private static String mImageSize = null;
 
     @NonNull
     private final RequestManager mGlideRequestManager;
@@ -144,6 +156,30 @@ public class MediaMetadataProvider {
 
             emitter.setCancellable(metadataSubscription::dispose);
         });
+    }
+
+    /**
+     * Read in media player config
+     *
+     * @param source Input Stream from source files
+     * @return JSONObject to read config
+     */
+    public static JSONObject readConfig(InputStream source) {
+        JSONObject obj = null;
+        InputStream inputStream = source;
+
+        try {
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+            String json = new String(buffer, "UTF-8");
+            obj = new JSONObject(json);
+
+            if (inputStream != null)
+                inputStream.close();
+        } catch (JSONException | IOException e) {
+            Log.e(TAG, "Error while reading Media Player Config: " + e);
+        }
+        return obj;
     }
 
     /**
@@ -337,7 +373,7 @@ public class MediaMetadataProvider {
      * @param metadata Player metadata.
      * @return Album Art Url, if found.
      */
-    private static Optional<String> getAlbumArtUrl(@NonNull RenderPlayerInfo metadata) {
+    private Optional<String> getAlbumArtUrl(@NonNull RenderPlayerInfo metadata) {
         HashMap<String, String> sourceBySize = new HashMap<>();
         for (ImageSource source : metadata.getPayload().getContent().getArt().getSources()) {
             sourceBySize.put(source.getSize(), source.getUrl());
@@ -348,9 +384,34 @@ public class MediaMetadataProvider {
                 TemplateRuntimeConstants.IMAGE_SIZE_MEDIUM, TemplateRuntimeConstants.IMAGE_SIZE_SMALL,
                 TemplateRuntimeConstants.IMAGE_SIZE_XSMALL};
 
+        // Use image size from config if provided
+        if (mImageSize == null) {
+            AssetManager assetManager = mContextWk.get().getAssets();
+            try {
+                InputStream targetStream = assetManager.open(Constants.MEDIA_PLAYER_CONFIG);
+                JSONObject MediaJson = readConfig(targetStream);
+
+                try {
+                    mImageSize = MediaJson.getJSONObject(MEDIA_CONFIG).getString(ALBUM_ART_IMAGE_SIZE);
+                } catch (JSONException e) {
+                    mImageSize = sizePriority[0];
+                    Log.e(TAG, e.getMessage());
+                }
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage());
+            }
+        }
+
+        String url = sourceBySize.get(mImageSize);
+        if (url != null) {
+            Log.d(TAG, "Config album art image size: " + mImageSize);
+            return Optional.of(url);
+        }
+        // If config size is not available, use default sizes
         for (String size : sizePriority) {
-            String url = sourceBySize.get(size);
+            url = sourceBySize.get(size);
             if (url != null) {
+                Log.d(TAG, "album art image size: " + size);
                 return Optional.of(url);
             }
         }

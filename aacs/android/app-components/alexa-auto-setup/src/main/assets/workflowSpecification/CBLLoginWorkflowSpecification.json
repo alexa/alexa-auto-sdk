@@ -8,17 +8,10 @@
       }
     },
     {
-      "event": "Alexa_Not_Selected_Default",
+      "event": "Network_Disconnected",
       "next": {
         "type": "view",
-        "resource": "navigation_fragment_assistAppSelection"
-      }
-    },
-    {
-      "event": "Alexa_Is_Selected_Default",
-      "next": {
-        "type": "action",
-        "resource": "CheckLanguageCommand"
+        "resource": "navigation_fragment_network"
       }
     },
     {
@@ -26,13 +19,6 @@
       "next": {
         "type": "action",
         "resource": "CheckDrivingStatusCommand"
-      }
-    },
-    {
-      "event": "Network_Disconnected",
-      "next": {
-        "type": "view",
-        "resource": "navigation_fragment_network"
       }
     },
     {
@@ -47,6 +33,34 @@
       "next": {
         "type": "action",
         "resource": "CheckDefaultAssistAppCommand"
+      }
+    },
+    {
+      "event": "Alexa_Not_Selected_Default",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_assistAppSelection"
+      }
+    },
+    {
+      "event": "Alexa_Is_Selected_Default",
+      "next": {
+        "type": "action",
+        "resource": "CheckAACSStatusCommand"
+      }
+    },
+    {
+      "event": "AACS_Not_Connected_Event",
+      "next": {
+        "type": "view",
+        "resource": "navigation_fragment_loadingScreen"
+      }
+    },
+    {
+      "event": "AACS_Connected_Event",
+      "next": {
+        "type": "action",
+        "resource": "CheckLanguageCommand"
       }
     },
     {
@@ -73,8 +87,8 @@
     {
       "event": "Language_Selection_Is_Complete",
       "next": {
-        "type": "action",
-        "resource": "CheckLoginRequiredCommand"
+        "type": "view",
+        "resource": "navigation_fragment_login"
       }
     },
     {
@@ -121,15 +135,15 @@
     {
       "event": "Contacts_Consent_Setup_Finished",
       "next": {
-        "type": "view",
-        "resource": "navigation_fragment_cblLoginFinish"
+        "type": "action",
+        "resource": "SetupCompleteCommand"
       }
     },
     {
       "event": "Contacts_Consent_Setup_Skipped",
       "next": {
-        "type": "view",
-        "resource": "navigation_fragment_cblLoginFinish"
+        "type": "action",
+        "resource": "SetupCompleteCommand"
       }
     },
     {

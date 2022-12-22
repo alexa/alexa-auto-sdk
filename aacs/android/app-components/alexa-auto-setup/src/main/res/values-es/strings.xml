@@ -1,25 +1,22 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-     <string name="login_qr_code_message">
-         <![CDATA[
-             Ve a <font color=\'#33B5E5\'>%1$s</font> e inicia sesión. Luego introduce este código:
-         ]]>
-     </string>
+    <string name="login_qr_code_message">
+        <![CDATA[
+            Ve a <font color=\'#33B5E5\'>%1$s</font> e inicia sesión. Luego introduce este código:
+        ]]>
+    </string>
     <string name="confirm_yes_button">Sí</string>
     <string name="confirm_exit_button">Salir</string>
     <string name="settings_button">Configuración</string>
-    <string name="try_alexa_button">PROBAR ALEXA</string>
+    <string name="try_alexa_button">Probar Alexa</string>
     <string name="privacy_notice_button">Aviso de privacidad</string>
     <string name="terms_of_use_button">Términos de uso</string>
     <string name="login_action_retry_button">Volver a intentarlo</string>
-    <string name="sign_in_action_button">INICIAR SESIÓN</string>
+    <string name="sign_in_action_button">Iniciar sesión</string>
     <string name="login_later_action_button">INICIAR SESIÓN MÁS TARDE</string>
-    <string name="login_connect_to_aacs">Espera un momento mientras conectamos con AACS…</string>
     <string name="login_message">Usa la voz para sacar el máximo partido a tu trayecto. Alexa puede ayudarte con indicaciones, música, llamadas y mucho más.</string>
     <string name="enable_preview_mode_header">¿Activar Alexa sin iniciar sesión?</string>
-    <string name="enable_preview_mode_action_button">ACEPTAR Y ACTIVAR ALEXA</string>
-    <string name="enable_preview_mode_message">Podrás pedirle a Alexa información e indicaciones. Para usar las funcionalidades de música, información digital y Hogar digital, entre otras, inicia sesión.</string>
-    <string name="enable_preview_mode_disclaimer">Amazon procesa y guarda en el Cloud de Amazon las interacciones con Alexa, así como otros datos, para proporcionar y mejorar nuestros servicios. Al seleccionar Aceptar y activar Alexa, aceptas las <annotation placeholder="">Condiciones de uso</annotation> de Amazon y los términos descritos <annotation placeholder="">aquí</annotation>. \n\n<annotation placeholder=""> Descubre cómo Alexa está diseñada para proteger tu privacidad</annotation>.</string>
+    <string name="enable_preview_mode_message">Podrás seguir pidiéndole a Alexa la información del tiempo e indicaciones para llegar a tu direcciones concretas. Para pedir música, restaurantes cercanos y más, inicia sesión.</string>
     <string name="enable_preview_mode_error_message">Se ha producido un problema al activar el modo de vista previa. Vuelve a intentarlo.</string>
     <string name="login_method_or_text">O escanea este código:</string>
     <string name="login_finish_heading_text">¡Todo listo%1$s!</string>
@@ -31,14 +28,17 @@
     <string name="login_all_done_btn_text">LISTO</string>
     <string name="setting_alexa_language_title">Idioma de Alexa</string>
     <string name="select_language_action_button">SELECCIONAR IDIOMA</string>
-    <string name="select_language_body">Alexa no está disponible en %1$s. Selecciona un idioma para Alexa.</string>
-    <string name="select_language_continue_button">CONTINUAR</string>
+    <string name="select_language_body">Alexa no está disponible en %1$s.</string>
+    <string name="unsupported_country_title">Alexa no está disponible en %1$s.</string>
+    <string name="unsupported_country_body">La funcionalidad de Alexa en el vehículo no está disponible actualmente en tu región.</string>
+    <string name="unsupported_country_cta">De acuerdo</string>
+    <string name="select_language_continue_button">Continuar</string>
     <string name="setup_not_complete_header">Se ha producido un error</string>
     <string name="setup_not_complete_text">Se ha producido un problema al configurar Alexa. Vuelve a intentarlo.</string>
     <string name="setup_not_complete_text_with_alexa_custom_assistant">Se ha producido un problema en la configuración. Vuelve a intentarlo.</string>
     <string name="cbl_login_error_message">Se ha producido un problema al iniciar sesión. Vuelve a intentarlo.</string>
     <string name="setup_not_complete_retry_button">VOLVER A INTENTARLO</string>
-    <string name="skip_permission_button_text">OMITIR</string>
+    <string name="skip_permission_button_text">Omitir</string>
     <string name="back_button_text">ATRÁS</string>
     <string name="use_location_button_text">USAR UBICACIÓN</string>
     <string name="location_permission_header_text">¿Qué hay cerca de aquí?</string>
@@ -46,21 +46,28 @@
     <string name="location_permission_body_text_with_alexa_custom_assistant">Comparte la ubicación actual de tu vehículo con [Brandon] y Alexa para recibir respuestas más precisas respecto a restaurantes cercanos, el tiempo local y más.</string>
     <string name="nav_favorites_permission_header_text">Ve a tus lugares favoritos</string>
     <string name="nav_favorites_permission_body_text">Alexa puede ayudarte a ir a tus ubicaciones favoritas almacenadas en tu vehículo. Los favoritos se cargarán en el servicio de Amazon.</string>
-    <string name="consent_agree_text">ACEPTAR Y PERMITIR</string>
+    <string name="consent_agree_text">Aceptar y permitir</string>
+    <string name="use_nav_favorites_button_text">Aceptar y permitir</string>
     <string name="assist_selection_title">Configura Alexa como tu asistente predeterminado</string>
     <string name="assist_selection_in_app">Para usar Alexa, debes configurar Alexa como la app de asistente predeterminada. Así se sustituirá el asistente actual.</string>
     <string name="assist_selection_in_system_settings">Para usar Alexa, debes configurar Alexa como la app de asistente predeterminada. \n Pulsa <b>Configuración</b> a continuación y selecciona <b>App de asistente</b>, <b>Alexa</b>.</string>
     <string name="block_setup_on_drive_text">Para configurar Alexa, el vehículo debe estar aparcado.</string>
     <string name="alexa_logo_content_description">Logotipo de sonrisa de Alexa</string>
-
-    <!-- translatable="false" tag is used for things-to-try (hint) strings only. These strings need to be localized based on the country and region -->
-    <string name="cbl_login_alexa_hint1" translatable="false">\"Alexa, pon la temperatura a 22 grados\"</string>
-    <string name="cbl_login_alexa_hint2" translatable="false">\"Alexa, busca una cafetería\"</string>
-    <string name="cbl_login_alexa_hint3" translatable="false">\"Alexa, pon la música\"</string>
-    <string name="auth_provider_login_alexa_hint1" translatable="false">\"Alexa, pon la temperatura a 22 grados\"</string>
-    <string name="auth_provider_login_alexa_hint2" translatable="false">\"Alexa, guíame hasta el aeropuerto\"</string>
-    <string name="auth_provider_login_alexa_hint3" translatable="false"></string>
-    <string name="auth_provider_sign_in_hint" translatable="false">Inicia sesión para usar las funcionalidades de música, información del tiempo, Hogar digital y mucho más.</string>
-    <string name="location_permission_hint_text" translatable="false">\"Alexa, busca restaurantes cerca de aquí\"</string>
-    <string name="nav_favorites_permission_hint_text" translatable="false">\"Alexa, llévame a casa\"</string>
+    <string name="login_qr_code_url_message">
+        <![CDATA[
+            Ve a <font color=\'#0000FF\'>%1$s</font> e inicia sesión.\n Luego introduce este código:
+        ]]>
+    </string>
+    <string name="login_qr_code_message_with_code">
+        <![CDATA[
+            Ve a <font color=\'#33B5E5\'>%1$s</font> e inicia sesión. Luego introduce este código: <b>%2$s</b>
+        ]]>
+    </string>
+    <string name="login_qr_code_scan_message">O escanea el código QR que aparece a continuación.</string>
+    <string name="enable_push_to_talk_header">¿Activar Pulsa y habla para Alexa?</string>
+    <string name="enable_push_to_talk_message">Así podrás acceder a Alexa pulsando el botón de voz del volante. Se sustituirá el asistente predeterminado.</string>
+    <string name="choose_language_action_button">Seleccionar idioma</string>
+    <string name="choose_language_body">Selecciona un idioma para Alexa.</string>
+    <string name="select_a_language_body">Alexa no está disponible en %1$s.</string>
+    <string name="select_language_confirm_button">Confirmar</string>
 </resources>

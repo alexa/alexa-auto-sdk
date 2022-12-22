@@ -35,6 +35,7 @@ import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
+import com.amazon.alexa.auto.setup.BuildConfig;
 import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
 import com.amazon.alexa.auto.setup.dependencies.DaggerSetupComponent;
 import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
@@ -52,7 +53,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class LoginViewModel extends AndroidViewModel {
     private static final String TAG = LoginViewModel.class.getSimpleName();
 
-    public final static int WAIT_FOR_LOGIN_START_MS = 5000;
+    public static int WAIT_FOR_LOGIN_START_MS = 5000;
 
     private final @NonNull AuthController mAuthController;
     private final @NonNull AlexaSetupController mAlexaSetupController;
@@ -76,6 +77,10 @@ public class LoginViewModel extends AndroidViewModel {
      */
     public LoginViewModel(@NonNull Application application) {
         super(application);
+
+        if (BuildConfig.DEBUG) {
+            WAIT_FOR_LOGIN_START_MS = 30000;
+        }
 
         AlexaApp app = AlexaApp.from(application);
 
@@ -117,8 +122,6 @@ public class LoginViewModel extends AndroidViewModel {
      */
     public void startLogin() {
         Log.d(TAG, "Authorization Login Workflow starting");
-
-        mAlexaPropertyManager.updateAlexaLocaleWithPersistentConfig();
 
         if (!this.mAuthController.isAuthenticated()) {
             // Why not expose the RX stream directly to the UI instead of transforming
@@ -231,7 +234,7 @@ public class LoginViewModel extends AndroidViewModel {
          * Elapsed time is defined with WAIT_FOR_LOGIN_START_MS constant.
          */
         private void scheduleWaitForLoginStartTimer() {
-            Log.v(TAG, "Scheduling WaitForLoginStart timer.");
+            Log.v(TAG, "Scheduling WaitForLoginStart timer: " + WAIT_FOR_LOGIN_START_MS);
 
             // Reset login started flag to false by default
             mLoginStarted = false;

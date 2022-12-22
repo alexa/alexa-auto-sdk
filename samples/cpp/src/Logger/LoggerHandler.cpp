@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -78,13 +78,13 @@ std::string LoggerHandler::formatTime() {
 
     // Format string using strftime() to produce date and time in the format "YYYY-MM-DD HH:MM:SS".
     std::chrono::system_clock::time_point time = std::chrono::system_clock::now();
-    char dateTimeString[20];
+    char dateTimeString[32];
     auto timeAsTime_t = std::chrono::system_clock::to_time_t(time);
     auto timeAsTmPtr = std::gmtime(&timeAsTime_t);
     strftime(dateTimeString, sizeof(dateTimeString), "%Y-%m-%d %H:%M:%S", timeAsTmPtr);
 
     // Format string using sprintf() to produce milliseconds in the format "nnn".
-    char millisString[4];
+    char millisString[8];
     auto timeMillisPart =
         static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count() % 1000);
     std::snprintf(millisString, sizeof(millisString), "%03d", timeMillisPart);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -57,7 +57,6 @@ private:
     std::string m_applicationPath{};
     std::string m_audioInputDevice{};
     std::string m_authorizationInProgress{};
-    std::string m_browserCommand{};
     std::string m_mediaPlayerCommand{};
     std::string m_networkIdentifier{};
     std::string m_payloadScriptCommand{};
@@ -81,7 +80,6 @@ public:
     auto getApplicationDirPath() -> std::string;
     auto getApplicationPath() -> std::string;
     auto getAudioInputDevice() -> std::string;
-    auto getBrowserCommand() -> std::string;
     auto getBuildIdentifier() -> std::string;
     auto getConfigFilePath(size_t index = 0) -> std::string;
     auto getConfigFilePaths() -> std::vector<std::string>;
@@ -124,7 +122,6 @@ public:
     auto setAudioInputDevice(const std::string& audioInputDevice) -> void;
     auto setAuthorizationInProgress(const std::string& service) -> void;
     auto setAuthProviderAvailability(bool available) -> void;
-    auto setBrowserCommand(const std::string& browserCommand) -> void;
     auto setDisableAutoAuthorizationCommand(bool disable) -> void;
     auto setLevel(logger::LoggerHandler::Level level) -> void;
     auto setMediaPlayerCommand(const std::string& mediaPlayerCommand) -> void;

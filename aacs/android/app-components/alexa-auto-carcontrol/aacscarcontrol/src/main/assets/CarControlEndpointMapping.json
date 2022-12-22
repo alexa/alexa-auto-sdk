@@ -75,7 +75,7 @@
                     "instance": "windowLock",
                     "configuration": {
                         "propertyId": "WINDOW_LOCK",
-                        "areaId": "0x500",
+                        "areaId": "0x540",
                         "dataType": "boolean",
                         "supportedModes": []
                     }
@@ -84,7 +84,7 @@
         },
         {
             "endpointId": "chargedoor",
-            "areaId": "0x01000000",
+            "areaId": "0x0",
             "capabilities": [
                 {
                     "interface": "ModeController",
@@ -171,658 +171,8 @@
             ]
         },
         {
-            "endpointId": "front.vent",
-            "areaId": "0x05",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "driver.vent",
-            "areaId": "0x01",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "passenger.vent",
-            "areaId": "0x04",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "rear.driver.vent",
-            "areaId": "0x10",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "rear.passenger.vent",
-            "areaId": "0x40",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "rear.vent",
-            "areaId": "0x70",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "secondRow.vent",
-            "areaId": "0x70",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "thirdRow.vent",
-            "areaId": "0x700",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "BODY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "FLOOR",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MIX",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "0"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "WINDSHIELD",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_FAN_DIRECTION",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "default.ac",
             "areaId": "0x75",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "intensity",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "LOW",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_MAX_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_FAN_SPEED",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MEDIUM",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_MAX_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_FAN_SPEED",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "HIGH",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_MAX_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "true"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_FAN_SPEED",
-                                        "dataType": "int",
-                                        "value": "6"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "interface": "ModeController",
-                    "instance": "mode",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "ECONOMY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_AUTO_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "AUTOMATIC",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_AUTO_ON",
-                                        "dataType": "boolean",
-                                        "value": "true"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MANUAL",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_AUTO_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_AC_ON",
-                        "dataType": "boolean"
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "front.ac",
-            "areaId": "0x05",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "intensity",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "LOW",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_MAX_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_FAN_SPEED",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MEDIUM",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_MAX_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_FAN_SPEED",
-                                        "dataType": "int",
-                                        "value": "4"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "HIGH",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_MAX_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "true"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_FAN_SPEED",
-                                        "dataType": "int",
-                                        "value": "6"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "interface": "ModeController",
-                    "instance": "mode",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "ECONOMY",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_AUTO_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    },
-                                    {
-                                        "propertyId": "HVAC_AC_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "AUTOMATIC",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_AUTO_ON",
-                                        "dataType": "boolean",
-                                        "value": "true"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "MANUAL",
-                                "settings": [
-                                    {
-                                        "propertyId": "HVAC_AUTO_ON",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_AC_ON",
-                        "dataType": "boolean"
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "rear.ac",
-            "areaId": "0x70",
             "capabilities": [
                 {
                     "interface": "ModeController",
@@ -999,7 +349,7 @@
         },
         {
             "endpointId": "front.seat",
-            "areaId": "0x05",
+            "areaId": "0x01",
             "capabilities": [
                 {
                     "interface": "RangeController",
@@ -1270,210 +620,6 @@
             ]
         },
         {
-            "endpointId": "rear.seat",
-            "areaId": "0x70",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "heaterintensity",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_TEMPERATURE",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ToggleController",
-                    "instance": "heater",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_TEMPERATURE",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ToggleController",
-                    "instance": "vent",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_VENTILATION",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "ONE",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "TWO",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "THREE",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "3"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "secondRow.seat",
-            "areaId": "0x70",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "heaterintensity",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_TEMPERATURE",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ToggleController",
-                    "instance": "heater",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_TEMPERATURE",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ToggleController",
-                    "instance": "vent",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_VENTILATION",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "ONE",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "TWO",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "THREE",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "3"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "thirdRow.seat",
-            "areaId": "0x700",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "heaterintensity",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_TEMPERATURE",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ToggleController",
-                    "instance": "heater",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_TEMPERATURE",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ToggleController",
-                    "instance": "vent",
-                    "configuration": {
-                        "propertyId": "HVAC_SEAT_VENTILATION",
-                        "dataType": "int"
-                    }
-                },
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "ONE",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "1"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "TWO",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "2"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "THREE",
-                                "settings": [
-                                    {
-                                        "propertyId": "SEAT_MEMORY_SELECT",
-                                        "dataType": "int",
-                                        "value": "3"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "climatecontrol",
             "areaId": "0x75",
             "capabilities": [
@@ -1526,20 +672,6 @@
             ]
         },
         {
-            "endpointId": "default.light",
-            "areaId": "0x01000000",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "CABIN_LIGHTS_SWITCH",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "default.reading.light",
             "areaId": "0x01",
             "capabilities": [
@@ -1548,29 +680,6 @@
                     "configuration": {
                         "propertyId": "READING_LIGHTS_SWITCH",
                         "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "driver.fan",
-            "areaId": "0x01",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
                         "supportedModes": []
                     }
                 }
@@ -1621,29 +730,6 @@
             ]
         },
         {
-            "endpointId": "front.fan",
-            "areaId": "0x05",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "front.foglight",
             "areaId": "0x01000000",
             "capabilities": [
@@ -1666,21 +752,6 @@
                     "configuration": {
                         "propertyId": "READING_LIGHTS_SWITCH",
                         "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "front.window",
-            "areaId": "0x50",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "height",
-                    "configuration": {
-                        "propertyId": "WINDOW_POS",
-                        "dataType": "int",
                         "supportedModes": []
                     }
                 }
@@ -1746,29 +817,6 @@
             ]
         },
         {
-            "endpointId": "passenger.fan",
-            "areaId": "0x04",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "passenger.heater",
             "areaId": "0x04",
             "capabilities": [
@@ -1813,28 +861,6 @@
             ]
         },
         {
-            "endpointId": "rear.driver.fan",
-            "areaId": "0x10",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "rear.driver.reading.light",
             "areaId": "0x10",
             "capabilities": [
@@ -1864,29 +890,6 @@
             ]
         },
         {
-            "endpointId": "rear.fan",
-            "areaId": "0x70",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "rear.foglight",
             "areaId": "0x01000000",
             "capabilities": [
@@ -1895,29 +898,6 @@
                     "configuration": {
                         "propertyId": "FOG_LIGHTS_SWITCH",
                         "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "rear.passenger.fan",
-            "areaId": "0x40",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
                         "supportedModes": []
                     }
                 }
@@ -1954,28 +934,13 @@
         },
         {
             "endpointId": "rear.reading.light",
-            "areaId": "0x70",
+            "areaId": "0x75",
             "capabilities": [
                 {
                     "interface": "PowerController",
                     "configuration": {
                         "propertyId": "READING_LIGHTS_SWITCH",
                         "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "rear.window",
-            "areaId": "0x500",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "height",
-                    "configuration": {
-                        "propertyId": "WINDOW_POS",
-                        "dataType": "int",
                         "supportedModes": []
                     }
                 }
@@ -2012,31 +977,8 @@
             ]
         },
         {
-            "endpointId": "secondRow.fan",
-            "areaId": "0x70",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "secondRow.heater",
-            "areaId": "0x70",
+            "areaId": "0x75",
             "capabilities": [
                 {
                     "interface": "RangeController",
@@ -2051,28 +993,13 @@
         },
         {
             "endpointId": "secondRow.reading.light",
-            "areaId": "0x70",
+            "areaId": "0x75",
             "capabilities": [
                 {
                     "interface": "PowerController",
                     "configuration": {
                         "propertyId": "READING_LIGHTS_SWITCH",
                         "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "secondRow.window",
-            "areaId": "0x500",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "height",
-                    "configuration": {
-                        "propertyId": "WINDOW_POS",
-                        "dataType": "int",
                         "supportedModes": []
                     }
                 }
@@ -2109,73 +1036,6 @@
             ]
         },
         {
-            "endpointId": "thirdRow.fan",
-            "areaId": "0x700",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "HVAC_POWER_ON",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                },
-                {
-                    "interface": "RangeController",
-                    "instance": "speed",
-                    "configuration": {
-                        "propertyId": "HVAC_FAN_SPEED",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "thirdRow.heater",
-            "areaId": "0x700",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "temperature",
-                    "configuration": {
-                        "propertyId": "HVAC_TEMPERATURE_SET",
-                        "dataType": "float",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "thirdRow.reading.light",
-            "areaId": "0x700",
-            "capabilities": [
-                {
-                    "interface": "PowerController",
-                    "configuration": {
-                        "propertyId": "READING_LIGHTS_SWITCH",
-                        "dataType": "boolean",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "thirdRow.window",
-            "areaId": "0x5000",
-            "capabilities": [
-                {
-                    "interface": "RangeController",
-                    "instance": "height",
-                    "configuration": {
-                        "propertyId": "WINDOW_POS",
-                        "dataType": "int",
-                        "supportedModes": []
-                    }
-                }
-            ]
-        },
-        {
             "endpointId": "gasdoor",
             "areaId": "0x01000000",
             "capabilities": [
@@ -2199,74 +1059,6 @@
                                 "settings": [
                                     {
                                         "propertyId": "FUEL_DOOR_OPEN",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "hood",
-            "areaId": "0x10000000",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "OPEN",
-                                "settings": [
-                                    {
-                                        "propertyId": "DOOR_LOCK",
-                                        "dataType": "boolean",
-                                        "value": "true"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "CLOSED",
-                                "settings": [
-                                    {
-                                        "propertyId": "DOOR_LOCK",
-                                        "dataType": "boolean",
-                                        "value": "false"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "endpointId": "trunk",
-            "areaId": "0x20000000",
-            "capabilities": [
-                {
-                    "interface": "ModeController",
-                    "instance": "position",
-                    "configuration": {
-                        "supportedModes": [
-                            {
-                                "value": "OPEN",
-                                "settings": [
-                                    {
-                                        "propertyId": "DOOR_LOCK",
-                                        "dataType": "boolean",
-                                        "value": "true"
-                                    }
-                                ]
-                            },
-                            {
-                                "value": "CLOSED",
-                                "settings": [
-                                    {
-                                        "propertyId": "DOOR_LOCK",
                                         "dataType": "boolean",
                                         "value": "false"
                                     }

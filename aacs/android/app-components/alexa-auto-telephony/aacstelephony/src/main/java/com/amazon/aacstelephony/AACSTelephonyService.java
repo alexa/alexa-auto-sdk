@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 package com.amazon.aacstelephony;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -25,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -40,8 +40,6 @@ import com.amazon.aacsconstants.Action;
 import com.amazon.aacsconstants.TelephonyConstants;
 import com.amazon.aacsconstants.Topic;
 import com.amazon.aacsipc.AACSSender;
-import com.amazon.aacsipc.TargetComponent;
-import com.amazon.alexa.auto.aacs.common.AACSComponentRegistryUtil;
 import com.amazon.alexa.auto.aacs.common.AACSMessage;
 import com.amazon.alexa.auto.aacs.common.AACSMessageBuilder;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
@@ -51,7 +49,6 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 public class AACSTelephonyService extends Service {
@@ -62,6 +59,7 @@ public class AACSTelephonyService extends Service {
     private AACSMessageSender mAACSMessageSender;
     private PhoneCallController mPhoneCallController;
     private BluetoothStateListener mBluetoothStateListener;
+    private BluetoothMapClientReceiver mBluetoothMapClientReceiver;
 
     public AACSTelephonyService() {
         mServiceLifecycle = new ServiceLifecycle();
@@ -74,6 +72,9 @@ public class AACSTelephonyService extends Service {
         mAACSMessageSender = new AACSMessageSender(new WeakReference<>(this), new AACSSender());
         mPhoneCallController = new PhoneCallController(this, mAACSMessageSender);
         initializeBluetoothStateListener();
+        initializeBluetoothMapClientReceiver();
+        // Initialize messaging handler
+        MessagingHandler.getInstance(this);
     }
 
     @Override
@@ -100,8 +101,10 @@ public class AACSTelephonyService extends Service {
         // clean up call map
         mPhoneCallController.cleanUp();
 
-        // unregister bluetooth state listener
+        // unregister bluetooth listeners
         unregisterReceiver(mBluetoothStateListener);
+        unregisterReceiver(mBluetoothMapClientReceiver);
+
         Log.i(TAG, "AACS Telephony Service destroyed");
     }
 
@@ -237,6 +240,20 @@ public class AACSTelephonyService extends Service {
         }
     }
 
+    private void initializeBluetoothMapClientReceiver() {
+        mBluetoothMapClientReceiver = new BluetoothMapClientReceiver(getApplicationContext());
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(MessagingConstants.ACTION_MESSAGE_RECEIVED);
+        filter.addAction(MessagingConstants.ACTION_MESSAGE_SENT);
+        filter.addAction(MessagingConstants.ACTION_MESSAGE_READ_STATUS_CHANGED);
+        filter.addAction(MessagingConstants.CONNECTION_STATE_CHANGED);
+
+        // MessagingListener run on another thread
+        HandlerThread handlerThread = new HandlerThread("MessagingListener");
+        handlerThread.start();
+        this.registerReceiver(mBluetoothMapClientReceiver, filter, Manifest.permission.RECEIVE_SMS, null);
+    }
+
     private void initializeBluetoothStateListener() {
         mBluetoothStateListener = new BluetoothStateListener(mAACSMessageSender);
         IntentFilter filter = new IntentFilter();
@@ -244,6 +261,7 @@ public class AACSTelephonyService extends Service {
         filter.addAction(Constants.ACTION_BLUETOOTH_PBAP_CLIENT_STATE_CHANGED);
         filter.addAction(Constants.ACTION_BLUETOOTH_HFP_CLIENT_STATE_CHANGED);
         filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        filter.addAction(MessagingConstants.ACTION_MESSAGE_RECEIVED);
 
         // BluetoothStateListener run on another thread
         HandlerThread handlerThread = new HandlerThread("BluetoothStateListener");

@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 32
     defaultConfig {
-        minSdkVersion 26
-        versionCode 1
-        versionName "4.1.1"
+        minSdkVersion 27
+        targetSdkVersion 27
+        versionCode Integer.parseInt(new Date().format("yyyyMMdd"))
+        versionName "4.2"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     buildTypes {
@@ -44,6 +45,8 @@ android {
 
 dependencies {
     implementation project(path: ':aacs-annotation-api')
+    implementation project(path: ':alexa-auto-voice-ui')
+    implementation project(path: ':alexa-auto-voice-ui')
     annotationProcessor project(path: ':aacs-annotation-processor')
     implementation project(path: ':aacscommonutils')
     implementation project(path: ':aacsconstants')

@@ -27,7 +27,7 @@
         android:layout_weight="1">
 
         <TextView android:id="@android:id/title"
-            style="@style/Alexa.TitleText"
+            style="?attr/headerText"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/settings_pref_item_min_height"
             android:gravity="center_vertical"

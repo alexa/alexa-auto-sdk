@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@ namespace aace {
 namespace engine {
 namespace navigation {
 
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+using NamespaceAndName = alexaClientSDK::avsCommon::avs::NamespaceAndName;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationCapabilityAgent");
 
@@ -34,22 +37,19 @@ static const std::string TAG("aace.navigation.NavigationCapabilityAgent");
 static const std::string NAMESPACE{"Navigation"};
 
 /// The StartNavigation directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName START_NAVIGATION{NAMESPACE, "StartNavigation"};
+static const NamespaceAndName START_NAVIGATION{NAMESPACE, "StartNavigation", AgentId::AGENT_ID_ALL};
 
 /// The ShowPreviousWaypoints directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName SHOW_PREVIOUS_WAYPOINTS{NAMESPACE,
-                                                                                      "ShowPreviousWaypoints"};
+static const NamespaceAndName SHOW_PREVIOUS_WAYPOINTS{NAMESPACE,"ShowPreviousWaypoints", AgentId::AGENT_ID_ALL};
 
 /// The NavigateToPreviousWaypoint directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName NAVIGATE_TO_PREVIOUS_WAYPOINT{
-    NAMESPACE,
-    "NavigateToPreviousWaypoint"};
+static const NamespaceAndName NAVIGATE_TO_PREVIOUS_WAYPOINT{NAMESPACE, "NavigateToPreviousWaypoint", AgentId::AGENT_ID_ALL};
 
 /// The CancelNavigation directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName CANCEL_NAVIGATION{NAMESPACE, "CancelNavigation"};
+static const NamespaceAndName CANCEL_NAVIGATION{NAMESPACE, "CancelNavigation", AgentId::AGENT_ID_ALL};
 
 /// The NavigationState context signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName NAVIGATION_STATE{NAMESPACE, "NavigationState"};
+static const NamespaceAndName NAVIGATION_STATE{NAMESPACE, "NavigationState", AgentId::AGENT_ID_ALL};
 
 /// Navigation capability constants
 /// Navigation interface type
@@ -255,32 +255,36 @@ void NavigationCapabilityAgent::handleStartNavigationDirective( std::shared_ptr<
         return;
     }
 
-    m_executor.submit([this, info]() {
-        m_navigationHandler->startNavigation( info->directive->getPayload() );
+    auto agentId = info->directive->getAgentId();
+    m_executor.submit([this, info, agentId]() {
+        m_navigationHandler->startNavigation(agentId, info->directive->getPayload());
         setHandlingCompleted( info );
     });
 }
 
 void NavigationCapabilityAgent::handleShowPreviousWaypointsDirective( std::shared_ptr<DirectiveInfo> info )
 {
-    m_executor.submit([this, info]() {
-        m_navigationHandler->showPreviousWaypoints();
+    auto agentId = info->directive->getAgentId();
+    m_executor.submit([this, info, agentId]() {
+        m_navigationHandler->showPreviousWaypoints(agentId);
         setHandlingCompleted( info );
     });
 }
 
 void NavigationCapabilityAgent::handleNavigateToPreviousWaypointDirective( std::shared_ptr<DirectiveInfo> info )
 {
-    m_executor.submit([this, info]() {
-        m_navigationHandler->navigateToPreviousWaypoint();
+    auto agentId = info->directive->getAgentId();
+    m_executor.submit([this, info, agentId]() {
+        m_navigationHandler->navigateToPreviousWaypoint(agentId);
         setHandlingCompleted( info );
     });
 }
 
 void NavigationCapabilityAgent::handleCancelNavigationDirective( std::shared_ptr<DirectiveInfo> info )
 {
-    m_executor.submit([this, info]() {
-        m_navigationHandler->cancelNavigation();
+    auto agentId = info->directive->getAgentId();
+    m_executor.submit([this, info, agentId]() {
+        m_navigationHandler->cancelNavigation(agentId);
         setHandlingCompleted( info );
     });
 }
@@ -300,35 +304,36 @@ void NavigationCapabilityAgent::handleUnknownDirective( std::shared_ptr<Directiv
     });
 }
 
-void NavigationCapabilityAgent::provideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken ) {
+void NavigationCapabilityAgent::provideState( const NamespaceAndName& stateProviderName, const unsigned int stateRequestToken ) {
      m_executor.submit( [this, stateProviderName, stateRequestToken] {
         executeProvideState( stateProviderName, stateRequestToken );
     });
 }
 
-void NavigationCapabilityAgent::navigationEvent( aace::navigation::NavigationEngineInterface::EventName event )
+void NavigationCapabilityAgent::navigationEvent( AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::EventName event )
 {
-    m_executor.submit( [this, event] {
-        executeNavigationEvent( event );
+    m_executor.submit( [this, agentId, event] {
+        executeNavigationEvent( agentId, event );
     });
 }
 
-void NavigationCapabilityAgent::navigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description )
+void NavigationCapabilityAgent::navigationError( AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description )
 {
-    m_executor.submit( [this, type, code, description] {
-        executeNavigationError( type, code, description );
+    m_executor.submit( [this, agentId, type, code, description] {
+        executeNavigationError( agentId, type, code, description );
     });
 }
 
-void NavigationCapabilityAgent::executeProvideState( const alexaClientSDK::avsCommon::avs::NamespaceAndName& stateProviderName, const unsigned int stateRequestToken )
+void NavigationCapabilityAgent::executeProvideState( const NamespaceAndName& stateProviderName, const unsigned int stateRequestToken )
 {
     try
     {
         ThrowIfNull( m_contextManager, "contextManagerIsNull" );
         bool payloadChanged = false;
         std::string payload;
+        auto agentId = stateProviderName.getAgentId();
 
-        payload = m_navigationHandler->getNavigationState();
+        payload = m_navigationHandler->getNavigationState(agentId);
 
         if( payload.empty() && m_navigationStatePayload.compare(DEFAULT_NAVIGATION_STATE_PAYLOAD) != 0 ) {
             payload = DEFAULT_NAVIGATION_STATE_PAYLOAD;
@@ -352,17 +357,17 @@ void NavigationCapabilityAgent::executeProvideState( const alexaClientSDK::avsCo
     }
 }
 
-void NavigationCapabilityAgent::executeNavigationEvent( aace::navigation::NavigationEngineInterface::EventName event )
+void NavigationCapabilityAgent::executeNavigationEvent( AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::EventName event )
 {
     switch( event ){
         case aace::navigation::NavigationEngineInterface::EventName::NAVIGATION_STARTED:
-            startNavigationSuccess();
+            startNavigationSuccess(agentId);
             break;
         case aace::navigation::NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN:
-            showPreviousWaypointsSuccess();
+            showPreviousWaypointsSuccess(agentId);
             break;
         case aace::navigation::NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED:
-            navigateToPreviousWaypointSuccess();
+            navigateToPreviousWaypointSuccess(agentId);
             break;
         default:
             AACE_ERROR(LX(TAG).d("reason","invalidEventType"));
@@ -370,21 +375,21 @@ void NavigationCapabilityAgent::executeNavigationEvent( aace::navigation::Naviga
     }
 }
 
-void NavigationCapabilityAgent::executeNavigationError( aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description )
+void NavigationCapabilityAgent::executeNavigationError( AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::ErrorType type, aace::navigation::NavigationEngineInterface::ErrorCode code, const std::string& description )
 {
     std::string errorCode;
     switch( type ) {
         case aace::navigation::NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED :
             errorCode = getNavigationErrorCode( code );
-            startNavigationError( errorCode, description );
+            startNavigationError( agentId, errorCode, description );
             break;
         case aace::navigation::NavigationEngineInterface::ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED:
             errorCode = getWaypointErrorCode( code );
-            showPreviousWaypointsError( errorCode, description );
+            showPreviousWaypointsError( agentId, errorCode, description );
             break;
         case aace::navigation::NavigationEngineInterface::ErrorType::PREVIOUS_NAVIGATION_START_FAILED:
             errorCode = getWaypointErrorCode( code );
-            navigateToPreviousWaypointError( errorCode, description );
+            navigateToPreviousWaypointError( agentId, errorCode, description );
             break;
         default:
             AACE_ERROR(LX(TAG).d("reason","invalidErrorType"));
@@ -422,9 +427,9 @@ std::string NavigationCapabilityAgent::getWaypointErrorCode( aace::navigation::N
 // Navigation success event handling
 //
 
-void NavigationCapabilityAgent::startNavigationSuccess() {
+void NavigationCapabilityAgent::startNavigationSuccess(AgentId::IdType agentId) {
     std::string navigationState;
-    navigationState = m_navigationHandler->getNavigationState();
+    navigationState = m_navigationHandler->getNavigationState(agentId);
     rapidjson::Document context( rapidjson::kObjectType );
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
@@ -451,11 +456,11 @@ void NavigationCapabilityAgent::startNavigationSuccess() {
     rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
     ThrowIfNot(payload.Accept( writer ), "failedToWriteJsonDocument" );
     auto navEvent = buildJsonEventString( START_NAVIGATION_SUCCESS, "", buffer.GetString() );
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( navEvent.second );
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId,  navEvent.second);
     m_messageSender->sendMessage( request );
 }
 
-void NavigationCapabilityAgent::showPreviousWaypointsSuccess()
+void NavigationCapabilityAgent::showPreviousWaypointsSuccess(AgentId::IdType agentId)
 {
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::StringBuffer buffer;
@@ -463,14 +468,14 @@ void NavigationCapabilityAgent::showPreviousWaypointsSuccess()
     ThrowIfNot(payload.Accept( writer ), "failedToWriteJsonDocument" );
 
     auto navEvent = buildJsonEventString( SHOW_PREVIOUS_WAYPOINTS_SUCCESS, "", buffer.GetString() );
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( navEvent.second );
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId,  navEvent.second);
     m_messageSender->sendMessage( request );
 }
 
-void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess()
+void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess(AgentId::IdType agentId)
 {
     std::string navigationState;
-    navigationState = m_navigationHandler->getNavigationState();
+    navigationState = m_navigationHandler->getNavigationState(agentId);
     rapidjson::Document context( rapidjson::kObjectType );
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
@@ -489,7 +494,7 @@ void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess()
     ThrowIfNot(payload.Accept( writer ), "failedToWriteJsonDocument" );
 
     auto navEvent = buildJsonEventString( NAVIGATE_TO_PREVIOUS_WAYPOINTS_SUCCESS, "", buffer.GetString() );
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( navEvent.second );
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId,  navEvent.second);
     m_messageSender->sendMessage( request );
 }
 
@@ -497,7 +502,7 @@ void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess()
 // Navigation fail event handling
 //
 
-void NavigationCapabilityAgent::startNavigationError( std::string code, std::string description)
+void NavigationCapabilityAgent::startNavigationError( AgentId::IdType agentId, std::string code, std::string description)
 {
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
@@ -510,11 +515,11 @@ void NavigationCapabilityAgent::startNavigationError( std::string code, std::str
     ThrowIfNot(payload.Accept( writer ), "failedToWriteJsonDocument" );
 
     auto navEvent = buildJsonEventString( START_NAVIGATION_ERROR, "", buffer.GetString() );
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( navEvent.second );
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId,  navEvent.second);
     m_messageSender->sendMessage( request );
 }
 
-void NavigationCapabilityAgent::navigateToPreviousWaypointError( std::string code, std::string description )
+void NavigationCapabilityAgent::navigateToPreviousWaypointError( AgentId::IdType agentId, std::string code, std::string description )
 {
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
@@ -526,11 +531,11 @@ void NavigationCapabilityAgent::navigateToPreviousWaypointError( std::string cod
     ThrowIfNot(payload.Accept( writer ), "failedToWriteJsonDocument" );
 
     auto navEvent = buildJsonEventString( NAVIGATE_TO_PREVIOUS_WAYPOINT_ERROR, "", buffer.GetString() );
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( navEvent.second );
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId,  navEvent.second);
     m_messageSender->sendMessage( request );
 }
 
-void NavigationCapabilityAgent::showPreviousWaypointsError( std::string code, std::string description )
+void NavigationCapabilityAgent::showPreviousWaypointsError( AgentId::IdType agentId, std::string code, std::string description )
 {
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
@@ -542,7 +547,7 @@ void NavigationCapabilityAgent::showPreviousWaypointsError( std::string code, st
     ThrowIfNot(payload.Accept( writer ), "failedToWriteJsonDocument" );
 
     auto navEvent = buildJsonEventString( SHOW_PREVIOUS_WAYPOINTS_ERROR, "", buffer.GetString() );
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>( navEvent.second );
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId,  navEvent.second);
     m_messageSender->sendMessage( request );
 }
 

@@ -86,6 +86,19 @@ public:
     int64_t getPlayerDuration();
 
     /**
+     * Sets the Alexa @c AudioPlayer interface as the foreground player the user sees on screen. This function is useful 
+     * for scenarios in which the user played an @c AudioPlayer media source, then played a different Alexa-aware
+     * @c ExternalMediaPlayer media source, such as a deep-linked media app or a local media source, and then manually
+     * returned visual activity to the Alexa @c AudioPlayer GUI. Calling this function ensures the next VUI command or
+     * GUI interaction with the playback control buttons acts on the @c AudioPlayer source rather than the more recently
+     * played @c ExternalMediaPlayer source.
+     *
+     * @note The @c AudioPlayer had to be previously playing at least once during this Engine cycle in order for this 
+     * function to make Alexa act on @c AudioPlayer.
+     */
+    void setAsForegroundActivity();
+
+    /**
      * @internal
      * Sets the Engine interface delegate.
      *

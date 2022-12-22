@@ -11,24 +11,6 @@ data class MediaState(
     val playWhenReady: Boolean,
     val playbackState: Int) {
 
-    /**
-     * Maps the MediaState to AACS Audio Output playback state.
-     *
-     * @return State mapped to AACS Audio output playback state.
-     */
-    fun toAACSMediaState() : String {
-        when (playbackState) {
-            Player.STATE_IDLE, Player.STATE_ENDED -> return MediaConstants.MediaState.STOPPED
-            Player.STATE_BUFFERING -> return MediaConstants.MediaState.BUFFERING
-            Player.STATE_READY -> return if (playWhenReady) {
-                MediaConstants.MediaState.PLAYING
-            } else {
-                MediaConstants.MediaState.STOPPED
-            }
-        }
-        return MediaConstants.MediaState.STOPPED
-    }
-
     fun toMediaSessionState() : Int {
         return when (playbackState) {
             Player.STATE_BUFFERING ->
@@ -42,7 +24,7 @@ data class MediaState(
                 else
                     PlaybackStateCompat.STATE_PAUSED
             Player.STATE_ENDED -> PlaybackStateCompat.STATE_PAUSED
-            Player.STATE_IDLE -> PlaybackStateCompat.STATE_PAUSED
+            Player.STATE_IDLE -> PlaybackStateCompat.STATE_NONE
             else -> PlaybackStateCompat.STATE_PAUSED
         }
     }
@@ -53,7 +35,7 @@ data class MediaState(
      */
     fun isPlaybackStopped() : Boolean {
         when(playbackState) {
-            Player.STATE_IDLE, Player.STATE_ENDED -> return !playWhenReady
+            Player.STATE_IDLE, Player.STATE_ENDED, Player.STATE_READY -> return !playWhenReady
             else -> return false
         }
     }

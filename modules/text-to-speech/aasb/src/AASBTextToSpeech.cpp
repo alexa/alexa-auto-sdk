@@ -106,7 +106,7 @@ void AASBTextToSpeech::prepareSpeechCompleted(
         ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
 
         auto m_streamManager_lock = m_streamManager.lock();
-        ThrowIfNull(m_streamManager_lock, "invalidstreamManagerReference");
+        ThrowIfNull(m_streamManager_lock, "invalidStreamManagerReference");
 
         // generate a unique stream id
         auto streamId = aace::engine::utils::uuid::generateUUID();

@@ -48,26 +48,6 @@ TEST_F(AlexaConfigurationImplTest, createDeviceInfoConfigBestCase) {
     EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
 }
 
-TEST_F(AlexaConfigurationImplTest, createAlertsConfigBestCase) {
-    std::string expectedConfigStr =
-        "{\n"
-        "    \"aace.alexa\": {\n"
-        "        \"avsDeviceSDK\": {\n"
-        "            \"alertsCapabilityAgent\": {\n"
-        "                \"databaseFilePath\": \"DATABASE_PATH\"\n"
-        "            }\n"
-        "        }\n"
-        "    }\n"
-        "}";
-
-    auto config = aace::alexa::config::AlexaConfiguration::createAlertsConfig("DATABASE_PATH");
-
-    //Convert to ostringstream for comparing the istream
-    std::ostringstream configStr;
-    configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
-}
-
 TEST_F(AlexaConfigurationImplTest, createNotificationsConfigBestCase) {
     std::string expectedConfigStr =
         "{\n"

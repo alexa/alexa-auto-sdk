@@ -28,6 +28,8 @@ namespace engine {
 namespace navigation {
 namespace navigationassistance {
 
+using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationAssistanceCapabilityAgent");
 
@@ -35,11 +37,11 @@ static const std::string TAG("aace.navigation.NavigationAssistanceCapabilityAgen
 static const std::string NAMESPACE{"Navigation.Assistance"};
 
 /// The AnnounceManeuver directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANNOUNCE_MANEUVER{NAMESPACE, "AnnounceManeuver"};
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANNOUNCE_MANEUVER{NAMESPACE, "AnnounceManeuver", AgentId::AGENT_ID_ALL};
 
 /// The AnnounceRoadRegulation directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANNOUNCE_ROAD_REGULATION{NAMESPACE,
-                                                                                       "AnnounceRoadRegulation"};
+                                                                                       "AnnounceRoadRegulation", AgentId::AGENT_ID_ALL};
 
 /// Navigation Assistance capability constants
 /// Navigation Assistance  interface type
@@ -232,6 +234,9 @@ void NavigationAssistanceCapabilityAgent::handleAnnounceManeuverDirective(std::s
     m_executor.submit([this, info, payload]() {
         m_navigationHandler->announceManeuver(payload);
         setHandlingCompleted(info);
+        auto agentId = info->directive->getAgentId();
+        AACE_DEBUG(LX(TAG).d("agentId", agentId));
+        setEventAgentByDirective(info->directive->getName(), agentId);
     });
 }
 
@@ -271,6 +276,9 @@ void NavigationAssistanceCapabilityAgent::handleAnnounceRoadRegulationDirective(
     m_executor.submit([this, info, roadRegulation]() {
         m_navigationHandler->announceRoadRegulation(roadRegulation);
         setHandlingCompleted(info);
+        auto agentId = info->directive->getAgentId();
+        AACE_DEBUG(LX(TAG).d("agentId", agentId));
+        setEventAgentByDirective(info->directive->getName(), agentId);
     });
 }
 
@@ -462,7 +470,9 @@ void NavigationAssistanceCapabilityAgent::announceManeuverSucceeded(std::string 
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_MANEUVER_SUCCEEDED, "", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(navEvent.second);
+    auto agentId = getEventAgent(ANNOUNCE_MANEUVER_SUCCEEDED);
+    AACE_DEBUG(LX(TAG).d("agentId", agentId));
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
 
@@ -481,7 +491,9 @@ void NavigationAssistanceCapabilityAgent::announceManeuverFailed(
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_MANEUVER_FAILED, "", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(navEvent.second);
+    auto agentId = getEventAgent(ANNOUNCE_MANEUVER_FAILED);
+    AACE_DEBUG(LX(TAG).d("agentId", agentId));
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
 
@@ -495,7 +507,8 @@ void NavigationAssistanceCapabilityAgent::announceRoadRegulationSucceeded(std::s
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_ROAD_REGULATION_SUCCEEDED, "", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(navEvent.second);
+    auto agentId = getEventAgent(ANNOUNCE_ROAD_REGULATION_SUCCEEDED);
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
 
@@ -514,13 +527,36 @@ void NavigationAssistanceCapabilityAgent::announceRoadRegulationFailed(
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_ROAD_REGULATION_FAILED, "", buffer.GetString());
-    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(navEvent.second);
+    auto agentId = getEventAgent(ANNOUNCE_ROAD_REGULATION_FAILED);
+    auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
 
 std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
 NavigationAssistanceCapabilityAgent::getCapabilityConfigurations() {
     return m_capabilityConfigurations;
+}
+
+void NavigationAssistanceCapabilityAgent::setEventAgentByDirective(
+    const std::string& directiveName, 
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId) {
+    if (directiveName == ANNOUNCE_MANEUVER.name) {
+        m_eventAgentMap[ANNOUNCE_MANEUVER_SUCCEEDED] = agentId;
+        m_eventAgentMap[ANNOUNCE_MANEUVER_FAILED] = agentId;
+    } else if (directiveName == ANNOUNCE_ROAD_REGULATION.name) {
+        m_eventAgentMap[ANNOUNCE_ROAD_REGULATION_SUCCEEDED] = agentId;
+        m_eventAgentMap[ANNOUNCE_ROAD_REGULATION_FAILED] = agentId;
+    } else {
+        AACE_WARN(LX(TAG).d("Directive name not found", directiveName));
+    }
+}
+
+alexaClientSDK::avsCommon::avs::AgentId::IdType NavigationAssistanceCapabilityAgent::getEventAgent(const std::string& eventName) {
+    if (m_eventAgentMap.find(eventName) != m_eventAgentMap.end()) {
+        return m_eventAgentMap[eventName];
+    }
+    AACE_INFO(LX(TAG).m("No agent is specified for the event. Sending the event to all agents."));
+    return AgentId::AGENT_ID_NONE;
 }
 
 }  // namespace navigationassistance

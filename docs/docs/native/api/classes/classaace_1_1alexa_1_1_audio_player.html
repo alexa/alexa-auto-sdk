@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">4.1.1</span>
+   &#160;<span id="projectnumber">4.2</span>
    </div>
   </td>
  </tr>
@@ -87,6 +87,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aa2b61c4887d9bca905914559b23fcf38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79508257fa720e5fe633c5b76c0ff911"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_audio_player.html#a79508257fa720e5fe633c5b76c0ff911">getPlayerDuration</a> ()</td></tr>
 <tr class="separator:a79508257fa720e5fe633c5b76c0ff911"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a787cfe51e230d79fbca4306e9a5b89c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1_audio_player.html#a787cfe51e230d79fbca4306e9a5b89c9">setAsForegroundActivity</a> ()</td></tr>
+<tr class="separator:a787cfe51e230d79fbca4306e9a5b89c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -102,7 +104,7 @@ Static Public Attributes</h2></td></tr>
 <a class="el" href="classaace_1_1alexa_1_1_playback_controller.html">PlaybackController</a> </dd>
 <dd>
 <a class="el" href="classaace_1_1alexa_1_1_template_runtime.html#a216ae3f6aa681cd2b5abead91eb17e49">TemplateRuntime::renderPlayerInfo()</a></dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000011">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
+<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000012">Deprecated:</a></b></dt><dd>This platform interface is deprecated. Use the Alexa Auto Services Bridge (AASB) message broker to publish and subscribe to AASB messages instead. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classaace_1_1core_1_1_message_broker.html">aace::core::MessageBroker</a> </dd></dl>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="afb9cdf00184a4e792b2207583145ef34"></a>
@@ -192,6 +194,25 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a787cfe51e230d79fbca4306e9a5b89c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a787cfe51e230d79fbca4306e9a5b89c9">&#9670;&nbsp;</a></span>setAsForegroundActivity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void aace::alexa::AudioPlayer::setAsForegroundActivity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Sets the Alexa <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> interface as the foreground player the user sees on screen. This function is useful for scenarios in which the user played an <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> media source, then played a different Alexa-aware <code>ExternalMediaPlayer</code> media source, such as a deep-linked media app or a local media source, and then manually returned visual activity to the Alexa <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> GUI. Calling this function ensures the next VUI command or GUI interaction with the playback control buttons acts on the <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> source rather than the more recently played <code>ExternalMediaPlayer</code> source.</p>
+<dl class="section note"><dt>Note</dt><dd>The <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code> had to be previously playing at least once during this Engine cycle in order for this function to make Alexa act on <code><a class="el" href="classaace_1_1alexa_1_1_audio_player.html">AudioPlayer</a></code>. </dd></dl>
+
+</div>
+</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a1dfdec2432e3caf9dc5f92d95aa231f1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1dfdec2432e3caf9dc5f92d95aa231f1">&#9670;&nbsp;</a></span>TIME_UNKNOWN</h2>
@@ -221,7 +242,7 @@ Static Public Attributes</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 4.1.1 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.2 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

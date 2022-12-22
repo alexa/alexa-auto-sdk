@@ -70,6 +70,10 @@ public class ConnectedBTDeviceRepository {
         return connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedDeviceByAddress(deviceAddress);
     }
 
+    public LiveData<ConnectedBTDevice> getConnectedBTDeviceByAddress(String deviceAddress) {
+        return connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedBTDeviceByAddressLive(deviceAddress);
+    }
+
     public void setConnectedDeviceToPrimary(String deviceAddress) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -83,12 +87,17 @@ public class ConnectedBTDeviceRepository {
                     connectedBTDevice.setDeviceAddress(previousRecord.getDeviceAddress());
                     connectedBTDevice.setDeviceName(previousRecord.getDeviceName());
                     connectedBTDevice.setContactsUploadPermission(previousRecord.getContactsUploadPermission());
-                    String permission = btDeviceDatabase.btDeviceDao()
-                                                .getBTDeviceByAddressSync(deviceAddress)
-                                                .getContactsUploadPermission();
+                    connectedBTDevice.setMessagingPermission(previousRecord.getMessagingPermission());
+                    String contactUploadPermission = btDeviceDatabase.btDeviceDao()
+                                                             .getBTDeviceByAddressSync(deviceAddress)
+                                                             .getContactsUploadPermission();
+                    String messagingPermission = btDeviceDatabase.btDeviceDao()
+                                                         .getBTDeviceByAddressSync(deviceAddress)
+                                                         .getMessagingPermission();
                     Log.i(TAG, "Inserting bt connected device entry: " + connectedBTDevice.getDeviceAddress());
                     connectedBTDeviceDatabase.connectedBTDeviceDao().insertConnectedBTDevice(connectedBTDevice);
-                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(connectedBTDevice, false, permission));
+                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(
+                            connectedBTDevice, false, contactUploadPermission, messagingPermission));
                 }
                 return null;
             }
@@ -111,15 +120,17 @@ public class ConnectedBTDeviceRepository {
                     isNewDevice = false;
                 }
 
-                BTDevice btDevice = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(device.getDeviceAddress());
-                String permission = btDevice.getContactsUploadPermission();
+                String contactUploadPermission = device.getContactsUploadPermission();
+                String messagingPermission = device.getMessagingPermission();
                 ConnectedBTDevice connectedBTDevice = new ConnectedBTDevice();
-                connectedBTDevice.setDeviceAddress(btDevice.getDeviceAddress());
-                connectedBTDevice.setDeviceName(btDevice.getDeviceName());
-                connectedBTDevice.setContactsUploadPermission(btDevice.getContactsUploadPermission());
+                connectedBTDevice.setDeviceAddress(device.getDeviceAddress());
+                connectedBTDevice.setDeviceName(device.getDeviceName());
+                connectedBTDevice.setContactsUploadPermission(device.getContactsUploadPermission());
+                connectedBTDevice.setMessagingPermission(device.getMessagingPermission());
                 Log.i(TAG, "Inserting bt connected device entry: " + connectedBTDevice.getDeviceAddress());
                 connectedBTDeviceDatabase.connectedBTDeviceDao().insertConnectedBTDevice(connectedBTDevice);
-                EventBus.getDefault().post(new PrimaryPhoneChangeMessage(connectedBTDevice, isNewDevice, permission));
+                EventBus.getDefault().post(new PrimaryPhoneChangeMessage(
+                        connectedBTDevice, isNewDevice, contactUploadPermission, messagingPermission));
                 return null;
             }
         }.execute();
@@ -135,12 +146,24 @@ public class ConnectedBTDeviceRepository {
                     int index = listData.size() - 1;
                     BTDevice btDevice = btDeviceDatabase.btDeviceDao().getBTDeviceByAddressSync(
                             listData.get(index).getDeviceAddress());
-                    String permission = btDevice.getContactsUploadPermission();
-                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(listData.get(index), false, permission));
+                    String contactUploadPermission = btDevice.getContactsUploadPermission();
+                    String messagingPermission = btDevice.getMessagingPermission();
+                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(
+                            listData.get(index), false, contactUploadPermission, messagingPermission));
                 } else {
-                    EventBus.getDefault().post(
-                            new PrimaryPhoneChangeMessage(null, false, Constants.CONTACTS_PERMISSION_NO));
+                    EventBus.getDefault().post(new PrimaryPhoneChangeMessage(
+                            null, false, Constants.CONTACTS_PERMISSION_NO, Constants.CONTACTS_PERMISSION_NO));
                 }
+                return null;
+            }
+        }.execute();
+    }
+
+    public void nukeTable(){
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                connectedBTDeviceDatabase.connectedBTDeviceDao().nukeTable();
                 return null;
             }
         }.execute();
@@ -154,6 +177,23 @@ public class ConnectedBTDeviceRepository {
                         connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedDeviceByAddress(deviceAddress);
                 if (device != null) {
                     device.setContactsUploadPermission(permission);
+                    connectedBTDeviceDatabase.connectedBTDeviceDao().updateConnectedBTDevice(device);
+                } else {
+                    Log.e(TAG, "Device not found in ConnectedBTDeviceRepository");
+                }
+                return null;
+            }
+        }.execute();
+    }
+
+    public void updateMessagingPermission(final String deviceAddress, final String permission) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                ConnectedBTDevice device =
+                        connectedBTDeviceDatabase.connectedBTDeviceDao().getConnectedDeviceByAddress(deviceAddress);
+                if (device != null) {
+                    device.setMessagingPermission(permission);
                     connectedBTDeviceDatabase.connectedBTDeviceDao().updateConnectedBTDevice(device);
                 } else {
                     Log.e(TAG, "Device not found in ConnectedBTDeviceRepository");
@@ -213,10 +253,13 @@ public class ConnectedBTDeviceRepository {
         private ConnectedBTDevice device;
         private boolean isNewDevice;
         private String contactsPermission;
-        public PrimaryPhoneChangeMessage(ConnectedBTDevice device, boolean newDevice, String contactsPermission) {
+        private String messagingPermission;
+        public PrimaryPhoneChangeMessage(
+                ConnectedBTDevice device, boolean newDevice, String contactsPermission, String messagingPermission) {
             this.isNewDevice = newDevice;
             this.device = device;
             this.contactsPermission = contactsPermission;
+            this.messagingPermission = messagingPermission;
         }
         public ConnectedBTDevice getConnectedBTDevice() {
             return this.device;
@@ -226,6 +269,9 @@ public class ConnectedBTDeviceRepository {
         }
         public String getContactsPermission() {
             return this.contactsPermission;
+        }
+        public String getMessagingPermission() {
+            return this.messagingPermission;
         }
     }
 }

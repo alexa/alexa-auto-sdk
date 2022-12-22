@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout for a Preference in a PreferenceActivity. The
+     Preference is able to place a specific widget for its particular
+     type in the "widget_frame" layout. -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="25dp"
+    android:layout_marginEnd="25dp"
+    android:orientation="vertical"
+    android:background="?android:attr/selectableItemBackground"
+    android:paddingEnd="?android:attr/scrollbarSize"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    >
+
+
+    <TextView
+        android:id="@+id/title"
+        style="?attr/headerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="marquee"
+        android:fadingEdge="horizontal"
+        android:singleLine="true"
+        android:text="@string/sms_consent_title"
+        android:layout_marginStart="@dimen/margin_horizontal_double"
+        android:layout_marginTop="@dimen/margin_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@android:id/summary"
+        style="?attr/bodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/title"
+        android:layout_alignStart="@android:id/title"
+        android:maxLines="4"
+        android:text="@string/sms_consent_summary"
+        android:layout_marginBottom="@dimen/margin_vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/widget"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/title"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        />
+
+
+    <!-- Preference should place its actual preference widget here. -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/widget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/title"
+        app:layout_constraintTop_toTopOf="@+id/title"
+        app:layout_constraintVertical_bias="0.5">
+        <LinearLayout
+            android:id="@android:id/widget_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

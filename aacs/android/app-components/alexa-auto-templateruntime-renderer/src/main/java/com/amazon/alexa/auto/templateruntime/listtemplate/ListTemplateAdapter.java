@@ -14,12 +14,16 @@
  */
 package com.amazon.alexa.auto.templateruntime.listtemplate;
 
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Guideline;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amazon.alexa.auto.aacs.common.ListTemplate;
@@ -29,8 +33,7 @@ import java.util.Comparator;
 
 public class ListTemplateAdapter extends RecyclerView.Adapter<ListTemplateAdapter.ViewHolder> {
     private final ListTemplate mListTemplate;
-    private static int MAX_ITEM_COUNT = 10;
-    private int maxCharsLeftTextField;
+    private final int maxCharsLeftTextField;
 
     public ListTemplateAdapter(ListTemplate listTemplate) {
         this.mListTemplate = listTemplate;
@@ -59,22 +62,36 @@ public class ListTemplateAdapter extends RecyclerView.Adapter<ListTemplateAdapte
 
     @Override
     public int getItemCount() {
-        return ((mListTemplate.getListItems().size() <= MAX_ITEM_COUNT) ? mListTemplate.getListItems().size()
-                                                                        : MAX_ITEM_COUNT);
+        int MAX_ITEM_COUNT = 10;
+        return (Math.min(mListTemplate.getListItems().size(), MAX_ITEM_COUNT));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView leftTextField;
         public TextView rightTextField;
-
+        public float textSize;
+        public float percent;
         public ViewHolder(View view, int leftTextFieldMaxChars) {
             super(view);
 
-            leftTextField = (TextView) view.findViewById(R.id.leftTextField);
-            leftTextField.setWidth((int) (leftTextFieldMaxChars
-                    * (view.getResources().getDimensionPixelSize(R.dimen.list_template_card_list_item_textSize)
-                            / view.getResources().getDisplayMetrics().density)));
-            rightTextField = (TextView) view.findViewById(R.id.rightTextField);
+            leftTextField = view.findViewById(R.id.leftTextField);
+            textSize = leftTextField.getTextSize()*leftTextFieldMaxChars;
+
+            DisplayMetrics displayMetrics = view.getResources().getDisplayMetrics();
+            float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+            if(dpWidth<1550) {
+                percent = textSize/dpWidth;
+            } else {
+                percent = textSize/dpWidth* (float)1.5;
+            }
+
+            Guideline guideLine = (Guideline) view.findViewById(R.id.guideline);
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) guideLine.getLayoutParams();
+            params.guidePercent = percent;
+            guideLine.setLayoutParams(params);
+
+            rightTextField = view.findViewById(R.id.rightTextField);
         }
     }
 }

@@ -29,8 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
  * Adds circular page indicators at the bottom of view
  */
 public class CirclePageIndicatorDecoration extends RecyclerView.ItemDecoration {
-    private final int colorActive = 0xFFFFFFFF;
-    private final int colorInactive = 0x66FFFFFF;
 
     private static final float DP = Resources.getSystem().getDisplayMetrics().density;
 
@@ -38,11 +36,6 @@ public class CirclePageIndicatorDecoration extends RecyclerView.ItemDecoration {
      * Height of the space the indicator takes up at the bottom of the view.
      */
     private final int mIndicatorHeight = (int) (DP * 16);
-
-    /**
-     * Indicator stroke width.
-     */
-    private final float mIndicatorStrokeWidth = DP * 8;
 
     /**
      * Indicator width.
@@ -61,6 +54,10 @@ public class CirclePageIndicatorDecoration extends RecyclerView.ItemDecoration {
     private final Paint mPaint = new Paint();
 
     public CirclePageIndicatorDecoration() {
+        /**
+         * Indicator stroke width.
+         */
+        float mIndicatorStrokeWidth = DP * 8;
         mPaint.setStrokeWidth(mIndicatorStrokeWidth);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setAntiAlias(true);
@@ -79,7 +76,7 @@ public class CirclePageIndicatorDecoration extends RecyclerView.ItemDecoration {
         float indicatorStartX = (parent.getWidth() - indicatorTotalWidth) / 2F;
 
         // center vertically in the allotted space
-        float indicatorPosY = parent.getHeight() - mIndicatorHeight / 2F;
+        float indicatorPosY = parent.getHeight() - mIndicatorHeight / 2F - (20 * DP);
 
         drawInactiveIndicators(c, indicatorStartX, indicatorPosY, itemCount);
 
@@ -104,6 +101,7 @@ public class CirclePageIndicatorDecoration extends RecyclerView.ItemDecoration {
     }
 
     private void drawInactiveIndicators(Canvas c, float indicatorStartX, float indicatorPosY, int itemCount) {
+        int colorInactive = 0x66FFFFFF;
         mPaint.setColor(colorInactive);
 
         // width of item indicator including padding
@@ -119,22 +117,18 @@ public class CirclePageIndicatorDecoration extends RecyclerView.ItemDecoration {
 
     private void drawHighlights(
             Canvas c, float indicatorStartX, float indicatorPosY, int highlightPosition, float progress) {
+        int colorActive = 0xFFFFFFFF;
         mPaint.setColor(colorActive);
 
         // width of item indicator including padding
         final float itemWidth = mIndicatorItemLength + mIndicatorItemPadding;
-
+        float highlightStart = indicatorStartX + itemWidth * highlightPosition;
         if (progress == 0F) {
             // no swipe, draw a normal indicator
-            float highlightStart = indicatorStartX + itemWidth * highlightPosition;
-
             c.drawCircle(highlightStart, indicatorPosY, mIndicatorItemLength / 2F, mPaint);
-
         } else {
-            float highlightStart = indicatorStartX + itemWidth * highlightPosition;
             // calculate partial highlight
             float partialLength = mIndicatorItemLength * progress + mIndicatorItemPadding * progress;
-
             c.drawCircle(highlightStart + partialLength, indicatorPosY, mIndicatorItemLength / 2F, mPaint);
         }
     }

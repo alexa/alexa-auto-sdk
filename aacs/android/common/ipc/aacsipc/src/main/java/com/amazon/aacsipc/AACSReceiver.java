@@ -338,8 +338,15 @@ public class AACSReceiver {
             Log.e(TAG, "IPC: mFetchStreamCallback is null.  Unable to call fetch handler");
             return;
         }
+
+        if (!bundle.containsKey(IPCConstants.AACS_IPC_BYTES_WRITTEN)) {
+            Log.e(TAG, "IPC: bytesWritten is missing. Unable to call fetch handler");
+            return;
+        }
+        final long bytesWritten = bundle.getLong(IPCConstants.AACS_IPC_BYTES_WRITTEN);
+
         Log.d(TAG, "IPC: receiver handleCancelFetch. Calling onStreamFetchCancelled()");
-        mFetchStreamCallback.onStreamFetchCancelled(streamId);
+        mFetchStreamCallback.onStreamFetchCancelled(streamId, bytesWritten);
     }
 
     private void handlePush(Bundle bundle) {
@@ -399,8 +406,22 @@ public class AACSReceiver {
     public interface MessageReceivedCallback { void onMessageReceived(String message); }
 
     public interface FetchStreamCallback {
+        /**
+         * Start writing to the ParcelFileDescriptor.AutoCloseOutputStream
+         * associated with the given streamId
+         *
+         * @param streamId Associated to the Stream to start streaming data to.
+         * @param writePipe Write pipe associated with the audio stream
+         */
         void onStreamRequested(String streamId, ParcelFileDescriptor writePipe);
-        void onStreamFetchCancelled(String streamId);
+        /**
+         * Stop writing to the ParcelFileDescriptor.AutoCloseOutputStream
+         * associated with the given streamId
+         *
+         * @param streamId Associated to the Stream to stop streaming data to.
+         * @param bytesWritten Total number of bytes successfully written to AutoSDK relative to the start of AudioInputMessageHandler. -1 if the number of bytes cannot be determined.
+         */
+        void onStreamFetchCancelled(String streamId, long bytesWritten);
     }
 
     public interface StreamPushedFromSenderCallback {

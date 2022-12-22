@@ -29,6 +29,7 @@
 #include <AVSCommon/SDKInterfaces/MessageRequestObserverInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+#include <acsdk/MultiAgentInterface/AgentManagerInterface.h>
 
 #include <AVSCommon/Utils/UUIDGeneration/UUIDGeneration.h>
 #include "CustomDomainHandlerInterface.h"
@@ -41,6 +42,7 @@ class CustomDomainCapabilityAgent
         : public alexaClientSDK::avsCommon::avs::CapabilityAgent
         , public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::MessageRequestObserverInterface
+        , public alexaClientSDK::multiAgentInterface::observer::AgentEnablementObserverInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<CustomDomainCapabilityAgent> {
 public:
@@ -59,6 +61,7 @@ public:
      * @param exceptionSender Interface to report exceptions to AVS.
      * @param contextManager Interface to provide custom state to AVS.
      * @param messageSender Interface to send events to AVS.
+     * @param agentManager The agent manager.
      * @return A new instance of @c CustomDomainCapabilityAgent on success, @c nullptr otherwise.
      */
     static std::shared_ptr<CustomDomainCapabilityAgent> create(
@@ -68,7 +71,8 @@ public:
         std::shared_ptr<CustomDomainHandlerInterface> customDomainHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager = nullptr);
 
     /// @name CapabilityAgent Functions
     /// @{
@@ -83,6 +87,12 @@ public:
     /// @{
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
     getCapabilityConfigurations() override;
+    /// @}
+
+    /// @name AgentEnablementObserverInterface Functions
+    /// @{
+    void onEnabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) override;
+    void onDisabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) override;
     /// @}
 
     /// @name RequiresShutdown method
@@ -159,7 +169,8 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<CustomDomainHandlerInterface> customDomainHandler,
         const std::string& interfaceNamespace,
-        const std::string& interfaceVersion);
+        const std::string& interfaceVersion,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager);
 
     /**
      * Initialize capability configuration & set provider for the states.
@@ -223,6 +234,9 @@ private:
     /// The version of the interface
     const std::string m_interfaceVersion;
 
+    /// The agent manager
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> m_agentManager;
+
     /** 
      * Maps CapabilityTag (representing a state name) to the corresponding state.
      */
@@ -258,6 +272,11 @@ private:
 
     /// Vector of the state names this interface reports in its context
     std::unordered_set<alexaClientSDK::avsCommon::avs::NamespaceAndName> m_states;
+
+    /// Enabled agents
+    std::unordered_set<alexaClientSDK::avsCommon::avs::AgentId::IdType> m_enabledAgentIds;
+
+    std::mutex m_mutex;
 };
 
 }  // namespace customDomain

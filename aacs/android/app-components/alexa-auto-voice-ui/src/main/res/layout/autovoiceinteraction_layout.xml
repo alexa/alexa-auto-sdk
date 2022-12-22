@@ -1,26 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/auto_voice_interaction_view_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/auto_padding_bottom"
     android:orientation="vertical"
-    android:background="@android:color/transparent">
+    android:background="@android:color/transparent"
+    android:fitsSystemWindows="true"
+    >
 
     <LinearLayout
         android:id="@+id/auto_voice_interaction_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:fitsSystemWindows="true"
+        >
+
+    </LinearLayout>
 
     <LinearLayout
+        android:fitsSystemWindows="true"
         android:id="@+id/auto_voice_chrome_bar_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/voice_chrome_bar_height"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/auto_voice_interaction_view"
+        app:layout_constraintTop_toTopOf="@+id/guideline0"
+        tools:ignore="MissingConstraints" />
 
     <!--  Layout for custom animation will be inserted here  -->
 
-</RelativeLayout>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.98" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

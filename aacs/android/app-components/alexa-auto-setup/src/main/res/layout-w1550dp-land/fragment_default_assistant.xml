@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_start_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:orientation="horizontal"
+    tools:background="@drawable/gradient_background">
+
+    <!--Next guidelines describe the default margins that the visible elements are constrained to-->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/header_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.3372" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/header_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4106" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/body_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4215" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/body_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4949" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/body_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.2511" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/body_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7489" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/buttons_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5901" />
+
+    <TextView
+        android:id="@+id/headerText"
+        style="?attr/headerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/assist_selection_title"
+        app:layout_constraintBottom_toBottomOf="@id/header_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/header_top" />
+
+    <TextView
+        android:id="@+id/bodyText"
+        style="?attr/bodyText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/assist_selection_in_app"
+        app:layout_constraintBottom_toBottomOf="@id/body_bottom"
+        app:layout_constraintEnd_toEndOf="@id/body_end"
+        app:layout_constraintStart_toStartOf="@id/body_start"
+        app:layout_constraintTop_toTopOf="@id/body_top" />
+
+    <TextView
+        android:id="@+id/exit_button"
+        style="?attr/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:paddingLeft="40dp"
+        android:paddingTop="20dp"
+        android:paddingRight="40dp"
+        android:paddingBottom="20dp"
+        android:text="@string/confirm_exit_button"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toStartOf="@id/yes_button"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttons_top" />
+
+    <TextView
+        android:id="@+id/yes_button"
+        style="?attr/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="40dp"
+        android:paddingTop="20dp"
+        android:paddingRight="40dp"
+        android:paddingBottom="20dp"
+        android:text="@string/confirm_yes_button"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/exit_button"
+        app:layout_constraintTop_toTopOf="@id/buttons_top" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

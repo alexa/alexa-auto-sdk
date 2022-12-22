@@ -106,39 +106,6 @@ public class AlexaPropertyManager {
         return updateAlexaProperty(propName, String.valueOf(value));
     }
 
-    /**
-     * Update Alexa locale with the persistent locale config.
-     * Persistent Alexa locale is preferable to use if it exists, otherwise, use persistent system locale.
-     */
-    public void updateAlexaLocaleWithPersistentConfig() {
-        Context context = mContextWk.get();
-        Preconditions.checkNotNull(context);
-
-        String alexaLocale = LocaleUtil.getPersistentAlexaLocale(context);
-
-        String systemLocale = LocaleUtil.getPersistentSystemLocale(context);
-        if (systemLocale.isEmpty()) {
-            systemLocale = LocaleUtil.getCurrentDeviceLocale(context);
-        }
-
-        String locale;
-        if (!alexaLocale.isEmpty())
-            locale = alexaLocale;
-        else
-            locale = systemLocale;
-
-        Log.d(TAG, "Updating Alexa locale with persistent locale config " + locale);
-        updateAlexaProperty(AACSPropertyConstants.LOCALE, locale).subscribe((succeeded) -> {
-            if (!succeeded) {
-                Log.w(TAG, "Failed to update locale");
-            } else {
-                Log.d(TAG, "Locale changed. Updating things to try local cache.");
-                FeatureDiscoveryUtil.checkNetworkAndPublishGetFeaturesMessage(context,
-                        FeatureDiscoveryUtil.SUPPORTED_DOMAINS, FeatureDiscoveryConstants.EventType.THINGS_TO_TRY);
-            }
-        });
-    }
-
     private Optional<String> getAlexaPropertySync(String name) {
         try (Cursor cursor = mContextWk.get().getContentResolver().query(mUri, null, name, null, null)) {
             if (cursor != null) {

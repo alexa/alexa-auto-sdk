@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <nlohmann/json.hpp>
 #include <regex>
 
+#include <AVSCommon/AVS/AgentId.h>
 #include <AVSCommon/SDKInterfaces/test/MockContextManager.h>
 #include <AVSCommon/SDKInterfaces/test/MockExceptionEncounteredSender.h>
 #include <AVSCommon/SDKInterfaces/test/MockMessageSender.h>
@@ -355,7 +356,7 @@ static const alexaClientSDK::avsCommon::avs::NamespaceAndName REDIAL{NAMESPACE, 
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANSWER{NAMESPACE, "Answer"};
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName STOP{NAMESPACE, "Stop"};
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName SENDDTMF{NAMESPACE, "SendDTMF"};
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName PCC_STATE{NAMESPACE, "PhoneCallControllerState"};
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName PCC_STATE{NAMESPACE, "PhoneCallControllerState", alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL};
 
 static const std::string MESSAGE_ID("messageId");
 

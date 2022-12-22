@@ -15,7 +15,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include <AASB/Engine/Alexa/AASBAlerts.h>
 #include <AASB/Engine/Alexa/AASBAlexaClient.h>
 #include <AASB/Engine/Alexa/AASBAlexaSpeaker.h>
 #include <AASB/Engine/Alexa/AASBAlexaEngineService.h>
@@ -58,7 +57,7 @@ AASBAlexaEngineService::AASBAlexaEngineService(const aace::engine::core::Service
         aace::engine::messageBroker::MessageHandlerEngineService(
             description,
             minRequiredVersion,
-            {"Alerts",
+            {
              "AlexaClient",
              "AlexaSpeaker",
              "AudioPlayer",
@@ -134,13 +133,6 @@ bool AASBAlexaEngineService::postRegister() {
 
         // get the service context
         auto context = getContext();
-
-        // Alerts
-        if (isInterfaceEnabled("Alerts")) {
-            auto alerts = AASBAlerts::create(aasbServiceInterface->getMessageBroker());
-            ThrowIfNull(alerts, "invalidAlertsHandler");
-            context->registerPlatformInterface(alerts);
-        }
 
         // AlexaClient
         if (isInterfaceEnabled("AlexaClient")) {

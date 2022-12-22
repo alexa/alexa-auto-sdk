@@ -14,6 +14,7 @@
  */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +24,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.amazon.alexa.auto.apps.common.util.LocaleUtil;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaLocalesProvider;
 import com.amazon.alexa.auto.setup.R;
 import com.amazon.alexa.auto.setup.dependencies.AndroidModule;
@@ -62,7 +63,7 @@ public class LanguageSelectionFragment extends Fragment {
         mShowContinueButton.putBoolean("showContinueButton", true);
 
         DaggerSetupComponent.builder()
-                .androidModule(new AndroidModule(getContext()))
+                .androidModule(new AndroidModule(requireContext()))
                 .build()
                 .injectLanguageSettingsFragment(this);
     }
@@ -75,16 +76,11 @@ public class LanguageSelectionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
         View fragmentView = requireView();
         mController = findNavController(fragmentView);
 
-        String currentLocale = LocaleUtil.getCurrentDeviceLocaleDisplayName(getContext());
+        String currentLocale = Resources.getSystem().getConfiguration().getLocales().get(0).getDisplayName();
         TextView languageSelectionBodyText = fragmentView.findViewById(R.id.language_selection_body_text_view);
         String format = getResources().getString(R.string.select_language_body);
         String bodyString = String.format(format, currentLocale);
@@ -93,7 +89,7 @@ public class LanguageSelectionFragment extends Fragment {
         TextView getStartedButtonText = fragmentView.findViewById(R.id.select_language_action_button);
 
         getStartedButtonText.setOnClickListener(
-                view -> { mController.navigate(R.id.navigation_fragment_languageSelection, mShowContinueButton); });
+                btn -> { mController.navigate(R.id.navigation_fragment_languageSelection, mShowContinueButton); });
     }
 
     @VisibleForTesting

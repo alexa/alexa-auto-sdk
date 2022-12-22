@@ -1,4 +1,4 @@
-# Using the IPC Library with AACS
+# AACS IPC Library
 
 ## Overview
 The IPC (inter-process communication) library implements the IPC protocol required for communications between an HMI (human-machine interface) application
@@ -96,7 +96,7 @@ mAACSSender.fetch(streamId, fetchCallback, target, context);
 ```
 
 
-**AACS fetching data from OEM application** - If the default audio input platform handler is enabled and an external audio stream source is used, when AACS receives a `StartAudioInput` or `StopAudioInput` message, it sends an IPC fetch request or an IPC cancel fetch request. This request fetches or cancels fetching the audio input stream from the application. The application must implement `AACSReceiver.FetchStreamCallback`, provide the write pipe associated with the audio stream in `onStreamRequested(String streamId, ParcelFileDescriptor writePipe)` method, and stop providing the stream in `onStreamFetchCancelled(String streamId)` method, as shown in the following example:
+**AACS fetching data from OEM application** - If the default audio input platform handler is enabled and an external audio stream source is used, when AACS receives a `StartAudioInput` or `StopAudioInput` message, it sends an IPC fetch request or an IPC cancel fetch request. This request fetches or cancels fetching the audio input stream from the application. The application must implement `AACSReceiver.FetchStreamCallback`, provide the write pipe associated with the audio stream in `onStreamRequested(String streamId, ParcelFileDescriptor writePipe)` method, and stop providing the stream in `onStreamFetchCancelled(String streamId, long bytesWritten)` method, as shown in the following example:
 
 ~~~java
         AACSReceiver.FetchStreamCallback aasbFetchCallback = new AACSReceiver.FetchStreamCallback() {
@@ -111,9 +111,10 @@ mAACSSender.fetch(streamId, fetchCallback, target, context);
             }
 
             @Override
-            public void onStreamFetchCancelled(String streamId) {
+            public void onStreamFetchCancelled(String streamId, long bytesWritten) {
                 // Stop writing to the ParcelFileDescriptor.AutoCloseOutputStream 
                 // associated with the given streamId
+                // bytesWritten is the total number of bytes successfully written to AutoSDK relative to the start of AudioInputMessageHandler
             }
         }
 ~~~
@@ -209,6 +210,6 @@ on the service, activity, or broadcast receiver in the app to forward intents to
         setIntent(intent);
 
         // Intents that are sent by AACS should be received here.
-        mAACSReceiver.receiveMessage(intent);
+        mAACSReceiver.receive(intent, null);
     }
 ```

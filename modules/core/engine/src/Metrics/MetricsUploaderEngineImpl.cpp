@@ -25,6 +25,7 @@ namespace engine {
 namespace metrics {
 
 const std::string MetricsUploaderEngineImpl::METRIC_RECORD_KEYWORD = "MetricEvent";
+const std::string MetricsUploaderEngineImpl::CONTEXT_KEY = "Context";
 const std::string MetricsUploaderEngineImpl::PRIORITY_KEY = "Priority";
 const std::string MetricsUploaderEngineImpl::PROGRAM_KEY = "Program";
 const std::string MetricsUploaderEngineImpl::SOURCE_KEY = "Source";
@@ -44,10 +45,10 @@ static const std::regex bufferRegex(":(BF|NB)");
 static const std::regex uniqueRegex(":(NUNI|UNIQ)");
 
 // Helper function to parse metric header for programName and sourceName
-size_t parseHeader(const std::string& metric, std::string& programName, std::string& sourceName) {
+size_t parseHeader(const std::string& metric, std::string& context, std::string& programName, std::string& sourceName) {
     size_t pos = 0;
 
-    for (int count = 0; count < 3; count++) {
+    for (int count = 0; count < 4; count++) {
         auto next = metric.find(":", pos);
         if (next == std::string::npos) return std::string::npos;
         auto field = metric.substr(pos, next - pos);
@@ -55,9 +56,12 @@ size_t parseHeader(const std::string& metric, std::string& programName, std::str
         //Extract Program and source name
         switch (count) {
             case 1:
-                programName = field;
+                context = field;
                 break;
             case 2:
+                programName = field;
+                break;
+            case 3:
                 sourceName = field;
                 break;
         }
@@ -126,10 +130,11 @@ void MetricsUploaderEngineImpl::log(
             return;
         }
 
-        //Parse program, source, datapoints to record metric
+        //Parse context, program, source, datapoints to record metric
+        std::string context;
         std::string programName;
         std::string sourceName;
-        size_t dataPointSepPos = parseHeader(logMessage, programName, sourceName);
+        size_t dataPointSepPos = parseHeader(logMessage, context, programName, sourceName);
         if (dataPointSepPos == std::string::npos) {
             return;
         }
@@ -154,13 +159,14 @@ void MetricsUploaderEngineImpl::log(
             std::string priority = logMessage.substr(logMessage.size() - 10, 2);
 
             //Validate values are not empty/null
-            if (programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty() ||
+            if (context.empty() || programName.empty() || sourceName.empty() || datapoints.empty() || priority.empty() ||
                 identityType.empty() || bufferType.empty()) {
                 return;
             }
 
             //Create metadata map
             std::unordered_map<std::string, std::string> metadata;
+            metadata[CONTEXT_KEY] = context;
             metadata[PROGRAM_KEY] = programName;
             metadata[SOURCE_KEY] = sourceName;
             metadata[PRIORITY_KEY] = priority;

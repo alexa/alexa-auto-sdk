@@ -1,0 +1,143 @@
+topic: Arbitrator
+namespace: aasb.message.arbitrator.arbitrator
+path: Arbitrator/Arbitrator
+
+messages:
+  - action: RegisterAgent
+    direction: incoming
+    desc: Register an agent with the Engine.
+    payload:
+      - name: assistantId
+        type: string
+        desc: A unique identifier of agent to register.
+      - name: name
+        type: string
+        desc: A name of agent that is registered.        
+      - name: dialogStateRules
+        type: list:DialogStateRule
+        desc: List of dialog state rules for the agent.
+    reply:
+      - name: success
+        type: bool
+        desc: True if agent was successfully registered, False otherwise. 
+
+  - action: DeregisterAgent
+    direction: incoming
+    desc: Deregister an agent with the Engine.
+    payload:
+      - name: assistantId
+        type: string
+        desc: A unique identifier of agent to deregister.
+    reply:
+      - name: success
+        type: bool
+        desc: True if agent was successfully deregistered, False otherwise. 
+
+  - action: StartDialog
+    direction: incoming
+    desc: Start a dialog request to become the active agent. A dialog represents the lifecycle of user interaction with the agent.
+    payload:
+      - name: assistantId
+        type: string
+        desc: A unique identifier of agent for whom the dialog is requested.
+      - name: mode
+        type: Mode
+        desc: The mode of dialog request.        
+    reply:
+      - name: success
+        type: bool
+        desc: True if dialog was started, False otherwise.     
+      - name: assistantId
+        type: string
+        desc: A unique identifier of agent for whom the dialog is requested.
+      - name: dialogId
+        type: string
+        desc: The unique identifier generated for the started dialog, 
+              returned if the dialog was started, empty otherwise                   
+      - name: reason
+        type: string
+        desc: The reason for the dialog not started, returned if request was denied, empty otherwise. 
+              This field is informational and is used only for logging purpose.                     
+
+  - action: SetDialogState
+    direction: incoming
+    desc: Notifies Engine to set the dialog state for the specified agent.
+    payload:
+      - name: assistantId
+        type: string
+        desc: The unique identifier of agent whose dialog state should be set.
+      - name: dialogId
+        type: string
+        desc: The unique identifier of dialog whose state should be set. 
+              This refers to the same Id that was returned when the dialog was started.        
+      - name: state
+        type: string
+        desc: The new state to set to.     
+
+  - action: StopDialog
+    direction: incoming
+    desc: Notifies Engine to stop the dialog state for the specified agent. 
+          Stopping the dialog results in the agent becoming INACTIVE. 
+          This triggers the Engine to send the OnAgentStateUpdated message.
+    payload:
+      - name: assistantId
+        type: string
+        desc: The unique identifier of agent whose dialog should be stopped.
+      - name: dialogId
+        type: string
+        desc: The unique identifier of dialog to stop.        
+
+  - action: OnAgentStateUpdated
+    direction: outgoing
+    desc: Notifies platform of an update to the agent state.
+    payload:
+      - name: assistantId
+        type: string
+        desc: The unique identifier of agent whose state is updated.
+      - name: name
+        type: string
+        desc: The name of agent whose state is updated.        
+      - name: state
+        type: AgentState
+        desc: The updated state.     
+
+  - action: OnDialogTerminated
+    direction: outgoing
+    desc: Notifies platform that the dialog is terminated for the agent.
+    payload:
+      - name: assistantId
+        type: string
+        desc: The unique identifier of agent whose dialog is terminated.
+      - name: dialogId
+        type: string
+        desc: The unique identifier of dialog request that is terminated.      
+      - name: reason
+        type: string
+        desc: The reason for terminating the dialog.                                                 
+
+types:
+  - name: DialogStateRule
+    type: struct
+    values:
+      - name: state
+        type: string
+        desc: Name of the dialog state
+      - name: wakewordInterruptionAllowed
+        type: bool
+        desc: Whether interruption (barge in) via wakeword allowed for this state
+
+  - name: Mode
+    type: enum
+    values:
+      - name: WAKEWORD
+        desc: Dialog request is through wakeword.
+      - name: GESTURE
+        desc: Dialog request is through gesture (PTT, TTT, etc).    
+
+  - name: AgentState
+    type: enum
+    values:
+      - name: ACTIVE
+        desc: Denotes agent is active.
+      - name: INACTIVE
+        desc: Denotes agent is inactive.             

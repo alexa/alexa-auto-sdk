@@ -1,7 +1,7 @@
-From cf7c0c54df12fe851ebb2f78b8eacc8da472f2d2 Mon Sep 17 00:00:00 2001
+From e36d1f32d2221bbaa192b9734525d65fb00fa61e Mon Sep 17 00:00:00 2001
 From: Eze Cervantes <ezeqc@amazon.com>
 Date: Thu, 9 Sep 2021 16:43:12 -0700
-Subject: [PATCH] Disable GUI
+Subject: [PATCH 04/14] Disable GUI
 
 ---
  modules/CMakeLists.txt | 4 ++--
@@ -21,5 +21,5 @@ index 45145b6..fde1e54 100644
 +  # add_subdirectory("GUI")
 +endif()
 -- 
-2.30.1 (Apple Git-130)
+2.36.0
 

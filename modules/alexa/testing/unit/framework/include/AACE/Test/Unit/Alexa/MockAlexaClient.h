@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ namespace alexa {
 class MockAlexaClient : public aace::alexa::AlexaClient {
 public:
     MOCK_METHOD1(dialogStateChanged, void(aace::alexa::AlexaClient::DialogState state));
+    MOCK_METHOD2(dialogStateChanged, void(aace::alexa::AssistantIdType id, aace::alexa::AlexaClient::DialogState state));
     MOCK_METHOD2(authStateChanged, void(aace::alexa::AlexaClient::AuthState, aace::alexa::AlexaClient::AuthError));
     MOCK_METHOD2(
         connectionStatusChanged,

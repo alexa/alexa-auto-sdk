@@ -2,4 +2,14 @@
 <resources>
     <string name="aacs_telephony_description">Dar acceso a la funcionalidad de llamadas de tu dispositivo Android</string>
     <string name="aacs_telephony_title">Servicio de telefonía AACS</string>
+
+    <string name="comms_toast_contacts_syncing">Sincronizando contactos de %1$s…</string>
+    <string name="comms_toast_contacts_synced">Contactos de %1$s sincronizados</string>
+    <string name="comms_toast_contacts_removing">Eliminando contactos del servicio de Amazon…</string>
+    <string name="comms_toast_contacts_removed">Contactos eliminados del servicio de Amazon</string>
+
+    <string name="aacs_telephony_toast_sms_syncing">Sincronizando mensajes SMS de %1$s…</string>
+    <string name="aacs_telephony_toast_sms_synced">Mensajes SMS de %1$s sincronizados</string>
+    <string name="aacs_telephony_toast_sms_removing">Eliminando mensajes SMS del servicio de Amazon…</string>
+    <string name="aacs_telephony_toast_sms_removed">Mensajes SMS eliminados del servicio de Amazon</string>
 </resources>

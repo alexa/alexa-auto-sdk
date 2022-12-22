@@ -2,4 +2,14 @@
 <resources>
     <string name="aacs_telephony_description">Providing phone calling functionality on your Android device</string>
     <string name="aacs_telephony_title">AACS Telephony Service</string>
+
+    <string name="comms_toast_contacts_syncing">Syncing contacts from %1$s…</string>
+    <string name="comms_toast_contacts_synced">Contacts from %1$s synced</string>
+    <string name="comms_toast_contacts_removing">Removing contacts from the Amazon service…</string>
+    <string name="comms_toast_contacts_removed">Contacts removed from the Amazon service</string>
+
+    <string name="aacs_telephony_toast_sms_syncing">Syncing SMS messages from %1$s…</string>
+    <string name="aacs_telephony_toast_sms_synced">SMS messages from %1$s synced</string>
+    <string name="aacs_telephony_toast_sms_removing">Removing SMS messages from the Amazon service…</string>
+    <string name="aacs_telephony_toast_sms_removed">SMS messages removed from the Amazon service</string>
 </resources>

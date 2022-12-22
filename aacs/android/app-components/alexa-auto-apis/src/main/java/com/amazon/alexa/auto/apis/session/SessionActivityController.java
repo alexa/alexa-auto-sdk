@@ -37,6 +37,11 @@ public interface SessionActivityController extends ScopedComponent {
     void removeFragment();
 
     /**
+     * Mark the current fragment as consumed but not invalidating/removing it.
+     */
+    void consumeFragment();
+
+    /**
      * Get voice fragment which is added into voice session activity.
      * @return voice fragment
      */
@@ -47,6 +52,12 @@ public interface SessionActivityController extends ScopedComponent {
      * @return true if added
      */
     boolean isFragmentAdded();
+
+    /**
+     * Check if the voice fragment has been consumed.
+     * @return true if consumed
+     */
+    boolean isFragmentConsumed();
 
     /**
      * Gets an observable that tells us if a voice fragment is inflated.

@@ -1,4 +1,4 @@
-#  Configuration Reference for AACS (Alexa Auto Client Service)
+#  AACS Configuration Reference
 
 ## Overview
 This document explains the various fields of the AACS configuration. The AACS configuration is similar to the Auto SDK configuration, with a few additional fields unique to AACS.
@@ -289,7 +289,7 @@ type must be handled in your application.
 (Followed with detailed `localMediaSourceMetadata` JSON array configuration if set `true`)
 
 Set to `true` to enable the default `LocalMediaSource` platform implementation to configure local media sources. By default `useDefaultLocalMediaSource` is treated `false` so if not included in the config file or set to `false` explicitly, please define `localMediaSource` JSON array in the `aacs.alexa` node to enable AASB LocalMediaSource messages to be delivered to your application.
-Refer the following sample configuration for the `useDefaultLocalMediaSource`.
+Refer to the following sample configuration for the `useDefaultLocalMediaSource`.
 ~~~
     "useDefaultLocalMediaSource" : true,
     "localMediaSourceMetadata": [
@@ -352,16 +352,14 @@ Refer the following sample configuration for the `useDefaultLocalMediaSource`.
     ]
 ~~~
 `sourceType` Specifies the available local media sources. Possible values are `BLUETOOTH`, `USB`, `FM_RADIO`, `AM_RADIO`, `SATELLITE_RADIO`, 
-`LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`, and `DEFAULT`. The `DEFAULT` source provides the facility to support all the media sources which are not listed in the given list.
+`LINE_IN`, `COMPACT_DISC`, `SIRIUS_XM`, `DAB`, and `DEFAULT`. The `DEFAULT` source provides the facility to support generic VUI transport controls for any additional active media source not deep-linked to Alexa already.
 
->**Note:** This feature uses [NotificationListenerService](https://developer.android.com/reference/android/service/notification/NotificationListenerService) to monitor active sessions, provide [BIND_NOTIFICATION_LISTENER_SERVICE permission](https://developer.android.com/reference/android/Manifest.permission#BIND_NOTIFICATION_LISTENER_SERVICE) to the application which includes AACS AAR to support the default local media source handling. If access is not provided, AACS would ignore the `"useDefaultLocalMediaSource" : true` configuration. This access is generally given by enabling the application with AACS AAR in `Settings >> Apps >> Special Access >> Notification access`.
+>**Important!:** Local media source control uses privileged permission [`MEDIA_CONTENT_CONTROL`](https://developer.android.com/reference/android/Manifest.permission#MEDIA_CONTENT_CONTROL) in order to access `android.media.session.MediaSessionManagerMediaSessionManager`. Ensure the AACS app is [allowlisted](https://source.android.com/docs/core/permissions/perms-allowlist) for this permission to be granted by Android at install time prior to installing the application on the device. 
+If the AACS app cannot be allowlisted for `MEDIA_CONTENT_CONTROL` but can be signed with the system key, you can remove `<uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />` from the AACS  `AndroidManifest.xml` and replace the permission with [`BIND_NOTIFICATION_LISTENER_SERVICE`](https://developer.android.com/reference/android/Manifest.permission#BIND_NOTIFICATION_LISTENER_SERVICE) instead *and* grant notification access to the `NotificationListenerService` of AACS at install time; E.g., `adb shell cmd notification allow_listener com.amazon.alexa.auto.app/com.amazon.alexaautoclientservice.NotificationListener`. However, it is strongly recommended to use the default behavior requiring `MEDIA_CONTENT_CONTROL` only since the user can revoke notification access at runtime through Android system settings, which will break local media source control if turned off.
 
->**Note:** If OEM wishes to make the application with AACS AAR as a system application, they can avoid the `Notification Access` step. Please add a line `<uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL" />` in the AACS `AndroidManifest.xml` file and provide all the required permissions to the system application in the Android operating system.
+`supported` enables the specified source. If `supported` is set `true`, that media source would be handled and controlled through AACS. If `supported` is set `false`, AACS would ignore the media source.
 
-Refer `Local Media Source` interface documentation `DEFAULT` media source.
-`supported` configures the given Local Media Source. if `supported` is set `true`, that media source would be handled and controlled through AACS. If `supported` is set `false`, AACS would ignore the media source.
-
-`mediaPackageName` and `mediaServiceClass` are mandatory configuration keys.  `mediaPackageName` represents the package name of the media source and `mediaServiceClass` represents the The name of the class inside of package that implements the component of the media browser service. This is a requirement of the [ComponentName](https://developer.android.com/reference/android/content/ComponentName). Please ensure that right data is provided here. Since `DEFAULT` player can act on behalf of all latest the media sources except Alexa music, MACC supported players and other configured local media sources, it is not full time associated to any package name and MediaBrowserService. It always represents 0th media controller of the [onActiveSessionsChanged](https://developer.android.com/reference/android/media/session/MediaSessionManager.OnActiveSessionsChangedListener#onActiveSessionsChanged(java.util.List%3Candroid.media.session.MediaController%3E)) controller list.
+`mediaPackageName` and `mediaServiceClass` are mandatory configuration keys. `mediaPackageName` represents the package name of the media source and `mediaServiceClass` represents the The name of the class inside of package that implements the component of the media browser service. This is a requirement of the [ComponentName](https://developer.android.com/reference/android/content/ComponentName). Please ensure that right data is provided here. Since `DEFAULT` player can act on behalf of all latest the media sources except Alexa music, MACC supported players and other configured local media sources, it is not full time associated to any package name and MediaBrowserService. It always represents 0th media controller of the [onActiveSessionsChanged](https://developer.android.com/reference/android/media/session/MediaSessionManager.OnActiveSessionsChangedListener#onActiveSessionsChanged(java.util.List%3Candroid.media.session.MediaController%3E)) controller list.
 
 Besides these mandatory configuration keys, following optional keys are useful for the correct mapping of metadata.
 

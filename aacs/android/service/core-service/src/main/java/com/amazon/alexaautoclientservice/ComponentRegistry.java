@@ -93,7 +93,11 @@ public class ComponentRegistry {
                         "No targets found in mTargetCache for shortCategory=%s shortAction=%s, querying package manager",
                         shortCategory, shortAction));
         final Intent queryIntent = new Intent(intentPrefix + shortAction);
-        queryIntent.addCategory(intentPrefix + shortCategory);
+        final String category = intentPrefix + shortCategory;
+        if (!category.isEmpty()) {
+            queryIntent.addCategory(intentPrefix + shortCategory);
+        }
+
         targets = AACSComponentRegistryUtil.queryPackageManager(context, queryIntent, AACSConstants.AACS_PERMISSION);
         if (targets == null) {
             Log.e(TAG,

@@ -26,7 +26,9 @@ public class AACSPropertyConstants {
     public static final String VERSION = "aace.core.version";
     public static final String NETWORK_INTERFACE = "aace.network.networkInterface";
     public static final String GEOLOCATION_ENABLED = "aace.geolocation.geolocationEnablement";
+    public static final String GEOLOCATION_ENABLED_CUSTOM_ASSISTANT = "aace.geolocation.geolocationEnablement.customAssistant";
     public static final String NAVI_FAVORITES_ENABLED = "aace.navigation.favoritesEnabled";
+    public static final String NETWORK_HTTP_PROXY_HEADERS = "aace.network.httpProxyHeaders";
 
     public static final String PROPERTY = "property";
 }

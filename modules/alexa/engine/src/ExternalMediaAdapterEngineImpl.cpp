@@ -471,34 +471,17 @@ void ExternalMediaAdapterEngineImpl::onPlayerEvent(const std::string& localPlaye
     emitCounterMetrics(
         METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_EXTERNALMEDIAPLAYER_PLAYER_EVENT, eventName});
     try {
+        AACE_INFO(LX(TAG).d("eventName", eventName).d("localPlayerId", localPlayerId));
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
-        // player has begun playing, acquire focus
-        if (eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
-            AACE_VERBOSE(LX(TAG, "onPlayerEvent").d("Setting focus for localPlayerId:", localPlayerId));
+
+        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
+            eventName.compare(aace::engine::alexa::TRACK_CHANGED) == 0 ||
+            eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
+            AACE_DEBUG(LX(TAG).d("Setting focus for localPlayerId:", localPlayerId));
             ThrowIfNot(setFocus(localPlayerId, true), "setFocusFailed");
         }
 
-        aace::alexa::ExternalMediaAdapter::ExternalMediaAdapterState platformState;
-        // when the session starts or track changes, we need to check if the app is already playing externally
-        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
-            eventName.compare(aace::engine::alexa::TRACK_CHANGED) == 0) {
-            // get the external media adapter state from the platform interface
-            try {
-                ThrowIfNot(m_platformMediaAdapter->getState(localPlayerId, platformState), "getState failed");
-                // player is already playing, acquire focus
-                if (platformState.playbackState.state.compare(aace::engine::alexa::PLAYING) == 0) {
-                    AACE_VERBOSE(LX(TAG, "onPlayerEvent").d("Setting focus for localPlayerId:", localPlayerId));
-                    ThrowIfNot(setFocus(localPlayerId, true), "setFocusFailed");
-                }
-            } catch (std::exception& ex) {
-                AACE_ERROR(LX(TAG, "onPlayerEvent")
-                               .d("Unable to set player focus", ex.what())
-                               .d("localPlayerId", localPlayerId));
-            }
-        }
-
         if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_ENDED) == 0) {
-            // unsetFocus
             ThrowIfNot(setFocus(localPlayerId, false), "setFocusFailed");
         }
 
@@ -517,7 +500,7 @@ void ExternalMediaAdapterEngineImpl::onPlayerEvent(const std::string& localPlaye
 
         m_messageSender_lock->sendMessage(request);
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onPlayerEvent").d("reason", ex.what()).d("localPlayerId", localPlayerId));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("localPlayerId", localPlayerId));
     }
 }
 
@@ -532,6 +515,8 @@ void ExternalMediaAdapterEngineImpl::onPlayerError(
         "onPlayerError",
         {METRIC_EXTERNALMEDIAPLAYER_PLAYER_ERROR, errorName, std::to_string(code)});
     try {
+        AACE_INFO(
+            LX(TAG).d("errorName", errorName).d("localPlayerId", localPlayerId).d("code", code).d("fatal", fatal));
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
 
         auto event = createExternalMediaPlayerEvent(
@@ -552,7 +537,7 @@ void ExternalMediaAdapterEngineImpl::onPlayerError(
         // cases where we should abandon focus
         if (errorName.compare(aace::engine::alexa::UNPLAYABLE_BY_AUTHORIZATION) == 0 ||
             errorName.compare(aace::engine::alexa::UNPLAYABLE_BY_STREAM_CONCURRENCY) == 0 ||
-            errorName.compare(aace::engine::alexa::INTERNAL_ERROR) == 0) {
+            (errorName.compare(aace::engine::alexa::INTERNAL_ERROR) == 0 && fatal)) {
             ThrowIfNot(setFocus(localPlayerId, false), "setFocusFailed");
         }
 

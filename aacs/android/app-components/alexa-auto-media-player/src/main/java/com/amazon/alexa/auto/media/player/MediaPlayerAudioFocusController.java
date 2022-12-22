@@ -49,7 +49,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
     /**
      * Interface implemented by Player for playback control.
      */
-    public interface PlaybackController {
+    public interface PlayerController {
         /**
          * Start the playback now. This method is called when intent to
          * Play the media is established and only thing missing had been
@@ -107,7 +107,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
     private final AudioManager mAudioManager;
 
     // Late Dependencies.
-    private PlaybackController mPlaybackController;
+    private PlayerController mPlayerController;
 
     // Internal Dependencies.
     @NonNull
@@ -139,75 +139,78 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
 
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                Preconditions.checkArgument(mCurrentState != AUDIO_FOCUS_STATE_NONE);
                 switch (mCurrentState) {
                     case AUDIO_FOCUS_STATE_WAITING_FOR_ACQUISITION:
-                        mPlaybackController.startPlaybackNow();
+                        mPlayerController.startPlaybackNow();
                         break;
                     case AUDIO_FOCUS_STATE_LOST_TRANSIENT:
                         // Coming out of focus loss transient state.
-                        mPlaybackController.requestResumingPlayback();
+                        mPlayerController.requestResumingPlayback();
                         break;
                     case AUDIO_FOCUS_STATE_ACQUIRED:
                         break; // Nothing to do, we already have a focus.
                     case AUDIO_FOCUS_STATE_NONE:
-                        break; // Precondition before switch would not let us be here.
+                        // Play since we gained focus
+                        Log.v(TAG, "Focus acquired when state was none");
+                        mPlayerController.startPlaybackNow();
+                        break;
                 }
                 mCurrentState = AUDIO_FOCUS_STATE_ACQUIRED;
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 mCurrentState = AUDIO_FOCUS_STATE_NONE;
-                mPlaybackController.requestStopPlayback();
+                mPlayerController.requestStopPlayback();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 mCurrentState = AUDIO_FOCUS_STATE_LOST_TRANSIENT;
-                mPlaybackController.requestPausePlayback();
+                mPlayerController.requestPausePlayback();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                Log.w(TAG, "Received AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK unexpectedly. setWillPauseWhenDucked is false");
                 // Since AudioFocus request has setWillPauseWhenDucked false
                 break;
             case AudioManager.AUDIOFOCUS_NONE:
-                mPlaybackController.requestStopPlayback();
+                // Don't need to do anything since focus was not requested, gained, or lost
                 mCurrentState = AUDIO_FOCUS_STATE_NONE;
                 break;
         }
     }
 
     public void startDucking() {
-        mPlaybackController.adjustPlaybackVolume(VOLUME_MULTIPLIER_DUCK);
+        mPlayerController.adjustPlaybackVolume(VOLUME_MULTIPLIER_DUCK);
     }
 
     private void startClientsideDucking() {
-        mPlaybackController.adjustPlaybackVolume(VOLUME_MULTIPLIER_DUCK);
+        mPlayerController.adjustPlaybackVolume(VOLUME_MULTIPLIER_DUCK);
         if (mMediaDuckingObserver != null) {
             mMediaDuckingObserver.reportClientDuckingState(true);
         }
     }
 
     public void stopDucking() {
-        mPlaybackController.adjustPlaybackVolume(VOLUME_MULTIPLIER_NORMAL);
+        mPlayerController.adjustPlaybackVolume(VOLUME_MULTIPLIER_NORMAL);
     }
 
     private void stopClientsideDucking() {
-        mPlaybackController.adjustPlaybackVolume(VOLUME_MULTIPLIER_NORMAL);
+        mPlayerController.adjustPlaybackVolume(VOLUME_MULTIPLIER_NORMAL);
         if (mMediaDuckingObserver != null) {
             mMediaDuckingObserver.reportClientDuckingState(false);
         }
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         Log.i(TAG, "Disposing the Audio Focus Controller");
         abandonAudioFocus();
     }
 
     /**
-     * Sets the {@link PlaybackController} required by this object.
+     * Sets the {@link PlayerController} required by this object.
      *
-     * @param controller Playback Controller.
+     * @param controller PlayerController.
      */
-    public void setPlaybackController(@NonNull PlaybackController controller) {
-        mPlaybackController = controller;
+    public void setPlayerController(@NonNull PlayerController controller) {
+        mPlayerController = controller;
     }
 
     public void resetAudioFocusRequest() {
@@ -221,7 +224,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
      * is delivered asynchronously.
      */
     public void startPlaybackAfterAcquiringFocus() {
-        Preconditions.checkNotNull(mPlaybackController);
+        Preconditions.checkNotNull(mPlayerController);
 
         Log.d(TAG,
                 "Start Playback (after acquiring focus). Current audio focus state: "
@@ -231,7 +234,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
             case AUDIO_FOCUS_STATE_ACQUIRED:
             case AUDIO_FOCUS_STATE_DUCKED:
                 // Focus already acquired. Continue with playback.
-                mPlaybackController.startPlaybackNow();
+                mPlayerController.startPlaybackNow();
                 break;
             case AUDIO_FOCUS_STATE_WAITING_FOR_ACQUISITION:
                 Log.d(TAG, "Waiting for audio focus from prior request");
@@ -244,7 +247,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
                 switch (focusResponse) {
                     case AudioManager.AUDIOFOCUS_REQUEST_GRANTED:
                         mCurrentState = AUDIO_FOCUS_STATE_ACQUIRED;
-                        mPlaybackController.startPlaybackNow();
+                        mPlayerController.startPlaybackNow();
                         break;
                     case AudioManager.AUDIOFOCUS_REQUEST_DELAYED:
                         mCurrentState = AUDIO_FOCUS_STATE_WAITING_FOR_ACQUISITION;
@@ -252,7 +255,7 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
                     case AudioManager.AUDIOFOCUS_REQUEST_FAILED:
                     default:
                         mCurrentState = AUDIO_FOCUS_STATE_NONE;
-                        mPlaybackController.failedToAcquireFocus();
+                        mPlayerController.failedToAcquireFocus();
                         break;
                 }
                 break;
@@ -294,7 +297,13 @@ public class MediaPlayerAudioFocusController implements AudioManager.OnAudioFocu
      */
     private int abandonAudioFocus() {
         Log.d(TAG, "Abandoning Audio Focus");
-        return mAudioManager.abandonAudioFocusRequest(mFocusRequest);
+        if (mFocusRequest != null) {
+            Log.d(TAG, "Abandoning Audio Focus");
+            return mAudioManager.abandonAudioFocusRequest(mFocusRequest);
+        } else {
+            Log.d(TAG, "No audio focus request to abandon. Doing nothing.");
+            return AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+        }
     }
 
     /**

@@ -3,7 +3,7 @@
 This library serves the following purposes:
 
 * It handles navigation-related directives. By parsing a navigation directive and interfacing
-   with the selected map provider, it performs the action required by the directive. The map provider used by the AACS Sample App is Google Maps.
+   with the selected map provider, it performs the action required by the directive. The map provider used by the Alexa Auto App is Google Maps.
    However, you can extend the library to use other map providers.
    This library supports navigating to a single waypoint and canceling an ongoing navigation.
 
@@ -19,7 +19,7 @@ This library serves the following purposes:
                }
          }
 
-   For more details see [TemplateRuntime Interface](../../../../modules/alexa/docs/TemplateRuntime.md)
+   For more details see [TemplateRuntime Interface](https://alexa.github.io/alexa-auto-sdk/docs/aasb/alexa/TemplateRuntime/)
 
 
 ## Prerequisites

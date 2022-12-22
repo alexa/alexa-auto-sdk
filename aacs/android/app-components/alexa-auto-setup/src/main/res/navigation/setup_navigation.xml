@@ -5,8 +5,14 @@
     app:startDestination="@id/navigation_fragment_login">
 
     <fragment
+        android:id="@+id/navigation_fragment_blockers"
+        android:name="com.amazon.alexa.auto.settings.BlockersFragment"
+        />
+
+    <fragment
         android:id="@+id/navigation_fragment_assistAppSelection"
-        android:name="com.amazon.alexa.auto.settings.AssistAppSelectionFragment" />
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.DefaultAssistantFragment"
+        />
 
     <fragment
         android:id="@+id/navigation_fragment_login"
@@ -22,7 +28,7 @@
 
     <fragment
         android:id="@+id/navigation_fragment_languageSelection"
-        android:name="com.amazon.alexa.auto.settings.AlexaSettingsLanguagesFragment"
+        android:name="com.amazon.alexa.auto.settings.SettingsAlexaLanguageFragment"
         android:label="@string/setting_alexa_language_title"/>
 
     <fragment
@@ -64,4 +70,8 @@
     <fragment
         android:id="@+id/navigation_fragment_blockSetupDrive"
         android:name="com.amazon.alexa.auto.setup.workflow.fragment.DriveBlockSetupFragment" />
+
+    <fragment
+        android:id="@+id/navigation_fragment_loadingScreen"
+        android:name="com.amazon.alexa.auto.setup.workflow.fragment.AACSLoadingFragment"/>
 </navigation>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ void NavigationHandler::handleNavigateToPreviousWaypointMessage(const std::strin
 }
 
 void NavigationHandler::handleShowAlternativeRoutesMessage(const std::string& message) {
-    log(logger::LoggerHandler::Level::INFO, "Recevied ShowAlternativeRoutesMessage");
+    log(logger::LoggerHandler::Level::INFO, "Received ShowAlternativeRoutesMessage");
     ShowAlternativeRoutesMessage msg = json::parse(message);
     showAlternativeRoutes(msg.payload.alternateRouteType);
 }

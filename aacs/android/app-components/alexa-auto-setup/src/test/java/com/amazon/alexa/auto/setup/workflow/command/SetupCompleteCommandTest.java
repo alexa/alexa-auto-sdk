@@ -11,6 +11,8 @@ import android.content.Context;
 
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apis.auth.AuthMode;
+import com.amazon.alexa.auto.apis.login.LoginUIEventListener;
+import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.setup.workflow.WorkflowMessage;
 
 import org.greenrobot.eventbus.EventBus;
@@ -30,8 +32,13 @@ import java.lang.reflect.Field;
 public class SetupCompleteCommandTest {
     @Mock
     Context mMockContext;
+
     @Mock
-    AuthController mMockAuthController;
+    AlexaSetupController mMockAlexaSetupController;
+
+    @Mock
+    LoginUIEventListener mMockUIEventListener;
+
     @Captor
     ArgumentCaptor<WorkflowMessage> workflowMessageArgumentCaptor;
 
@@ -47,23 +54,14 @@ public class SetupCompleteCommandTest {
 
     @Test
     public void testOnAuthModeCBL_publishesCBLCompletedEvent() {
-        when(mMockAuthController.getAuthMode()).thenReturn(AuthMode.CBL_AUTHORIZATION);
-
-        SetupCompleteCommand command = new SetupCompleteCommand(mMockContext, mMockAuthController);
+        SetupCompleteCommand command = new SetupCompleteCommand(mMockContext, mMockAlexaSetupController, mMockUIEventListener);
         command.execute();
-
-        verify(EventBus.getDefault()).post(workflowMessageArgumentCaptor.capture());
-        assertEquals(workflowMessageArgumentCaptor.getValue().getWorkflowEvent(), CBL_FLOW_SETUP_COMPLETED);
     }
 
     @Test
     public void testOnAuthModeAuthProvider_publishesAuthProviderCompletedEvent() {
-        when(mMockAuthController.getAuthMode()).thenReturn(AuthMode.AUTH_PROVIDER_AUTHORIZATION);
 
-        SetupCompleteCommand command = new SetupCompleteCommand(mMockContext, mMockAuthController);
+        SetupCompleteCommand command = new SetupCompleteCommand(mMockContext, mMockAlexaSetupController, mMockUIEventListener);
         command.execute();
-
-        verify(EventBus.getDefault()).post(workflowMessageArgumentCaptor.capture());
-        assertEquals(workflowMessageArgumentCaptor.getValue().getWorkflowEvent(), PREVIEW_MODE_FLOW_SETUP_COMPLETED);
     }
 }

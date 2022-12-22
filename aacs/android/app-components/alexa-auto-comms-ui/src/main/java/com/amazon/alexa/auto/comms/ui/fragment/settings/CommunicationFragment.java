@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 package com.amazon.alexa.auto.comms.ui.fragment.settings;
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -25,12 +24,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.navigation.NavController;
@@ -45,7 +44,7 @@ import com.amazon.alexa.auto.comms.ui.db.ConnectedBTDeviceRepository;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 /**
  * Communication fragment to manage all connected bluetooth devices in a list.
@@ -56,131 +55,67 @@ public class CommunicationFragment extends Fragment {
     private NavController mController;
     BluetoothManager mBluetoothManager;
     BluetoothAdapter mBluetoothAdapter;
-
+    Bundle newBundle;
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.communication_settings_fragment, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        newBundle = getArguments();
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        if(newBundle.getString("device").equals("true")){
+            return inflater.inflate(R.layout.communication_settings_fragment, container, false);
+        }
+        return inflater.inflate(R.layout.communication_settings_fragment_no_device, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view1, Bundle bundle){
+        super.onViewCreated(view1, bundle);
         View fragmentView = requireView();
         mController = findNavController(fragmentView);
         mBluetoothManager = (BluetoothManager) getContext().getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
-        BTDeviceRepository BTDeviceRepo =  BTDeviceRepository.getInstance(getContext());
-        ConnectedBTDeviceRepository ConnectedBTDeviceRepo =  ConnectedBTDeviceRepository.getInstance(getContext());
-        LinearLayout rootLayout = (LinearLayout) fragmentView.findViewById(R.id.alexa_communication_fragment);
+        BTDeviceRepository BTDeviceRepo = BTDeviceRepository.getInstance(getContext());
+        ConnectedBTDeviceRepository ConnectedBTDeviceRepo = ConnectedBTDeviceRepository.getInstance(getContext());
+
         // Dynamically observe all the paired bluetooth devices from bluetooth adapter bonded devices
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
         // Save last device address to know when to add primary device to top and add pair new button
-        AtomicReference<String> lastDev = new AtomicReference<>("");
-        if (pairedDevices.size() > 0) {
-            BluetoothDevice arr[] = pairedDevices.toArray(new BluetoothDevice[pairedDevices.size()]);
-            String lastDevice = arr[pairedDevices.size() - 1].getName();
-            lastDev.set(lastDevice);
-            for (BluetoothDevice device : arr) {
-                String name = device.getName();
-                String address = device.getAddress();
-                LiveData<BTDevice> btDevice = BTDeviceRepo.getBTDeviceByAddress(address);
-                btDevice.observe(getViewLifecycleOwner(), listObserver -> {
-                    if (btDevice.getValue() != null) {
-                        String contactsUploadPermission = btDevice.getValue().getContactsUploadPermission();
 
-                        // add the communication layout for each device.
-                        View to_add =
-                                getLayoutInflater().inflate(R.layout.communication_consent_layout, rootLayout, false);
+        ConstraintLayout rootLayout = (ConstraintLayout) fragmentView.findViewById(R.id.alexa_communication_fragment);
 
-                        TextView deviceName = (TextView) to_add.findViewById(R.id.deviceName);
-                        deviceName.setText(name);
+        LiveData<List<ConnectedBTDevice>> listData =
+                ConnectedBTDeviceRepository.getInstance(getContext()).getConnectedDevices();
 
-                        TextView contactConsent = (TextView) to_add.findViewById(R.id.consentStatus);
-                        String communicationConsentStatus = Constants.COMMUNICATION_PERMISSION_DISABLED;
+                listData.observe(getViewLifecycleOwner(), listObserver -> {
+                    if (listData.getValue() != null && listData.getValue().size() > 0 && pairedDevices.size()>0) {
+                        // Per Android telephony, it uses last paired bluetooth device for calling and handle messages.
+                        ConnectedBTDevice primaryDevice = listData.getValue().get(listData.getValue().size() - 1);
+                        String lastAddress = primaryDevice.getDeviceAddress();
+                        String lastDeviceName = primaryDevice.getDeviceName();
 
-                        if (contactsUploadPermission.equals(Constants.CONTACTS_PERMISSION_YES)) {
-                            communicationConsentStatus = Constants.COMMUNICATION_PERMISSION_ENABLED;
-                        }
-
-                        String format = getResources().getString(R.string.comms_permission_status);
-                        String bodyString = String.format(format, communicationConsentStatus);
-                        contactConsent.setText(bodyString);
-
+                        TextView primaryDeviceName = (TextView) rootLayout.findViewById(R.id.deviceName);
+                        String formattedString = String.format((String) primaryDeviceName.getText(), lastDeviceName);
+                        primaryDeviceName.setText( formattedString);
                         Bundle deviceAddress = new Bundle();
-                        deviceAddress.putString(Constants.COMMUNICATION_DEVICE_ADDRESS, address);
-                        ImageView checkMore = to_add.findViewById(R.id.checkMore);
-                        to_add.setOnClickListener(view -> {
-                            mController.navigate(R.id.navigation_fragment_communication_consent, deviceAddress);
+                        deviceAddress.putString(Constants.COMMUNICATION_DEVICE_ADDRESS, lastAddress);
+                        requireActivity().getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.settings, new CommunicationPreferenceFragment(deviceAddress))
+                                .commit();
+                        Button btSetting = (Button) rootLayout.findViewById(R.id.btSetting);
+                        btSetting.setOnClickListener(view -> {
+                            goToBluetoothSettings(getContext());
                         });
-                        Log.d(TAG, "adding device " + device.getName());
-                        to_add.setTag(name);
-                        if (rootLayout.findViewWithTag(name) == null) {
-                            rootLayout.addView(to_add);
-                        }
-                        // Once the last device is added, find the primary device and add it to the top
-                        if (device.getName().equals(String.valueOf(lastDev))) {
-                            LiveData<List<ConnectedBTDevice>> listData = ConnectedBTDeviceRepo.getConnectedDevices();
-                            listData.observe(getViewLifecycleOwner(), listObserver2 -> {
-                                if (listData.getValue() != null && listData.getValue().size() > 0) {
-                                    // Per Android telephony, the last connected device is the primary device
-                                    String primaryAddress = listData.getValue().get(listData.getValue().size() - 1).getDeviceAddress();
-                                    String primaryName = listData.getValue().get(listData.getValue().size() - 1).getDeviceName();
-                                    Log.d(TAG, "primary device found " + name);
-                                    LiveData<BTDevice> primaryDevice = BTDeviceRepo.getBTDeviceByAddress(primaryAddress);
-                                    primaryDevice.observe(getViewLifecycleOwner(), observer -> {
-                                        if (primaryDevice.getValue() != null) {
-                                            String primaryContactsUploadPermission = primaryDevice.getValue().getContactsUploadPermission();
-                                            View to_add_primary =
-                                                    getLayoutInflater().inflate(R.layout.communication_consent_layout, rootLayout, false);
-                                            TextView primaryDeviceName = (TextView) to_add_primary.findViewById(R.id.deviceName);
-                                            primaryDeviceName.setText(primaryName);
-
-                                            TextView primaryContactConsent = (TextView) to_add_primary.findViewById(R.id.consentStatus);
-                                            String primaryCommunicationConsentStatus = Constants.COMMUNICATION_PERMISSION_DISABLED;
-
-                                            if (primaryContactsUploadPermission.equals(Constants.CONTACTS_PERMISSION_YES)) {
-                                                primaryCommunicationConsentStatus = Constants.COMMUNICATION_PERMISSION_ENABLED;
-                                            }
-                                            String primaryFormat = getResources().getString(R.string.comms_permission_status);
-                                            String primaryBodyString = String.format(primaryFormat, primaryCommunicationConsentStatus);
-                                            primaryContactConsent.setText(primaryBodyString);
-
-                                            Bundle primaryDeviceAddress = new Bundle();
-                                            primaryDeviceAddress.putString(Constants.COMMUNICATION_DEVICE_ADDRESS, primaryAddress);
-                                            ImageView primaryCheckMore = to_add.findViewById(R.id.checkMore);
-                                            to_add_primary.setOnClickListener(view -> {
-                                                mController.navigate(R.id.navigation_fragment_communication_consent, primaryDeviceAddress);
-                                            });
-                                            View child = rootLayout.findViewWithTag(primaryName);
-                                            if (child != null){
-                                                rootLayout.removeView(child);
-                                            }
-                                            to_add_primary.setTag(primaryName);
-                                            rootLayout.addView(to_add_primary, 0);
-                                            addPairNewButton(rootLayout);
-                                        } else {
-                                            Log.d(TAG, "Primary device is not found.");
-                                            addPairNewButton(rootLayout);
-                                        }
-                                    });
-
-                                } else {
-                                    Log.d(TAG, "There is no primary device found.");
-                                    addPairNewButton(rootLayout);
-                                }
-                            });
-                        }
-                    } else {
-                        Log.d(TAG, "There is no device found.");
-                        addPairNewButton(rootLayout);
+                    }else {
+                        ConstraintLayout rootLayout1 = (ConstraintLayout) fragmentView.findViewById(R.id.alexa_communication_fragment);
+                        Button btSetting = (Button) rootLayout1.findViewById(R.id.btSetting);
+                        btSetting.setOnClickListener(view -> { goToBluetoothSettings(getContext());} );
                     }
                 });
-            }
-        }
-        else{
-            Log.d(TAG, "There are no paired devices");
-            addPairNewButton(rootLayout);
-        }
     }
 
     @VisibleForTesting
@@ -197,19 +132,4 @@ public class CommunicationFragment extends Fragment {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.getApplicationContext().startActivity(intent);
     }
-
-    /**
-     * Adds 'Pair new' buttom to bottom of device list
-     * @param rootLayout Android LinearLayout.
-     */
-    private void addPairNewButton(LinearLayout rootLayout){
-        if (rootLayout.getRootView().findViewById(R.id.communication_pair_new_layout) == null) {
-            View pairNewOne = getLayoutInflater().inflate(R.layout.communication_pair_new_layout, rootLayout, false);
-            pairNewOne.setOnClickListener(view -> {
-                goToBluetoothSettings(getContext());
-            });
-            rootLayout.addView(pairNewOne);
-        }
-    }
-
 }

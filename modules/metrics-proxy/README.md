@@ -1,0 +1,1 @@
+See the [Metrics Proxy module documentation](./docs/index.md).

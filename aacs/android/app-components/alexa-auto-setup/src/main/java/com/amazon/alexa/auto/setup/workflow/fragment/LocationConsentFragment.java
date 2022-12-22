@@ -14,6 +14,7 @@
  */
 package com.amazon.alexa.auto.setup.workflow.fragment;
 
+import static com.amazon.aacsconstants.AssistantConstants.ON_DEVICE_POLICY;
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.LOCATION_CONSENT_COMPLETED;
 import static com.amazon.alexa.auto.setup.workflow.event.LoginEvent.SETUP_ERROR;
 import static com.amazon.alexa.auto.setup.workflow.model.UserConsent.DISABLED;
@@ -31,6 +32,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.amazon.alexa.auto.apis.alexaCustomAssistant.AssistantManager;
+import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.aacsconstants.AACSPropertyConstants;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.apps.common.util.config.AlexaPropertyManager;
@@ -91,14 +94,22 @@ public class LocationConsentFragment extends Fragment {
         useLocationButtonView.setOnClickListener(view -> { updateAACSPropertyAndNavigate(ENABLED.getValue()); });
 
         if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
-            ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
-            alexaImage.setVisibility(View.GONE);
+            AlexaApp mApp = AlexaApp.from(getContext());
+            if (mApp == null) {
+                Log.e(TAG, "Invalid AlexaApp instance.");
+                return;
+            }
+            AssistantManager assistantManager = mApp.getRootComponent().getComponent(AssistantManager.class).get();
 
-            TextView locationPermissionText = fragmentView.findViewById(R.id.location_permission_text_view);
-            locationPermissionText.setText(R.string.location_permission_body_text_with_alexa_custom_assistant);
+            if (assistantManager != null && !ON_DEVICE_POLICY.equals(assistantManager.getCoAssistantPolicy())) {
+                Log.d(TAG, "Not using ON_DEVICE policy.");
 
-            TextView hintText = fragmentView.findViewById(R.id.alexa_hint2);
-            hintText.setVisibility(View.GONE);
+                TextView locationPermissionText = fragmentView.findViewById(R.id.location_permission_text_view);
+                locationPermissionText.setText(R.string.location_permission_body_text_with_alexa_custom_assistant);
+
+                TextView hintText = fragmentView.findViewById(R.id.alexa_hint2);
+                hintText.setVisibility(View.GONE);
+            }
         }
     }
 

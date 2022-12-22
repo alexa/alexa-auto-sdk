@@ -62,24 +62,6 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }
 
-std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAlertsConfig(
-    const std::string& databaseFilePath) {
-    rapidjson::Document document(rapidjson::kObjectType);
-    rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
-    rapidjson::Value avsDeviceSDKElement(rapidjson::kObjectType);
-    rapidjson::Value alertsCapabilityAgentElement(rapidjson::kObjectType);
-
-    alertsCapabilityAgentElement.AddMember(
-        "databaseFilePath",
-        rapidjson::Value().SetString(databaseFilePath.c_str(), databaseFilePath.length()),
-        document.GetAllocator());
-    avsDeviceSDKElement.AddMember("alertsCapabilityAgent", alertsCapabilityAgentElement, document.GetAllocator());
-    aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
-    document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
-
-    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
-}
-
 std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createNotificationsConfig(
     const std::string& databaseFilePath) {
     rapidjson::Document document(rapidjson::kObjectType);

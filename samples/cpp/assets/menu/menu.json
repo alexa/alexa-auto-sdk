@@ -657,6 +657,11 @@
                         "name": "Get Player Position and Duration"
                     },
                     {
+                        "do": "notify/onSetAsForegroundActivity",
+                        "key": "F",
+                        "name": "Set as foreground player"
+                    },
+                    {
                         "do": "GoBack",
                         "key": "esc",
                         "name": "Go back"
@@ -1000,6 +1005,118 @@
                     }
                 ],
                 "name": "Address Book Menu"
+            }
+        },
+        {
+            "do": "GoTo",
+            "key": "C",
+            "name": "Car Play Menu",
+            "value": {
+                "id": "car-play",
+                "item": [
+                    {
+                        "do": "GoTo",
+                        "key": "A",
+                        "name": "Agent registration",
+                        "value": {
+                            "id": "car-play-state",
+                            "item": [
+                                {
+                                    "do": "notify/registerSiriAgent",
+                                    "key": "1",
+                                    "name": "Register SIRI Agent",
+                                    "value": "Register SIRI Agent"
+                                },
+                                 {
+                                    "do": "notify/onDeregisterAgent",
+                                    "key": "2",
+                                    "name": "Deregister SIRI Agent",
+                                    "value": "Deregister SIRI Agent"
+                                },
+                                {
+                                    "do": "GoBack",
+                                    "key": "esc",
+                                    "name": "Go back"
+                                }
+                            ],
+                            "name": "Agent registration Menu"
+                        }
+                    },
+                    {
+                        "do": "GoTo",
+                        "key": "S",
+                        "name": "SIRI Interaction",
+                        "value": {
+                            "id": "car-play-alexa-gesture",
+                            "item": [
+                                {
+                                    "do": "notify/onPTT",
+                                    "key": "1",
+                                    "name": "Button Down",
+                                    "value": "PTT"
+                                },
+                                {
+                                    "do": "notify/onSiriSPEAKING",
+                                    "key": "2",
+                                    "name": "Set State to SPEAKING",
+                                    "value": "SPEAKING STATE"
+                                },
+                                {
+                                    "do": "notify/onSiriNONE",
+                                    "key": "3",
+                                    "name": "Set State to NONE",
+                                    "value": "NONE STATE"
+                                },
+                                {
+                                    "do": "GoBack",
+                                    "key": "esc",
+                                    "name": "Go back"
+                                }
+                            ],
+                            "name": "SIRI Interaction Menu"
+                        }
+                    },
+                    {
+                        "do": "GoTo",
+                        "key": "M",
+                        "name": "Car Play Mode",
+                        "value": {
+                            "id": "car-play-mode",
+                            "item": [
+                                {
+                                    "do": "notify/onVAD",
+                                    "key": "1",
+                                    "name": "VAD",
+                                    "value":"VAD"
+                                },
+                                {
+                                    "do": "notify/onKWD",
+                                    "key": "2",
+                                    "name": "Keyword", 
+                                    "value":"Keyword"                                                                  
+                                },
+                                {
+                                    "do": "notify/onDeactivated",
+                                    "key": "3",
+                                    "name": "Deactivated",
+                                    "value":"Deactivated"                                
+                                },
+                                {
+                                    "do": "GoBack",
+                                    "key": "esc",
+                                    "name": "Go back"
+                                }
+                            ],
+                            "name": "Car Play Mode Menu"
+                        }
+                    },
+                    {
+                        "do": "GoBack",
+                        "key": "esc",
+                        "name": "Go back"
+                    }
+                ],
+                "name": "Car Play Menu"
             }
         },
         {

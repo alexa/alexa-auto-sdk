@@ -123,17 +123,6 @@ inline std::ostream& operator<<(std::ostream& stream, const SpeechRecognizerEngi
 }
 
 /**
- * AlertsEngineInterface
- */
-class AlertsEngineInterface {
-public:
-    virtual ~AlertsEngineInterface() = default;
-
-    virtual void onLocalStop() = 0;
-    virtual void removeAllAlerts() = 0;
-};
-
-/**
  * PlaybackControllerEngineInterface
  */
 class PlaybackControllerEngineInterface {
@@ -610,6 +599,16 @@ public:
      * or @c TIME_UNKNOWN if the duration is unknown or invalid.
      */
     virtual int64_t onGetPlayerDuration() = 0;
+
+    /**
+     * Sets the Alexa @c AudioPlayer interface as the active player the user sees on screen. This function is useful for 
+     * scenarios in which the user most recently played a different Alexa-aware @c ExternalMediaPlayer media source, such
+     * as a deep-linked media app or a local media source, and then manually returned the head unit visual focus to the
+     * Alexa @c AudioPlayer GUI. Calling this function ensures the next VUI command or GUI interaction with the 
+     * playback control buttons acts on the @c AudioPlayer source rather than the more recently played
+     * @c ExternalMediaPlayer source.
+     */
+    virtual void onSetAsForegroundActivity() = 0;
 };
 
 /**

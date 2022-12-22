@@ -27,6 +27,8 @@
                 <action android:name="com.amazon.aacs.aasb.DataSourceUpdate" />
                 <category android:name="com.amazon.aacs.aasb.AlexaClient" />
                 <action android:name="com.amazon.aacs.aasb.DialogStateChanged"/>
+                <category android:name="com.amazon.aacs.aasb.Navigation" />
+                <action android:name="com.amazon.aacs.aasb.StartNavigation"/>
             </intent-filter>
         </receiver>
 

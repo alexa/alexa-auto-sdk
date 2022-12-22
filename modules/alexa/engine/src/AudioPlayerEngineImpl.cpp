@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
+
+#include <string>
 
 #include "AACE/Engine/Alexa/AudioPlayerEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -27,6 +29,12 @@ using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AudioPlayerEngineImpl");
+
+/// The "content" channel name for AudioActivityTracker.
+static const std::string CONTENT_CHANNEL_NAME{"Content"};
+
+/// The interface name for the AudioActivityTracker content channel.
+static const std::string CONTENT_INTERFACE_NAME{"AudioPlayer"};
 
 /// Program Name for Metrics
 static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioPlayerEngineImpl";
@@ -56,16 +64,17 @@ bool AudioPlayerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
     std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface>
         audioPlayerObserverDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager) {
     try {
-        ThrowIfNot(
-            initializeAudioChannel(audioOutputChannel, speakerManager, authDelegate), "initializeAudioChannelFailed");
-        // temporary
+        ThrowIfNot(initializeAudioChannel(audioOutputChannel, speakerManager), "initializeAudioChannelFailed");
         std::vector<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface>>
             audioChannelVolumeInterfaces{getChannelVolumeInterface()};
         auto provider = alexaClientSDK::avsCommon::utils::mediaPlayer::PooledMediaResourceProvider::
             createPooledMediaResourceProviderInterface({shared_from_this()}, audioChannelVolumeInterfaces);
+
+        m_activityTracker = activityTrackerInterface;
 
         // create the capability agent
         m_audioPlayerCapabilityAgent = alexaClientSDK::acsdkAudioPlayer::AudioPlayer::create(
@@ -75,6 +84,7 @@ bool AudioPlayerEngineImpl::initialize(
             contextManager,
             exceptionSender,
             playbackRouter,
+            customerDataManager,
             nullptr,
             metricRecorder);
         ThrowIfNull(m_audioPlayerCapabilityAgent, "couldNotCreateCapabilityAgent");
@@ -109,8 +119,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
     std::shared_ptr<alexaClientSDK::acsdkAudioPlayerInterfaces::AudioPlayerObserverInterface>
         audioPlayerObserverDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
-    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder) {
+    std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager) {
     std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = nullptr;
 
     try {
@@ -125,8 +136,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
         ThrowIfNull(exceptionSender, "invalidExceptionSender");
         ThrowIfNull(playbackRouter, "invalidPlaybackRouter");
         ThrowIfNull(audioPlayerObserverDelegate, "invalidAudioPlayerObserverInterfaceDelegate");
-        ThrowIfNull(authDelegate, "invalidAuthDelegate");
         ThrowIfNull(metricRecorder, "invalidMetricRecorder");
+        ThrowIfNull(activityTrackerInterface, "invalidActivityTrackerInterface");
+        ThrowIfNull(customerDataManager, "invalidCustomerDataManager");
 
         // open the Music audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel(
@@ -148,8 +160,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
                 exceptionSender,
                 playbackRouter,
                 audioPlayerObserverDelegate,
-                authDelegate,
-                metricRecorder),
+                metricRecorder,
+                activityTrackerInterface,
+                customerDataManager),
             "initializeAudioPlayerEngineImplFailed");
 
         // set the platform's engine interface reference
@@ -174,6 +187,8 @@ void AudioPlayerEngineImpl::doShutdown() {
         m_audioPlayerCapabilityAgent.reset();
     }
 
+    m_activityTracker.reset();
+
     AudioChannelEngineImpl::doShutdown();
 
     if (m_audioPlayerPlatformInterface != nullptr) {
@@ -193,6 +208,18 @@ int64_t AudioPlayerEngineImpl::onGetPlayerPosition() {
 int64_t AudioPlayerEngineImpl::onGetPlayerDuration() {
     emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetPlayerDuration", {METRIC_AUDIO_PLAYER_GET_PLAYER_DURATION});
     return getMediaDuration();
+}
+
+void AudioPlayerEngineImpl::onSetAsForegroundActivity() {
+    AACE_INFO(LX(TAG));
+    alexaClientSDK::afml::Channel::State activity = alexaClientSDK::afml::Channel::State(CONTENT_CHANNEL_NAME);
+    activity.focusState = alexaClientSDK::avsCommon::avs::FocusState::FOREGROUND;
+    activity.interfaceName = CONTENT_INTERFACE_NAME;
+    AACE_INFO(LX(TAG)
+                  .d("name", activity.name)
+                  .d("interfaceName", activity.interfaceName)
+                  .d("focusState", activity.focusState));
+    m_activityTracker->notifyOfActivityUpdates({activity});
 }
 
 //

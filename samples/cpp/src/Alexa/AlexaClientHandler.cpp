@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -234,6 +234,8 @@ std::string AlexaClientHandler::convertDialogStateToString(const DialogState& st
             return "THINKING";
         case DialogState::SPEAKING:
             return "SPEAKING";
+        case DialogState::FINISHED:
+            return "FINISHED";
     }
     // Invalid dialog state
     log(logger::LoggerHandler::Level::ERROR, "Invalid Dialog State");

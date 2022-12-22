@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Alexa Media</string>
+    <string name="alexa_media_app_name">Alexa Media</string>
     <string name="notification_channel">Alexa Music</string>
     <string name="notification_channel_description">Alexa Music com controle de mídia</string>
     <string name="notification_service_title">Alexa Music</string>
@@ -12,10 +12,10 @@
     <string name="playback_control_loop">Repetir</string>
     <string name="playback_control_next">Avançar</string>
     <string name="playback_control_previous">Anterior</string>
-    <string name="alexa_music_login_required">Acesse as configurações da Alexa e faça login com a Amazon para reproduzir músicas com a Alexa</string>
+    <string name="alexa_music_login_required">Acesse as configurações de Alexa e inicie a sessão na Amazon para reproduzir músicas com Alexa</string>
     <string name="alexa_music_login_text">Iniciar sessão</string>
-    <string name="alexa_music_alexa_not_selected_va">Altere o aplicativo de assistência para a Alexa para reproduzir músicas com a Alexa</string>
-    <string name="alexa_music_select_va">Selecione a Alexa como aplicativo de assistência</string>
+    <string name="alexa_music_alexa_not_selected_va">Altere o aplicativo de assistência para Alexa para reproduzir músicas com a Alexa</string>
+    <string name="alexa_music_select_va">Selecione Alexa como aplicativo de assistência</string>
     <string name="alexa_music_hint_1">Diga: \"Alexa, toque música.\"</string>
     <string name="artist_msp_seperator">&#160;|&#160;</string>
 </resources>

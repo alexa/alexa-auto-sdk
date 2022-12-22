@@ -1,17 +1,120 @@
 # Change Log
-## v4.1.1 released on 2022-08-08
+
+## v4.2 Released on 2022-12-21
 
 ### Enhancements
+
+#### Auto SDK
+
+* Added `MultiAgent` components in AVS Device SDK. All the AVS directives and events are tagged with assistant ID. With the new MultiAgent environment, agent-based metrics are also introduced. The metrics can now be filtered by assistants, programs, and sources.
+* When receiving `AlexaClient` messages, the payload of `DialogStateChanged` message will now have the ID of the assistant that the change is associated.
+* Disabled timers, alarms, and reminders by removing the `Alerts` AVS capability from the Engine. The corresponding `Alerts` AASB messages and Engine configuration are also removed.
+* The Alexa Auto SDK 3rd Party Wake Word (3PWW) feature provides OEMs an opportunity to enable support for 3rd party voice assistants (3PVA) such as Apple Siri on the same in-vehicle infotainment system alongside Alexa Custom Assistant (ACA)/Alexa wake words.
+* Added the AASB message `AudioPlayer.SetAsForegroundActivity`, which the application can use to tell the Auto SDK Engine that the Alexa `AudioPlayer` interface is the foreground media source the user sees on screen. The `SetAsForegroundActivity` message is useful to ensure VUI and GUI commands act on the `AudioPlayer` source for scenarios in which the user played an Alexa media source (e.g., Amazon Music), switched to a different Alexa-aware external media source like FM radio or a deep-linked media app, and then manually returned visual activity to the Alexa media screen. The Alexa Auto App is updated to use the new message in the Alexa `MediaSession`.
+* Updated the Alexa cloud retention period for address book storage from 24 hours to 30 days. Implementations can now reduce data usage by reducing the frequency of address book upload accordingly.
+* Updated the Auto SDK to use AVS Device SDK Version 1.26.0. For information about this version of AVS Device SDK, see the [AVS Documentation](https://developer.amazon.com/en-US/docs/alexa/avs-device-sdk-1-2x/release-notes.html#version-1260).
+
+#### Alexa Auto App
+* Renamed the AACS Sample App to Alexa Auto App. Any previous mentions of the name AACS Sample App should be treated the same as Alexa Auto App. 
+* Added a landing page to Alexa Auto App. The landing page provides sample utterances for supported domains and UI to update the settings.
+* The Alexa Auto App has an updated UI for setup and settings screens. These improvements scale responsively for medium landscape screens (approximately 1300 x 900 resolution and screen size ranging from 1100dp to 1549dp).
+* Updated Alexa Auto App to post a [notification](https://developer.android.com/training/cars/notifications) to the Notification Center when Alexa delivers a notification to the user. The user must ask Alexa to read their notifications to hear the notification content.
+* Simplified building of the Alexa Auto App by reducing the number of build options during setup.
+* Added SMS features to Alexa Auto App. The user can ask Alexa to read unread messages, send a message to a phone number or contact, and reply to a message using the primary bluetooth connected mobile phone.
+* Removed the red voice chrome animation previously used when Alexa was not available. The voice chrome now uses the standard blue speaking animation as Alexa speaks an error prompt.
+
+### Resolved Issues
+
+#### Auto SDK
+
+* Fixed an issue in which the Engine would not send an `AudioOutput.Resume` message to the client app in cases where the client has not yet responded to the previous `AudioOutput.Pause` message. This could cause a state where the SDK thinks the transient pause initiated for user and Alexa dialog never finished, preventing any further Alexa media from playing until the head unit restarts.
+* Fixed a race condition in `DoNotDisturb` capability agent that could cause a crash during Engine shutdown.
+* Fixed an issue in which Alexa speech did not play when the user asks to redial while their phone is disconnected.
+* Updated `MessageStream::write()` to return 0 when writing the data to the consumer fails rather than returning the data size.
+* Fixed issues in which the Engine did not send the `TemplateRuntime.ClearTemplate` message at the right time.
+* Pinned Conan package revisions of various dependencies to avoid sudden failures building Auto SDK.
+* Fixed an issue in which the Engine did not send `TemplateRuntime.ClearPlayerInfo` when the user signs out.
+* Fixed an issue in which the `Navigation.StartNavigation` AASB message did not include the correct POI details of the destination when the user selected the destination from the POI card shown on screen. Previously the “name” field in the template payload was populated with the address instead of the POI name.
+* Fixed an issue in which the local navigation skill produced a second, duplicate `TemplateRuntime.RenderTemplate` message for the `LocalSearchDetailTemplate1` card when the user started offline navigation with Alexa.
+* Fixed an issue in offline mode in which Alexa did not recognize followup requests like "select the first one" after the user requests a search for POIs or addresses.
+
+#### Alexa Auto App
+
+* Fixed various issues in the Alexa media session:
+    * Rather than leaving the media session active and open indefinitely, the media session deactivates, stops its service, and removes the foreground service notification when media is no longer playing. The media service also sets the session to be inactive when the user signs out of their Alexa account or disables Alexa on the head unit.
+    * The media session no longer reports error states when there is no player or sign-in error. The issue in which the error state could overtake a valid state of active media and remove all its supported controls from the session, breaking the media app UI and the instrument cluster or media widget display, is also resolved.
+    * Previously, if the user played Alexa media and then switched to the Spotify app or a local media source, Alexa media could not resume with voice or button press after the user switched back to the Alexa media UI . This is resolved so the user can switch between the two types of Alexa-aware players and properly pause or resume the content they are viewing on screen.
+    * The media session clears its playback data and stops playback when the customer signs out of their Alexa account on the head unit. Also resolved the issues that un-recoverably corrupted the state of the media session after user sign out.
+    * Fixed issues in which the media session could report unexpected playback states to Auto SDK, causing problems such as not being able to resume properly when paused for an utterance or skipping to the next song unexpectedly.
+* Fixed an issue in which the Alexa Voice UI would remain open and transparent after the voice session ended.
+* Fixed an issue in which the points of interest display card remained open when navigation started. Previously, the user had to manually close the card.
+* Fixed an issue in which the wake word is recognized before the user signed in to their Alexa account when LVC is enabled.
+* Fixed an issue in which the “None” string in the Alexa communications settings was always displayed in English.
+* Fixed an issue in which asking Alexa to set the volume updated the volume on the head unit as expected, but Alexa would respond with the wrong value to subsequent voice requests like "Alexa, what's the volume?"
+* Fixed a crash when using local media source control when notification listener access was not granted. [Allowlisting](https://source.android.com/docs/core/permissions/perms-allowlist) the Alexa Auto App for privileged install permission [MEDIA_CONTENT_CONTROL](https://developer.android.com/reference/android/Manifest.permission#MEDIA_CONTENT_CONTROL)  prior to installation is required by default, and notification listener access is no longer required to use local media source control.
+* Fixed an issue in which the user could not add an additional stop to the active navigation route because Alexa could not properly retrieve navigation context from the head unit.
+* Fixed an issue with offline calling in which Alexa would repeatedly prompt "Which phone number or contact do you want to call?" without ending the interaction if she could not resolve the user's requested contact name.
+* Fixed an external wake word engine integration issue.
+* Improved app stability
+
+### Known Issues
+
+#### Auto SDK
+
+**General**
+
+* The [Alexa Automotive UX guidelines](#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards) specify when to automatically dismiss a `TemplateRuntime` display card for each template type. The Engine publishes the `TemplateRuntime` interface messages `ClearTemplate` and `ClearPlayerInfo` based on the timeouts configured in the `aace.alexa.templateRuntimeCapabilityAgent` Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., `LocalSearchListTemplate2`) with a different timeout than other templates (e.g., `WeatherTemplate`). The configuration also does not provide a way for you to specify infinite timeout for `NowPlaying` cards. You must implement your application’s dismissal logic for display cards and media info accordingly.
+* There is a rare race condition in which publishing the `AlexaClient.StopForegroundActivity` message does not cancel the active Alexa interaction. The race condition can happen when the application publishes the message at the beginning of the `THINKING` state `AlexaClient.DialogStateChanged` transition.
+
+**Car control**
+
+* If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in the set from Alexa. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, Alexa retains endpoint 1 from set A, which might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try
+
+**Communications**
+
+* The dual-tone multi-frequency (DTMF) does work correctly when selecting the number 1.
+* Alexa-to-Alexa calls do not work on Linux armv8 platforms
+
+**Entertainment**
+
+* When music is playing, repeatedly pressing the “next” button to advance in the playlist restarts the current song.
+* When using the LVC extension, if the application publishes the `MediaPlaybackRequestor.RequestMediaPlayback` AASB message before the Auto SDK Engine connects to Alexa cloud, media playback will not automatically resume as expected. The workaround is to wait for the connection to Alexa cloud to complete before publishing the `RequestMediaPlayback` message.
+
+**Local Voice Control**
+
+* Alexa responds with an error to the utterance "Play FM radio" and requests to tune to a station name. "Change to FM radio" and "Switch to FM radio" work as expected.
+* Some contacts in the addressbook are not resolved correctly in offline mode.
+
+**C++ sample app**
+
+* The sample app may fail to handle synchronous-style `AASB messages` within the required timeout to construct device context for Alexa. As a result, some utterances may not work as expected.
+
+
+#### Alexa Auto App
+
+* If there is no internet connection when the user launches Alexa for the first time in the ignition cycle, the “No Network Connection” message displays momentarily and disappears.
+* The Alexa Auto App doesn’t reconnect to LVC when when the user switches the default assistant from Alexa to a different voice assistant and then back to Alexa. Alexa Auto App needs to be restarted (e.g., by a new ignition cycle) to reconnect to LVC.
+* Alexa can take up to 90 seconds to reconnect when lost network connection is restored.
+* If the user has two phones connected to the head unit and asks Alexa to read their SMS messages, the reply comes from the secondary phone instead of the primary phone. 
+* When the user asks Alexa to read their messages after she has already read them, Alexa reads the same messages again instead of replying that there are no new messages to read.
+
+
+## v4.1.1 released on 2022-80-08
+
+### Enhancements
+
 * Improved Auto SDK AACS Sample App Setup and Settings UX.
 * Updated APL renderer app component, as well as dependent APL Viewhost Android libraries (AARs). It is highly recommended you update to release 4.1.1 for APL integrations.
 >**Note:** All Auto SDK 4.1 extensions are compatible with 4.1.1.
 
 ### Resolved Issues
+
 * Improved the settings menu by expanding the clickable area of settings, and added missing descriptions for menu items.
 * Fixed a race condition in which updating the Alexa language setting, and then navigating away from the menu page could crash the application without switching the language.
 * Fixed an issue in which the Alexa comms permission screen did not render properly. Improved the margin alignment issue in the setup screens.
 
 ### Known Issues
+
 **General**
 
 * The [Alexa Automotive UX guidelines](#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards) specify when to automatically dismiss a `TemplateRuntime` display card for each template type. The Engine publishes the `TemplateRuntime` interface messages `ClearTemplate` and `ClearPlayerInfo` based on the timeouts configured in the `aace.alexa.templateRuntimeCapabilityAgent` Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., `LocalSearchListTemplate2`) with a different timeout than other templates (e.g., `WeatherTemplate`). The configuration also does not provide a way for you to specify infinite timeout for `NowPlaying` cards. You must implement your application’s dismissal logic for display cards and media info accordingly.
@@ -1324,3 +1427,4 @@ The following enhancements were added to the Alexa Auto SDK since the last Alpha
 * On App startup we see the following messages (none of these will cause any issues):
    * E/AVS:SQLiteAlertStorage:openFailed::File specified does not exist.:file path=/data/user/0/com.amazon.sampleapp/cache/appdata/alerts.sqlite
 * Several minor documentation issues that will be addressed in the GA release
+

@@ -20,6 +20,7 @@
 #include <AACE/Engine/MessageBroker/MessageBrokerInterface.h>
 #include <AASB/Message/Alexa/AlexaClient/ConnectionStatus.h>
 #include <AASB/Message/Alexa/AlexaClient/ConnectionChangedReason.h>
+#include <AASB/Message/Alexa/AlexaClient/DialogState.h>
 
 namespace aasb {
 namespace engine {
@@ -33,7 +34,7 @@ public:
         std::shared_ptr<aace::engine::messageBroker::MessageBrokerInterface> messageBroker);
 
     // aace::alexa::AASBAlexaClient
-    void dialogStateChanged(DialogState state) override;
+    void dialogStateChanged(aace::alexa::AssistantIdType id, DialogState state) override;
     void authStateChanged(AuthState state, AuthError error) override;
     void connectionStatusChanged(
         ConnectionStatus status,
@@ -51,6 +52,9 @@ private:
 
     static aasb::message::alexa::alexaClient::ConnectionChangedReason convertReason(
         aace::alexa::AlexaClient::ConnectionChangedReason reason);
+
+    static aasb::message::alexa::alexaClient::DialogState convertDialogState(
+        aace::alexa::AlexaClient::DialogState dialogState);
 };
 
 }  // namespace alexa

@@ -77,6 +77,7 @@
 #include <RegistrationManager/RegistrationManagerFactory.h>
 #include <RegistrationManager/RegistrationNotifierInterface.h>
 #include <SpeakerManager/SpeakerManager.h>
+#include <SpeakerManager/SpeakerManagerMiscStorage.h>
 #include <SQLiteStorage/SQLiteMiscStorage.h>
 #include <System/SoftwareInfoSender.h>
 #include <System/UserInactivityMonitor.h>
@@ -95,15 +96,17 @@
 #include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
 #include "AACE/Engine/Storage/StorageEngineService.h"
 #include "AACE/Engine/Vehicle/VehicleEngineService.h"
+#include "AACE/Engine/Wakeword/WakewordManagerEngineService.h"
+#include "AACE/Engine/Arbitrator/ArbitratorEngineService.h"
 #include <AACE/Engine/Alexa/AlexaEngineLocationStateProvider.h>
 
-#include "AlertsEngineImpl.h"
 #include "AlexaClientEngineImpl.h"
 #include "AlexaComponentInterface.h"
 #include "AlexaEndpointInterface.h"
 #include "AlexaEngineClientObserver.h"
 #include "AlexaEngineLogger.h"
 #include "AlexaSpeakerEngineImpl.h"
+#include "AssistantInfoManager.h"
 #include "AudioPlayerEngineImpl.h"
 #include "AuthorizationManager.h"
 #include "AuthProviderEngineImpl.h"
@@ -158,7 +161,9 @@ public:
         DEPENDS(aace::engine::network::NetworkEngineService),
         DEPENDS(aace::engine::storage::StorageEngineService),
         DEPENDS(aace::engine::vehicle::VehicleEngineService),
-        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
+        DEPENDS(aace::engine::wakeword::WakewordManagerEngineService),
+        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService),
+        DEPENDS(aace::engine::arbitrator::ArbitratorEngineService))
 
 private:
     AlexaEngineService(const aace::engine::core::ServiceDescription& description);
@@ -233,6 +238,7 @@ public:
     std::shared_ptr<AuthorizationManager> getAuthorizationManager() override;
     std::shared_ptr<alexaClientSDK::settings::DeviceSettingsManager> getDeviceSettingsManager() override;
     std::shared_ptr<alexaClientSDK::acl::PostConnectSequencerFactory> getPostConnectSequencerFactory() override;
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> getAgentManager() override;
     /// @}
 
     /// AlexaEndpointInterface
@@ -324,13 +330,15 @@ private:
     void recordVehicleMetric();
     bool registerProperties();
 
+    bool register3PWakewordManagerDelegate(
+        std::shared_ptr<aace::engine::wakeword::WakewordManagerDelegateInterface> wakewordManagerDelegate);
+
     // platform interface registration
     template <class T>
     bool registerPlatformInterfaceType(std::shared_ptr<aace::core::PlatformInterface> platformInterface) {
         std::shared_ptr<T> typedPlatformInterface = std::dynamic_pointer_cast<T>(platformInterface);
         return typedPlatformInterface != nullptr ? registerPlatformInterfaceType(typedPlatformInterface) : false;
     }
-    bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::Alerts> alerts);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::AlexaClient> alexaClient);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::AlexaSpeaker> alexaSpeaker);
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::AudioPlayer> audioPlayer);
@@ -417,9 +425,12 @@ private:
 
     std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> m_shutdownNotifier;
     std::shared_ptr<alexaClientSDK::acsdkShutdownManagerInterfaces::ShutdownManagerInterface> m_shutdownManager;
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> m_agentManager;
 
     std::string m_avsGateway;
     std::string m_lwaEndpoint;
+
+    std::shared_ptr<AssistantInfoManager> m_assistantInfoManager;
 
     /// ACMS endpoint provided as part of the engine configuration.
     std::string m_acmsEndpoint;
@@ -447,7 +458,6 @@ private:
     std::vector<std::string> m_authProviderNames;
 
     // engine implementation object references
-    std::shared_ptr<aace::engine::alexa::AlertsEngineImpl> m_alertsEngineImpl;
     std::shared_ptr<aace::engine::alexa::AlexaClientEngineImpl> m_alexaClientEngineImpl;
     std::shared_ptr<aace::engine::alexa::AlexaSpeakerEngineImpl> m_alexaSpeakerEngineImpl;
     std::shared_ptr<aace::engine::alexa::AudioPlayerEngineImpl> m_audioPlayerEngineImpl;

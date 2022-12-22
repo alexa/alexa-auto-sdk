@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,8 +54,6 @@ import com.amazon.autovoicechrome.util.AutoVoiceChromeState;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.Optional;
@@ -71,10 +71,13 @@ public class VoiceActivity extends AppCompatActivity {
     private Disposable mActivityControllerDisposable;
     private boolean mVoiceSessionInUse;
     private boolean mSessionEnded;
-    private AutoVoiceChromeState mCurrentAlexaDialogState;
+    private String mCurrentAlexaDialogState;
     private Disposable mViewControllerDisposable;
     private MediaPlayer mNetworkErrorTTSPrompt;
     private Fragment mVoiceFragment;
+    private static final Integer TRANSITION_TO_IDLE_WAIT_TIME = 500;
+    private Runnable mTransitionToIdleRunnable;
+    private Handler mHandler;
 
     @NonNull
     AutoVoiceChromeController mAutoVoiceChromeController;
@@ -95,8 +98,8 @@ public class VoiceActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
-        setTheme(R.style.Theme_Alexa_VoiceInteractionUi_Activity);
         setContentView(R.layout.autovoiceinteraction_layout);
 
         mAutoVoiceChromeController = new AutoVoiceChromeController(getApplicationContext());
@@ -107,7 +110,6 @@ public class VoiceActivity extends AppCompatActivity {
 
         EventBus.getDefault().register(this);
         mEarconController.initEarcon();
-        mNetworkErrorTTSPrompt = MediaPlayer.create(getApplicationContext(), R.raw.auto_error_offline);
         initializeProviders();
 
         // Getting voice chrome view group for auto voice chrome controller
@@ -116,15 +118,15 @@ public class VoiceActivity extends AppCompatActivity {
         ViewGroup v = (ViewGroup) mContentView;
 
         // Getting voice chrome view group for auto voice chrome controller
-        ViewGroup autoVoiceChromeBarView = (ViewGroup) v.getChildAt(1);
-
+        ViewGroup autoVoiceChromeBarView = v.findViewById(R.id.auto_voice_chrome_bar_view);
         mAutoVoiceChromeController.initialize(autoVoiceChromeBarView);
 
         // Initializing animation provider if it exists
         if (mAnimationProvider != null) {
             // Inflate custom animation layout onto the root view
-            getLayoutInflater().inflate(mAnimationProvider.getCustomLayout(), v);
-            ViewGroup autoCustomAnimationView = (ViewGroup) v.getChildAt(2);
+            ViewGroup autoCustomAnimationView = (ViewGroup) getLayoutInflater()
+                    .inflate(mAnimationProvider.getCustomLayout(), null);
+            v.addView(autoCustomAnimationView);
             mAnimationProvider.initialize(getApplicationContext(), autoCustomAnimationView);
         }
 
@@ -132,9 +134,27 @@ public class VoiceActivity extends AppCompatActivity {
         // screen, the UX could be replace with "X" button, need UX confirm
         mContentView.setOnClickListener(view -> cancelAlexaDialog());
 
+        mTransitionToIdleRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!mVoiceSessionInUse) {
+                    finish();
+                }
+            }
+        };
+        mHandler = new Handler(Looper.getMainLooper());
+
+        mNetworkErrorTTSPrompt = MediaPlayer.create(getApplicationContext(), R.raw.auto_error_offline);
+        mNetworkErrorTTSPrompt.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mPlayer) {
+                mHandler.postDelayed(mTransitionToIdleRunnable, TRANSITION_TO_IDLE_WAIT_TIME);
+            }
+        });
+
         Bundle args = getIntent().getExtras();
-        mCurrentAlexaDialogState = AutoVoiceChromeState.IDLE;
-        if (args != null && args.containsKey(AASBConstants.TOPIC))
+        mCurrentAlexaDialogState = AASBConstants.AlexaClient.DIALOG_STATE_IDLE;
+        if (args != null && args.getString(AASBConstants.ACTION) != null && args.containsKey(AASBConstants.TOPIC))
             sendAutoVoiceUIMessage(args);
 
         setVISViewForSessionController();
@@ -143,21 +163,20 @@ public class VoiceActivity extends AppCompatActivity {
     public void onStart() {
         Log.d(TAG, "onStart");
         super.onStart();
-
         if (!isFinishing()) {
-            // Clear previous added fragment if voice session is not in used
-            if (!mVoiceSessionInUse) {
-                AlexaApp.from(getApplicationContext())
-                        .getRootComponent()
-                        .getComponent(SessionActivityController.class)
-                        .ifPresent(SessionActivityController::removeFragment);
-            }
-
-            // Subscribe fragment added observable to add/remove fragment in voice activity
             AlexaApp app = AlexaApp.from(getApplicationContext());
             Optional<SessionActivityController> viewController =
                     app.getRootComponent().getComponent(SessionActivityController.class);
+
             viewController.ifPresent(sessionActivityController -> {
+                // Clear previously consumed fragment. Non-consumed fragments were added while the session was closed
+                // and launched a new session to be shown
+                if (sessionActivityController.isFragmentConsumed()) {
+                    Log.i(TAG, "Removing the previously consumed fragment, if one exists");
+                    sessionActivityController.removeFragment();
+                }
+
+                // Subscribe fragment added observable to add/remove fragment in voice activity
                 mActivityControllerDisposable =
                         sessionActivityController.getFragmentAddedObservable().subscribe(fragmentAdded -> {
                             Log.d(TAG, "ActivityControllerDisposable | fragmentAdded | " + fragmentAdded);
@@ -165,6 +184,7 @@ public class VoiceActivity extends AppCompatActivity {
 
                             mVoiceFragment = sessionActivityController.getFragment();
                             if (mVoiceFragment != null) {
+                                sessionActivityController.consumeFragment();
                                 if (fragmentAdded) {
                                     getSupportFragmentManager()
                                             .beginTransaction()
@@ -204,13 +224,14 @@ public class VoiceActivity extends AppCompatActivity {
         super.onStop();
 
         mVoiceSessionInUse = false;
-        finish();
+        cancelAlexaDialog();
     }
 
     @Override
     public void finish() {
         Log.d(TAG, "finish");
         super.finish();
+        overridePendingTransition(0,0);
 
         // Clean up visuals and eventbus in finish() callback instead of onDestroy() to prevent
         // leaking IntentReceiver and crashing the app when session is finished.
@@ -245,17 +266,22 @@ public class VoiceActivity extends AppCompatActivity {
             mActivityControllerDisposable.dispose();
             mActivityControllerDisposable = null;
         }
+        mHandler.removeCallbacksAndMessages(null);
     }
 
     @Subscribe
     public void onVoiceUiStateChange(AutoVoiceUIMessage message) {
         Log.d(TAG,
                 "Receiving voice interaction message, topic: " + message.getTopic()
-                        + " action: " + message.getAction());
+                        + " | action: " + message.getAction() + " | payload: " + message.getPayload());
         final String messageTopic = message.getTopic();
         final String messageAction = message.getAction();
         final String messagePayload = message.getPayload();
         if (!isFinishing()) {
+            removeHandlerCallbacks(mTransitionToIdleRunnable);
+            if(messageAction.equals(Action.AlexaClient.CLOSE_DISPLAY_CARD)) {
+                finish();
+            }
             if (Topic.SPEECH_RECOGNIZER.equals(messageTopic)) {
                 switch (messageAction) {
                     case Action.SpeechRecognizer.WAKEWORD_DETECTED:
@@ -277,7 +303,7 @@ public class VoiceActivity extends AppCompatActivity {
                         break;
                 }
             } else if (Constants.TOPIC_ALEXA_CONNECTION.equals(messageTopic)) {
-                if (Constants.ACTION_ALEXA_NOT_CONNECTED.equals(messagePayload)) {
+                if (Constants.ACTION_ALEXA_NOT_CONNECTED.equals(messageAction) && !ModuleProvider.isAlexaCustomAssistantEnabled(getApplicationContext())) {
                     // Error chrome is only shown if authenticated
                     if (AlexaApp.from(getApplicationContext())
                                     .getRootComponent()
@@ -288,30 +314,36 @@ public class VoiceActivity extends AppCompatActivity {
                     }
                 }
             } else if (Constants.TOPIC_VOICE_ANIMATION.equals(messageTopic)) {
-                switch (message.getAction()) {
+                switch (messageAction) {
                     case Action.AlexaClient.DIALOG_STATE_CHANGED:
-                        mCurrentAlexaDialogState = convertToAutoVoiceChromeDialogState(message.getPayload());
-                        if (mAnimationProvider != null) {
-                            // Switching animation for dialog state changed
-                            switchAnimation(mCurrentAlexaDialogState.toString());
-                        } else {
-                            mAutoVoiceChromeController.onStateChanged(
-                                    convertToAutoVoiceChromeDialogState(mCurrentAlexaDialogState.toString()));
-                        }
-
-                        if (AutoVoiceChromeState.IDLE.equals(mCurrentAlexaDialogState)) {
+                        mCurrentAlexaDialogState = messagePayload;
+                        if (AASBConstants.AlexaClient.DIALOG_STATE_IDLE.equals(mCurrentAlexaDialogState)) {
                             mSessionEnded = true;
+                            //Schedule  finishing the activity after the idle transition animation completes.
+                            if (!mVoiceSessionInUse)
+                                mHandler.postDelayed(mTransitionToIdleRunnable, TRANSITION_TO_IDLE_WAIT_TIME);
                         }
-                        if (AutoVoiceChromeState.LISTENING.equals(mCurrentAlexaDialogState)) {
+                        if (AASBConstants.AlexaClient.DIALOG_STATE_LISTENING.equals(mCurrentAlexaDialogState)) {
                             mSessionEnded = false;
-                        } else if (AASBConstants.AlexaClient.DIALOG_STATE_EXPECTING.equals(
-                                           mCurrentAlexaDialogState.toString())) {
+                        }
+                        if (AASBConstants.AlexaClient.DIALOG_STATE_EXPECTING.equals(
+                                           message.getPayload())) {
                             if (mEarconProvider != null) {
                                 mEarconController.playAudioCueStartVoice(
                                         mEarconProvider.shouldUseAudioCueStartVoice(""));
                             } else {
                                 mEarconController.playAudioCueStartVoice();
                             }
+                            Log.d(TAG,
+                                    "Ignoring EXPECTING state for animation. Will transition to LISTENING automatically");
+                            return;
+                        }
+                        if (mAnimationProvider != null) {
+                            // Switching animation for dialog state changed
+                            switchAnimation(convertToAutoVoiceChromeDialogState(mCurrentAlexaDialogState).toString());
+                        } else {
+                            mAutoVoiceChromeController.onStateChanged(
+                                    convertToAutoVoiceChromeDialogState(mCurrentAlexaDialogState));
                         }
                         break;
                     case Action.Animation.ANIMATION_SWITCH:
@@ -321,6 +353,11 @@ public class VoiceActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void removeHandlerCallbacks(Runnable runnable) {
+        if (runnable != null)
+            mHandler.removeCallbacks(runnable);
     }
 
     private void initializeProviders() {
@@ -364,6 +401,7 @@ public class VoiceActivity extends AppCompatActivity {
      * visual elements onto.
      */
     private void setVISViewForSessionController() {
+        Log.d(TAG, "setVISViewForSessionController");
         ViewGroup view = findViewById(R.id.auto_voice_interaction_view);
         AlexaApp app = AlexaApp.from(getApplicationContext());
         Optional<SessionViewController> viewController =
@@ -404,20 +442,20 @@ public class VoiceActivity extends AppCompatActivity {
     AutoVoiceChromeState convertToAutoVoiceChromeDialogState(String state) {
         AutoVoiceChromeState autoVoiceChromeState = AutoVoiceChromeState.UNKNOWN;
         switch (state) {
-            case "IDLE":
-            case "EXPECTING":
+            case AASBConstants.AlexaClient.DIALOG_STATE_IDLE:
                 autoVoiceChromeState = AutoVoiceChromeState.IDLE;
                 break;
-            case "SPEAKING":
+            case AASBConstants.AlexaClient.DIALOG_STATE_SPEAKING:
                 autoVoiceChromeState = AutoVoiceChromeState.SPEAKING;
                 break;
-            case "THINKING":
+            case AASBConstants.AlexaClient.DIALOG_STATE_THINKING:
                 autoVoiceChromeState = AutoVoiceChromeState.THINKING;
                 break;
-            case "LISTENING":
+            case AASBConstants.AlexaClient.DIALOG_STATE_LISTENING:
                 autoVoiceChromeState = AutoVoiceChromeState.LISTENING;
                 break;
         }
+        Log.d(TAG, "Returning: " + autoVoiceChromeState.toString());
         return autoVoiceChromeState;
     }
 
@@ -428,6 +466,7 @@ public class VoiceActivity extends AppCompatActivity {
                     .ifPresent(message -> {
                         mMessageSender.sendMessage(Topic.ALEXA_CLIENT, Action.AlexaClient.STOP_FOREGROUND_ACTIVITY, "");
                     });
+            mSessionEnded = true;
         }
 
         AlexaApp app = AlexaApp.from(getApplicationContext());

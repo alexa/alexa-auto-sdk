@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import com.amazon.alexa.auto.apis.app.AlexaAppRootComponent;
 import com.amazon.alexa.auto.apis.app.ScopedComponent;
 import com.amazon.alexa.auto.apis.auth.AuthController;
+import com.amazon.alexa.auto.apis.media.PlayerInfoCache;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 import com.amazon.alexa.auto.app.dependencies.AppComponent;
 import com.amazon.alexa.auto.app.dependencies.DaggerAppComponent;
@@ -42,11 +43,14 @@ public class DefaultAlexaAppRootComponent implements AlexaAppRootComponent {
     private final Lazy<AlexaSetupController> mSetupController;
     @NonNull
     private final Lazy<AuthController> mAuthController;
+    @NonNull
+    private final Lazy<PlayerInfoCache> mPlayerInfoCache;
 
-    public DefaultAlexaAppRootComponent(
-            @NonNull Lazy<AlexaSetupController> setupController, @NonNull Lazy<AuthController> authController) {
+    public DefaultAlexaAppRootComponent(@NonNull Lazy<AlexaSetupController> setupController,
+            @NonNull Lazy<AuthController> authController, @NonNull Lazy<PlayerInfoCache> playerInfoCache) {
         mSetupController = setupController;
         mAuthController = authController;
+        mPlayerInfoCache = playerInfoCache;
     }
 
     @Override
@@ -57,6 +61,11 @@ public class DefaultAlexaAppRootComponent implements AlexaAppRootComponent {
     @Override
     public AuthController getAuthController() {
         return mAuthController.get();
+    }
+
+    @Override
+    public PlayerInfoCache getPlayerInfoCache() {
+        return mPlayerInfoCache.get();
     }
 
     @Override

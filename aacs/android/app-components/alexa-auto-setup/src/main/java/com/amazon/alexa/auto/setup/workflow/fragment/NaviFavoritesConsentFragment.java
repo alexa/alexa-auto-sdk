@@ -73,8 +73,6 @@ public class NaviFavoritesConsentFragment extends Fragment {
         useNaviFavoritesButtonView.setOnClickListener(view -> { updatePropertyAndNavigate(ENABLED); });
 
         if (ModuleProvider.isAlexaCustomAssistantEnabled(fragmentView.getContext())) {
-            ImageView alexaImage = fragmentView.findViewById(R.id.alexa_img_view);
-            alexaImage.setVisibility(View.GONE);
 
             TextView naviFavoritesPermissionText = fragmentView.findViewById(R.id.nav_favorites_permission_text_view);
             naviFavoritesPermissionText.setText(R.string.nav_favorites_permission_body_text);

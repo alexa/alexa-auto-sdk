@@ -17,6 +17,7 @@ package com.amazon.alexa.auto.apis.app;
 import androidx.annotation.NonNull;
 
 import com.amazon.alexa.auto.apis.auth.AuthController;
+import com.amazon.alexa.auto.apis.media.PlayerInfoCache;
 import com.amazon.alexa.auto.apis.setup.AlexaSetupController;
 
 import java.util.Optional;
@@ -52,6 +53,13 @@ public interface AlexaAppRootComponent {
      * @return Auth Controller.
      */
     AuthController getAuthController();
+
+    /**
+     * Provides the {@link PlayerInfoCache}.
+     *
+     * @return PlayerInfoCache.
+     */
+    PlayerInfoCache getPlayerInfoCache();
 
     /**
      * Activate the scoped component and bring it in scope.

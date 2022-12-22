@@ -16,6 +16,7 @@ package com.amazon.alexa.auto.media.dependencies;
 
 import android.content.Context;
 import android.media.AudioManager;
+import android.util.Log;
 
 import com.amazon.aacsipc.AACSSender;
 import com.amazon.alexa.auto.aacs.common.AACSMessageSender;
@@ -23,7 +24,6 @@ import com.amazon.alexa.auto.aacs.common.PlaybackControlMessages;
 import com.amazon.alexa.auto.apps.common.util.Preconditions;
 import com.amazon.alexa.auto.media.MusicStreamAttributeUpdater;
 import com.amazon.alexa.auto.media.aacs.handlers.AudioPlayerHandler;
-import com.amazon.alexa.auto.media.aacs.handlers.TemplateRuntimeHandler;
 import com.amazon.alexa.auto.media.player.MediaPlayerAudioFocusController;
 import com.amazon.alexa.auto.media.player.MediaPlayerExo;
 import com.amazon.alexa.auto.media.session.MediaSessionManager;
@@ -40,15 +40,19 @@ import dagger.Provides;
  */
 @Module
 public class AACSModule {
+    private static final String TAG = AACSModule.class.getSimpleName();
+
     @Provides
     @Singleton
     public PlaybackControlMessages providePlaybackControlMessageSender(AACSMessageSender sender) {
+        Log.v(TAG, "providePlaybackControlMessageSender");
         return new PlaybackControlMessages(sender);
     }
 
     @Provides
     @Singleton
     public AACSMessageSender provideMessageSender(WeakReference<Context> context) {
+        Log.v(TAG, "provideMessageSender");
         return new AACSMessageSender(context, new AACSSender());
     }
 
@@ -56,6 +60,7 @@ public class AACSModule {
     public AudioPlayerHandler provideAudioPlayerHandler(WeakReference<Context> contextWk,
             AACSMessageSender messageSender, MediaPlayerExo mediaPlayer,
             PlaybackControlMessages playbackControlMessages, MusicStreamAttributeUpdater musicStreamUpdater) {
+        Log.v(TAG, "provideAudioPlayerHandler");
         Context context = contextWk.get();
         Preconditions.checkNotNull(context);
 
@@ -65,10 +70,5 @@ public class AACSModule {
 
         return new AudioPlayerHandler(
                 messageSender, mediaPlayer, focusController, playbackControlMessages, musicStreamUpdater);
-    }
-
-    @Provides
-    public TemplateRuntimeHandler provideTemplateRuntimeHandler(MediaSessionManager mediaSessionManager) {
-        return new TemplateRuntimeHandler(mediaSessionManager);
     }
 }

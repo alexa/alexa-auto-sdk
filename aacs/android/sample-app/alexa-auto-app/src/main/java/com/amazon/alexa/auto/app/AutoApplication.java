@@ -28,12 +28,16 @@ import com.amazon.alexa.auto.app.dependencies.AndroidAppModule;
 import com.amazon.alexa.auto.app.dependencies.AppComponent;
 import com.amazon.alexa.auto.app.dependencies.DaggerAppComponent;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
+import com.amazon.alexa.auto.app.BuildConfig;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+
+import androidx.annotation.NonNull;
 
 /**
  * Application class which also provides component registry to constituent
@@ -41,6 +45,10 @@ import javax.inject.Inject;
  */
 public class AutoApplication extends Application implements AlexaApp {
     private static final String TAG = AutoApplication.class.getSimpleName();
+
+    // Version code and name
+    private String versionCode = Integer.toString(BuildConfig.VERSION_CODE);
+    private String versionName = BuildConfig.VERSION_NAME;
 
     private AppComponent mDaggerAppComponent;
     @Inject
@@ -61,6 +69,11 @@ public class AutoApplication extends Application implements AlexaApp {
             moduleInterface.initialize(getApplicationContext());
         }
         Log.i(TAG, "Alexa Auto App initialized");
+        Log.i(TAG, "APK Version Code: " + versionCode);
+        Log.i(TAG, "APK Version Name: " + versionName);
+
+        //TODO: Remove once Google fix ready: https://issuetracker.google.com/issues/245258072
+        setupDefaultUncaughtExceptionHeader();
     }
 
     /**
@@ -79,5 +92,46 @@ public class AutoApplication extends Application implements AlexaApp {
         // would like to get their dependencies from the returned
         // component.
         return mAppRootComponent;
+    }
+
+    /**
+     * Workaround solution: https://issuetracker.google.com/issues/245258072#comment39 to avoid
+     * application to be killed after failed to deliver a broadcast
+     */
+    private void setupDefaultUncaughtExceptionHeader() {
+        UncaughtExceptionHandler uncaughtExceptionHandler =
+            Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler(new CustomUncaughtExceptionHandler(uncaughtExceptionHandler));
+    }
+
+    private static class CustomUncaughtExceptionHandler implements UncaughtExceptionHandler {
+        private static final String CANNOT_DELIVER_BROADCAST_EXCEPTION =
+            "CannotDeliverBroadcastException";
+
+        private final UncaughtExceptionHandler handler;
+
+        CustomUncaughtExceptionHandler(UncaughtExceptionHandler handler) {
+            this.handler = handler;
+        }
+
+        /**
+         * Evaluate whether to silently absorb uncaught crashes such that they
+         * don't crash the app. We generally want to avoid this practice - we would
+         * rather know about them. However in some cases there's nothing we can do
+         * about the crash (e.g. it is an OS fault) and we would rather not have them
+         * pollute our reliability stats.
+         */
+        private boolean shouldAbsorb(Throwable exception) {
+            return CANNOT_DELIVER_BROADCAST_EXCEPTION.equals(exception.getClass().getSimpleName());
+        }
+
+        @Override
+        public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
+            if (shouldAbsorb(e)) {
+                Log.e(TAG, "Absorbing exception", e);
+            } else {
+                handler.uncaughtException(t, e);
+            }
+        }
     }
 }

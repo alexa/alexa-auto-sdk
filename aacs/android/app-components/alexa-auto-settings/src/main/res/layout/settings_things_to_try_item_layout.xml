@@ -34,7 +34,7 @@
             android:id="@+id/ttt_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/Alexa.Heading3Text"
+            android:textAppearance="?attr/headerText"
             android:textAlignment="center"
             android:layout_marginTop="@dimen/margin_vertical"
             android:hyphenationFrequency="normal"

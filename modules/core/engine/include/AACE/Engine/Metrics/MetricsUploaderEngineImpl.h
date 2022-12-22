@@ -27,6 +27,7 @@ namespace metrics {
 class MetricsUploaderEngineImpl : public aace::engine::logger::sink::Sink {
 public:
     static const std::string METRIC_RECORD_KEYWORD;
+    static const std::string CONTEXT_KEY;
     static const std::string PRIORITY_KEY;
     static const std::string PROGRAM_KEY;
     static const std::string SOURCE_KEY;

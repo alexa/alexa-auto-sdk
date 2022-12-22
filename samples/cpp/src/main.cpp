@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -90,9 +90,6 @@ static void usageExit(std::string& name) {
                  "  -i DEVICE\n"
                  "  --audio-input-device DEVICE\n"
                  "      Specify the audio input device.\n"
-                 "\n"
-                 "  --browser COMMAND\n"
-                 "      Open URL with the specified browser.\n"
                  "\n"
                  "  --media-player COMMAND\n"
                  "      Play audio with the specified media player.\n"
@@ -186,12 +183,6 @@ int main(int argc, const char* argv[]) {
                     }
                     input.close();
                     applicationContext->addMenuFilePath(arg);
-                } else if (c2(arg, ' ', "browser")) {
-                    if (++i == size) {
-                        missingArgumentExit(name, arg);
-                    }
-                    arg = list[i];
-                    applicationContext->setBrowserCommand(arg);
                 } else if (c2(arg, 'i', "audio-input-device")) {
                     if (++i == size) {
                         missingArgumentExit(name, arg);

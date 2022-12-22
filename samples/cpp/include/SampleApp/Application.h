@@ -38,6 +38,12 @@
 // Sample Authorization Interfaces
 #include "SampleApp/Authorization/AuthorizationHandler.h"
 
+#ifdef AAC_VAD_ENABLE
+// Sample Agent Handler Interface
+#include "SampleApp/3PAgent/AgentHandler.h"
+#include "SampleApp/3PAgent/PryonliteVAD.h"
+#endif
+
 // Sample Location Interfaces
 #include "SampleApp/Location/LocationProviderHandler.h"
 
@@ -52,7 +58,6 @@
 
 #ifdef AAC_ALEXA
 // Sample Alexa Interfaces
-#include "SampleApp/Alexa/AlertsHandler.h"
 #include "SampleApp/Alexa/AlexaClientHandler.h"
 #include "SampleApp/Alexa/AudioPlayerHandler.h"
 #include "SampleApp/Alexa/EqualizerControllerHandler.h"

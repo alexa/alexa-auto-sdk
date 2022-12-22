@@ -119,4 +119,16 @@ public class PlaybackControlMessages {
             return future;
         }
     }
+
+    /**
+     * Set Alexa AudioPlayer interface as the foreground activity of Alexa's content channel so GUI and VUI
+     * playback interactions act on AudioPlayer, even if another source like ExternalMediaPlayer was more recently
+     * playing.
+     *
+     * @return Future with status of send (true if send succeeded).
+     */
+    public Future<Boolean> setAudioPlayerAsForegroundActivity() {
+        Log.d(TAG, "Setting AudioPlayer as the foreground content channel activity");
+        return mAACSSender.sendMessage(Topic.AUDIO_PLAYER, Action.AudioPlayer.SET_AS_FOREGROUND_ACTIVITY, "");
+    }
 }

@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.amazon.alexa.auto.comms.ui.Constants;
+
 import java.io.Serializable;
 
 @Entity
@@ -28,11 +30,13 @@ public class ConnectedBTDevice implements Serializable {
     private String deviceAddress;
     private String deviceName;
     private String contactsUploadPermission;
+    private String messagingPermission;
 
     public ConnectedBTDevice() {
         deviceAddress = "";
         deviceName = "";
-        contactsUploadPermission = "NO";
+        contactsUploadPermission = Constants.CONTACTS_PERMISSION_NO;
+        messagingPermission = Constants.CONTACTS_PERMISSION_NO;
     }
 
     public int getId() {
@@ -65,5 +69,13 @@ public class ConnectedBTDevice implements Serializable {
 
     public void setContactsUploadPermission(String contactsUploadPermission) {
         this.contactsUploadPermission = contactsUploadPermission;
+    }
+
+    public String getMessagingPermission() {
+        return messagingPermission;
+    }
+
+    public void setMessagingPermission(String messagingPermission) {
+        this.messagingPermission = messagingPermission;
     }
 }

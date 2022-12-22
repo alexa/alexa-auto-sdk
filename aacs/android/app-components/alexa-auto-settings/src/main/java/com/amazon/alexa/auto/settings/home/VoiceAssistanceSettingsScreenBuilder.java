@@ -113,11 +113,6 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
                 handsfreePref.setSummary(R.string.setting_voice_assistance_wake_word_summary);
             }
 
-            Preference locationConsentPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_LOCATION_CONSENT);
-            if (locationConsentPref != null) {
-                locationConsentPref.setSummary(R.string.setting_voice_assistance_setting_location_consent_summary);
-            }
-
             // These settings will be within assistant settings instead of in the root level
             Preference signInPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_SIGNIN);
             if (signInPref != null)
@@ -150,6 +145,19 @@ public class VoiceAssistanceSettingsScreenBuilder implements AlexaSettingsScreen
 
             if (mScreen == null) {
                 mScreen = screen;
+            }
+
+            Preference locationConsentPref = screen.findPreference(PreferenceKeys.ALEXA_SETTINGS_LOCATION_CONSENT);
+            if (locationConsentPref != null) {
+                if ((mAssistantManager != null)
+                    && (!PreferenceKeys.ALEXA_SETTINGS_POWERED_BY_ALEXA_POLICY.equals(mAssistantManager.getCoAssistantPolicy()))) {
+                    locationConsentPref.setVisible(false);
+                }
+                else {
+                    locationConsentPref.setSummary(R.string.setting_voice_assistance_setting_location_consent_summary);
+                }
+            } else {
+                Log.w(TAG, "locationConsentPrefNull");
             }
 
             EventBus.getDefault().register(this);

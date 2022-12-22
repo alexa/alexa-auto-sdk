@@ -24,6 +24,7 @@
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
 #include <SmartScreenSDKInterfaces/TemplateRuntimeObserverInterface.h>
 #include <TemplateRuntimeCapabilityAgent/TemplateRuntime.h>
+#include <RegistrationManager/CustomerDataManagerInterface.h>
 
 #include "AACE/Alexa/AlexaEngineInterfaces.h"
 #include "AACE/Alexa/TemplateRuntime.h"
@@ -50,7 +51,8 @@ private:
             renderPlayerInfoCardsProviderInterfaces,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager);
 
 public:
     static std::shared_ptr<TemplateRuntimeEngineImpl> create(
@@ -62,7 +64,8 @@ public:
             renderPlayerInfoCardsProviderInterfaces,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> focusManager,
         std::shared_ptr<alexaClientSDK::avsCommon::avs::DialogUXStateAggregator> dialogUXStateAggregator,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager);
 
     void setRenderPlayerInfoCardsProviderInterface(
         std::unordered_set<
@@ -77,10 +80,13 @@ public:
     //
     // TemplateRuntimeObserverInterface
     //
-    void renderTemplateCard(const std::string& jsonPayload, alexaClientSDK::avsCommon::avs::FocusState focusState)
-        override;
+    void renderTemplateCard(
+        const std::string& token,
+        const std::string& jsonPayload,
+        alexaClientSDK::avsCommon::avs::FocusState focusState) override;
     void clearTemplateCard(const std::string& token) override;
     void renderPlayerInfoCard(
+        const std::string& token,
         const std::string& jsonPayload,
         alexaSmartScreenSDK::smartScreenSDKInterfaces::AudioPlayerInfo audioPlayerInfo,
         alexaClientSDK::avsCommon::avs::FocusState focusState,

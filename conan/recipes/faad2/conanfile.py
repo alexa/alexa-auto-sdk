@@ -19,14 +19,14 @@ class Faad2Conan(ConanFile):
     source_subfolder = "source_subfolder"
 
     def build_requirements(self):
-        if hasattr(self, 'settings_build') and tools.cross_building(self, skip_x64_x86=True):
-            pass # use libtool provided by the toolchain
+        if hasattr(self, "settings_build") and tools.cross_building(self, skip_x64_x86=True):
+            pass  # use libtool provided by the toolchain
         else:
             self.build_requires("libtool/2.4.6")
 
     def source(self):
-        tarball = '_'.join(self.version.split('.'))
-        tools.get('https://github.com/knik0/faad2/archive/refs/tags/{file}.tar.gz'.format(file=tarball))
+        tarball = "_".join(self.version.split("."))
+        tools.get("https://github.com/knik0/faad2/archive/refs/tags/{file}.tar.gz".format(file=tarball))
         extracted_dir = self.name + "-" + tarball
         os.rename(extracted_dir, self.source_subfolder)
 
@@ -36,9 +36,9 @@ class Faad2Conan(ConanFile):
             autotools = AutoToolsBuildEnvironment(self)
             _args = ["--prefix=%s/builddir" % (os.getcwd()), "CFLAGS=-fPIC", "CXXFLAGS=-fPIC"]
             if self.options.shared:
-                _args.extend(['--enable-shared=yes', '--enable-static=no'])
+                _args.extend(["--enable-shared=yes", "--enable-static=no"])
             else:
-                _args.extend(['--enable-shared=no', '--enable-static=yes'])
+                _args.extend(["--enable-shared=no", "--enable-static=yes"])
             autotools.configure(args=_args)
             autotools.make(args=["-j4"])
             autotools.install()

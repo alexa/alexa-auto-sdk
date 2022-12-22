@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,12 +13,12 @@
  * permissions and limitations under the License.
  */
 
-#include <AASB/Engine/Alexa/AASBAudioPlayer.h>
 #include <AACE/Engine/Core/EngineMacros.h>
-
-#include <AASB/Message/Alexa/AudioPlayer/PlayerActivityChangedMessage.h>
-#include <AASB/Message/Alexa/AudioPlayer/GetPlayerPositionMessage.h>
+#include <AASB/Engine/Alexa/AASBAudioPlayer.h>
 #include <AASB/Message/Alexa/AudioPlayer/GetPlayerDurationMessage.h>
+#include <AASB/Message/Alexa/AudioPlayer/GetPlayerPositionMessage.h>
+#include <AASB/Message/Alexa/AudioPlayer/PlayerActivityChangedMessage.h>
+#include <AASB/Message/Alexa/AudioPlayer/SetAsForegroundActivityMessage.h>
 
 namespace aasb {
 namespace engine {
@@ -96,6 +96,20 @@ bool AASBAudioPlayer::initialize(std::shared_ptr<aace::engine::messageBroker::Me
                     m_messageBroker_lock->publish(getPlayerDurationMessageReply.toString()).send();
                 } catch (std::exception& ex) {
                     AACE_ERROR(LX(TAG, "GetPlayerDurationMessage").d("reason", ex.what()));
+                }
+            });
+
+        messageBroker->subscribe(
+            aasb::message::alexa::audioPlayer::SetAsForegroundActivityMessage::topic(),
+            aasb::message::alexa::audioPlayer::SetAsForegroundActivityMessage::action(),
+            [wp](const Message& message) {
+                try {
+                    AACE_INFO(LX(TAG, "SetAsForegroundActivityMessage"));
+                    auto sp = wp.lock();
+                    ThrowIfNull(sp, "invalidWeakPtrReference");
+                    sp->setAsForegroundActivity();
+                } catch (std::exception& ex) {
+                    AACE_ERROR(LX(TAG, "SetAsForegroundActivityMessage").d("reason", ex.what()));
                 }
             });
         return true;

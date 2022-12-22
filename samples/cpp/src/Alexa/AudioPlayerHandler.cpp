@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <AASB/Message/Alexa/AudioPlayer/GetPlayerDurationMessage.h>
 #include <AASB/Message/Alexa/AudioPlayer/GetPlayerPositionMessage.h>
+#include <AASB/Message/Alexa/AudioPlayer/SetAsForegroundActivityMessage.h>
 
 // C++ Standard Library
 #include <sstream>
@@ -123,6 +124,12 @@ int64_t AudioPlayerHandler::getPlayerPosition() {
     return waitForAsyncReply(msg.header.id);
 }
 
+void AudioPlayerHandler::setAsForegroundActivity() {
+    // Publish the "SetAsForegroundActivityMessage" message
+    SetAsForegroundActivityMessage msg;
+    m_messageBroker->publish(msg.toString());
+}
+
 void AudioPlayerHandler::handleGetPlayerDurationMessageReply(const std::string& message) {
     log(logger::LoggerHandler::Level::INFO, "Received GetPlayerDurationMessageReply");
     GetPlayerDurationMessageReply msg = json::parse(message);
@@ -168,6 +175,20 @@ void AudioPlayerHandler::setupUI() {
             if (auto console = m_console.lock()) {
                 console->printLine(
                     "Player Position: " + std::to_string(playerPosition) + " / " + std::to_string(playerDuration));
+            }
+        });
+
+        return true;
+    });
+
+    activity->registerObserver(Event::onSetAsForegroundActivity, [=](const std::string& value) {
+        log(logger::LoggerHandler::Level::VERBOSE, "onSetAsForegroundActivity:");
+
+        setAsForegroundActivity();
+
+        activity->runOnUIThread([=]() {
+            if (auto console = m_console.lock()) {
+                console->printLine("AudioPlayer is the foreground player");
             }
         });
 

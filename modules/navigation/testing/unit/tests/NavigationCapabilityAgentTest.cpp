@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,13 +44,13 @@ static const std::string MESSAGE_ID("messageId");
 
 class TestNavigationHandler : public aace::engine::navigation::NavigationHandlerInterface {
 public:
-    MOCK_METHOD0(cancelNavigation, void());
-    MOCK_METHOD0(getNavigationState, std::string());
-    MOCK_METHOD0(showPreviousWaypoints, void());
-    MOCK_METHOD0(navigateToPreviousWaypoint, void());
+    MOCK_METHOD1(cancelNavigation, void(alexaClientSDK::avsCommon::avs::AgentId::IdType agentId));
+    MOCK_METHOD1(getNavigationState, std::string(alexaClientSDK::avsCommon::avs::AgentId::IdType agentId));
+    MOCK_METHOD1(showPreviousWaypoints, void(alexaClientSDK::avsCommon::avs::AgentId::IdType agentId));
+    MOCK_METHOD1(navigateToPreviousWaypoint, void(alexaClientSDK::avsCommon::avs::AgentId::IdType agentId));
     MOCK_METHOD1(showAlternativeRoutes, void(aace::navigation::Navigation::AlternateRouteType alternateRouteType));
     MOCK_METHOD1(controlDisplay, void(aace::navigation::Navigation::ControlDisplay controlDisplay));
-    MOCK_METHOD1(startNavigation, void(const std::string& payload));
+    MOCK_METHOD2(startNavigation, void(alexaClientSDK::avsCommon::avs::AgentId::IdType agentId, const std::string& payload));
     MOCK_METHOD1(announceManeuver, void(const std::string& payload));
     MOCK_METHOD1(announceRoadRegulation, void(aace::navigation::Navigation::RoadRegulation roadRegulation));
 };
@@ -210,7 +210,9 @@ TEST_F(NavigationCapabilityAgentTest, testSetDestinationDirective) {
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
         alexaClientSDK::avsCommon::avs::AVSDirective::create("", avsMessageHeader, MockPayload, attachmentManager, "");
 
-    EXPECT_CALL(*m_testNavigationHandler, startNavigation(MockPayload)).Times(testing::Exactly(1));
+    auto alexaAgentId = alexaClientSDK::avsCommon::avs::AgentId::getAlexaAgentId();
+
+    EXPECT_CALL(*m_testNavigationHandler, startNavigation(alexaAgentId, MockPayload)).Times(testing::Exactly(1));
 
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);
@@ -224,7 +226,9 @@ TEST_F(NavigationCapabilityAgentTest, testCancelNavigationDirective) {
     std::shared_ptr<alexaClientSDK::avsCommon::avs::AVSDirective> directive =
         alexaClientSDK::avsCommon::avs::AVSDirective::create("", avsMessageHeader, "", attachmentManager, "");
 
-    EXPECT_CALL(*m_testNavigationHandler, cancelNavigation()).Times(testing::Exactly(1));
+    auto alexaAgentId = alexaClientSDK::avsCommon::avs::AgentId::getAlexaAgentId();
+
+    EXPECT_CALL(*m_testNavigationHandler, cancelNavigation(alexaAgentId)).Times(testing::Exactly(1));
 
     m_capAgent->CapabilityAgent::preHandleDirective(directive, std::move(m_mockDirectiveHandlerResult));
     m_capAgent->CapabilityAgent::handleDirective(MESSAGE_ID);

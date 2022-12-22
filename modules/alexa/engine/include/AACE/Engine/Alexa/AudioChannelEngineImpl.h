@@ -20,8 +20,6 @@
 #include <set>
 #include <atomic>
 
-#include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
-#include <AVSCommon/SDKInterfaces/AuthObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
@@ -42,7 +40,6 @@ namespace alexa {
 
 class AudioChannelEngineImpl
         : public aace::audio::AudioOutputEngineInterface
-        , public alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
         , public alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
@@ -60,8 +57,7 @@ public:
 
     virtual bool initializeAudioChannel(
         std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> audioOutputChannel,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate = nullptr);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
     virtual void doShutdown() override;
 
@@ -121,13 +117,6 @@ public:
     bool setMute(bool mute) override;
     bool getSpeakerSettings(
         alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings) override;
-
-    //
-    // alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface
-    //
-    void onAuthStateChange(
-        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
-        alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) override;
 
     //
     // aace::engine::alexa::DuckingInterface
@@ -213,6 +202,8 @@ private:
     bool execStartDucking();
     bool execStopDucking();
 
+    static alexaClientSDK::avsCommon::utils::mediaPlayer::ErrorType convertErrorType(MediaError error);
+
 private:
     std::string m_name;
     std::shared_ptr<aace::engine::audio::AudioOutputChannelInterface> m_audioOutputChannel;
@@ -228,7 +219,6 @@ private:
         m_mediaPlayerObservers;
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> m_speakerManager;
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> m_authDelegate;
 
     alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId m_currentId;
     std::string m_url;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
 package com.amazon.alexaautoclientservice.modules.mediaManager;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.amazon.aacsconstants.AACSConstants;
-import com.amazon.alexaautoclientservice.NotificationListener;
 import com.amazon.alexaautoclientservice.modules.externalMediaPlayer.IDiscoveredPlayerProvider;
 
 import java.util.Collection;
@@ -34,38 +33,27 @@ import java.util.Map;
 public class LocalSessionHandler {
     private static final String TAG = AACSConstants.AACS + "-" + LocalSessionHandler.class.getSimpleName();
 
+    private final String mAlexaPackageName;
+    private final ComponentName mNotificationListenerName;
     private MediaSessionManager mMediaSessionManager;
-    private Context mContext;
     private final Map<String, LocalMediaSourceHandler> mSources;
     private IDiscoveredPlayerProvider mDiscoveredPlayerProvider;
 
-    public LocalSessionHandler() {
+    public LocalSessionHandler(@NonNull MediaSessionManager mediaSessionManager, @NonNull String alexaPackageName,
+            @Nullable ComponentName notificationListenerComponent) {
+        mMediaSessionManager = mediaSessionManager;
+        mAlexaPackageName = alexaPackageName;
+        mNotificationListenerName = notificationListenerComponent;
         mSources = new HashMap<>();
     }
 
-    public void onCreate(Context context) {
-        if (!NotificationListener.isEnabled(context)) {
-            Log.w(TAG,
-                    "Notification Listener permission is required for this feature to work, please provide the permission and restart the app to use Local Media Source controlling through Alexa");
-            return;
-        }
-        mMediaSessionManager = (MediaSessionManager) context.getSystemService(Context.MEDIA_SESSION_SERVICE);
-        if (mMediaSessionManager == null) {
-            Log.w(TAG, "MediaSessionManager is null, something went wrong");
-            return;
-        }
-        this.mContext = context;
-    }
-
     public void onInitialize() {
-        ComponentName listenerComponent = new ComponentName(mContext, NotificationListener.class);
-        mMediaSessionManager.addOnActiveSessionsChangedListener(mSessionsChangedListener, listenerComponent);
-        process(mMediaSessionManager, listenerComponent, null);
+        mMediaSessionManager.addOnActiveSessionsChangedListener(mSessionsChangedListener, mNotificationListenerName);
+        process(mMediaSessionManager.getActiveSessions(mNotificationListenerName));
     }
 
     public void onDestroy() {
         mMediaSessionManager.removeOnActiveSessionsChangedListener(mSessionsChangedListener);
-        this.mContext = null;
         Collection<LocalMediaSourceHandler> collection = mSources.values();
         for (LocalMediaSourceHandler localMediaSource : collection) {
             localMediaSource.cleanup();
@@ -79,7 +67,7 @@ public class LocalSessionHandler {
                 @Override
                 public void onActiveSessionsChanged(
                         @Nullable @org.jetbrains.annotations.Nullable List<MediaController> controllers) {
-                    process(null, null, controllers);
+                    process(controllers);
                 }
             };
 
@@ -95,12 +83,8 @@ public class LocalSessionHandler {
         }
     }
 
-    public void process(MediaSessionManager mediaSessionManager, ComponentName listenerComponent,
-            List<MediaController> controllerList) {
+    public void process(List<MediaController> controllerList) {
         Log.v(TAG, "Processing the session list");
-        if (mediaSessionManager != null && controllerList == null) {
-            controllerList = mediaSessionManager.getActiveSessions(listenerComponent);
-        }
         if (controllerList == null || controllerList.isEmpty()) {
             Log.v(TAG, "No active sessions right now");
         } else {
@@ -132,7 +116,7 @@ public class LocalSessionHandler {
      * @return true if package name belongs to Alexa media or MACC discovered players
      */
     private boolean isExceptionalApp(String packageName) {
-        return (packageName.equals(mContext.getPackageName()) || packageName.contains("com.amazon.alexa.auto.app")
+        return (packageName.equals(mAlexaPackageName) || packageName.contains("com.amazon.alexa.auto.app")
                 || (mDiscoveredPlayerProvider != null
                         && mDiscoveredPlayerProvider.containsDiscoveredPlayer(packageName)));
     }

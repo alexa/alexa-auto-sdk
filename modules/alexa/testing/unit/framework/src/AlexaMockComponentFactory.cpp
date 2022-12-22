@@ -345,6 +345,14 @@ std::unique_ptr<alexaClientSDK::endpoints::EndpointBuilder> AlexaMockComponentFa
     return std::move(m_mockEndpointBuilder);
 }
 
+std::shared_ptr<aace::test::unit::avs::MockActivityTrackerInterface> AlexaMockComponentFactory::
+    getActivityTrackerInterfaceMock() {
+    if (m_mockActivityTracker == nullptr) {
+        m_mockActivityTracker = std::make_shared<aace::test::unit::avs::MockActivityTrackerInterface>();
+    }
+    return m_mockActivityTracker;
+}
+
 std::shared_ptr<aace::test::unit::avs::MockMessageStorage> AlexaMockComponentFactory::getMessageStorageMock() {
     if (m_mockMessageStorage == nullptr) {
         m_mockMessageStorage = std::make_shared<aace::test::unit::avs::MockMessageStorage>();
@@ -458,14 +466,6 @@ std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> AlexaMoc
 //
 // platform interface mocks
 //
-
-std::shared_ptr<MockAlerts> AlexaMockComponentFactory::getAlertsMock() {
-    if (m_mockAlerts == nullptr) {
-        m_mockAlerts = std::make_shared<MockAlerts>();
-    }
-
-    return m_mockAlerts;
-}
 
 std::shared_ptr<MockNotifications> AlexaMockComponentFactory::getNotificationsMock() {
     if (m_mockNotifications == nullptr) {

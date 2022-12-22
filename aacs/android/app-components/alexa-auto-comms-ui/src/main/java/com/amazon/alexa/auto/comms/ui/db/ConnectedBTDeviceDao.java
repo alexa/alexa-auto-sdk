@@ -36,6 +36,9 @@ public interface ConnectedBTDeviceDao {
     List<ConnectedBTDevice> getConnectedDevicesSync();
 
     @Query("SELECT * FROM ConnectedBTDevice WHERE deviceAddress = :deviceAddress")
+    LiveData<ConnectedBTDevice> getConnectedBTDeviceByAddressLive(String deviceAddress);
+
+    @Query("SELECT * FROM ConnectedBTDevice WHERE deviceAddress = :deviceAddress")
     ConnectedBTDevice getConnectedDeviceByAddress(String deviceAddress);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -46,4 +49,7 @@ public interface ConnectedBTDeviceDao {
 
     @Update
     void updateConnectedBTDevice(ConnectedBTDevice btDevice);
+
+    @Query("DELETE FROM ConnectedBTDevice")
+    void nukeTable();
 }

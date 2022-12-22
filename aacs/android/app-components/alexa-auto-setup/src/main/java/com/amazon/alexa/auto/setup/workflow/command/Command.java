@@ -25,6 +25,7 @@ import org.greenrobot.eventbus.EventBus;
  */
 public abstract class Command {
     public static final String CHECK_DEFAULT_ASSIST_APP_COMMAND = "CheckDefaultAssistAppCommand";
+    public static final String CHECK_AACS_STATUS_COMMAND = "CheckAACSStatusCommand";
     public static final String CHECK_DRIVING_STATUS_COMMAND = "CheckDrivingStatusCommand";
     public static final String CHECK_NETWORK_STATUS_COMMAND = "CheckNetworkStatusCommand";
     public static final String CHECK_LANGUAGE_COMMAND = "CheckLanguageCommand";
@@ -34,6 +35,7 @@ public abstract class Command {
     public static final String SETUP_COMPLETE_COMMAND = "SetupCompleteCommand";
     public static final String NAVIGATION_FAVORITE_COMMAND = "CheckNaviFavoriteCommand";
     public static final String CHECK_SEPARATE_ADDRESSBOOK_CONSENT_COMMAND = "CheckSeparateAddressBookConsentCommand";
+    public static final String CHECK_SEPARATE_LOCATION_CONSENT_COMMAND = "CheckSeparateLocationConsentCommand";
 
     private final Context mContext;
 

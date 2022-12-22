@@ -41,13 +41,17 @@ bool play( ContentSelector type, std::string payload, const std::string& session
 
 The table below provides details about the supported `ContentSelector` types based on `Source` type:
 
-| Source type | Supported content selector(s) |
-|:------|:---------|
-| FM | FREQUENCY, PRESET |
-| AM | FREQUENCY, PRESET | 
-| SXM | CHANNEL, PRESET | 
-| DAB | CHANNEL |
-| DEFAULT | PRESET |
+
+| `Source` | Supported `ContentSelector` | `payload` examples
+|:---------|:----------------------------|:------------------|
+| FM  | FREQUENCY | "105.9" <br> "98.7 HD 1" |
+|     | PRESET    |  "2" |
+| AM  | FREQUENCY | "1100" <br> "840" |
+|     | PRESET    | "1" |
+| SXM | CHANNEL   | "22" <br> "70" |
+|     | PRESET    | "3"  |
+| DAB | CHANNEL   | “BBC Radio Extra 4”
+| DEFAULT | PRESET | "5" |
 
 The supported ranges and increments for valid frequency, preset, and channel may vary depending on the region you are in. Contact your partner manager for more detailed information.
 

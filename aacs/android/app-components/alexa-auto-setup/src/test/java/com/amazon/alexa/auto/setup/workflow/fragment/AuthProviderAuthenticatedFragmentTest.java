@@ -82,7 +82,7 @@ public class AuthProviderAuthenticatedFragmentTest {
 
             verify(mMockLoginViewModel, times(1)).setupCompleted();
 
-            TextView finishView = view.findViewById(R.id.auth_provider_login_finished_btn);
+            TextView finishView = view.findViewById(R.id.auth_provider_login_finished_button);
             finishView.performClick();
 
             verify(mMockLoginViewModel, times(1)).userFinishedLogin();

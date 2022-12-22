@@ -32,9 +32,6 @@ Your application must provide the `aace.alexa` configuration in the same format 
             "certifiedSender": {
                 "databaseFilePath": "${DATA_PATH}/certifiedSender.db"
             },
-            "alertsCapabilityAgent": {
-                "databaseFilePath": "${DATA_PATH}/alertsCapabilityAgent.db"
-            },
             "notifications": {
                 "databaseFilePath": "${DATA_PATH}/notifications.db"
             },
@@ -66,13 +63,13 @@ Your application must provide the `aace.alexa` configuration in the same format 
 }
 ```
 
-The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `alertsCapabilityAgent`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
+The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
 
 The `deviceSettings` field specifies the settings on the device. The following list describes the settings:
 
 * `databaseFilePath` is the path to the SQLite database that stores persistent settings. The database will be created on initialization if it does not already exist.
 * `defaultLocale` specifies the default locale setting, which is Alexa's locale setting until updated on the device. The default value of `defaultLocale` is “en-US”.
-* `locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR"]`.
+* `locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR", "ar-SA"]`.
 * `localeCombinations` specifies the list of locale pairs available on a device that supports multi-locale mode. Through the Dynamic Language Switching feature, Alexa can communicate with the user of such device in languages specified in the locale pairs. In each pair, the first value is the primary locale, which Alexa uses most often when interacting with the user. The second value is the secondary locale, which specifies an additional language that Alexa uses when responding to an utterance in the corresponding language. For example, if ["en-US", "es-US"] is declared in `localeCombinations` and the device specifies this pair as the current locale setting, Alexa primarily operates in English for the U.S. but can understand and respond to utterances in Spanish for the U.S., without requiring the device to update the locale setting.
   
     By default, `localeCombinations` is a list of the following combinations, which are also the supported combinations as of 2021-02-02. It is possible for the default value to be different from the list of supported combinations in the future. For updates to the supported combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations).
@@ -171,10 +168,6 @@ Provide a visual experience by building a UI based on the templates and media pl
 ### Control volume with AlexaSpeaker
 
 [AlexaSpeaker interface>>](./AlexaSpeaker.md)
-
-### Manage timers, alarms, and reminders with Alerts
-
-[Alerts interface>>](./Alerts.md)
 
 ### Render notification indicators with Notifications
 

@@ -16,9 +16,6 @@
 
     <item name="android:colorBackground">@color/OxfordBlue</item>
     <item name="android:colorBackgroundFloating">@color/Black</item>
-    <item name="colorOnBackground">@color/White</item>
-    <item name="hintColorOnBackground">@color/GrayChateau</item>
-    <item name="dividerColorOnBackground">@color/GrayChateau</item>
 
     <!-- Theme Shapes -->
     <item name="shapeAppearanceMediumComponent">@drawable/medium_component_background</item>

@@ -1,0 +1,52 @@
+{
+  "aace.metricsProxy": {
+    "assistants": [
+      {
+        "id": 2,
+        "allow": [
+          {
+            "program": "AlexaAuto_AlexaMetricSink",
+            "sources": [
+              {
+                "source": "SPEECH_SYNTHESIZER-TTS_STARTED"
+              },
+              {
+                "source": "SPEECH_SYNTHESIZER-TTS_FINISHED"
+              },
+              {
+                "source": "UPL-TTS"
+              }
+            ]
+          }
+        ],
+        "buffer": {
+          "size": 100,
+          "frequency": 600
+        }
+      },
+      {
+        "id": 3,
+        "allow": [
+          {
+            "program": "AlexaAuto_AlexaMetricSink",
+            "sources": [
+              {
+                "source": "SPEECH_SYNTHESIZER-TTS_STARTED"
+              },
+              {
+                "source": "SPEECH_SYNTHESIZER-TTS_FINISHED"
+              },
+              {
+                "source": "UPL-TTS"
+              }
+            ]
+          }
+        ],
+        "buffer": {
+          "size": 200,
+          "frequency": 300
+        }
+      }
+    ]
+  }
+}

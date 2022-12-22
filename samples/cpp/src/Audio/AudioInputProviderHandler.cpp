@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ void AudioInputProviderHandler::startAudioInput(std::shared_ptr<MessageStream> s
                     std::memset((char*)buffer, 0, bsize);
                 } else {
                     ssize_t count = read((char*)buffer, bsize);
-                    if (count < bsize) {
+                    if (count >= 0 && (size_t)count < bsize) {
                         std::memset(((char*)buffer) + count, 0, bsize - count);
                     }
                 }

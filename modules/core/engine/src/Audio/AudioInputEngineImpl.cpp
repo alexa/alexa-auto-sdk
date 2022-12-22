@@ -118,15 +118,23 @@ void AudioInputEngineImpl::doShutdown() {
 // AudioInputChannelEngineInterface
 ssize_t AudioInputEngineImpl::write(const int16_t* data, const size_t size) {
     try {
-        std::lock_guard<std::mutex> callbackLock(m_callbackMutex);
+        std::unique_lock<std::mutex> callbackLock(m_callbackMutex);
+        if (m_callbackMap.empty()){
+            return 0;
+        }
+
+        auto copyOfCallbackMap = m_callbackMap;
+
+        callbackLock.unlock();
 
         // execute the register callbacks
-        for (auto& next : m_callbackMap) {
+        for (auto& next : copyOfCallbackMap) {
             next.second(data, size);
         }
 
-        // always return a successful write even if some of the callbacks failed to write all
-        // of the data being provided... the audio input channel should handle retries or buffering
+        // return a successful write for any callback.
+        // if some of the callbacks failed to write all of the data being provided...
+        // the audio input channel should handle retries or buffering
         // on its own if it is needed!
         return size;
     } catch (std::exception& ex) {

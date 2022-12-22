@@ -11,8 +11,7 @@ class GStreamerConan(ConanFile):
     name = "gstreamer"
     version = "1.18.4"
     description = "GStreamer is a development framework for creating applications like media players, video editors, streaming media broadcasters and so on"
-    topics = ("conan", "gstreamer", "multimedia", "video",
-              "audio", "broadcasting", "framework", "media")
+    topics = ("conan", "gstreamer", "multimedia", "video", "audio", "broadcasting", "framework", "media")
     url = "https://github.com/conan-io/conan-center-index"
     homepage = "https://gstreamer.freedesktop.org/"
     license = "GPL-2.0-only"
@@ -41,11 +40,11 @@ class GStreamerConan(ConanFile):
         del self.settings.compiler.cppstd
 
     def config_options(self):
-        if self.settings.os == 'Windows':
+        if self.settings.os == "Windows":
             del self.options.fPIC
 
     def build_requirements(self):
-        if self.settings.os == 'Windows':
+        if self.settings.os == "Windows":
             self.build_requires("winflexbison/2.5.22")
         else:
             self.build_requires("bison/3.7.1")
@@ -67,7 +66,9 @@ class GStreamerConan(ConanFile):
         meson.options["tests"] = "disabled"
         if self.settings.os != "Linux":
             meson.options["introspection"] = "disabled"
-        meson.configure(build_folder=self._build_subfolder, source_folder=self._source_subfolder, args=['--wrap-mode=nofallback'])
+        meson.configure(
+            build_folder=self._build_subfolder, source_folder=self._source_subfolder, args=["--wrap-mode=nofallback"]
+        )
         self._meson = meson
         return self._meson
 
@@ -118,7 +119,12 @@ class GStreamerConan(ConanFile):
         # gstcoreelements and gstcoretracers are plugins which should be loaded dynamically, and not linked to directly
         if not self.options.shared:
             self.cpp_info.components["gstcoreelements"].names["pkg_config"] = "gstcoreelements"
-            self.cpp_info.components["gstcoreelements"].requires = ["glib::gobject-2.0", "glib::glib-2.0", "gstreamer-1.0", "gstreamer-base-1.0"]
+            self.cpp_info.components["gstcoreelements"].requires = [
+                "glib::gobject-2.0",
+                "glib::glib-2.0",
+                "gstreamer-1.0",
+                "gstreamer-base-1.0",
+            ]
             self.cpp_info.components["gstcoreelements"].libs = ["gstcoreelements"]
             self.cpp_info.components["gstcoreelements"].includedirs = [os.path.join("include", "gstreamer-1.0")]
             self.cpp_info.components["gstcoreelements"].libdirs = [gst_plugin_path]

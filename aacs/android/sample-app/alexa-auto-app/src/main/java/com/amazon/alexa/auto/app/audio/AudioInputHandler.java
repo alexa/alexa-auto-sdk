@@ -96,9 +96,10 @@ public class AudioInputHandler implements AudioIOServiceWorker, AACSReceiver.Fet
      * {@link #onStreamRequested)}.
      *
      * @param streamId Id of the stream.
+     * @param bytesWritten Size written to AutoSDK buffer
      */
     @Override
-    public void onStreamFetchCancelled(String streamId) {
+    public void onStreamFetchCancelled(String streamId, long bytesWritten) {
         Log.d(TAG, "Stream for writing audio input removed:" + streamId);
         ParcelFileDescriptor.AutoCloseOutputStream stream = mAudioStreams.get(streamId);
         if (stream != null) {
@@ -161,7 +162,8 @@ public class AudioInputHandler implements AudioIOServiceWorker, AACSReceiver.Fet
      */
     private void removeErroredStreams(@NonNull List<String> erroredStreams) {
         Log.w(TAG, "Removing failed streams");
-        erroredStreams.forEach(this::onStreamFetchCancelled);
+
+        erroredStreams.forEach(erroredStream -> this.onStreamFetchCancelled(erroredStream, -1));
         mMainThreadHandler.post(this::checkAndStopAudioInputCaptureIfRequired);
     }
 

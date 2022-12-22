@@ -8,7 +8,7 @@ class AvsDeviceSdkConan(ConanFile):
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
 
     name = "avs-device-sdk"
-    version = "1.25.0"
+    version = "1.26.0"
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake", "cmake_find_package"
     exports_sources = "CMakeLists.txt", "patches/*"
@@ -20,19 +20,17 @@ class AvsDeviceSdkConan(ConanFile):
     options = {
         "with_opus": [True, False],
         "with_endpoint_controllers": [True, False],
-        "with_metrics": [True,False],
-        "with_sensitive_logs": [True,False],
-        "with_curl_logs": [True,False],
-        "with_latency_logs": [True,False],
-        "build_testing": [True,False],
-        "with_curl_http_version_2_prior_knowledge": [True,False]
+        "with_metrics": [True, False],
+        "with_sensitive_logs": [True, False],
+        "with_latency_logs": [True, False],
+        "build_testing": [True, False],
+        "with_curl_http_version_2_prior_knowledge": [True, False],
     }
     default_options = {
         "with_opus": True,
         "with_endpoint_controllers": True,
         "with_metrics": True,
         "with_sensitive_logs": False,
-        "with_curl_logs": False,
         "with_latency_logs": False,
         "build_testing": False,
         "libcurl:shared": True,
@@ -73,13 +71,24 @@ class AvsDeviceSdkConan(ConanFile):
         cmake.definitions["ENABLE_ALL_ENDPOINT_CONTROLLERS"] = "ON" if self.options.with_endpoint_controllers else "OFF"
         cmake.definitions["METRICS"] = "ON" if self.options.with_metrics else "OFF"
         cmake.definitions["ACSDK_EMIT_SENSITIVE_LOGS"] = self.options.with_sensitive_logs
-        cmake.definitions["ACSDK_EMIT_CURL_LOGS"] = self.options.with_curl_logs
         cmake.definitions["ACSDK_LATENCY_LOG"] = self.options.with_latency_logs
         cmake.definitions["RAPIDJSON_MEM_OPTIMIZATION"] = "OFF"
         cmake.definitions["BUILD_TESTING"] = "ON" if self.options.build_testing else "OFF"
         if self.settings.os == "Android":
-            cmake.definitions["ANDROID"] = "OFF" # this is not a mistake!
-        cmake.definitions["ACSDK_ENABLE_CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE"] = "ON" if self.options.with_curl_http_version_2_prior_knowledge else "OFF"
+            cmake.definitions["ANDROID"] = "OFF"  # this is not a mistake!
+        cmake.definitions["ACSDK_ENABLE_CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE"] = (
+            "ON" if self.options.with_curl_http_version_2_prior_knowledge else "OFF"
+        )
+        if self.settings.os == "Neutrino":
+            cmake.definitions["FILE_SYSTEM_UTILS"] = "OFF"      # FileSystemUtils is not supported on QNX but enabled by default
+
+        crypto_libs = glob.glob(os.path.join(self.deps_cpp_info["openssl"].lib_paths[0], "libcrypto.*"))
+        crypto_lib = sorted(crypto_libs, key=len)[0]
+        cmake.definitions["CRYPTO_LIBRARY"] = crypto_lib
+
+        crypto_include_dir = self.deps_cpp_info["openssl"].include_paths[0]
+        cmake.definitions["CRYPTO_INCLUDE_DIR"] = crypto_include_dir
+
         cmake.configure(source_folder=self._source_subfolder)
         return cmake
 
@@ -109,8 +118,16 @@ class AvsDeviceSdkConan(ConanFile):
             cmake.install()
 
         # copying test headers
-        self.copy( "*.h", src=os.path.join(self._source_subfolder, "AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces"), dst="include/AVSCommon/SDKInterfaces/test")
-        self.copy( "*.h", src=os.path.join(self._source_subfolder, "Settings/test/Settings"), dst="include/AVSCommon/SDKInterfaces/test/Settings")
+        self.copy(
+            "*.h",
+            src=os.path.join(self._source_subfolder, "AVSCommon/SDKInterfaces/test/AVSCommon/SDKInterfaces"),
+            dst="include/AVSCommon/SDKInterfaces/test",
+        )
+        self.copy(
+            "*.h",
+            src=os.path.join(self._source_subfolder, "Settings/test/Settings"),
+            dst="include/AVSCommon/SDKInterfaces/test/Settings",
+        )
 
     def package_info(self):
         self.cpp_info.names["pkg_config"] = "AlexaClientSDK"

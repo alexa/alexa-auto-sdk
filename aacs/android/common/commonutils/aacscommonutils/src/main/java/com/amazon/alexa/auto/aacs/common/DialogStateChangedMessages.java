@@ -14,6 +14,8 @@
  */
 package com.amazon.alexa.auto.aacs.common;
 
+import static com.amazon.aacsconstants.AssistantConstants.ASSISTANT_ID_NONE;
+
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -41,6 +43,17 @@ public class DialogStateChangedMessages {
             return dialogState != null ? Optional.of(dialogState) : Optional.empty();
         } catch (Exception exception) {
             Log.w(TAG, "Failed to parse dialog state from aacs message: " + json + " error: " + exception);
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Integer> parseAssistantId(@NonNull String json) {
+        try {
+            JSONObject obj = new JSONObject(json);
+            int id = obj.optInt("assistantId", ASSISTANT_ID_NONE);
+            return id != ASSISTANT_ID_NONE ? Optional.of(id) : Optional.empty();
+        } catch (Exception exception) {
+            Log.w(TAG, "Failed to parse assistant Id from aacs message: " + json + " error: " + exception);
             return Optional.empty();
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.car.VehiclePropertyIds;
 import android.car.hardware.property.CarPropertyManager;
 import android.content.Context;
 import android.util.Log;
+import android.util.NoSuchPropertyException;
 
 import com.amazon.aacsconstants.AACSConstants;
 
@@ -61,10 +62,7 @@ public class CarControlHandler {
         }
         CarControlHelper.PropertySetting setting =
                 mHelper.getPropertySetting(endpointId, CarControlConstants.POWER_CONTROLLER, "");
-        if (setting == null) {
-            Log.e(TAG, String.format("Property setting %s cannot be found from Car Control configuration", endpointId));
-            return false;
-        }
+        validateSetting(setting, endpointId, "");
         try {
             mCarManager.setBooleanProperty(setting.propertyId, setting.areaId, turnOn);
             Log.d(TAG,
@@ -84,10 +82,7 @@ public class CarControlHandler {
         }
         CarControlHelper.PropertySetting setting =
                 mHelper.getPropertySetting(endpointId, CarControlConstants.POWER_CONTROLLER, "");
-        if (setting == null) {
-            Log.e(TAG, String.format("Property setting %s cannot be found from Car Control configuration", endpointId));
-            return false;
-        }
+        validateSetting(setting, endpointId, "");
         try {
             return mCarManager.getBooleanProperty(setting.propertyId, setting.areaId);
         } catch (SecurityException | IllegalArgumentException e) {
@@ -103,12 +98,7 @@ public class CarControlHandler {
         }
         CarControlHelper.PropertySetting setting =
                 mHelper.getPropertySetting(endpointId, CarControlConstants.TOGGLE_CONTROLLER, instance);
-        if (setting == null) {
-            Log.e(TAG,
-                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
-                            endpointId, instance));
-            return false;
-        }
+        validateSetting(setting, endpointId, instance);
         try {
             switch (setting.dataType) {
                 case INT:
@@ -144,12 +134,7 @@ public class CarControlHandler {
         }
         CarControlHelper.PropertySetting setting =
                 mHelper.getPropertySetting(endpointId, CarControlConstants.TOGGLE_CONTROLLER, instance);
-        if (setting == null) {
-            Log.e(TAG,
-                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
-                            endpointId, instance));
-            return false;
-        }
+        validateSetting(setting, endpointId, instance);
         try {
             return mCarManager.getBooleanProperty(setting.propertyId, setting.areaId);
         } catch (SecurityException | IllegalArgumentException e) {
@@ -167,12 +152,7 @@ public class CarControlHandler {
         }
         CarControlHelper.PropertySetting setting =
                 mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
-        if (setting == null) {
-            Log.e(TAG,
-                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
-                            endpointId, instance));
-            return false;
-        }
+        validateSetting(setting, endpointId, instance);
         try {
             switch (setting.dataType) {
                 case INT:
@@ -219,12 +199,7 @@ public class CarControlHandler {
         }
         CarControlHelper.PropertySetting setting =
                 mHelper.getPropertySetting(endpointId, CarControlConstants.RANGE_CONTROLLER, instance);
-        if (setting == null) {
-            Log.e(TAG,
-                    String.format("Property setting combination %s, %s cannot be found from Car Control configuration",
-                            endpointId, instance));
-            return false;
-        }
+        validateSetting(setting, endpointId, instance);
         try {
             switch (setting.dataType) {
                 case INT:
@@ -235,8 +210,19 @@ public class CarControlHandler {
                                     setting.propertyId, setting.areaId, delta));
                     return true;
                 case FLOAT:
-                    mCarManager.setFloatProperty(
-                            setting.propertyId, setting.areaId, ((float) currentRangeControllerValue + (float) delta));
+                    if (mCarManager.getIntProperty(
+                                VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS, CarControlConstants.AREA_GLOBAL)
+                            == CarControlConstants.CELSIUS_UNIT) {
+                        mCarManager.setFloatProperty(setting.propertyId, setting.areaId,
+                                ((float) currentRangeControllerValue + (float) delta));
+                    } else if (mCarManager.getIntProperty(VehiclePropertyIds.HVAC_TEMPERATURE_DISPLAY_UNITS,
+                                       CarControlConstants.AREA_GLOBAL)
+                            == CarControlConstants.FAHRENHEIT_UNIT) {
+                        // Need to do conversion here since Android internally uses Celsius
+                        mCarManager.setFloatProperty(setting.propertyId, setting.areaId,
+                                CarControlUtil.celcius(CarControlUtil.fahrenheit((float) currentRangeControllerValue)
+                                        + (float) delta));
+                    }
                     Log.d(TAG,
                             String.format("Adjust Range Controller for PropertyID: %s at AreaID: %s by %s",
                                     setting.propertyId, setting.areaId, delta));
@@ -290,13 +276,7 @@ public class CarControlHandler {
         }
         List<CarControlHelper.PropertySetting> settings =
                 mHelper.getPropertySettings(endpointId, CarControlConstants.MODE_CONTROLLER, instance, value);
-        if (settings == null || settings.size() == 0) {
-            Log.e(TAG,
-                    String.format(
-                            "Property setting combination %s, %s, %s cannot be found from Car Control configuration",
-                            endpointId, instance, value));
-            return false;
-        }
+        validateSetting(settings, endpointId, instance, value);
         try {
             for (CarControlHelper.PropertySetting setting : settings) {
                 switch (setting.dataType) {
@@ -391,4 +371,21 @@ public class CarControlHandler {
         }
         return value;
     }
+
+    private void validateSetting(CarControlHelper.PropertySetting setting, String endpointId, String instance) {
+        if (setting == null) {
+            String errorMsg = String.format("Property setting %s cannot be found from Car Control configuration. instance: %s", endpointId, instance);
+            Log.w(TAG, errorMsg);
+            throw new NoSuchPropertyException(errorMsg);
+        }
+    }
+
+    private void validateSetting(List<CarControlHelper.PropertySetting> settings, String endpointId, String instance, String value){
+        if (settings == null || settings.size() == 0) {
+            String errorMsg = String.format("Property setting %s cannot be found from Car Control configuration. instance: %s value: %s", endpointId, instance, value);
+            Log.w(TAG, errorMsg);
+            throw new NoSuchPropertyException(errorMsg);
+        }
+    }
+
 }

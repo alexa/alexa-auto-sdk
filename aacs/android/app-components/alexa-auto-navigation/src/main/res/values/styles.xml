@@ -46,30 +46,34 @@
     </style>
 
     <style name="LocalSearchOpenTimeText">
-        <item name="android:paddingStart">15dp</item>
-        <item name="android:paddingEnd">15dp</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">5dp</item>
-        <item name="android:background">@drawable/light_info_background</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:paddingStart">5dp</item>
+        <item name="android:paddingEnd">5dp</item>
+        <item name="android:textSize">25sp</item>
         <item name="android:textColor">@color/White</item>
         <item name="android:lines">1</item>
     </style>
 
     <style name="LocalSearchDetailAddressText">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:maxLines">2</item>
     </style>
 
     <style name="LocalSearchDetailDistanceEtaText">
-        <item name="android:textSize">45sp</item>
+        <item name="android:textSize">30sp</item>
         <item name="android:textColor">@color/White</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="LocalSearchDetailTitleText">
         <item name="android:textColor">@color/White</item>
-        <item name="android:textSize">40sp</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:lines">1</item>
+    </style>
+
+    <style name="OPEN">
+        <item name="android:textColor">@color/White</item>
+        <item name="android:textSize">30sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:lines">1</item>
     </style>

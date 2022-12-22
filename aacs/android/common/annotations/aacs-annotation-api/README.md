@@ -1,4 +1,4 @@
-# AACS Annotation Documentation
+# AACS Annotations
 
 ## aacs-annotation-api
 

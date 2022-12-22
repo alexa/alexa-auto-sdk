@@ -53,9 +53,6 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
                 case Action.AlexaClient.DIALOG_STATE_CHANGED:
                     handleDialogStateChanged(message);
                     break;
-                case Action.SpeechRecognizer.WAKEWORD_DETECTED:
-                    handleWakewordDetected(message);
-                    break;
                 case Action.SpeechRecognizer.END_OF_SPEECH_DETECTED:
                     sendAutoVoiceUIMessage(Topic.SPEECH_RECOGNIZER, Action.SpeechRecognizer.END_OF_SPEECH_DETECTED, "");
                     break;
@@ -69,15 +66,6 @@ public class AACSBroadcastReceiver extends BroadcastReceiver {
             DialogStateChangedMessages.parseDialogState(aacsMessage.payload).ifPresent(payload -> {
                 sendAutoVoiceUIMessage(
                         Constants.TOPIC_VOICE_ANIMATION, Action.AlexaClient.DIALOG_STATE_CHANGED, payload);
-            });
-        }
-    }
-
-    @VisibleForTesting
-    void handleWakewordDetected(@NonNull AACSMessage aacsMessage) {
-        if (aacsMessage.payload != null) {
-            WakewordDetectedMessages.parseWakeword(aacsMessage.payload).ifPresent(payload -> {
-                sendAutoVoiceUIMessage(Topic.SPEECH_RECOGNIZER, Action.SpeechRecognizer.WAKEWORD_DETECTED, payload);
             });
         }
     }

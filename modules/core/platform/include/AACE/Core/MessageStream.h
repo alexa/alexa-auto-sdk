@@ -30,7 +30,7 @@ public:
     virtual ~MessageStream() = default;
 
     /**
-     * Reads data from the strean when available. Data will be
+     * Reads data from the stream when available. Data will be
      * available while @c isClosed() returns false.
      *
      * @param [out] data The buffer where data should be copied

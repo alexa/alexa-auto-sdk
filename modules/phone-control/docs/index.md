@@ -82,6 +82,8 @@ If the call is answered and in progress, publish the `CallStateChanged` message 
 
 Whenever the user asks Alexa to end the call, the Engine publishes the `Stop` message. Publish the `CallStateChanged` message to indicate that the call is now **IDLE**.
 
+> **Note:** It is possible for the connection state to become `DISCONNECTED` after the user asks Alexa to dial or redial a number. Therefore, the application must ensure to check the connection state when the [`Dial`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#dial) or [`Redial`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#redial) message is received. If the call cannot be placed, publish the [`CallFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#callfailed) specifying an appropriate error code and message.
+
 <details markdown="1"><summary>Click to expand or collapse sequence diagram: Outbound Calling</summary>
 <br></br>
 

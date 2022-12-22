@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2021-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,13 +44,15 @@ CustomDomainCapabilityAgent::CustomDomainCapabilityAgent(
     std::shared_ptr<MessageSenderInterface> messageSender,
     std::shared_ptr<CustomDomainHandlerInterface> customDomainHandler,
     const std::string& interfaceNamespace,
-    const std::string& interfaceVersion) :
+    const std::string& interfaceVersion,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) :
         CapabilityAgent{interfaceNamespace, exceptionSender},
         RequiresShutdown{"CustomDomainCapabilityAgent"},
         m_contextManager{contextManager},
         m_messageSender{messageSender},
         m_customDomainHandler{customDomainHandler},
-        m_interfaceVersion{interfaceVersion} {
+        m_interfaceVersion{interfaceVersion},
+        m_agentManager{agentManager} {
 }
 
 std::shared_ptr<CustomDomainCapabilityAgent> CustomDomainCapabilityAgent::create(
@@ -60,7 +62,8 @@ std::shared_ptr<CustomDomainCapabilityAgent> CustomDomainCapabilityAgent::create
     std::shared_ptr<CustomDomainHandlerInterface> customDomainHandler,
     std::shared_ptr<ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<ContextManagerInterface> contextManager,
-    std::shared_ptr<MessageSenderInterface> messageSender) {
+    std::shared_ptr<MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     try {
         ThrowIfNull(contextManager, "invalidContextManager");
         ThrowIfNull(exceptionSender, "invalidExceptionSender");
@@ -70,7 +73,7 @@ std::shared_ptr<CustomDomainCapabilityAgent> CustomDomainCapabilityAgent::create
         ThrowIf(interfaceVersion.empty(), "invalidInterfaceVersion");
 
         auto customDomainCapabilityAgent = std::shared_ptr<CustomDomainCapabilityAgent>(new CustomDomainCapabilityAgent(
-            exceptionSender, contextManager, messageSender, customDomainHandler, interfaceNamespace, interfaceVersion));
+            exceptionSender, contextManager, messageSender, customDomainHandler, interfaceNamespace, interfaceVersion, agentManager));
 
         customDomainCapabilityAgent->initialize(states);
 
@@ -82,6 +85,7 @@ std::shared_ptr<CustomDomainCapabilityAgent> CustomDomainCapabilityAgent::create
 }
 
 void CustomDomainCapabilityAgent::initialize(const std::vector<std::string>& states) {
+    AACE_DEBUG(LX(TAG));
     // Generate the custom capability configuration
     std::unordered_map<std::string, std::string> configMap;
 
@@ -96,7 +100,59 @@ void CustomDomainCapabilityAgent::initialize(const std::vector<std::string>& sta
         for (const auto& state : states) {
             auto capabilityIdentifier = NamespaceAndName{m_namespace, state};
             m_states.insert(capabilityIdentifier);
-            m_contextManager->addStateProvider(capabilityIdentifier, shared_from_this());
+            if (!m_agentManager) {
+                m_contextManager->addStateProvider(capabilityIdentifier, shared_from_this());
+            } else {
+                m_agentManager->addAgentEnablementObserverInterface(alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+            }
+        }
+    }
+}
+
+void CustomDomainCapabilityAgent::onEnabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) {
+    AACE_DEBUG(LX(TAG));
+    if (m_agentManager) {
+        auto supportedAgentIds = m_agentManager->getAVSInterfaceEnabledAgentIds(m_namespace);
+        if (0 != supportedAgentIds.count(id)) {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            // Only insert enabled agent ID to m_enabledAgentIds when no agent ID is in m_enabledAgentIds 
+            // to make sure there's always only one agent enabled for the custom interface at one time.
+            if (0 == m_enabledAgentIds.count(id)) {
+                m_enabledAgentIds.insert(id);
+                lock.unlock();
+                if (!m_states.empty()) {
+                    for (const auto& state : m_states) {
+                        auto capabilityIdentifier = NamespaceAndName{m_namespace, state.name, id};
+                        if (m_states.find(capabilityIdentifier) == m_states.end()) {
+                            m_states.insert(capabilityIdentifier);
+                            m_contextManager->addStateProvider(capabilityIdentifier, shared_from_this());
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void CustomDomainCapabilityAgent::onDisabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) {
+    AACE_DEBUG(LX(TAG));
+    if (m_agentManager) {
+        auto supportedAgentIds = m_agentManager->getAVSInterfaceEnabledAgentIds(m_namespace);
+        if (0 != supportedAgentIds.count(id)) {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            if (m_enabledAgentIds.count(id)) {
+                m_enabledAgentIds.erase(id);
+                lock.unlock();
+                if (!m_states.empty()) {
+                    for (const auto& state : m_states) {
+                        auto capabilityIdentifier = NamespaceAndName{m_namespace, state.name, id};
+                        if (m_states.find(capabilityIdentifier) != m_states.end()) {
+                            m_states.erase(capabilityIdentifier);
+                            m_contextManager->removeStateProvider(capabilityIdentifier);
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -106,10 +162,17 @@ DirectiveHandlerConfiguration CustomDomainCapabilityAgent::getConfiguration() co
 
     DirectiveHandlerConfiguration configuration;
 
-    // The wildcard namespace signature so the DirectiveSequencer will send us all
-    // Directives under the custom namespace.
-    configuration[NamespaceAndName{m_namespace, "*"}] = BlockingPolicy(BlockingPolicy::MEDIUMS_NONE, false);
-
+    if (!m_agentManager) {
+        // The wildcard namespace signature so the DirectiveSequencer will send us all
+        // Directives under the custom namespace.
+        configuration[NamespaceAndName{m_namespace, "*"}] = BlockingPolicy(BlockingPolicy::MEDIUMS_NONE, false);
+    } else {
+        auto agents = m_agentManager->getAVSInterfaceEnabledAgentIds(m_namespace, "*");
+        for (const auto& agent : agents) {
+            AACE_DEBUG(LX(TAG).d("EnabledAgentId", agent));
+            configuration[NamespaceAndName{m_namespace, "*", agent}] = BlockingPolicy(BlockingPolicy::MEDIUMS_NONE, false);
+        }
+    }
     return configuration;
 }
 
@@ -343,9 +406,23 @@ void CustomDomainCapabilityAgent::sendEvent(
             // Build event without context
             auto event = alexaClientSDK::avsCommon::avs::buildJsonEventString(
                 eventHeader, Optional<AVSMessageEndpoint>(), payload, Optional<AVSContext>());
-            auto request = std::make_shared<MessageRequest>(event);
+            
+            if (m_agentManager == nullptr) {
+                AACE_INFO(LX(TAG).m("No other applicable agents as Agent Manager is null, tagging custom event with Alexa's ID"));
+                auto request = std::make_shared<MessageRequest>(event);
+                m_messageSender->sendMessage(request);
+                return;
+            }
 
-            m_messageSender->sendMessage(request);
+            if (m_enabledAgentIds.size() > 0) {
+                // Note: Currently a custom interface only supports one agent to disambiguate the event destination.
+                auto agentId = *m_enabledAgentIds.begin();
+                AACE_INFO(LX(TAG).m("Tagging custom event with agent Id").d("agentId", agentId));
+                auto request = std::make_shared<MessageRequest>(agentId, event);
+                m_messageSender->sendMessage(request);
+            } else {
+                AACE_INFO(LX(TAG).m("No applicable agents are enabled. Custom event is not sent."));
+            }
             return;
         }
 
@@ -376,8 +453,24 @@ void CustomDomainCapabilityAgent::onContextAvailable(
 
             auto event = alexaClientSDK::avsCommon::avs::buildJsonEventString(
                 eventHeader, Optional<AVSMessageEndpoint>(), eventInfo.payload, Optional<AVSContext>(endpointContext));
-            auto request = std::make_shared<MessageRequest>(event);
-            m_messageSender->sendMessage(request);
+
+            if (m_agentManager == nullptr) {
+                AACE_INFO(LX(TAG).m("No other applicable agents as Agent Manager is null, tagging custom event with Alexa's ID"));
+                auto request = std::make_shared<MessageRequest>(event);
+                m_messageSender->sendMessage(request);
+                m_pendingEvents.erase(token);
+                return;
+            }
+
+            if (m_enabledAgentIds.size() > 0) {
+                // Note: Currently a custom interface only supports one agent to disambiguate the event destination.
+                auto agentId = *m_enabledAgentIds.begin();
+                AACE_INFO(LX(TAG).m("Tagging custom event with agent Id").d("agentId", agentId));
+                auto request = std::make_shared<MessageRequest>(agentId, event);
+                m_messageSender->sendMessage(request);
+            } else {
+                AACE_INFO(LX(TAG).m("No applicable agents are enabled. Custom event is not sent."));
+            }
             m_pendingEvents.erase(token);
         }
     });
@@ -420,6 +513,12 @@ void CustomDomainCapabilityAgent::doShutdown() {
     m_pendingEvents.clear();
     m_pendingDirectives.clear();
     m_states.clear();
+
+    if (m_agentManager) {
+        m_agentManager->removeAgentEnablementObserverInterface(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+        m_agentManager.reset();
+    }
 }
 
 }  // namespace customDomain

@@ -98,7 +98,7 @@ static const std::string AVS_DEVICE_SDK_CONFIG =
     "        \"databaseFilePath\":\"settings.db\","
     "        "
     "\"locales\":[\"en-US\",\"en-GB\",\"de-DE\",\"en-IN\",\"en-CA\",\"ja-JP\",\"en-AU\",\"fr-FR\",\"it-IT\",\"es-ES\","
-    "\"es-MX\",\"fr-CA\",\"es-US\", \"hi-IN\", \"pt-BR\"],"
+    "\"es-MX\",\"fr-CA\",\"es-US\", \"hi-IN\", \"pt-BR\", \"ar-SA\"],"
     "        \"defaultLocale\":\"en-US\","
     "        \"localeCombinations\":[[\"en-CA\", \"fr-CA\"],[\"fr-CA\", \"en-CA\"]],"
     "        \"defaultTimezone\":\"America/Vancouver\""

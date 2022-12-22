@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,14 +13,24 @@
  * permissions and limitations under the License.
  */
 
+#include <AVSCommon/Utils/HTTP/HttpResponseCode.h>
+#include <AVSCommon/Utils/RetryTimer.h>
+
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Core/EngineVersion.h>
 #include <AACE/Engine/AddressBook/AddressBookCloudUploaderRESTAgent.h>
 
 #include "zlib.h"
 
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
 namespace aace {
 namespace engine {
 namespace addressBook {
+
+using namespace alexaClientSDK::avsCommon::utils::http;
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBookCloudService.AddressBookCloudUploaderRESTAgent");
@@ -71,7 +81,7 @@ const std::string AUTO_SDK_DEFAULT_ADDRESS_BOOK_NAME = "AutoSDK";
 static const std::chrono::seconds DEFAULT_HTTP_TIMEOUT = std::chrono::seconds(60);
 
 /// Default value for the HTTP retry on Network Error.
-static const int HTTP_RETRY_COUNT = 3;
+static const int HTTP_RETRY_COUNT = 2;
 
 /// REST URL to upload the address book
 static const std::string DEFAULT_ACMS_ENDPOINT = "https://alexa-comms-mobile-service-na.amazon.com";
@@ -97,10 +107,100 @@ static const std::string GET_INDENTITY_V2_QUERY = "/identities?includeUserName=f
 /// Path suffix for URL used in ACMS Get Address Book Ids
 static const std::string GET_ADDRESS_BOOK_QUERY = "?addressBookSourceIds=";
 
+/// Valid hours for uploaded address book
+static const int ADDRESS_BOOK_VALID_HOURS = 30 * 24;
+
+/// HTTP Gateway Timeout
+static const int HTTP_ERROR_GATEWAY_TIMEOUT = 504;
+
+/**
+ * Function to convert the number of times we have already retried to the time to perform the next retry.
+ *
+ * @param retryCount The number of times we have retried
+ * @return The time that the next retry should be attempted
+ */
+static std::chrono::steady_clock::time_point calculateTimeToRetry(int retryCount) {
+    /**
+     * Table of retry backoff values
+     */
+    const static std::vector<int> retryBackoffTimes = {
+        1000,  // Retry 1:  1.00s range with 50% randomization: [ 0.5s,  1.5s]
+        3000,  // Retry 2:  3.00s range with 50% randomization: [ 1.5s,  4.5s]
+    };
+
+    // Retry Timer Object.
+    alexaClientSDK::avsCommon::utils::RetryTimer RETRY_TIMER(retryBackoffTimes);
+
+    return std::chrono::steady_clock::now() + RETRY_TIMER.calculateTimeToRetry(retryCount);
+}
+
+enum class HTTPResponseResult {
+    // Request Successful
+    SUCCESS,
+
+    // Retry Request
+    RETRY,
+
+    // Request Failed
+    FAILED
+};
+
+std::ostream& operator<<(std::ostream& os, const HTTPResponseResult& result) {
+    switch (result) {
+        case HTTPResponseResult::SUCCESS:
+            return os << "SUCCESS";
+        case HTTPResponseResult::RETRY:
+            return os << "RETRY";
+        case HTTPResponseResult::FAILED:
+            return os << "FAILED";
+    }
+    return os << "UnknownResult: " << static_cast<int>(result);
+}
+
+/**
+ * Funtion to parse the HTTP response.
+ *
+ * @param code The HTTP response code.
+ * @return Returns SUCCESS when HTTP resonse is 200 which the expected values for the API used here.
+ * And, RETRY for the retriable HTTP code, and FAILED for the permanent failures. 
+ */
+static HTTPResponseResult parseHTTPResponseCode(long code) {
+    HTTPResponseResult status = HTTPResponseResult::FAILED;
+    switch (code) {
+        case HTTPResponseCode::SUCCESS_OK:
+            status = HTTPResponseResult::SUCCESS;
+            break;
+        case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
+        case HTTPResponseCode::CLIENT_ERROR_FORBIDDEN:
+        case HTTPResponseCode::CLIENT_ERROR_THROTTLING_EXCEPTION:
+        case HTTPResponseCode::SERVER_ERROR_INTERNAL:
+        case HTTPResponseCode::SERVER_UNAVAILABLE:
+        case HTTPResponseCode::SERVER_ERROR_NOT_IMPLEMENTED:
+        case HTTP_ERROR_GATEWAY_TIMEOUT:
+            status = HTTPResponseResult::RETRY;
+            break;
+        case HTTPResponseCode::SUCCESS_CREATED:
+        case HTTPResponseCode::SUCCESS_ACCEPTED:
+        case HTTPResponseCode::SUCCESS_NO_CONTENT:
+        case HTTPResponseCode::SUCCESS_PARTIAL_CONTENT:
+            // For the API's that Auto SDK uses these are not the expected response, so treating
+            // them as FAILED. Change this logic if any new API in the future return these codes.
+        default:
+            status = HTTPResponseResult::FAILED;
+            break;
+    }
+    AACE_DEBUG(LX(TAG).d("code", code).d("status", status));
+    return status;
+}
+
 AddressBookCloudUploaderRESTAgent::AddressBookCloudUploaderRESTAgent(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface> authDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::DeviceInfo> deviceInfo) :
-        m_authDelegate(authDelegate), m_deviceInfo(deviceInfo), m_acmsEndpoint(DEFAULT_ACMS_ENDPOINT) {
+        alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
+        m_isShuttingDown(false),
+        m_authDelegate(authDelegate),
+        m_deviceInfo(deviceInfo),
+        m_acmsEndpoint(DEFAULT_ACMS_ENDPOINT) {
 }
 
 std::shared_ptr<AddressBookCloudUploaderRESTAgent> AddressBookCloudUploaderRESTAgent::create(
@@ -116,7 +216,7 @@ std::shared_ptr<AddressBookCloudUploaderRESTAgent> AddressBookCloudUploaderRESTA
 
         return addressBookCloudRESTAgent;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "create").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return nullptr;
     }
 }
@@ -146,85 +246,152 @@ bool AddressBookCloudUploaderRESTAgent::isAccountProvisioned() {
 std::vector<std::string> AddressBookCloudUploaderRESTAgent::buildCommonHTTPHeader() {
     std::vector<std::string> httpHeaderData;
     std::string requestUUID = alexaClientSDK::avsCommon::utils::uuidGeneration::generateUUID();
-    httpHeaderData = {AUTHORIZATION_HTTP_HEADER + COLON_SEPARATOR + SPACE_SEPARATOR +
-                          AUTHORIZATION_HTTP_HEADER_POSTFIX + SPACE_SEPARATOR + m_authDelegate->getAuthToken(),
-                      ACCEPT_PFM + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_PFM,
-                      X_AMZN_REQUESTID + COLON_SEPARATOR + SPACE_SEPARATOR + requestUUID,
-                      X_AZN_CLIENTID + COLON_SEPARATOR + SPACE_SEPARATOR + m_deviceInfo->getDeviceSerialNumber(),
-                      USER_AGENT + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_USER_AGENT_VALUE};
+    auto token = m_authDelegate->getAuthToken();
+    auto userAgent =
+        DEFAULT_USER_AGENT_VALUE + FORWARD_SLASH + aace::engine::core::version::getEngineVersion().toString();
+    if (!token.empty()) {
+        httpHeaderData = {AUTHORIZATION_HTTP_HEADER + COLON_SEPARATOR + SPACE_SEPARATOR +
+                              AUTHORIZATION_HTTP_HEADER_POSTFIX + SPACE_SEPARATOR + token,
+                          ACCEPT_PFM + COLON_SEPARATOR + SPACE_SEPARATOR + DEFAULT_PFM,
+                          X_AMZN_REQUESTID + COLON_SEPARATOR + SPACE_SEPARATOR + requestUUID,
+                          X_AZN_CLIENTID + COLON_SEPARATOR + SPACE_SEPARATOR + m_deviceInfo->getDeviceSerialNumber(),
+                          USER_AGENT + COLON_SEPARATOR + SPACE_SEPARATOR + userAgent};
+    }
 
     return httpHeaderData;
 }
 
-bool AddressBookCloudUploaderRESTAgent::parseCommonHTTPResponse(const HTTPResponse& response) {
-    if (HTTPResponseCode::SUCCESS_OK == response.code) {
-        return true;
-    }
-    return false;
-}
-
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doPost(
+std::pair<bool, AddressBookCloudUploaderRESTAgent::HTTPResponse> AddressBookCloudUploaderRESTAgent::doPost(
     const std::string& url,
     const std::vector<std::string> headerLines,
     const std::string& data,
     std::chrono::seconds timeout) {
+    AACE_DEBUG(LX(TAG));
     try {
-        // Creating the HttpPost on every doPost is by design to ensure that curl in libcurlUtils uses the
-        // latest provided curl options.
-        auto httpPost = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost::create();
-        ThrowIfNull(httpPost, "nullHttpPost");
+        int retry = 0;
+        do {
+            // Creating the HttpPost on every doPost ensures most updated curl options set in libCurlUtils are used.
+            auto httpPost = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpPost::create();
+            ThrowIfNull(httpPost, "nullHttpPost");
 
-        return httpPost->doPost(url, headerLines, data, timeout);
+            auto httpResponse = httpPost->doPost(url, headerLines, data, timeout);
+
+            auto status = parseHTTPResponseCode(httpResponse.code);
+
+            ThrowIf(status == HTTPResponseResult::FAILED, "doPostFailed");
+
+            if (status == HTTPResponseResult::SUCCESS) {
+                return std::make_pair(true, httpResponse);
+            }
+
+            if (retry < HTTP_RETRY_COUNT) {
+                std::unique_lock<std::mutex> lock(m_wakeMutex);
+                m_wake.wait_until(
+                    lock, calculateTimeToRetry(retry++), [this] { return m_isShuttingDown ? true : false; });
+                lock.unlock();
+
+                if (m_isShuttingDown) {
+                    AACE_INFO(LX(TAG).m("exitDueToShutdown"));
+                    return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
+                }
+            } else {
+                break;
+            }
+        } while (true);
+
+        AACE_INFO(LX(TAG).m("exceededRetries"));
+        return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "doPost").d("reason", ex.what()));
-        return AddressBookCloudUploaderRESTAgent::HTTPResponse();
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
     }
 }
 
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doGet(
+std::pair<bool, AddressBookCloudUploaderRESTAgent::HTTPResponse> AddressBookCloudUploaderRESTAgent::doGet(
     const std::string& url,
     const std::vector<std::string>& headers) {
+    AACE_DEBUG(LX(TAG));
     try {
-        // Creating the HttpGet on every doGet is by design to ensure that curl in libcurlUtils uses the
-        // latest provided curl options.
-        auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
-        ThrowIfNull(httpGet, "nullHttpGet");
+        int retry = 0;
+        do {
+            // Creating the HttpGet on every doGet ensures most updated curl options set in libCurlUtils are used.
+            auto httpGet = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpGet::create();
+            ThrowIfNull(httpGet, "nullHttpGet");
 
-        return httpGet->doGet(url, headers, DEFAULT_HTTP_TIMEOUT);
+            auto httpResponse = httpGet->doGet(url, headers, DEFAULT_HTTP_TIMEOUT);
+
+            auto status = parseHTTPResponseCode(httpResponse.code);
+
+            ThrowIf(status == HTTPResponseResult::FAILED, "doGetFailed");
+
+            if (status == HTTPResponseResult::SUCCESS) {
+                return std::make_pair(true, httpResponse);
+            }
+
+            if (retry < HTTP_RETRY_COUNT) {
+                std::unique_lock<std::mutex> lock(m_wakeMutex);
+                m_wake.wait_until(
+                    lock, calculateTimeToRetry(retry++), [this] { return m_isShuttingDown ? true : false; });
+                lock.unlock();
+
+                if (m_isShuttingDown) {
+                    AACE_INFO(LX(TAG).m("exitDueToShutdown"));
+                    return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
+                }
+            } else {
+                break;
+            }
+        } while (true);
+
+        AACE_INFO(LX(TAG).m("exceededRetries"));
+        return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "doGet").d("reason", ex.what()));
-        return AddressBookCloudUploaderRESTAgent::HTTPResponse();
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
     }
 }
 
-AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::doDelete(
+std::pair<bool, AddressBookCloudUploaderRESTAgent::HTTPResponse> AddressBookCloudUploaderRESTAgent::doDelete(
     const std::string& url,
     const std::vector<std::string>& headers) {
+    AACE_DEBUG(LX(TAG));
     try {
-        // Creating the HttpDelete on every doDelete is by design to ensure that curl in libcurlUtils uses the
-        // latest provided curl options.
-        auto httpDelete = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete::create();
-        ThrowIfNull(httpDelete, "nullHttpDelete");
+        int retry = 0;
+        do {
+            // Creating the HttpDelete on every doDelete ensures most updated curl options set in libCurlUtils are used.
+            auto httpDelete = alexaClientSDK::avsCommon::utils::libcurlUtils::HttpDelete::create();
+            ThrowIfNull(httpDelete, "nullHttpDelete");
 
-        return httpDelete->doDelete(url, headers, DEFAULT_HTTP_TIMEOUT);
+            auto httpResponse = httpDelete->doDelete(url, headers, DEFAULT_HTTP_TIMEOUT);
+
+            auto status = parseHTTPResponseCode(httpResponse.code);
+
+            ThrowIf(status == HTTPResponseResult::FAILED, "doDeleteFailed");
+
+            if (status == HTTPResponseResult::SUCCESS) {
+                return std::make_pair(true, httpResponse);
+            }
+
+            if (retry < HTTP_RETRY_COUNT) {
+                std::unique_lock<std::mutex> lock(m_wakeMutex);
+                m_wake.wait_until(
+                    lock, calculateTimeToRetry(retry++), [this] { return m_isShuttingDown ? true : false; });
+                lock.unlock();
+
+                if (m_isShuttingDown) {
+                    AACE_INFO(LX(TAG).m("exitDueToShutdown"));
+                    return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
+                }
+            } else {
+                break;
+            }
+        } while (true);
+
+        AACE_INFO(LX(TAG).m("exceededRetries"));
+        return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "doDelete").d("reason", ex.what()));
-        return AddressBookCloudUploaderRESTAgent::HTTPResponse();
-    }
-}
-
-std::string AddressBookCloudUploaderRESTAgent::getHTTPErrorString(const HTTPResponse& response) {
-    switch (response.code) {
-        case HTTPResponseCode::SUCCESS_NO_CONTENT:
-            return ".successWithNoContent";
-        case HTTPResponseCode::BAD_REQUEST:
-            return ".badRequest";
-        case HTTPResponseCode::FORBIDDEN:
-            return ".authenticationFailed";
-        case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-            return ".internalServiceError";
-        default:
-            return ".httpRequestFailed ";
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return std::make_pair(false, AddressBookCloudUploaderRESTAgent::HTTPResponse());
     }
 }
 
@@ -232,33 +399,38 @@ void AddressBookCloudUploaderRESTAgent::reset() {
     setPceId("");
 }
 
+void AddressBookCloudUploaderRESTAgent::doShutdown() {
+    m_isShuttingDown = true;
+    m_wake.notify_all();
+}
+
 bool AddressBookCloudUploaderRESTAgent::isPceIdValid() {
     return (!getPceId().empty());
 }
 
 AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderRESTAgent::getAlexaAccountInfo() {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-    rapidjson::Document document;
+    AACE_DEBUG(LX(TAG));
     AlexaAccountInfo alexaAccount;
-
     // Initialize to default values.
     alexaAccount.commsId = "";
     alexaAccount.provisionStatus = CommsProvisionStatus::INVALID;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
-    bool validFlag = false;
     try {
-        auto url = m_acmsEndpoint + FORWARD_SLASH + ACCOUNTS_PATH;
-        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
-            httpResponse = doGet(url, httpHeaderData);
-            if (parseCommonHTTPResponse(httpResponse)) {
-                validFlag = true;
-                break;
-            }
-        }
-        ThrowIfNot(validFlag, "httpDoGetFailed" + getHTTPErrorString(httpResponse));
+        rapidjson::Document document;
 
-        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+        auto httpHeader = buildCommonHTTPHeader();
+        if (httpHeader.size() == 0) {
+            // When auth token is empty the size returned is 0.
+            AACE_WARN(LX(TAG).m("httpHeaderEmpty"));
+            return alexaAccount;
+        }
+
+        auto url = m_acmsEndpoint + FORWARD_SLASH + ACCOUNTS_PATH;
+
+        auto result = doGet(url, httpHeader);
+
+        ThrowIfNot(result.first, "doGetFailed:" + responseCodeToString((HTTPResponseCode)result.second.code));
+
+        if (document.Parse(result.second.body.c_str()).HasParseError()) {
             Throw("jsonParseError");
         }
         if (!document.IsArray()) {
@@ -296,32 +468,30 @@ AddressBookCloudUploaderRESTAgent::AlexaAccountInfo AddressBookCloudUploaderREST
         }
         return alexaAccount;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "getAlexaAccountInfo").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return alexaAccount;
     }
 }
 
 std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity(const std::string& commsId) {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-    rapidjson::Document document;
-    std::string pceId = "";
-    bool validFlag = false;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
-
+    AACE_DEBUG(LX(TAG));
     try {
+        rapidjson::Document document;
+        std::string pceId;
         auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + commsId + GET_INDENTITY_V2_QUERY;
-        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
-            httpResponse = doGet(url, httpHeaderData);
-            if (parseCommonHTTPResponse(httpResponse)) {
-                validFlag = true;
-                break;
-            }
+
+        auto httpHeader = buildCommonHTTPHeader();
+        if (httpHeader.size() == 0) {
+            // When auth token is empty the size returned is 0.
+            AACE_WARN(LX(TAG).m("httpHeaderEmpty"));
+            return "";
         }
 
-        ThrowIfNot(validFlag, "httpDoGetFailed" + getHTTPErrorString(httpResponse));
+        auto result = doGet(url, httpHeader);
 
-        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+        ThrowIfNot(result.first, "doGetFailed:" + responseCodeToString((HTTPResponseCode)result.second.code));
+
+        if (document.Parse(result.second.body.c_str()).HasParseError()) {
             Throw("jsonParseError");
         }
 
@@ -333,7 +503,7 @@ std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity(const std::s
         }
         return pceId;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "getPceIdFromIdentity").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return "";
     }
 }
@@ -341,29 +511,28 @@ std::string AddressBookCloudUploaderRESTAgent::getPceIdFromIdentity(const std::s
 std::string AddressBookCloudUploaderRESTAgent::createAndGetCloudAddressBook(
     const std::string& addressBookSourceId,
     const std::string& addressBookType) {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-    rapidjson::Document document;
-    std::string addressBookId = "";
-    bool validFlag = false;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
-    httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
-    auto addressDataJson = buildCreateAddressBookDataJson(addressBookSourceId, addressBookType);
-
+    AACE_DEBUG(LX(TAG));
     try {
+        auto httpHeaderData = buildCommonHTTPHeader();
+        if (httpHeaderData.size() == 0) {
+            // When auth token is empty the size returned is 0.
+            AACE_WARN(LX(TAG).m("httpHeaderEmpty"));
+            return "";
+        }
+        httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
+
+        rapidjson::Document document;
+        auto addressDataJson = buildCreateAddressBookDataJson(addressBookSourceId, addressBookType);
+        std::string addressBookId;
+
         auto url =
             m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH + ADDRESSBOOK_PATH;
-        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
-            httpResponse = doPost(url, httpHeaderData, addressDataJson, DEFAULT_HTTP_TIMEOUT);
-            if (parseCommonHTTPResponse(httpResponse)) {
-                validFlag = true;
-                break;
-            }
-        }
 
-        ThrowIfNot(validFlag, "httpDoPostFailed" + getHTTPErrorString(httpResponse));
+        auto result = doPost(url, httpHeaderData, addressDataJson, DEFAULT_HTTP_TIMEOUT);
 
-        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+        ThrowIfNot(result.first, "doPostFailed:" + responseCodeToString((HTTPResponseCode)result.second.code));
+
+        if (document.Parse(result.second.body.c_str()).HasParseError()) {
             Throw("jsonParseError");
         }
 
@@ -371,14 +540,22 @@ std::string AddressBookCloudUploaderRESTAgent::createAndGetCloudAddressBook(
         if (it != document.MemberEnd() && it->value.IsString()) {
             addressBookId = it->value.GetString();
         } else {
-            Throw("notValidAddressBookId");
+            Throw("invalidAddressBookId");
         }
 
         return addressBookId;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "createAndGetCloudAddressBook").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return "";
     }
+}
+
+static std::string hoursFromNowISO8601(int offsetInHours) {
+    auto now = std::chrono::system_clock::now();
+    auto t_c = std::chrono::system_clock::to_time_t(now + std::chrono::hours(offsetInHours));
+    std::stringstream ss;
+    ss << std::put_time(std::gmtime(&t_c), "%FT%TZ");
+    return ss.str();
 }
 
 std::string AddressBookCloudUploaderRESTAgent::buildCreateAddressBookDataJson(
@@ -400,6 +577,11 @@ std::string AddressBookCloudUploaderRESTAgent::buildCreateAddressBookDataJson(
         "addressBookType",
         rapidjson::Value().SetString(addressBookType.c_str(), addressBookType.length()),
         document.GetAllocator());
+    auto validUntilDate = hoursFromNowISO8601(ADDRESS_BOOK_VALID_HOURS);
+    document.AddMember(
+        "validUntilDate",
+        rapidjson::Value().SetString(validUntilDate.c_str(), validUntilDate.length()),
+        document.GetAllocator());
 
     return aace::engine::utils::json::toString(document);
 }
@@ -408,24 +590,22 @@ bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId(
     const std::string& addressBookSourceId,
     const std::string& addressBookType,
     std::string& cloudAddressBookId) {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-    rapidjson::Document document;
-    bool validFlag = false;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
     try {
         auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
                    ADDRESSBOOK_PATH + GET_ADDRESS_BOOK_QUERY + addressBookSourceId;
-        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
-            httpResponse = doGet(url, httpHeaderData);
-            if (parseCommonHTTPResponse(httpResponse)) {
-                validFlag = true;
-                break;
-            }
-        }
-        ThrowIfNot(validFlag, "httpDoGetFailed" + getHTTPErrorString(httpResponse));
 
-        if (document.Parse(httpResponse.body.c_str()).HasParseError()) {
+        auto httpHeader = buildCommonHTTPHeader();
+        if (httpHeader.size() == 0) {
+            // Size is 0 in cases where auth token is empty.
+            AACE_WARN(LX(TAG).m("httpHeaderEmpty"));
+            return false;
+        }
+        auto result = doGet(url, httpHeader);
+
+        ThrowIfNot(result.first, "doGetFailed:" + responseCodeToString((HTTPResponseCode)result.second.code));
+
+        rapidjson::Document document;
+        if (document.Parse(result.second.body.c_str()).HasParseError()) {
             Throw("jsonParseError");
         }
 
@@ -447,7 +627,7 @@ bool AddressBookCloudUploaderRESTAgent::getCloudAddressBookId(
         }
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "getCloudAddressBookId").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
@@ -495,40 +675,39 @@ static int gzip(const std::string& bytes, std::string& gzipped) {
 AddressBookCloudUploaderRESTAgent::HTTPResponse AddressBookCloudUploaderRESTAgent::uploadDocumentToCloud(
     std::shared_ptr<rapidjson::Document> document,
     const std::string& cloudAddressBookId) {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
-    httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
-
-    auto content = aace::engine::utils::json::toString(*document);
-    std::string gzipped;
-    int ret = gzip(content, gzipped);
-    if (ret == Z_OK) {
-        httpHeaderData.insert(httpHeaderData.end(), "Content-Encoding: gzip");
-        content = std::move(gzipped);
-    } else {
-        AACE_ERROR(LX(TAG, "failedToCompressContent").d("error", ret));
-    }
-
-    auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
-               ADDRESSBOOK_PATH + FORWARD_SLASH + cloudAddressBookId + FORWARD_SLASH + ENTRIES_PATH;
-    for (int retryCount = 0; retryCount < HTTP_RETRY_COUNT; retryCount++) {
-        httpResponse = doPost(url, httpHeaderData, content, DEFAULT_HTTP_TIMEOUT);
-        switch (httpResponse.code) {
-            case HTTPResponseCode::SUCCESS_OK:
-                return httpResponse;
-            case HTTPResponseCode::HTTP_RESPONSE_CODE_UNDEFINED:
-            case HTTPResponseCode::SUCCESS_NO_CONTENT:
-            case HTTPResponseCode::REDIRECTION_START_CODE:
-            case HTTPResponseCode::REDIRECTION_END_CODE:
-            case HTTPResponseCode::BAD_REQUEST:
-            case HTTPResponseCode::FORBIDDEN:
-            case HTTPResponseCode::SERVER_INTERNAL_ERROR:
-                break;  //Retry
+    AACE_DEBUG(LX(TAG));
+    try {
+        auto httpHeaderData = buildCommonHTTPHeader();
+        if (httpHeaderData.size() == 0) {
+            // When auth token is empty the size returned is 0.
+            AACE_WARN(LX(TAG).m("httpHeaderEmpty"));
+            return AddressBookCloudUploaderRESTAgent::HTTPResponse();
         }
-    }
+        httpHeaderData.insert(httpHeaderData.end(), CONTENT_TYPE_APPLICATION_JSON);
 
-    return httpResponse;
+        auto content = aace::engine::utils::json::toString(*document);
+        std::string gzipped;
+        int ret = gzip(content, gzipped);
+        if (ret == Z_OK) {
+            httpHeaderData.insert(httpHeaderData.end(), "Content-Encoding: gzip");
+            content = std::move(gzipped);
+        } else {
+            AACE_ERROR(LX(TAG, "failedToCompressContent").d("error", ret));
+        }
+
+        auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
+                   ADDRESSBOOK_PATH + FORWARD_SLASH + cloudAddressBookId + FORWARD_SLASH + ENTRIES_PATH;
+
+        auto result = doPost(url, httpHeaderData, content, DEFAULT_HTTP_TIMEOUT);
+
+        ThrowIfNot(result.first, "doPostFailed:" + responseCodeToString((HTTPResponseCode)result.second.code));
+
+        return result.second;
+
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        return AddressBookCloudUploaderRESTAgent::HTTPResponse();
+    }
 }
 
 bool AddressBookCloudUploaderRESTAgent::parseCreateAddressBookEntryResponse(
@@ -555,31 +734,32 @@ bool AddressBookCloudUploaderRESTAgent::parseCreateAddressBookEntryResponse(
         }
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "parseCreateAddressBookEntryResponse").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }
 
 bool AddressBookCloudUploaderRESTAgent::deleteCloudAddressBook(const std::string& addressBookId) {
-    AddressBookCloudUploaderRESTAgent::HTTPResponse httpResponse;
-    rapidjson::Document document;
-    bool validFlag = false;
-
-    auto httpHeaderData = buildCommonHTTPHeader();
+    AACE_DEBUG(LX(TAG));
     try {
+        rapidjson::Document document;
+
         auto url = m_acmsEndpoint + FORWARD_SLASH + USERS_PATH + FORWARD_SLASH + getPceId() + FORWARD_SLASH +
                    ADDRESSBOOK_PATH + FORWARD_SLASH + addressBookId;
-        for (int retry = 0; retry < HTTP_RETRY_COUNT; retry++) {
-            httpResponse = doDelete(url, httpHeaderData);
-            if (parseCommonHTTPResponse(httpResponse)) {
-                validFlag = true;
-                break;
-            }
+
+        auto httpHeader = buildCommonHTTPHeader();
+        if (httpHeader.size() == 0) {
+            // When auth token is empty the size returned is 0.
+            AACE_WARN(LX(TAG).m("httpHeaderEmpty"));
+            return false;
         }
-        ThrowIfNot(validFlag, "httpDoDeleteFailed" + getHTTPErrorString(httpResponse));
+        auto result = doDelete(url, httpHeader);
+
+        ThrowIfNot(result.first, "doDeleteFailed:" + responseCodeToString((HTTPResponseCode)result.second.code));
+
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "deleteCloudAddressBook").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return false;
     }
 }

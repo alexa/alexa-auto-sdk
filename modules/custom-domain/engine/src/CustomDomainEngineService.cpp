@@ -68,8 +68,14 @@ bool CustomDomainEngineService::registerPlatformInterfaceType(
     try {
         ThrowIfNotNull(m_customDomainEngineImpl, "platformInterfaceAlreadyRegistered");
 
+        auto alexaComponentInterface =
+            getContext()->getServiceInterface<aace::engine::alexa::AlexaComponentInterface>("aace.alexa");
+        ThrowIfNull(alexaComponentInterface, "alexaComponentInterfaceInvalid");
+
+        auto agentManager = alexaComponentInterface->getAgentManager();
+        
         m_customDomainEngineImpl = aace::engine::customDomain::CustomDomainEngineImpl::create(
-            customDomain, getContext(), m_customInterfaceMetadata);
+            customDomain, getContext(), m_customInterfaceMetadata, agentManager);
         ThrowIfNull(m_customDomainEngineImpl, "createCustomDomainEngineImplFailed");
 
         return true;

@@ -13,9 +13,10 @@
  * permissions and limitations under the License.
  */
 
-#include <AASB/Engine/Alexa/AASBAlexaClient.h>
+#include <sstream>
 #include <AACE/Engine/Core/EngineMacros.h>
 
+#include <AASB/Engine/Alexa/AASBAlexaClient.h>
 #include <AASB/Message/Alexa/AlexaClient/DialogStateChangedMessage.h>
 #include <AASB/Message/Alexa/AlexaClient/AuthStateChangedMessage.h>
 #include <AASB/Message/Alexa/AlexaClient/ConnectionStatusChangedMessage.h>
@@ -79,16 +80,18 @@ bool AASBAlexaClient::initialize(std::shared_ptr<aace::engine::messageBroker::Me
 //
 // aace::alexa::AlexaClient
 //
-
-void AASBAlexaClient::dialogStateChanged(DialogState state) {
+void AASBAlexaClient::dialogStateChanged(aace::alexa::AssistantIdType id, DialogState state) {
     try {
-        AACE_VERBOSE(LX(TAG));
+        std::stringstream dialogState;
+        dialogState << state;
+        AACE_INFO(LX(TAG).d("id", id).d("state", dialogState.str()));
 
         auto m_messageBroker_lock = m_messageBroker.lock();
         ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
 
         aasb::message::alexa::alexaClient::DialogStateChangedMessage message;
-        message.payload.state = static_cast<aasb::message::alexa::alexaClient::DialogState>(state);
+        message.payload.assistantId = id;
+        message.payload.state = convertDialogState(state);
 
         m_messageBroker_lock->publish(message.toString()).send();
     } catch (std::exception& ex) {
@@ -123,34 +126,27 @@ void AASBAlexaClient::connectionStatusChanged(
         auto m_messageBroker_lock = m_messageBroker.lock();
         ThrowIfNull(m_messageBroker_lock, "invalidMessageBrokerReference");
 
-        // Send the original message when there's only one endpoint
-        if (detailed.size() == 1) {
-            aasb::message::alexa::alexaClient::ConnectionStatusChangedMessage message;
-            message.payload.status = convertConnectionStatus(status);
-            message.payload.reason = convertReason(reason);
-            m_messageBroker_lock->publish(message.toString()).send();
-        } else {
-            aasb::message::alexa::alexaClient::ConnectionStatusChangedDetailedMessage message;
-            message.payload.status = convertConnectionStatus(status);
-            message.payload.reason = convertReason(reason);
+        aasb::message::alexa::alexaClient::ConnectionStatusChangedDetailedMessage message;
+        message.payload.status = convertConnectionStatus(status);
+        message.payload.reason = convertReason(reason);
 
-            aasb::message::alexa::alexaClient::ConnectionStatusDetails connectionStatusDetails;
+        aasb::message::alexa::alexaClient::ConnectionStatusDetails connectionStatusDetails;
 
-            for (auto connectionStatusInfo : detailed) {
-                aasb::message::alexa::alexaClient::ConnectionStatusInfo info;
-                info.status = convertConnectionStatus(connectionStatusInfo.status);
-                info.reason = convertReason(connectionStatusInfo.reason);
+        for (auto connectionStatusInfo : detailed) {
+            aasb::message::alexa::alexaClient::ConnectionStatusInfo info;
+            info.status = convertConnectionStatus(connectionStatusInfo.status);
+            info.reason = convertReason(connectionStatusInfo.reason);
 
-                if (connectionStatusInfo.type == aace::alexa::AlexaClient::ConnectionType::AVS) {
-                    connectionStatusDetails.avs = info;
-                } else if (connectionStatusInfo.type == aace::alexa::AlexaClient::ConnectionType::LOCAL) {
-                    connectionStatusDetails.local = info;
-                }
+            if (connectionStatusInfo.type == aace::alexa::AlexaClient::ConnectionType::AVS) {
+                connectionStatusDetails.avs = info;
+            } else if (connectionStatusInfo.type == aace::alexa::AlexaClient::ConnectionType::LOCAL) {
+                connectionStatusDetails.local = info;
             }
-
-            message.payload.detailed = connectionStatusDetails;
-            m_messageBroker_lock->publish(message.toString()).send();
         }
+
+        message.payload.detailed = connectionStatusDetails;
+        m_messageBroker_lock->publish(message.toString()).send();
+
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
@@ -213,6 +209,28 @@ aasb::message::alexa::alexaClient::ConnectionChangedReason AASBAlexaClient::conv
         default:
             AACE_NOT_REACHED;
             return aasb::message::alexa::alexaClient::ConnectionChangedReason::NONE;
+    }
+}
+
+// static
+aasb::message::alexa::alexaClient::DialogState AASBAlexaClient::convertDialogState(
+    aace::alexa::AlexaClient::DialogState dialogState) {
+    switch (dialogState) {
+        case aace::alexa::AlexaClient::DialogState::IDLE:
+            return aasb::message::alexa::alexaClient::DialogState::IDLE;
+        case aace::alexa::AlexaClient::DialogState::LISTENING:
+            return aasb::message::alexa::alexaClient::DialogState::LISTENING;
+        case aace::alexa::AlexaClient::DialogState::EXPECTING:
+            return aasb::message::alexa::alexaClient::DialogState::EXPECTING;
+        case aace::alexa::AlexaClient::DialogState::THINKING:
+            return aasb::message::alexa::alexaClient::DialogState::THINKING;
+        case aace::alexa::AlexaClient::DialogState::SPEAKING:
+            return aasb::message::alexa::alexaClient::DialogState::SPEAKING;
+        case aace::alexa::AlexaClient::DialogState::FINISHED:
+            return aasb::message::alexa::alexaClient::DialogState::FINISHED;
+        default:
+            AACE_NOT_REACHED;
+            return aasb::message::alexa::alexaClient::DialogState::IDLE;
     }
 }
 

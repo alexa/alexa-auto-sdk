@@ -6,7 +6,7 @@ This library serves the following purposes:
    When a Bluetooth device is connected or disconnected, the `BluetoothReceiver` class receives the intent with the device's connection status, MAC address, and display name. When a device is paired, the class receives the intent for a device pairing, with the device's bond state, MAC address, and display name. The `BluetoothReceiver` class calls  the `BluetoothDirectiveHandler` class to update the Bluetooth device database based on the change. 
 
 * It handles contacts upload or removal requests to Alexa.
-   This library starts the AACS contacts service intents to handle contacts upload or removal requests.
+   This library starts the AACS Contacts Service intents to handle contacts upload or removal requests.
 
 On the Android Automotive OS, the last connected phone is considered the primary device. Only one device can upload the address book to the cloud at a time. If the primary phone changes, the old address book is removed and the new address book is scheduled to upload after 30 seconds. If you want to change this default behavior, implement your own system UI for users to select the primary phone and call the Android system API `setUserSelectedOutgoingPhoneAccount` to set the user-selected outgoing phone account. Send a `com.amazon.alexa.auto.comms.primaryPhoneChanged` intent to Alexa Auto Comms UI to inform the change of the primary phone.
 ```
@@ -30,8 +30,8 @@ There are two databases where devices are stored:
 ## Prerequisites
 The following list describes the prerequisites for this library:
 
-* AACS Telephony and Contacts libraries must be built.
-* Your Android device must meet the prerequisites for using the [AACS Telephony library](../alexa-auto-telephony/README.md#prerequisites).
+* Telephony and Contacts libraries must be built.
+* Your Android device must meet the prerequisites for using the [Telephony library](../alexa-auto-telephony/README.md#prerequisites).
 
 ## Known Issues
 * On a reboot, Android automatically connects any phone that is paired which could cause the primary phone to change and contacts sync issues.

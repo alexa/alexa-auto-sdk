@@ -27,6 +27,7 @@ import com.amazon.alexa.auto.apis.app.AlexaApp;
 import com.amazon.alexa.auto.apis.auth.AuthController;
 import com.amazon.alexa.auto.apps.common.util.ModuleProvider;
 import com.amazon.alexa.auto.setup.R;
+import com.amazon.alexa.auto.setup.workflow.command.CheckAACSStatusCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckContactsConsentStatusCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckDefaultAssistAppCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckDrivingStatusCommand;
@@ -36,6 +37,7 @@ import com.amazon.alexa.auto.setup.workflow.command.CheckLoginRequiredCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckNaviFavoriteCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckNetworkStatusCommand;
 import com.amazon.alexa.auto.setup.workflow.command.CheckSeparateAddressBookConsentCommand;
+import com.amazon.alexa.auto.setup.workflow.command.CheckSeparateLocationConsentCommand;
 import com.amazon.alexa.auto.setup.workflow.command.Command;
 import com.amazon.alexa.auto.setup.workflow.command.SetupCompleteCommand;
 
@@ -156,6 +158,9 @@ public class WorkflowNavigator {
             case Command.CHECK_DEFAULT_ASSIST_APP_COMMAND:
                 command = new CheckDefaultAssistAppCommand(mContext.get());
                 break;
+            case Command.CHECK_AACS_STATUS_COMMAND:
+                command = new CheckAACSStatusCommand(mContext.get());
+                break;
             case Command.CHECK_DRIVING_STATUS_COMMAND:
                 command = new CheckDrivingStatusCommand(mContext.get());
                 break;
@@ -182,6 +187,9 @@ public class WorkflowNavigator {
                 break;
             case Command.CHECK_SEPARATE_ADDRESSBOOK_CONSENT_COMMAND:
                 command = new CheckSeparateAddressBookConsentCommand(mContext.get());
+                break;
+            case Command.CHECK_SEPARATE_LOCATION_CONSENT_COMMAND:
+                command = new CheckSeparateLocationConsentCommand(mContext.get());
                 break;
             default:
                 break;

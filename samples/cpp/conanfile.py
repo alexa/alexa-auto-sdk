@@ -101,28 +101,34 @@ class SampleApp(ConanFile):
         # certs and data config
         self.replace_token(config_file, "CERTS_PATH", self.def_certs_path)
         self.replace_token(config_file, "DATA_PATH", self.def_data_path)
-        # device info config
+        # alexa client info config
         self.replace_token(config_file, "CLIENT_ID")
         self.replace_token(config_file, "PRODUCT_ID")
+        self.replace_token(config_file, "AMAZON_ID")
+        # device config
+        self.replace_token(config_file, "DEVICE_MANUFACTURER")
+        self.replace_token(config_file, "DEVICE_MODEL")
+        self.replace_token(config_file, "DEVICE_PLATFORM")
+        self.replace_token(config_file, "DEVICE_OS_VERSION")
+        self.replace_token(config_file, "DEVICE_HARDWARE_ARCH")
         self.replace_token(config_file, "DEVICE_SERIAL_NUMBER")
-        self.replace_token(config_file, "MANUFACTURER_NAME")
-        self.replace_token(config_file, "DEVICE_DESCRIPTION")
+        # app info config
+        self.replace_token(config_file, "APP_VERSION")
+
         # vehicle info config
-        self.replace_token(config_file, "VEHICLE_OS", self.settings.os)
-        self.replace_token(config_file, "VEHICLE_ARCH", self.settings.arch)
         self.replace_token(config_file, "VEHICLE_MAKE")
         self.replace_token(config_file, "VEHICLE_MODEL")
         self.replace_token(config_file, "VEHICLE_YEAR")
         self.replace_token(config_file, "VEHICLE_TRIM")
-        self.replace_token(config_file, "VEHICLE_GEOGRAPHY")
-        self.replace_token(config_file, "VEHICLE_VERSION")
-        self.replace_token(config_file, "VEHICLE_LANGUAGE")
         self.replace_token(config_file, "VEHICLE_MICROPHONE")
-        self.replace_token(config_file, "VEHICLE_IDENTIFIER")
         self.replace_token(config_file, "VEHICLE_COUNTRY")
+        self.replace_token(config_file, "VEHICLE_IDENTIFIER")
         self.replace_token(config_file, "VEHICLE_ENGINE_TYPE")
         self.replace_token(config_file, "VEHICLE_RSE_EMBEDDED_FIRETVS")
 
+        # metric info
+        self.replace_token(config_file, "METRIC_TAG")
+        
     def _configure_cmake(self):
         cmake = CMake(self)
         defs = {}

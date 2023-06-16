@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -55,30 +55,41 @@ using namespace aasb::message::arbitrator::arbitrator;
 
 static const uint32_t ASYNC_REPLY_TIMEOUT = 1000;
 
+// AssistantId SIRI
+static const std::string ASSISTANT_ID = "1234";
+
 static const std::string NAME_OF_3P_AGENT = "SIRI_ASSISTANT";
 
 static const std::string  THREE_P_WAKEWORD = "SIRI";
 
-// AssistantId SIRI
-static const std::string ASSISTANT_ID = "1234";
+// To check Mic Audio bool
+static bool micAudio = false;
 
-std::string stateString = "RECOGNIZING_SPEECH";
+// To check Initialization of Pryonlite Engine
+static bool isVADInitialized = false;
+
+static std::string stateString = "RECOGNIZING_SPEECH";
 
 // Initilizing begin and end Indexes
 static int beginIndexPos = 0;
 
 static int endIndexPos = 0; 
 
+static auto sampleRateHz = 16000;
+
+// path to model file
+static std::string pathToModelFile;
+
+// To prevent from switching into wrong states of SIRI.  
+static std::string assist_id = "UNKNOWN";
+
+static std::string dial_id = "UNKNOWN";
+
 // Pryonlite Class Shared Pointer
-std::shared_ptr<PryonLiteVAD> m_pryonLiteVAD{};
+std::shared_ptr<PryonLiteVAD> pryonLiteVADInstance{};
 
-int NUM_SAMPLES_PER_PUSH = 160;
-
-auto sampleRateHz = 16000;
-
-std::string assist_id = "a";
-
-std::string dial_id = "b";
+// AgentHandler Instance
+AgentHandler *agentInstance = nullptr;
 
 AgentHandler::AgentHandler(
     std::weak_ptr<Activity> activity,
@@ -89,10 +100,11 @@ AgentHandler::AgentHandler(
         m_messageBroker{std::move(messageBroker)} {
     setupUI();
     subscribeToAASBMessages();
+    agentInstance = this;
 }
 
 void AgentHandler::initialize() {
-    m_pryonLiteVAD = PryonLiteVAD::create(m_loggerHandler, shared_from_this());
+    pryonLiteVADInstance = PryonLiteVAD::create(m_loggerHandler, shared_from_this());
 }
 
 std::weak_ptr<Activity> AgentHandler::getActivity() {
@@ -203,7 +215,8 @@ void AgentHandler::handleStartDialogReplyMessage(const std::string& message){
         if(replyMsg.payload.success){
             showMessage("Recieved reply for the ID: " + replyMsg.payload.dialogId);
             auto timestamp = calculateStartOfKeywordTimeStamp(beginIndexPos, endIndexPos);
-            requestSiri(timestamp);
+            std::string message = "Hey"  + THREE_P_WAKEWORD + "! was said ... at TimeStamp: ";
+            requestSiri(timestamp, message);
             std::string state = "RECOGNIZING_SPEECH";
             assist_id = replyMsg.payload.assistantId;
             dial_id =  replyMsg.payload.dialogId;
@@ -341,69 +354,78 @@ std::chrono::time_point<std::chrono::system_clock> AgentHandler::calculateStartO
 }
 
 void AgentHandler::setStartofSpeechTimeStamp(std::chrono::time_point<std::chrono::system_clock>& startofSpeechTimeStamp){
-    requestSiri(startofSpeechTimeStamp);
-    std::string assistantId = ASSISTANT_ID;
-    auto mode = aasb::message::arbitrator::arbitrator::Mode::WAKEWORD;
-    startDialog(assistantId, mode);
+    std::string message = "Voice Activity Begin Timestamp: ";
+    requestSiri(startofSpeechTimeStamp, message);
 }
 
-void AgentHandler::requestSiri(std::chrono::time_point<std::chrono::system_clock>& timeStamp){
+void AgentHandler::requestSiri(std::chrono::time_point<std::chrono::system_clock>& timeStamp, std::string& message){
     std::string voiceActivation;
     // Converting system_clock to NTP. requestSIRI gives timestamp in NTP format.
     const long long secs = 2208988800;  // Total number of seconds from 1 Jan 1900 to 31 Dec 1970 is = 60*60*24*25567 = 2208988800;
     long long beginTimestamp = std::chrono::duration_cast<std::chrono::seconds>(timeStamp.time_since_epoch()).count()  // total seconds form 1 Jan 1971 to now
                                     + (std::chrono::seconds(secs)).count();
-    showMessage(THREE_P_WAKEWORD + " Begin Timestamp: " + std::to_string(beginTimestamp));
-    showMessage("Hey " + THREE_P_WAKEWORD + "! was said");
+    showMessage(message + std::to_string(beginTimestamp));
+}
+
+void AgentHandler::VADFeedAudio(AgentHandler::AudioType type){
+    if(!isVADInitialized){
+        std::ifstream file(pathToModelFile);
+        if (!file) {
+            log(logger::LoggerHandler::Level::ERROR, "Invalid path to Models file");
+            return;
+        }
+        pryonLiteVADInstance->getWavFilePath(pathToModelFile);
+        std::string pathToFingerprintsFile = std::string();
+        std::string pathToWatermarkCfgFile = std::string();
+        isVADInitialized = pryonLiteVADInstance->init(pathToModelFile, pathToFingerprintsFile, pathToWatermarkCfgFile);
+        if(isVADInitialized){
+            showMessage("VAD Mode is set successfully");
+        }
+    }
+    if(type == AgentHandler::AudioType::AUDIO_FILE){   
+        if(micAudio){
+            pryonLiteVADInstance->stopMicAudio();
+            micAudio = false;
+        }
+        pryonLiteVADInstance->feedAudio();
+    }
+    if(type == AgentHandler::AudioType::MIC_AUDIO){
+        if(!micAudio){
+            pryonLiteVADInstance->startMicAudio();
+            micAudio = true;
+        } else{
+            log(logger::LoggerHandler::Level::ERROR, "Mic Audio already enabled");
+        }
+    }
+}
+
+bool AgentHandler::getPath(const std::vector<json>& jsons){
+    for (auto const& j : jsons) {
+        try {
+           if (j.find("pryonLiteVAD") != j.end()) {
+                pathToModelFile = std::string(j["pryonLiteVAD"]["rootPath"]) + "/" + std::string(j["pryonLiteVAD"]["models"]);
+                return true;
+            }
+        } catch (json::exception& e){
+        }
+    }
+    return false;
 }
 
 void AgentHandler::setCarPlayMode(AgentHandler::CarPlayMode mode){
     std::string wakeword = THREE_P_WAKEWORD;
-    bool stopFeedAudioThread = true;
-    if(AgentHandler::CarPlayMode::VAD == mode){
-        showMessage("VAD Mode is set");
-
-       //disable kwd mode if enabled before:
-       enable3PWakeword(wakeword, false);
-
-        m_pryonLiteVADThread = std::thread([&] {
-            std::string modelFile = "H.ar-SA+de-DE+en-AU+en-CA+en-GB+en-IN+en-US+es-MX+es-US+fr-CA+fr-FR+hi-IN+it-IT+ja-JP+pt-BR.alexa+siri.bin";
-            std::string filePath = "share/amazonlite/models/" + modelFile; 
-            std::ifstream file(filePath);
-            if (!file){
-                // for Linux C++ SampleApp path to model file.
-                filePath = "/opt/AAC/share/amazonlite/models/" + modelFile;
-                std::ifstream file(filePath);
-                if(!file){
-                    showMessage("Pryonlite Model (.bin) file is missing");
-                    return;
-                }
-            }
-            std::string pathToModelFile = filePath;
-            std::string pathToFingerprintsFile = std::string();
-            std::string pathToWatermarkCfgFile = std::string();
-            bool isInitialized = m_pryonLiteVAD->init(pathToModelFile, pathToFingerprintsFile, pathToWatermarkCfgFile);
-            if(isInitialized){
-                showMessage("Pryonlite engine initialized successfully");
-            }
-        });
-
-    }else if (AgentHandler::CarPlayMode::KWD == mode){
+    if (AgentHandler::CarPlayMode::KWD == mode){
         showMessage("KWD Mode is set");
-        m_pryonLiteVAD->returnBoolThread(stopFeedAudioThread);
-        m_pryonLiteVAD->destroy();
-        if (m_pryonLiteVADThread.joinable()) {
-            m_pryonLiteVADThread.join();
-        }
+        pryonLiteVADInstance->destroy();
+        micAudio = false;
+        isVADInitialized = false;
         enable3PWakeword(wakeword, true);
 
     } else if(AgentHandler::CarPlayMode::DEACTIVATED == mode) {
         showMessage("Deactivated Mode is set");
-        m_pryonLiteVAD->returnBoolThread(stopFeedAudioThread);
-        m_pryonLiteVAD->destroy();
-        if (m_pryonLiteVADThread.joinable()) {
-            m_pryonLiteVADThread.join();
-        }
+        pryonLiteVADInstance->destroy();
+        micAudio = false;
+        isVADInitialized = false;
         enable3PWakeword(wakeword, false);
     }
 }
@@ -536,10 +558,15 @@ void AgentHandler::setupUI() {
         return true;
     });
 
-    // If Set to VAD CarPlay Mode
-    activity->registerObserver(Event::onVAD, [=](const std::string&) {
-        showMessage("Car Play mode is set...");
-        setCarPlayMode(AgentHandler::CarPlayMode::VAD);
+    // Audio File for VAD
+    activity->registerObserver(Event::onAudioFile, [=](const std::string&) {
+        VADFeedAudio(AgentHandler::AudioType::AUDIO_FILE);
+        return true;
+    });
+
+    // Mic Audio for VAD
+    activity->registerObserver(Event::onMicAudio, [=](const std::string&) {
+        VADFeedAudio(AgentHandler::AudioType::MIC_AUDIO);
         return true;
     });
 
@@ -559,13 +586,13 @@ void AgentHandler::setupUI() {
 
     activity->registerObserver(Event::onPTT, [=](const std::string&) {
         std::string assistantId = ASSISTANT_ID;
-        showMessage("Car Play mode is set...");
         immediateAgentInvocation(assistantId ,aasb::message::arbitrator::arbitrator::Mode::GESTURE);
         return true;
     });
     
     activity->registerObserver(Event::onSiriSPEAKING, [=](const std::string&) {
-        if((stateString != "SPEAKING") && (assist_id != "a") && (dial_id != "b")){
+        // Comparing assist_id and dial_id in order to prevent wrong state switching
+        if((stateString != "SPEAKING") || (assist_id == "UNKNOWN") || (dial_id == "UNKNOWN")){
             log(logger::LoggerHandler::Level::ERROR, "Can not switch to SPEAKING state");
             return false;
         }
@@ -576,9 +603,10 @@ void AgentHandler::setupUI() {
     });
 
     activity->registerObserver(Event::onSiriNONE, [=](const std::string&) {
-        if((stateString != "NONE") && (assist_id != "a") && (dial_id != "b")){
+        // Comparing assist_id and dial_id in order to prevent wrong state switching
+        if((stateString != "NONE") || (assist_id == "UNKNOWN") || (dial_id == "UNKNOWN")){
             log(logger::LoggerHandler::Level::ERROR, "Can not switch to NONE state");
-            return false;
+            return false; 
         }
         std::string mode = "NONE";
         stateString = "RECOGNIZING_SPEECH";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public:
      * @return The number of bytes read, 0 if the end of stream is reached or data is not currently available,
      * or -1 if an error occurred
      */
-    virtual ssize_t read(char* data, const size_t size) = 0;
+    virtual ssize_t read(char* data, size_t size) = 0;
 
     /**
      * Writes data to the stream.
@@ -48,7 +48,12 @@ public:
      * @return The number of bytes successfully written to the stream or a negative error code
      * if data could not be written
      */
-    virtual ssize_t write(const char* data, const size_t size) = 0;
+    virtual ssize_t write(const char* data, size_t size) = 0;
+
+    /**
+     * Close the stream.
+     */
+    virtual void close();
 
     /**
      * Checks if the stream has been closed.

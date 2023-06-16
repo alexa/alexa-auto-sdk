@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@
 
 #include <memory>
 
-#include "AACE/DeviceUsage/DeviceUsage.h"
-#include "AACE/DeviceUsage/DeviceUsageEngineInterfaces.h"
+#include <AACE/DeviceUsage/DeviceUsage.h>
+#include <AACE/DeviceUsage/DeviceUsageEngineInterfaces.h>
+#include <AACE/Engine/Core/EngineService.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 
 namespace aace {
 namespace engine {
@@ -32,14 +34,17 @@ private:
     /**
      * Constructor.
      */
-    DeviceUsageEngineImpl(std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface);
+    DeviceUsageEngineImpl(
+        std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
 public:
     /**
      * Factory method for creating instance of @c DeviceUsageEngineImpl
      */
     static std::shared_ptr<DeviceUsageEngineImpl> create(
-        std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface);
+        std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface,
+        std::shared_ptr<aace::engine::core::EngineContext> engineContext);
 
     virtual ~DeviceUsageEngineImpl() = default;
 
@@ -53,6 +58,7 @@ public:
 private:
     /// Auto SDK DeviceUsage platform interface handler instance.
     std::shared_ptr<aace::deviceUsage::DeviceUsage> m_deviceUsagePlatformInterface;
+    std::weak_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
 };
 
 }  // namespace deviceUsage

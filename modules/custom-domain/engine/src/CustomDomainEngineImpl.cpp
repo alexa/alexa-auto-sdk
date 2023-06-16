@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  */
 #include "AACE/Engine/CustomDomain/CustomDomainEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <nlohmann/json.hpp>
 #include <AACE/Engine/Alexa/AlexaComponentInterface.h>
 
@@ -24,7 +23,6 @@ namespace aace {
 namespace engine {
 namespace customDomain {
 
-using namespace aace::engine::utils::metrics;
 using json = nlohmann::json;
 
 // String to identify log entries originating from this file.
@@ -35,9 +33,6 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "CustomDomainEngineImpl";
 
 /// Counter metrics for CustomDomain Platform APIs
 static const std::string METRIC_CUSTOM_DOMAIN_HANDLE_DIRECTIVE = "HandleDirective";
-static const std::string METRIC_CUSTOM_DOMAIN_CANCEL_DIRECTIVE = "CancelDirective";
-static const std::string METRIC_CUSTOM_DOMAIN_REPORT_DIRECTIVE_HANDLING_RESULT = "ReportDirectiveHandlingResult";
-static const std::string METRIC_CUSTOM_DOMAIN_GET_CONTEXT = "GetContext";
 static const std::string METRIC_CUSTOM_DOMAIN_SEND_EVENT = "SendEvent";
 
 /// String constants in configuration
@@ -96,7 +91,14 @@ bool CustomDomainEngineImpl::initialize(
                 LX(TAG).m("Creating Custom Domain capability agent").d("interfaceName", name).d("version", version));
 
             auto capabilityAgent = CustomDomainCapabilityAgent::create(
-                name, version, states, shared_from_this(), exceptionSender, contextManager, messageSender, agentManager);
+                name,
+                version,
+                states,
+                shared_from_this(),
+                exceptionSender,
+                contextManager,
+                messageSender,
+                agentManager);
             ThrowIfNull(capabilityAgent, "couldNotCreateCapabilityAgent");
 
             // Register capability with the default endpoint
@@ -146,7 +148,12 @@ std::shared_ptr<CustomDomainEngineImpl> CustomDomainEngineImpl::create(
 
         ThrowIfNot(
             customDomainEngineImpl->initialize(
-                defaultCapabilitiesRegistrar, exceptionSender, contextManager, messageSender, customInterfaceMetadata, agentManager),
+                defaultCapabilitiesRegistrar,
+                exceptionSender,
+                contextManager,
+                messageSender,
+                customInterfaceMetadata,
+                agentManager),
             "initializeCustomDomainEngineImplFailed");
 
         // set the platform engine interface reference
@@ -183,10 +190,6 @@ void CustomDomainEngineImpl::handleDirective(
     const std::string& correlationToken,
     const std::string& messageId) {
     AACE_INFO(LX(TAG));
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "handleDirecitve",
-        {METRIC_CUSTOM_DOMAIN_HANDLE_DIRECTIVE, directiveNamespace, name});
     if (m_customDomainPlatformInterface != nullptr) {
         m_customDomainPlatformInterface->handleDirective(
             directiveNamespace, name, payload, correlationToken, messageId);
@@ -199,10 +202,6 @@ void CustomDomainEngineImpl::cancelDirective(
     const std::string& correlationToken,
     const std::string& messageId) {
     AACE_INFO(LX(TAG));
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "cancelDirective",
-        {METRIC_CUSTOM_DOMAIN_CANCEL_DIRECTIVE, directiveNamespace, name});
     if (m_customDomainPlatformInterface != nullptr) {
         m_customDomainPlatformInterface->cancelDirective(directiveNamespace, name, correlationToken, messageId);
     }
@@ -210,7 +209,6 @@ void CustomDomainEngineImpl::cancelDirective(
 
 std::string CustomDomainEngineImpl::getContext(const std::string& contextNamespace) {
     AACE_INFO(LX(TAG).d("namespace", contextNamespace));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "getContext", {METRIC_CUSTOM_DOMAIN_GET_CONTEXT, contextNamespace});
     if (m_customDomainPlatformInterface != nullptr) {
         return m_customDomainPlatformInterface->getContext(contextNamespace);
     }
@@ -223,10 +221,6 @@ void CustomDomainEngineImpl::onReportDirectiveHandlingResult(
     const std::string& messageId,
     ResultType result) {
     AACE_INFO(LX(TAG));
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onReportDirectiveHandlingResult",
-        {METRIC_CUSTOM_DOMAIN_REPORT_DIRECTIVE_HANDLING_RESULT, directiveNamespace});
     if (m_capabilityAgentMap.find(directiveNamespace) == m_capabilityAgentMap.end()) {
         AACE_ERROR(LX(TAG).d("reason", "invalidNamespace").d("namespace", directiveNamespace));
         return;
@@ -247,8 +241,6 @@ void CustomDomainEngineImpl::onSendEvent(
     const std::string& correlationToken,
     const std::string& customContext) {
     AACE_INFO(LX(TAG));
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onSendEvent", {METRIC_CUSTOM_DOMAIN_SEND_EVENT, eventNamespace, name});
     if (m_capabilityAgentMap.find(eventNamespace) == m_capabilityAgentMap.end()) {
         AACE_ERROR(LX(TAG).d("reason", "invalidNamespace").d("namespace", eventNamespace));
         return;

@@ -1,9 +1,0 @@
-.gradle/
-.idea/
-build/
-gradle/
-gradlew
-gradlew.bat
-local.properties
-.DS_Store
-libs/

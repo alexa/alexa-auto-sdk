@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@
 #include <AVSCommon/Utils/LibcurlUtils/HttpPut.h>
 #include <AVSGatewayManager/Storage/AVSGatewayManagerStorage.h>
 #include <CapabilitiesDelegate/Storage/SQLiteCapabilitiesDelegateStorage.h>
+#include <Captions/LibwebvttParserAdapter.h>
 #include <CertifiedSender/SQLiteMessageStorage.h>
 #include <Endpoints/DefaultEndpointBuilder.h>
 #include <Endpoints/EndpointBuilder.h>
@@ -64,21 +65,21 @@
 #include <AACE/Engine/Alexa/InitiatorVerifier.h>
 #include <AACE/Engine/Authorization/AuthorizationServiceInterface.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/MetricsEmissionInterface.h>
 #include <AACE/Engine/Network/NetworkObservableInterface.h>
+#include <AACE/Engine/Utils/Agent/AgentId.h>
 #include <AACE/Engine/Utils/JSON/JSON.h>
 #include <AACE/Engine/Utils/String/StringUtils.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <AACE/Vehicle/VehicleProperties.h>
-#include <AACE/Engine/Vehicle/VehiclePropertyInterface.h>
+#include <AACE/Engine/Vehicle/VehicleConfigServiceInterface.h>
 #include <AACE/Engine/Alexa/AudioDuckingConfig.h>
-#include <AACE/Engine/Alexa/AlexaMetricSink.h>
+#include <AACE/Engine/Alexa/AvsSdkMetricSink.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
 using namespace alexaClientSDK::avsCommon::sdkInterfaces;
-using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaEngineService");
@@ -252,7 +253,7 @@ bool AlexaEngineService::registerProperties() {
 bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> configuration) {
     try {
         // Set Alexa Agent ID
-        alexaClientSDK::avsCommon::avs::AgentId::setAlexaAgentId(ALEXA_ASSISTANT_ID);
+        alexaClientSDK::avsCommon::avs::AgentId::setAlexaAgentId(aace::engine::utils::agent::AGENT_ID_ALEXA);
 
         // configure static interrupt model with audio ducking off
         std::shared_ptr<std::istream> duckingConfigStream =
@@ -289,7 +290,7 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         ThrowIfNull(m_authorizationManager, "createAuthorizationManagerFailed");
         m_authorizationManager->addAuthObserver(shared_from_this());
         ThrowIfNot(
-            registerServiceInterface<MetricsEmissionInterface>(m_authorizationManager),
+            registerServiceInterface<aace::engine::metrics::MetricsEmissionInterface>(m_authorizationManager),
             "registerMetricsEmissionInterfaceFailed");
 
         // Create the HTTP put delegate - Creates an HTTPPut handler instance on each put
@@ -307,12 +308,12 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         m_capabilitiesDelegate->addCapabilitiesObserver(shared_from_this());
 
         // Create the Metric Sink in Auto SDK to capture AVS Device SDK metrics
-        auto alexaMetricSink = std::unique_ptr<aace::engine::alexa::AlexaMetricSink>(new AlexaMetricSink());
-        ThrowIfNull(alexaMetricSink, "invalidMetricSink");
+        auto avsSdkMetricSink = AvsSdkMetricSink::create(m_metricService);
+        ThrowIfNull(avsSdkMetricSink, "invalidMetricSink");
 
         //Create the Metric Recorder - Records metric from all the components. Add the metric sink as a sink in the Metric Recorder
         m_metricRecorder = alexaClientSDK::metrics::implementations::MetricRecorder::createMetricRecorderInterface(
-            std::move(alexaMetricSink));
+            std::move(avsSdkMetricSink));
         ThrowIfNull(m_metricRecorder, "invalidMetricRecorder");
 
         // Create the UPLMetricSink in AVS Device SDK which calculates UPL metric and forwards the metric to the MetricRecorder
@@ -393,6 +394,16 @@ bool AlexaEngineService::configureDeviceSDK(std::shared_ptr<std::istream> config
         m_systemSoundPlayer = SystemSoundPlayer::create(audioManager, m_audioFactory->systemSounds());
         ThrowIfNull(m_systemSoundPlayer, "createSystemSoundPlayerFailed");
 
+        m_captionManager = nullptr;
+        m_captionPresenterHandler = nullptr;
+#ifdef AAC_CAPTIONS
+        // Create the caption manager
+        auto webvttParser = alexaClientSDK::captions::LibwebvttParserAdapter::getInstance();
+        m_captionManager = alexaClientSDK::captions::CaptionManager::create(webvttParser);
+        m_captionPresenterHandler = std::make_shared<aace::engine::alexa::CaptionPresenterHandler>();
+        m_captionManager->setCaptionPresenter(m_captionPresenterHandler);
+#endif
+
         // Create the Alexa Engine global settings observer
         m_globalSettingsObserver = std::make_shared<AlexaEngineGlobalSettingsObserver>();
 
@@ -426,6 +437,52 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
                     deviceSDKConfigRoot, alexaConfigRoot["avsDeviceSDK"].GetObject(), deviceSDKConfig.GetAllocator()),
                 "mergeConfigurationFailed");
         }
+        auto vehicleService =
+            getContext()->getServiceInterface<aace::engine::vehicle::VehicleConfigServiceInterface>("aace.vehicle");
+        ThrowIfNull(vehicleService, "Null VehicleConfigServiceInterface");
+        const std::string serialNumber =
+            vehicleService->getDeviceInfoValue(aace::engine::vehicle::KEY_DEVICE_INFO_SERIAL_NUMBER);
+        const std::string vehicleMake =
+            vehicleService->getVehicleInfoValue(aace::engine::vehicle::KEY_VEHICLE_INFO_MAKE);
+        const std::string vehicleModel =
+            vehicleService->getVehicleInfoValue(aace::engine::vehicle::KEY_VEHICLE_INFO_MODEL);
+        std::string productDescription = vehicleMake + " " + vehicleModel;
+        std::string productManufacturer = vehicleMake;
+
+        ThrowIfNot(
+            alexaConfigRoot.HasMember("alexaClientInfo") && alexaConfigRoot["alexaClientInfo"].IsObject(),
+            "Missing 'alexaClientInfo' object");
+        auto clientInfo = alexaConfigRoot["alexaClientInfo"].GetObject();
+        ThrowIfNot(
+            clientInfo.HasMember("clientId") && clientInfo["clientId"].IsString(),
+            "Missing 'alexaClientInfo.clientId'");
+        const std::string clientId = clientInfo["clientId"].GetString();
+        ThrowIfNot(
+            clientInfo.HasMember("productId") && clientInfo["productId"].IsString(),
+            "Missing 'alexaClientInfo.productId'");
+        const std::string productId = clientInfo["productId"].GetString();
+        ThrowIfNot(
+            clientInfo.HasMember("amazonId") && clientInfo["amazonId"].IsString(),
+            "Missing 'alexaClientInfo.amazonId'");
+        const std::string amazonId = clientInfo["amazonId"].GetString();
+
+        if (clientInfo.HasMember("description") && clientInfo["description"].IsString()) {
+            productDescription = clientInfo["description"].GetString();
+        }
+        if (clientInfo.HasMember("manufacturerName") && clientInfo["manufacturerName"].IsString()) {
+            productManufacturer = clientInfo["manufacturerName"].GetString();
+        }
+        rapidjson::Value avsDeviceInfo(rapidjson::kObjectType);
+
+        auto& allocator = deviceSDKConfig.GetAllocator();
+        avsDeviceInfo.AddMember("clientId", clientId, allocator);
+        avsDeviceInfo.AddMember("deviceSerialNumber", serialNumber, allocator);
+        avsDeviceInfo.AddMember("productId", productId, allocator);
+        avsDeviceInfo.AddMember("deviceType", amazonId, allocator);
+        avsDeviceInfo.AddMember("manufacturerName", productManufacturer, allocator);
+        avsDeviceInfo.AddMember("description", productDescription, allocator);
+        avsDeviceInfo.AddMember("friendlyName", productDescription, allocator);
+        deviceSDKConfigRoot.AddMember("deviceInfo", std::move(avsDeviceInfo), allocator);
 
         if (alexaConfigRoot.HasMember("system") && alexaConfigRoot["system"].IsObject()) {
             auto system = alexaConfigRoot["system"].GetObject();
@@ -714,6 +771,31 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
             }
         }
 
+        auto mediaPlayerFingerprintRoot = alexaConfigRoot.FindMember("mediaPlayerFingerprint");
+        if (mediaPlayerFingerprintRoot != alexaConfigRoot.MemberEnd() && mediaPlayerFingerprintRoot->value.IsObject()) {
+            auto mediaPlayerFingerprint = mediaPlayerFingerprintRoot->value.GetObject();
+            auto packageNode = mediaPlayerFingerprint.FindMember("package");
+            if (packageNode != mediaPlayerFingerprint.MemberEnd() && packageNode->value.IsString()) {
+                m_mediaPlayerFingerprint.package = packageNode->value.GetString();
+            } else {
+                AACE_WARN(LX(TAG).m("missingOrInvalidPackage"));
+            }
+            auto buildTypeNode = mediaPlayerFingerprint.FindMember("buildType");
+            if (buildTypeNode != mediaPlayerFingerprint.MemberEnd() && buildTypeNode->value.IsString()) {
+                m_mediaPlayerFingerprint.buildType = buildTypeNode->value.GetString();
+            } else {
+                AACE_WARN(LX(TAG).m("missingOrInvalidBuildType"));
+            }
+            auto versionNumberNode = mediaPlayerFingerprint.FindMember("versionNumber");
+            if (versionNumberNode != mediaPlayerFingerprint.MemberEnd() && versionNumberNode->value.IsString()) {
+                m_mediaPlayerFingerprint.versionNumber = versionNumberNode->value.GetString();
+            } else {
+                AACE_WARN(LX(TAG).m("missingOrInvalidVersionNumber"));
+            }
+        } else {
+            AACE_WARN(LX(TAG).m("missingOrInvalidMediaPlayerFingerprint"));
+        }
+
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         deviceSDKConfig.Accept(writer);
@@ -726,6 +808,10 @@ bool AlexaEngineService::configure(std::shared_ptr<std::istream> configuration) 
         m_audioFormat.endianness = alexaClientSDK::avsCommon::utils::AudioFormat::Endianness::LITTLE;
         m_audioFormat.encoding = alexaClientSDK::avsCommon::utils::AudioFormat::Encoding::LPCM;
         m_audioFormat.layout = alexaClientSDK::avsCommon::utils::AudioFormat::Layout::INTERLEAVED;
+
+        m_metricService =
+            getContext()->getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>("aace.metrics");
+        ThrowIfNull(m_metricService, "MetricRecorderServiceInterface is null");
 
         // Register the alexa component interface - Allows retrieval of the Alexa components
         ThrowIfNot(
@@ -995,34 +1081,30 @@ bool AlexaEngineService::preRegister() {
         ThrowIfNull(m_endpointBuilderFactory, "createEndpointBuilderFactoryFailed");
 
         // Create the VehicleData capability provider
-        // Note: For Auto SDK version 2.2 we create a dummy endpoint to host this capability
-        auto vehicleEngineService =
-            getContext()->getServiceInterface<aace::engine::vehicle::VehicleEngineService>("aace.vehicle");
-        if (vehicleEngineService != nullptr && vehicleEngineService->isVehicleInfoConfigured()) {
-            auto vehicleProperties = vehicleEngineService->getVehicleProperties();
-            auto vehicleData = VehicleData::create(vehicleProperties);
-            auto endpointBuilder = m_endpointBuilderFactory->createEndpointBuilder();
-            endpointBuilder->withCapabilityConfiguration(vehicleData);
-            endpointBuilder->withDerivedEndpointId("_AutoSDKVehicleMetadata");
-            endpointBuilder->withFriendlyName("_AutoSDKVehicleMetadata");
-            endpointBuilder->withDescription("Internal reference endpoint");
-            endpointBuilder->withManufacturerName(m_deviceInfo->getManufacturerName());
-            endpointBuilder->withDisplayCategory({"VEHICLE"});
-            endpointBuilder->withCookies({{"createdBy", "AutoSDK"}});
-            auto vehicleDataEndpoint = endpointBuilder->build();
-            ThrowIfNull(vehicleDataEndpoint, "couldNotBuildVehicleDataEndpoint");
-            endpointBuilder.reset();
-            auto resultFuture = m_endpointManager->registerEndpoint(std::move(vehicleDataEndpoint));
-            // Only wait for immediate errors.
-            if ((resultFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)) {
-                auto result = resultFuture.get();
-                ThrowIfNot(
-                    (result == alexaClientSDK::avsCommon::sdkInterfaces::endpoints::
-                                   EndpointRegistrationManagerInterface::RegistrationResult::SUCCEEDED),
-                    "couldNotRegisterVehicleDataEndpoint");
-            }
-        } else {
-            AACE_WARN(LX(TAG).m("nullVehicleEngineService").m("skippingVehicleDataCapability"));
+        // Use a a dummy endpoint to host this capability
+        auto vehicleService =
+            getContext()->getServiceInterface<aace::engine::vehicle::VehicleConfigServiceInterface>("aace.vehicle");
+        ThrowIfNull(vehicleService, "Null VehicleConfigServiceInterface");
+        auto vehicleData = VehicleData::create(vehicleService);
+        auto endpointBuilder = m_endpointBuilderFactory->createEndpointBuilder();
+        endpointBuilder->withCapabilityConfiguration(vehicleData);
+        endpointBuilder->withDerivedEndpointId("_AutoSDKVehicleMetadata");
+        endpointBuilder->withFriendlyName("_AutoSDKVehicleMetadata");
+        endpointBuilder->withDescription("Internal reference endpoint");
+        endpointBuilder->withManufacturerName(m_deviceInfo->getManufacturerName());
+        endpointBuilder->withDisplayCategory({"VEHICLE"});
+        endpointBuilder->withCookies({{"createdBy", "AutoSDK"}});
+        auto vehicleDataEndpoint = endpointBuilder->build();
+        ThrowIfNull(vehicleDataEndpoint, "couldNotBuildVehicleDataEndpoint");
+        endpointBuilder.reset();
+        auto resultFuture = m_endpointManager->registerEndpoint(std::move(vehicleDataEndpoint));
+        // Only wait for immediate errors.
+        if ((resultFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)) {
+            auto result = resultFuture.get();
+            ThrowIfNot(
+                (result == alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointRegistrationManagerInterface::
+                               RegistrationResult::SUCCEEDED),
+                "couldNotRegisterVehicleDataEndpoint");
         }
 
         return true;
@@ -1101,7 +1183,6 @@ bool AlexaEngineService::setup() {
 
         // get the network provider from the network service
         auto networkProvider = getContext()->getServiceInterface<aace::network::NetworkInfoProvider>("aace.network");
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "setup", "GetNetworkStatus", 1);
 
         // get the initial network status from the network provider - if the network provider is not
         // available then we always treat the network status as CONNECTED
@@ -1229,6 +1310,7 @@ bool AlexaEngineService::shutdown() {
             m_authorizationManager->removeAuthObserver(m_alexaClientEngineImpl);
             m_authorizationManager->removeAuthObserver(shared_from_this());
             m_authorizationManager->removeAuthObserver(m_clientObserver);
+            m_authorizationManager->removeAuthObserver(m_speechRecognizerEngineImpl);
             m_authorizationManager->shutdown();
         }
 
@@ -1258,6 +1340,7 @@ bool AlexaEngineService::shutdown() {
 
         if (m_dialogUXStateAggregator != nullptr) {
             m_dialogUXStateAggregator->removeObserver(m_alexaClientEngineImpl);
+            m_dialogUXStateAggregator->removeObserver(m_speechRecognizerEngineImpl);
             m_dialogUXStateAggregator.reset();
         }
 
@@ -1474,12 +1557,26 @@ bool AlexaEngineService::shutdown() {
         }
 
         if (m_agentManager != nullptr) {
+            m_agentManager->removeAgentConnectionObserverInterface(
+                alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, m_externalMediaPlayerEngineImpl);
             m_agentManager.reset();
         }
 
         if (m_deviceSetupEngineImpl != nullptr) {
             m_deviceSetupEngineImpl->shutdown();
             m_deviceSetupEngineImpl.reset();
+        }
+
+        if (m_captionManager != nullptr) {
+            AACE_DEBUG(LX(TAG).m("CaptionManager"));
+            m_captionManager->shutdown();
+            m_captionManager.reset();
+        }
+
+        if (m_captionPresenterEngineImpl != nullptr) {
+            AACE_DEBUG(LX(TAG).m("CaptionPresenterEngineImpl"));
+            m_captionPresenterEngineImpl->shutdown();
+            m_captionPresenterEngineImpl.reset();
         }
 
         if (m_capabilityChangeNotifier != nullptr) {
@@ -1499,6 +1596,7 @@ bool AlexaEngineService::shutdown() {
         m_audioFocusManager.reset();
         m_visualFocusManager.reset();
         m_metricRecorder.reset();
+        m_metricService.reset();
 
         // shutdown the executor
         m_executor.shutdown();
@@ -1874,18 +1972,6 @@ bool AlexaEngineService::disconnect() {
     }
 }
 
-void AlexaEngineService::recordVehicleMetric() {
-    try {
-        auto vehicleEngineService =
-            getContext()->getServiceInterface<aace::engine::vehicle::VehicleEngineService>("aace.vehicle");
-        ThrowIfNull(vehicleEngineService, "invalidVehicleEngineService");
-
-        vehicleEngineService->record();
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
-    }
-}
-
 void AlexaEngineService::onCapabilitiesStateChange(
     CapabilitiesObserverInterface::State newState,
     CapabilitiesObserverInterface::Error newError,
@@ -1917,8 +2003,6 @@ void AlexaEngineService::onAuthStateChange(AuthObserverInterface::State newState
                 if (m_authState == AuthObserverInterface::State::REFRESHED) {
                     AACE_DEBUG(LX(TAG, "onAuthStateChange: connecting"));
                     connect();
-                    // Record with all vehicle data
-                    recordVehicleMetric();
                 } else {
                     if (m_authState == AuthObserverInterface::State::UNINITIALIZED) {
                         m_capabilitiesConfigured = false;
@@ -2032,6 +2116,9 @@ bool AlexaEngineService::registerPlatformInterface(std::shared_ptr<aace::core::P
         ReturnIf(registerPlatformInterfaceType<aace::alexa::SpeechSynthesizer>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::TemplateRuntime>(platformInterface), true);
         ReturnIf(registerPlatformInterfaceType<aace::alexa::DeviceSetup>(platformInterface), true);
+#ifdef AAC_CAPTIONS
+        ReturnIf(registerPlatformInterfaceType<aace::alexa::CaptionPresenter>(platformInterface), true);
+#endif
 
         return false;
     } catch (std::exception& ex) {
@@ -2188,7 +2275,9 @@ bool AlexaEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::ale
             m_audioPlayerObserverDelegate,
             m_metricRecorder,
             m_audioActivityTracker,
-            m_customerDataManager);
+            m_customerDataManager,
+            m_captionManager,
+            m_mediaPlayerFingerprint);
         ThrowIfNull(m_audioPlayerEngineImpl, "createAudioPlayerEngineImplFailed");
         m_renderPlayerInfoCardsProviderInterfaces.insert(m_audioPlayerEngineImpl);
 
@@ -2262,7 +2351,8 @@ bool AlexaEngineService::registerPlatformInterfaceType(
             m_customerDataManager,
             m_exceptionSender,
             m_contextManager,
-            m_connectionManager);
+            m_connectionManager,
+            m_metricService);
         ThrowIfNull(m_equalizerControllerEngineImpl, "createEqualizerControllerEngineImplFailed");
 
         return true;
@@ -2332,12 +2422,17 @@ bool AlexaEngineService::createExternalMediaPlayerImpl() {
             m_exceptionSender,
             m_playbackRouterDelegate,
             m_audioPlayerObserverDelegate,
+            m_metricService,
             externalMediaAdapterRegistration,
             m_duckingEnabled);
         ThrowIfNull(m_externalMediaPlayerEngineImpl, "createExternalMediaPlayerEngineImplFailed");
 
         // external media player impl needs to observer connection manager connections status
         m_connectionManager->addConnectionStatusObserver(m_externalMediaPlayerEngineImpl);
+        if (m_agentManager != nullptr && m_assistantInfoManager->getAssistantPolicy() == AssistantPolicy::ON_DEVICE) {
+            m_agentManager->addAgentConnectionObserverInterface(
+                alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, m_externalMediaPlayerEngineImpl);
+        }
 
         return true;
     } catch (std::exception& ex) {
@@ -2392,6 +2487,7 @@ bool AlexaEngineService::registerPlatformInterfaceType(
             m_defaultEndpointBuilder,
             m_connectionManager,
             m_exceptionSender,
+            m_metricService,
             m_mediaResumeThreshold);
         ThrowIfNull(m_mediaPlaybackRequestorEngineImpl, "createMediaPlaybackRequestorEngineImplFailed");
         m_connectionManager->addConnectionStatusObserver(m_mediaPlaybackRequestorEngineImpl);
@@ -2438,7 +2534,7 @@ bool AlexaEngineService::registerPlatformInterfaceType(
 
         // create the playback controller engine implementation
         m_playbackControllerEngineImpl = aace::engine::alexa::PlaybackControllerEngineImpl::create(
-            playbackController, m_defaultEndpointBuilder, m_connectionManager, m_contextManager);
+            playbackController, m_defaultEndpointBuilder, m_connectionManager, m_contextManager, m_metricService);
         ThrowIfNull(m_playbackControllerEngineImpl, "createPlaybackControllerEngineImplFailed");
 
         // register playback router with the playback router delegate
@@ -2473,7 +2569,9 @@ bool AlexaEngineService::registerPlatformInterfaceType(
             m_speakerManager,
             m_exceptionSender,
             m_metricRecorder,
+            m_captionManager,
             m_agentManager);
+
         ThrowIfNull(m_speechSynthesizerEngineImpl, "createSpeechSynthesizerEngineImplFailed");
 
         // add engine interface to shutdown list
@@ -2539,6 +2637,24 @@ bool AlexaEngineService::registerPlatformInterfaceType(
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<FeatureDiscovery>").d("reason", ex.what()));
+        return false;
+    }
+}
+
+bool AlexaEngineService::registerPlatformInterfaceType(
+    std::shared_ptr<aace::alexa::CaptionPresenter> captionPresenter) {
+    try {
+        ThrowIfNotNull(m_captionPresenterEngineImpl, "platformInterfaceAlreadyRegistered");
+
+        // create the Caption Presenter engine implementation
+        m_captionPresenterEngineImpl =
+            aace::engine::alexa::CaptionPresenterEngineImpl::create(captionPresenter, m_captionPresenterHandler);
+
+        ThrowIfNull(m_captionPresenterEngineImpl, "createCaptionPresenterEngineImplFailed");
+
+        return true;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<CaptionPresenter>").d("reason", ex.what()));
         return false;
     }
 }

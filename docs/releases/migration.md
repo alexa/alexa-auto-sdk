@@ -2,13 +2,130 @@
 
 ## Overview
 
-This guide highlights the changes in each Auto SDK version that require your application to update to maintain compatibility. The guide outlines the changes with step-by-step recommendations to help you stay up-to-date with the latest Auto SDK version. Each section describes an increment of one release, so if you skip intermediate versions when you upgrade, ensure you follow the steps in each section from your current version to the latest version. 
+This guide highlights the changes in each Auto SDK version that require your application to update to maintain compatibility. The guide outlines the changes with step-by-step recommendations to help you stay up-to-date with the latest Auto SDK version. Each section describes an increment of one release, so if you skip intermediate versions when you upgrade, ensure you follow the steps in each section from your current version to the latest version.
 
 ## Backward compatibility
 
 Auto SDK remains backward compatible across minor version updates; however, to continually improve, Auto SDK sometimes deprecates APIs, configuration fields, and build options in a minor version. The changes this guide outlines in minor version upgrade sections are intended to highlight deprecations and help you stop using deprecated features as soon as possible to prepare for their removal in the next major version.
 
 Although rare, if Auto SDK makes an exception to the backward compatibility tenants in a minor version, this guide explicitly calls out the change.
+
+## Migrating from Auto SDK v4.2.0 to v4.3.0
+
+### Moved Alexa Auto App
+
+AACS and the Alexa Auto App are removed from the Alexa Auto SDK source. If your vehicle uses the Android platform, contact your Amazon Solutions Architect or Partner Manager for access to Alexa Auto App and its documentation.
+
+### Updated extensions packaging
+
+Auto SDK extensions are released as a single package on the Amazon developer portal instead of a separate package for each extension like previous releases. Replace each extension folder in your Auto SDK source tree with the equivalent folder extracted from the new package.
+
+### Updated Alexa client info, vehicle info, and metrics configuration
+
+Auto SDK 4.3 adjusts configuration format for device info in `aace.alexa`, `aace.vehicle`, and `aace.dcm` configuration objects to reduce duplication and reorganize fields to be consumed by the appropriate Engine service. Update your configuration from something like this
+
+```json
+{
+    "aace.alexa": {
+        "avsDeviceSDK": {
+            "deviceInfo": {
+                "clientId": "${CLIENT_ID}",
+                "productId": "${PRODUCT_ID}",
+                "deviceSerialNumber": "${DEVICE_SERIAL_NUMBER}",
+                "manufacturerName": "${MANUFACTURER_NAME}",
+                "description": "${DEVICE_DESCRIPTION}"
+            },
+            "libcurlUtils": {
+                ...
+        ...
+    },
+    "aace.dcm": {
+        "metricsFilePath": "${PATH_TO_STORE_METRICS}",
+        "metricsTag": "${SALT_FOR_METRICS_ID_HASH}",
+        "deviceInfo": {
+            "deviceType": "${AMAZON_ID}",
+            "deviceId": "${DEVICE_SERIAL_NUMBER}"
+        }
+    },
+    {
+        "aace.vehicle": {
+            "info": {
+                "make": "${VEHICLE_MAKE}",
+                "model": "${VEHICLE_MODEL}",
+                "year": "${VEHICLE_YEAR}",
+                "trim":  "${VEHICLE_TRIM}",
+                "geography": "${COUNTRY_CODE}",
+                "version": "${APP_VERSION}",
+                "os": "${DEVICE_OS_NAME_AND_VERSION}",
+                "arch":  "${DEVICE_HARDWARE_ARCH}",
+                "language": "${DEVICE_LANGUAGE}",
+                "microphone": "${VEHICLE_MICROPHONE_TYPE}",
+                "vehicleIdentifier":  "${VEHICLE_IDENTIFIER}",
+                "engineType": "${VEHICLE_ENGINE_TYPE}",
+                "rseEmbeddedFireTvs": "${RSE_FIRE_TV_COUNT}"
+            },
+            "operatingCountry": "${COUNTRY_CODE}"
+        }
+      },
+    ...
+}
+```
+
+to something like this
+
+```json
+{
+    "aace.alexa": {
+        "alexaClientInfo": {
+            "clientId": "${CLIENT_ID}",
+            "productId": "${PRODUCT_ID}",
+            "amazonId": "${AMAZON_ID}"
+        },
+        "avsDeviceSDK": {
+            "libcurlUtils": {
+                ...
+        ...
+    },
+    "aace.metrics": {
+        "metricDeviceIdTag": "${SALT_FOR_METRICS_ID_HASH}",
+        "metricStoragePath": "${PATH_TO_STORE_METRICS}"
+    },
+    "aace.vehicle": {
+        "deviceInfo": {
+            "manufacturer": "${DEVICE_MANUFACTURER}",
+            "model": "${DEVICE_MODEL}",
+            "platform": "${DEVICE_PLATFORM}",
+            "osVersion": "${DEVICE_OS_VERSION}",
+            "hardwareArch": "${DEVICE_HARDWARE_ARCH}",
+            "serialNumber":  "${DEVICE_SERIAL_NUMBER}"
+        },
+        "appInfo": {
+            "softwareVersion": "${APP_VERSION}"
+        },
+        "vehicleInfo": {
+            "make": "${VEHICLE_MAKE}",
+            "model": "${VEHICLE_MODEL}",
+            "year": "${VEHICLE_YEAR}",
+            "trim": "${VEHICLE_TRIM}",
+            "microphoneType": "${VEHICLE_MICROPHONE}",
+            "operatingCountry": "${COUNTRY_CODE}",
+            "vehicleIdentifier": "${VEHICLE_IDENTIFIER}",
+            "engineType": "${VEHICLE_ENGINE_TYPE}",
+            "rseEmbeddedFireTvs": "${RSE_FIRE_TV_COUNT}"
+        }
+    },
+    ...
+}
+```
+
+In particular,
+
+* Alexa client info is moved out of `aace.alexa.avsDeviceSDK` into `aace.alexa.alexaClientInfo`. The updated object removes DSN and adds Amazon ID. All fields are required.
+* DCM configuration is removed and replaced with `aace.metrics`, which includes a subset of values as the previous `aace.dcm`. The `aace.metrics` configuration object is required.
+* Vehicle configuration organizes fields by category, removes duplicated values available through other means, adds additional info, and replaces the DSN value previously in `aace.alexa.avsDeviceSDK`. The `aace.vehicle` object is required. See the Core module documentation for further information about which fields are required.
+
+The relevant configuration factory functions have updated signatures. See the Alexa module and Core module documentation for complete details about the configuration.
+
 
 ## Migrating from Auto SDK v4.1.1 to v4.2.0
 This section provides the information you need to migrate from Auto SDK v4.1.1 to Auto SDK v4.2.0
@@ -21,7 +138,7 @@ The Alerts AASB messages and the corresponding Engine implementation for Reminde
 ### Updated build option
 
 The build option flag to generate metrics has been changed from **with_latency_logs** to **with_metrics.** The "with_metrics"
-variable is a more accurate representation to describe metrics emission. The default value of **with_metrics** is True, meaning metrics logs will be emitted when built with DCM extension without explicitly specifying any flag. 
+variable is a more accurate representation to describe metrics emission. The default value of **with_metrics** is True, meaning metrics logs will be emitted when built with DCM extension without explicitly specifying any flag.
 ### Deprecated API
 
 Deprecated `dialogStateChanged(DialogState state`) API in AlexaClient in favor of a new one with the assistant ID specified. If you use `MessageBroker` (recommended) to receive AlexaClient messages, the payload of the DialogStateChanged message will now have the ID of the assistant that the change is associated.
@@ -30,9 +147,9 @@ Deprecated `dialogStateChanged(DialogState state`) API in AlexaClient in favor o
 
 The Assistant ID in the Alexa Custom Assistant extension is now an integer, and the previous ID in string format is renamed to uuid. This change applies to the related extension configuration fields and APIs, including `SetAssistantsSetting`. Please refer to the extension documentation for further details.
 
-### Alexa Auto App 
+### Alexa Auto App
 
-#### Building 
+#### Building
 
 We deprecated the optional non-extension module arguments to the gradlew build script — by default, components like `APL`, and `Car Control`, will now be built with only one argument.
 
@@ -46,9 +163,9 @@ For developing with Android Studio, we've upgraded the AGP version to 7.3.1, and
 
 **Note**: Modules that utilize VHAL APIs (e.g., APL, Car Control, and UXRestrictions) expect to be able to use android.car library, which is available on AAOS platforms. The Alexa Auto App will still run on AOSP, but you are responsible for adequately implementing these modules so that all features work end-to-end on your AOSP device..
 
-#### Permissions 
+#### Permissions
 
-These are the new privileged permissions required to be added to the alexa auto app privileged permission allowlist XML file: 
+These are the new privileged permissions required to be added to the alexa auto app privileged permission allowlist XML file:
 
 ```
 <permission name="android.permission.WRITE_SECURE_SETTINGS" />
@@ -57,19 +174,19 @@ These are the new privileged permissions required to be added to the alexa auto 
 <permission name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
 <permission name="android.permission.PACKAGE_USAGE_STATS" />
 <permission name="android.permission.MEDIA_CONTENT_CONTROL" />
-        
+
 <permission name="android.car.permission.CAR_POWER" />
 <permission name="android.car.permission.CONTROL_CAR_ENERGY_PORTS" />
 <permission name="android.car.permission.CAR_VENDOR_EXTENSION" />
 ```
-#### Breaking API Changes 
+#### Breaking API Changes
 
 * The `FetchStreamCallback.onStreamFetchCancelled` callback now has a second parameter; the signature now is (`String streamID, long bytesWritten`). The `bytesWritten` parameter returns the total number of bytes successfully written to AutoSDK relative to the start of `AudioInputMessageHandler`.
 * `LocaleUtil` has been refactored to be greatly simplified — all app-locale setting has been replaced with `AppCompatDelegate.[get/set]ApplicationLocales` (backwards-compatible, but requires `compileSDK=33`)
-* Every fragment/UI layout was updated. If you had any code that previously modified these pages, you need to first carefully re-evaluate if your local changes conflict with the newer UI updates. The following are some particular cases you’ll need to be aware of: 
+* Every fragment/UI layout was updated. If you had any code that previously modified these pages, you need to first carefully re-evaluate if your local changes conflict with the newer UI updates. The following are some particular cases you’ll need to be aware of:
     * The sign-in URL used to be hard-coded in the `CBLFragment` and LoginFragment within the setup module. Now, the Auto SDK provides the sign-in URL as a part of the CBL authorization payload — we mandate that all partners use this functionality over the hard-coded URL..
     * Certain pages were translated from Java to Kotlin on top of new additions to those same pages (`SettingsActivity`). If you had any local additions to these pages initially written in Java, these would undoubtedly break, and you will need to port those over to Kotlin.
-* If your device relied on the `DefaultNaviProvider` to broadcast intents to your navigation app, then be mindful that there was a minor change to the `controlDisplay` method to parse the `controlDisplayData` into a JSON object instead of passing it in as a raw string. 
+* If your device relied on the `DefaultNaviProvider` to broadcast intents to your navigation app, then be mindful that there was a minor change to the `controlDisplay` method to parse the `controlDisplayData` into a JSON object instead of passing it in as a raw string.
 
 ## Migrating from Auto SDK v4.0.0 to v4.1.0
 This section provides the information you need to migrate from Auto SDK v4.0.0 to Auto SDK v4.1.0
@@ -80,7 +197,7 @@ The field `alternateRoute.savings.amount` in the `Navigation.ShowAlternativeRout
 
 ### LVC App Components replace LVC APK on Android Platform
 
-AACS LVC App Components replace the LVC APK on Android. Auto SDK no longer releases the LVC APK, and the previous LVC APK does not work with 4.1 AACS. The LVC App Components are Android libraries (AARs) that run LVC in the same application as AACS, and the AACS Sample App integrates them by default. 
+AACS LVC App Components replace the LVC APK on Android. Auto SDK no longer releases the LVC APK, and the previous LVC APK does not work with 4.1 AACS. The LVC App Components are Android libraries (AARs) that run LVC in the same application as AACS, and the AACS Sample App integrates them by default.
 
 * If your Alexa client application uses the Java platform interfaces (deprecated in 4.0), you are required to update your application to use AACS before integrating with LVC App Components. See [Migrate to the MessageBroker API](./migrate-to-messagebroker.md) and the [AACS documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/) for information about migrating your application.
 
@@ -102,8 +219,8 @@ The C++ and Java platform interfaces are deprecated in favor of Alexa Auto Servi
 In Auto SDK version 3.3, your application using AACS was required to configure the AASB version with the following `aacs.aasb` object in your AACS configuration file:
 
 ```
-"aacs.aasb" : {           
-    "version": "3.3"      
+"aacs.aasb" : {
+    "version": "3.3"
 }
 ```
 
@@ -133,7 +250,7 @@ change it to this:
 ```
 
 ## Migrating from Auto SDK v3.2.1 to v3.3.0
-This section provides the information you need to migrate from Auto SDK v3.2.1 to Auto SDK v3.3.0 
+This section provides the information you need to migrate from Auto SDK v3.2.1 to Auto SDK v3.3.0
 
 ### Local Media Source and Global Preset Enhancements
 
@@ -171,7 +288,7 @@ The JSON schemas of search and response are still the same.
 Note: Do not use/implement a mix of the old APIs and the new APIs
 
 #### Local Navigation Module Engine Configuration Changes
-The `aace.localNavigation.localSearch` configuration keys `navigationPOISocketPath` and `poiEERSocketPath` are renamed to `navigationLocalSearchSocketPath` and `localSearchEERSocketPath`, respectively. 
+The `aace.localNavigation.localSearch` configuration keys `navigationPOISocketPath` and `poiEERSocketPath` are renamed to `navigationLocalSearchSocketPath` and `localSearchEERSocketPath`, respectively.
 For example, if your configuration was this
 
 ```jsonc
@@ -205,7 +322,7 @@ Note: the socket paths in the Linux default sample configuration file are update
 If you use LVC on Android, update the configuration returned by your implementation of the interface `ILVCClient.getConfiguration()`.
 
 The paths `NavigationPOISocketDir` and `POIEERSocketDir` have been deprecated in favor of `NavigationLocalSearchSocketDir` and `LocalSearchEERSocketDir`, respectively.
-The socket names `NavigationPOISocketName` and `POIEERSocketName` have been deprecated in favor of `NavigationLocalSearchSocketName` and `LocalSearchEERSocketName`, respectively. 
+The socket names `NavigationPOISocketName` and `POIEERSocketName` have been deprecated in favor of `NavigationLocalSearchSocketName` and `LocalSearchEERSocketName`, respectively.
 
 #### LVC Linux App Configuration Changes
 The LVC configuration file `lvc-config.json` installed at `/opt/LVC/config` by the installation script `LVC.sh` has no changes to its JSON configuration schema since Auto SDK 3.2. However, the socket directories and names used by default in this file are updated to use more general names.
@@ -219,7 +336,7 @@ The Alexa Comms library in Auto SDK v3.2.0 uses Device Client Metrics (DCM) inst
 If you build the Alexa Comms module configuration using the programmatic factory function `AlexaCommsConfiguration::createCommsConfig()` (C++) or `AlexaCommsConfiguration.createCommsConfig()` (Java), remove the parameters that are no longer present in the signature.
 
 ### Using the Device Client Metrics (DCM) Extension
-The Device Client Metrics extension in Auto SDK v3.2.0 requires a field called `metricsTag` to be defined in the DCM configuration. The value of `metricsTag` is used for generating a unique identifier for anonymous registration metrics. 
+The Device Client Metrics extension in Auto SDK v3.2.0 requires a field called `metricsTag` to be defined in the DCM configuration. The value of `metricsTag` is used for generating a unique identifier for anonymous registration metrics.
 
 >**Note:** You must not use the vehicle identification number (VIN) or device serial number (DSN) as `metricsTag`. For information about how to use this field, see the Device Client Metric extension documentation.
 
@@ -234,7 +351,7 @@ Auto SDK v3.1.0 introduces the Authorization module that provides a single platf
 
 **Migrating from the CBL Platform Interface**
 
-To migrate from the CBL platform interface to the Authorization platform interface, follow the instructions in the CBL module documentation, which describes the Authorization APIs for CBL authorization. 
+To migrate from the CBL platform interface to the Authorization platform interface, follow the instructions in the CBL module documentation, which describes the Authorization APIs for CBL authorization.
 
 The Engine notifies the application of any errors during the authorization process via the `authorizationError` API. The errors reported when you use the Authorization platform interface are different from the ones reported with the CBL platform interface, as shown in the following table:
 
@@ -249,7 +366,7 @@ The Engine notifies the application of any errors during the authorization proce
 
 **Migrating from the AuthProvider Platform Interface**
 
-To migrate from the AuthProvider platform interface to the Authorization platform interface, follow the instructions in the Alexa module documentation, which describes the Authorization APIs for Auth Provider authorization. 
+To migrate from the AuthProvider platform interface to the Authorization platform interface, follow the instructions in the Alexa module documentation, which describes the Authorization APIs for Auth Provider authorization.
 
 The Engine notifies the application of any errors during the authorization process via the `authorizationError` API. The errors reported when you use the Authorization platform interface are different from the ones reported with the AuthProvider platform interface, as shown in the following table:
 
@@ -262,7 +379,7 @@ The Engine notifies the application of any errors during the authorization proce
 
 ## Deprecated Features Removed in Auto SDK v3.0.0
 * The following asset IDs for Car Control have been removed: "Alexa.Automotive.DeviceName.DriverSeat", "Alexa.Automotive.DeviceName.LeftSeat", "Alexa.Automotive.DeviceName.PassengerSeat", "Alexa.Automotive.DeviceName.RightSeat".
-* The `createControl()` method has been removed. Use `createEndpoint()` instead. 
+* The `createControl()` method has been removed. Use `createEndpoint()` instead.
 * Support for the "isMemberOf" relationship for endpoint definition has been removed. You must list member endpoints in a zone definition.
 * Implicit zone definitions have been removed.
 * The following `TemplateRuntime` methods have been removed:
@@ -277,7 +394,7 @@ The Engine notifies the application of any errors during the authorization proce
 Address Book module enables the user to upload contacts from the phone that is paired with the car or the navigation favorites from the car head unit to Alexa cloud. For more information about how this module works, see the Address Book module documentation. Both the Android and C++ sample apps demonstrate the use of the `AddressBook` platform interface. See the sample app source code for specific implementation details.
 
 The following Address Book API descriptions help you transition from the Contact Uploader module to the Address Book module:
- 
+
 `addAddressBook`
 
 ```
@@ -285,23 +402,23 @@ The following Address Book API descriptions help you transition from the Contact
 ```
 
 Use `addAddressBook` instead of `ContactUploader::addContactsBegin`. In addition, `addAddressBook` requires you to specify the source id to identify the address book, the friendly name of the address book, and the type of address book.
- 
+
 `removeAddressBook`
 ```
     bool removeAddressBook(const std::string& addressBookSourceId);
 ```
-    
+
 Use `removeAddressBook` instead of `ContactUploader:: removeUploadedContacts`. You must specify the id of the address book to be removed.
- 
+
 `getEntries`
 ```
     bool getEntries(
             const std::string& addressBookSourceId,
             std::weak_ptr<IAddressBookEntriesFactory> factory)
 ```
-    
+
 When using the Address Book module, the Engine pulls the address book contents from the platform implementation. You must upload the address book contents through the factory class, `IAddressBookEntriesFactory`, for the specified address book source id.
-  
+
 ## Migrating from Auto SDK v2.2.1 to v2.3.0
 
 This section outlines the changes you will need to make to migrate from Auto SDK v2.2.1 to Auto SDK v2.3.
@@ -310,7 +427,7 @@ This section outlines the changes you will need to make to migrate from Auto SDK
 
 Read the updated Car Control module documentation to get a complete understanding of all supported features and the current format of the "aace.carControl" configuration schema. Read the updated API documentation for the `CarControlConfiguration` builder class if you construct your configuration programmatically. The changes to the "aace.carControl" configuration for v2.3 are backward-compatible, meaning your previous configuration (regardless of whether it was file-based or built programmatically with the `CarControlConfiguration` class) will still compile and produce a valid configuration to input to Auto SDK. However, several updates are recommended to ensure expected behavior, even if you do not want new features.
 
-#### 1. Zones configuration schema update 
+#### 1. Zones configuration schema update
 
 Prior to v2.3, to assign an endpoint to exactly one zone, you would specify an "isMemberOf" relationship in the definition of the endpoint and specify no information about endpoints in the zone definition.
 
@@ -539,9 +656,9 @@ The following build changes have been introduced in Auto SDK v2.1:
 * The builder script usage has changed for Linux targets. All Linux targets now use the same platform name (`linux`), and `-t <target>` is mandatory. For example, to build for a Linux native target, use:
 
     `builder/build.sh linux -t native`
-    
+
     to build for Linux native, pokyarm, and pokyarm64 targets, use:
-    
+
     `builder/build.sh linux -t native,pokyarm,pokyarm64`
 
     See the Builder documentation for details about supported platforms and targets.
@@ -627,11 +744,11 @@ void NavigationHandler::startNavigation(const std::string& payload ) {
         navigationEvent( aace::navigation::NavigationEngineInterface::EventName::NAVIGATION_STARTED );
     ...
     // failure
-        navigationError( aace::navigation::NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED, aace::navigation::NavigationEngineInterface::ErrorCode::INTERNAL_SERVICE_ERROR, "" );    
+        navigationError( aace::navigation::NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED, aace::navigation::NavigationEngineInterface::ErrorCode::INTERNAL_SERVICE_ERROR, "" );
 ```
 </p>
 </details>
-    
+
 **STEP 2:** Modify the payload for the `getNavigationState()` method.
 
 The functionality of the `getNavigationState()` and `cancelNavigationState()` methods is unchanged from Auto SDK v2.0, but the `getNavigationState()` payload has changed. The NavigationState context has been updated to contain more information than in Auto SDK v2.0.
@@ -672,7 +789,7 @@ The `name` field has been added to the waypoint payload:
     "state": "{{STRING}}", //NAVIGATING or NOT_NAVIGATING
     "waypoints": [
         {
-            "type": "{{STRING}}", //Type of the waypoint - SOURCE, DESTINATION or INTERIM  
+            "type": "{{STRING}}", //Type of the waypoint - SOURCE, DESTINATION or INTERIM
             "estimatedTimeOfArrival": {
                 "ideal": {{STRING}}, //Expected clock time ETA based on the ideal conditions. ISO 8601 UTC format
                 "predicted": {{STRING}} //predicted clock time ETA based on traffic conditions. ISO 8601 UTC format
@@ -709,7 +826,7 @@ The `name` field has been added to the waypoint payload:
            ++ "name": "{{STRING}}", // name of the waypoint such as home or Starbucks
             "coordinate": [{{LATITUDE_DOUBLE}},{{LONGITUDE_DOUBLE}}],
             "pointOfInterest": {
-                "id": "{{STRING}}", //POI lookup Id vended from Alexa 
+                "id": "{{STRING}}", //POI lookup Id vended from Alexa
                 "hoursOfOperation": [
                  {
                      "dayOfWeek": "{{STRING}}",
@@ -724,7 +841,7 @@ The `name` field has been added to the waypoint payload:
                 ],
                 "phoneNumber": "{{STRING}}"
              }
-             
+
         },
         ...
       ],
@@ -737,8 +854,8 @@ The `name` field has been added to the waypoint payload:
               {{LATITUDE_DOUBLE}},
               {{LONGITUDE_DOUBLE}}
             ],
-        ...      
-     ]   
+        ...
+     ]
   }
 }
 ...,
@@ -750,7 +867,7 @@ The `name` field has been added to the waypoint payload:
 
 The new navigation methods are all called in response to navigation-based user utterances such as “show my previous route” or “what’s the speed limit here?”. At a minimum, your implementation should report a `navigationError()` to inform the user when the navigation system does not support that information.
 
->**Note:** The `navigationEvent()`, `showAlternativeRoutesSucceeded()` and `navigationError()` methods have been implemented in the Auto SDK but are not yet implemented on the cloud side. Sending the events will not affect navigation functionality, but the Alexa cloud will return an `INVALID_REQUEST_EXCEPTION` or `INVALID_SERVICE_EXCEPTION` until these events are implemented on the cloud side.  
+>**Note:** The `navigationEvent()`, `showAlternativeRoutesSucceeded()` and `navigationError()` methods have been implemented in the Auto SDK but are not yet implemented on the cloud side. Sending the events will not affect navigation functionality, but the Alexa cloud will return an `INVALID_REQUEST_EXCEPTION` or `INVALID_SERVICE_EXCEPTION` until these events are implemented on the cloud side.
 
 <details><summary><strong>Java (Android)</strong> - click to expand or collapse</summary>
 <p>
@@ -762,40 +879,40 @@ public void showPreviousWaypoints() {
     navigationError( ErrorType.SHOW_PREVIOUS_WAYPOINTS_FAILED, ErrorCode.NOT_SUPPORTED, *""** *);
 }
 ...
-    
+
 @Override
 public void navigateToPreviousWaypoint() {
     //handle navigation to previous waypoint
     navigationError( ErrorType.PREVIOUS_NAVIGATION_START_FAILED, ErrorCode.NOT_SUPPORTED, "" );
 }
 ...
-    
+
 @Override
 public void showAlternativeRoutes( AlternateRouteType alternateRouteType ) {
     //pass AlternateRouteType enum
     navigationError( ErrorType.DEFAULT_ALTERNATE_ROUTES_FAILED, ErrorCode.NOT_SUPPORTED, "" );
 }
 ...
-    
+
 @Override
 public void controlDisplay ( ControlDisplay controlDisplay ) {
     //pass ControlDisplay enum
     navigationError( ErrorType.ROUTE_OVERVIEW_FAILED, ErrorCode.NOT_SUPPORTED, "" );
 }
 ...
-    
+
 @Override
 public void announceManeuver( String payload  ) {
     //pass the JSON string payload from AnnounceManeuver directive
     navigationError( ErrorType.TURN_GUIDANCE_FAILED, ErrorCode.NOT_SUPPORTED, "" );
 }
 ...
-    
+
 @Override
 public void announceRoadRegulation( RoadRegulation roadRegulation ) {
     //pass RoadRegulation enum
     navigationError( ErrorType.SPEED_LIMIT_REGULATION_FAILED, ErrorCode.NOT_SUPPORTED, "" );
-} 
+}
 ```
 </p>
 </details>
@@ -806,44 +923,44 @@ public void announceRoadRegulation( RoadRegulation roadRegulation ) {
 ```
 void NavigationHandler::showPreviousWaypoints() {
         //handle showing information about previous waypoints...
-        navigationError( aace::navigation::Navigation::ErrorType.SHOW_PREVIOUS_WAYPOINTS_FAILED, 
+        navigationError( aace::navigation::Navigation::ErrorType.SHOW_PREVIOUS_WAYPOINTS_FAILED,
             aace::navigation::Navigation::ErrorCode.NOT_SUPPORTED, ""* *);
    }
     ...
-    
+
     void NavigationHandler::navigateToPreviousWaypoint() {
         //handle navigation to previous waypoint
-        navigationError( aace::navigation::Navigation::ErrorType.PREVIOUS_NAVIGATION_START_FAILED, 
+        navigationError( aace::navigation::Navigation::ErrorType.PREVIOUS_NAVIGATION_START_FAILED,
             aace::navigation::Navigation::ErrorCode.NOT_SUPPORTED, "" );
     }
     ...
-    
+
     void NavigationHandler::showAlternativeRoutes( aace::navigation::Navigation::AlternateRouteType alternateRouteType ) {
         //pass AlternateRouteType enum
-        navigationError( aace::navigation::Navigation::ErrorType.DEFAULT_ALTERNATE_ROUTES_FAILED, 
+        navigationError( aace::navigation::Navigation::ErrorType.DEFAULT_ALTERNATE_ROUTES_FAILED,
             aace::navigation::Navigation::ErrorCode.NOT_SUPPORTED, "" );
     }
     ...
-    
+
     void NavigationHandler::controlDisplay ( aace::navigation::Navigation::ControlDisplay controlDisplay ) {
         //pass ControlDisplay enum
-        navigationError( aace::navigation::Navigation::ErrorType.ROUTE_OVERVIEW_FAILED, 
+        navigationError( aace::navigation::Navigation::ErrorType.ROUTE_OVERVIEW_FAILED,
             aace::navigation::Navigation::ErrorCode.NOT_SUPPORTED, "" );
     }
     ...
-    
+
     void NavigationHandler::announceManeuver( String payload  ) {
         //pass the JSON string payload from AnnounceManeuver directive
-        navigationError( aace::navigation::Navigation::ErrorType.TURN_GUIDANCE_FAILED, 
+        navigationError( aace::navigation::Navigation::ErrorType.TURN_GUIDANCE_FAILED,
             aace::navigation::Navigation::ErrorCode.NOT_SUPPORTED, "" );
     }
     ...
-    
+
     void NavigationHandler::announceRoadRegulation( aace::navigation::Navigation::RoadRegulation roadRegulation ) {
         //pass RoadRegulation enum
-        navigationError( aace::navigation::Navigation::ErrorType.SPEED_LIMIT_REGULATION_FAILED, 
+        navigationError( aace::navigation::Navigation::ErrorType.SPEED_LIMIT_REGULATION_FAILED,
             aace::navigation::Navigation::ErrorCode.NOT_SUPPORTED, "" );
-    } 
+    }
 ```
 </p>
 </details>
@@ -861,10 +978,10 @@ The Car Control module platform interface files and documentation are now locate
 
 >**Note:** In addition, if you use custom assets for car control in an implementation with the optional Local Voice Control (LVC) extension, you must specify the path to the custom assets in both the Auto SDK car control configuration and the LVC configuration, not just the LVC configuration. For details, see Car Control module documentation.
 
-### Code-Based-Linking (CBL) Handler in the Sample Apps 
+### Code-Based-Linking (CBL) Handler in the Sample Apps
 Both of the Auto SDK Sample Apps now include the Code-Based Linking (CBL) handler implementation (in favor of the `AuthProvider` handler implementation ) to handle obtaining access tokens from Login with Amazon (LWA). Changing from the `AuthProvider` handler to the CBL handler is not a required change, but we recommend that you use the Auto SDK CBL interface for ease of implementation. For details about the CBL handler, please see the CBL module documentation.
 
-If you want to continue using the `AuthProvider` interface, we recommend that you implement the new `onAuthFailure()` method that exposes 403 "unauthorized request" exceptions from Alexa Voice Service (AVS). This method may be invoked, for example, when your product makes a request to AVS using an access token obtained for a device which has been deregistered from the Alexa companion app. In the Sample Apps, you can override the  interface and unset your login credentials as if the user had done so with your GUI interface: 
+If you want to continue using the `AuthProvider` interface, we recommend that you implement the new `onAuthFailure()` method that exposes 403 "unauthorized request" exceptions from Alexa Voice Service (AVS). This method may be invoked, for example, when your product makes a request to AVS using an access token obtained for a device which has been deregistered from the Alexa companion app. In the Sample Apps, you can override the  interface and unset your login credentials as if the user had done so with your GUI interface:
 
 <details><summary><strong>Java (Android)</strong> - click to expand or collapse</summary>
 <p>
@@ -872,7 +989,7 @@ If you want to continue using the `AuthProvider` interface, we recommend that yo
 ```
 @Override
     public void authFailure( String token ) {
-        // handle user de-authorize scenario 
+        // handle user de-authorize scenario
 ```
 </p>
 </details>
@@ -882,7 +999,7 @@ If you want to continue using the `AuthProvider` interface, we recommend that yo
 
 ```
 void AuthProviderHandler::authFailure( const std::string& token ) {
-        // handle user de-authorize scenario 
+        // handle user de-authorize scenario
 ```
 </p>
 </details>

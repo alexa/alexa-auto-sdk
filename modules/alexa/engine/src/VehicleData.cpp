@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -12,20 +12,21 @@
  * express or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
-
-#include "AACE/Engine/Alexa/VehicleData.h"
-#include "AACE/Engine/Core/EngineMacros.h"
+#include <string>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include <string>
+#include <AACE/Engine/Alexa/VehicleData.h>
+#include <AACE/Engine/Core/EngineMacros.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
+
+using namespace aace::engine::vehicle;
 
 /// String to identify log entries originating from this file
 static const std::string TAG("aace.alexa.VehicleData");
@@ -61,26 +62,11 @@ static const char VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER[] = "vehicleIdentifie
 /// VehicleData capability attribute: rseEmbeddedFireTvs
 static const char VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS[] = "rseEmbeddedFireTvs";
 
-/// Map from a capability attribute string to its corresponding @c VehiclePropertyType
-static std::unordered_map<std::string, VehicleData::VehiclePropertyType> s_attributeToVehiclePropertyMap = {
-    {VEHICLEDATA_ATTRIBUTE_OS, VehicleData::VehiclePropertyType::OPERATING_SYSTEM},
-    {VEHICLEDATA_ATTRIBUTE_ARCH, VehicleData::VehiclePropertyType::HARDWARE_ARCH},
-    {VEHICLEDATA_ATTRIBUTE_MIC, VehicleData::VehiclePropertyType::MICROPHONE},
-    {VEHICLEDATA_ATTRIBUTE_GEOGRAPHY, VehicleData::VehiclePropertyType::GEOGRAPHY},
-    {VEHICLEDATA_ATTRIBUTE_VERSION, VehicleData::VehiclePropertyType::VERSION},
-    {VEHICLEDATA_ATTRIBUTE_MAKE, VehicleData::VehiclePropertyType::MAKE},
-    {VEHICLEDATA_ATTRIBUTE_MODEL, VehicleData::VehiclePropertyType::MODEL},
-    {VEHICLEDATA_ATTRIBUTE_TRIM, VehicleData::VehiclePropertyType::TRIM},
-    {VEHICLEDATA_ATTRIBUTE_YEAR, VehicleData::VehiclePropertyType::YEAR},
-    {VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, VehicleData::VehiclePropertyType::ENGINE_TYPE},
-    {VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, VehicleData::VehiclePropertyType::VEHICLE_IDENTIFIER},
-    {VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, VehicleData::VehiclePropertyType::RSE_EMBEDDED_FIRETVS},
-};
-
-std::shared_ptr<VehicleData> VehicleData::create(const VehiclePropertyMap& vehiclePropertyMap) {
+std::shared_ptr<VehicleData> VehicleData::create(
+    const std::shared_ptr<aace::engine::vehicle::VehicleConfigServiceInterface>& vehicleService) {
     try {
-        // Note: the create() method creates the CapabilityConfiguration at this point to validate vehiclePropertyMap
-        auto configuration = getVehicleDataCapabilityConfiguration(vehiclePropertyMap);
+        ThrowIfNull(vehicleService, "Null VehicleConfigServiceInterface");
+        auto configuration = getVehicleDataCapabilityConfiguration(vehicleService);
         ThrowIfNull(configuration, "couldNotCreateCapabilityConfiguration");
         std::shared_ptr<VehicleData> vehicleData = std::shared_ptr<VehicleData>(new VehicleData(configuration));
         return vehicleData;
@@ -99,20 +85,9 @@ std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityCon
     return m_capabilityConfigurations;
 }
 
-alexaClientSDK::avsCommon::utils::Optional<std::string> VehicleData::getPropertyByAttribute(
-    const std::string& attribute,
-    const VehiclePropertyMap& vehiclePropertyMap) {
-    alexaClientSDK::avsCommon::utils::Optional<std::string> value;
-    auto propertyType = s_attributeToVehiclePropertyMap[attribute];
-    auto it = vehiclePropertyMap.find(propertyType);
-    if (it != vehiclePropertyMap.end()) {
-        value.set(it->second);
-    }
-    return value;
-}
-
 std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> VehicleData::
-    getVehicleDataCapabilityConfiguration(const VehiclePropertyMap& vehiclePropertyMap) {
+    getVehicleDataCapabilityConfiguration(
+        const std::shared_ptr<aace::engine::vehicle::VehicleConfigServiceInterface>& vehicleService) {
     try {
         auto additionalConfigurations =
             alexaClientSDK::avsCommon::avs::CapabilityConfiguration::AdditionalConfigurations();
@@ -121,48 +96,43 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> Vehicle
         auto& allocator = payload.GetAllocator();
         rapidjson::Value resourcesObject(rapidjson::kObjectType);
 
-        auto make = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MAKE, vehiclePropertyMap);
-        ThrowIfNot(make.hasValue(), "missingRequiredMakeAttribute");
-        resourcesObject.AddMember(
-            VEHICLEDATA_ATTRIBUTE_MAKE, getTextResourceObject(make.value(), allocator), allocator);
+        auto make = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_MAKE);
+        ThrowIf(make.empty(), "missingRequiredMakeAttribute");
+        resourcesObject.AddMember(VEHICLEDATA_ATTRIBUTE_MAKE, getTextResourceObject(make, allocator), allocator);
 
-        auto model = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MODEL, vehiclePropertyMap);
-        ThrowIfNot(model.hasValue(), "missingRequiredModelAttribute");
-        resourcesObject.AddMember(
-            VEHICLEDATA_ATTRIBUTE_MODEL, getTextResourceObject(model.value(), allocator), allocator);
+        auto model = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_MODEL);
+        ThrowIf(model.empty(), "missingRequiredModelAttribute");
+        resourcesObject.AddMember(VEHICLEDATA_ATTRIBUTE_MODEL, getTextResourceObject(model, allocator), allocator);
 
-        auto trim = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_TRIM, vehiclePropertyMap);
-        if (trim.hasValue()) {
-            resourcesObject.AddMember(
-                VEHICLEDATA_ATTRIBUTE_TRIM, getTextResourceObject(trim.value(), allocator), allocator);
+        auto trim = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_TRIM);
+        if (!trim.empty()) {
+            resourcesObject.AddMember(VEHICLEDATA_ATTRIBUTE_TRIM, getTextResourceObject(trim, allocator), allocator);
         }
 
         payload.AddMember("resources", resourcesObject, allocator);
 
-        auto year = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_YEAR, vehiclePropertyMap);
-        ThrowIfNot(year.hasValue(), "missingRequiredYearAttribute");
-        ThrowIf(year.value() == "", "yearAttributeIsEmpty");
-        payload.AddMember(VEHICLEDATA_ATTRIBUTE_YEAR, (int64_t)std::stol(year.value()), allocator);
+        auto year = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_YEAR);
+        ThrowIf(year.empty(), "yearAttributeIsEmpty");
+        payload.AddMember(VEHICLEDATA_ATTRIBUTE_YEAR, (int64_t)std::stol(year), allocator);
 
-        auto engineType = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, vehiclePropertyMap);
-        if (engineType.hasValue()) {
-            payload.AddMember(VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, engineType.value(), allocator);
+        auto engineType = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_ENGINE_TYPE);
+        if (!engineType.empty()) {
+            payload.AddMember(VEHICLEDATA_ATTRIBUTE_ENGINE_TYPE, engineType, allocator);
         } else {
             AACE_DEBUG(LX(TAG, "skippingEmptyEngineType"));
         }
 
-        auto vehicleIdentifier = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, vehiclePropertyMap);
-        if (vehicleIdentifier.hasValue()) {
-            payload.AddMember(VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, vehicleIdentifier.value(), allocator);
+        auto vehicleIdentifier = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_VEHICLE_ID);
+        if (!vehicleIdentifier.empty()) {
+            payload.AddMember(VEHICLEDATA_ATTRIBUTE_VEHICLE_IDENTIFIER, vehicleIdentifier, allocator);
         } else {
             AACE_DEBUG(LX(TAG, "skippingEmptyVehicleIdentifier"));
         }
 
-        auto rseEmbeddedFireTvs =
-            getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, vehiclePropertyMap);
-        if (rseEmbeddedFireTvs.hasValue()) {
+        auto rseEmbeddedFireTvs = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_RSE_FIRE_TVS);
+        if (!rseEmbeddedFireTvs.empty()) {
             payload.AddMember(
-                VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, (int64_t)std::stol(rseEmbeddedFireTvs.value()), allocator);
+                VEHICLEDATA_ATTRIBUTE_RSE_EMBEDDED_FIRETVS, (int64_t)std::stol(rseEmbeddedFireTvs), allocator);
         } else {
             AACE_DEBUG(LX(TAG, "skippingEmptyRseEmbeddedFireTvs"));
         }
@@ -171,38 +141,41 @@ std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> Vehicle
         rapidjson::Value analyticsObject(rapidjson::kObjectType);
         rapidjson::Value analyticsSegmentsArray(rapidjson::kArrayType);
 
-        auto os = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_OS, vehiclePropertyMap);
-        if (os.hasValue()) {
-            analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_OS, os.value(), allocator), allocator);
+        auto osVersion = vehicleService->getDeviceInfoValue(KEY_DEVICE_INFO_OS_VERSION);
+        auto platform = vehicleService->getDeviceInfoValue(KEY_DEVICE_INFO_PLATFORM);
+        std::string os;
+        if (!platform.empty()) {
+            os = !osVersion.empty() ? platform + " " + osVersion : platform;
+        }
+        if (!os.empty()) {
+            analyticsSegmentsArray.PushBack(getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_OS, os, allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
-        auto arch = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_ARCH, vehiclePropertyMap);
-        if (arch.hasValue()) {
-            analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_ARCH, arch.value(), allocator), allocator);
+        auto arch = vehicleService->getDeviceInfoValue(KEY_DEVICE_INFO_HARDWARE_ARCH);
+        if (!arch.empty()) {
+            analyticsSegmentsArray.PushBack(getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_ARCH, arch, allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
-        auto microphone = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_MIC, vehiclePropertyMap);
-        if (microphone.hasValue()) {
+        auto microphone = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_MIC_TYPE);
+        if (!microphone.empty()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_MIC, microphone.value(), allocator), allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_MIC, microphone, allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
-        auto geography = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_GEOGRAPHY, vehiclePropertyMap);
-        if (geography.hasValue()) {
+        auto geography = vehicleService->getVehicleInfoValue(KEY_VEHICLE_INFO_OPERATING_COUNTRY);
+        if (!geography.empty()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_GEOGRAPHY, geography.value(), allocator), allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_GEOGRAPHY, geography, allocator), allocator);
             includeAnalyticsSegments = true;
         }
 
-        auto version = getPropertyByAttribute(VEHICLEDATA_ATTRIBUTE_VERSION, vehiclePropertyMap);
-        if (version.hasValue()) {
+        auto version = vehicleService->getAppInfoValue(KEY_APP_INFO_SOFTWARE_VERSION);
+        if (!version.empty()) {
             analyticsSegmentsArray.PushBack(
-                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_VERSION, version.value(), allocator), allocator);
+                getAnalyticsObject(VEHICLEDATA_ATTRIBUTE_VERSION, version, allocator), allocator);
             includeAnalyticsSegments = true;
         }
 

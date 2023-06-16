@@ -1,13 +1,17 @@
 message("#### APPLYING AAC_BASE_MODULE CMAKE SETTINGS!")
 
 if(AAC_ENABLE_ADDRESS_SANITIZER)
-    message(STATUS "Enabling Address Sanitizer for AACECore")
+    message(STATUS "Enabling ASan")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
 endif()
 
 if(AAC_ENABLE_COVERAGE)
-    message(STATUS "Enabling coverage for Core module.")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+    message(STATUS "Enabling code coverage")
+    if(APPLE)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping")
+    else()
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+    endif()
     set(CMAKE_CXX_OUTPUT_EXTENSION_REPLACE ON)
 endif()
 

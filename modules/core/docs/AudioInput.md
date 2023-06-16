@@ -29,7 +29,7 @@ The core audio Engine service enables multiple Engine components to share single
 
 ## Use the AudioInput interface in a native C++ application
 
-To write the audio data to the Engine after receiving a `StartAudioInput` message, use the `MessageBroker::openStream()` function, specifying the same `streamId` from the `StartAudioInput` message and the operation mode `MessageStream::Mode::WRITE`. The `openStream()` call returns a `MessageStream` object. Provide audio data in repeated calls to `MessageStream::write()` until the Engine publishes a `StopAudioInput` message for the stream ID. 
+To write the audio data to the Engine after receiving a `StartAudioInput` message, use the `MessageBroker::openStream()` function, specifying the same `streamId` from the `StartAudioInput` message and the operation mode `MessageStream::Mode::WRITE`. The `openStream()` call returns a `MessageStream` object. Provide audio data in repeated calls to `MessageStream::write()` until the Engine publishes a `StopAudioInput` message for the stream ID.
 
 The following C++ example code demonstrates how your application subscribes to `AudioInput` AASB messages, opens an input stream to provide audio when requested, and stops providing audio when requested.
 
@@ -73,7 +73,7 @@ class MyAudioInputHandler {
         // ...
         // Return quickly to avoid blocking the MessageBroker's outgoing thread!
         return;
-    }    
+    }
 
     void MyAudioInputHandler::handleStopAudioInputMessage(const std::string& message) {
         StopAudioInputMessage msg = json::parse(message);
@@ -89,7 +89,3 @@ class MyAudioInputHandler {
     }
 }
 ```
-
-## Use the AudioInput interface in an Android application
-
-Alexa Auto Client Service (AACS) provides a default implementation of `AudioInput`. You can use the default implementation in your application instead of integrating directly with the `AudioInput` AASB messages yourself. See the [Android documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/) for details about using the default implementation.

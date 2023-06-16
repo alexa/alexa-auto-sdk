@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../ExternalMediaAdapter/">
+      
+      
+        <link rel="next" href="../MediaPlaybackRequestor/">
+      
       <link rel="icon" href="../../../../logo.png">
-      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.15">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.16">
     
     
       
@@ -17,12 +23,13 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.c382b1dc.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.26e3688c.min.css">
       
         
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.cc9b2e1e.min.css">
-        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ecc896b0.min.css">
       
+      
+
     
     
     
@@ -35,10 +42,11 @@
       
     
     
-    <script>__md_scope=new URL("../../../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
+    
     
     
   </head>
@@ -77,7 +85,7 @@
 
   
 
-<header class="md-header md-header--lifted" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../../../.." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
       
@@ -104,27 +112,31 @@
       </div>
     </div>
     
-      <form class="md-header__option" data-md-component="palette">
-        
+      
+        <form class="md-header__option" data-md-component="palette">
           
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+            
+              <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              </label>
+            
           
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+            
+              <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+              </label>
+            
           
-            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            </label>
-          
-        
-          
-          
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
-          
-            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
-            </label>
-          
-        
-      </form>
+        </form>
+      
     
     
     
@@ -142,11 +154,11 @@
       </label>
       <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
@@ -160,7 +172,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -172,7 +184,7 @@
         <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     alexa/alexa-auto-sdk
@@ -185,7 +197,7 @@
     
       
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
-  <div class="md-tabs__inner md-grid">
+  <div class="md-grid">
     <ul class="md-tabs__list">
       
         
@@ -316,7 +328,7 @@
       <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     alexa/alexa-auto-sdk
@@ -337,8 +349,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
       
       
         
@@ -367,7 +380,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Home" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1">
           <span class="md-nav__icon md-icon"></span>
           Home
@@ -399,8 +412,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_3" type="checkbox" id="__nav_1_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" >
       
       
         
@@ -425,7 +439,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Releases" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1_3">
           <span class="md-nav__icon md-icon"></span>
           Releases
@@ -457,8 +471,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_3_3" type="checkbox" id="__nav_1_3_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3_3" >
       
       
         
@@ -468,12 +483,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_1_3_3">
+        <label class="md-nav__link" for="__nav_1_3_3" id="__nav_1_3_3_label" tabindex="0">
           Upgrade your Auto SDK version
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Upgrade your Auto SDK version" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_3_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1_3_3">
           <span class="md-nav__icon md-icon"></span>
           Upgrade your Auto SDK version
@@ -545,8 +560,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_5" type="checkbox" id="__nav_1_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
       
       
         
@@ -556,12 +572,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_1_5">
+        <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
           More
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="More" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1_5">
           <span class="md-nav__icon md-icon"></span>
           More
@@ -622,8 +638,9 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
       
       
         
@@ -633,12 +650,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_2">
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
           Explore Auto SDK
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Explore Auto SDK" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Explore Auto SDK
@@ -654,15 +671,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
       
       
         
           
             
-          
-        
           
         
           
@@ -682,7 +698,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Auto SDK Concepts" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_1">
           <span class="md-nav__icon md-icon"></span>
           Auto SDK Concepts
@@ -699,20 +715,6 @@
     <li class="md-nav__item">
       <a href="../../../concepts/core-api-overview/" class="md-nav__link">
         Core API Overview
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../concepts/android-api-overview/" class="md-nav__link">
-        Android API Overview
       </a>
     </li>
   
@@ -751,8 +753,9 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2" type="checkbox" id="__nav_2_2" checked>
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
       
       
         
@@ -807,7 +810,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Auto SDK Features" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
           Auto SDK Features
@@ -825,8 +828,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_2" type="checkbox" id="__nav_2_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
       
       
         
@@ -843,7 +847,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Address Book" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_2">
           <span class="md-nav__icon md-icon"></span>
           Address Book
@@ -870,8 +874,9 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_3" type="checkbox" id="__nav_2_2_3" checked>
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3" checked>
       
       
         
@@ -894,7 +899,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Alexa" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_3_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_2_2_3">
           <span class="md-nav__icon md-icon"></span>
           Alexa
@@ -914,49 +919,50 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_3_2" type="checkbox" id="__nav_2_2_3_2" checked>
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3_2" checked>
       
       
-        <label class="md-nav__link" for="__nav_2_2_3_2">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2_2_3_2" id="__nav_2_2_3_2_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_3_2_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_2_2_3_2">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -1084,7 +1090,7 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
         
@@ -1274,8 +1280,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_4" type="checkbox" id="__nav_2_2_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_4" >
       
       
         
@@ -1292,7 +1299,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="APL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_4">
           <span class="md-nav__icon md-icon"></span>
           APL
@@ -1317,8 +1324,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_5" type="checkbox" id="__nav_2_2_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_5" >
       
       
         
@@ -1335,7 +1343,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Bluetooth" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_5">
           <span class="md-nav__icon md-icon"></span>
           Bluetooth
@@ -1360,8 +1368,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_6" type="checkbox" id="__nav_2_2_6" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_6" >
       
       
         
@@ -1378,7 +1387,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Car Control" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_6">
           <span class="md-nav__icon md-icon"></span>
           Car Control
@@ -1403,8 +1412,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_7" type="checkbox" id="__nav_2_2_7" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_7" >
       
       
         
@@ -1421,7 +1431,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="CBL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_7_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_7">
           <span class="md-nav__icon md-icon"></span>
           CBL
@@ -1446,8 +1456,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_8" type="checkbox" id="__nav_2_2_8" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_8" >
       
       
         
@@ -1464,7 +1475,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Connectivity" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_8_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_8">
           <span class="md-nav__icon md-icon"></span>
           Connectivity
@@ -1489,8 +1500,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_9" type="checkbox" id="__nav_2_2_9" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9" >
       
       
         
@@ -1513,7 +1525,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_9_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_9">
           <span class="md-nav__icon md-icon"></span>
           Core
@@ -1531,37 +1543,38 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_9_2" type="checkbox" id="__nav_2_2_9_2" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_2" >
       
       
-        <label class="md-nav__link" for="__nav_2_2_9_2">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2_2_9_2" id="__nav_2_2_9_2_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_9_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_9_2">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -1717,8 +1730,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_10" type="checkbox" id="__nav_2_2_10" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10" >
       
       
         
@@ -1735,7 +1749,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Custom Domain" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_10_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_10">
           <span class="md-nav__icon md-icon"></span>
           Custom Domain
@@ -1760,8 +1774,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_11" type="checkbox" id="__nav_2_2_11" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_11" >
       
       
         
@@ -1778,7 +1793,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Loopback Detector" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_11_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_11">
           <span class="md-nav__icon md-icon"></span>
           Loopback Detector
@@ -1803,8 +1818,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_12" type="checkbox" id="__nav_2_2_12" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_12" >
       
       
         
@@ -1821,7 +1837,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Messaging" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_12_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_12">
           <span class="md-nav__icon md-icon"></span>
           Messaging
@@ -1846,8 +1862,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_13" type="checkbox" id="__nav_2_2_13" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_13" >
       
       
         
@@ -1860,14 +1877,14 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../metrics-proxy/">Metrics Proxy</a>
+          <a href="../../mobile-bridge/">Mobile Bridge</a>
           
         </div>
       
-      <nav class="md-nav" aria-label="Metrics Proxy" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_13_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_13">
           <span class="md-nav__icon md-icon"></span>
-          Metrics Proxy
+          Mobile Bridge
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -1889,8 +1906,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_14" type="checkbox" id="__nav_2_2_14" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_14" >
       
       
         
@@ -1907,7 +1925,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Navigation" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_14_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_14">
           <span class="md-nav__icon md-icon"></span>
           Navigation
@@ -1932,8 +1950,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_15" type="checkbox" id="__nav_2_2_15" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_15" >
       
       
         
@@ -1950,7 +1969,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Phone Control" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_15_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_15">
           <span class="md-nav__icon md-icon"></span>
           Phone Control
@@ -1975,8 +1994,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_16" type="checkbox" id="__nav_2_2_16" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_16" >
       
       
         
@@ -1993,7 +2013,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="System Audio" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_16_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_16">
           <span class="md-nav__icon md-icon"></span>
           System Audio
@@ -2018,8 +2038,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_17" type="checkbox" id="__nav_2_2_17" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_17" >
       
       
         
@@ -2036,7 +2057,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Text-to-Speech" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_17_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_17">
           <span class="md-nav__icon md-icon"></span>
           Text-to-Speech
@@ -2061,8 +2082,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_18" type="checkbox" id="__nav_2_2_18" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_18" >
       
       
         
@@ -2079,7 +2101,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Text-to-Speech Provider" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_18_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_18">
           <span class="md-nav__icon md-icon"></span>
           Text-to-Speech Provider
@@ -2119,19 +2141,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
       
       
         
           
             
-          
-        
-          
-        
-          
-        
           
         
       
@@ -2141,13 +2158,9 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../../../../android/">Develop for Android</a>
           
-            <label for="__nav_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
         </div>
       
-      <nav class="md-nav" aria-label="Develop for Android" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
           Develop for Android
@@ -2156,700 +2169,6 @@
           
             
           
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
-      
-      
-      
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../../android/aacs/sample-app/">Alexa Auto App</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Alexa Auto App" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_2">
-          <span class="md-nav__icon md-icon"></span>
-          Alexa Auto App
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../../android/aacs/app-components/">App Components</a>
-          
-            <label for="__nav_3_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="App Components" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_3">
-          <span class="md-nav__icon md-icon"></span>
-          App Components
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-apis/" class="md-nav__link">
-        alexa-auto-apis
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3_3" type="checkbox" id="__nav_3_3_3" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../../android/aacs/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
-          
-            <label for="__nav_3_3_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
-        <label class="md-nav__title" for="__nav_3_3_3">
-          <span class="md-nav__icon md-icon"></span>
-          alexa-auto-apl-renderer
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-apl-renderer/modules/apl-render/" class="md-nav__link">
-        APL Render
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-apps-common-ui/" class="md-nav__link">
-        alexa-auto-apps-common-ui
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-apps-common-util/" class="md-nav__link">
-        alexa-auto-apps-common-util
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-carcontrol/" class="md-nav__link">
-        alexa-auto-carcontrol
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-comms-ui/" class="md-nav__link">
-        alexa-auto-comms-ui
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-contacts/" class="md-nav__link">
-        alexa-auto-contacts
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-device-usage/" class="md-nav__link">
-        alexa-auto-device-usage
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-lwa-auth/" class="md-nav__link">
-        alexa-auto-lwa-auth
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-media-player/" class="md-nav__link">
-        alexa-auto-media-player
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-navigation/" class="md-nav__link">
-        alexa-auto-navigation
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-settings/" class="md-nav__link">
-        alexa-auto-settings
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-setup/" class="md-nav__link">
-        alexa-auto-setup
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-telephony/" class="md-nav__link">
-        alexa-auto-telephony
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-templateruntime-renderer/" class="md-nav__link">
-        alexa-auto-templateruntime-renderer
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-tts/" class="md-nav__link">
-        alexa-auto-tts
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-ux-restrictions/" class="md-nav__link">
-        alexa-auto-ux-restrictions
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-voice-interaction/" class="md-nav__link">
-        alexa-auto-voice-interaction
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/app-components/alexa-auto-voice-ui/" class="md-nav__link">
-        alexa-auto-voice-ui
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" type="checkbox" id="__nav_3_4" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../../android/aacs/">AACS</a>
-          
-            <label for="__nav_3_4">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="AACS" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_4">
-          <span class="md-nav__icon md-icon"></span>
-          AACS
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/service/" class="md-nav__link">
-        Configuration reference
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4_3" type="checkbox" id="__nav_3_4_3" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../../android/aacs/common/">Common utility libraries</a>
-          
-            <label for="__nav_3_4_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Common utility libraries" data-md-level="3">
-        <label class="md-nav__title" for="__nav_3_4_3">
-          <span class="md-nav__icon md-icon"></span>
-          Common utility libraries
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/common/ipc/" class="md-nav__link">
-        IPC
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/common/commonutils/" class="md-nav__link">
-        Common Utils
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../android/aacs/common/annotations/aacs-annotation-api/" class="md-nav__link">
-        Annotations
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4_4" type="checkbox" id="__nav_3_4_4" >
-      
-      
-      
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../../../android/aacs/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">Instrumentation</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Instrumentation" data-md-level="3">
-        <label class="md-nav__title" for="__nav_3_4_4">
-          <span class="md-nav__icon md-icon"></span>
-          Instrumentation
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
         </ul>
       </nav>
     </li>
@@ -2867,8 +2186,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
       
       
         
@@ -2895,7 +2215,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Develop with Native C++" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Develop with Native C++
@@ -2913,8 +2233,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
       
       
         
@@ -2924,12 +2245,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_2">
+        <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
           Build System
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Build System" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
           Build System
@@ -2959,8 +2280,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2_2" type="checkbox" id="__nav_4_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2" >
       
       
         
@@ -2977,7 +2299,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Builder Tool Command Reference" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2_2">
           <span class="md-nav__icon md-icon"></span>
           Builder Tool Command Reference
@@ -3009,8 +2331,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
       
       
         
@@ -3027,7 +2350,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="C++ Sample App" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_3">
           <span class="md-nav__icon md-icon"></span>
           C++ Sample App
@@ -3052,8 +2375,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
       
       
         
@@ -3070,7 +2394,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="API Reference" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_4">
           <span class="md-nav__icon md-icon"></span>
           API Reference
@@ -3103,8 +2427,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
       
       
         
@@ -3127,7 +2452,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="AASB Message Reference" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           AASB Message Reference
@@ -3145,43 +2470,46 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
       
       
-        <label class="md-nav__link" for="__nav_5_2">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
           Modules
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Modules" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2">
           <span class="md-nav__icon md-icon"></span>
           Modules
@@ -3197,8 +2525,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_1" type="checkbox" id="__nav_5_2_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_1" >
       
       
         
@@ -3206,12 +2535,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_1">
+        <label class="md-nav__link" for="__nav_5_2_1" id="__nav_5_2_1_label" tabindex="0">
           Address Book
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Address Book" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_1">
           <span class="md-nav__icon md-icon"></span>
           Address Book
@@ -3227,8 +2556,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_1_1" type="checkbox" id="__nav_5_2_1_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_1_1" >
       
       
         
@@ -3236,12 +2566,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_1_1">
+        <label class="md-nav__link" for="__nav_5_2_1_1" id="__nav_5_2_1_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_1_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_1_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -3285,8 +2615,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_2" type="checkbox" id="__nav_5_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_2" >
       
       
         
@@ -3294,12 +2625,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_2">
+        <label class="md-nav__link" for="__nav_5_2_2" id="__nav_5_2_2_label" tabindex="0">
           Alexa
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Alexa" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_2">
           <span class="md-nav__icon md-icon"></span>
           Alexa
@@ -3315,51 +2646,52 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_2_1" type="checkbox" id="__nav_5_2_2_1" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_2_1" >
       
       
-        <label class="md-nav__link" for="__nav_5_2_2_1">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_2_1" id="__nav_5_2_2_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_2_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_2_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -3613,8 +2945,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_3" type="checkbox" id="__nav_5_2_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_3" >
       
       
         
@@ -3622,12 +2955,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_3">
+        <label class="md-nav__link" for="__nav_5_2_3" id="__nav_5_2_3_label" tabindex="0">
           APL
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="APL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_3">
           <span class="md-nav__icon md-icon"></span>
           APL
@@ -3643,8 +2976,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_3_1" type="checkbox" id="__nav_5_2_3_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_3_1" >
       
       
         
@@ -3652,12 +2986,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_3_1">
+        <label class="md-nav__link" for="__nav_5_2_3_1" id="__nav_5_2_3_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_3_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_3_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -3701,8 +3035,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_4" type="checkbox" id="__nav_5_2_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_4" >
       
       
         
@@ -3710,12 +3045,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_4">
+        <label class="md-nav__link" for="__nav_5_2_4" id="__nav_5_2_4_label" tabindex="0">
           Car Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Car Control" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_4">
           <span class="md-nav__icon md-icon"></span>
           Car Control
@@ -3731,8 +3066,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_4_1" type="checkbox" id="__nav_5_2_4_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_4_1" >
       
       
         
@@ -3740,12 +3076,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_4_1">
+        <label class="md-nav__link" for="__nav_5_2_4_1" id="__nav_5_2_4_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_4_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_4_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -3789,8 +3125,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5" type="checkbox" id="__nav_5_2_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_5" >
       
       
         
@@ -3798,12 +3135,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_5">
+        <label class="md-nav__link" for="__nav_5_2_5" id="__nav_5_2_5_label" tabindex="0">
           CBL
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="CBL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_5">
           <span class="md-nav__icon md-icon"></span>
           CBL
@@ -3819,8 +3156,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5_1" type="checkbox" id="__nav_5_2_5_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_5_1" >
       
       
         
@@ -3828,12 +3166,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_5_1">
+        <label class="md-nav__link" for="__nav_5_2_5_1" id="__nav_5_2_5_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_5_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_5_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -3877,8 +3215,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6" type="checkbox" id="__nav_5_2_6" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" >
       
       
         
@@ -3886,12 +3225,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_6">
+        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
           Connectivity
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Connectivity" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_6">
           <span class="md-nav__icon md-icon"></span>
           Connectivity
@@ -3907,8 +3246,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6_1" type="checkbox" id="__nav_5_2_6_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6_1" >
       
       
         
@@ -3916,12 +3256,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_6_1">
+        <label class="md-nav__link" for="__nav_5_2_6_1" id="__nav_5_2_6_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_6_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_6_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -3965,8 +3305,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_7" type="checkbox" id="__nav_5_2_7" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7" >
       
       
         
@@ -3974,12 +3315,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_7">
+        <label class="md-nav__link" for="__nav_5_2_7" id="__nav_5_2_7_label" tabindex="0">
           Core
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_7_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_7">
           <span class="md-nav__icon md-icon"></span>
           Core
@@ -3995,37 +3336,38 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_7_1" type="checkbox" id="__nav_5_2_7_1" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7_1" >
       
       
-        <label class="md-nav__link" for="__nav_5_2_7_1">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_7_1" id="__nav_5_2_7_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_7_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_7_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4181,8 +3523,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_8" type="checkbox" id="__nav_5_2_8" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8" >
       
       
         
@@ -4190,12 +3533,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_8">
+        <label class="md-nav__link" for="__nav_5_2_8" id="__nav_5_2_8_label" tabindex="0">
           Custom Domain
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Custom Domain" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_8_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_8">
           <span class="md-nav__icon md-icon"></span>
           Custom Domain
@@ -4211,8 +3554,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_8_1" type="checkbox" id="__nav_5_2_8_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8_1" >
       
       
         
@@ -4220,12 +3564,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_8_1">
+        <label class="md-nav__link" for="__nav_5_2_8_1" id="__nav_5_2_8_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_8_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_8_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4269,8 +3613,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_9" type="checkbox" id="__nav_5_2_9" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_9" >
       
       
         
@@ -4278,12 +3623,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_9">
+        <label class="md-nav__link" for="__nav_5_2_9" id="__nav_5_2_9_label" tabindex="0">
           Messaging
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Messaging" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_9_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_9">
           <span class="md-nav__icon md-icon"></span>
           Messaging
@@ -4299,8 +3644,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_9_1" type="checkbox" id="__nav_5_2_9_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_9_1" >
       
       
         
@@ -4308,12 +3654,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_9_1">
+        <label class="md-nav__link" for="__nav_5_2_9_1" id="__nav_5_2_9_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_9_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_9_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4357,8 +3703,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_10" type="checkbox" id="__nav_5_2_10" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_10" >
       
       
         
@@ -4366,13 +3713,103 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_10">
+        <label class="md-nav__link" for="__nav_5_2_10" id="__nav_5_2_10_label" tabindex="0">
+          Mobile Bridge
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_10">
+          <span class="md-nav__icon md-icon"></span>
+          Mobile Bridge
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_10_1" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_10_1" id="__nav_5_2_10_1_label" tabindex="0">
+          Interfaces
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_10_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_10_1">
+          <span class="md-nav__icon md-icon"></span>
+          Interfaces
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../aasb/mobile-bridge/MobileBridge/" class="md-nav__link">
+        MobileBridge
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_11" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_11" id="__nav_5_2_11_label" tabindex="0">
           Navigation
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Navigation" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_10">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_11_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_11">
           <span class="md-nav__icon md-icon"></span>
           Navigation
         </label>
@@ -4387,8 +3824,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_10_1" type="checkbox" id="__nav_5_2_10_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_11_1" >
       
       
         
@@ -4396,13 +3834,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_10_1">
+        <label class="md-nav__link" for="__nav_5_2_11_1" id="__nav_5_2_11_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
-        <label class="md-nav__title" for="__nav_5_2_10_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_11_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_11_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
         </label>
@@ -4445,8 +3883,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_11" type="checkbox" id="__nav_5_2_11" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_12" >
       
       
         
@@ -4454,13 +3893,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_11">
+        <label class="md-nav__link" for="__nav_5_2_12" id="__nav_5_2_12_label" tabindex="0">
           Phone Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Phone Control" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_11">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_12_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_12">
           <span class="md-nav__icon md-icon"></span>
           Phone Control
         </label>
@@ -4475,8 +3914,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_11_1" type="checkbox" id="__nav_5_2_11_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_12_1" >
       
       
         
@@ -4484,13 +3924,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_11_1">
+        <label class="md-nav__link" for="__nav_5_2_12_1" id="__nav_5_2_12_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
-        <label class="md-nav__title" for="__nav_5_2_11_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_12_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_12_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
         </label>
@@ -4533,8 +3973,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_12" type="checkbox" id="__nav_5_2_12" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_13" >
       
       
         
@@ -4542,13 +3983,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_12">
+        <label class="md-nav__link" for="__nav_5_2_13" id="__nav_5_2_13_label" tabindex="0">
           Text-to-Speech
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Text-to-Speech" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_12">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_13_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_13">
           <span class="md-nav__icon md-icon"></span>
           Text-to-Speech
         </label>
@@ -4563,8 +4004,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_12_1" type="checkbox" id="__nav_5_2_12_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_13_1" >
       
       
         
@@ -4572,13 +4014,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_12_1">
+        <label class="md-nav__link" for="__nav_5_2_13_1" id="__nav_5_2_13_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
-        <label class="md-nav__title" for="__nav_5_2_12_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_13_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_13_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
         </label>
@@ -4703,10 +4145,11 @@
               </div>
             
           
-          <div class="md-content" data-md-component="content">
-            <article class="md-content__inner md-typeset">
-              
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
                 
+                  
 
 
 <h1 id="localmediasource-interface">LocalMediaSource Interface<a class="headerlink" href="#localmediasource-interface" title="Permanent link">&para;</a></h1>
@@ -4714,77 +4157,92 @@
 <p>The <code>LocalMediaSource</code> interface allows the platform to register a local media source by type (<code>BLUETOOTH</code>, <code>USB</code>, <code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SATELLITE_RADIO</code>, <code>LINE_IN</code>, <code>COMPACT_DISC</code>, <code>SIRIUS_XM</code>, <code>DAB</code>, and <code>DEFAULT</code>). Registering a local media source allows playback control of that source via Alexa (e.g. "Alexa, play the CD player"). It also enables playback initiation via Alexa by frequency, channel, or preset for relevant source types (e.g. "Alexa, play 98.7 FM").</p>
 <p><code>DEFAULT</code> media source is a generic media source that can be used for controlling any local media source on the OEM infotainment system. It is recommended to use <code>DEFAULT</code> media source for all local media except Alexa music, MACC-supported deep linked media players, and other registered Local Media Sources. <code>DEFAULT</code> media player can not be launched by name like "Alexa, Play CD player" but it can be used to control playback actions reported in the <a href="#reporting-playback-state"><code>supportedOperations</code></a>. For example, "Alexa, play" resumes the default player playback as long a the DEFAULT source is in <a href="#reporting-playback-events">focus</a>.</p>
 <p>The following is an example of registering a CD player local media source using type <code>Source.COMPACT_DISC</code>:</p>
-<div class="highlight"><pre><span></span><code>auto m_CDLocalMediaSource = std::make_shared&lt;MyCDLocalMediaSource&gt;( Source.COMPACT_DISC );
-engine-&gt;registerPlatformInterface( m_CDLocalMediaSource );
-</code></pre></div>
-<p>To implement a custom handler for a CD player local media source extend the <code>LocalMediaSource</code> class:</p>
-<div class="highlight"><pre><span></span><code>#include &lt;AACE/Alexa/LocalMediaSource.h&gt;
-class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
-  public:
-    MyCDLocalMediaSource( LocalMediaSource::Source source ) {
-        m_source = source;  
-        ...
-    }
-    ...
-}; 
-... 
+<div class="highlight"><pre><span></span><code><span class="c1">// Include necessary message header files:</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;AASB/Message/Alexa/LocalMediaSource/PlayMessage.h&gt;</span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">aasb</span><span class="o">::</span><span class="nn">message</span><span class="o">::</span><span class="nn">alexa</span><span class="o">::</span><span class="nn">localMediaSource</span><span class="p">;</span>
+
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;nlohmann/json.hpp&gt;</span>
+<span class="k">using</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nlohmann</span><span class="o">::</span><span class="n">json</span><span class="p">;</span>
+
+<span class="p">...</span>
+
+<span class="w">    </span><span class="c1">// Subscribe to corresponding messages with handlers:</span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">PlayMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">source</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Source</span><span class="o">::</span><span class="n">COMPACT_DISC</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Handle CD playback</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">},</span><span class="w"> </span><span class="n">PlayMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"> </span><span class="n">PlayMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span>
 </code></pre></div>
 <h2 id="starting-playback-with-content-selection-by-voice">Starting Playback with Content Selection by Voice<a class="headerlink" href="#starting-playback-with-content-selection-by-voice" title="Permanent link">&para;</a></h2>
-<p>The <code>play()</code> method is called when Alexa invokes play by <code>ContentSelector</code> type (<code>FREQUENCY</code>, <code>CHANNEL</code>, <code>PRESET</code>) for a radio local media source (<code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SIRIUS_XM</code>, <code>DAB</code>). The <code>payload</code> is a string that depends on the <code>ContentSelector</code> type and local media <code>Source</code> type (e.g., "1", "98.7 FM HD 1").</p>
-<div class="highlight"><pre><span></span><code>bool play( ContentSelector type, std::string payload, const std::string&amp; sessionId ) override {
-    // play initiation for frequency, channel, or presets
-    ...
-}
+<p>The <code>Play</code> message is sent when Alexa invokes play by <code>ContentSelector</code> type (<code>FREQUENCY</code>, <code>CHANNEL</code>, <code>PRESET</code>) for a radio local media source (<code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SIRIUS_XM</code>, <code>DAB</code>). The <code>payload</code> is a string that depends on the <code>ContentSelector</code> type and local media <code>Source</code> type (e.g., "1", "98.7 FM HD 1").</p>
+<div class="highlight"><pre><span></span><code><span class="kt">bool</span><span class="w"> </span><span class="nf">play</span><span class="p">(</span><span class="w"> </span><span class="n">ContentSelector</span><span class="w"> </span><span class="n">type</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">payload</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">sessionId</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="k">override</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// play initiation for frequency, channel, or presets</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Subscribe to corresponding messages with handlers:</span>
+<span class="w">    </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">subscribe</span><span class="p">(</span>
+<span class="w">        </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">PlayMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">source</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Source</span><span class="o">::</span><span class="n">FM_RADIO</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Handle FM radio playback specified by:</span>
+<span class="w">                </span><span class="c1">// - msg.payload.contentSelectorType</span>
+<span class="w">                </span><span class="c1">// - msg.payload.payload:</span>
+<span class="w">                </span><span class="c1">// - msg.payload.sessionId</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">},</span><span class="w"> </span><span class="n">PlayMessage</span><span class="o">::</span><span class="n">topic</span><span class="p">(),</span><span class="w"> </span><span class="n">PlayMessage</span><span class="o">::</span><span class="n">action</span><span class="p">());</span>
 </code></pre></div>
 <p>The table below provides details about the supported <code>ContentSelector</code> types based on <code>Source</code> type:</p>
 <table>
 <thead>
 <tr>
-<th align="left"><code>Source</code></th>
-<th align="left">Supported <code>ContentSelector</code></th>
-<th align="left"><code>payload</code> examples</th>
+<th style="text-align: left;"><code>Source</code></th>
+<th style="text-align: left;">Supported <code>ContentSelector</code></th>
+<th style="text-align: left;"><code>payload</code> examples</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">FM</td>
-<td align="left">FREQUENCY</td>
-<td align="left">"105.9" <br> "98.7 HD 1"</td>
+<td style="text-align: left;">FM</td>
+<td style="text-align: left;">FREQUENCY</td>
+<td style="text-align: left;">"105.9" <br> "98.7 HD 1"</td>
 </tr>
 <tr>
-<td align="left"></td>
-<td align="left">PRESET</td>
-<td align="left">"2"</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PRESET</td>
+<td style="text-align: left;">"2"</td>
 </tr>
 <tr>
-<td align="left">AM</td>
-<td align="left">FREQUENCY</td>
-<td align="left">"1100" <br> "840"</td>
+<td style="text-align: left;">AM</td>
+<td style="text-align: left;">FREQUENCY</td>
+<td style="text-align: left;">"1100" <br> "840"</td>
 </tr>
 <tr>
-<td align="left"></td>
-<td align="left">PRESET</td>
-<td align="left">"1"</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PRESET</td>
+<td style="text-align: left;">"1"</td>
 </tr>
 <tr>
-<td align="left">SXM</td>
-<td align="left">CHANNEL</td>
-<td align="left">"22" <br> "70"</td>
+<td style="text-align: left;">SXM</td>
+<td style="text-align: left;">CHANNEL</td>
+<td style="text-align: left;">"22" <br> "70"</td>
 </tr>
 <tr>
-<td align="left"></td>
-<td align="left">PRESET</td>
-<td align="left">"3"</td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;">PRESET</td>
+<td style="text-align: left;">"3"</td>
 </tr>
 <tr>
-<td align="left">DAB</td>
-<td align="left">CHANNEL</td>
-<td align="left">“BBC Radio Extra 4”</td>
+<td style="text-align: left;">DAB</td>
+<td style="text-align: left;">CHANNEL</td>
+<td style="text-align: left;">“BBC Radio Extra 4”</td>
 </tr>
 <tr>
-<td align="left">DEFAULT</td>
-<td align="left">PRESET</td>
-<td align="left">"5"</td>
+<td style="text-align: left;">DEFAULT</td>
+<td style="text-align: left;">PRESET</td>
+<td style="text-align: left;">"5"</td>
 </tr>
 </tbody>
 </table>
@@ -4792,49 +4250,34 @@ class MyCDLocalMediaSource : public aace::alexa::LocalMediaSource {
 <blockquote>
 <p><strong>Note:</strong> The <code>DAB</code> channel payload is the radio station name string. If supported, then the name string must be handled by the client's DAB implementation.</p>
 </blockquote>
-<p>The <code>play()</code> method will not be invoked if a source cannot handle the specified <code>ContentSelector</code> type.</p>
-<p>The <code>DEFAULT</code> <code>Local Media Source</code> handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (<code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SIRIUS_XM</code>) actually corresponds to the preset. The meaning of the preset in the <code>payload</code> parameter of <code>play(ContentSelector contentSelectorType, const std::string&amp; payload, const std::string&amp; sessionId)</code>is determined by the <code>DEFAULT</code> platform implementation and should suit the needs of the vehicle's infotainment system, i.e. when the <code>play()</code> method is called, your implementation should map the preset to a preset that makes sense for the current context.</p>
-<blockquote>
-<p><strong>Note:</strong> The <code>GlobalPreset</code> platform interface is deprecated. Use <code>DEFAULT</code> <code>LocalMediaSource</code> instead.</p>
-</blockquote>
+<p>The <code>Play</code> message will not be sent if a source cannot handle the specified <code>ContentSelector</code> type.</p>
+<p>The <code>DEFAULT</code> <code>Local Media Source</code> handles "Alexa, play preset \<number>\" utterances without requiring that users explicitly say which local media source (<code>AM_RADIO</code>, <code>FM_RADIO</code>, <code>SIRIUS_XM</code>) actually corresponds to the preset. The meaning of the preset in the <code>msg.payload.payload</code> field is determined by the <code>DEFAULT</code> platform implementation and should suit the needs of the vehicle's infotainment system, i.e. when the <code>Play</code> message is received, your implementation should map the preset to a preset that makes sense for the current context.</p>
 <h2 id="controlling-playback-by-voice">Controlling Playback by Voice<a class="headerlink" href="#controlling-playback-by-voice" title="Permanent link">&para;</a></h2>
-<p>The <code>playControl()</code> method is called with a <code>PlayControlType</code>(<code>RESUME</code>, <code>PAUSE</code>, <code>STOP</code>, <code>NEXT</code>, <code>PREVIOUS</code>, <code>START_OVER</code>, <code>FAST_FORWARD</code>, <code>REWIND</code>, <code>ENABLE_REPEAT_ONE</code>, <code>ENABLE_REPEAT</code>, <code>DISABLE_REPEAT</code>, <code>ENABLE_SHUFFLE</code>, <code>DISABLE_SHUFFLE</code>, <code>FAVORITE</code>, <code>UNFAVORITE</code>) when Alexa invokes a playback control on the local media source.</p>
-<div class="highlight"><pre><span></span><code>bool playControl( PlayControlType controlType ) override {
-    // handle the control type appropriately for CD player
-    return true;
-}
+<p>The <code>PlayControl</code> message is sent with a <code>PlayControlType</code>(<code>RESUME</code>, <code>PAUSE</code>, <code>STOP</code>, <code>NEXT</code>, <code>PREVIOUS</code>, <code>START_OVER</code>, <code>FAST_FORWARD</code>, <code>REWIND</code>, <code>ENABLE_REPEAT_ONE</code>, <code>ENABLE_REPEAT</code>, <code>DISABLE_REPEAT</code>, <code>ENABLE_SHUFFLE</code>, <code>DISABLE_SHUFFLE</code>, <code>FAVORITE</code>, <code>UNFAVORITE</code>) when Alexa invokes a playback control on the local media source.</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">PlayControlMessage</span><span class="w"> </span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="o">::</span><span class="n">parse</span><span class="p">(</span><span class="n">message</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">source</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">m_source</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">controlType</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="no">PlayControlType</span><span class="o">::</span><span class="no">RESUME</span><span class="p">:</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="no">PlayControlType</span><span class="o">::</span><span class="no">PAUSE</span><span class="p">:</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="k">case</span><span class="w"> </span><span class="no">PlayControlType</span><span class="o">::</span><span class="no">STOP</span><span class="p">:</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="k">default</span><span class="o">:</span>
+<span class="w">            </span><span class="k">break</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
 </code></pre></div>
 <blockquote>
-<p><strong>Note:</strong> The <code>play()</code> method is used to initiate playback with specified content selection, whereas <code>playControl(RESUME)</code> is used to play or resume the source when content is not specified or not supported. E.g. FM receives <code>play()</code> when the user requests FM with a specific frequency ("Alexa, play 98.7 FM radio"), and USB receives <code>playControl(RESUME)</code> when the user requests playback with just the source name ("Alexa, play USB").</p>
+<p><strong>Note:</strong> The <code>Play</code> message is used to initiate playback with specified content selection, whereas <code>PlayControl</code> message with <code>PlayControlType::RESUME</code> is used to play or resume the source when content is not specified or not supported. E.g. FM receives <code>Play</code> message when the user requests FM with a specific frequency ("Alexa, play 98.7 FM radio"), and USB receives <code>PlayControl</code> message with <code>PlayControlType::RESUME</code> when the user requests playback with just the source name ("Alexa, play USB").</p>
 </blockquote>
-<p>The <code>seek()</code> and <code>adjustSeek()</code> methods are invoked to seek the currently focused <code>LocalMediaSource</code>. These methods are only used by sources that are capable of seeking. <code>seek()</code> is for specifying an absolute offset, whereas <code>adjustSeek()</code> is for specifying a relative offset. </p>
-<div class="highlight"><pre><span></span><code>bool seek( long offset ) override {
-    // handle seeking CD player
-}
-...
-
-bool adjustSeek( long offset ) override {
-    // handle adjusting seek for CD player
-}
-</code></pre></div>
-<p>The <code>volumeChanged()</code> and <code>mutedStateChanged()</code> methods are invoked to change the volume and mute state of the currently focused local media player. <code>volumeChanged()</code> specifies the new volume. <code>mutedStateChanged()</code> specifies the new <code>MutedState</code>.</p>
-<div class="highlight"><pre><span></span><code>@Override
-public boolean volumeChanged( float volume ) {
-    // handle volume change
-}
-...
-
-@Override
-public boolean mutedStateChanged( MutedState state ) {
-    // handle setting mute state
-}
-...
-</code></pre></div>
+<p>The <code>Seek</code> message and <code>AdjustSeek</code> message are sent to seek the currently focused <code>LocalMediaSource</code>. These messages are only used by sources that are capable of seeking. <code>Seek</code> message is for specifying an absolute offset, whereas <code>AdjustSeek</code> message is for specifying a relative offset.</p>
+<p>The <code>VolumeChanged</code> message and <code>MutedStateChanged</code> message are sent to change the volume and mute state of the currently focused local media player. <code>VolumeChanged</code> message specifies the new volume. <code>MutedStateChanged</code> message specifies the new <code>MutedState</code>.</p>
 <h2 id="reporting-playback-events">Reporting Playback Events<a class="headerlink" href="#reporting-playback-events" title="Permanent link">&para;</a></h2>
-<p>The <code>LocalMediaSource</code> interface provides methods <code>playerEvent()</code> and <code>playerError()</code> for your implementation to report events regarding the state of the playback session managed by your local source. Even though your local source manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, the  <code>playerEvent()</code> and <code>playerError()</code> calls provide important information to the Engine:</p>
+<p>The <code>LocalMediaSource</code> interface provides <code>PlayerEvent</code> message and <code>PlayerError</code> message for your implementation to report events regarding the state of the playback session managed by your local source. Even though your local source manages its own playback, including reacting to on-device transport control button presses from the user and reacting appropriately to other non-Alexa audio events on the system, sending  <code>PlayerEvent</code> message and <code>PlayerError</code> message provides important information to the Engine:</p>
 <ol>
 <li>
-<p>The Engine may use calls to these methods to synchronize the state of your local source's playback session with Alexa.</p>
+<p>The Engine may use these messages to synchronize the state of your local source's playback session with Alexa.</p>
 </li>
 <li>
 <p>The Engine may react to these calls according to the event name specified to update its internal view of your local source's state. Particular event names indicate if the source is focused on the system (meaning it has an active playback session) or if it is un-focused (meaning it is not in use and is brought into use only by further on-device interaction by the user or a user voice request to Alexa). The Engine uses this information to sync its internal focus management.</p>
@@ -4843,67 +4286,68 @@ public boolean mutedStateChanged( MutedState state ) {
 <table>
 <thead>
 <tr>
-<th align="left">playerEvent() event name</th>
-<th align="left">Description</th>
+<th style="text-align: left;">PlayerEvent name</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">"PlaybackSessionStarted"</td>
-<td align="left">The local media source is switched from the inactive to active media state or a new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing).</td>
+<td style="text-align: left;">"PlaybackSessionStarted"</td>
+<td style="text-align: left;">The local media source is switched from the inactive to active media state or a new playback session has started, either from a GUI interaction or as a result of a user voice request to Alexa. The Engine considers the player active and in focus (although it may or may not yet be playing).</td>
 </tr>
 <tr>
-<td align="left">"PlaybackSessionEnded"</td>
-<td align="left">The local media source is switched from the active to inactive media state or an active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus.</td>
+<td style="text-align: left;">"PlaybackSessionEnded"</td>
+<td style="text-align: left;">The local media source is switched from the active to inactive media state or an active playback session has ended. The player should no longer be playing or playable until a new session is started by GUI interaction or user voice request to Alexa. The Engine considers the player inactive and no longer in focus.</td>
 </tr>
 <tr>
-<td align="left">"PlaybackStarted"</td>
-<td align="left">During an active session, the local source has started to play or resumed from a paused state.</td>
+<td style="text-align: left;">"PlaybackStarted"</td>
+<td style="text-align: left;">During an active session, the local source has started to play or resumed from a paused state.</td>
 </tr>
 <tr>
-<td align="left">"PlaybackStopped"</td>
-<td align="left">During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa.</td>
+<td style="text-align: left;">"PlaybackStopped"</td>
+<td style="text-align: left;">During an active session, the player stopped, either as a result of a GUI interaction or a user voice request to Alexa.</td>
 </tr>
 </tbody>
 </table>
 <table>
 <thead>
 <tr>
-<th align="left">playerError() event name</th>
-<th align="left">Description</th>
+<th style="text-align: left;">PlayerError name</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">"INTERNAL_ERROR"</td>
-<td align="left">During an active session, an internal error caused playback to stop.</td>
+<td style="text-align: left;">"INTERNAL_ERROR"</td>
+<td style="text-align: left;">During an active session, an internal error caused playback to stop.</td>
 </tr>
 </tbody>
 </table>
-<p>Both <code>playerEvent()</code> and <code>playerError()</code> are expected to provide the appropriate sessionId.</p>
-<p>Call <code>playerEvent("PlaybackSessionStarted", sessionId)</code> to tell the Engine that the user brought the <code>LocalMediaSource</code> to the foreground with a GUI interaction. The Engine considers the source to have an active playback session, although it may or may not be playing yet. If no other Alexa media source is playing, utterances such as “Alexa, play” target this source. You must also call <code>playerEvent("PlaybackSessionStarted", sessionId)</code> when the source is brought into the foreground by a call to <code>play()</code> or <code>playControl()</code> as a result of a user voice request. Once the source starts playing, call <code>playerEvent("PlaybackStarted", sessionId)</code>.</p>
-<p>Call <code>playerEvent("PlaybackSessionEnded", sessionId)</code> to tell the Engine that the <code>LocalMediaSource</code> is no longer in the foreground, typically as a result of a GUI interaction from the user after the player is stopped. The Engine considers the source inactive or not in focus, and starting a new playback session for the source requires a further GUI interaction or user voice request to Alexa that targets the source by name.</p>
-<div class="highlight"><pre><span></span><code>class MyFMRadioLocalMediaSource : public aace::alexa::LocalMediaSource {
-...
-    // public method in source handler  
-    void setAlexaFocusForFMRadio( bool isFocused ) {  
-        ...
-        if (isFocused) {
-            ...  
-            // FM Radio begins playback independently of Alexa
-            playerEvent(&quot;PlaybackSessionStarted&quot;, m_sessionId);
-        } else {
-            ...    
-            // Notify Alexa that FM Radio is no longer the active media source on the device as a result of platform driven change
-            playerEvent(&quot;PlaybackSessionEnded&quot;, m_sessionId);
-        }
-        ...
-    }
-...    
+<p>Both <code>PlayerEvent</code> message and <code>PlayerError</code> message are expected to provide the appropriate sessionId.</p>
+<p>Send <code>PlayerEventMessage{"PlaybackSessionStarted", sessionId}</code> to tell the Engine that the user brought the <code>LocalMediaSource</code> to the foreground with a GUI interaction. The Engine considers the source to have an active playback session, although it may or may not be playing yet. If no other Alexa media source is playing, utterances such as “Alexa, play” target this source. You must also send <code>PlayerEventMessage{"PlaybackSessionStarted", sessionId}</code> when the source is brought into the foreground after receiving <code>Player</code> message or <code>PlayerControl</code> message as a result of a user voice request. Once the source starts playing, send <code>PlayerEvent{"PlaybackStarted", sessionId}</code>.</p>
+<p>Send <code>PlayerEventMessage{"PlaybackSessionEnded", sessionId}</code> to tell the Engine that the <code>LocalMediaSource</code> is no longer in the foreground, typically as a result of a GUI interaction from the user after the player is stopped. The Engine considers the source inactive or not in focus, and starting a new playback session for the source requires a further GUI interaction or user voice request to Alexa that targets the source by name.</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">setAlexaFocusForFMRadio</span><span class="p">(</span><span class="kt">bool</span><span class="w"> </span><span class="n">isFocused</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">isFocused</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// FM Radio begins playback independently of Alexa</span>
+<span class="w">            </span><span class="n">playerEvent</span><span class="p">(</span><span class="s">&quot;PlaybackSessionStarted&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_sessionId</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="p">...</span>
+<span class="w">            </span><span class="c1">// Notify Alexa that FM Radio is no longer the active media source on the device as a result of platform driven change</span>
+<span class="w">            </span><span class="n">playerEvent</span><span class="p">(</span><span class="s">&quot;PlaybackSessionEnded&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m_sessionId</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">playerEvent</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">eventName</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span><span class="w"> </span><span class="n">sessionId</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">PlayerEventMessage</span><span class="w"> </span><span class="n">msg</span><span class="p">;</span>
+<span class="w">        </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m_source</span><span class="p">;</span>
+<span class="w">        </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">eventName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eventName</span><span class="p">;</span>
+<span class="w">        </span><span class="n">msg</span><span class="p">.</span><span class="n">payload</span><span class="p">.</span><span class="n">sessionId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sessionId</span><span class="p">;</span>
+<span class="w">        </span><span class="n">m_messageBroker</span><span class="o">-&gt;</span><span class="n">publish</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
 </code></pre></div>
 <blockquote>
 <p><strong>Note:</strong> Only one <code>LocalMediaSource</code> type can have Alexa focus at a time.</p>
-<p><strong>Note:</strong> <code>setFocus()</code> and <code>setFocus(bool)</code> methods are deprecated for the <code>LocalMediaSource</code> platform interface. <code>playerEvent()</code> with <code>"PlaybackSessionStarted"</code> or <code>"PlaybackSessionEnded"</code> should be used instead of <code>setFocus(true)</code> and <code>setFocus(false)</code>.</p>
+<p><strong>Note:</strong> <code>SetFocus</code> message is deprecated for the <code>LocalMediaSource</code> interface. Use <code>PlayerEvent</code> message with <code>"PlaybackSessionStarted"</code> or <code>"PlaybackSessionEnded"</code> instead.</p>
 </blockquote>
 <p>Please abide by following rules related to <code>sessionId</code> in your <code>LocalMediaSource</code> integration:</p>
 <ul>
@@ -4911,10 +4355,10 @@ public boolean mutedStateChanged( MutedState state ) {
 <p><code>sessionId</code> is a universally unique identifier (UUID) generated according to the RFC 4122 specification.</p>
 </li>
 <li>
-<p>If a media source starts because of a call to <code>play(contentSelector, payload, sessionId)</code> from the Engine, note the <code>sessionId</code> parameter and use it in any <code>playerEvent()</code> calls until the session is inactive.</p>
+<p>If a media source starts because of a call to <code>PlayMessage{contentSelector, payload, sessionId}</code> from the Engine, note the <code>sessionId</code> field and use it in any <code>PlayerEvent</code> message calls until the session is inactive.</p>
 </li>
 <li>
-<p>If a media source starts for any other reason (e.g. a call to <code>playControl(RESUME)</code> from the Engine, or user GUI interaction on the head unit), create a new <code>sessionId</code> and use it in any <code>playerEvent()</code> calls until the session is inactive.</p>
+<p>If a media source starts for any other reason (e.g. a call to <code>PlayControlMessage{RESUME}</code> from the Engine, or user GUI interaction on the head unit), create a new <code>sessionId</code> and use it in any <code>PlayerEvent</code> message calls until the session is inactive.</p>
 </li>
 <li>
 <p>A <code>sessionId</code> is always associated with one media source playback session, so <code>USB</code>'s <code>sessionId</code> should be different than <code>COMPACT_DISC</code>'s <code>sessionId</code>.</p>
@@ -4923,245 +4367,238 @@ public boolean mutedStateChanged( MutedState state ) {
 <p>An individual <code>LocalMediaSource</code> should maintain the <code>sessionId</code> for the whole cycle from playback session start to playback session end.</p>
 </li>
 <li>
-<p>For any "opening" <code>playerEvent()</code> call for a particular <code>sessionId</code> (e.g. <code>"PlaybackSessionStarted"</code>, <code>"PlaybackStarted"</code>), you must report a corresponding closing call (e.g. <code>"PlaybackStopped"</code>, <code>"PlaybackSessionEnded"</code>) at the appropriate time (i.e., when the source is stopped, switched, etc.)</p>
+<p>For any "opening" <code>PlayerEvent</code> message call for a particular <code>sessionId</code> (e.g. <code>"PlaybackSessionStarted"</code>, <code>"PlaybackStarted"</code>), you must report a corresponding closing call (e.g. <code>"PlaybackStopped"</code>, <code>"PlaybackSessionEnded"</code>) at the appropriate time (i.e., when the source is stopped, switched, etc.)</p>
 </li>
 </ul>
 <h2 id="reporting-playback-state">Reporting Playback State<a class="headerlink" href="#reporting-playback-state" title="Permanent link">&para;</a></h2>
-<p>The <code>getState()</code> method is called to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the <code>LocalMediaSourceState</code> and returned.</p>
+<p>The Engine sends <code>GetState</code> message to synchronize the local player's state with the cloud. This method is used to maintain correct state during startup and with every Alexa request. All relevant information should be added to the <code>LocalMediaSourceState</code> in the reply message.</p>
 <p>Many fields of the <code>LocalMediaSourceState</code> are not required for local media source players. You should omit these as noted below.</p>
-<div class="highlight"><pre><span></span><code>LocalMediaSourceState getState() override {
-    LocalMediaSourceState stateToReturn = std::make_shared&lt;LocalMediaSourceState&gt;();
-    stateToReturn.playbackState.albumName = &quot;mock albumName&quot;;
-    // fill in all required state information (see below)
-    return stateToReturn;
-}
-</code></pre></div>
 <p>The following table describes the fields comprising a <code>LocalMediaSourceState</code>, which includes two sub-components: <code>PlaybackState</code> and <code>SessionState</code>.</p>
 <table>
 <thead>
 <tr>
-<th align="left">State</th>
-<th align="left">Type</th>
-<th align="left">Required</th>
-<th align="left">Notes</th>
+<th style="text-align: left;">State</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Required</th>
+<th style="text-align: left;">Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left"><strong>PlaybackState</strong></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;"><strong>PlaybackState</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">state</td>
-<td align="left">String</td>
-<td align="left">Yes</td>
-<td align="left">"IDLE"/"STOPPED"/"PLAYING"</td>
+<td style="text-align: left;">state</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">"IDLE"/"STOPPED"/"PLAYING"</td>
 </tr>
 <tr>
-<td align="left">supportedOperations</td>
-<td align="left">SupportedPlaybackOperation[]</td>
-<td align="left">Yes</td>
-<td align="left">see SupportedPlaybackOperation</td>
+<td style="text-align: left;">supportedOperations</td>
+<td style="text-align: left;">SupportedPlaybackOperation[]</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">see SupportedPlaybackOperation</td>
 </tr>
 <tr>
-<td align="left">trackOffset</td>
-<td align="left">long</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">trackOffset</td>
+<td style="text-align: left;">long</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">shuffleEnabled</td>
-<td align="left">boolean</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">shuffleEnabled</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">repeatEnabled</td>
-<td align="left">boolean</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">repeatEnabled</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">favorites</td>
-<td align="left">Favorites</td>
-<td align="left">No</td>
-<td align="left">see Favorites</td>
+<td style="text-align: left;">favorites</td>
+<td style="text-align: left;">Favorites</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">see Favorites</td>
 </tr>
 <tr>
-<td align="left">type</td>
-<td align="left">String</td>
-<td align="left">Yes</td>
-<td align="left">must be set to "ExternalMediaPlayerMusicItem"</td>
+<td style="text-align: left;">type</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">must be set to "ExternalMediaPlayerMusicItem"</td>
 </tr>
 <tr>
-<td align="left">playbackSource</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">If available else use local player name</td>
+<td style="text-align: left;">playbackSource</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">If available else use local player name</td>
 </tr>
 <tr>
-<td align="left">playbackSourceId</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">playbackSourceId</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">trackName</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">If available else use local player name</td>
+<td style="text-align: left;">trackName</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">If available else use local player name</td>
 </tr>
 <tr>
-<td align="left">trackId</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">trackId</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">trackNumber</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">trackNumber</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">artistName</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">artistName</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">artistId</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">artistId</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">albumName</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">albumName</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">albumId</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">albumId</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">tinyURL</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">tinyURL</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">smallURL</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">smallURL</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">mediumURL</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">mediumURL</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">largeURL</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">largeURL</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">coverId</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">coverId</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">mediaProvider</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">mediaProvider</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left">mediaType</td>
-<td align="left">MediaType</td>
-<td align="left">No</td>
-<td align="left">see MediaType</td>
+<td style="text-align: left;">mediaType</td>
+<td style="text-align: left;">MediaType</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">see MediaType</td>
 </tr>
 <tr>
-<td align="left">duration</td>
-<td align="left">long</td>
-<td align="left">No</td>
-<td align="left">optional</td>
+<td style="text-align: left;">duration</td>
+<td style="text-align: left;">long</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">optional</td>
 </tr>
 <tr>
-<td align="left"><strong>SessionsState</strong></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
+<td style="text-align: left;"><strong>SessionsState</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
 </tr>
 <tr>
-<td align="left">endpointId</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">endpointId</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">loggedIn</td>
-<td align="left">boolean</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">loggedIn</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">userName</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">userName</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">isGuest</td>
-<td align="left">boolean</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">isGuest</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">launched</td>
-<td align="left">boolean</td>
-<td align="left">Yes</td>
-<td align="left">true if the source is enabled, false otherwise</td>
+<td style="text-align: left;">launched</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">true if the source is enabled, false otherwise</td>
 </tr>
 <tr>
-<td align="left">active</td>
-<td align="left">boolean</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">active</td>
+<td style="text-align: left;">boolean</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">accessToken</td>
-<td align="left">String</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">accessToken</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">tokenRefreshInterval</td>
-<td align="left">long</td>
-<td align="left">No</td>
-<td align="left">empty</td>
+<td style="text-align: left;">tokenRefreshInterval</td>
+<td style="text-align: left;">long</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">empty</td>
 </tr>
 <tr>
-<td align="left">supportedContentSelectors</td>
-<td align="left">ContentSelector[]</td>
-<td align="left">No</td>
-<td align="left">see ContentSelector</td>
+<td style="text-align: left;">supportedContentSelectors</td>
+<td style="text-align: left;">ContentSelector[]</td>
+<td style="text-align: left;">No</td>
+<td style="text-align: left;">see ContentSelector</td>
 </tr>
 <tr>
-<td align="left">spiVersion</td>
-<td align="left">String</td>
-<td align="left">Yes</td>
-<td align="left">must be "1.0"</td>
+<td style="text-align: left;">spiVersion</td>
+<td style="text-align: left;">String</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">must be "1.0"</td>
 </tr>
 </tbody>
 </table>
@@ -5191,26 +4628,26 @@ LocalMediaSource::SupportedPlaybackOperation::START_OVER
 <table>
 <thead>
 <tr>
-<th align="left">Source</th>
-<th align="left">Supportable <code>ContentSelector</code> Values</th>
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Supportable <code>ContentSelector</code> Values</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>AM_RADIO</code></td>
-<td align="left"><code>PRESET</code>, <code>FREQUENCY</code></td>
+<td style="text-align: left;"><code>AM_RADIO</code></td>
+<td style="text-align: left;"><code>PRESET</code>, <code>FREQUENCY</code></td>
 </tr>
 <tr>
-<td align="left"><code>FM_RADIO</code></td>
-<td align="left"><code>PRESET</code>, <code>FREQUENCY</code></td>
+<td style="text-align: left;"><code>FM_RADIO</code></td>
+<td style="text-align: left;"><code>PRESET</code>, <code>FREQUENCY</code></td>
 </tr>
 <tr>
-<td align="left"><code>SIRIUS_XM</code></td>
-<td align="left"><code>PRESET</code>, <code>CHANNEL</code></td>
+<td style="text-align: left;"><code>SIRIUS_XM</code></td>
+<td style="text-align: left;"><code>PRESET</code>, <code>CHANNEL</code></td>
 </tr>
 <tr>
-<td align="left"><code>DEFAULT</code></td>
-<td align="left"><code>PRESET</code></td>
+<td style="text-align: left;"><code>DEFAULT</code></td>
+<td style="text-align: left;"><code>PRESET</code></td>
 </tr>
 </tbody>
 </table>
@@ -5224,54 +4661,27 @@ LocalMediaSource::SupportedPlaybackOperation::START_OVER
 <p><strong>3. Switching between different DEFAULT sources</strong>
 <img alt="Default to Default Switching" src="../diagrams/DEFAULT_to_DEFAULT_Switching.png" /></p>
 
-              
-            </article>
-          </div>
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
-          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
             Back to top
-          </a>
+          </button>
         
       </main>
       
         <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href="../ExternalMediaAdapter/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ExternalMediaAdapter" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              ExternalMediaAdapter
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../MediaPlaybackRequestor/" class="md-footer__link md-footer__link--next" aria-label="Next: MediaPlaybackRequestor" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              MediaPlaybackRequestor
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -5297,10 +4707,11 @@ LocalMediaSource::SupportedPlaybackOperation::START_OVER
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "search": "../../../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "search": "../../../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.a6c66575.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.a51614de.min.js"></script>
       
     
   </body>

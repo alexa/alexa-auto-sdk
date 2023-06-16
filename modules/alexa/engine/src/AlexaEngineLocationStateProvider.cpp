@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,19 +16,13 @@
 #include "AACE/Engine/Alexa/AlexaEngineLocationStateProvider.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Utils/JSON/JSON.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaEngineLocationStateProvider");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaEngineLocationStateProvider";
 
 // state provider constants
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName LOCATION_STATE{"Geolocation", "GeolocationState"};
@@ -103,7 +97,6 @@ void AlexaEngineLocationStateProvider::executeProvideState(
 
         aace::location::Location location;
         if (access == aace::location::LocationProviderEngineInterface::LocationServiceAccess::ENABLED) {
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "executeProvideState", "GetLocation", 1);
             location = m_locationProvider->getLocation();
         }
 

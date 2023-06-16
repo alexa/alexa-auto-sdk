@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
+#include <acsdk/MultiAgentInterface/Connection/AgentConnectionObserverInterface.h>
 
 #include "AACE/Engine/PropertyManager/PropertyListenerInterface.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
@@ -31,6 +32,7 @@
 #include "AACE/Engine/TextToSpeech/PrepareSpeechResult.h"
 #include "AACE/Engine/TextToSpeech/TextToSpeechSynthesizerInterface.h"
 #include "TextToSpeechProviderCapabilityAgent.h"
+#include <acsdk/MultiAgentInterface/AgentManagerInterface.h>
 
 namespace aace {
 namespace engine {
@@ -39,33 +41,36 @@ namespace textToSpeechProvider {
 extern const char* const PROVIDER_KEY;
 
 class TextToSpeechProviderEngine
-        : public aace::engine::textToSpeech::TextToSpeechSynthesizerInterface
-        , public aace::engine::textToSpeechProvider::TextToSpeechProviderInterface
-        , public aace::engine::propertyManager::PropertyListenerInterface
-        , public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
-        , public alexaClientSDK::avsCommon::utils::RequiresShutdown
-        , public std::enable_shared_from_this<TextToSpeechProviderEngine> {
+    : public aace::engine::textToSpeech::TextToSpeechSynthesizerInterface
+    , public aace::engine::textToSpeechProvider::TextToSpeechProviderInterface
+    , public aace::engine::propertyManager::PropertyListenerInterface
+    , public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
+    , public alexaClientSDK::multiAgentInterface::connection::AgentConnectionObserverInterface
+    , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+    , public std::enable_shared_from_this<TextToSpeechProviderEngine> {
 private:
     TextToSpeechProviderEngine();
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
-            capabilitiesRegistrar,
+        capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
         const std::string& voiceConfiguration,
-        std::shared_ptr<aace::engine::core::EngineContext> engineContext);
+        std::shared_ptr<aace::engine::core::EngineContext> engineContext,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager);
 
 public:
     static std::shared_ptr<TextToSpeechProviderEngine> create(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
-            capabilitiesRegistrar,
+        capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
         const std::string& voiceConfiguration,
-        std::shared_ptr<aace::engine::core::EngineContext> engineContext);
+        std::shared_ptr<aace::engine::core::EngineContext> engineContext,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager = nullptr);
 
     // TextToSpeechSynthesizerInterface
     std::future<aace::engine::textToSpeech::PrepareSpeechResult> prepareSpeech(
@@ -89,12 +94,19 @@ public:
     void onConnectionStatusChanged(
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::ChangedReason reason)
-        override;
+    override;
     void onConnectionStatusChanged(
         const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
         const std::vector<
-            alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
-            engineStatuses) override;
+        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
+        engineStatuses) override;
+    /// @name @c alexaClientSDK::multiAgentInterface::connection::AgentConnectionObserverInterface functions
+    /// @{
+    void onAgentAvailabilityStateChanged(
+        alexaClientSDK::avsCommon::avs::AgentId::IdType id,
+        AvailabilityState status,
+        const std::string& reason) override;
+    /// @}
 
     void doShutdown() override;
 
@@ -104,19 +116,22 @@ private:
         const std::string& speechId,
         const std::string& reason);
     bool validateLocale(const std::string& voiceId, const std::string& locale);
-    alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status getCurrentConnectionStatus();
+    bool isConnected();
 
 private:
     std::shared_ptr<aace::engine::textToSpeechProvider::TextToSpeechProviderCapabilityAgent>
-        m_textToSpeechProviderCapabilityAgent;
+    m_textToSpeechProviderCapabilityAgent;
     std::weak_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> m_propertyManager;
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> m_agentManager;
     std::unordered_map<std::string, std::shared_ptr<std::promise<aace::engine::textToSpeech::PrepareSpeechResult>>>
-        m_speechRequestsMap;
+    m_speechRequestsMap;
     std::unordered_map<std::string, std::string> m_voiceIdToAssistantIdMap;
     std::unordered_map<std::string, std::vector<std::string>> m_voiceIdToLocalesMap;
     std::string m_currentLocale;
     std::mutex m_mutex;
-    std::mutex m_connectionMutex;
+    std::mutex m_aggregateConnectionMutex;
+    std::unordered_map<alexaClientSDK::avsCommon::avs::AgentId::IdType, bool> m_agentAvailabilityMap;
+    bool m_agentAvailable = false;
     alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status m_connectionStatus =
         alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::DISCONNECTED;
 };

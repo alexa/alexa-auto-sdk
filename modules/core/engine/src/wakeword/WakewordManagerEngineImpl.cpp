@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,14 +17,11 @@
 
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/Wakeword/WakewordManagerEngineImpl.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <AACE/Engine/Wakeword/WakewordManagerServiceInterface.h>
 
 namespace aace {
 namespace engine {
 namespace wakeword {
-
-using namespace aace::engine::utils::metrics;
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.engine.wakeword.WakewordManagerEngineImpl");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <AACE/Engine/Navigation/DisplayManagerCapabilityAgent.h>
 #include <AACE/Test/Unit/AVS/MockAttachmentManager.h>
+#include <AACE/Test/Unit/Metrics/MockMetricRecorderServiceInterface.h>
 
 namespace aace {
 namespace test {
@@ -248,6 +249,7 @@ public:
     std::shared_ptr<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>> m_mockAttachmentManager;
     std::unique_ptr<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>>
         m_mockDirectiveHandlerResult;
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_mockMetricRecorder;
 };
 
 DisplayManagerCapabilityAgentTest::DisplayManagerCapabilityAgentTest() :
@@ -262,8 +264,9 @@ void DisplayManagerCapabilityAgentTest::SetUp() {
         std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockMessageSender>>();
     m_mockContextManager =
         std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>();
+    m_mockMetricRecorder = std::make_shared<aace::test::unit::core::MockMetricRecorderServiceInterface>();
     m_capabilityAgent = aace::engine::navigation::DisplayManagerCapabilityAgent::create(
-        m_mockDisplayHandler, m_mockExceptionSender, m_mockMessageSender, m_mockContextManager);
+        m_mockDisplayHandler, m_mockExceptionSender, m_mockMessageSender, m_mockContextManager, m_mockMetricRecorder);
     m_mockAttachmentManager = std::make_shared<testing::StrictMock<aace::test::unit::avs::MockAttachmentManager>>();
     m_mockDirectiveHandlerResult = std::unique_ptr<
         testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockDirectiveHandlerResult>>();
@@ -313,25 +316,31 @@ TEST_F(DisplayManagerCapabilityAgentTest, testCreateSuccess) {
 
 TEST_F(DisplayManagerCapabilityAgentTest, testCreateFailsNullDisplayHandler) {
     auto invalid = DisplayManagerCapabilityAgent::create(
-        nullptr, m_mockExceptionSender, m_mockMessageSender, m_mockContextManager);
+        nullptr, m_mockExceptionSender, m_mockMessageSender, m_mockContextManager, m_mockMetricRecorder);
     EXPECT_EQ(nullptr, invalid);
 }
 
 TEST_F(DisplayManagerCapabilityAgentTest, testCreateFailsNullExceptionSender) {
-    auto invalid =
-        DisplayManagerCapabilityAgent::create(m_mockDisplayHandler, nullptr, m_mockMessageSender, m_mockContextManager);
+    auto invalid = DisplayManagerCapabilityAgent::create(
+        m_mockDisplayHandler, nullptr, m_mockMessageSender, m_mockContextManager, m_mockMetricRecorder);
     EXPECT_EQ(nullptr, invalid);
 }
 
 TEST_F(DisplayManagerCapabilityAgentTest, testCreateFailsNullMessageSender) {
     auto invalid = DisplayManagerCapabilityAgent::create(
-        m_mockDisplayHandler, m_mockExceptionSender, nullptr, m_mockContextManager);
+        m_mockDisplayHandler, m_mockExceptionSender, nullptr, m_mockContextManager, m_mockMetricRecorder);
     EXPECT_EQ(nullptr, invalid);
 }
 
 TEST_F(DisplayManagerCapabilityAgentTest, testCreateFailsNullContextManager) {
     auto invalid = DisplayManagerCapabilityAgent::create(
-        m_mockDisplayHandler, m_mockExceptionSender, m_mockMessageSender, nullptr);
+        m_mockDisplayHandler, m_mockExceptionSender, m_mockMessageSender, nullptr, m_mockMetricRecorder);
+    EXPECT_EQ(nullptr, invalid);
+}
+
+TEST_F(DisplayManagerCapabilityAgentTest, testCreateFailsNullMetricRecorder) {
+    auto invalid = DisplayManagerCapabilityAgent::create(
+        m_mockDisplayHandler, m_mockExceptionSender, m_mockMessageSender, m_mockContextManager, nullptr);
     EXPECT_EQ(nullptr, invalid);
 }
 

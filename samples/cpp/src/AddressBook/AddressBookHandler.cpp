@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -65,10 +65,9 @@ void from_json(const json& j, PostalAddress& p) {
     j.at("districtOrCounty").get_to(p.districtOrCounty);
     j.at("postalCode").get_to(p.postalCode);
     j.at("country").get_to(p.country);
-    j.at("latitudeInDegrees").get_to(p.latitudeInDegrees);
-    j.at("latitudeInDegrees").get_to(p.latitudeInDegrees);
-    j.at("longitudeInDegrees").get_to(p.longitudeInDegrees);
-    j.at("accuracyInMeters").get_to(p.accuracyInMeters);
+    if (j.contains("latitudeInDegrees")) j.at("latitudeInDegrees").get_to(p.latitudeInDegrees);
+    if (j.contains("longitudeInDegrees")) j.at("longitudeInDegrees").get_to(p.longitudeInDegrees);
+    if (j.contains("accuracyInMeters")) j.at("accuracyInMeters").get_to(p.accuracyInMeters);
 }
 
 void from_json(const json& j, Contact& p) {
@@ -77,6 +76,7 @@ void from_json(const json& j, Contact& p) {
     if (j.count("phoneNumbers") > 0) {
         j.at("phoneNumbers").get_to(p.phoneNumbers);
     }
+    if (j.count("postalAddresses") > 0) j.at("postalAddresses").get_to(p.postalAddresses);
 }
 
 void from_json(const json& j, NavigationFavorite& p) {
@@ -299,8 +299,24 @@ AddressBook AddressBookHandler::populateAddressBook(AddressBookType type) {
                 phoneData.entryId = contact.id;
                 phoneData.label = phone.label;
                 phoneData.number = phone.number;
+                addressBook.phoneData.push_back(phoneData);
             }
-            addressBook.phoneData.push_back(phoneData);
+
+            for (PostalAddress contactAddress : contact.postalAddresses) {
+                aasb::message::addressBook::addressBook::PostalAddress postalAddress;
+                postalAddress.entryId = contact.id;
+                postalAddress.label = contactAddress.label;
+                postalAddress.addressLine1 = contactAddress.addressLine1;
+                postalAddress.addressLine2 = contactAddress.addressLine2;
+                postalAddress.addressLine3 = contactAddress.addressLine3;
+                postalAddress.city = contactAddress.city;
+                postalAddress.stateOrRegion = contactAddress.stateOrRegion;
+                postalAddress.districtOrCounty = contactAddress.districtOrCounty;
+                postalAddress.postalCode = contactAddress.postalCode;
+                postalAddress.country = contactAddress.country;
+
+                addressBook.postalAddresses.push_back(postalAddress);
+            }
         }
     } else if (type == AddressBookType::NAVIGATION) {
         for (NavigationFavorite navigationFavorite : m_navigationFavorites) {

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Alexa Auto SDK `Messaging` module enables your Alexa Auto SDK client application to use the Short Message Service (SMS) capabilities of Alexa, independent of the messaging device's connection mechanism. The SMS features of this module include reading messages, sending messages, and replying to messages as they are read. 
+The Alexa Auto SDK `Messaging` module enables your Alexa Auto SDK client application to use the Short Message Service (SMS) capabilities of Alexa, independent of the messaging device's connection mechanism. The SMS features of this module include reading messages, sending messages, and replying to messages as they are read.
 
 The user must connect their device and consent to allow Alexa to read and send SMS messages through the messaging device. The Messaging feature can use phone numbers directly or use phone contacts uploaded via the `Address Book` module.
 
@@ -40,7 +40,7 @@ When Alexa sends a request to the Engine to deliver a message, the Engine publis
 
 When a user requests for Alexa to read messages, your application's `Messaging` module integration must upload a conversation report containing all unread messages. Once Alexa requests a conversation report upload, the Engine publishes the [`UploadConversations` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/messaging/Messaging/index.html#uploadconversations). Publish the [`ConversationsReport` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/messaging/Messaging/index.html#conversationsreport) to notify the Engine to upload a conversation report to the cloud.
 
->**Note:** Messages are grouped by conversation, each given a unique identifier. Conversations also have unique identifiers and contain the list of recipient phone numbers included in the conversation, but not the phone number of the messaging device. 
+>**Note:** Messages are grouped by conversation, each given a unique identifier. Conversations also have unique identifiers and contain the list of recipient phone numbers included in the conversation, but not the phone number of the messaging device.
 
 After Alexa reads a message, it notifies the application that the message was read and should exclude the read message in subsequent conversation report uploads. The Engine publishes the [`UpdateMessagesStatus` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/messaging/Messaging/index.html#updatemessagesstatus) to update the status of the SMS messages. Publish either the [`UpdateMessagesStatusSucceeded` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/messaging/Messaging/index.html#updatemessagesstatussucceeded) or [`UpdateMessageStatusFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/messaging/Messaging/index.html#updatemessagesstatusfailed) indicating the success of the message status update. After Alexa reads all messages, or if message readout is interrupted, Alexa requests the upload of a new conversation report. In this way, Alexa stays in sync with unread messages on the messaging device.
 
@@ -246,7 +246,3 @@ class MyMessagingHandler {
 
 </details>
 </br>
-
-### Android Integration
-
-Short Message Service (SMS) support is not yet available in the Alexa Auto Client Service (AACS). If you are interested in using the SMS capabilities of Alexa you are required to implement it independently using AASB Messages.

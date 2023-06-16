@@ -37,7 +37,7 @@ messages:
   - action: SetPosition
     direction: outgoing
     desc: >
-      Notifies the platform implementation to set the playback position of the current 
+      Notifies the platform implementation to set the playback position of the current
       audio source in the platform media player.
     payload:
       - name: channel
@@ -68,11 +68,14 @@ messages:
       - name: repeating
         type: bool
         desc: True if the platform should loop the audio when playing.
+      - name: playbackContext
+        type: PlaybackContext
+        desc: The context related to playback of an audio item.
 
   - action: GetPosition
     direction: outgoing
     desc: >
-      Returns the current playback position of the platform media player. If the audio 
+      Returns the current playback position of the platform media player. If the audio
       source is not playing, the most recent position played should be returned.
     payload:
       - name: channel
@@ -120,7 +123,7 @@ messages:
       - name: duration
         type: int
         desc: >
-          The duration of the current audio source. If the duration is unknown, 
+          The duration of the current audio source. If the duration is unknown,
           then -1 should be returned.
 
   - action: Stop
@@ -209,7 +212,7 @@ messages:
   - action: MediaStateChanged
     direction: incoming
     desc: >
-      Notifies the Engine of an audio playback state change in the platform implementation. Must be 
+      Notifies the Engine of an audio playback state change in the platform implementation. Must be
       called when the platform media player transitions between stopped and playing states.
     payload:
       - name: channel
@@ -241,7 +244,7 @@ types:
         desc: Stream property name.
       - name: value
         desc: Stream property value.
-      
+
   - name: MediaState
     type: enum
     values:
@@ -318,5 +321,20 @@ types:
       - name: REPORT_DUCKING_STARTED
         desc: This action informs Alexa engine that ducking is initiated by platform interface. Highly recommended to provide information so that engine would not override the action.
       - name: REPORT_DUCKING_STOPPED
-        desc: This action informs Alexa engine that ducking is stopped by platform interface. Highly recommended to provide information so that engine can duck if required.  
+        desc: This action informs Alexa engine that ducking is stopped by platform interface. Highly recommended to provide information so that engine can duck if required.
 
+  - name: PlaybackContext
+    type: struct
+    values:
+      - name: keyConfig
+        type: dict
+        desc: Headers to use when fetching encryption keys. The map contains up to 20 pairs of header name and value. Header names may be "Authorization" or strings prefixed with "x-", containing up to 256 characters. Values may contain up to 4096 characters.
+      - name: manifestConfig
+        type: dict
+        desc: Headers to use when fetching manifests. The map contains up to 20 pairs of header name and value. Header names may be "Authorization" or strings prefixed with "x-", containing up to 256 characters. Values may contain up to 4096 characters.
+      - name: audioSegmentConfig
+        type: dict
+        desc: Headers to use when fetching audio chunks described in the manifest. The map contains up to 20 pairs of header name and value. Header names may be "Authorization" or strings prefixed with "x-", containing up to 256 characters. Values may contain up to 4096 characters.
+      - name: allConfig
+        type: dict
+        desc: A catch-all list of headers to use in all URL requests. The map contains up to 20 pairs of header name and value. The headers in keyConfig, manifestConfig, and audioSegmentConfig take priority over the "all" headers, and hence any name-value pairs in the higher priority lists must overwrite any pair with the same name from allConfig. Header names may be "Authorization" or strings prefixed with "x-", containing up to 256 characters. Values may contain up to 4096 characters.

@@ -1,0 +1,110 @@
+@startuml
+
+title: Mobile Bridge
+
+skinparam sequenceMessageAlign direction
+skinparam lifelineStrategy nosolid
+
+<style>
+sequenceDiagram {
+    .alexa {
+        RoundCorner 5
+        BackgroundColor #05FEFE
+        LineColor #214CFB
+    }
+    .engine {
+        RoundCorner 5
+        BackgroundColor LightCyan
+        LineColor LightSlateGray
+    }
+    .platform {
+        RoundCorner 5
+        BackgroundColor WhiteSmoke
+        LineColor DarkGrey
+    }
+    actor {
+        BackgroundColor White
+        LineColor Black
+    }
+    arrow {
+        LineColor Black
+    }
+    lifeline {
+        LineColor Grey
+        LineStyle 4
+    }
+    .message{
+        BackgroundColor Ivory
+        LineColor LightSlateGray
+        RoundCorner 5
+    }
+}
+</style>
+
+participant TUN <<system>> order 10
+participant "Platform Implementation" as Platform <<platform>> order 50
+participant MobileBridgeEngine as MB <<engine>> order 40
+participant TransportManager as TM <<engine>> order 30
+participant SessionManager as SM <<engine>> order 20
+
+== Start mobile bridge ==
+
+Platform -> TUN: open
+activate TUN
+
+Platform -> MB: StartMobileBridge(tunFd)
+activate MB
+MB -> SM: start(tunFd)
+activate SM
+MB -> TM: create
+activate TM
+MB --> Platform
+MB -> Platform: GetTransports
+Platform --> MB: list of transports
+
+loop until the end of transports
+MB -> Platform: Connect(transportId, inputStreamId, outputStreamId)
+Platform --> MB
+MB -> TM: registerTransport(transport)
+end
+
+TM -> Platform: OnActiveTransportChange(transportId)
+
+== Device handshaking and authorization ==
+
+TM <-> Platform: handshaking through input/output stream
+
+TM -> Platform: OnDeviceHandshaked(transportId)
+
+Platform -> TM: AuthorizedDevice(transportId)
+
+== Data streaming ==
+
+TUN -> SM: IP packets
+SM -> Platform: ProtectSocket(socket)
+SM -> TM: outgoing data through socket
+TM -> Platform: write outgoing data to output stream of the active transport
+Platform -> TM: read incoming data from input stream of the active transport
+TM -> SM: incoming data through socket
+SM -> TUN: IP packets
+
+== Stop mobile bridge ==
+
+Platform -> MB: StopMobileBridge()
+
+loop until the end of transports
+MB -> Platform: Disconnect()
+Platform --> MB
+end
+
+MB -> TM: destroy
+deactivate TM
+MB -> SM: stop()
+deactivate SM
+MB --> Platform
+deactivate MB
+
+Platform -> TUN: close
+deactivate TUN
+
+@enduml

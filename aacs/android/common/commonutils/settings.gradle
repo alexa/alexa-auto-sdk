@@ -1,7 +1,0 @@
-rootProject.name='commonutils'
-include ':aacscommonutils'
-gradle.ext.aacsCommonRoot = '../'
-include ':aacsconstants'
-project(':aacsconstants').projectDir = new File(gradle.ext.aacsCommonRoot, '/constants/aacsconstants')
-include ':aacsipc'
-project(':aacsipc').projectDir = new File(gradle.ext.aacsCommonRoot, '/ipc/aacsipc')

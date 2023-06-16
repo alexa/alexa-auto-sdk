@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,23 +15,13 @@
 
 #include "AACE/Engine/Alexa/NotificationsEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.NotificationsEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "NotificationsEngineImpl";
-
-/// Counter metrics for Notifications Platform APIs
-static const std::string METRIC_NOTIFICATIONS_SET_INDICATOR = "SetIndicator";
-static const std::string METRIC_NOTIFICATIONS_ON_NOTIFICATION_RECEIVED = "OnNotificationReceived";
 
 NotificationsEngineImpl::NotificationsEngineImpl(
     std::shared_ptr<aace::alexa::Notifications> notificationsPlatformInterface) :
@@ -167,16 +157,10 @@ void NotificationsEngineImpl::doShutdown() {
 
 // NotificationObserverInterface
 void NotificationsEngineImpl::onSetIndicator(alexaClientSDK::avsCommon::avs::IndicatorState state) {
-    std::stringstream indicatorState;
-    indicatorState << state;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onSetIndicator", {METRIC_NOTIFICATIONS_SET_INDICATOR, indicatorState.str()});
     m_notificationsPlatformInterface->setIndicator(static_cast<aace::alexa::Notifications::IndicatorState>(state));
 }
 
 void NotificationsEngineImpl::onNotificationReceived() {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onNotificationReceived", {METRIC_NOTIFICATIONS_ON_NOTIFICATION_RECEIVED});
     AACE_INFO(LX(TAG, "onNotificationReceived"));
     m_notificationsPlatformInterface->onNotificationReceived();
 }

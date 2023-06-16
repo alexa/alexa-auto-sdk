@@ -2,9 +2,9 @@
 
 ## Overview
 
-The `Connectivity` module for the Alexa Auto SDK creates a lower data consumption mode for Alexa, allowing automakers to offer tiered functionality based on the status of their connectivity plans. By using this module, you can send the customer's connectivity status from the vehicle to Alexa, which determines whether the customer can enjoy a full or partial set of Alexa features. This module allows the automaker to create tiered access to Alexa for customers and offer up-sell opportunities to subscribe to a full connectivity plan.  
+The `Connectivity` module for the Alexa Auto SDK creates a lower data consumption mode for Alexa, allowing automakers to offer tiered functionality based on the status of their connectivity plans. By using this module, you can send the customer's connectivity status from the vehicle to Alexa, which determines whether the customer can enjoy a full or partial set of Alexa features. This module allows the automaker to create tiered access to Alexa for customers and offer up-sell opportunities to subscribe to a full connectivity plan.
 
-A customer who purchases an Alexa-enabled vehicle typically has to subscribe to the automaker’s connectivity plans and accept the automaker's and network provider's terms and conditions to access Alexa. Without the `Connectivity` module, if the customer declines the terms and conditions, or does not have a data plan (for example, due to plan expiration), the customer loses access to Alexa. The `Connectivity` module, however, provides an option that allows the automaker to offer a reduced set of Alexa functionality and limited bandwidth consumption for little or no cost. In this low data consumption mode, utterances sent to the cloud are filtered by feature, because the `Connectivity` module offers a restricted set of features. For example, when a user accesses Alexa through the `Connectivity` module, an utterance requesting music streaming does not start the streaming but turns on the FM radio station that was last played. Features such as weather and traffic remain accessible.  
+A customer who purchases an Alexa-enabled vehicle typically has to subscribe to the automaker’s connectivity plans and accept the automaker's and network provider's terms and conditions to access Alexa. Without the `Connectivity` module, if the customer declines the terms and conditions, or does not have a data plan (for example, due to plan expiration), the customer loses access to Alexa. The `Connectivity` module, however, provides an option that allows the automaker to offer a reduced set of Alexa functionality and limited bandwidth consumption for little or no cost. In this low data consumption mode, utterances sent to the cloud are filtered by feature, because the `Connectivity` module offers a restricted set of features. For example, when a user accesses Alexa through the `Connectivity` module, an utterance requesting music streaming does not start the streaming but turns on the FM radio station that was last played. Features such as weather and traffic remain accessible.
 
 Your application's `Connectivity` module integration is responsible for:
 
@@ -22,8 +22,6 @@ The `Connectivity` module does not require Engine configuration.
 ### Providing the Network Identifier
 
 The network identifier is agnostic of the data plan and is assigned when initially integrated into the vehicle. It links the device with the network provider and enables the network provider to identify and provide device connectivity. Examples of the network identifier are the Embedded SIM ID (eSIM ID) and a globally unique ID (GUID). Which ID to use depends on the implementation determined in agreement with Amazon, OEM, and MNO.
-
-> **Note:** The network identifier is optional. If it is missing, the Engine will use `vehicleIdentifier` in the Engine configuration as the network identifier. To learn more about vehicle information in the Engine configuration, see the `Core` module documentation. 
 
 During device discovery the Engine publishes the [`GetIdentifier` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/connectivity/AlexaConnectivity/index.html#getidentifier). To report the network identifier to Alexa, publish the [`GetIdentifierReply` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/connectivity/AlexaConnectivity/index.html#getidentifier#getidentifierreply).
 
@@ -61,7 +59,7 @@ Alexa parses the internet connectivity information from the vehicle and determin
 
 | Property | Type | Description | Required
 |-|-|-|-|
-| `dataPlan` | Object | It provides the active data plan type and end date. | Yes (only when `managedProvider.type` is `MANAGED`) 
+| `dataPlan` | Object | It provides the active data plan type and end date. | Yes (only when `managedProvider.type` is `MANAGED`)
 | `dataPlan.type` | String | **Accepted values:** <ul><li>`PAID` indicates that the device has an active data plan paid for by the customer.<li>`TRIAL` indicates that the device has an active data plan which has been provided to the customer as a promotional event.<li>`AMAZON_SPONSORED` indicates that the customer has not paid for a data plan or signed up for a free trial. The customer can connect to the internet via a plan sponsored by Amazon and can access a limited number of Alexa features.</ul> A customer with either of `PAID` or `TRIAL` data plan has unrestricted access to all Alexa features. | Yes
 | `dataPlan.endDate` | String | It specifies the date on which the trial data plan ends. If it is not set, there is no end date for the plan. The value is in the RFC 3339 format. | Yes (only when `dataPlan.type` is `TRIAL`)
 | `termsStatus` | String | It indicates whether the customer has accepted the terms and conditions of the OEM and MNO. If it is not set, the behavior is the same as when it is set to `DECLINED`. <br><br>**Accepted values**:<br><ul><li>`ACCEPTED` means that the customer has agreed to receive voice messages from Alexa, which enable the customer to use voice to purchase a data plan.<li>`DECLINED` means that the customer does not accept the terms and conditions, and will not receive reminders from Alexa for a data plan upgrade.<li>`DEFERRED` means that the customer does not accept the terms and conditions, and will not receive reminders from Alexa for a data plan upgrade. However, Alexa might remind the user to respond to the terms and conditions again.</ul> | No, but recommended
@@ -98,7 +96,7 @@ To activate the voice up-sell conversation with Alexa (e.g., to activate the tri
 
 | Property | Type | Description | Required
 |-|-|-|-|
-| `type` | String | Represents the type of the connectivity event to Alexa. <br><br>**Accepted Values**:<br><ul><li>`ACTIVATE_TRIAL` for Alexa to begin the trial data plan activation (if available). Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation. <br> **Note:** If the platform implementation cannot determine the data plan type, use this event type. Alexa would first check the trial eligibility. If the customer is not eligible, Alexa begins the paid plan voice conversation. <li> `ACTIVATE_PAID_PLAN` for Alexa to begin the paid data plan activation. Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation.| Yes 
+| `type` | String | Represents the type of the connectivity event to Alexa. <br><br>**Accepted Values**:<br><ul><li>`ACTIVATE_TRIAL` for Alexa to begin the trial data plan activation (if available). Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation. <br> **Note:** If the platform implementation cannot determine the data plan type, use this event type. Alexa would first check the trial eligibility. If the customer is not eligible, Alexa begins the paid plan voice conversation. <li> `ACTIVATE_PAID_PLAN` for Alexa to begin the paid data plan activation. Alexa, upon receiving this event, may perform some validations and eligibility checks before starting the voice conversation.| Yes
 
 </details>
 </br>
@@ -174,7 +172,7 @@ class MyAlexaConnectivityHandler {
       // ...Handle delivery status of the event...
   }
 
-  // Handle the GetConnectivityState message from the Engine and publish the reply message to the Engine 
+  // Handle the GetConnectivityState message from the Engine and publish the reply message to the Engine
   void MyAlexaConnectivityHandler::handleGetConnectivityStateMessage(const std::string& message) {
       GetConnectivityStateMessage msg = json::parse(message);
       GetConnectivityStateMessageReply replyMsg;
@@ -223,7 +221,3 @@ class MyAlexaConnectivityHandler {
 
 </details>
 </br>
-
-### Android Integration
-
-This lower data consumption mode for Alexa is not available in the Alexa Auto Client Service (AACS). If you are interested in creating tiered access to Alexa for customers you are required to implement it independently using AASB Messages.

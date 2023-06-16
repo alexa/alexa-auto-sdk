@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #define AACE_ENGINE_NETWORK_NETWORK_ENGINE_SERVICE_H
 
 #include "AACE/Engine/Core/EngineService.h"
+#include "AACE/Engine/Metrics/MetricsEngineService.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerEngineService.h"
 #include "AACE/Network/NetworkInfoProvider.h"
@@ -29,7 +30,11 @@ namespace network {
 
 class NetworkEngineService : public aace::engine::core::EngineService {
 public:
-    DESCRIBE("aace.network", VERSION("1.0"), DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
+    DESCRIBE(
+        "aace.network",
+        VERSION("1.0"),
+        DEPENDS(aace::engine::metrics::MetricsEngineService),
+        DEPENDS(aace::engine::propertyManager::PropertyManagerEngineService))
 
 private:
     NetworkEngineService(const aace::engine::core::ServiceDescription& description);
@@ -49,8 +54,12 @@ public:
         const SetPropertyResultCallback& callbackFunction);
 
 protected:
+    /// aace::engine::core::EngineService
+    /// @{
     bool initialize() override;
     bool registerPlatformInterface(std::shared_ptr<aace::core::PlatformInterface> platformInterface) override;
+    bool stop() override;
+    /// @}
 
 private:
     // platform interface registration

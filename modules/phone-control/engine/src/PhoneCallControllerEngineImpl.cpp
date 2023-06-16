@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 #include "AACE/Engine/PhoneCallController/PhoneCallControllerRESTAgent.h"
 
 #include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace phoneCallController {
-
-using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.phoneCallController.PhoneCallControllerEngineImpl");
@@ -36,20 +33,7 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "PhoneCallControllerEngine
 
 /// Metric for Auto Provisioning the account
 static const std::string METRIC_AUTO_PROVISION = "AutoProvisioned";
-/// Counter metrics for Phone Call Controller Platform APIs
-static const std::string METRIC_PHONE_CONTROLLER_DIAL = "Dial";
-static const std::string METRIC_PHONE_CONTROLLER_REDIAL = "Redial";
-static const std::string METRIC_PHONE_CONTROLLER_ANSWER = "Answer";
-static const std::string METRIC_PHONE_CONTROLLER_STOP = "Stop";
-static const std::string METRIC_PHONE_CONTROLLER_SEND_DTMF = "SendDTMF";
-static const std::string METRIC_PHONE_CONTROLLER_CONNECTION_STATE_CHANGED = "ConnectionStateChanged";
-static const std::string METRIC_PHONE_CONTROLLER_CALL_STATE_CHANGED = "CallStateChanged";
-static const std::string METRIC_PHONE_CONTROLLER_CALL_FAILED = "CallFailed";
-static const std::string METRIC_PHONE_CONTROLLER_CALLER_ID_RECEIVED = "CallerIdReceived";
-static const std::string METRIC_PHONE_CONTROLLER_SEND_DTMF_SUCCEEDED = "SendDTMFSucceeded";
-static const std::string METRIC_PHONE_CONTROLLER_SEND_DTMF_FAILED = "SendDTMFFailed";
-static const std::string METRIC_PHONE_CONTROLLER_DEVICE_CONFIGURATION_UPDATED = "DeviceConfigurationUpdated";
-static const std::string METRIC_PHONE_CONTROLLER_CREATE_CALLID = "CreateCallId";
+
 /**
  * Function to convert the number of times we have already retried to the time to perform the next retry.
  *
@@ -187,12 +171,6 @@ void PhoneCallControllerEngineImpl::doShutdown() {
 }
 
 void PhoneCallControllerEngineImpl::onConnectionStateChanged(ConnectionState state) {
-    std::stringstream ss;
-    ss << state;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onConnectionStateChanged",
-        {METRIC_PHONE_CONTROLLER_CONNECTION_STATE_CHANGED, ss.str()});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->connectionStateChanged(state);
     }
@@ -202,10 +180,6 @@ void PhoneCallControllerEngineImpl::onCallStateChanged(
     CallState state,
     const std::string& callId,
     const std::string& callerId) {
-    std::stringstream ss;
-    ss << state;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onCallStateChanged", {METRIC_PHONE_CONTROLLER_CALL_STATE_CHANGED, ss.str()});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->callStateChanged(state, callId, callerId);
     }
@@ -215,24 +189,18 @@ void PhoneCallControllerEngineImpl::onCallFailed(
     const std::string& callId,
     CallError code,
     const std::string& message) {
-    std::stringstream ss;
-    ss << code;
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onCallFailed", {METRIC_PHONE_CONTROLLER_CALL_FAILED, ss.str()});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->callFailed(callId, code, message);
     }
 }
 
 void PhoneCallControllerEngineImpl::onCallerIdReceived(const std::string& callId, const std::string& callerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onCallerIdReceived", {METRIC_PHONE_CONTROLLER_CALLER_ID_RECEIVED});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->callerIdReceived(callId, callerId);
     }
 }
 
 void PhoneCallControllerEngineImpl::onSendDTMFSucceeded(const std::string& callId) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onSendDTMFSucceeded", {METRIC_PHONE_CONTROLLER_SEND_DTMF_SUCCEEDED});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->sendDTMFSucceeded(callId);
     }
@@ -242,10 +210,6 @@ void PhoneCallControllerEngineImpl::onSendDTMFFailed(
     const std::string& callId,
     DTMFError code,
     const std::string& message) {
-    std::stringstream ss;
-    ss << code;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onSendDTMFFailed", {METRIC_PHONE_CONTROLLER_SEND_DTMF_FAILED, ss.str()});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->sendDTMFFailed(callId, code, message);
     }
@@ -253,16 +217,11 @@ void PhoneCallControllerEngineImpl::onSendDTMFFailed(
 
 void PhoneCallControllerEngineImpl::onDeviceConfigurationUpdated(
     std::unordered_map<PhoneCallControllerEngineInterface::CallingDeviceConfigurationProperty, bool> configurationMap) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onDeviceConfigurationUpdated",
-        {METRIC_PHONE_CONTROLLER_DEVICE_CONFIGURATION_UPDATED});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         m_phoneCallControllerCapabilityAgent->deviceConfigurationUpdated(configurationMap);
     }
 }
 std::string PhoneCallControllerEngineImpl::onCreateCallId() {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onCreateCallId", {METRIC_PHONE_CONTROLLER_CREATE_CALLID});
     if (m_phoneCallControllerCapabilityAgent != nullptr) {
         return m_phoneCallControllerCapabilityAgent->createCallId();
     }
@@ -270,7 +229,6 @@ std::string PhoneCallControllerEngineImpl::onCreateCallId() {
 }
 
 bool PhoneCallControllerEngineImpl::dial(const std::string& payload) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "dial", {METRIC_PHONE_CONTROLLER_DIAL});
     if (m_phoneCallControllerPlatformInterface != nullptr) {
         return m_phoneCallControllerPlatformInterface->dial(payload);
     }
@@ -278,7 +236,6 @@ bool PhoneCallControllerEngineImpl::dial(const std::string& payload) {
 }
 
 bool PhoneCallControllerEngineImpl::redial(const std::string& payload) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "redial", {METRIC_PHONE_CONTROLLER_REDIAL});
     if (m_phoneCallControllerPlatformInterface != nullptr) {
         return m_phoneCallControllerPlatformInterface->redial(payload);
     }
@@ -286,14 +243,12 @@ bool PhoneCallControllerEngineImpl::redial(const std::string& payload) {
 }
 
 void PhoneCallControllerEngineImpl::answer(const std::string& payload) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "answer", {METRIC_PHONE_CONTROLLER_ANSWER});
     if (m_phoneCallControllerPlatformInterface != nullptr) {
         m_phoneCallControllerPlatformInterface->answer(payload);
     }
 }
 
 void PhoneCallControllerEngineImpl::stop(const std::string& payload) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "stop", {METRIC_PHONE_CONTROLLER_STOP});
     if (m_phoneCallControllerPlatformInterface != nullptr) {
         m_phoneCallControllerPlatformInterface->stop(payload);
     }
@@ -303,7 +258,6 @@ void PhoneCallControllerEngineImpl::playRingtone(const std::string& payload) {
 }
 
 void PhoneCallControllerEngineImpl::sendDTMF(const std::string& payload) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "sendDTMF", {METRIC_PHONE_CONTROLLER_SEND_DTMF});
     if (m_phoneCallControllerPlatformInterface != nullptr) {
         m_phoneCallControllerPlatformInterface->sendDTMF(payload);
     }
@@ -393,8 +347,7 @@ void PhoneCallControllerEngineImpl::autoProvisioningThread() {
             }
 
             if (success) {
-                AACE_INFO(LX(TAG, __func__).m("autoProvisioningSuccessfull"));
-                emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "autoProvisioningThread", {METRIC_AUTO_PROVISION});
+                AACE_INFO(LX(TAG, __func__).m("autoProvisioningSuccessful"));
             } else {
                 AACE_ERROR(LX(TAG, __func__).m("autoProvisioningAccountFailed"));
             }

@@ -8,17 +8,8 @@ The core Auto SDK API provides the "Engine" to manage communication with Alexa a
 
 **[>> Auto SDK Core API Overview](./core-api-overview.md)**
 
-## Android API overview
-
-For Android applications, Auto SDK provides a set of Android libraries built upon the core Auto SDK API, simplifying your integration with an Android abstraction and pre-made feature implementations.
-
-**[>> Auto SDK Android API Overview](./android-api-overview.md)**
-
 ## Modules overview
 
 Auto SDK organizes its features into "modules" that enable you to select the features you want to use in your application.
 
 **[>> Understand Auto SDK Modules](./modules-overview.md)**
-
-
-

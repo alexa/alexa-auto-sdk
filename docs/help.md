@@ -10,8 +10,6 @@ The following functionality is available with help from your designated Amazon S
 * Alexa Communication
 * Local Voice Control
 * Device Client Metrics
-* Voice Chrome for Android
-* Alexa Presentation Language (APL) component required for APL rendering on the Android Sample App
 
 To use this functionality, your product must be placed on an allow list by Amazon. Contact your SA or Partner Manager, provide the Amazon ID of your development device, and request the functionality you want to add.
 

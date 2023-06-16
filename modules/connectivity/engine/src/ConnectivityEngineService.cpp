@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
  * permissions and limitations under the License.
  */
 
-#include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Vehicle/VehiclePropertyInterface.h>
 #include <nlohmann/json.hpp>
+
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Vehicle/VehicleConfigServiceInterface.h>
 
 #include "AACE/Engine/Connectivity/ConnectivityConstants.h"
 #include "AACE/Engine/Connectivity/ConnectivityEngineService.h"
@@ -73,11 +74,11 @@ bool ConnectivityEngineService::registerPlatformInterfaceType(
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
-        auto vehicleProperties =
-            getContext()->getServiceInterface<aace::engine::vehicle::VehiclePropertyInterface>("aace.vehicle");
-        ThrowIfNull(vehicleProperties, "vehiclePropertiesInvalid");
+        auto vehicleService =
+            getContext()->getServiceInterface<aace::engine::vehicle::VehicleConfigServiceInterface>("aace.vehicle");
+        ThrowIfNull(vehicleService, "vehicleConfigServiceInterfaceInvalid");
         auto vehicleIdentifier =
-            vehicleProperties->getVehicleProperty(vehicle::VehiclePropertyType::VEHICLE_IDENTIFIER);
+            vehicleService->getVehicleInfoValue(aace::engine::vehicle::KEY_VEHICLE_INFO_VEHICLE_ID);
 
         m_alexaConnectivityEngineImpl = aace::engine::connectivity::AlexaConnectivityEngineImpl::create(
             alexaConnectivity, defaultCapabilitiesRegistrar, messageSender, contextManager, vehicleIdentifier);

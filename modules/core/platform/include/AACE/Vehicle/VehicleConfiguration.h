@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #ifndef AACE_VEHICLE_CONFIG_VEHICLE_CONFIGURATION_H
 #define AACE_VEHICLE_CONFIG_VEHICLE_CONFIGURATION_H
 
+#include <string>
 #include <utility>
 
 #include "AACE/Core/EngineConfiguration.h"
@@ -27,15 +28,66 @@ namespace vehicle {
 namespace config {
 
 /**
- * The @c VehicleConfiguration class is a factory interface for creating "aace.vehicle" configuration objects.
+ * The @c VehicleConfiguration class is a factory that creates "aace.vehicle"
+ * Engine configuration objects.
  */
 class VehicleConfiguration {
 public:
     /**
-     * Specifies the vehicle properties required in configuration
+     * Specifies the device info configuration keys
      */
-    enum class VehiclePropertyType {
+    enum class DeviceInfoPropertyType {
+        /**
+         * The manufacturer of the head unit hardware.
+         * Example values: "Alpine", "Pioneer"
+         */
+        MANUFACTURER,
 
+        /**
+         * The model name of the head unit hardware.
+         * Example value: "Coral"
+         */
+        MODEL,
+
+        /**
+         * The serial number of the head unit expressed as a string.
+         */
+        SERIAL_NUMBER,
+
+        /**
+         * The head unit software platform or operating system name.
+         * Example values: "Android", "Ubuntu"
+         */
+        PLATFORM,
+
+        /**
+         * The version of the head unit operating system expressed as a string.
+         * Example values: "12", "18.04.6 LTS"
+         */
+        OS_VERSION,
+
+        /**
+         * The hardware architecture of the head unit or CPU+instruction set.
+         * Examples: "arm64-v8a", "x86_64", "armv7hf", "armv8"
+         */
+        HARDWARE_ARCH
+    };
+
+    /**
+     * Specifies the app info configuration keys
+     */
+    enum class AppInfoPropertyType {
+        /**
+         * The version of the Auto SDK client application expressed as a string.
+         * Example value: "1.0.1"
+         */
+        SOFTWARE_VERSION
+    };
+
+    /**
+     * Specifies the vehicle info configuration keys
+     */
+    enum class VehicleInfoPropertyType {
         /**
          * The make of the vehicle.
          * @note This property is required.
@@ -50,53 +102,33 @@ public:
 
         /**
          * The model year of the vehicle.
-         * A value of this property type must be an integer in the range 1900-2100.
+         * A value of this property type must be an integer in the range
+         * 1900-2100 expressed as a string.
          * Example value: "2019"
          * @note This property is required.
          */
         YEAR,
 
         /**
-         * The trim level of the vehicle, identifying the vehicle's level of equipment or special features.
+         * The trim package of the vehicle, identifying the vehicle's level of
+         * equipment or special features.
          * Example values: "Standard", "Sport", "Limited"
          */
         TRIM,
 
         /**
-         * The current location (country/region/state/etc.) of the vehicle. 
-         * Example values: "US", "US-North", "WA"
+         * The current (or intended, if current is not available) operating
+         * country for the vehicle. The value must be an ISO 3166
+         * Alpha-2 country code.
+         * Example values: "US", "MX", "JP"
          */
-        GEOGRAPHY,
-
-        /**
-         * The client software version.
-         * Example value: "2.2.1X"
-         */
-        VERSION,
-
-        /**
-         * The operating system used by the vehicle's infotainment system.
-         * Example value: "AndroidOreo_8.1"
-         */
-        OPERATING_SYSTEM,
-
-        /**
-         * The hardware architecture used by the vehicle.
-         * Example value: "x86_64"
-         */
-        HARDWARE_ARCH,
-
-        /**
-         * The language or locale selected for Alexa by the vehicle owner.
-         * Example values: "en-US", "fr-CA"
-         */
-        LANGUAGE,
+        OPERATING_COUNTRY,
 
         /**
          * The type and arrangement of microphone used by the vehicle.
-         * Example value: "7 mic array, centrally mounted"
+         * Example value: "7 mic array centrally mounted"
          */
-        MICROPHONE,
+        MICROPHONE_TYPE,
 
         /**
          * The automaker's identifier for the vehicle.
@@ -104,114 +136,178 @@ public:
         VEHICLE_IDENTIFIER,
 
         /**
-         * The engine type for the vehicle.
+         * The type of engine in the vehicle.
+         * Accepted values: "GAS", "HYBRID", "ELECTRIC"
          */
         ENGINE_TYPE,
 
         /**
-         * The number of RSE embedded FireTVs installed in the vehicle.
+         * The number of rear seat embedded Fire TVs in the vehicle. The value
+         * must be an integer expressed as a string.
+         * Example value: "2"
          */
-        RSE_EMBEDDED_FIRETVS,
-
+        RSE_EMBEDDED_FIRE_TVS
     };
 
     /**
-     * Identifies a vehicle property with a type and value pair
+     * Identifies a vehicle info property with a pair of type and value.
      */
-    using VehicleProperty = std::pair<VehiclePropertyType, std::string>;
+    using VehicleInfoProperty = std::pair<VehicleInfoPropertyType, std::string>;
 
     /**
-     * Factory method used to programmatically generate "aace.vehicle" vehicle info configuration data.
-     * The data generated by this method is equivalent to providing the following JSON
-     * values in a configuration file:
+     * Identifies a device info property with a pair of type and value.
+     */
+    using DeviceInfoProperty = std::pair<DeviceInfoPropertyType, std::string>;
+
+    /**
+     * Identifies an app info property with a pair of type and value.
+     */
+    using AppInfoProperty = std::pair<AppInfoPropertyType, std::string>;
+
+    /**
+     * Factory function used to programmatically generate
+     * "aace.vehicle.vehicleInfo" Engine configuration data. The data
+     * generated by this function is equivalent to providing the following JSON
+     * format in a configuration file:
      *
      * @code{.json}
      * {
-     *   "aace.vehicle":
-     *   {
-     *      "info": {
-     *          "make": "<MAKE>",
-     *          "model": "<MODEL>",
-     *          "year": "<YEAR>",
+     *   "aace.vehicle": {
+     *      "vehicleInfo": {
+     *          "make": "<VEHICLE_MAKE>",
+     *          "model": "<VEHICLE_MODEL>",
+     *          "year": "<VEHICLE_MODEL_YEAR>",
      *          "trim": "<TRIM>",
-     *          "geography": "<GEOGRAPHY>",
-     *          "version": "<SOFTWARE_VERSION>",
-     *          "os": "<OPERATING_SYSTEM>",
-     *          "arch": "<HARDWARE_ARCH>",
-     *          "language": "<LANGUAGE>",
-     *          "microphone": "<MICROPHONE>",
-     *          "vehicleIdentifier": "<VEHICLE_IDENTIFIER>",
+     *          "microphoneType": "<MICROPHONE_TYPE>",
+     *          "operatingCountry": "<OPERATING_COUNTRY>",
+     *          "vehicleIdentifier": "<VEHICLE_ID>",
      *          "engineType": "<ENGINE_TYPE>",
-     *          "rseEmbeddedFireTvs": "<RSE_EMBEDDED_FIRETVS>"
+     *          "rseEmbeddedFireTvs": "<EMBEDDED_FIRE_TV_COUNT>"
      *      }
      *   }
      * }
      * @endcode
      *
-     * @param [in] propertyList A list of @c VehicleProperty type and value pairs
+     * @param [in] propertyList A list of @c VehicleInfoProperty pairs
+     * @return An @c aace::core::config::EngineConfiguration containing the
+     *         specified data in JSON format
      */
     static std::shared_ptr<aace::core::config::EngineConfiguration> createVehicleInfoConfig(
-        const std::vector<VehicleProperty>& propertyList);
+        const std::vector<VehicleInfoProperty>& propertyList);
 
     /**
-     * Factory method used to programmatically generate vehicle operating country configuration data.
-     * The data generated by this method is equivalent to providing the following JSON
-     * values in a configuration file:
+     * Factory function used to programmatically generate
+     * "aace.vehicle.deviceInfo" Engine configuration data. The data
+     * generated by this function is equivalent to providing the following JSON
+     * format in a configuration file:
      *
      * @code{.json}
      * {
      *   "aace.vehicle": {
-     *      "operatingCountry": "<COUNTRY>"
+     *      "deviceInfo": {
+     *          "manufacturer": "<DEVICE_MANUFACTURER>",
+     *          "model": "<DEVICE_MODEL>",
+     *          "serialNumber": <DEVICE_SERIAL_NUMBER>,
+     *          "osVersion": "<OS_VERSION>",
+     *          "hardwareArch": "<HARDWARE_ARCH>",
+     *          "platform": "<PLATFORM>",
+     *      }
      *   }
      * }
      * @endcode
      *
-     * @param [in] operatingCountry A 2-letter ISO country code
+     * @param [in] propertyList A list of @c DeviceInfoProperty pairs
+     * @return An @c aace::core::config::EngineConfiguration containing the
+     *         specified data in JSON format
      */
-    static std::shared_ptr<aace::core::config::EngineConfiguration> createOperatingCountryConfig(
-        const std::string& operatingCountry);
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createDeviceInfoConfig(
+        const std::vector<DeviceInfoProperty>& propertyList);
+
+    /**
+     * Factory function used to programmatically generate
+     * "aace.vehicle.appInfo" Engine configuration data. The data
+     * generated by this function is equivalent to providing the following JSON
+     * format in a configuration file:
+     *
+     * @code{.json}
+     * {
+     *   "aace.vehicle": {
+     *      "appInfo": {
+     *          "softwareVersion": "<APP_VERSION>"
+     *      }
+     *   }
+     * }
+     * @endcode
+     *
+     * @param [in] propertyList A list of @c AppInfoProperty pairs
+     * @return An @c aace::core::config::EngineConfiguration containing the
+     *         specified data in JSON format
+     */
+    static std::shared_ptr<aace::core::config::EngineConfiguration> createAppInfoConfig(
+        const std::vector<AppInfoProperty>& propertyList);
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration::VehiclePropertyType& state) {
-    switch (state) {
-        case VehicleConfiguration::VehiclePropertyType::MAKE:
+inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration::VehicleInfoPropertyType& property) {
+    switch (property) {
+        case VehicleConfiguration::VehicleInfoPropertyType::MAKE:
             stream << "MAKE";
             break;
-        case VehicleConfiguration::VehiclePropertyType::MODEL:
+        case VehicleConfiguration::VehicleInfoPropertyType::MODEL:
             stream << "MODEL";
             break;
-        case VehicleConfiguration::VehiclePropertyType::YEAR:
+        case VehicleConfiguration::VehicleInfoPropertyType::YEAR:
             stream << "YEAR";
             break;
-        case VehicleConfiguration::VehiclePropertyType::TRIM:
+        case VehicleConfiguration::VehicleInfoPropertyType::TRIM:
             stream << "TRIM";
             break;
-        case VehicleConfiguration::VehiclePropertyType::GEOGRAPHY:
-            stream << "GEOGRAPHY";
+        case VehicleConfiguration::VehicleInfoPropertyType::MICROPHONE_TYPE:
+            stream << "MICROPHONE_TYPE";
             break;
-        case VehicleConfiguration::VehiclePropertyType::VERSION:
-            stream << "VERSION";
+        case VehicleConfiguration::VehicleInfoPropertyType::OPERATING_COUNTRY:
+            stream << "OPERATING_COUNTRY";
             break;
-        case VehicleConfiguration::VehiclePropertyType::OPERATING_SYSTEM:
-            stream << "OPERATING_SYSTEM";
-            break;
-        case VehicleConfiguration::VehiclePropertyType::HARDWARE_ARCH:
-            stream << "HARDWARE_ARCH";
-            break;
-        case VehicleConfiguration::VehiclePropertyType::LANGUAGE:
-            stream << "LANGUAGE";
-            break;
-        case VehicleConfiguration::VehiclePropertyType::MICROPHONE:
-            stream << "MICROPHONE";
-            break;
-        case VehicleConfiguration::VehiclePropertyType::VEHICLE_IDENTIFIER:
+        case VehicleConfiguration::VehicleInfoPropertyType::VEHICLE_IDENTIFIER:
             stream << "VEHICLE_IDENTIFIER";
             break;
-        case VehicleConfiguration::VehiclePropertyType::ENGINE_TYPE:
+        case VehicleConfiguration::VehicleInfoPropertyType::ENGINE_TYPE:
             stream << "ENGINE_TYPE";
             break;
-        case VehicleConfiguration::VehiclePropertyType::RSE_EMBEDDED_FIRETVS:
-            stream << "RSE_EMBEDDED_FIRETVS";
+        case VehicleConfiguration::VehicleInfoPropertyType::RSE_EMBEDDED_FIRE_TVS:
+            stream << "RSE_EMBEDDED_FIRE_TVS";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration::DeviceInfoPropertyType& property) {
+    switch (property) {
+        case VehicleConfiguration::DeviceInfoPropertyType::MANUFACTURER:
+            stream << "MANUFACTURER";
+            break;
+        case VehicleConfiguration::DeviceInfoPropertyType::MODEL:
+            stream << "MODEL";
+            break;
+        case VehicleConfiguration::DeviceInfoPropertyType::SERIAL_NUMBER:
+            stream << "SERIAL_NUMBER";
+            break;
+        case VehicleConfiguration::DeviceInfoPropertyType::OS_VERSION:
+            stream << "OS_VERSION";
+            break;
+        case VehicleConfiguration::DeviceInfoPropertyType::HARDWARE_ARCH:
+            stream << "HARDWARE_ARCH";
+            break;
+        case VehicleConfiguration::DeviceInfoPropertyType::PLATFORM:
+            stream << "PLATFORM";
+            break;
+    }
+    return stream;
+}
+
+inline std::ostream& operator<<(std::ostream& stream, const VehicleConfiguration::AppInfoPropertyType& property) {
+    switch (property) {
+        case VehicleConfiguration::AppInfoPropertyType::SOFTWARE_VERSION:
+            stream << "SOFTWARE_VERSION";
             break;
     }
     return stream;

@@ -4,6 +4,7 @@ var searchData=
   ['paused',['PAUSED',['../namespaceaace_1_1alexa.html#a37ae7d120b16c200f504fbb646c98a0aa99b2439e63f73ad515f7ab2447a80673',1,'aace::alexa']]],
   ['pending',['PENDING',['../classaace_1_1alexa_1_1_alexa_client.html#a375451d4d9cb626701ac8cbaa02ffbe2ac69f06e1a9b016d133907b4e5f5864d2',1,'aace::alexa::AlexaClient']]],
   ['ping_5ftimedout',['PING_TIMEDOUT',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a2e03079aa2f230632487842f6cce997a',1,'aace::alexa::AlexaClient']]],
+  ['platform',['PLATFORM',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4a8b55a44b49368262df89fd0e17b1a181',1,'aace::vehicle::config::VehicleConfiguration']]],
   ['play',['PLAY',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a3b32eb7e1dbfad9ca06089fd174634f4a6a216efc529825c60a4a4c0bc99ad77f',1,'aace::alexa::PlaybackControllerEngineInterface::PLAY()'],['../classaace_1_1alexa_1_1_external_media_adapter.html#ad404e42d4033d44e53c1e09734312a6ea6a216efc529825c60a4a4c0bc99ad77f',1,'aace::alexa::ExternalMediaAdapter::PLAY()']]],
   ['playing',['PLAYING',['../namespaceaace_1_1alexa.html#a37ae7d120b16c200f504fbb646c98a0aa50366a49630a416ab3ccaa004196027e',1,'aace::alexa']]],
   ['podcast',['PODCAST',['../classaace_1_1alexa_1_1_external_media_adapter.html#a743163f79b264acddbcbac96a3d06836a78e22457c7b45ec21614b44e54620ef3',1,'aace::alexa::ExternalMediaAdapter']]],

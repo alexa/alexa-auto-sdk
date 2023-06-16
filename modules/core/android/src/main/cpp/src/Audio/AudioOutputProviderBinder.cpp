@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -59,19 +59,19 @@ std::shared_ptr<aace::audio::AudioOutput> AudioOutputProviderHandler::openChanne
             "invokeMethodFailed");
         ThrowIfNull(result, "invalidLocation");
 
-        // create an audio input JObject
+        // create an audio output JObject
         JObject audioOutputObj(result, "com/amazon/aace/audio/AudioOutput");
         ThrowIfJavaEx(env, "invalidAudioOutputObj");
 
-        // get the audio input binder native ref
+        // get the audio output binder native ref
         jlong nativeRef;
         ThrowIfNot(audioOutputObj.invoke("getNativeRef", "()J", &nativeRef), "invokeMethodFailed");
 
-        // cast the native ref to an audio input ptr
+        // cast the native ref to an audio output ptr
         auto audioOutputBinder = reinterpret_cast<AudioOutputBinder*>(nativeRef);
         ThrowIfNull(audioOutputBinder, "invalidAudioOutputBinder");
 
-        // get the audio input handler from the binder
+        // get the audio output handler from the binder
         return audioOutputBinder->getAudioOutputHandler();
     }
     catch_with_ex {

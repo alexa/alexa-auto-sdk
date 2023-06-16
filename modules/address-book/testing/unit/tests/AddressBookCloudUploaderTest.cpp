@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <AACE/AddressBook/AddressBook.h>
 #include <AACE/Engine/AddressBook/AddressBookCloudUploader.h>
+#include <AACE/Test/Unit/Metrics/MockMetricRecorderServiceInterface.h>
 
 namespace aace {
 namespace test {
@@ -215,6 +216,7 @@ public:
         m_mockNetworkObservableInterface = std::make_shared<testing::StrictMock<MockNetworkObservableInterface>>();
         m_mockAddressBookServiceInterface = std::make_shared<testing::StrictMock<MockAddressBookServiceInterface>>();
         m_alexaEndpointInterface = std::make_shared<DummyAlexaEndpointInterface>();
+        m_mockMetricRecorder = std::make_shared<aace::test::unit::core::MockMetricRecorderServiceInterface>();
 
         // create device info
         m_deviceInfo = alexaClientSDK::avsCommon::utils::DeviceInfo::create(
@@ -239,7 +241,8 @@ public:
             aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED,
             m_mockNetworkObservableInterface,
             m_alexaEndpointInterface,
-            false);  // To flase, makes test cases simple by not waiting on EXPECT_CALL due to cleaning of Address Book events.
+            m_mockMetricRecorder,
+            false);  // To false, makes test cases simple by not waiting on EXPECT_CALL due to cleaning of Address Book events.
     }
 
     void TearDown() override {
@@ -258,6 +261,7 @@ public:
     std::shared_ptr<testing::StrictMock<MockNetworkObservableInterface>> m_mockNetworkObservableInterface;
     std::shared_ptr<testing::StrictMock<MockAddressBookServiceInterface>> m_mockAddressBookServiceInterface;
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_alexaEndpointInterface;
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_mockMetricRecorder;
 };
 
 TEST_F(AddressBookCloudUploaderTest, create) {
@@ -355,6 +359,7 @@ TEST_F(AddressBookCloudUploaderTest, WithNetworkAndAuthRefreshedAddSingleContact
         aace::network::NetworkInfoProvider::NetworkStatus::CONNECTED,
         mockNetworkObservableInterface,
         alexaEndpointInterface,
+        m_mockMetricRecorder,
         true);
 
     EXPECT_CALL(*mockAuthDelegate, getAuthToken())
@@ -802,7 +807,7 @@ TEST_F(AddressBookCloudUploaderTest, VerifyPostalAddressInputSanity) {
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldFail_deprecated) {
+TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldPass_deprecated) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken()).WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
@@ -814,7 +819,7 @@ TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookSho
                 std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
                 if (auto sharedRef = factory.lock()) {
                     // clang-format off
-                    EXPECT_FALSE(sharedRef->addPostalAddress("001", "Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5));
+                    EXPECT_TRUE(sharedRef->addPostalAddress("001", "Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5));
                     // clang-format on
                 }
                 waitEvent.wakeUp();
@@ -830,7 +835,7 @@ TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookSho
     EXPECT_TRUE(waitEvent.wait(TIMEOUT));
 }
 
-TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldFail) {
+TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookShouldPass) {
     alexaClientSDK::avsCommon::utils::WaitEvent waitEvent;
 
     EXPECT_CALL(*m_mockAuthDelegate, getAuthToken()).WillRepeatedly(testing::Return(std::string(AUTH_TOKEN)));
@@ -842,7 +847,7 @@ TEST_F(AddressBookCloudUploaderTest, AddingPostalAddressForContactAddressBookSho
                 std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) -> bool {
                 if (auto sharedRef = factory.lock()) {
                     // clang-format off
-                    EXPECT_FALSE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("001", "firstName", "lastName", "",
+                    EXPECT_TRUE(sharedRef->addEntry(buildEntryPayloadWithNameAndPostalAddresses("001", "firstName", "lastName", "",
                         { 
                             {"Home", "123 Main Street", "", "", "Santa Clara", "California", "", "95001", "US", 90, 180, 5}
                         }

@@ -54,7 +54,7 @@ std::shared_ptr<ChannelVolumeManager> ChannelVolumeManager::create(
     VolumeCurveFunction volumeCurve,
     std::shared_ptr<DuckingInterface> duckingInterface) {
     if (!speaker) {
-        AACE_ERROR(LX(__func__).d("reason", "Null SpeakerInterface").m("createFailed"));
+        AACE_ERROR(LX(TAG).d("reason", "Null SpeakerInterface").m("createFailed"));
         return nullptr;
     }
 
@@ -64,7 +64,7 @@ std::shared_ptr<ChannelVolumeManager> ChannelVolumeManager::create(
     /// Retrieve initial volume setting from underlying speakers
     SpeakerInterface::SpeakerSettings settings;
     if (!channelVolumeManager->getSpeakerSettings(&settings)) {
-        AACE_ERROR(LX(__func__).m("createFailed").d("reason", "Unable To Retrieve Speaker Settings"));
+        AACE_ERROR(LX(TAG).m("createFailed").d("reason", "Unable To Retrieve Speaker Settings"));
         return nullptr;
     }
     channelVolumeManager->m_unduckedVolume = settings.volume;
@@ -83,7 +83,8 @@ ChannelVolumeManager::ChannelVolumeManager(
         m_unduckedVolume{AVS_SET_VOLUME_MIN},
         m_volumeCurveFunction{volumeCurve ? volumeCurve : defaultVolumeAttenuateFunction},
         m_DuckingInterface(duckingInterface),
-        m_type{type} {
+        m_type{type},
+        m_pendingSetUnduckedVolume{false} {
 }
 
 ChannelVolumeInterface::Type ChannelVolumeManager::getSpeakerType() const {
@@ -97,17 +98,17 @@ size_t ChannelVolumeManager::getId() const {
 
 bool ChannelVolumeManager::startDucking() {
     std::lock_guard<std::mutex> locker{m_mutex};
-    AACE_DEBUG(LX(__func__));
+    AACE_DEBUG(LX(TAG).d("m_isDucked", m_isDucked));
     if (m_isDucked) {
-        AACE_WARN(LX(__func__).m("Channel is Already Attenuated"));
+        AACE_WARN(LX(TAG).m("Channel is Already Attenuated"));
         return true;
     }
 
     if (!m_DuckingInterface) {
-        AACE_WARN(LX(__func__).m("Ducking interface is misssing"));
+        AACE_WARN(LX(TAG).m("Ducking interface is missing"));
         return false;
     } else if (!m_DuckingInterface->startDucking()) {
-        AACE_WARN(LX(__func__).m("Failed to start ducking"));
+        AACE_WARN(LX(TAG).m("Failed to start ducking"));
         return false;
     }
     m_isDucked = true;
@@ -116,7 +117,7 @@ bool ChannelVolumeManager::startDucking() {
 
 bool ChannelVolumeManager::stopDucking() {
     std::lock_guard<std::mutex> locker{m_mutex};
-    AACE_DEBUG(LX(__func__));
+    AACE_DEBUG(LX(TAG));
 
     // exit early if the channel is not attenuated
     if (!m_isDucked) {
@@ -125,21 +126,27 @@ bool ChannelVolumeManager::stopDucking() {
 
     // Restore the speaker volume
     if (!m_DuckingInterface) {
-        AACE_WARN(LX(__func__).m("Ducking interface is misssing"));
+        AACE_WARN(LX(TAG).m("Ducking interface is missing"));
         return false;
     } else if (!m_DuckingInterface->stopDucking()) {
+        AACE_WARN(LX(TAG).m("Failed to stop ducking"));
         return false;
     }
 
-    AACE_DEBUG(LX(__func__));
+    if (m_pendingSetUnduckedVolume) {
+        AACE_INFO(LX(TAG).m("settingDeferredUnduckedVolume").d("unduckedVolume", m_unduckedVolume));
+        m_pendingSetUnduckedVolume = false;
+        m_speaker->setVolume(m_unduckedVolume);
+    }
+
     m_isDucked = false;
     return true;
 }
 
 bool ChannelVolumeManager::setUnduckedVolume(int8_t volume) {
-    AACE_DEBUG(LX(__func__).d("volume", static_cast<int>(volume)));
+    AACE_DEBUG(LX(TAG).d("volume", static_cast<int>(volume)));
     if (!withinBounds(volume, AVS_SET_VOLUME_MIN, AVS_SET_VOLUME_MAX)) {
-        AACE_ERROR(LX(__func__).m("Invalid Volume"));
+        AACE_ERROR(LX(TAG).m("Invalid Volume"));
         return false;
     }
 
@@ -147,37 +154,38 @@ bool ChannelVolumeManager::setUnduckedVolume(int8_t volume) {
     // store the volume
     m_unduckedVolume = volume;
     if (m_isDucked) {
-        AACE_WARN(LX(__func__).m("Channel is Attenuated, Deferring Operation"));
+        m_pendingSetUnduckedVolume = true;
+        AACE_WARN(LX(TAG).m("Channel is Attenuated, Deferring Operation"));
         // New Volume shall be applied upon the next call to stopDucking()
         return true;
     }
 
-    AACE_DEBUG(LX(__func__).d("Unducked Channel Volume", static_cast<int>(volume)));
+    AACE_DEBUG(LX(TAG).d("Unducked Channel Volume", static_cast<int>(volume)));
     return m_speaker->setVolume(m_unduckedVolume);
 }
 
 bool ChannelVolumeManager::setMute(bool mute) {
     std::lock_guard<std::mutex> locker{m_mutex};
-    AACE_DEBUG(LX(__func__).d("mute", static_cast<int>(mute)));
+    AACE_DEBUG(LX(TAG).d("mute", static_cast<int>(mute)));
     return m_speaker->setMute(mute);
 }
 
 bool ChannelVolumeManager::getSpeakerSettings(
     alexaClientSDK::avsCommon::sdkInterfaces::SpeakerInterface::SpeakerSettings* settings) const {
-    AACE_DEBUG(LX(__func__));
+    AACE_DEBUG(LX(TAG));
     if (!settings) {
         return false;
     }
 
     std::lock_guard<std::mutex> locker{m_mutex};
     if (!m_speaker->getSpeakerSettings(settings)) {
-        AACE_ERROR(LX(__func__).m("Unable To Retrieve SpeakerSettings"));
+        AACE_ERROR(LX(TAG).m("Unable To Retrieve SpeakerSettings"));
         return false;
     }
 
     // if the channel is ducked : return the cached latest unducked volume
     if (m_isDucked) {
-        AACE_DEBUG(LX(__func__).m("Channel is Already Attenuated"));
+        AACE_DEBUG(LX(TAG).m("Channel is Already Attenuated"));
         settings->volume = m_unduckedVolume;
     }
 

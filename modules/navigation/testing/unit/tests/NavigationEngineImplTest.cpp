@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,9 +21,10 @@
 #include <AVSCommon/SDKInterfaces/test/MockDirectiveSequencer.h>
 #include <AVSCommon/SDKInterfaces/test/MockContextManager.h>
 
-#include <AACE/Test/Unit/Alexa/AlexaTestHelper.h>
 #include <AACE/Navigation/Navigation.h>
 #include <AACE/Engine/Navigation/NavigationEngineImpl.h>
+#include <AACE/Test/Unit/Alexa/AlexaTestHelper.h>
+#include <AACE/Test/Unit/Metrics/MockMetricRecorderServiceInterface.h>
 
 namespace aace {
 namespace test {
@@ -55,12 +56,15 @@ public:
             std::make_shared<testing::StrictMock<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager>>();
         m_mockNavigationProviderName = "HERE";
         m_alexaMockFactory = alexa::AlexaTestHelper::createAlexaMockComponentFactory();
+        m_mockMetricRecorder = std::make_shared<aace::test::unit::core::MockMetricRecorderServiceInterface>();
+
         m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create(
             m_mockPlatformInterface,
             m_alexaMockFactory->getEndpointBuilderMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
             m_alexaMockFactory->getMessageSenderInterfaceMock(),
             m_alexaMockFactory->getContextManagerInterfaceMock(),
+            m_mockMetricRecorder,
             m_mockNavigationProviderName);
     }
     void TearDown() override {
@@ -90,6 +94,9 @@ public:
 
     // test helper for providing common mocks
     std::shared_ptr<alexa::AlexaMockComponentFactory> m_alexaMockFactory;
+
+    /// The mocked @c MetricRecorderServiceInterface
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_mockMetricRecorder;
 };
 
 /**
@@ -107,6 +114,7 @@ TEST_F(NavigationEngineImplTest, createWithNullPlatform) {
         m_mockExceptionEncounteredSender,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_mockContextManager,
+        m_mockMetricRecorder,
         m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
@@ -119,6 +127,7 @@ TEST_F(NavigationEngineImplTest, createWithNullEndpointBuilder) {
         m_mockExceptionEncounteredSender,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_mockContextManager,
+        m_mockMetricRecorder,
         m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
@@ -131,6 +140,7 @@ TEST_F(NavigationEngineImplTest, createWithNullExceptionEncounteredSender) {
         nullptr,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
         m_mockContextManager,
+        m_mockMetricRecorder,
         m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);
 }
@@ -142,6 +152,20 @@ TEST_F(NavigationEngineImplTest, createWithNullContextManager) {
         m_alexaMockFactory->getEndpointBuilderMock(),
         m_mockExceptionEncounteredSender,
         m_alexaMockFactory->getMessageSenderInterfaceMock(),
+        nullptr,
+        m_mockMetricRecorder,
+        m_mockNavigationProviderName);
+    EXPECT_EQ(nullptr, testNavigationEngineImpl);
+}
+
+TEST_F(NavigationEngineImplTest, createWithNullMetricRecorder) {
+    std::shared_ptr<aace::engine::navigation::NavigationEngineImpl> testNavigationEngineImpl;
+    testNavigationEngineImpl = engine::navigation::NavigationEngineImpl::create(
+        m_mockPlatformInterface,
+        m_alexaMockFactory->getEndpointBuilderMock(),
+        m_mockExceptionEncounteredSender,
+        m_alexaMockFactory->getMessageSenderInterfaceMock(),
+        m_mockContextManager,
         nullptr,
         m_mockNavigationProviderName);
     EXPECT_EQ(nullptr, testNavigationEngineImpl);

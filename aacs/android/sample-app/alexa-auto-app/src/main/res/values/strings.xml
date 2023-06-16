@@ -1,8 +1,0 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="alexa_app_name" tools:ignore="MissingTranslation">Alexa</string>
-
-    <!-- Audio IO -->
-    <string name="audio_io_notification_channel_name" tools:ignore="MissingTranslation">Alexa Audio IO</string>
-    <string name="audio_io_notification_channel_description" tools:ignore="MissingTranslation">Alexa Audio IO</string>
-    <string name="audio_io_notification_service_title" tools:ignore="MissingTranslation">Alexa Audio IO</string>
-</resources>

@@ -1,7 +1,0 @@
-.DS_Store
-.gradle
-*.iml
-gradlew.bat
-local.properties
-core-service/.DS_Store
-core-service/libs/

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ void AuthorizationManager::setRegistrationManager(
 void AuthorizationManager::registerAuthorizationAdapter(
     const std::string& service,
     std::shared_ptr<AuthorizationAdapterInterface> adapter) {
-    AACE_DEBUG(LX(TAG));
+    AACE_INFO(LX(TAG));
     try {
         ThrowIfNull(adapter, "invalidAuthorizationAdapter");
         ThrowIf(service.empty(), "emptyService");
@@ -99,7 +99,7 @@ void AuthorizationManager::registerAuthorizationAdapter(
 }
 
 AuthorizationManager::StartAuthorizationResult AuthorizationManager::startAuthorization(const std::string& service) {
-    AACE_DEBUG(LX(TAG));
+    AACE_INFO(LX(TAG));
     try {
         ThrowIf(service.empty(), "emptyService");
         ThrowIf(
@@ -248,7 +248,7 @@ void AuthorizationManager::authStateChanged(const std::string& service, State st
 }
 
 bool AuthorizationManager::logout(const std::string& service) {
-    AACE_DEBUG(LX(TAG));
+    AACE_INFO(LX(TAG));
     try {
         ThrowIf(service.empty(), "emptyService");
         ThrowIf(
@@ -264,10 +264,10 @@ bool AuthorizationManager::logout(const std::string& service) {
             activeAdapterLock.unlock();
             updateAuthStateAndNotifyAuthObservers(State::UNINITIALIZED, Error::SUCCESS);
             ThrowIfNot(performLogoutLocked(), "performLogoutLockedFailed");
+            performDeregisterLocked();
 
             // Lock activeAdapterLock, as we are using m_activeAdapter
             activeAdapterLock.lock();
-            performDeregisterLocked();
             m_activeAdapter = {"", ""};
             ThrowIfNot(clearAdapterStateLocked(), "clearAdapterStateFailed");
 
@@ -304,7 +304,9 @@ void AuthorizationManager::removeAuthObserver(
     }
 }
 
-void AuthorizationManager::addListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) {
+void AuthorizationManager::addListener(
+    std::shared_ptr<aace::engine::metrics::MetricsEmissionListenerInterface> listener) {
+    AACE_DEBUG(LX(TAG));
     try {
         std::unique_lock<std::mutex> lock(m_metricEmissionListenerMutex);
         ThrowIfNull(listener, "nullListener");
@@ -317,7 +319,8 @@ void AuthorizationManager::addListener(std::shared_ptr<MetricsEmissionListenerIn
     }
 }
 
-void AuthorizationManager::removeListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) {
+void AuthorizationManager::removeListener(
+    std::shared_ptr<aace::engine::metrics::MetricsEmissionListenerInterface> listener) {
     try {
         std::lock_guard<std::mutex> lock(m_metricEmissionListenerMutex);
         ThrowIfNull(listener, "nullListener");

@@ -7,7 +7,7 @@ Alexa sends visual metadata (display card templates) for your device to display.
 
 You can programmatically generate template runtime configuration using the `aace::alexa::config::AlexaConfiguration::createTemplateRuntimeTimeoutConfig()` factory method, or provide the equivalent JSON values in a configuration file.
 
-```
+```json
 {
     "aace.alexa" {
         "templateRuntimeCapabilityAgent": {
@@ -18,23 +18,34 @@ You can programmatically generate template runtime configuration using the `aace
 }
 ```
 
-To implement a custom handler for GUI templates, extend the `TemplateRuntime` class:
+To implement a custom handler for GUI templates, subscribe to `TemplateRuntime` messages:
 
-```
-#include <AACE/Alexa/TemplateRuntime.h>
-class MyTemplateRuntime : public aace::alexa::TemplateRuntime {
-    public:
-        void renderTemplate( const std::string& payload, FocusState focusState ) override {
-        // handle rendering the template data specified in payload
-        }
-        
-        void renderPlayerInfo( const std::string& payload, PlayerActivity audioPlayerState, std::chrono::milliseconds offset, FocusState focusState ) override {
-        // handle rendering the player info data specified in payload
-        }
-};
+```cpp
+// Include necessary message header files
+#include <AASB/Message/Alexa/TemplateRuntime/RenderTemplateMessage.h>
+#include <AASB/Message/Alexa/TemplateRuntime/RenderPlayerInfoMessage.h>
+using namespace aasb::message::alexa::templateRuntime;
+
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
 ...
 
-// Register the platform interface with the Engine
-engine->registerPlatformInterface( std::make_shared<MyTemplateRuntime>() );
+    // Subscribe to corresponding messages with handlers
+    m_messageBroker->subscribe(
+        [=](const std::string& message) {
+            RenderPlayerInfoMessage msg = json::parse(message);
+            // handle rendering the player info data specified in msg.payload
+        },
+        RenderPlayerInfoMessage::topic(),
+        RenderPlayerInfoMessage::action());
+    m_messageBroker->subscribe(
+        [=](const std::string& message) {
+            RenderTemplateMessage msg = json::parse(message);
+            // handle rendering the template data specified in msg.payload
+        },
+        RenderTemplateMessage::topic(),
+        RenderTemplateMessage::action());
 ```
+
 >**Note:** In the case of lists, it is the responsibility of the platform implementation to handle pagination. Alexa sends down the entire list as a JSON response and starts reading out the first five elements of the list. At the end of the first five elements, Alexa prompts the user whether or not to read the remaining elements from the list. If the user chooses to proceed with the remaining elements, Alexa sends down the entire list as a JSON response but starts reading from the sixth element onwards.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,17 +13,21 @@
  * permissions and limitations under the License.
  */
 
+#include <string>
 #include <unordered_map>
 #include <forward_list>
 #ifndef NO_SIGPIPE
 #include <csignal>
 #endif
 
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+
 #include "AACE/Engine/Core/EngineImpl.h"
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/Core/EngineVersion.h"
-#include "AACE/Engine/Core/CoreMetrics.h"
 #include "AACE/Engine/Utils/JSON/JSON.h"
 #include "AACE/Core/CoreProperties.h"
 
@@ -39,8 +43,69 @@ namespace core {
 // json namespace alias
 namespace json = aace::engine::utils::json;
 
-// String to identify log entries originating from this file.
+using namespace aace::engine::metrics;
+
+/// String to identify log entries originating from this file.
 static const std::string TAG("aace.core.EngineImpl");
+
+/// Prefix for Engine metrics
+static const std::string METRIC_PREFIX = "ENGINE-";
+
+/// Source name for Engine lifecycle event metrics
+static const std::string METRIC_SOURCE = METRIC_PREFIX + "EngineLifecycleEvent";
+
+/// Key name for Engine lifecycle event latency metrics
+static const std::string METRIC_LIFECYCLE_LATENCY_KEY = "EngineLifecycleEventLatency";
+
+/// Key name for Engine lifecycle event success count metrics
+static const std::string METRIC_LIFECYCLE_EVENT_SUCCESS_COUNT = "EngineLifecycleEventSuccessCount";
+
+/// Key name for Engine lifecycle event failure count metrics
+static const std::string METRIC_LIFECYCLE_EVENT_ERROR_COUNT = "EngineLifecycleEventErrorCount";
+
+/// Key name for Engine lifecycle stage metric dimension
+static const std::string METRIC_LIFECYCLE_STAGE_TYPE_KEY = "LifecycleStage";
+
+/// Configure stage metric dimension
+static const std::string METRIC_LIFECYCLE_STAGE_CONFIG = "Configure";
+
+/// Start stage metric dimension
+static const std::string METRIC_LIFECYCLE_STAGE_START = "Start";
+
+/// Stop stage metric dimension
+static const std::string METRIC_LIFECYCLE_STAGE_STOP = "Stop";
+
+/// Shutdown stage metric dimension
+static const std::string METRIC_LIFECYCLE_STAGE_SHUTDOWN = "Shutdown";
+
+/**
+ * Records a metric with the specified data.
+ * Uses the default context for Engine.
+ */
+static void submitLifecycleMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    const DataPoint& latencyDataPoint,
+    const std::string& lifecycleStage,
+    bool isSuccess) {
+    auto metricBuilder = MetricEventBuilder()
+                             .withSourceName(METRIC_SOURCE)
+                             .withAlexaAgentId()
+                             .withIdentityType(IdentityType::UNIQUE)
+                             .withPriority(Priority::HIGH)
+                             .withBufferType(BufferType::SKIP_BUFFER);
+    metricBuilder.addDataPoint(latencyDataPoint);
+    metricBuilder.addDataPoint(
+        CounterDataPointBuilder{}.withName(METRIC_LIFECYCLE_EVENT_SUCCESS_COUNT).increment(isSuccess ? 1 : 0).build());
+    metricBuilder.addDataPoint(
+        CounterDataPointBuilder{}.withName(METRIC_LIFECYCLE_EVENT_ERROR_COUNT).increment(isSuccess ? 0 : 1).build());
+    metricBuilder.addDataPoint(
+        StringDataPointBuilder{}.withName(METRIC_LIFECYCLE_STAGE_TYPE_KEY).withValue(lifecycleStage).build());
+    try {
+        recordMetric(recorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
 
 std::shared_ptr<EngineImpl> EngineImpl::create() {
     try {
@@ -114,17 +179,33 @@ bool EngineImpl::registerProperties() {
 
 bool EngineImpl::shutdown() {
     try {
+        AACE_DEBUG(LX(TAG).m("EngineShutdown"));
         if (m_initialized == false) {
             AACE_WARN(LX(TAG).m("Attempting to shutdown engine that is not initialized - doing nothing."));
             return true;
         }
 
         // engine must be stopped before shutdown, but continue with shutdown if failed...
-        if (stop() == false) {
+        if (m_running == true && stop() == false) {
             AACE_ERROR(LX(TAG).d("reason", "stopEngineFailed"));
         }
+        m_shutdownDuration.withName(METRIC_LIFECYCLE_LATENCY_KEY).startTimer();
 
-        AACE_DEBUG(LX(TAG).m("EngineShutdown"));
+        // Shut down MetricsEngineService last so we can record duration metric
+        // for rest of Engine shutdown
+        std::shared_ptr<EngineService> metricService = nullptr;
+        for (auto serviceItr = m_orderedServiceList.begin(); serviceItr != m_orderedServiceList.end();) {
+            if ((*serviceItr)->getDescription().getType() == "aace.metrics") {
+                metricService = *serviceItr;
+                m_orderedServiceList.erase(serviceItr);
+                break;
+            } else {
+                serviceItr++;
+            }
+        }
+        if (metricService == nullptr) {
+            AACE_WARN(LX(TAG).m("Could not find MetricsEngineService in map"));
+        }
 
         // iterate through registered engine services and call shutdown() for each module
         for (auto next : m_orderedServiceList) {
@@ -145,9 +226,24 @@ bool EngineImpl::shutdown() {
         m_initialized = false;
         m_configured = false;
 
+        m_shutdownDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        if (metricRecorder == nullptr) {
+            AACE_WARN(LX(TAG).m("Cannot record shutdown latency metric. Metric recorder weak_ptr expired"));
+            return true;
+        }
+        submitLifecycleMetric(metricRecorder, m_shutdownDuration.build(), METRIC_LIFECYCLE_STAGE_SHUTDOWN, true);
+        if (metricService != nullptr) {
+            AACE_DEBUG(LX(TAG).m("Shutting down MetricsEngineService after recording shutdown latency"));
+            metricService->handleShutdownEngineEvent();
+        }
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_shutdownDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ReturnIf(metricRecorder == nullptr, false);
+        submitLifecycleMetric(metricRecorder, m_shutdownDuration.build(), METRIC_LIFECYCLE_STAGE_SHUTDOWN, false);
         return false;
     }
 }
@@ -170,6 +266,7 @@ bool EngineImpl::configure(
 bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::EngineConfiguration>> configurationList) {
     try {
         AACE_DEBUG(LX(TAG).m("EngineConfigure"));
+        m_configureDuration.withName(METRIC_LIFECYCLE_LATENCY_KEY).startTimer();
 
         ThrowIfNot(m_initialized, "engineNotInitialized");
         ThrowIf(m_running, "engineRunning");
@@ -206,6 +303,12 @@ bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::Engin
             AACE_ERROR(LX(TAG).m("nullMergedConfiguration"));
         }
 
+        // get a reference to the metrics service interface
+        auto metricsService =
+            getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>("aace.metrics");
+        ThrowIfNull(metricsService, "invalidMetricRecorderServiceInterface");
+        m_metricRecorder = metricsService;
+
         m_configured = true;
 
         // iterate through registered engine modules and call handlePreRegisterEngineEvent() for each module
@@ -213,9 +316,17 @@ bool EngineImpl::configure(std::vector<std::shared_ptr<aace::core::config::Engin
             ThrowIfNot(next->handlePreRegisterEngineEvent(), "handlePreRegisterEngineEvent");
         }
 
+        m_configureDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ThrowIfNull(metricRecorder, "Metric recorder weak_ptr expired");
+        submitLifecycleMetric(metricRecorder, m_configureDuration.build(), METRIC_LIFECYCLE_STAGE_CONFIG, true);
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_configureDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ReturnIf(metricRecorder == nullptr, false);
+        submitLifecycleMetric(metricRecorder, m_configureDuration.build(), METRIC_LIFECYCLE_STAGE_CONFIG, false);
         return false;
     }
 }
@@ -330,7 +441,7 @@ bool EngineImpl::checkServices() {
 bool EngineImpl::start() {
     try {
         AACE_DEBUG(LX(TAG).m("EngineStart"));
-        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_START_BEGIN);
+        m_startDuration.withName(METRIC_LIFECYCLE_LATENCY_KEY).startTimer();
 
         ThrowIf(m_running, "engineAlreadyRunning");
         ThrowIfNot(m_initialized, "engineNotInitialized");
@@ -365,11 +476,17 @@ bool EngineImpl::start() {
         // set the engine running flag to true
         m_running = true;
 
-        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_START_END);
+        m_startDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ThrowIfNull(metricRecorder, "Metric recorder weak_ptr expired");
+        submitLifecycleMetric(metricRecorder, m_startDuration.build(), METRIC_LIFECYCLE_STAGE_START, true);
         return true;
     } catch (std::exception& ex) {
-        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_START_EXCEPTION);
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_startDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ReturnIf(metricRecorder == nullptr, false);
+        submitLifecycleMetric(metricRecorder, m_startDuration.build(), METRIC_LIFECYCLE_STAGE_START, false);
         return false;
     }
 }
@@ -377,12 +494,12 @@ bool EngineImpl::start() {
 bool EngineImpl::stop() {
     try {
         AACE_DEBUG(LX(TAG).m("EngineStop"));
-        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_BEGIN);
 
         if (m_running == false) {
             AACE_WARN(LX(TAG).m("Attempting to stop engine that is not running - doing nothing."));
             return true;
         }
+        m_stopDuration.withName(METRIC_LIFECYCLE_LATENCY_KEY).startTimer();
 
         // iterate through registered engine modules and call stop() for each module
         for (auto next : m_orderedServiceList) {
@@ -397,11 +514,17 @@ bool EngineImpl::stop() {
         // set the engine running and configured flag to false - the engine must be reconfigured before starting again
         m_running = false;
 
-        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_END);
+        m_stopDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ThrowIfNull(metricRecorder, "Metric recorder weak_ptr expired");
+        submitLifecycleMetric(metricRecorder, m_stopDuration.build(), METRIC_LIFECYCLE_STAGE_STOP, true);
         return true;
     } catch (std::exception& ex) {
-        CORE_METRIC(LX(TAG), aace::engine::core::CoreMetrics::Location::ENGINE_STOP_EXCEPTION);
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        m_stopDuration.stopTimer();
+        auto metricRecorder = m_metricRecorder.lock();
+        ReturnIf(metricRecorder == nullptr, false);
+        submitLifecycleMetric(metricRecorder, m_stopDuration.build(), METRIC_LIFECYCLE_STAGE_STOP, false);
         return false;
     }
 }

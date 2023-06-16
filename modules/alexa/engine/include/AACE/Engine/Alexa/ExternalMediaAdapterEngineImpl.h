@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ExternalMediaAdapterInterface.h"
-#include "ExternalMediaPlayerInterface.h"
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/ExternalMediaAdapter.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/ExternalMediaAdapter.h"
-
 #include "ExternalMediaAdapterHandler.h"
+#include "ExternalMediaAdapterInterface.h"
+#include "ExternalMediaPlayerInterface.h"
 
 namespace aace {
 namespace engine {
@@ -45,11 +45,11 @@ private:
     ExternalMediaAdapterEngineImpl(
         std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter,
         std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
-        std::shared_ptr<FocusHandlerInterface> focusHandler);
-
-    bool initialize(
+        std::shared_ptr<FocusHandlerInterface> focusHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
+
+    bool initialize(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
 public:
     static std::shared_ptr<ExternalMediaAdapterEngineImpl> create(
@@ -57,7 +57,8 @@ public:
         std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
         std::shared_ptr<FocusHandlerInterface> focusHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     // aace::alexa::ExternalMediaAdapterEngineInterface
     void onReportDiscoveredPlayers(const std::vector<DiscoveredPlayerInfo>& discoveredPlayers) override;
@@ -109,7 +110,6 @@ protected:
 
 private:
     std::shared_ptr<aace::alexa::ExternalMediaAdapter> m_platformMediaAdapter;
-    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 };
 
 }  // namespace alexa

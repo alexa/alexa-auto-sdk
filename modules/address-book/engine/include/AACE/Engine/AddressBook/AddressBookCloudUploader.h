@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,17 +17,21 @@
 #define AACE_ENGINE_ADDRESS_BOOK_ADDRESS_BOOK_CLOUD_UPLOADER_H
 
 #include <atomic>
-#include <thread>
-#include <deque>
-#include <unordered_map>
 #include <condition_variable>
+#include <deque>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <unordered_map>
 
 #include <AVSCommon/SDKInterfaces/AuthObserverInterface.h>
 #include <AVSCommon/SDKInterfaces/AuthDelegateInterface.h>
+#include <AVSCommon/Utils/HTTP/HttpResponseCode.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/DeviceInfo.h>
 
 #include <AACE/Network/NetworkInfoProvider.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include <AACE/Engine/Network/NetworkInfoObserver.h>
 #include <AACE/Engine/Network/NetworkObservableInterface.h>
 
@@ -53,9 +57,7 @@ public:
     Event(Type type, std::shared_ptr<AddressBookEntity> addressBookEntity) :
             m_type(type), m_retryCounter(0), m_addressBookEntity(std::move(addressBookEntity)) {
         // Cache the create time for metrics
-        auto now = std::chrono::system_clock::now();
-        auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
-        m_createTimeMs = now_ms.count();
+        m_createTime = std::chrono::system_clock::now();
     }
 
     Type getType() {
@@ -66,7 +68,7 @@ public:
         return m_addressBookEntity;
     }
 
-    int getRetryCount() {
+    unsigned int getRetryCount() {
         return m_retryCounter;
     }
 
@@ -74,8 +76,8 @@ public:
         m_retryCounter += 1;
     }
 
-    double getEventCreateTime() {
-        return m_createTimeMs;
+    std::chrono::system_clock::time_point getEventCreateTime() {
+        return m_createTime;
     }
 
 private:
@@ -83,14 +85,71 @@ private:
     Type m_type;
 
     // Network Retry Counter
-    int m_retryCounter;
+    unsigned int m_retryCounter;
 
     // AddressBookEntity
     std::shared_ptr<AddressBookEntity> m_addressBookEntity;
 
-    // For metrics
-    double m_createTimeMs;
+    // Creation time
+    std::chrono::system_clock::time_point m_createTime;
 };
+
+enum class AddressBookOperationResultCode {
+    SUCCESS,
+    ERROR_ACCOUNT_NOT_PROVISIONED,
+    ERROR_DELETE_ADDRESS_BOOK_FAILED,
+    ERROR_CREATE_ADDRESS_BOOK_FAILED,
+    ERROR_HTTP_PARSE_RESPONSE_FAILED,
+    ERROR_HTTP_RESPONSE_MISSING_CONTENT,
+    ERROR_HTTP_UNHANDLED_REDIRECTION_RESPONSE,
+    ERROR_HTTP_BAD_REQUEST,
+    ERROR_HTTP_FORBIDDEN,
+    ERROR_HTTP_THROTTLED,
+    ERROR_HTTP_SERVER_ERROR,
+    ERROR_UNKNOWN
+};
+
+inline std::ostream& operator<<(std::ostream& stream, const AddressBookOperationResultCode& code) {
+    switch (code) {
+        case AddressBookOperationResultCode::SUCCESS:
+            stream << "SUCCESS";
+            break;
+        case AddressBookOperationResultCode::ERROR_ACCOUNT_NOT_PROVISIONED:
+            stream << "ERROR_ACCOUNT_NOT_PROVISIONED";
+            break;
+        case AddressBookOperationResultCode::ERROR_DELETE_ADDRESS_BOOK_FAILED:
+            stream << "ERROR_DELETE_ADDRESS_BOOK_FAILED";
+            break;
+        case AddressBookOperationResultCode::ERROR_CREATE_ADDRESS_BOOK_FAILED:
+            stream << "ERROR_CREATE_ADDRESS_BOOK_FAILED";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_PARSE_RESPONSE_FAILED:
+            stream << "ERROR_HTTP_PARSE_RESPONSE_FAILED";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_RESPONSE_MISSING_CONTENT:
+            stream << "ERROR_HTTP_RESPONSE_MISSING_CONTENT";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_UNHANDLED_REDIRECTION_RESPONSE:
+            stream << "ERROR_HTTP_UNHANDLED_REDIRECTION_RESPONSE";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_BAD_REQUEST:
+            stream << "ERROR_HTTP_BAD_REQUEST";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_FORBIDDEN:
+            stream << "ERROR_HTTP_FORBIDDEN";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_THROTTLED:
+            stream << "ERROR_HTTP_THROTTLED";
+            break;
+        case AddressBookOperationResultCode::ERROR_HTTP_SERVER_ERROR:
+            stream << "ERROR_HTTP_SERVER_ERROR";
+            break;
+        case AddressBookOperationResultCode::ERROR_UNKNOWN:
+            stream << "ERROR_UNKNOWN";
+            break;
+    }
+    return stream;
+}
 
 class AddressBookCloudUploader
         : public aace::engine::addressBook::AddressBookObserver
@@ -108,6 +167,7 @@ private:
         NetworkInfoObserver::NetworkStatus networkStatus,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         bool cleanAllAddressBooksAtStart);
 
 public:
@@ -118,6 +178,7 @@ public:
         NetworkInfoObserver::NetworkStatus networkStatus,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         bool cleanAllAddressBooksAtStart);
 
     // AddressBookObserver
@@ -141,17 +202,33 @@ protected:
 
 private:
     using HTTPResponse = AddressBookCloudUploaderRESTAgent::HTTPResponse;
+    using HTTPResponseCode = alexaClientSDK::avsCommon::utils::http::HTTPResponseCode;
 
     void eventLoop(bool cleanAllAddressBooksAtStart);  // Infinite loop
     const Event popNextEventFromQ();
 
-    bool handleUpload(std::shared_ptr<AddressBookEntity> addressBookEntity);
-    bool handleRemove(std::shared_ptr<AddressBookEntity> addressBookEntity);
+    /**
+     * Upload the specified address book
+     * @param [in] addressBookEntity Address book to upload
+     * @param [out] numBatches int reference to update with the number of
+     *        batches it took to complete the upload attempt
+     * @param [out] result AddressBookOperationResultCode reference to update
+     *        with result of the upload
+     * @return @c true if the upload was successful, false otherwise
+     */
+    bool handleUpload(
+        std::shared_ptr<AddressBookEntity> addressBookEntity,
+        int& numBatches,
+        AddressBookOperationResultCode& result);
+    bool handleRemove(std::shared_ptr<AddressBookEntity> addressBookEntity, AddressBookOperationResultCode& result);
 
     bool checkAndAutoProvisionAccount();
-    std::string prepareForUpload(std::shared_ptr<AddressBookEntity> addressBookEntity);
-    bool upload(const std::string& cloudAddressBookId, std::shared_ptr<rapidjson::Document>);
-    bool uploadEntries(const std::string& cloudAddressBookId, std::shared_ptr<rapidjson::Document> document);
+    AddressBookOperationResultCode prepareForUpload(
+        std::shared_ptr<AddressBookEntity> addressBookEntity,
+        std::string& cloudAddressBookId);
+    AddressBookOperationResultCode uploadEntries(
+        const std::string& cloudAddressBookId,
+        std::shared_ptr<rapidjson::Document> document);
 
     std::string createAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity);
     bool deleteAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity);
@@ -168,7 +245,24 @@ private:
     UploadFlowState handleParseHTTPResponse(const HTTPResponse& httpResponse);
     UploadFlowState handleError(const std::string& addressBookId);
 
-    void logNetworkMetrics(const HTTPResponse& httpResponse);
+    static AddressBookOperationResultCode httpResponseCodeToResult(HTTPResponseCode code);
+
+    /// Get AddressBookOperationResultCode as a string for metrics dimensions
+    static std::string getResultString(const AddressBookOperationResultCode& result);
+
+    /**
+     * Records latency, success count, and error count metrics with various
+     * dimensions for the result of address book requests. Uses the default
+     * context for @c AddressBookCloudUploader.
+     */
+    static void submitAddressBookRequestResultMetrics(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& recorder,
+        Event::Type eventType,
+        std::chrono::milliseconds latency,
+        unsigned int retryCount,
+        unsigned int numBatchesInRequest,
+        AddressBookType addressBookType,
+        AddressBookOperationResultCode result);
 
     friend std::ostream& operator<<(std::ostream& stream, const UploadFlowState& state);
 
@@ -179,8 +273,11 @@ private:
     /// reference to AddressBookService
     std::shared_ptr<aace::engine::addressBook::AddressBookServiceInterface> m_addressBookService;
 
-    // Mapping source address book id to AddressBookEntity.
+    /// Mapping source address book id to AddressBookEntity
     std::unordered_map<std::string, std::shared_ptr<AddressBookEntity>> m_addressBooks;
+
+    /// The metric recorder
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
 
     /// Indicates whether the internal main loop should keep running.
     std::atomic<bool> m_isShuttingDown;

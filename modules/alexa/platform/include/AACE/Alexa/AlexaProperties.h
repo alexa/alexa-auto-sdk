@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #define AACE_ALEXA_PROPERTY_ALEXA_PROPERTIES_H
 
 /** @file */
+
+#include <string>
 
 namespace aace {
 namespace alexa {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,32 +20,32 @@
 
 #include <AACE/Alexa/AlexaConfiguration.h>
 #include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/JSON/JSON.h>
+
+namespace json = aace::engine::utils::json;
 
 class AlexaConfigurationImplTest : public ::testing::Test {};
 
-TEST_F(AlexaConfigurationImplTest, createDeviceInfoConfigBestCase) {
-    std::string expectedConfigStr =
-        "{\n"
-        "    \"aace.alexa\": {\n"
-        "        \"avsDeviceSDK\": {\n"
-        "            \"deviceInfo\": {\n"
-        "                \"deviceSerialNumber\": \"DEVICE_SERIAL_NUMBER\",\n"
-        "                \"clientId\": \"CLIENT_ID\",\n"
-        "                \"productId\": \"PRODUCT_ID\",\n"
-        "                \"manufacturerName\": \"MANUFACTURER_NAME\",\n"
-        "                \"description\": \"DESCRIPTION\"\n"
-        "            }\n"
-        "        }\n"
-        "    }\n"
-        "}";
+TEST_F(AlexaConfigurationImplTest, createAlexaClientInfoConfigBestCase) {
+    // clang-format off
+    json::Value expected = {
+        {"aace.alexa",{
+            {"alexaClientInfo",{
+                {"clientId","CLIENT_ID"},
+                {"productId","PRODUCT_ID"},
+                {"amazonId","AMAZON_ID"}
+            }}
+        }}
+    };
+    // clang-format on
 
-    auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig(
-        "DEVICE_SERIAL_NUMBER", "CLIENT_ID", "PRODUCT_ID", "MANUFACTURER_NAME", "DESCRIPTION");
+    auto config =
+        aace::alexa::config::AlexaConfiguration::createAlexaClientInfoConfig("CLIENT_ID", "PRODUCT_ID", "AMAZON_ID");
 
     // compare config stream with expected string value
     std::ostringstream configStr;
     configStr << config->getStream()->rdbuf();
-    EXPECT_EQ(configStr.str(), expectedConfigStr) << "Error in the Configuration String";
+    EXPECT_EQ(true, expected == json::toJson(configStr.str())) << "Error in the Configuration String";
 }
 
 TEST_F(AlexaConfigurationImplTest, createNotificationsConfigBestCase) {

@@ -1084,10 +1084,32 @@
                             "id": "car-play-mode",
                             "item": [
                                 {
-                                    "do": "notify/onVAD",
+                                    "do": "GoTo",
                                     "key": "1",
                                     "name": "VAD",
-                                    "value":"VAD"
+                                    "value": {
+                                        "id": "VAD",
+                                        "item": [
+                                            {
+                                                "do": "notify/onMicAudio",
+                                                "key": "1",
+                                                "name": "Mic Audio",
+                                                "value":"Mic Audio"
+                                            },
+                                            {
+                                                "do": "notify/onAudioFile",
+                                                "key": "2",
+                                                "name": "Audio File Input", 
+                                                "value":"Audio File Input"                                                                  
+                                            },
+                                            {
+                                                "do": "GoBack",
+                                                "key": "esc",
+                                                "name": "Go back"
+                                            }
+                                        ],
+                                        "name": "VAD"
+                                    }
                                 },
                                 {
                                     "do": "notify/onKWD",
@@ -1240,7 +1262,7 @@
             "      \\___/ /_/   /_/   /___/\\_,_/_/_/_/ .__/_/\\__/ /_/ |_/ .__/ .__/",
             "                                      /_/                /_/  /_/    ",
             "",
-            "  Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved."
+            "  Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved."
         ],
         "keyTapError": [
             "${KEYOPEN}${KEY}${KEYCLOSE} is not valid in this menu\u0007"

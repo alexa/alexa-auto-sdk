@@ -8,16 +8,16 @@ participant "Auto SDK" as AutoSDK  order 40
 participant LoginWithAmazonService order 50
 
 Application -> AuthorizationHandler : Start CBL authorization using\nthe stored refresh token.
-AuthorizationHandler -> AutoSDK : startAuthorization( "alexa:cbl", "{ "refreshToken" : "<refreshToken>" }" )
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", AUTHORIZING )
+AuthorizationHandler -> AutoSDK : StartAuthorization{ "alexa:cbl", "{ "refreshToken" : "<refreshToken>" }" }
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "alexa:cbl", AUTHORIZING }
 
 == Handling the refresh of tokens ==
-AutoSDK -> AuthorizationHandler : getAuthorizationData( "alexa:cbl", "refreshToken" )
+AutoSDK -> AuthorizationHandler : GetAuthorizationData{ "alexa:cbl", "refreshToken" }
 ...
 AutoSDK->LoginWithAmazonService: Authorize and tokens
 LoginWithAmazonService-->AutoSDK: {refresh-token, access-token}
-AutoSDK -> AuthorizationHandler : setAuthorizationData( "alexa:cbl", "refreshToken", "{ "refreshToken" : "<refreshToken>" }" )
+AutoSDK -> AuthorizationHandler : SetAuthorizationData{ "alexa:cbl", "refreshToken", "{ "refreshToken" : "<refreshToken>" }" }
 
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", AUTHORIZED )
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "alexa:cbl", AUTHORIZED }
 
 @enduml

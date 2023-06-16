@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['datapoint',['Datapoint',['../classaace_1_1metrics_1_1_metrics_uploader_1_1_datapoint.html',1,'aace::metrics::MetricsUploader']]],
   ['devicesetup',['DeviceSetup',['../classaace_1_1alexa_1_1_device_setup.html',1,'aace::alexa']]],
   ['devicesetupengineinterface',['DeviceSetupEngineInterface',['../classaace_1_1alexa_1_1_device_setup_engine_interface.html',1,'aace::alexa']]],
   ['deviceusage',['DeviceUsage',['../classaace_1_1device_usage_1_1_device_usage.html',1,'aace::deviceUsage']]],

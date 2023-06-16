@@ -4,26 +4,26 @@ The DoNotDisturb (DND) interface allows users to block all incoming notification
 
 To implement a custom handler for DND extend the `DoNotDisturb` class:
 
-```
-#include <AACE/Alexa/DoNotDisturb>
+```cpp
+#include "AASB/Message/Alexa/DoNotDisturb/SetDoNotDisturbMessage.h"
+#include "AASB/Message/Alexa/DoNotDisturb/DoNotDisturbChangedMessage.h"
+using namespace aasb::message::alexa::doNotDisturb;
 
-class MyDoNotDisturbHandler : public aace::alexa::DoNotDisturb {
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
-  public:
-    void setDoNotDisturb( bool doNotDisturb ) override {
-        // set your DoNotDisturb indicator
-    }
-    // on user GUI setting change
-    ...
-        bool doNotDisturb = userSetState;
-        doNotDisturbChanged(doNotDisturb);
-    ...
-
-};
 ...
 
-// Register the platform interface with the Engine
-auto m_doNotDisturbHandler = std::make_shared<MyDoNotDisturbHandler>();
-engine->registerPlatformInterface(m_doNotDisturbHandler);
+    m_messageBroker->subscribe(
+        [=](const std::string& message) {
+            SetDoNotDisturbMessage msg = json::parse(message);
 
+        },
+        SetDoNotDisturbMessage::topic(),
+        SetDoNotDisturbMessage::action());
+
+    // Publish the "DoNotDisturbChanged" message
+    DoNotDisturbChangedMessage msg;
+    msg.payload.doNotDisturb = true;
+    m_messageBroker->publish(msg);
 ```

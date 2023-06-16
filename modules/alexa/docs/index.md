@@ -4,25 +4,21 @@
 
 The Alexa Auto SDK Alexa module provides interfaces for standard Alexa features. The Engine handles steps to send events and sequence directives so you can focus on using the provided AASB messages to interact with Alexa.
 
-> **Important!:** Not every interface of the `Alexa` module documentation is updated to reflect the Auto SDK 4.0 Message Broker message API. Some pages still include text, code samples, or diagrams that show deprecated platform interfaces rather than their corresponding AASB message interface equivalents. Your application will use the the AASB message interfaces with MessageBroker. The `Alexa` documentation will be fully updated in the next Auto SDK version.
-
 ## Configure the Alexa module
 
 The `Alexa` module defines required and optional configuration objects that you include in the Engine configuration for your application. You can define the configuration objects in a file or construct them programmatically with the relevant configuration factory functions.
 
 Your application must provide the `aace.alexa` configuration in the same format as the example specified below. Alternatively, use the [`AlexaConfiguration`](https://alexa.github.io/alexa-auto-sdk/docs/native/api/classes/classaace_1_1alexa_1_1config_1_1_alexa_configuration.html) factory functions to generate individual elements of this configuration.
 
-```
+```json
 {
     "aace.alexa": {
+        "alexaClientInfo": {
+            "clientId": "${CLIENT_ID}",
+            "productId": "${PRODUCT_ID}",
+            "amazonId": "${AMAZON_ID}"
+        },
         "avsDeviceSDK": {
-            "deviceInfo": {
-                "clientId": "${CLIENT_ID}",
-                "productId": "${PRODUCT_ID}",
-                "deviceSerialNumber": "${DEVICE_SERIAL_NUMBER}",
-                "manufacturerName": "${MANUFACTURER_NAME}",
-                "description": "${DEVICE_DESCRIPTION}"
-            },
             "libcurlUtils": {
                 "CURLOPT_CAPATH": "${CERTS_PATH}"
             },
@@ -32,6 +28,9 @@ Your application must provide the `aace.alexa` configuration in the same format 
             "certifiedSender": {
                 "databaseFilePath": "${DATA_PATH}/certifiedSender.db"
             },
+            "alertsCapabilityAgent": {
+                "databaseFilePath": "${DATA_PATH}/alertsCapabilityAgent.db"
+            },
             "notifications": {
                 "databaseFilePath": "${DATA_PATH}/notifications.db"
             },
@@ -40,7 +39,6 @@ Your application must provide the `aace.alexa` configuration in the same format 
             },
             "deviceSettings": {
                 "databaseFilePath": "${DATA_PATH}/deviceSettings.db",
-                "locales": ["{{STRING}}", ...],
                 "defaultLocale":"en-US",
                 "localeCombinations": [
                     ["{{STRING}}","{{STRING}}"],
@@ -63,7 +61,7 @@ Your application must provide the `aace.alexa` configuration in the same format 
 }
 ```
 
-The `deviceInfo` field contains the details of the device. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
+The `alexaClientInfo` field contains the details of the Alexa client. The fields `libcurlUtils`, `miscDatabase`, `certifiedSender`, `alertsCapabilityAgent`, `notifications`, and `capabilitiesDelegate` specify the respective database file paths.
 
 The `deviceSettings` field specifies the settings on the device. The following list describes the settings:
 
@@ -71,9 +69,9 @@ The `deviceSettings` field specifies the settings on the device. The following l
 * `defaultLocale` specifies the default locale setting, which is Alexa's locale setting until updated on the device. The default value of `defaultLocale` is “en-US”.
 * `locales` specifies the list of locales supported by the device. The default value is `["en-US","en-GB","de-DE","en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US", "hi-IN", "pt-BR", "ar-SA"]`.
 * `localeCombinations` specifies the list of locale pairs available on a device that supports multi-locale mode. Through the Dynamic Language Switching feature, Alexa can communicate with the user of such device in languages specified in the locale pairs. In each pair, the first value is the primary locale, which Alexa uses most often when interacting with the user. The second value is the secondary locale, which specifies an additional language that Alexa uses when responding to an utterance in the corresponding language. For example, if ["en-US", "es-US"] is declared in `localeCombinations` and the device specifies this pair as the current locale setting, Alexa primarily operates in English for the U.S. but can understand and respond to utterances in Spanish for the U.S., without requiring the device to update the locale setting.
-  
+
     By default, `localeCombinations` is a list of the following combinations, which are also the supported combinations as of 2021-02-02. It is possible for the default value to be different from the list of supported combinations in the future. For updates to the supported combinations, see the [Alexa Voice Service documentation](https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#localecombinations).
-    
+
     * ["en-US", "es-US"]
     * ["es-US", "en-US"]
     * ["en-IN", "hi-IN"]
@@ -94,12 +92,12 @@ The `deviceSettings` field specifies the settings on the device. The following l
 
     When a device operates in multi-locale mode, an application can select any locale pair in the list above as the locale setting if the following
     conditions are met:
-    
-    * The device's primary locale setting is the first locale in the selected pair. 
+
+    * The device's primary locale setting is the first locale in the selected pair.
     * The device also supports the secondary locale in the pair.
     * The pair is specified in `localeCombinations`.
-    
-    **Note:** Dynamic Language Switching is only available in online mode. 
+
+    **Note:** Dynamic Language Switching is only available in online mode.
 
 ## Use the Alexa module interfaces
 

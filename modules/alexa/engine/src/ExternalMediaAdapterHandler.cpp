@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,10 +13,12 @@
  * permissions and limitations under the License.
  */
 
+#include <AVSCommon/AVS/AgentId.h>
 #include <AVSCommon/AVS/EventBuilder.h>
 
-#include "AACE/Engine/Alexa/ExternalMediaAdapterHandler.h"
-#include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Alexa/ExternalMediaAdapterHandler.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Utils/Agent/AgentId.h>
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -26,6 +28,8 @@
 namespace aace {
 namespace engine {
 namespace alexa {
+
+using namespace aace::engine::metrics;
 
 static const uint8_t DEFAULT_SPEAKER_VOLUME = 50;
 
@@ -38,11 +42,115 @@ static const std::string TAG("aace.alexa.ExternalMediaAdapterHandler");
 // external media player agent constant
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "alexaAutoSDK";
 
+/// Prefix for metrics emitted from ExternalMediaPlayer components.
+static const std::string METRIC_PREFIX = "EMP-";
+
+/// Source name for ExternalMediaPlayer request metrics
+static const std::string METRIC_SOURCE_EMP_REQUEST = METRIC_PREFIX + "ExternalMediaPlayer";
+
+/// Metric key for EMP player ID dimension.
+static const std::string METRIC_EMP_PLAYER_ID_KEY = "PlayerID";
+
+/// Metric key for count of player events
+static const std::string METRIC_EMP_PLAYER_EVENT_COUNT = "EMPPlayerEventCount";
+
+/// Metric key for EMP player event type dimension.
+static const std::string METRIC_EMP_PLAYER_EVENT_TYPE_KEY = "EventType";
+
+/// Metric key for count of authorization denials
+static const std::string METRIC_EMP_PLAYER_ERROR_COUNT = "EMPPlayerErrorCount";
+
+/// Metric key for EMP player error type dimension.
+static const std::string METRIC_EMP_PLAYER_ERROR_TYPE_KEY = "ErrorType";
+
+/// Metric key for EMP request type dimension.
+static const std::string METRIC_EMP_REQUEST_TYPE_KEY = "RequestType";
+
+/// Metric key for latency of EMP requests
+static const std::string METRIC_EMP_RESPONSE_LATENCY = "EMPResponseLatency";
+
+/// Metric dimension request type Login
+static const std::string METRIC_REQUEST_TYPE_LOGIN = "Login";
+
+/// Metric dimension request type Logout
+static const std::string METRIC_REQUEST_TYPE_LOGOUT = "Logout";
+
+using namespace aace::engine::metrics;
+
+void ExternalMediaAdapterHandler::submitMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    aace::engine::utils::agent::AgentIdType agentId,
+    const std::string& source,
+    const std::vector<DataPoint>& dataPoints) {
+    auto metricBuilder = MetricEventBuilder()
+                             .withSourceName(source)
+                             .withAgentId(agentId)
+                             .withIdentityType(IdentityType::NORMAL)
+                             .withPriority(Priority::NORMAL)
+                             .withBufferType(BufferType::NO_BUFFER);
+    metricBuilder.addDataPoints(dataPoints);
+    try {
+        recordMetric(recorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
+
+void ExternalMediaAdapterHandler::submitEventCountMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    aace::engine::utils::agent::AgentIdType agentId,
+    const std::string& eventType,
+    const std::string& playerId) {
+    std::vector<DataPoint> dps = {
+        CounterDataPointBuilder{}.withName(METRIC_EMP_PLAYER_EVENT_COUNT).increment(1).build(),
+        StringDataPointBuilder{}.withName(METRIC_EMP_PLAYER_EVENT_TYPE_KEY).withValue(eventType).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_EMP_PLAYER_ID_KEY)
+            .withValue(!playerId.empty() ? playerId : "DEFAULT")
+            .build()};
+    submitMetric(recorder, agentId, METRIC_SOURCE_EMP_REQUEST, dps);
+}
+
+void ExternalMediaAdapterHandler::submitErrorCountMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    aace::engine::utils::agent::AgentIdType agentId,
+    const std::string& errorType,
+    const std::string& playerId) {
+    std::vector<DataPoint> dps = {
+        CounterDataPointBuilder{}.withName(METRIC_EMP_PLAYER_ERROR_COUNT).increment(1).build(),
+        StringDataPointBuilder{}.withName(METRIC_EMP_PLAYER_ERROR_TYPE_KEY).withValue(errorType).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_EMP_PLAYER_ID_KEY)
+            .withValue(!playerId.empty() ? playerId : "DEFAULT")
+            .build()};
+    submitMetric(recorder, agentId, METRIC_SOURCE_EMP_REQUEST, dps);
+}
+
+void ExternalMediaAdapterHandler::submitResponseLatencyMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    aace::engine::utils::agent::AgentIdType agentId,
+    const std::string& requestType,
+    const std::string& playerId,
+    const DataPoint& latencyDataPoint) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        StringDataPointBuilder{}.withName(METRIC_EMP_REQUEST_TYPE_KEY).withValue(requestType).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_EMP_PLAYER_ID_KEY)
+            .withValue(!playerId.empty() ? playerId : "DEFAULT")
+            .build()};
+    submitMetric(recorder, agentId, METRIC_SOURCE_EMP_REQUEST, dps);
+}
+
 ExternalMediaAdapterHandler::ExternalMediaAdapterHandler(
     std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
-    std::shared_ptr<FocusHandlerInterface> focusHandler) :
+    std::shared_ptr<FocusHandlerInterface> focusHandler,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) :
         ExternalMediaAdapterHandlerInterface::ExternalMediaAdapterHandlerInterface(TAG),
         m_focusHandler(focusHandler),
+        m_messageSender(messageSender),
+        m_metricRecorder(metricRecorder),
         m_discoveredPlayerSender(discoveredPlayerSender),
         m_muted(false),
         m_volume(DEFAULT_SPEAKER_VOLUME) {
@@ -113,6 +221,17 @@ bool ExternalMediaAdapterHandler::setFocus(const std::string& localPlayerId, boo
     }
 }
 
+void ExternalMediaAdapterHandler::setDefaultPlayerFocus() {
+    try {
+        AACE_DEBUG(LX(TAG).m("Setting focus for default player"));
+        auto focusHandler_lock = m_focusHandler.lock();
+        ThrowIfNull(focusHandler_lock, "invalidFocusHandler");
+        m_executor.submit([focusHandler_lock]() { focusHandler_lock->setDefaultPlayerFocus(); });
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    }
+}
+
 std::vector<PlayerInfo> ExternalMediaAdapterHandler::authorizeDiscoveredPlayers(
     const std::vector<PlayerInfo>& authorizedPlayerList) {
     try {
@@ -157,6 +276,7 @@ bool ExternalMediaAdapterHandler::login(
     bool forceLogin,
     std::chrono::milliseconds tokenRefreshInterval) {
     try {
+        m_loginDurationBuilder.startTimer();
         auto it = m_alexaToLocalPlayerIdMap.find(playerId);
         ThrowIf(it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId");
 
@@ -171,12 +291,14 @@ bool ExternalMediaAdapterHandler::login(
                        .d("playerId", playerId)
                        .d("userName", userName)
                        .d("forceLogin", forceLogin));
+        m_loginDurationBuilder.stopTimer();
         return false;
     }
 }
 
 bool ExternalMediaAdapterHandler::logout(const std::string& playerId) {
     try {
+        m_logoutDurationBuilder.startTimer();
         auto it = m_alexaToLocalPlayerIdMap.find(playerId);
         ThrowIf(it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId");
 
@@ -186,6 +308,7 @@ bool ExternalMediaAdapterHandler::logout(const std::string& playerId) {
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "logout").d("reason", ex.what()).d("playerId", playerId));
+        m_logoutDurationBuilder.stopTimer();
         return false;
     }
 }
@@ -216,18 +339,21 @@ bool ExternalMediaAdapterHandler::play(
     bool preload,
     const alexaClientSDK::avsCommon::avs::PlayRequestor& playRequestor) {
     try {
-        auto it = m_alexaToLocalPlayerIdMap.find(playerId);
-        ThrowIf(it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId");
+        std::string localPlayerId;
+        if (playerId.empty()) {
+            auto it = m_playerInfoMap.find(playerId);
+            ThrowIf(it == m_playerInfoMap.end(), "Default Player not found");
+        } else {
+            auto it = m_alexaToLocalPlayerIdMap.find(playerId);
+            ThrowIf(it == m_alexaToLocalPlayerIdMap.end(), "invalidPlayerId");
+            localPlayerId = it->second;
+            // update the player info
+            ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
+            auto playerInfo = m_playerInfoMap[localPlayerId];
 
-        // get the local player id
-        auto localPlayerId = it->second;
-
-        // update the player info
-        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
-        auto playerInfo = m_playerInfoMap[localPlayerId];
-
-        playerInfo.skillToken = skillToken;
-        playerInfo.playbackSessionId = playbackSessionId;
+            playerInfo.skillToken = skillToken;
+            playerInfo.playbackSessionId = playbackSessionId;
+        }
 
         // call the platform media adapter
         ThrowIfNot(
@@ -418,7 +544,19 @@ std::string ExternalMediaAdapterHandler::createExternalMediaPlayerEvent(
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
         auto playerInfo = m_playerInfoMap[localPlayerId];
+        return createExternalMediaPlayerEvent(playerInfo, event, includePlaybackSessionId, createPayload);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "createExternalMediaPlayerEvent").d("reason", ex.what()).d("localPlayerId", localPlayerId));
+        return "";
+    }
+}
 
+std::string ExternalMediaAdapterHandler::createExternalMediaPlayerEvent(
+    const PlayerInfo& playerInfo,
+    const std::string& event,
+    bool includePlaybackSessionId,
+    std::function<void(rapidjson::Value::Object&, rapidjson::Value::AllocatorType&)> createPayload) {
+    try {
         // create the event payload
         rapidjson::Document document(rapidjson::kObjectType);
 
@@ -455,7 +593,7 @@ std::string ExternalMediaAdapterHandler::createExternalMediaPlayerEvent(
                    "ExternalMediaPlayer", event, "", buffer.GetString())
             .second;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "createExternalMediaPlayerEvent").d("reason", ex.what()).d("localPlayerId", localPlayerId));
+        AACE_ERROR(LX(TAG, "createExternalMediaPlayerEvent").d("reason", ex.what()).d("playerId", playerInfo.playerId));
         return "";
     }
 }
@@ -561,6 +699,7 @@ void ExternalMediaAdapterHandler::reportPlaybackSessionId(
     const std::string& localPlayerId,
     const std::string& sessionId) {
     try {
+        ReturnIf(localPlayerId.empty());  // generic player does not track session ID
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
         auto it = m_playerInfoMap.find(localPlayerId);
         ThrowIf(it == m_playerInfoMap.end(), "invalidLocalPlayerId");
@@ -569,6 +708,158 @@ void ExternalMediaAdapterHandler::reportPlaybackSessionId(
         AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId).d("sessionId", sessionId));
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()).d("localPlayerId", localPlayerId).d("sessionId", sessionId));
+    }
+}
+
+void ExternalMediaAdapterHandler::loginComplete(const std::string& localPlayerId) {
+    try {
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId));
+
+        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
+        auto playerInfo = m_playerInfoMap[localPlayerId];
+        const std::string playerId = playerInfo.playerId;
+
+        DataPoint latencyDataPoint = m_loginDurationBuilder.withName(METRIC_EMP_RESPONSE_LATENCY).stopTimer().build();
+        submitResponseLatencyMetric(
+            m_metricRecorder.lock(),
+            aace::engine::utils::agent::AGENT_ID_NONE,
+            METRIC_REQUEST_TYPE_LOGIN,
+            playerId,
+            latencyDataPoint);
+
+        auto event = createExternalMediaPlayerEvent(playerInfo, "Login");
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, event);
+
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
+
+        m_messageSender_lock->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "loginComplete failed").d("reason", ex.what()).d("localPlayerId", localPlayerId));
+    }
+}
+
+void ExternalMediaAdapterHandler::logoutComplete(const std::string& localPlayerId) {
+    try {
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId));
+
+        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
+        auto playerInfo = m_playerInfoMap[localPlayerId];
+        const std::string playerId = playerInfo.playerId;
+
+        DataPoint latencyDataPoint = m_logoutDurationBuilder.withName(METRIC_EMP_RESPONSE_LATENCY).stopTimer().build();
+        submitResponseLatencyMetric(
+            m_metricRecorder.lock(),
+            aace::engine::utils::agent::AGENT_ID_NONE,
+            METRIC_REQUEST_TYPE_LOGOUT,
+            playerId,
+            latencyDataPoint);
+
+        auto event = createExternalMediaPlayerEvent(playerInfo, "Logout");
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, event);
+
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
+
+        m_messageSender_lock->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "logoutComplete failed").d("reason", ex.what()).d("localPlayerId", localPlayerId));
+    }
+}
+
+void ExternalMediaAdapterHandler::playerEvent(const std::string& localPlayerId, const std::string& eventName) {
+    try {
+        AACE_INFO(LX(TAG).d("eventName", eventName).d("localPlayerId", localPlayerId));
+
+        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
+        auto playerInfo = m_playerInfoMap[localPlayerId];
+        const std::string playerId = playerInfo.playerId;
+
+        submitEventCountMetric(m_metricRecorder.lock(), aace::engine::utils::agent::AGENT_ID_ALL, eventName, playerId);
+
+        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
+            eventName.compare(aace::engine::alexa::TRACK_CHANGED) == 0 ||
+            eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
+            AACE_DEBUG(LX(TAG).d("Setting focus for localPlayerId:", localPlayerId));
+            if (!setFocus(localPlayerId, true)) {
+                AACE_ERROR(LX(TAG).m("setFocus(true) failed").d("localPlayerId", localPlayerId));
+            }
+        }
+
+        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_ENDED) == 0) {
+            ThrowIfNot(setFocus(localPlayerId, false), "setFocusFailed");
+            if (!setFocus(localPlayerId, false)) {
+                AACE_ERROR(LX(TAG).m("setFocus(false) failed").d("localPlayerId", localPlayerId));
+            }
+        }
+
+        auto event = createExternalMediaPlayerEvent(
+            playerInfo,
+            "PlayerEvent",
+            true,
+            [eventName](rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
+                payload.AddMember(
+                    "eventName", rapidjson::Value().SetString(eventName.c_str(), eventName.length()), allocator);
+            });
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, event);
+
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
+
+        m_messageSender_lock->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "playerEvent failed").d("reason", ex.what()).d("localPlayerId", localPlayerId));
+    }
+}
+
+void ExternalMediaAdapterHandler::playerError(
+    const std::string& localPlayerId,
+    const std::string& errorName,
+    long code,
+    const std::string& description,
+    bool fatal) {
+    try {
+        AACE_INFO(
+            LX(TAG).d("errorName", errorName).d("localPlayerId", localPlayerId).d("code", code).d("fatal", fatal));
+
+        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerInfo");
+        auto playerInfo = m_playerInfoMap[localPlayerId];
+        const std::string playerId = playerInfo.playerId;
+
+        submitErrorCountMetric(m_metricRecorder.lock(), aace::engine::utils::agent::AGENT_ID_ALL, errorName, playerId);
+
+        auto event = createExternalMediaPlayerEvent(
+            playerInfo,
+            "PlayerError",
+            true,
+            [errorName, code, description, fatal](
+                rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
+                payload.AddMember(
+                    "errorName", rapidjson::Value().SetString(errorName.c_str(), errorName.length()), allocator);
+                payload.AddMember("code", rapidjson::Value().SetInt64(code), allocator);
+                payload.AddMember(
+                    "description", rapidjson::Value().SetString(description.c_str(), description.length()), allocator);
+                payload.AddMember("fatal", rapidjson::Value().SetBool(fatal), allocator);
+            });
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, event);
+
+        // cases where we should abandon focus
+        if (errorName.compare(aace::engine::alexa::UNPLAYABLE_BY_AUTHORIZATION) == 0 ||
+            errorName.compare(aace::engine::alexa::UNPLAYABLE_BY_STREAM_CONCURRENCY) == 0 ||
+            (errorName.compare(aace::engine::alexa::INTERNAL_ERROR) == 0 && fatal)) {
+            ThrowIfNot(setFocus(localPlayerId, false), "setFocusFailed");
+        }
+
+        auto m_messageSender_lock = m_messageSender.lock();
+        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
+
+        m_messageSender_lock->sendMessage(request);
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "playerError failed").d("reason", ex.what()).d("localPlayerId", localPlayerId));
     }
 }
 
@@ -581,6 +872,10 @@ void ExternalMediaAdapterHandler::doShutdown() {
 
     if (!m_focusHandler.expired()) {
         m_focusHandler.reset();
+    }
+
+    if (!m_metricRecorder.expired()) {
+        m_metricRecorder.reset();
     }
 }
 

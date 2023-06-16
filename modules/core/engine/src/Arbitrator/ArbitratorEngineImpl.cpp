@@ -13,11 +13,8 @@
  * permissions and limitations under the License.
  */
 
-#include <sstream>
-
 #include <AACE/Engine/Core/EngineMacros.h>
 #include <AACE/Engine/Arbitrator/ArbitratorEngineImpl.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.engine.arbitrator.ArbitratorEngineImpl");
@@ -29,14 +26,10 @@ static const std::string METRIC_PROGRAM_NAME_SUFFIX = "ArbitratorEngineImpl";
 static const std::string METRIC_ARBITRATOR_REGISTER_AGENT = "RegisterAgent";
 static const std::string METRIC_ARBITRATOR_DEREGISTER_AGENT = "DeregisterAgent";
 static const std::string METRIC_ARBITRATOR_START_DIALOG = "StartDialog";
-static const std::string METRIC_ARBITRATOR_STOP_DIALOG = "StopDialog";
-static const std::string METRIC_ARBITRATOR_SET_DIALOG_STATE = "SetDialogState";
 
 namespace aace {
 namespace engine {
 namespace arbitrator {
-
-using namespace aace::engine::utils::metrics;
 
 ArbitratorEngineImpl::ArbitratorEngineImpl(std::shared_ptr<aace::arbitrator::Arbitrator> arbitratorPlatformInterface) :
         m_arbitratorPlatformInterface(arbitratorPlatformInterface) {
@@ -74,8 +67,6 @@ bool ArbitratorEngineImpl::onRegisterAgent(
     const std::string& assistantId,
     const std::string& name,
     const std::vector<DialogStateRule>& dialogStateRules) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onRegisterAgent", METRIC_ARBITRATOR_REGISTER_AGENT, 1);
-
     AACE_DEBUG(LX(TAG).d("assistantId", assistantId).d("name", name));
     try {
         ThrowIf(assistantId.empty(), "invalidAssistantId");
@@ -90,8 +81,6 @@ bool ArbitratorEngineImpl::onRegisterAgent(
 }
 
 bool ArbitratorEngineImpl::onDeregisterAgent(const std::string& assistantId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onDeregisterAgent", METRIC_ARBITRATOR_DEREGISTER_AGENT, 1);
-
     AACE_DEBUG(LX(TAG).d("assistantId", assistantId));
     try {
         ThrowIf(assistantId.empty(), "invalidAssistantId");
@@ -105,18 +94,17 @@ bool ArbitratorEngineImpl::onDeregisterAgent(const std::string& assistantId) {
 }
 
 void ArbitratorEngineImpl::onStartDialog(const std::string& assistantId, Mode mode, const std::string& token) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStartDialog", METRIC_ARBITRATOR_START_DIALOG, 1);
     AACE_DEBUG(LX(TAG).d("assistantId", assistantId).d("mode", convertModeToString(mode)));
     try {
         ThrowIf(assistantId.empty(), "assistantId");
-        std::string  reason = "Agent Not Registered";
+        std::string reason = "Agent Not Registered";
         std::string dialogId = "";
-        
-        if(m_assistantManager->isAgentRegistered(assistantId)) {
+
+        if (m_assistantManager->isAgentRegistered(assistantId)) {
             auto startDialogResult = m_assistantManager->startDialog(assistantId, mode);
             dialogId = startDialogResult.first;
             reason = startDialogResult.second;
-        } 
+        }
         ThrowIfNull(m_arbitratorPlatformInterface, "nullArbitratorPlatformInterface");
         // send start dialog reply to platform
         m_arbitratorPlatformInterface->startDialogReply(assistantId, dialogId, reason, token);
@@ -126,7 +114,6 @@ void ArbitratorEngineImpl::onStartDialog(const std::string& assistantId, Mode mo
 }
 
 void ArbitratorEngineImpl::onStopDialog(const std::string& assistantId, const std::string& dialogId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStopDialog", METRIC_ARBITRATOR_STOP_DIALOG, 1);
     AACE_DEBUG(LX(TAG).d("assistantId", assistantId).d("dialogId", dialogId));
     try {
         ThrowIf(assistantId.empty(), "assistantId");
@@ -142,7 +129,6 @@ void ArbitratorEngineImpl::onSetDialogState(
     const std::string& assistantId,
     const std::string& dialogId,
     const std::string& state) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSetDialogState", METRIC_ARBITRATOR_SET_DIALOG_STATE, 1);
     AACE_DEBUG(LX(TAG).d("assistantId", assistantId).d("dialogId", dialogId).d("state", state));
     try {
         ThrowIf(assistantId.empty(), "assistantId");
@@ -151,7 +137,7 @@ void ArbitratorEngineImpl::onSetDialogState(
 
         //check for valid dialogId and registered assistant
         ThrowIfNot(m_assistantManager->isAgentRegistered(assistantId), "Agent Not Registered");
-        
+
         m_assistantManager->setDialogState(assistantId, dialogId, state);
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -161,7 +147,7 @@ void ArbitratorEngineImpl::onSetDialogState(
 void ArbitratorEngineImpl::doShutDown() {
     AACE_INFO(LX(TAG));
 
-    if(m_assistantManager != nullptr) {
+    if (m_assistantManager != nullptr) {
         m_assistantManager->removeListener(shared_from_this());
         m_assistantManager.reset();
     }
@@ -188,16 +174,15 @@ void ArbitratorEngineImpl::removeObserver(std::shared_ptr<ArbitratorObserverInte
 std::pair<std::string, std::string> ArbitratorEngineImpl::onStartDialog(
     const std::string& assistantId,
     const std::string& mode) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStartDialog", METRIC_ARBITRATOR_START_DIALOG, 1);
     AACE_DEBUG(LX(TAG).d("assistantId", assistantId).d("mode", mode));
     try {
         ThrowIf(assistantId.empty(), "assistantId");
-        if(m_assistantManager->isAgentRegistered(assistantId)) {        
+        if (m_assistantManager->isAgentRegistered(assistantId)) {
             return m_assistantManager->startDialog(assistantId, convertStringToMode(mode));
-        } else {         
-            std::string  reason = "Agent Not Registered";
+        } else {
+            std::string reason = "Agent Not Registered";
             std::string dialogId = "";
-            
+
             return std::make_pair(dialogId, reason);
         }
     } catch (std::exception& ex) {

@@ -18,7 +18,7 @@ The `Phone Control` module does not require Engine configuration.
 
 ## Using the Phone Call Controller AASB Messages
 
-### Changing Connection State 
+### Changing Connection State
 
 When connection to a calling device is established or terminated, publish the [`ConnectionStateChanged` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#connectionstatechanged).
 
@@ -44,27 +44,27 @@ To update the device configuration of the connected calling device, publish the 
 
 </br>
 
-### Calling 
+### Calling
 
-Whether the call is initiated by Alexa or by the user, during the call session your application is responsible for publishing [`CallStateChanged` messages](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#callstatechanged) to inform the Engine of the progression of the call (e.g., call is answered, call ended) while the Engine publishes messages to the application in order to handle user interactions with the call (e.g., answer, dial, stop).  
+Whether the call is initiated by Alexa or by the user, during the call session your application is responsible for publishing [`CallStateChanged` messages](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#callstatechanged) to inform the Engine of the progression of the call (e.g., call is answered, call ended) while the Engine publishes messages to the application in order to handle user interactions with the call (e.g., answer, dial, stop).
 
 Regardless of whether the call is inbound or outbound:
 
 * During a call if the user asks Alexa to press the keypad, the Engine publishes the [`SendDTMF` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#senddtmf). Your application must handle this message and publish either the [`SendDTMFSucceeded` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#senddtmfsucceeded) or [`SendDTMFFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#senddtmffailed) to indicate its completion or failure, respectively.
-* If an error occurrs during an active call or call setup, publish the [`CallFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#callfailed) specifying the error. 
+* If an error occurrs during an active call or call setup, publish the [`CallFailed` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#callfailed) specifying the error.
 * When the user asks Alexa to hang up a call, cancel a call setup, or decline an incoming call the Engine publishes the [`Stop` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#stop).
 
 ---
 
 #### Inbound Calling
 
-When an inbound call is detected, publish the [`CreateCallId` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#createcallid). In response, the Engine will publish the `CreateCallId` reply containing a unique identifier for the call. Once an inbound call alert is received, your application must publish the `CallStateChanged` message indicating the call is now in the **CALL_RECEIVED** state. When the inbound call begins ringing, publish the `CallStateChanged` message, this time specifying the **INBOUND_RINGING** call state. 
+When an inbound call is detected, publish the [`CreateCallId` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#createcallid). In response, the Engine will publish the `CreateCallId` reply containing a unique identifier for the call. Once an inbound call alert is received, your application must publish the `CallStateChanged` message indicating the call is now in the **CALL_RECEIVED** state. When the inbound call begins ringing, publish the `CallStateChanged` message, this time specifying the **INBOUND_RINGING** call state.
 
 If the user asks Alexa to answer the inbound call, the Engine publishes the [`Answer` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#answer). Publish the `CallStateChanged` message indicating the call is now **ACTIVE**.
 
 Whenever the user asks Alexa to end the call, the Engine publishes the `Stop` message. Publish the `CallStateChanged` message to indicate that the call is now **IDLE**.
 
-> **Note:** When a caller id is received for an inbound call, publish the [`CallerIdReceived` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#calleridreceived). 
+> **Note:** When a caller id is received for an inbound call, publish the [`CallerIdReceived` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#calleridreceived).
 
 <details markdown="1"><summary>Click to expand or collapse sequence diagram: Inbound Calling</summary>
 <br></br>
@@ -76,7 +76,7 @@ Whenever the user asks Alexa to end the call, the Engine publishes the `Stop` me
 
 #### Outbound Calling
 
-When a user asks Alexa to dial a number or call an uploaded contact, the Engine publishes the [`Dial` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#dial). Alternatively, if the user asks Alexa to redial the last dialed number, the Engine publishes the [`Redial` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#redial). In both cases, your application must publish the `CallStateChanged` message indicating the call is now in the **DIALING** state. Once the outgoing call setup is complete and outbound ringing has started, publish the `CallStateChanged` message specifying the **OUTBOUND_RINGING** call state. 
+When a user asks Alexa to dial a number or call an uploaded contact, the Engine publishes the [`Dial` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#dial). Alternatively, if the user asks Alexa to redial the last dialed number, the Engine publishes the [`Redial` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/phone-control/PhoneCallController/index.html#redial). In both cases, your application must publish the `CallStateChanged` message indicating the call is now in the **DIALING** state. Once the outgoing call setup is complete and outbound ringing has started, publish the `CallStateChanged` message specifying the **OUTBOUND_RINGING** call state.
 
 If the call is answered and in progress, publish the `CallStateChanged` message indicating the call is now **ACTIVE**.
 
@@ -298,7 +298,7 @@ class MyPhoneCallControllerHandler {
         // Send a DTMF signal
     }
 
-    // Implement to convert CallingDeviceConfigurationProperty to string 
+    // Implement to convert CallingDeviceConfigurationProperty to string
     std::string MyPhoneCallControllerHandler::configurationFeatureToString(CallingDeviceConfigurationProperty feature);
 
 };
@@ -306,7 +306,3 @@ class MyPhoneCallControllerHandler {
 ```
 
 </details>
-
-### Android Integration
-
-The Alexa Auto Client Service (AACS) provides the AACS Telephony Library to integrate the Auto SDK `Phone Control` module on Android. See the AACS Telephony Library documentation for more information.

@@ -9,25 +9,25 @@ participant "Auto SDK" as AutoSDK  order 40
 participant LoginWithAmazonService  order 50
 
 Application -> AuthorizationHandler : Start CBL authorization flow.
-AuthorizationHandler -> AutoSDK : startAuthorization( "alexa:cbl", "" )
+AuthorizationHandler -> AutoSDK : StartAuthorization{ "alexa:cbl", "" }
 opt Other Alexa authorizations used previously will be logged out.
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "<previous-service>", UNAUTHORIZED )
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "<previous-service>", UNAUTHORIZED }
 end
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", AUTHORIZING )
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "alexa:cbl", AUTHORIZING }
 
 == Get CBL code and url from LWA ==
-AutoSDK->LoginWithAmazonService: Authorize and get CBL code 
-AutoSDK -> AuthorizationHandler : eventReceived( "alexa:cbl", "{\n\t"type" : "cbl-code",\n\t"payload": { \n\t\t"code" : "<code>", \n\t\t"url" : "<url>" \n\t}\n}")
+AutoSDK->LoginWithAmazonService: Authorize and get CBL code
+AutoSDK -> AuthorizationHandler : EventReceived{ "alexa:cbl", "{\n\t"type" : "cbl-code",\n\t"payload": { \n\t\t"code" : "<code>", \n\t\t"url" : "<url>" \n\t}\n}" }
 
 == Wait for user to authenticate with LWA ==
 AutoSDK->LoginWithAmazonService: Poll for tokens
 LoginWithAmazonService-->AutoSDK: {refresh-token, access-token}
-AutoSDK -> AuthorizationHandler : setAuthorizationData( "alexa:cbl", "refreshToken", "{ "refreshToken" : "<refreshToken>" }" )
+AutoSDK -> AuthorizationHandler : SetAuthorizationData{ "alexa:cbl", "refreshToken", "{ "refreshToken" : "<refreshToken>" }" }
 
 opt When user profile is configured
-AutoSDK -> AuthorizationHandler : eventReceived( "alexa:cbl", "{\n\t"type" : "user-profile",\n\t"payload" : {\n\t\t"name" : "<name>", \n\t\t"email" : "<email>" \n\t}\n}")
+AutoSDK -> AuthorizationHandler : EventReceived{ "alexa:cbl", "{\n\t"type" : "user-profile",\n\t"payload" : {\n\t\t"name" : "<name>", \n\t\t"email" : "<email>" \n\t}\n}" }
 end
 
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", AUTHORIZED )
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "alexa:cbl", AUTHORIZED }
 
 @enduml

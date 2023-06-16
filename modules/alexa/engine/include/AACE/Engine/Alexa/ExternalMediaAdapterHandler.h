@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,18 +24,22 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ExternalMediaAdapterInterface.h"
-#include "ExternalMediaPlayerInterface.h"
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/ExternalMediaAdapter.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/ExternalMediaAdapter.h"
-
 #include "DiscoveredPlayerSenderInterface.h"
 #include "ExternalMediaAdapterHandlerInterface.h"
+#include "ExternalMediaAdapterInterface.h"
+#include "ExternalMediaPlayerInterface.h"
 
 #include <rapidjson/document.h>
 
@@ -52,16 +56,25 @@ class ExternalMediaAdapterHandler
 protected:
     ExternalMediaAdapterHandler(
         std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
-        std::shared_ptr<FocusHandlerInterface> focusHandler);
+        std::shared_ptr<FocusHandlerInterface> focusHandler,
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     bool initializeAdapterHandler(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
     bool validatePlayer(const std::string& localPlayerId, bool checkAuthorized = true);
     bool setFocus(const std::string& localPlayerId, bool focusAcquire);
+    void setDefaultPlayerFocus();
 
     std::string createExternalMediaPlayerEvent(
         const std::string& localPlayerId,
+        const std::string& event,
+        bool includePlaybackSessionId = false,
+        std::function<void(rapidjson::Value::Object&, rapidjson::Value::AllocatorType&)> createPayload =
+            [](rapidjson::Value::Object& v, rapidjson::Value::AllocatorType& a) {});
+    std::string createExternalMediaPlayerEvent(
+        const PlayerInfo& playerInfo,
         const std::string& event,
         bool includePlaybackSessionId = false,
         std::function<void(rapidjson::Value::Object&, rapidjson::Value::AllocatorType&)> createPayload =
@@ -71,6 +84,15 @@ protected:
         const std::vector<aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>& discoveredPlayers);
     bool removeDiscoveredPlayer(const std::string& localPlayerId);
     void reportPlaybackSessionId(const std::string& localPlayerId, const std::string& sessionId);
+    void loginComplete(const std::string& localPlayerId);
+    void logoutComplete(const std::string& localPlayerId);
+    void playerEvent(const std::string& localPlayerId, const std::string& eventName);
+    void playerError(
+        const std::string& localPlayerId,
+        const std::string& errorName,
+        long code,
+        const std::string& description,
+        bool fatal);
 
     // ExternalMediaAdapterHandler interface
     virtual bool handleAuthorization(
@@ -104,6 +126,38 @@ protected:
 
     // alexaClientSDK::avsCommon::utils::RequiresShutdown
     virtual void doShutdown() override;
+
+    /**
+     * Records a metric with the specified data points.
+     * Uses the default context for ExternalMediaPlayer.
+     */
+    static void submitMetric(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& recorder,
+        aace::engine::utils::agent::AgentIdType agentId,
+        const std::string& source,
+        const std::vector<aace::engine::metrics::DataPoint>& datapoints);
+
+    /// Record an event count metric of the specified type
+    static void submitEventCountMetric(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& recorder,
+        aace::engine::utils::agent::AgentIdType agentId,
+        const std::string& eventType,
+        const std::string& playerId);
+
+    /// Record an error count metric of the specified type
+    static void submitErrorCountMetric(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& recorder,
+        aace::engine::utils::agent::AgentIdType agentId,
+        const std::string& errorType,
+        const std::string& playerId);
+
+    /// Record a response metric of the specified type
+    static void submitResponseLatencyMetric(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& recorder,
+        aace::engine::utils::agent::AgentIdType agentId,
+        const std::string& requestType,
+        const std::string& playerId,
+        const aace::engine::metrics::DataPoint& latencyDataPoint);
 
 public:
     std::vector<PlayerInfo> authorizeDiscoveredPlayers(const std::vector<PlayerInfo>& authorizedPlayerList) override;
@@ -143,6 +197,8 @@ public:
 
 protected:
     std::weak_ptr<FocusHandlerInterface> m_focusHandler;
+    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
+    std::weak_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
     /**
      * Generic executor. Used for delaying focus state change.
      */
@@ -166,6 +222,12 @@ private:
      * Serializes generic condition. Used for delaying focus state change.
      */
     std::condition_variable m_attemptedSetFocusPlayerInFocusCondition;
+
+    /// Duration builder for login latency metric
+    aace::engine::metrics::DurationDataPointBuilder m_loginDurationBuilder;
+
+    /// Duration builder for logout latency metric
+    aace::engine::metrics::DurationDataPointBuilder m_logoutDurationBuilder;
 };
 
 class FocusHandlerInterface {

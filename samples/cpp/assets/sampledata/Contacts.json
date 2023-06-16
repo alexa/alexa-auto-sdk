@@ -12,7 +12,31 @@
                     "label": "Test",
                     "number": "34985398457"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Alice Work",
+                    "addressLine1": "456 Enterprise Way",
+                    "addressLine2": "Building 13",
+                    "addressLine3": "",
+                    "city": "Santa Clara",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95001",
+                    "country": "US"
+                },
+                {
+                    "label": "Alice Home",
+                    "addressLine1": "123 Main St",
+                    "addressLine2": "Apt 13",
+                    "addressLine3": "",
+                    "city": "Santa Clara",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95001",
+                    "country": "US"
+                }
+            ]                      
         },
         {
             "id": "002",
@@ -30,7 +54,20 @@
                     "label": "Work",
                     "number": "54321"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Bob",
+                    "addressLine1": "789 Enterprise Way",
+                    "addressLine2": "Building 1",
+                    "addressLine3": "",
+                    "city": "Santa Clara",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95002",
+                    "country": "US"
+                }
+            ]           
         },
         {
             "id": "003",
@@ -44,7 +81,20 @@
                     "label": "Toto",
                     "number": "398457"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Calvin",
+                    "addressLine1": "123 Enterprise Way",
+                    "addressLine2": "Building 1",
+                    "addressLine3": "",
+                    "city": "Santa Clara",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95002",
+                    "country": "US"
+                }
+            ]            
         },
         {
             "id": "004",
@@ -58,7 +108,20 @@
                     "label": "Home",
                     "number": "121212"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "David",
+                    "addressLine1": "99 Enterprise Way",
+                    "addressLine2": "Building 42",
+                    "addressLine3": "",
+                    "city": "Santa Clara",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95002",
+                    "country": "US"
+                }
+            ]              
         },
         {
             "id": "005",
@@ -72,7 +135,20 @@
                     "label": "Home",
                     "number": "131313"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Ethan",
+                    "addressLine1": "99 Enterprise Way",
+                    "addressLine2": "Building 42",
+                    "addressLine3": "",
+                    "city": "Santa Clara",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95002",
+                    "country": "US"
+                }
+            ]            
         },
         {
             "id": "006",
@@ -86,7 +162,20 @@
                     "label": "Home",
                     "number": "746335"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Jack",
+                    "addressLine1": "1701 Airport Blvd, San Jose",
+                    "addressLine2": "",
+                    "addressLine3": "",
+                    "city": "San Jose",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95110",
+                    "country": "US"
+                }
+            ]            
         },
         {
             "id": "007",
@@ -100,7 +189,20 @@
                     "label": "Home",
                     "number": "4556674"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Hanna",
+                    "addressLine1": "1701 Airport Blvd, San Jose",
+                    "addressLine2": "",
+                    "addressLine3": "",
+                    "city": "San Jose",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "95110",
+                    "country": "US"
+                }
+            ]            
         },
         {
             "id": "008",
@@ -114,7 +216,31 @@
                     "label": "Home",
                     "number": "455643"
                 }
-            ]
+            ],
+            "postalAddresses": [
+                {
+                    "label": "Jason Home",
+                    "addressLine1": "1100 Enterprise Way, Sunnyvale",
+                    "addressLine2": "Building 14",
+                    "addressLine3": "",
+                    "city": "Sunnyvale",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "94089",
+                    "country": "US"
+                },
+                {
+                    "label": "Jason Work",
+                    "addressLine1": "1100 Mathilda Ave",
+                    "addressLine2": "Apt 14",
+                    "addressLine3": "",
+                    "city": "Sunnyvale",
+                    "stateOrRegion": "California",
+                    "districtOrCounty": "",
+                    "postalCode": "94089",
+                    "country": "US"
+                }
+            ]            
         },
         {
             "id": "009",
@@ -132,7 +258,7 @@
                     "label": "Work",
                     "number": "2349875"
                 }
-            ]
+            ] 
         },
         {
             "id": "010",
@@ -150,7 +276,7 @@
                     "label": "Work",
                     "number": "45633"
                 }
-            ]
+            ]           
         }
     ]
 }

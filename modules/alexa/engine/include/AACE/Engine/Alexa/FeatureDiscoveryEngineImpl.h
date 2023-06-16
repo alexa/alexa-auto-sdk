@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "AVSCommon/Utils/RequiresShutdown.h"
-#include "AACE/Alexa/FeatureDiscovery.h"
-#include "AACE/Engine/Core/EngineService.h"
-#include "AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h"
-#include "AACE/Engine/Alexa/FeatureDiscoveryRESTAgent.h"
-#include "AACE/Engine/Utils/Threading/Executor.h"
+#include <AVSCommon/Utils/RequiresShutdown.h>
+#include <AACE/Alexa/FeatureDiscovery.h>
+#include <AACE/Engine/Core/EngineService.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+#include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
+#include <AACE/Engine/Alexa/FeatureDiscoveryRESTAgent.h>
+#include <AACE/Engine/Utils/Threading/Executor.h>
 
 namespace aace {
 namespace engine {
@@ -57,6 +58,7 @@ private:
     std::weak_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> m_propertyManager;
     std::shared_ptr<aace::alexa::FeatureDiscovery> m_featureDiscoveryPlatformInterface;
     std::shared_ptr<aace::engine::alexa::FeatureDiscoveryRESTAgent> m_featureDiscoveryRESTAgent;
+    std::weak_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
     std::string m_tag;
     std::unordered_set<std::string> m_validCombinations;
     aace::engine::utils::threading::Executor m_executor;

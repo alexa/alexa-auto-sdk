@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 #include <AVSCommon/Utils/Logger/ConsoleLogger.h>
 #include <AVSCommon/Utils/Logger/LoggerSinkManager.h>
 #include <AVSCommon/Utils/Logger/LoggerUtils.h>
-#include <AVSCommon/Utils/Metrics.h>
 
 #include "AACE/Engine/Alexa/AlexaEngineLogger.h"
 #include "AACE/Engine/Core/EngineMacros.h"
@@ -60,11 +59,6 @@ void AlexaEngineLogger::emit(
     const char* threadMoniker,
     const char* text) {
     aace::logger::Logger::Level aaceLevel = map(level);
-    if (aaceLevel == aace::logger::Logger::Level::CRITICAL) {
-        if (strstr(text, alexaClientSDK::avsCommon::utils::METRICS_TAG.c_str()) != nullptr) {
-            aaceLevel = aace::logger::Logger::Level::METRIC;
-        }
-    }
     m_engineLogger->log("AVS", TAG, aaceLevel, time, threadMoniker ? threadMoniker : "", text ? text : "");
 }
 

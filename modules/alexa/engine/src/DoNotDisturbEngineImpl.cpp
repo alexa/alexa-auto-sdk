@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -21,13 +21,10 @@
 #include <Settings/SettingCallbacks.h>
 #include "AACE/Engine/Alexa/DoNotDisturbEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
-
-using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.DoNotDisturbEngineImpl");
@@ -35,13 +32,6 @@ static const std::string TAG("aace.alexa.DoNotDisturbEngineImpl");
 // report setting strings
 static const std::string DND_ON = "true";
 static const std::string DND_OFF = "false";
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "DoNotDisturbEngineImpl";
-
-/// Counter metrics for DoNotDisturb Platform APIs
-static const std::string METRIC_DND_SET_DO_NOT_DISTURB = "SetDoNotDisturb";
-static const std::string METRIC_DND_DO_NOT_DISTURB_CHANGED = "DoNotDisturbChanged";
 
 DoNotDisturbEngineImpl::DoNotDisturbEngineImpl(
     std::shared_ptr<aace::alexa::DoNotDisturb> doNotDisturbPlatformInterface) :
@@ -151,8 +141,6 @@ void DoNotDisturbEngineImpl::onSettingNotification(
             case alexaClientSDK::settings::SettingNotifications::AVS_CHANGE:
             // intentional fall-through
             case alexaClientSDK::settings::SettingNotifications::LOCAL_CHANGE:
-                emitCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX, "onSettingNotification", {METRIC_DND_SET_DO_NOT_DISTURB, stateString});
                 m_doNotDisturbPlatformInterface->setDoNotDisturb(value);
                 AACE_VERBOSE(LX(TAG, "onSettingNotification").d("DND ON", stateString));
                 break;
@@ -176,8 +164,6 @@ void DoNotDisturbEngineImpl::onSettingNotification(
 // DoNotDisturbEngineInterface
 bool DoNotDisturbEngineImpl::onDoNotDisturbChanged(bool doNotDisturb) {
     std::string stateString = doNotDisturb ? DND_ON : DND_OFF;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onDoNotDisturbChanged", {METRIC_DND_DO_NOT_DISTURB_CHANGED, stateString});
     if (m_doNotDisturbCapabilityAgent != nullptr) {
         AACE_VERBOSE(LX(TAG, "onDoNotDisturbChanged").d("DND ON", stateString));
         auto m_dndModeSetting = m_doNotDisturbCapabilityAgent->getDoNotDisturbSetting();

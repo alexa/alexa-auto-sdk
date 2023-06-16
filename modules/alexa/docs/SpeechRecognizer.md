@@ -6,7 +6,7 @@ The `SpeechRecognizer` interface is one of the key required interfaces in the Al
 
 At Engine startup time, the `SpeechRecognizer` component in the Engine opens an audio input channel of type `VOICE` for your application to provide the user speech to Alexa. Your application subscribes to the [`AudioInput.StartAudioInput`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioInput/index.html#startaudioinput) and [`AudioInput.StopAudioInput`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioInput/index.html#stopaudioinput) messages as outlined in the [AudioInput](https://alexa.github.io/alexa-auto-sdk/docs/explore/features/core/AudioInput/) interface documentation. When the Engine expects to receive audio from your application, the Engine publishes a `StartAudioInput` message with `audioType` set to `VOICE`. Your application provides the voice audio input until the Engine publishes the `StopAudioInput` message for the same audio type.
 
-The user decides when to speak to Alexa by invoking her with a tap-to-talk GUI button press, a push-to-talk physical button press, or—in vehicles supporting voice-initiated listening—an "Alexa" utterance. 
+The user decides when to speak to Alexa by invoking her with a tap-to-talk GUI button press, a push-to-talk physical button press, or—in vehicles supporting voice-initiated listening—an "Alexa" utterance.
 
 ## Invoke Alexa with tap-and-release
 
@@ -28,7 +28,7 @@ When Amazonlite detects the "Alexa" wake word in the continuous audio stream pro
 
 To save bandwidth when the Engine sends user speech to Alexa in `SpeechRecognizer.Recognize` events, you can configure the Engine to encode the audio with the [Opus audio encoding format](https://www.opus-codec.org/docs/html_api/group__opusencoder.html) by adding the following object to your Engine configuration:
 
-```
+```json
 {
     "aace.alexa": {
        "speechRecognizer": {
@@ -57,7 +57,6 @@ configurations.push_back(speechRecognizerConfig);
 // ... create other EngineConfiguration objects and add them to configurations...
 
 m_engine->configure(configurations);
-
 ```
 
 </details>

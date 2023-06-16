@@ -1,0 +1,27 @@
+From 8cdc99363a30168400e9de5b1e22f3bb45af7c02 Mon Sep 17 00:00:00 2001
+From: Meera Sundaram <sunmeera@amazon.com>
+Date: Wed, 5 Apr 2023 16:45:35 -0700
+Subject: [PATCH] Specify SOVERSION property by CURL_SOVERSION
+
+---
+ lib/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index a50b3242b..39ca706ec 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -116,6 +116,10 @@ endif()
+ set_target_properties(${LIB_NAME} PROPERTIES PREFIX "")
+ set_target_properties(${LIB_NAME} PROPERTIES IMPORT_PREFIX "")
+ 
++if(DEFINED CURL_SOVERSION)
++   set_target_properties(${LIB_NAME} PROPERTIES SOVERSION ${CURL_SOVERSION})
++endif()
++
+ if(CURL_HAS_LTO)
+   set_target_properties(${LIB_NAME} PROPERTIES
+     INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE
+-- 
+2.37.1 (Apple Git-137.1)
+

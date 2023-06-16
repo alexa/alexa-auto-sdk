@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -56,12 +56,6 @@ EngineLogger::EngineLogger() {
 #elif defined AAC_DEFAULT_LOGGER_LEVEL_INFO
     auto rule = aace::engine::logger::sink::Rule::create(
         Level::INFO,
-        aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY,
-        aace::engine::logger::sink::Rule::EMPTY);
-#elif defined AAC_DEFAULT_LOGGER_LEVEL_METRIC
-    auto rule = aace::engine::logger::sink::Rule::create(
-        Level::METRIC,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY,
         aace::engine::logger::sink::Rule::EMPTY);

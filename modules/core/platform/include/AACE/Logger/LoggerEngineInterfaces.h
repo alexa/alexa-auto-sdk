@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -47,11 +47,6 @@ public:
         INFO,
 
         /**
-         * Log of a metric, enabled only for builds with metrics enabled
-         */
-        METRIC,
-
-        /**
          * Log of an event that may indicate a problem
          */
         WARN,
@@ -77,9 +72,6 @@ inline std::ostream& operator<<(std::ostream& stream, const LoggerEngineInterfac
             break;
         case LoggerEngineInterface::Level::INFO:
             stream << "INFO";
-            break;
-        case LoggerEngineInterface::Level::METRIC:
-            stream << "METRIC";
             break;
         case LoggerEngineInterface::Level::WARN:
             stream << "WARN";

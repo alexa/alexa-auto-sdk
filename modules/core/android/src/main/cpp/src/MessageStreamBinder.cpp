@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ Java_com_amazon_aace_core_MessageStream_disposeBinder(JNIEnv* env, jobject /* th
         ThrowIfNull(messageStreamBinder, "invalidMessageStreamBinder");
         delete messageStreamBinder;
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_MessageStream_disposeBinder", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -56,7 +56,7 @@ Java_com_amazon_aace_core_MessageStream_isClosed(JNIEnv* env, jobject /* this */
 
         return messageStreamBinder->getMessageStream()->isClosed();
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_MessageStream_isClosed", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
         return true;
     }
 }
@@ -75,7 +75,7 @@ JNIEXPORT jint JNICALL Java_com_amazon_aace_core_MessageStream_read(
         return static_cast<jint>(
             messageStreamBinder->getMessageStream()->read(((char*)JByteArray(data).ptr()) + offset, size - offset));
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_MessageStream_read", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
         return 0;
     }
 }
@@ -94,8 +94,19 @@ JNIEXPORT jint JNICALL Java_com_amazon_aace_core_MessageStream_write(
         return static_cast<jint>(
             messageStreamBinder->getMessageStream()->write(((char*)JByteArray(data).ptr()) + offset, size));
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_MessageStream_write", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
         return 0;
+    }
+}
+
+JNIEXPORT void JNICALL Java_com_amazon_aace_core_MessageStream_close(JNIEnv* env, jobject /* this */, jlong ref) {
+    try {
+        auto messageStreamBinder = Message_STREAM_BINDER(ref);
+        ThrowIfNull(messageStreamBinder, "invalidMessageStreamBinder");
+
+        messageStreamBinder->getMessageStream()->close();
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
     }
 }
 
@@ -111,7 +122,7 @@ JNIEXPORT jobject JNICALL Java_com_amazon_aace_core_MessageStream_getMode(JNIEnv
 
         return modeObj;
     } catch (const std::exception& ex) {
-        AACE_JNI_ERROR(TAG, "Java_com_amazon_aace_core_MessageStream_getMode", ex.what());
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
         return nullptr;
     }
 }

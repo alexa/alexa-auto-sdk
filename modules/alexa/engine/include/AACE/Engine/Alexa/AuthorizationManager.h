@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <RegistrationManager/RegistrationManagerInterface.h>
 
+#include <AACE/Engine/Metrics/MetricsEmissionInterface.h>
 #include "AuthorizationManagerInterface.h"
 #include "AuthorizationManagerStorage.h"
-#include "MetricsEmissionInterface.h"
 
 namespace aace {
 namespace engine {
@@ -34,7 +34,7 @@ namespace alexa {
 class AuthorizationManager
         : public AuthorizationManagerInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::AuthDelegateInterface
-        , public MetricsEmissionInterface
+        , public aace::engine::metrics::MetricsEmissionInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
         , public std::enable_shared_from_this<AuthorizationManager> {
 public:
@@ -85,8 +85,8 @@ public:
 
     /// @name MetricsEmissionInterface
     /// @{
-    void addListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) override;
-    void removeListener(std::shared_ptr<MetricsEmissionListenerInterface> listener) override;
+    void addListener(std::shared_ptr<aace::engine::metrics::MetricsEmissionListenerInterface> listener) override;
+    void removeListener(std::shared_ptr<aace::engine::metrics::MetricsEmissionListenerInterface> listener) override;
     /// @}
 
 protected:
@@ -174,7 +174,7 @@ private:
         m_authDelegateObservers;
 
     /// An observer to be notified for the change metrics emission state. Access is synchronized with @c m_metricEmissionListenerMutex.
-    std::shared_ptr<MetricsEmissionListenerInterface> m_metricsEmissionListener;
+    std::shared_ptr<aace::engine::metrics::MetricsEmissionListenerInterface> m_metricsEmissionListener;
 
     /// The mutex for synchronizing calls into AuthorizationManager.
     std::mutex m_callMutex;

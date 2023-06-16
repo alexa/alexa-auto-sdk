@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="aacs_contacts_description">Fornecer serviço para os contatos da lista de telefone do seu dispositivo Android</string>
-    <string name="aacs_contacts_title">Serviço de contatos do SAC Alexa Auto</string>
-</resources>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,30 +15,34 @@
 
 #include <AACE/Engine/Core/EngineMacros.h>
 
-#include "AACE/Engine/Alexa/MediaPlaybackRequestorEngineImpl.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
+#include <AACE/Engine/Alexa/MediaPlaybackRequestorEngineImpl.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.MediaPlaybackRequestorEngineImpl");
 
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "MediaPlaybackRequestor";
-static const std::string METRIC_TIME_TO_IGNORE_MEDIA_RESUME = "MediaPlaybackRequestor.RoadSafetyGuardrail";
+/// Threshold reached metric error
+static const std::string METRIC_ERROR_THRESHOLD_REACHED = "THRESHOLD_REACHED";
+
+/// Timeout metric error
+static const std::string METRIC_ERROR_TIMEOUT = "TIMEOUT";
 
 MediaPlaybackRequestorEngineImpl::MediaPlaybackRequestorEngineImpl(
     std::shared_ptr<aace::alexa::MediaPlaybackRequestor> mediaPlaybackRequestorPlatformInterface,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender) :
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown{TAG},
         m_mediaPlaybackRequestorPlatformInterface(mediaPlaybackRequestorPlatformInterface),
         m_connectionStatus(Status::DISCONNECTED) {
-    m_mediaPlaybackRequestor =
-        aace::engine::alexa::MediaPlaybackRequestor::createMediaPlaybackRequestor(messageSender, exceptionSender);
+    m_mediaPlaybackRequestor = aace::engine::alexa::MediaPlaybackRequestor::createMediaPlaybackRequestor(
+        messageSender, exceptionSender, metricRecorder);
 }
 
 bool MediaPlaybackRequestorEngineImpl::initialize(
@@ -62,6 +66,7 @@ std::shared_ptr<MediaPlaybackRequestorEngineImpl> MediaPlaybackRequestorEngineIm
         capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     long long int mediaResumeThreshold) {
     AACE_INFO(LX(TAG));
     try {
@@ -69,7 +74,7 @@ std::shared_ptr<MediaPlaybackRequestorEngineImpl> MediaPlaybackRequestorEngineIm
 
         auto mediaPlaybackRequestorEngineImpl =
             std::shared_ptr<MediaPlaybackRequestorEngineImpl>(new MediaPlaybackRequestorEngineImpl(
-                mediaPlaybackRequestorPlatformInterface, messageSender, exceptionSender));
+                mediaPlaybackRequestorPlatformInterface, messageSender, exceptionSender, metricRecorder));
 
         ThrowIfNot(
             mediaPlaybackRequestorEngineImpl->initialize(mediaResumeThreshold, capabilitiesRegistrar),
@@ -109,11 +114,7 @@ void MediaPlaybackRequestorEngineImpl::onRequestMediaPlayback(
                               .d("mediaResumeThreshold", mediaResumeThreshold));
                 mediaPlaybackRequestorPlatformInterface->mediaPlaybackResponse(
                     MediaPlaybackRequestStatus::FAILED_TIMEOUT);
-                emitTimerMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX,
-                    "mediaResumeRequest",
-                    METRIC_TIME_TO_IGNORE_MEDIA_RESUME,
-                    elapsedBootTime);
+                mediaPlaybackRequestor->submitMediaRequestErrorMetric(elapsedBootTime, METRIC_ERROR_THRESHOLD_REACHED);
             } else if (connectionStatus != Status::CONNECTED) {
                 AACE_WARN(LX(TAG).d("connectionStatus", connectionStatus));
                 mediaPlaybackRequestorPlatformInterface->mediaPlaybackResponse(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@
 #include <gmock/gmock.h>
 #include <sstream>
 
-// testing includes
-#include <AACE/Test/Unit/Core/CoreTestHelper.h>
-// engine includes
-#include <AACE/Engine/Core/EngineImpl.h>
-// platform includes
 #include <AACE/Core/CoreProperties.h>
+#include <AACE/Engine/Core/EngineImpl.h>
+#include <AACE/Test/Unit/Core/CoreTestHelper.h>
 
 using namespace aace::test::unit::core;
 

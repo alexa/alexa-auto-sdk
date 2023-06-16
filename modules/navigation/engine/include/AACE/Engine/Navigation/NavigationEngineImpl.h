@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include <AVSCommon/SDKInterfaces/Endpoints/EndpointCapabilitiesRegistrarInterface.h>
 
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include <AACE/Navigation/Navigation.h>
 #include <AACE/Navigation/NavigationEngineInterfaces.h>
 
@@ -62,7 +63,8 @@ private:
             capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
 public:
     ~NavigationEngineImpl() = default;
@@ -74,6 +76,7 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         const std::string& navigationProviderName);
 
     /// @name @c NavigationHandlerInterface functions.
@@ -130,7 +133,8 @@ private:
     AgentId::IdType getEventAgent(NavigationEngineInterface::EventName event);
     void setErrorAgent(NavigationEngineInterface::ErrorType type, AgentId::IdType agentId);
     AgentId::IdType getErrorAgent(NavigationEngineInterface::ErrorType type);
-    private:
+
+private:
     std::unordered_map<NavigationEngineInterface::EventName, AgentId::IdType> m_eventAgentMap;
 };
 

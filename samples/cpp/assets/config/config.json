@@ -1,13 +1,11 @@
 {
     "aace.alexa": {
+        "alexaClientInfo": {
+            "clientId": "${CLIENT_ID}",
+            "productId": "${PRODUCT_ID}",
+            "amazonId": "${AMAZON_ID}"
+        },
         "avsDeviceSDK": {
-            "deviceInfo": {
-                "clientId": "${CLIENT_ID}",
-                "productId": "${PRODUCT_ID}",
-                "deviceSerialNumber": "${DEVICE_SERIAL_NUMBER}",
-                "manufacturerName": "${MANUFACTURER_NAME}",
-                "description": "${DEVICE_DESCRIPTION}"
-            },
             "libcurlUtils": {
                 "CURLOPT_CAPATH": "${CERTS_PATH}"
             },
@@ -40,23 +38,33 @@
         "localStoragePath": "${DATA_PATH}/aace-storage.db",
         "storageType": "sqlite"
     },
+    "aace.metrics": {
+        "metricDeviceIdTag": "${METRIC_TAG}",
+        "metricStoragePath": "${DATA_PATH}/metrics"
+    },
     "aace.vehicle": {
-        "info": {
+        "deviceInfo": {
+            "manufacturer": "${DEVICE_MANUFACTURER}",
+            "model": "${DEVICE_MODEL}",
+            "platform": "${DEVICE_PLATFORM}",
+            "osVersion": "${DEVICE_OS_VERSION}",
+            "hardwareArch": "${DEVICE_HARDWARE_ARCH}",
+            "serialNumber":  "${DEVICE_SERIAL_NUMBER}"
+        },
+        "appInfo": {
+            "softwareVersion": "${APP_VERSION}"
+        },
+        "vehicleInfo": {
             "make": "${VEHICLE_MAKE}",
             "model": "${VEHICLE_MODEL}",
             "year": "${VEHICLE_YEAR}",
             "trim": "${VEHICLE_TRIM}",
-            "geography": "${VEHICLE_GEOGRAPHY}",
-            "version": "${VEHICLE_VERSION}",
-            "os": "${VEHICLE_OS}",
-            "arch": "${VEHICLE_ARCH}",
-            "language": "${VEHICLE_LANGUAGE}",
-            "microphone": "${VEHICLE_MICROPHONE}",
+            "microphoneType": "${VEHICLE_MICROPHONE}",
+            "operatingCountry": "${VEHICLE_COUNTRY}",
             "vehicleIdentifier": "${VEHICLE_IDENTIFIER}",
             "engineType": "${VEHICLE_ENGINE_TYPE}",
             "rseEmbeddedFireTvs": "${VEHICLE_RSE_EMBEDDED_FIRETVS}"
-        },
-        "operatingCountry": "${VEHICLE_COUNTRY}"
+        }
     },
     "aace.cbl" : {
         "enableUserProfile": false

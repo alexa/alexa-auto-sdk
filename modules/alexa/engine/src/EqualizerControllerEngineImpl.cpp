@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,8 +13,11 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Engine/Alexa/EqualizerControllerEngineImpl.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
+#include <AACE/Engine/Alexa/EqualizerControllerEngineImpl.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
 
 #include <acsdkEqualizerImplementations/SDKConfigEqualizerConfiguration.h>
 
@@ -22,7 +25,7 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
+using namespace aace::engine::metrics;
 
 /// String to identify log entries originating from this file
 static const std::string TAG("aace.alexa.EqualizerControllerEngineImpl");
@@ -30,20 +33,27 @@ static const std::string TAG("aace.alexa.EqualizerControllerEngineImpl");
 /// Key for the JSON equalizer config branch
 static const std::string EQUALIZER_CONFIGURATION_ROOT_KEY = "equalizer";
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "EqualizerControllerEngineImpl";
+/// Source prefix for metrics emitted from EqualizerController
+static const std::string METRIC_PREFIX = "EQUALIZER-";
 
-/// Counter metrics for EqualizerController Platform APIs
-static const std::string METRIC_EQUALIZER_CONTROLLER_SET_BAND_LEVELS = "SetBandLevels";
-static const std::string METRIC_EQUALIZER_CONTROLLER_GET_BAND_LEVELS = "GetBandLevels";
-static const std::string METRIC_EQUALIZER_CONTROLLER_LOCAL_SET_BAND_LEVELS = "LocalSetBandLevels";
-static const std::string METRIC_EQUALIZER_CONTROLLER_LOCAL_ADJUST_BAND_LEVELS = "LocalAdjustBandLevels";
-static const std::string METRIC_EQUALIZER_CONTROLLER_LOCAL_RESET_BANDS = "LocalResetBands";
+/// Source name for event metric
+static const std::string METRIC_SOURCE = METRIC_PREFIX + "EqualizerEvent";
+
+/// Equalizer count metric key
+static const std::string METRIC_EVENT_COUNT = "EqualizerEventCount";
+
+/// Metric event type key
+static const std::string METRIC_EVENT_TYPE = "EventType";
+
+/// SetBandLevels metric type
+static const std::string METRIC_SET_BAND_LEVELS = "SetBandLevels";
 
 EqualizerControllerEngineImpl::EqualizerControllerEngineImpl(
-    std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface) :
+    std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-        m_equalizerPlatformInterface(equalizerPlatformInterface) {
+        m_equalizerPlatformInterface(equalizerPlatformInterface),
+        m_metricRecorder{metricRecorder} {
 }
 
 bool EqualizerControllerEngineImpl::initialize(
@@ -105,13 +115,15 @@ std::shared_ptr<EqualizerControllerEngineImpl> EqualizerControllerEngineImpl::cr
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>
         exceptionEncounteredSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) {
     std::shared_ptr<EqualizerControllerEngineImpl> equalizerEngineImpl = nullptr;
 
     try {
-        ThrowIfNull(equalizerPlatformInterface, "invalidEqualizerPlatformInterface");
+        ThrowIfNull(equalizerPlatformInterface, "nullEqualizerPlatformInterface");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
         equalizerEngineImpl = std::shared_ptr<EqualizerControllerEngineImpl>(
-            new EqualizerControllerEngineImpl(equalizerPlatformInterface));
+            new EqualizerControllerEngineImpl(equalizerPlatformInterface, metricRecorder));
         ThrowIfNot(
             equalizerEngineImpl->initialize(
                 capabilitiesRegistrar,
@@ -136,9 +148,16 @@ std::shared_ptr<EqualizerControllerEngineImpl> EqualizerControllerEngineImpl::cr
 void EqualizerControllerEngineImpl::setEqualizerBandLevels(
     alexaClientSDK::acsdkEqualizerInterfaces::EqualizerBandLevelMap bandLevels) {
     std::vector<EqualizerBandLevel> newBandLevels = convertBandLevels(bandLevels);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "setEqualizerBandLevels", {METRIC_EQUALIZER_CONTROLLER_SET_BAND_LEVELS});
     AACE_VERBOSE(LX(TAG, "setEqualizerBandLevels").d("bandLevels", bandLevelsToString(newBandLevels)));
+    auto metricBuilder = MetricEventBuilder().withSourceName(METRIC_SOURCE).withAlexaAgentId();
+    metricBuilder.addDataPoint(CounterDataPointBuilder{}.withName(METRIC_EVENT_COUNT).increment(1).build());
+    metricBuilder.addDataPoint(
+        StringDataPointBuilder{}.withName(METRIC_EVENT_TYPE).withValue(METRIC_SET_BAND_LEVELS).build());
+    try {
+        recordMetric(m_metricRecorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
     m_equalizerPlatformInterface->setBandLevels(newBandLevels);
 }
 
@@ -156,7 +175,6 @@ void EqualizerControllerEngineImpl::saveState(const alexaClientSDK::acsdkEqualiz
 
 alexaClientSDK::avsCommon::utils::error::SuccessResult<alexaClientSDK::acsdkEqualizerInterfaces::EqualizerState>
 EqualizerControllerEngineImpl::loadState() {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "loadState", {METRIC_EQUALIZER_CONTROLLER_GET_BAND_LEVELS});
     // note: We load state from the platform implementation on startup instead of using persistent storage
     auto bandLevels = m_equalizerPlatformInterface->getBandLevels();
     AACE_VERBOSE(LX(TAG, "loadState").d("bandLevels", bandLevelsToString(bandLevels)));
@@ -174,8 +192,6 @@ void EqualizerControllerEngineImpl::clear() {
 }
 
 void EqualizerControllerEngineImpl::onLocalSetBandLevels(const std::vector<EqualizerBandLevel>& bandLevels) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onLocalSetBandLevels", {METRIC_EQUALIZER_CONTROLLER_SET_BAND_LEVELS});
     AACE_VERBOSE(LX(TAG, "onLocalSetBandLevels").d("bandLevels", bandLevelsToString(bandLevels)));
     // Convert band level settings map
     // note: alexaClientSDK::equalizer::EqualizerController::setBandLevels does not truncate to configured min/max
@@ -185,8 +201,6 @@ void EqualizerControllerEngineImpl::onLocalSetBandLevels(const std::vector<Equal
 }
 
 void EqualizerControllerEngineImpl::onLocalAdjustBandLevels(const std::vector<EqualizerBandLevel>& bandAdjustments) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onLocalAdjustBandLevels", {METRIC_EQUALIZER_CONTROLLER_LOCAL_ADJUST_BAND_LEVELS});
     AACE_VERBOSE(LX(TAG, "onLocalAdjustBandLevels").d("bandAdjustments", bandLevelsToString(bandAdjustments)));
     // Convert band level adjustment map
     // note: alexaClientSDK::equalizer::EqualizerController::adjustBandLevels truncates to configured min/max range
@@ -194,8 +208,6 @@ void EqualizerControllerEngineImpl::onLocalAdjustBandLevels(const std::vector<Eq
 }
 
 void EqualizerControllerEngineImpl::onLocalResetBands(const std::vector<EqualizerBand>& bands) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onLocalResetBands", {METRIC_EQUALIZER_CONTROLLER_LOCAL_RESET_BANDS});
     AACE_VERBOSE(LX(TAG, "onLocalResetBands"));
     if (bands.size() == 0) {
         // Reset all supported bands
@@ -220,6 +232,7 @@ void EqualizerControllerEngineImpl::doShutdown() {
     if (m_equalizerCapabilityAgent != nullptr) {
         m_equalizerCapabilityAgent->shutdown();
     }
+    m_metricRecorder.reset();
 }
 
 int EqualizerControllerEngineImpl::truncateBandLevel(const EqualizerBandLevel& bandLevel) {

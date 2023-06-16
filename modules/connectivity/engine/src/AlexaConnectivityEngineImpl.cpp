@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,13 +20,11 @@
 
 #include "AACE/Engine/Connectivity/AlexaConnectivityEngineImpl.h"
 #include "AACE/Engine/Connectivity/ConnectivityConstants.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace connectivity {
 
-using namespace aace::engine::utils::metrics;
 using namespace aace::connectivity;
 
 /// String to identify log entries originating from this file.
@@ -36,9 +34,6 @@ static const std::string TAG("aace.connectivity.AlexaConnectivityEngineImpl");
 static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaConnectivityEngineImpl";
 
 /// Counter metrics for Alexa Connectivity Platform APIs
-static const std::string METRIC_CONNECTIVITY_GET_CONNECTIVITY_STATE = "GetConnectivityState";
-static const std::string METRIC_CONNECTIVITY_GET_IDENTIFIER = "GetIdentifier";
-static const std::string METRIC_CONNECTIVITY_CONNECTIVITY_STATE_CHANGE = "ConnectivityStateChange";
 static const std::string METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT = "SendConnectivityEvent";
 static const std::string METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT_FAILED = "SendConnectivityEventFailed";
 
@@ -110,8 +105,6 @@ std::shared_ptr<AlexaConnectivityEngineImpl> AlexaConnectivityEngineImpl::create
 bool AlexaConnectivityEngineImpl::onConnectivityStateChange() {
     AACE_INFO(LX(TAG));
     try {
-        emitCounterMetrics(
-            METRIC_PROGRAM_NAME_SUFFIX, "onConnectivityStateChange", METRIC_CONNECTIVITY_CONNECTIVITY_STATE_CHANGE, 1);
         // Save the old values.
         auto oldDataPlan = getDataPlan();
         auto oldDataPlansAvailable = DataPlansAvailable(getDataPlansAvailable());
@@ -160,8 +153,6 @@ bool AlexaConnectivityEngineImpl::onConnectivityStateChange() {
 
 void AlexaConnectivityEngineImpl::onSendConnectivityEvent(const std::string& event, const std::string& token) {
     AACE_DEBUG(LX(TAG).sensitive("token", token));
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onSendConnectivityEvent", METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT, 1);
 
     m_executor.submit([this, event, token]() {
         AACE_DEBUG(LX(TAG).m("onSendConnectivityEventExecutor"));
@@ -203,11 +194,6 @@ void AlexaConnectivityEngineImpl::onSendConnectivityEvent(const std::string& eve
                 // Notify only when token is not empty
                 m_alexaConnectivityPlatformInterface->connectivityEventResponse(token, StatusCode::FAIL);
             }
-            emitCounterMetrics(
-                METRIC_PROGRAM_NAME_SUFFIX,
-                "onSendConnectivityEvent",
-                METRIC_CONNECTIVITY_SEND_CONNECTIVITY_EVENT_FAILED,
-                1);
         }
     });
 }
@@ -230,7 +216,6 @@ AlexaConnectivityInterface::ManagedProvider AlexaConnectivityEngineImpl::getMana
 AlexaConnectivityInterface::NetworkIdentifier AlexaConnectivityEngineImpl::getNetworkIdentifier() const {
     AACE_INFO(LX(TAG));
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "getNetworkIdentifier", METRIC_CONNECTIVITY_GET_IDENTIFIER, 1);
         ThrowIfNull(m_alexaConnectivityPlatformInterface, "invalidPlatformInterface");
 
         // FOR SECURITY REASONS, GET THE NETWORK IDENTIFIER FROM THE PLATFORM
@@ -381,8 +366,6 @@ AlexaConnectivityInterface::Terms AlexaConnectivityEngineImpl::parseTerms(const 
 bool AlexaConnectivityEngineImpl::updateConnectivityState() {
     AACE_INFO(LX(TAG));
     try {
-        emitCounterMetrics(
-            METRIC_PROGRAM_NAME_SUFFIX, "updateConnectivityState", METRIC_CONNECTIVITY_GET_CONNECTIVITY_STATE, 1);
         ThrowIfNull(m_alexaConnectivityPlatformInterface, "invalidPlatformInterface");
 
         // Lock to ensure supported properties are updated as a single block.

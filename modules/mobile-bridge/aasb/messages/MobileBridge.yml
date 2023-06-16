@@ -1,0 +1,154 @@
+topic: MobileBridge
+namespace: aasb.message.mobileBridge
+path: MobileBridge
+
+messages:
+  - action: StartMobileBridge
+    direction: incoming
+    desc: Start mobile bridge.
+    payload:
+      - name: tunFd
+        desc: The file descriptor for the TUN interface.
+        type: int
+
+  - action: StopMobileBridge
+    direction: incoming
+    desc: Stop mobile bridge.
+
+  - action: ProtectSocket
+    direction: outgoing
+    desc: Protect a socket from VPN connections.
+    payload:
+      - name: socket
+        desc: The socket to protect.
+        type: int
+    reply:
+      - name: success
+        type: bool
+        desc: Success to protect the socket.
+
+  - action: OnActiveTransportChange
+    direction: outgoing
+    desc: Notify transport change.
+    payload:
+      - name: transportId
+        desc: The string to identify the transport.
+      - name: transportState
+        type: TransportState
+        desc: The transport state
+
+  - action: OnDeviceHandshaked
+    direction: outgoing
+    desc: Notify a device has completed handshaking.
+    payload:
+      - name: transportId
+        desc: The string to identify the transport.
+      - name: deviceToken
+        desc: An unique token to identify the device.
+      - name: friendlyName
+        desc: Device's friendly name.
+
+  - action: AuthorizeDevice
+    direction: incoming
+    desc: Notify a device has completed handshaking.
+    payload:
+      - name: deviceToken
+        desc: An unique token to identify the device.
+      - name: authorized
+        type: bool
+        desc: Whether the device is authorized.
+
+  - action: OnInfo
+    direction: outgoing
+    desc: Notify an info sent from a connected device.
+    payload:
+      - name: deviceToken
+        desc: An unique token to identify the device.
+      - name: infoId
+        type: int
+      - name: info
+        desc: The info string.
+
+  - action: SendInfo
+    direction: incoming
+    desc: Send an info to the specified device.
+    payload:
+      - name: deviceToken
+        desc: An unique token to identify the device.
+      - name: infoId
+        type: int
+      - name: info
+        desc: The info string.
+
+  - action: GetTransports
+    direction: outgoing
+    desc: Get the list of transports.
+    reply:
+      - name: transports
+        type: list:Transport
+        desc: The list of transports.
+
+  - action: Connect
+    direction: outgoing
+    desc: Connect to the specified transport.
+    payload:
+      - name: transportId
+        desc: The string to identify the transport.
+      - name: inputStreamId
+        desc: Stream ID of incoming transport data.
+      - name: outputStreamId
+        desc: Stream ID of outgoing transport data.
+    reply:
+      - name: transportId
+        desc: The string to identify the transport.
+      - name: success
+        type: bool
+        desc: Success of connection attempt.
+
+  - action: Disconnect
+    direction: outgoing
+    desc: Disconnect with specified transport.
+    payload:
+      - name: transportId
+        desc: The string to identify the transport.
+    reply:
+      - name: transportId
+        desc: The string to identify the transport.
+      - name: success
+        type: bool
+        desc: Success of disconnection attempt.
+
+types:
+
+  - name: App
+    type: struct
+    values:
+      - name: appId
+        desc: The unique identifier of the app.
+
+  - name: Transport
+    type: struct
+    values:
+      - name: transportId
+        desc: The unique identifier of the transport.
+      - name: type
+        desc: The transport type.
+        type: TransportType
+
+  - name: TransportType
+    type: enum
+    values:
+      - name: BLUETOOTH
+      - name: WIFI
+      - name: USB
+      - name: EAP
+      - name: UNKNOWN
+  - name: TransportState
+    type: enum
+    values:
+      - name: INITIALIZED
+      - name: CONNECTING
+      - name: CONNECTED
+      - name: HANDSHAKED
+      - name: AUTHORIZED
+      - name: DISCONNECTED

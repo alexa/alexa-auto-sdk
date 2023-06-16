@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -70,6 +70,7 @@
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSGatewayManager/AVSGatewayManager.h>
 #include <CapabilitiesDelegate/CapabilitiesDelegate.h>
+#include <Captions/CaptionManager.h>
 #include <CertifiedSender/CertifiedSender.h>
 #include <ContextManager/ContextManager.h>
 #include <Endpoints/EndpointRegistrationManager.h>
@@ -89,6 +90,7 @@
 #include "AACE/Engine/Core/EngineService.h"
 #include "AACE/Engine/Location/LocationEngineService.h"
 #include "AACE/Engine/Logger/LoggerEngineService.h"
+#include "AACE/Engine/Metrics/MetricsEngineService.h"
 #include "AACE/Engine/Network/NetworkEngineService.h"
 #include "AACE/Engine/Network/NetworkInfoObserver.h"
 #include "AACE/Engine/PropertyManager/PropertyDescription.h"
@@ -124,6 +126,7 @@
 #include "SpeechSynthesizerEngineImpl.h"
 #include "SystemSoundPlayer.h"
 #include "TemplateRuntimeEngineImpl.h"
+#include "CaptionPresenterEngineImpl.h"
 #include "WakewordEngineManager.h"
 #include "WakewordObservableInterface.h"
 #include "WakewordObserverInterface.h"
@@ -155,6 +158,7 @@ public:
     DESCRIBE(
         "aace.alexa",
         VERSION("1.0"),
+        DEPENDS(aace::engine::metrics::MetricsEngineService),
         DEPENDS(aace::engine::audio::AudioEngineService),
         DEPENDS(aace::engine::location::LocationEngineService),
         DEPENDS(aace::engine::logger::LoggerEngineService),
@@ -327,7 +331,6 @@ private:
     bool configureDeviceSDK(std::shared_ptr<std::istream> configuration);
     bool connect();
     bool disconnect();
-    void recordVehicleMetric();
     bool registerProperties();
 
     bool register3PWakewordManagerDelegate(
@@ -358,6 +361,7 @@ private:
     bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::DeviceSetup> deviceSetupPlatformInterface);
     bool registerPlatformInterfaceType(
         std::shared_ptr<aace::alexa::FeatureDiscovery> featureDiscoveryPlatformInterface);
+    bool registerPlatformInterfaceType(std::shared_ptr<aace::alexa::CaptionPresenter> captionPresenter);
 
     bool createExternalMediaPlayerImpl();
 
@@ -407,6 +411,7 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityChangeNotifier> m_capabilityChangeNotifier;
     alexaClientSDK::avsCommon::utils::Optional<alexaClientSDK::acsdkInteractionModel::InteractionModelFactoryInterfaces>
         m_interactionModelCA;
+    std::shared_ptr<alexaClientSDK::captions::CaptionManager> m_captionManager;
 
     std::shared_ptr<aace::engine::alexa::LocaleAssetsManager> m_localeAssetManager;
 
@@ -418,6 +423,7 @@ private:
     std::shared_ptr<SystemSoundPlayer> m_systemSoundPlayer;
     std::shared_ptr<AudioPlayerObserverDelegate> m_audioPlayerObserverDelegate;
     std::shared_ptr<AlexaAuthorizationProvider> m_alexaAuthorizationProvider;
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricService;
 
     std::shared_ptr<aace::engine::storage::LocalStorageInterface> m_localStorage;
 
@@ -473,6 +479,7 @@ private:
     std::shared_ptr<aace::engine::alexa::TemplateRuntimeEngineImpl> m_templateRuntimeEngineImpl;
     std::shared_ptr<aace::engine::alexa::DeviceSetupEngineImpl> m_deviceSetupEngineImpl;
     std::shared_ptr<aace::engine::alexa::FeatureDiscoveryEngineImpl> m_featureDiscoveryEngineImpl;
+    std::shared_ptr<aace::engine::alexa::CaptionPresenterEngineImpl> m_captionPresenterEngineImpl;
 
     // logger
     std::shared_ptr<AlexaEngineLogger> m_logger;
@@ -502,6 +509,12 @@ private:
     bool m_duckingEnabled;
 
     std::mutex m_setPropertyResultCallbackMutex;
+
+    // Caption
+    std::shared_ptr<aace::engine::alexa::CaptionPresenterHandler> m_captionPresenterHandler;
+
+    // Media player fingerprint
+    alexaClientSDK::avsCommon::utils::mediaPlayer::Fingerprint m_mediaPlayerFingerprint;
 };
 
 //

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,132 +13,65 @@
  * permissions and limitations under the License.
  */
 
-#include "AACE/Engine/Metrics/MetricEvent.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Metrics/MetricEvent.h"
 
 namespace aace {
 namespace engine {
 namespace metrics {
 
-static const std::string TAG("MetricEvent");
-
-/// Default number of samples for metric.
-const std::string METRIC_NUM_SAMPLES_DEFAULT = "1";
-
-/// Empty context value for metric.
-const std::string METRIC_EMPTY_CONTEXT = "";
-const std::string METRIC_DEFAULT_CONTEXT = "0";
-
-MetricEvent::MetricEvent(const std::string& program, const std::string& source) :
-        MetricEvent(program, source, MetricPriority::NR, MetricBufferType::NB, MetricIdentityType::NUNI) {
-}
-
-MetricEvent::MetricEvent(const std::string& program, const std::string& source, MetricPriority priority) :
-        MetricEvent(program, source, priority, MetricBufferType::NB, MetricIdentityType::NUNI) {
-}
-
-MetricEvent::MetricEvent(const std::string& program, const std::string& source, MetricBufferType bufferType) :
-        MetricEvent(program, source, MetricPriority::NR, bufferType, MetricIdentityType::NUNI) {
-}
+/// String to identify log entries originating from this file.
+static const std::string TAG("aace.engine.metrics.MetricEvent");
 
 MetricEvent::MetricEvent(
-    const std::string& program,
-    const std::string& source,
-    MetricBufferType bufferType,
-    MetricIdentityType identityType) :
-        MetricEvent(program, source, MetricPriority::NR, bufferType, identityType) {
+    const std::string& programName,
+    const std::string& sourceName,
+    MetricContext metricContext,
+    const std::unordered_map<std::string, DataPoint>& dataPoints,
+    std::chrono::steady_clock::time_point timestamp) :
+        m_programName{programName},
+        m_sourceName{sourceName},
+        m_metricContext{std::move(metricContext)},
+        m_dataPoints{dataPoints},
+        m_timestamp{timestamp} {
 }
 
-MetricEvent::MetricEvent(
-    const std::string& program,
-    const std::string& source,
-    MetricPriority priority,
-    MetricBufferType bufferType,
-    MetricIdentityType identityType) :
-        m_program{program},
-        m_source(source),
-        m_metricLog{""},
-        m_priority{priority},
-        m_bufferType{bufferType},
-        m_identityType{identityType} {
-    m_metricLog.append(m_program).append(":").append(m_source);
+std::string MetricEvent::getProgramName() const {
+    return m_programName;
 }
 
-void MetricEvent::addTimer(const std::string& name, double value) {
-    addDataToLog(name, std::to_string(value), MetricDataType::TI, METRIC_NUM_SAMPLES_DEFAULT);
+std::string MetricEvent::getSourceName() const {
+    return m_sourceName;
 }
 
-void MetricEvent::addString(const std::string& name, const std::string& value) {
-    addDataToLog(name, value, MetricDataType::DV, METRIC_NUM_SAMPLES_DEFAULT);
+const MetricContext& MetricEvent::getMetricContext() const {
+    return m_metricContext;
 }
 
-void MetricEvent::addCounter(const std::string& name, int value) {
-    addDataToLog(name, std::to_string(value), MetricDataType::CT, METRIC_NUM_SAMPLES_DEFAULT);
-}
-
-void MetricEvent::record() {
-    record(METRIC_EMPTY_CONTEXT);
-}
-
-void MetricEvent::record(const std::string& context) {
-    std::string priorityStr = priorityToString(m_priority);
-    m_metricLog.append(":").append(priorityStr);
-    m_metricLog.append(":").append(bufferTypeToString(m_bufferType));
-    m_metricLog.append(":").append(identityTypeToString(m_identityType));
-    if (context.empty()) {
-        AACE_WARN(LX(TAG).m("Empty context, using default value"));
-        AACE_METRIC(LX(TAG, METRIC_DEFAULT_CONTEXT + ":" + m_metricLog));
+DataPoint MetricEvent::getDataPoint(const std::string& name, DataType dataType) const {
+    auto iter = m_dataPoints.find(name);
+    if (iter == m_dataPoints.end()) {
+        AACE_WARN(LX(TAG).m("requested data point doesn't exist").d("name", name));
+        return DataPoint{"", "", DataType::COUNTER};
     }
-    else {
-        AACE_METRIC(LX(TAG, context + ":" + m_metricLog));
-    }
+    return iter->second;
 }
 
-void MetricEvent::addDataToLog(std::string name, std::string value, MetricDataType type, std::string sampleCount) {
-    m_metricLog.append(":").append(name).append("=").append(value).append(";");
-    m_metricLog.append(dataTypeToString(type)).append(";").append(sampleCount).append(",");
+std::vector<DataPoint> MetricEvent::getDataPoints() const {
+    std::vector<DataPoint> dataPoints;
+    for (const auto& entry : m_dataPoints) {
+        dataPoints.push_back(entry.second);
+    }
+    return dataPoints;
 }
 
-std::string MetricEvent::priorityToString(MetricPriority priority) {
-    switch (priority) {
-        case MetricPriority::NR:
-            return "NR";
-        case MetricPriority::HI:
-            return "HI";
-    }
-    return "";
+std::chrono::system_clock::time_point MetricEvent::getSystemClockTimestamp() const {
+    return std::chrono::system_clock::now() - std::chrono::duration_cast<std::chrono::system_clock::duration>(
+                                                  std::chrono::steady_clock::now() - m_timestamp);
 }
 
-std::string MetricEvent::dataTypeToString(MetricDataType type) {
-    switch (type) {
-        case MetricDataType::TI:
-            return "TI";
-        case MetricDataType::DV:
-            return "DV";
-        case MetricDataType::CT:
-            return "CT";
-    }
-    return "";
-}
-
-std::string MetricEvent::bufferTypeToString(MetricBufferType type) {
-    switch (type) {
-        case MetricBufferType::BF:
-            return "BF";
-        case MetricBufferType::NB:
-        default:
-            return "NB";
-    }
-}
-
-std::string MetricEvent::identityTypeToString(MetricIdentityType type) {
-    switch (type) {
-        case MetricIdentityType::UNIQ:
-            return "UNIQ";
-        case MetricIdentityType::NUNI:
-        default:
-            return "NUNI";
-    }
+std::chrono::steady_clock::time_point MetricEvent::getSteadyClockTimestamp() const {
+    return m_timestamp;
 }
 
 }  // namespace metrics

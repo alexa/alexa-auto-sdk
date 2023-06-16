@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">4.2</span>
+   &#160;<span id="projectnumber">4.3</span>
    </div>
   </td>
  </tr>
@@ -75,66 +75,112 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a6aa7ee80198586f3a51d0c0f8fb542cf"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cf">VehiclePropertyType</a> { <br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfab1e5b15ab34e89de8faf65a0d88d1c64">VehiclePropertyType::MAKE</a>, 
+<tr class="memitem:ae4b58f9dd91c015120344afcfc6649e4"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4">DeviceInfoPropertyType</a> { <br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4a6a4c1672391ec30e8de1c47e55fa0037">DeviceInfoPropertyType::MANUFACTURER</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa7a03bac2692f8d17e2cda1b0721ffd0e">VehiclePropertyType::MODEL</a>, 
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4a7a03bac2692f8d17e2cda1b0721ffd0e">DeviceInfoPropertyType::MODEL</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfad18101729d290479023d5eceeb29c9cf">VehiclePropertyType::YEAR</a>, 
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4abac5402bcf9584b3014bd64b8b6ad282">DeviceInfoPropertyType::SERIAL_NUMBER</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfaa32049f307ffa78cf7b4586ac7d98e06">VehiclePropertyType::TRIM</a>, 
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4a8b55a44b49368262df89fd0e17b1a181">DeviceInfoPropertyType::PLATFORM</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfaf86cc9cf8e9ec55a6a9bb2e8380f08ae">VehiclePropertyType::GEOGRAPHY</a>, 
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4a75b26c6de10578eefbeeea43f8557b85">DeviceInfoPropertyType::OS_VERSION</a>, 
 <br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa021321e8c168ba3ae39ce3a2e7b3ec87">VehiclePropertyType::VERSION</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa079a931f8bc9b374ff498c7343959d32">VehiclePropertyType::OPERATING_SYSTEM</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa369dd85de22dfb81108b4fbd1d84203e">VehiclePropertyType::HARDWARE_ARCH</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa5b64a5253f843da2950972747ac9a3b0">VehiclePropertyType::LANGUAGE</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa74a1ebda7fe4e2d30e665420bedde3bf">VehiclePropertyType::MICROPHONE</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa85399bf95fd69bdc2f006fd5490aa748">VehiclePropertyType::VEHICLE_IDENTIFIER</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfaa9d881f4c0b245ec3c7eb6475df3808f">VehiclePropertyType::ENGINE_TYPE</a>, 
-<br />
-&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfa00596599fbcfdf162c7c2bb17eb73d98">VehiclePropertyType::RSE_EMBEDDED_FIRETVS</a>
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4a369dd85de22dfb81108b4fbd1d84203e">DeviceInfoPropertyType::HARDWARE_ARCH</a>
 <br />
  }</td></tr>
-<tr class="separator:a6aa7ee80198586f3a51d0c0f8fb542cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c75abd04aaf80ed9057f1b940e83bd7"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a8c75abd04aaf80ed9057f1b940e83bd7">VehicleProperty</a> = std::pair&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cf">VehiclePropertyType</a>, std::string &gt;</td></tr>
-<tr class="separator:a8c75abd04aaf80ed9057f1b940e83bd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ae4b58f9dd91c015120344afcfc6649e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab40ee885032d9c31ea4e73d7ba0d5e37"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ab40ee885032d9c31ea4e73d7ba0d5e37">AppInfoPropertyType</a> { <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ab40ee885032d9c31ea4e73d7ba0d5e37a5d5872b781943bd5021b640d3ad708ad">AppInfoPropertyType::SOFTWARE_VERSION</a>
+ }</td></tr>
+<tr class="separator:ab40ee885032d9c31ea4e73d7ba0d5e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9d59c34a7c8b17e2608ac0b9b328799"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799">VehicleInfoPropertyType</a> { <br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799ab1e5b15ab34e89de8faf65a0d88d1c64">VehicleInfoPropertyType::MAKE</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799a7a03bac2692f8d17e2cda1b0721ffd0e">VehicleInfoPropertyType::MODEL</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799ad18101729d290479023d5eceeb29c9cf">VehicleInfoPropertyType::YEAR</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799aa32049f307ffa78cf7b4586ac7d98e06">VehicleInfoPropertyType::TRIM</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799a9305aa462f9fdf2a3f5af154306e8b29">VehicleInfoPropertyType::OPERATING_COUNTRY</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799ab295c7fc17e1955c935c74eacd60572a">VehicleInfoPropertyType::MICROPHONE_TYPE</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799a85399bf95fd69bdc2f006fd5490aa748">VehicleInfoPropertyType::VEHICLE_IDENTIFIER</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799aa9d881f4c0b245ec3c7eb6475df3808f">VehicleInfoPropertyType::ENGINE_TYPE</a>, 
+<br />
+&#160;&#160;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799a2afc42ef3b84000a4485ab97f741a220">VehicleInfoPropertyType::RSE_EMBEDDED_FIRE_TVS</a>
+<br />
+ }</td></tr>
+<tr class="separator:ae9d59c34a7c8b17e2608ac0b9b328799"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6141ce9aa3d0bf653c0118aa1668728c"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6141ce9aa3d0bf653c0118aa1668728c">VehicleInfoProperty</a> = std::pair&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799">VehicleInfoPropertyType</a>, std::string &gt;</td></tr>
+<tr class="separator:a6141ce9aa3d0bf653c0118aa1668728c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5332999ec13b8c6206055a1cf234a9d6"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a5332999ec13b8c6206055a1cf234a9d6">DeviceInfoProperty</a> = std::pair&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4">DeviceInfoPropertyType</a>, std::string &gt;</td></tr>
+<tr class="separator:a5332999ec13b8c6206055a1cf234a9d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1749dfe4e50445cb62e7626b437959b"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad1749dfe4e50445cb62e7626b437959b">AppInfoProperty</a> = std::pair&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ab40ee885032d9c31ea4e73d7ba0d5e37">AppInfoPropertyType</a>, std::string &gt;</td></tr>
+<tr class="separator:ad1749dfe4e50445cb62e7626b437959b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:ad67c9d173ea737eb9d737db84b2d0ec1"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad67c9d173ea737eb9d737db84b2d0ec1">createVehicleInfoConfig</a> (const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a8c75abd04aaf80ed9057f1b940e83bd7">VehicleProperty</a> &gt; &amp;propertyList)</td></tr>
-<tr class="separator:ad67c9d173ea737eb9d737db84b2d0ec1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a469681a9d4866c0e898f512fe98eb8ab"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a469681a9d4866c0e898f512fe98eb8ab">createOperatingCountryConfig</a> (const std::string &amp;operatingCountry)</td></tr>
-<tr class="separator:a469681a9d4866c0e898f512fe98eb8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96bba0d6fb87613c8301d8961b25b903"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a96bba0d6fb87613c8301d8961b25b903">createVehicleInfoConfig</a> (const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6141ce9aa3d0bf653c0118aa1668728c">VehicleInfoProperty</a> &gt; &amp;propertyList)</td></tr>
+<tr class="separator:a96bba0d6fb87613c8301d8961b25b903"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac387e37d94a56609326a51118a5b5d40"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ac387e37d94a56609326a51118a5b5d40">createDeviceInfoConfig</a> (const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a5332999ec13b8c6206055a1cf234a9d6">DeviceInfoProperty</a> &gt; &amp;propertyList)</td></tr>
+<tr class="separator:ac387e37d94a56609326a51118a5b5d40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9b945da4022c8d26e5c9e262a463fd5"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#af9b945da4022c8d26e5c9e262a463fd5">createAppInfoConfig</a> (const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad1749dfe4e50445cb62e7626b437959b">AppInfoProperty</a> &gt; &amp;propertyList)</td></tr>
+<tr class="separator:af9b945da4022c8d26e5c9e262a463fd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <code><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html">VehicleConfiguration</a></code> class is a factory interface for creating "aace.vehicle" configuration objects. </p>
+<div class="textblock"><p>The <code><a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html">VehicleConfiguration</a></code> class is a factory that creates "aace.vehicle" Engine configuration objects. </p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a8c75abd04aaf80ed9057f1b940e83bd7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c75abd04aaf80ed9057f1b940e83bd7">&#9670;&nbsp;</a></span>VehicleProperty</h2>
+<a id="a6141ce9aa3d0bf653c0118aa1668728c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6141ce9aa3d0bf653c0118aa1668728c">&#9670;&nbsp;</a></span>VehicleInfoProperty</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a8c75abd04aaf80ed9057f1b940e83bd7">aace::vehicle::config::VehicleConfiguration::VehicleProperty</a> =  std::pair&lt;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cf">VehiclePropertyType</a>, std::string&gt;</td>
+          <td class="memname">using <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6141ce9aa3d0bf653c0118aa1668728c">aace::vehicle::config::VehicleConfiguration::VehicleInfoProperty</a> =  std::pair&lt;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799">VehicleInfoPropertyType</a>, std::string&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Identifies a vehicle property with a type and value pair </p>
+<p>Identifies a vehicle info property with a pair of type and value. </p>
+
+</div>
+</div>
+<a id="a5332999ec13b8c6206055a1cf234a9d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5332999ec13b8c6206055a1cf234a9d6">&#9670;&nbsp;</a></span>DeviceInfoProperty</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a5332999ec13b8c6206055a1cf234a9d6">aace::vehicle::config::VehicleConfiguration::DeviceInfoProperty</a> =  std::pair&lt;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4">DeviceInfoPropertyType</a>, std::string&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Identifies a device info property with a pair of type and value. </p>
+
+</div>
+</div>
+<a id="ad1749dfe4e50445cb62e7626b437959b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1749dfe4e50445cb62e7626b437959b">&#9670;&nbsp;</a></span>AppInfoProperty</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad1749dfe4e50445cb62e7626b437959b">aace::vehicle::config::VehicleConfiguration::AppInfoProperty</a> =  std::pair&lt;<a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ab40ee885032d9c31ea4e73d7ba0d5e37">AppInfoPropertyType</a>, std::string&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Identifies an app info property with a pair of type and value. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Enumeration Documentation</h2>
-<a id="a6aa7ee80198586f3a51d0c0f8fb542cf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6aa7ee80198586f3a51d0c0f8fb542cf">&#9670;&nbsp;</a></span>VehiclePropertyType</h2>
+<a id="ae4b58f9dd91c015120344afcfc6649e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4b58f9dd91c015120344afcfc6649e4">&#9670;&nbsp;</a></span>DeviceInfoPropertyType</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -143,7 +189,7 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cf">aace::vehicle::config::VehicleConfiguration::VehiclePropertyType</a></td>
+          <td class="memname">enum <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4">aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType</a></td>
         </tr>
       </table>
   </td>
@@ -152,41 +198,97 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Specifies the vehicle properties required in configuration </p>
+<p>Specifies the device info configuration keys </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfab1e5b15ab34e89de8faf65a0d88d1c64"></a>MAKE&#160;</td><td class="fielddoc"><p>The make of the vehicle. </p><dl class="section note"><dt>Note</dt><dd>This property is required. </dd></dl>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae4b58f9dd91c015120344afcfc6649e4a6a4c1672391ec30e8de1c47e55fa0037"></a>MANUFACTURER&#160;</td><td class="fielddoc"><p>The manufacturer of the head unit hardware. Example values: "Alpine", "Pioneer" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa7a03bac2692f8d17e2cda1b0721ffd0e"></a>MODEL&#160;</td><td class="fielddoc"><p>The model of the vehicle. </p><dl class="section note"><dt>Note</dt><dd>This property is required. </dd></dl>
+<tr><td class="fieldname"><a id="ae4b58f9dd91c015120344afcfc6649e4a7a03bac2692f8d17e2cda1b0721ffd0e"></a>MODEL&#160;</td><td class="fielddoc"><p>The model name of the head unit hardware. Example value: "Coral" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfad18101729d290479023d5eceeb29c9cf"></a>YEAR&#160;</td><td class="fielddoc"><p>The model year of the vehicle. A value of this property type must be an integer in the range 1900-2100. Example value: "2019" </p><dl class="section note"><dt>Note</dt><dd>This property is required. </dd></dl>
+<tr><td class="fieldname"><a id="ae4b58f9dd91c015120344afcfc6649e4abac5402bcf9584b3014bd64b8b6ad282"></a>SERIAL_NUMBER&#160;</td><td class="fielddoc"><p>The serial number of the head unit expressed as a string. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfaa32049f307ffa78cf7b4586ac7d98e06"></a>TRIM&#160;</td><td class="fielddoc"><p>The trim level of the vehicle, identifying the vehicle's level of equipment or special features. Example values: "Standard", "Sport", "Limited" </p>
+<tr><td class="fieldname"><a id="ae4b58f9dd91c015120344afcfc6649e4a8b55a44b49368262df89fd0e17b1a181"></a>PLATFORM&#160;</td><td class="fielddoc"><p>The head unit software platform or operating system name. Example values: "Android", "Ubuntu" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfaf86cc9cf8e9ec55a6a9bb2e8380f08ae"></a>GEOGRAPHY&#160;</td><td class="fielddoc"><p>The current location (country/region/state/etc.) of the vehicle. Example values: "US", "US-North", "WA" </p>
+<tr><td class="fieldname"><a id="ae4b58f9dd91c015120344afcfc6649e4a75b26c6de10578eefbeeea43f8557b85"></a>OS_VERSION&#160;</td><td class="fielddoc"><p>The version of the head unit operating system expressed as a string. Example values: "12", "18.04.6 LTS" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa021321e8c168ba3ae39ce3a2e7b3ec87"></a>VERSION&#160;</td><td class="fielddoc"><p>The client software version. Example value: "2.2.1X" </p>
+<tr><td class="fieldname"><a id="ae4b58f9dd91c015120344afcfc6649e4a369dd85de22dfb81108b4fbd1d84203e"></a>HARDWARE_ARCH&#160;</td><td class="fielddoc"><p>The hardware architecture of the head unit or CPU+instruction set. Examples: "arm64-v8a", "x86_64", "armv7hf", "armv8" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa079a931f8bc9b374ff498c7343959d32"></a>OPERATING_SYSTEM&#160;</td><td class="fielddoc"><p>The operating system used by the vehicle's infotainment system. Example value: "AndroidOreo_8.1" </p>
+</table>
+
+</div>
+</div>
+<a id="ab40ee885032d9c31ea4e73d7ba0d5e37"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab40ee885032d9c31ea4e73d7ba0d5e37">&#9670;&nbsp;</a></span>AppInfoPropertyType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ab40ee885032d9c31ea4e73d7ba0d5e37">aace::vehicle::config::VehicleConfiguration::AppInfoPropertyType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Specifies the app info configuration keys </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ab40ee885032d9c31ea4e73d7ba0d5e37a5d5872b781943bd5021b640d3ad708ad"></a>SOFTWARE_VERSION&#160;</td><td class="fielddoc"><p>The version of the Auto SDK client application expressed as a string. Example value: "1.0.1" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa369dd85de22dfb81108b4fbd1d84203e"></a>HARDWARE_ARCH&#160;</td><td class="fielddoc"><p>The hardware architecture used by the vehicle. Example value: "x86_64" </p>
+</table>
+
+</div>
+</div>
+<a id="ae9d59c34a7c8b17e2608ac0b9b328799"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9d59c34a7c8b17e2608ac0b9b328799">&#9670;&nbsp;</a></span>VehicleInfoPropertyType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799">aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Specifies the vehicle info configuration keys </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799ab1e5b15ab34e89de8faf65a0d88d1c64"></a>MAKE&#160;</td><td class="fielddoc"><p>The make of the vehicle. </p><dl class="section note"><dt>Note</dt><dd>This property is required. </dd></dl>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa5b64a5253f843da2950972747ac9a3b0"></a>LANGUAGE&#160;</td><td class="fielddoc"><p>The language or locale selected for Alexa by the vehicle owner. Example values: "en-US", "fr-CA" </p>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799a7a03bac2692f8d17e2cda1b0721ffd0e"></a>MODEL&#160;</td><td class="fielddoc"><p>The model of the vehicle. </p><dl class="section note"><dt>Note</dt><dd>This property is required. </dd></dl>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa74a1ebda7fe4e2d30e665420bedde3bf"></a>MICROPHONE&#160;</td><td class="fielddoc"><p>The type and arrangement of microphone used by the vehicle. Example value: "7 mic array, centrally mounted" </p>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799ad18101729d290479023d5eceeb29c9cf"></a>YEAR&#160;</td><td class="fielddoc"><p>The model year of the vehicle. A value of this property type must be an integer in the range 1900-2100 expressed as a string. Example value: "2019" </p><dl class="section note"><dt>Note</dt><dd>This property is required. </dd></dl>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa85399bf95fd69bdc2f006fd5490aa748"></a>VEHICLE_IDENTIFIER&#160;</td><td class="fielddoc"><p>The automaker's identifier for the vehicle. </p>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799aa32049f307ffa78cf7b4586ac7d98e06"></a>TRIM&#160;</td><td class="fielddoc"><p>The trim package of the vehicle, identifying the vehicle's level of equipment or special features. Example values: "Standard", "Sport", "Limited" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfaa9d881f4c0b245ec3c7eb6475df3808f"></a>ENGINE_TYPE&#160;</td><td class="fielddoc"><p>The engine type for the vehicle. </p>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799a9305aa462f9fdf2a3f5af154306e8b29"></a>OPERATING_COUNTRY&#160;</td><td class="fielddoc"><p>The current (or intended, if current is not available) operating country for the vehicle. The value must be an ISO 3166 Alpha-2 country code. Example values: "US", "MX", "JP" </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a6aa7ee80198586f3a51d0c0f8fb542cfa00596599fbcfdf162c7c2bb17eb73d98"></a>RSE_EMBEDDED_FIRETVS&#160;</td><td class="fielddoc"><p>The number of RSE embedded FireTVs installed in the vehicle. </p>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799ab295c7fc17e1955c935c74eacd60572a"></a>MICROPHONE_TYPE&#160;</td><td class="fielddoc"><p>The type and arrangement of microphone used by the vehicle. Example value: "7 mic array centrally mounted" </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799a85399bf95fd69bdc2f006fd5490aa748"></a>VEHICLE_IDENTIFIER&#160;</td><td class="fielddoc"><p>The automaker's identifier for the vehicle. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799aa9d881f4c0b245ec3c7eb6475df3808f"></a>ENGINE_TYPE&#160;</td><td class="fielddoc"><p>The type of engine in the vehicle. Accepted values: "GAS", "HYBRID", "ELECTRIC" </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ae9d59c34a7c8b17e2608ac0b9b328799a2afc42ef3b84000a4485ab97f741a220"></a>RSE_EMBEDDED_FIRE_TVS&#160;</td><td class="fielddoc"><p>The number of rear seat embedded Fire TVs in the vehicle. The value must be an integer expressed as a string. Example value: "2" </p>
 </td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="ad67c9d173ea737eb9d737db84b2d0ec1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad67c9d173ea737eb9d737db84b2d0ec1">&#9670;&nbsp;</a></span>createVehicleInfoConfig()</h2>
+<a id="a96bba0d6fb87613c8301d8961b25b903"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96bba0d6fb87613c8301d8961b25b903">&#9670;&nbsp;</a></span>createVehicleInfoConfig()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -197,7 +299,7 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a8c75abd04aaf80ed9057f1b940e83bd7">VehicleProperty</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6141ce9aa3d0bf653c0118aa1668728c">VehicleInfoProperty</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>propertyList</em></td><td>)</td>
           <td></td>
         </tr>
@@ -208,18 +310,19 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Factory method used to programmatically generate "aace.vehicle" vehicle info configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.vehicle&quot;:</div><div class="line">  {</div><div class="line">     &quot;info&quot;: {</div><div class="line">         &quot;make&quot;: &quot;&lt;MAKE&gt;&quot;,</div><div class="line">         &quot;model&quot;: &quot;&lt;MODEL&gt;&quot;,</div><div class="line">         &quot;year&quot;: &quot;&lt;YEAR&gt;&quot;,</div><div class="line">         &quot;trim&quot;: &quot;&lt;TRIM&gt;&quot;,</div><div class="line">         &quot;geography&quot;: &quot;&lt;GEOGRAPHY&gt;&quot;,</div><div class="line">         &quot;version&quot;: &quot;&lt;SOFTWARE_VERSION&gt;&quot;,</div><div class="line">         &quot;os&quot;: &quot;&lt;OPERATING_SYSTEM&gt;&quot;,</div><div class="line">         &quot;arch&quot;: &quot;&lt;HARDWARE_ARCH&gt;&quot;,</div><div class="line">         &quot;language&quot;: &quot;&lt;LANGUAGE&gt;&quot;,</div><div class="line">         &quot;microphone&quot;: &quot;&lt;MICROPHONE&gt;&quot;,</div><div class="line">         &quot;vehicleIdentifier&quot;: &quot;&lt;VEHICLE_IDENTIFIER&gt;&quot;,</div><div class="line">         &quot;engineType&quot;: &quot;&lt;ENGINE_TYPE&gt;&quot;,</div><div class="line">         &quot;rseEmbeddedFireTvs&quot;: &quot;&lt;RSE_EMBEDDED_FIRETVS&gt;&quot;</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<p>Factory function used to programmatically generate "aace.vehicle.vehicleInfo" Engine configuration data. The data generated by this function is equivalent to providing the following JSON format in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.vehicle&quot;: {</div><div class="line">     &quot;vehicleInfo&quot;: {</div><div class="line">         &quot;make&quot;: &quot;&lt;VEHICLE_MAKE&gt;&quot;,</div><div class="line">         &quot;model&quot;: &quot;&lt;VEHICLE_MODEL&gt;&quot;,</div><div class="line">         &quot;year&quot;: &quot;&lt;VEHICLE_MODEL_YEAR&gt;&quot;,</div><div class="line">         &quot;trim&quot;: &quot;&lt;TRIM&gt;&quot;,</div><div class="line">         &quot;microphoneType&quot;: &quot;&lt;MICROPHONE_TYPE&gt;&quot;,</div><div class="line">         &quot;operatingCountry&quot;: &quot;&lt;OPERATING_COUNTRY&gt;&quot;,</div><div class="line">         &quot;vehicleIdentifier&quot;: &quot;&lt;VEHICLE_ID&gt;&quot;,</div><div class="line">         &quot;engineType&quot;: &quot;&lt;ENGINE_TYPE&gt;&quot;,</div><div class="line">         &quot;rseEmbeddedFireTvs&quot;: &quot;&lt;EMBEDDED_FIRE_TV_COUNT&gt;&quot;</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">propertyList</td><td>A list of <code>VehicleProperty</code> type and value pairs </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyList</td><td>A list of <code>VehicleInfoProperty</code> pairs </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>An <code><a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a></code> containing the specified data in JSON format </dd></dl>
 
 </div>
 </div>
-<a id="a469681a9d4866c0e898f512fe98eb8ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a469681a9d4866c0e898f512fe98eb8ab">&#9670;&nbsp;</a></span>createOperatingCountryConfig()</h2>
+<a id="ac387e37d94a56609326a51118a5b5d40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac387e37d94a56609326a51118a5b5d40">&#9670;&nbsp;</a></span>createDeviceInfoConfig()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -228,10 +331,10 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::vehicle::config::VehicleConfiguration::createOperatingCountryConfig </td>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::vehicle::config::VehicleConfiguration::createDeviceInfoConfig </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>operatingCountry</em></td><td>)</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a5332999ec13b8c6206055a1cf234a9d6">DeviceInfoProperty</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>propertyList</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -241,13 +344,48 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Factory method used to programmatically generate vehicle operating country configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.vehicle&quot;: {</div><div class="line">     &quot;operatingCountry&quot;: &quot;&lt;COUNTRY&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<p>Factory function used to programmatically generate "aace.vehicle.deviceInfo" Engine configuration data. The data generated by this function is equivalent to providing the following JSON format in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.vehicle&quot;: {</div><div class="line">     &quot;deviceInfo&quot;: {</div><div class="line">         &quot;manufacturer&quot;: &quot;&lt;DEVICE_MANUFACTURER&gt;&quot;,</div><div class="line">         &quot;model&quot;: &quot;&lt;DEVICE_MODEL&gt;&quot;,</div><div class="line">         &quot;serialNumber&quot;: &lt;DEVICE_SERIAL_NUMBER&gt;,</div><div class="line">         &quot;osVersion&quot;: &quot;&lt;OS_VERSION&gt;&quot;,</div><div class="line">         &quot;hardwareArch&quot;: &quot;&lt;HARDWARE_ARCH&gt;&quot;,</div><div class="line">         &quot;platform&quot;: &quot;&lt;PLATFORM&gt;&quot;,</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">operatingCountry</td><td>A 2-letter ISO country code </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyList</td><td>A list of <code>DeviceInfoProperty</code> pairs </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>An <code><a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a></code> containing the specified data in JSON format </dd></dl>
+
+</div>
+</div>
+<a id="af9b945da4022c8d26e5c9e262a463fd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9b945da4022c8d26e5c9e262a463fd5">&#9670;&nbsp;</a></span>createAppInfoConfig()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::vehicle::config::VehicleConfiguration::createAppInfoConfig </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad1749dfe4e50445cb62e7626b437959b">AppInfoProperty</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>propertyList</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory function used to programmatically generate "aace.vehicle.appInfo" Engine configuration data. The data generated by this function is equivalent to providing the following JSON format in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.vehicle&quot;: {</div><div class="line">     &quot;appInfo&quot;: {</div><div class="line">         &quot;softwareVersion&quot;: &quot;&lt;APP_VERSION&gt;&quot;</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyList</td><td>A list of <code>AppInfoProperty</code> pairs </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An <code><a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a></code> containing the specified data in JSON format </dd></dl>
 
 </div>
 </div>
@@ -256,7 +394,7 @@ Static Public Member Functions</h2></td></tr>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 4.2 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.3 - Copyright 2017-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

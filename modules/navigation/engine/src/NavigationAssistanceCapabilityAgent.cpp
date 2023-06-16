@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  * permissions and limitations under the License.
  */
 #include <iostream>
+#include <stdexcept>
 
 #include <string>
 #include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+
 #include <AVSCommon/Utils/JSON/JSONUtils.h>
 
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+
 #include "AACE/Engine/Navigation/NavigationAssistanceCapabilityAgent.h"
-#include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
@@ -29,6 +35,7 @@ namespace navigation {
 namespace navigationassistance {
 
 using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+using namespace aace::engine::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationAssistanceCapabilityAgent");
@@ -37,13 +44,15 @@ static const std::string TAG("aace.navigation.NavigationAssistanceCapabilityAgen
 static const std::string NAMESPACE{"Navigation.Assistance"};
 
 /// The AnnounceManeuver directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANNOUNCE_MANEUVER{NAMESPACE, "AnnounceManeuver", AgentId::AGENT_ID_ALL};
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANNOUNCE_MANEUVER{NAMESPACE,
+                                                                                "AnnounceManeuver",
+                                                                                AgentId::AGENT_ID_ALL};
 
 /// The AnnounceRoadRegulation directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName ANNOUNCE_ROAD_REGULATION{NAMESPACE,
-                                                                                       "AnnounceRoadRegulation", AgentId::AGENT_ID_ALL};
+                                                                                       "AnnounceRoadRegulation",
+                                                                                       AgentId::AGENT_ID_ALL};
 
-/// Navigation Assistance capability constants
 /// Navigation Assistance  interface type
 static const std::string NAVIGATION_ASSISTANCE_CAPABILITY_INTERFACE_TYPE = "AlexaInterface";
 /// Display Manager  interface name
@@ -66,6 +75,109 @@ static const std::unordered_map<std::string, aace::navigation::Navigation::RoadR
         {"CARPOOL_RULES", aace::navigation::Navigation::RoadRegulation::CARPOOL_RULES},
 };
 
+/// Prefix for metrics emitted from the NavigationAssistance CA
+static const std::string METRIC_PREFIX = "NAVIGATION_ASSISTANCE-";
+
+/// Navigation assistance latency metric
+static const std::string METRIC_NAV_ASSIST_LATENCY = "AssistanceLatencyValue";
+
+/// Navigation assistance success count metric
+static const std::string METRIC_NAV_ASSIST_SUCCESS = "AssistanceSuccessCount";
+
+/// Navigation assistance type metric dimension
+static const std::string METRIC_NAV_ASSIST_TYPE = "AssistanceEventType";
+
+/// Navigation announcement type metric dimension
+static const std::string METRIC_ANNOUNCEMENT_TYPE = "AnnouncementType";
+
+/// Navigation assistance error count metric
+static const std::string METRIC_NAV_ASSIST_ERROR = "AssistanceErrorCount";
+
+/// Navigation assistance error code metric dimension
+static const std::string METRIC_NAV_ASSISTANCE_ERROR_CODE = "AssistanceErrorCode";
+
+/**
+ * Creates and records a metric.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param activityName The activity name of the metric
+ * @param agentId The ID of the agent associated with the metric
+ * @param dataPoints The @c DataPoint objects to include in the MetricEvent
+*/
+static void submitMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const std::string& activityName,
+    const std::vector<DataPoint>& dataPoints) {
+    auto metricBuilder = MetricEventBuilder{}.withSourceName(activityName);
+    metricBuilder.withAgentId(agentId);
+    metricBuilder.addDataPoints(dataPoints);
+    auto metric = metricBuilder.build();
+    try {
+        recordMetric(metricRecorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
+
+/**
+ * Creates and records a metric for successful announcement operations.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the announcement
+ *        operation latency
+ * @param assistanceEventType The type of the navigation assistance operation.
+ *        Use the directive name.
+ * @param announcementType The type of announcement
+*/
+static void submitAnnouncementSuccessMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    const std::string& assistanceEventType,
+    const std::string& announcementType) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_NAV_ASSIST_SUCCESS).increment(1).build(),
+        CounterDataPointBuilder{}.withName(METRIC_NAV_ASSIST_ERROR).increment(0).build(),
+        StringDataPointBuilder{}.withName(METRIC_NAV_ASSIST_TYPE).withValue(assistanceEventType).build(),
+        StringDataPointBuilder{}.withName(METRIC_ANNOUNCEMENT_TYPE).withValue(announcementType).build()};
+    submitMetric(metricRecorder, agentId, METRIC_PREFIX + assistanceEventType, dps);
+}
+
+/**
+ * Creates and records a metric for failed announcement operations.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the announcement
+ *        operation latency
+ * @param assistanceEventType The type of the navigation assistance operation.
+ *        Use the directive name.
+ * @param announcementType The type of announcement
+ * @param error The error code
+*/
+static void submitAnnouncementErrorMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    const std::string& assistanceEventType,
+    const std::string& announcementType,
+    const std::string& error) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_NAV_ASSIST_SUCCESS).increment(0).build(),
+        CounterDataPointBuilder{}.withName(METRIC_NAV_ASSIST_ERROR).increment(1).build(),
+        StringDataPointBuilder{}.withName(METRIC_NAV_ASSIST_TYPE).withValue(assistanceEventType).build(),
+        StringDataPointBuilder{}.withName(METRIC_ANNOUNCEMENT_TYPE).withValue(announcementType).build(),
+        StringDataPointBuilder{}.withName(METRIC_NAV_ASSISTANCE_ERROR_CODE).withValue(error).build()};
+    submitMetric(metricRecorder, agentId, METRIC_PREFIX + assistanceEventType, dps);
+}
+
 /**
  * Creates the Navigation Assistance capability configuration.
  *
@@ -75,18 +187,22 @@ static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>
 getNavigationAssistanceCapabilityConfiguration();
 
 std::shared_ptr<NavigationAssistanceCapabilityAgent> NavigationAssistanceCapabilityAgent::create(
-    std::shared_ptr<NavigationHandlerInterface> navigationHandler,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) {
+    const std::shared_ptr<NavigationHandlerInterface>& navigationHandler,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+        exceptionSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+    const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder) {
     try {
         ThrowIfNull(navigationHandler, "nullNavigationHandler");
         ThrowIfNull(exceptionSender, "nullExceptionSender");
         ThrowIfNull(messageSender, "nullMessageSender");
         ThrowIfNull(contextManager, "nullContextManager");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
 
-        auto navigationAssistanceCapabilityAgent = std::shared_ptr<NavigationAssistanceCapabilityAgent>(
-            new NavigationAssistanceCapabilityAgent(navigationHandler, exceptionSender, messageSender, contextManager));
+        auto navigationAssistanceCapabilityAgent =
+            std::shared_ptr<NavigationAssistanceCapabilityAgent>(new NavigationAssistanceCapabilityAgent(
+                navigationHandler, exceptionSender, messageSender, contextManager, metricRecorder));
 
         ThrowIfNull(navigationAssistanceCapabilityAgent, "nullNavigationAssistanceCapabilityAgent");
 
@@ -137,15 +253,18 @@ alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration NavigationAssistan
 }
 
 NavigationAssistanceCapabilityAgent::NavigationAssistanceCapabilityAgent(
-    std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) :
+    const std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface>& navigationHandler,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+        exceptionSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+    const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder) :
         alexaClientSDK::avsCommon::avs::CapabilityAgent{NAMESPACE, exceptionSender},
         alexaClientSDK::avsCommon::utils::RequiresShutdown{"NavigationAssistanceCapabilityAgent"},
         m_navigationHandler{navigationHandler},
         m_contextManager{contextManager},
-        m_messageSender{messageSender} {
+        m_messageSender{messageSender},
+        m_metricRecorder{metricRecorder} {
     m_capabilityConfigurations.insert(getNavigationAssistanceCapabilityConfiguration());
 }
 
@@ -232,6 +351,7 @@ void NavigationAssistanceCapabilityAgent::handleAnnounceManeuverDirective(std::s
         return;
     }
     m_executor.submit([this, info, payload]() {
+        m_announcementDurationData.startTimer();
         m_navigationHandler->announceManeuver(payload);
         setHandlingCompleted(info);
         auto agentId = info->directive->getAgentId();
@@ -274,6 +394,7 @@ void NavigationAssistanceCapabilityAgent::handleAnnounceRoadRegulationDirective(
     aace::navigation::Navigation::RoadRegulation roadRegulation =
         roadRegulationTypeStringToEnumMap.find(roadRegulationType)->second;
     m_executor.submit([this, info, roadRegulation]() {
+        m_announcementDurationData.startTimer();
         m_navigationHandler->announceRoadRegulation(roadRegulation);
         setHandlingCompleted(info);
         auto agentId = info->directive->getAgentId();
@@ -461,6 +582,12 @@ std::string NavigationAssistanceCapabilityAgent::getRoadRegulationErrorCode(
 }
 
 void NavigationAssistanceCapabilityAgent::announceManeuverSucceeded(std::string maneuverType) {
+    auto agentId = getEventAgent(ANNOUNCE_MANEUVER_SUCCEEDED);
+    AACE_DEBUG(LX(TAG).d("agentId", agentId));
+
+    DataPoint latencyDataPoint = m_announcementDurationData.withName(METRIC_NAV_ASSIST_LATENCY).stopTimer().build();
+    submitAnnouncementSuccessMetric(m_metricRecorder, agentId, latencyDataPoint, ANNOUNCE_MANEUVER.name, maneuverType);
+
     rapidjson::Document payload(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
     payload.AddMember("type", rapidjson::Value(maneuverType.c_str(), allocator), allocator);
@@ -470,8 +597,6 @@ void NavigationAssistanceCapabilityAgent::announceManeuverSucceeded(std::string 
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_MANEUVER_SUCCEEDED, "", buffer.GetString());
-    auto agentId = getEventAgent(ANNOUNCE_MANEUVER_SUCCEEDED);
-    AACE_DEBUG(LX(TAG).d("agentId", agentId));
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
@@ -480,6 +605,13 @@ void NavigationAssistanceCapabilityAgent::announceManeuverFailed(
     std::string code,
     std::string description,
     std::string maneuverType) {
+    auto agentId = getEventAgent(ANNOUNCE_MANEUVER_FAILED);
+    AACE_DEBUG(LX(TAG).d("agentId", agentId));
+
+    DataPoint latencyDataPoint = m_announcementDurationData.withName(METRIC_NAV_ASSIST_LATENCY).stopTimer().build();
+    submitAnnouncementErrorMetric(
+        m_metricRecorder, agentId, latencyDataPoint, ANNOUNCE_MANEUVER.name, maneuverType, code);
+
     rapidjson::Document payload(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
     payload.AddMember("type", rapidjson::Value(maneuverType.c_str(), allocator), allocator);
@@ -491,13 +623,18 @@ void NavigationAssistanceCapabilityAgent::announceManeuverFailed(
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_MANEUVER_FAILED, "", buffer.GetString());
-    auto agentId = getEventAgent(ANNOUNCE_MANEUVER_FAILED);
-    AACE_DEBUG(LX(TAG).d("agentId", agentId));
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
 
 void NavigationAssistanceCapabilityAgent::announceRoadRegulationSucceeded(std::string roadRegulationType) {
+    auto agentId = getEventAgent(ANNOUNCE_ROAD_REGULATION_SUCCEEDED);
+    AACE_DEBUG(LX(TAG).d("agentId", agentId));
+
+    DataPoint latencyDataPoint = m_announcementDurationData.withName(METRIC_NAV_ASSIST_LATENCY).stopTimer().build();
+    submitAnnouncementSuccessMetric(
+        m_metricRecorder, agentId, latencyDataPoint, ANNOUNCE_ROAD_REGULATION.name, roadRegulationType);
+
     rapidjson::Document payload(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
     payload.AddMember("type", rapidjson::Value(roadRegulationType.c_str(), allocator), allocator);
@@ -507,7 +644,6 @@ void NavigationAssistanceCapabilityAgent::announceRoadRegulationSucceeded(std::s
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_ROAD_REGULATION_SUCCEEDED, "", buffer.GetString());
-    auto agentId = getEventAgent(ANNOUNCE_ROAD_REGULATION_SUCCEEDED);
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
@@ -516,6 +652,13 @@ void NavigationAssistanceCapabilityAgent::announceRoadRegulationFailed(
     std::string code,
     std::string description,
     std::string roadRegulationType) {
+    auto agentId = getEventAgent(ANNOUNCE_ROAD_REGULATION_FAILED);
+    AACE_DEBUG(LX(TAG).d("agentId", agentId));
+
+    DataPoint latencyDataPoint = m_announcementDurationData.withName(METRIC_NAV_ASSIST_LATENCY).stopTimer().build();
+    submitAnnouncementErrorMetric(
+        m_metricRecorder, agentId, latencyDataPoint, ANNOUNCE_ROAD_REGULATION.name, roadRegulationType, code);
+
     rapidjson::Document payload(rapidjson::kObjectType);
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
     payload.AddMember("type", rapidjson::Value(roadRegulationType.c_str(), allocator), allocator);
@@ -527,7 +670,6 @@ void NavigationAssistanceCapabilityAgent::announceRoadRegulationFailed(
     ThrowIfNot(payload.Accept(writer), "failedToWriteJsonDocument");
 
     auto navEvent = buildJsonEventString(ANNOUNCE_ROAD_REGULATION_FAILED, "", buffer.GetString());
-    auto agentId = getEventAgent(ANNOUNCE_ROAD_REGULATION_FAILED);
     auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, navEvent.second);
     m_messageSender->sendMessage(request);
 }
@@ -538,7 +680,7 @@ NavigationAssistanceCapabilityAgent::getCapabilityConfigurations() {
 }
 
 void NavigationAssistanceCapabilityAgent::setEventAgentByDirective(
-    const std::string& directiveName, 
+    const std::string& directiveName,
     alexaClientSDK::avsCommon::avs::AgentId::IdType agentId) {
     if (directiveName == ANNOUNCE_MANEUVER.name) {
         m_eventAgentMap[ANNOUNCE_MANEUVER_SUCCEEDED] = agentId;
@@ -551,7 +693,8 @@ void NavigationAssistanceCapabilityAgent::setEventAgentByDirective(
     }
 }
 
-alexaClientSDK::avsCommon::avs::AgentId::IdType NavigationAssistanceCapabilityAgent::getEventAgent(const std::string& eventName) {
+alexaClientSDK::avsCommon::avs::AgentId::IdType NavigationAssistanceCapabilityAgent::getEventAgent(
+    const std::string& eventName) {
     if (m_eventAgentMap.find(eventName) != m_eventAgentMap.end()) {
         return m_eventAgentMap[eventName];
     }

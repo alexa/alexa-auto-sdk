@@ -1,0 +1,11 @@
+topic: CaptionPresenter
+namespace: aasb.message.alexa.captionPresenter
+path: Alexa/CaptionPresenter
+
+messages:
+  - action: SetCaption
+    direction: outgoing
+    desc: Notifies the platform of the caption for the assistant's most recent utterance.
+    payload:
+      - name: caption
+        desc: A string of the caption.

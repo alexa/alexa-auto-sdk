@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 #include "AACE/Engine/Alexa/ExternalMediaAdapterConstants.h"
 #include "AACE/Engine/Alexa/LocalMediaSourceEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -26,8 +25,6 @@
 namespace aace {
 namespace engine {
 namespace alexa {
-
-using namespace aace::engine::utils::metrics;
 
 static const uint8_t MAX_SPEAKER_VOLUME = 100;
 
@@ -43,26 +40,18 @@ static const std::string DEFAULT_PLAYERCOOKIE_PAYLOAD = R"(
     }
 )";
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "LocalMediaSourceEngineImpl";
-
-/// Counter metrics for LocalMediaSource Platform APIs
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAY = "Play";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAY_CONTROL = "PlayControl";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_SEEK = "Seek";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_ADJUST_SEEK = "AdjustSeek";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_VOLUME_CHANGED = "VolumeChanged";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_MUTED_STATE_CHANGED = "MutedStateChanged";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAYER_EVENT = "PlayerEvent";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_PLAYER_ERROR = "PlayerError";
-static const std::string METRIC_LOCAL_MEDIA_SOURCE_SET_FOCUS = "SetFocus";
-
 LocalMediaSourceEngineImpl::LocalMediaSourceEngineImpl(
     std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
     const std::string& localPlayerId,
     std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
-    std::shared_ptr<FocusHandlerInterface> focusHandler) :
-        aace::engine::alexa::ExternalMediaAdapterHandler(discoveredPlayerSender, focusHandler),
+    std::shared_ptr<FocusHandlerInterface> focusHandler,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) :
+        aace::engine::alexa::ExternalMediaAdapterHandler(
+            discoveredPlayerSender,
+            focusHandler,
+            messageSender,
+            metricRecorder),
         m_platformLocalMediaSource(platformLocalMediaSource),
         m_localPlayerId(localPlayerId),
         m_contentSelectorNameMap{{"frequency", ContentSelector::FREQUENCY},
@@ -77,20 +66,27 @@ std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create(
     std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
     std::shared_ptr<FocusHandlerInterface> focusHandler,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) {
     std::shared_ptr<LocalMediaSourceEngineImpl> localMediaSourceEngineImpl = nullptr;
 
     try {
         ThrowIfNull(platformLocalMediaSource, "invalidPlatformLocalMediaSource");
         ThrowIfNull(discoveredPlayerSender, "invalidDiscoveredPlayerSender");
+        ThrowIfNull(messageSender, "invalidMessageSender");
         ThrowIfNull(focusHandler, "invalidFocusHandler");
+        ThrowIfNull(metricRecorder, "invalidMetricRecorder");
 
         // create the external media adapter engine implementation
         localMediaSourceEngineImpl = std::shared_ptr<LocalMediaSourceEngineImpl>(new LocalMediaSourceEngineImpl(
-            platformLocalMediaSource, localPlayerId, discoveredPlayerSender, focusHandler));
+            platformLocalMediaSource,
+            localPlayerId,
+            discoveredPlayerSender,
+            focusHandler,
+            messageSender,
+            metricRecorder));
         ThrowIfNot(
-            localMediaSourceEngineImpl->initialize(messageSender, speakerManager),
-            "initializeLocalMediaSourceEngineImplFailed");
+            localMediaSourceEngineImpl->initialize(speakerManager), "initializeLocalMediaSourceEngineImplFailed");
 
         // register the platforms engine interface
         platformLocalMediaSource->setEngineInterface(localMediaSourceEngineImpl);
@@ -106,12 +102,8 @@ std::shared_ptr<LocalMediaSourceEngineImpl> LocalMediaSourceEngineImpl::create(
 }
 
 bool LocalMediaSourceEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
     try {
-        ThrowIfNull(messageSender, "invalidMessageSender");
-        m_messageSender = messageSender;
-
         // initialize the adapter handler
         ThrowIfNot(initializeAdapterHandler(speakerManager), "initializeAdapterHandlerFailed");
 
@@ -155,8 +147,7 @@ bool LocalMediaSourceEngineImpl::handleLogin(
     bool forceLogin,
     std::chrono::milliseconds tokenRefreshInterval) {
     try {
-        AACE_VERBOSE(LX(TAG));
-
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId));
         Throw("unsupportedLocalMediaSourceOperation");
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "handleLogin")
@@ -189,7 +180,7 @@ bool LocalMediaSourceEngineImpl::handlePlay(
     const std::string& playbackSessionId,
     const std::string& skillToken) {
     try {
-        AACE_VERBOSE(LX(TAG));
+        AACE_INFO(LX(TAG).d("localPlayerId", m_localPlayerId).sensitive("playContextToken", playContextToken));
 
         // For Local Media sources localPlayerId, index, offset, preload, and navigation are currently unused
         reportPlaybackSessionId(m_localPlayerId, playbackSessionId);
@@ -208,7 +199,6 @@ bool LocalMediaSourceEngineImpl::handlePlay(
         ContentSelector contentSelector = foundIt->second;
 
         std::string selectionPayload = playContextToken.substr(separatorIndex + 1);  //  i.e."98.7"
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlay", {METRIC_LOCAL_MEDIA_SOURCE_PLAY});
         ThrowIfNot(
             m_platformLocalMediaSource->play(contentSelector, selectionPayload) ||
                 m_platformLocalMediaSource->play(contentSelector, selectionPayload, playbackSessionId),
@@ -231,9 +221,8 @@ bool LocalMediaSourceEngineImpl::handlePlay(
 bool LocalMediaSourceEngineImpl::handlePlayControl(
     const std::string& localPlayerId,
     aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlayControl", {METRIC_LOCAL_MEDIA_SOURCE_PLAY_CONTROL});
     try {
-        AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId).d("playControlType", playControlType));
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId).d("playControlType", playControlType));
 
         ThrowIfNot(m_platformLocalMediaSource->playControl(playControlType), "platformMediaAdapterPlayControlFailed");
         // set focus on successful RESUME control
@@ -258,9 +247,8 @@ bool LocalMediaSourceEngineImpl::handlePlayControl(
 }
 
 bool LocalMediaSourceEngineImpl::handleSeek(const std::string& localPlayerId, std::chrono::milliseconds offset) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSeek", {METRIC_LOCAL_MEDIA_SOURCE_SEEK});
     try {
-        AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId));
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId));
 
         ThrowIfNot(m_platformLocalMediaSource->seek(offset), "platformMediaAdapterSeekFailed");
 
@@ -274,9 +262,8 @@ bool LocalMediaSourceEngineImpl::handleSeek(const std::string& localPlayerId, st
 bool LocalMediaSourceEngineImpl::handleAdjustSeek(
     const std::string& localPlayerId,
     std::chrono::milliseconds deltaOffset) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleAdjustSeek", {METRIC_LOCAL_MEDIA_SOURCE_ADJUST_SEEK});
     try {
-        AACE_VERBOSE(LX(TAG).d("localPlayerId", localPlayerId));
+        AACE_INFO(LX(TAG).d("localPlayerId", localPlayerId));
 
         ThrowIfNot(m_platformLocalMediaSource->adjustSeek(deltaOffset), "platformMediaAdapterAdjustSeekFailed");
 
@@ -474,7 +461,7 @@ std::string LocalMediaSourceEngineImpl::getPlayerId(Source source) {
 }
 
 bool LocalMediaSourceEngineImpl::handleSetVolume(int8_t volume) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSetVolume", {METRIC_LOCAL_MEDIA_SOURCE_VOLUME_CHANGED});
+    AACE_INFO(LX(TAG).d("localPlayerId", m_localPlayerId));
     try {
         ThrowIfNot(
             m_platformLocalMediaSource->volumeChanged((float)volume / MAX_SPEAKER_VOLUME),
@@ -487,12 +474,7 @@ bool LocalMediaSourceEngineImpl::handleSetVolume(int8_t volume) {
 }
 
 bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
-    std::stringstream ss;
-    ss
-        << (mute ? aace::alexa::ExternalMediaAdapter::MutedState::MUTED
-                 : aace::alexa::ExternalMediaAdapter::MutedState::UNMUTED);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "handleSetMute", {METRIC_LOCAL_MEDIA_SOURCE_MUTED_STATE_CHANGED, ss.str()});
+    AACE_INFO(LX(TAG).d("localPlayerId", m_localPlayerId));
     try {
         ThrowIfNot(
             m_platformLocalMediaSource->mutedStateChanged(
@@ -512,47 +494,16 @@ bool LocalMediaSourceEngineImpl::handleSetMute(bool mute) {
 //
 
 void LocalMediaSourceEngineImpl::onPlayerEvent(const std::string& eventName, const std::string& sessionId) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_EVENT, eventName});
-    AACE_INFO(LX(TAG).d("eventName", eventName).d("localPlayerId", m_localPlayerId));
     if (m_localPlayerId.empty()) {
+        AACE_INFO(LX(TAG).d("eventName", eventName).d("localPlayerId", m_localPlayerId));
         if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
             eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
             setDefaultPlayerFocus();
         }
-        AACE_VERBOSE(LX(TAG).m("DEFAULT player does not send events"));
         return;
     }
     reportPlaybackSessionId(m_localPlayerId, sessionId);
-    if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
-        eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
-        if (!setFocus(m_localPlayerId, true)) {
-            AACE_ERROR(LX(TAG).m("setFocus(true) failed"));
-        }
-    } else if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_ENDED) == 0) {
-        if (!setFocus(m_localPlayerId, false)) {
-            AACE_ERROR(LX(TAG).m("setFocus(false) failed"));
-        }
-    }
-
-    try {
-        auto event = createExternalMediaPlayerEvent(
-            m_localPlayerId,
-            "PlayerEvent",
-            true,
-            [eventName](rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
-                payload.AddMember(
-                    "eventName", rapidjson::Value().SetString(eventName.c_str(), eventName.length()), allocator);
-            });
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
-
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-
-        m_messageSender_lock->sendMessage(request);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("eventName", eventName));
-    }
+    playerEvent(m_localPlayerId, eventName);
 }
 
 void LocalMediaSourceEngineImpl::onPlayerError(
@@ -561,59 +512,19 @@ void LocalMediaSourceEngineImpl::onPlayerError(
     const std::string& description,
     bool fatal,
     const std::string& sessionId) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onPlayerError",
-        {METRIC_LOCAL_MEDIA_SOURCE_PLAYER_ERROR, errorName, std::to_string(code)});
-    try {
-        AACE_INFO(
-            LX(TAG).d("errorName", errorName).d("localPlayerId", m_localPlayerId).d("code", code).d("fatal", fatal));
-
-        if (m_localPlayerId.empty()) {
-            AACE_VERBOSE(LX(TAG).m("DEFAULT player does not send events"));
-            return;
-        }
-        auto event = createExternalMediaPlayerEvent(
-            m_localPlayerId,
-            "PlayerError",
-            true,
-            [errorName, code, description, fatal](
-                rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
-                payload.AddMember(
-                    "errorName", rapidjson::Value().SetString(errorName.c_str(), errorName.length()), allocator);
-                payload.AddMember("code", rapidjson::Value().SetInt64(code), allocator);
-                payload.AddMember(
-                    "description", rapidjson::Value().SetString(description.c_str(), description.length()), allocator);
-                payload.AddMember("fatal", rapidjson::Value().SetBool(fatal), allocator);
-            });
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
-
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-
-        m_messageSender_lock->sendMessage(request);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+    if (m_localPlayerId.empty()) {
+        AACE_INFO(LX(TAG).m("DEFAULT player does not send events"));
+        return;
     }
+    playerError(m_localPlayerId, errorName, code, description, fatal);
 }
 
 void LocalMediaSourceEngineImpl::onSetFocus(bool focusAcquire) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSetFocus", {METRIC_LOCAL_MEDIA_SOURCE_SET_FOCUS});
+    AACE_INFO(LX(TAG).d("localPlayerId", m_localPlayerId));
     try {
         ThrowIfNot(setFocus(m_localPlayerId, focusAcquire), "setFocusFailed");
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "onSetFocus").d("reason", ex.what()));
-    }
-}
-
-void LocalMediaSourceEngineImpl::setDefaultPlayerFocus() {
-    try {
-        AACE_DEBUG(LX(TAG).m("Setting focus for default player"));
-        auto focusHandler_lock = m_focusHandler.lock();
-        ThrowIfNull(focusHandler_lock, "invalidFocusHandler");
-        m_executor.submit([focusHandler_lock]() { focusHandler_lock->setDefaultPlayerFocus(); });
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }
 }
 

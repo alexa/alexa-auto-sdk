@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include <rapidjson/document.h>
+
+#include <acsdk/MultiAgentInterface/Connection/AgentConnectionObserverInterface.h>
 #include <AVSCommon/AVS/CapabilityAgent.h>
 #include <AVSCommon/AVS/CapabilityConfiguration.h>
 #include <AVSCommon/AVS/DirectiveHandlerConfiguration.h>
@@ -34,9 +37,6 @@
 #include <AVSCommon/SDKInterfaces/RenderPlayerInfoCardsProviderInterface.h>
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/ExceptionEncounteredSenderInterface.h>
-#include "ExternalMediaAdapterInterface.h"
-#include "ExternalMediaAdapterHandlerInterface.h"
-#include "ExternalMediaPlayerInterface.h"
 #include <AVSCommon/SDKInterfaces/FocusManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
@@ -44,17 +44,20 @@
 #include <AVSCommon/Utils/MediaPlayer/MediaPlayerInterface.h>
 #include <AVSCommon/Utils/RequiresShutdown.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/ExternalMediaAdapter.h>
+#include <AACE/Alexa/GlobalPreset.h>
+#include <AACE/Alexa/LocalMediaSource.h>
+#include <AACE/Engine/Alexa/ExternalMediaAdapterHandler.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+#include <AACE/Engine/Network/NetworkInfoObserver.h>
+#include <AACE/Engine/Network/NetworkObservableInterface.h>
+
+#include "ExternalMediaAdapterInterface.h"
+#include "ExternalMediaAdapterHandlerInterface.h"
 #include "ExternalMediaPlayer.h"
-
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/ExternalMediaAdapter.h"
-#include "AACE/Alexa/GlobalPreset.h"
-#include "AACE/Alexa/LocalMediaSource.h"
-#include "AACE/Engine/Alexa/ExternalMediaAdapterHandler.h"
-#include "AACE/Engine/Network/NetworkInfoObserver.h"
-#include "AACE/Engine/Network/NetworkObservableInterface.h"
-
-#include <rapidjson/document.h>
+#include "ExternalMediaPlayerInterface.h"
 
 namespace aace {
 namespace engine {
@@ -67,11 +70,15 @@ class ExternalMediaPlayerEngineImpl
         , public FocusHandlerInterface
         , public aace::engine::alexa::ExternalMediaAdapterHandlerInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
+        , public alexaClientSDK::multiAgentInterface::connection::AgentConnectionObserverInterface
         , public alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsProviderInterface
         , public std::enable_shared_from_this<ExternalMediaPlayerEngineImpl> {
 private:
     using DiscoveredPlayerMap =
         std::unordered_map<std::string, aace::alexa::ExternalMediaAdapter::DiscoveredPlayerInfo>;
+
+    using AgentAvailability =
+        alexaClientSDK::multiAgentInterface::connection::AgentConnectionObserverInterface::AvailabilityState;
 
     ExternalMediaPlayerEngineImpl(const std::string& agent);
 
@@ -88,6 +95,7 @@ private:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface>
             externalMediaAdapterRegistration);
 
@@ -113,6 +121,7 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> playbackRouter,
         std::shared_ptr<aace::engine::alexa::AudioPlayerObserverDelegate> audioPlayerObserverDelegate,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         std::shared_ptr<aace::engine::alexa::ExternalMediaAdapterRegistrationInterface>
             externalMediaAdapterRegistration,
         bool duckingEnabled);
@@ -158,10 +167,23 @@ public:
     void setFocus(const std::string& playerId, bool focusAcquire) override;
     void setDefaultPlayerFocus() override;
 
-    // alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
+    /// @name @c alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface
+    /// @{
     void onConnectionStatusChanged(const Status status, const ChangedReason reason) override;
     void onConnectionStatusChanged(const Status status, const std::vector<EngineConnectionStatus>& engineStatuses)
         override;
+    /// @}
+    void onConnectionStatusChangedLocked(
+        const Status status,
+        const std::vector<EngineConnectionStatus>& engineStatuses);
+
+    /// @name @c alexaClientSDK::multiAgentInterface::connection::AgentConnectionObserverInterface functions
+    /// @{
+    void onAgentAvailabilityStateChanged(
+        alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+        AvailabilityState status,
+        const std::string& reason) override;
+    /// @}
 
     // RenderPlayerInfoCardsObserver interface
     void setObserver(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::RenderPlayerInfoCardsObserverInterface>
@@ -217,9 +239,20 @@ private:
     std::unordered_map<std::string, PlayerInfo> m_authorizationStateMap;
 
     /**
-     * The current state of connection to an Alexa endpoint. Access is serialized by @c m_connectionMutex
+     * The current state of connection to any assistant. Access is serialized by @c m_connectionMutex
      */
-    Status m_connectionStatus = Status::DISCONNECTED;
+    Status m_aggregateConnectionStatus = Status::DISCONNECTED;
+
+    /**
+     * The current availability status of an on-device custom agent, if available.
+     * Access is serialized by @c m_connectionMutex
+     */
+    AgentAvailability m_customAgentStatus = AgentAvailability::UNAVAILABLE;
+
+    /**
+     * The current state of connection to a Alexa. Access is serialized by @c m_connectionMutex
+     */
+    Status m_alexaConnectionStatus = Status::DISCONNECTED;
 
     /**
      * The current engine types connected to an Alexa endpoint. Access is serialized by @c m_connectionMutex
@@ -267,6 +300,9 @@ private:
 
     /// Mutex to serialize access to the observers.
     std::mutex m_observersMutex;
+
+    /// Metric recorder.
+    std::weak_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
 };
 
 //

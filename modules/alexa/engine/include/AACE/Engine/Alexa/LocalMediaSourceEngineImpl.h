@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,15 +19,17 @@
 #include <memory>
 #include <string>
 
-#include "ExternalMediaAdapterInterface.h"
-#include "ExternalMediaPlayerInterface.h"
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/GlobalPreset.h"
-#include "AACE/Alexa/LocalMediaSource.h"
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/SDKInterfaces/SpeakerManagerInterface.h>
 
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/GlobalPreset.h>
+#include <AACE/Alexa/LocalMediaSource.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+
 #include "ExternalMediaAdapterHandler.h"
+#include "ExternalMediaAdapterInterface.h"
+#include "ExternalMediaPlayerInterface.h"
 
 namespace aace {
 namespace engine {
@@ -41,18 +43,17 @@ private:
         std::shared_ptr<aace::alexa::LocalMediaSource> platformLocalMediaSource,
         const std::string& localPlayerId,
         std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
-        std::shared_ptr<FocusHandlerInterface> focusHandler);
-
-    bool initialize(
+        std::shared_ptr<FocusHandlerInterface> focusHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
+
+    bool initialize(std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
 
     using ContentSelector = aace::alexa::LocalMediaSource::ContentSelector;
 
     using Source = aace::alexa::LocalMediaSource::Source;
 
     std::string getPlayerId(Source source);
-    void setDefaultPlayerFocus();
 
 public:
     static std::shared_ptr<LocalMediaSourceEngineImpl> create(
@@ -61,7 +62,8 @@ public:
         std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
         std::shared_ptr<FocusHandlerInterface> focusHandler,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     // aace::alexa::LocalMediaSourceEngineInterface
     void onPlayerEvent(const std::string& eventName, const std::string& sessionId) override;
@@ -108,7 +110,6 @@ protected:
 
 private:
     std::shared_ptr<aace::alexa::LocalMediaSource> m_platformLocalMediaSource;
-    std::weak_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
     std::string m_localPlayerId;
     std::unordered_map<std::string, ContentSelector> m_contentSelectorNameMap;

@@ -15,81 +15,101 @@ The `Core` module defines required and optional configuration objects that you i
 
 ### (Required) Vehicle info configuration
 
-Your application must provide the `aace.vehicle` configuration specified below. Amazon uses the vehicle configuration properties for analytics.
+Your application must provide the `aace.vehicle` configuration specified below. Amazon uses the vehicle configuration properties for analytics and metrics.
 
 ```
-{
-  "aace.vehicle": {
-     "info": {
-         "make": {{STRING}},
-         "model": {{STRING}},
-         "year": {{STRING}},
-         "trim": {{STRING}},
-         "geography": {{STRING}},
-         "version": {{STRING}},
-         "os": {{STRING}},
-         "arch": {{STRING}},
-         "language": {{STRING}},
-         "microphone": {{STRING}},
-         "vehicleIdentifier": {{STRING}},
-         "engineType": {{STRING}},
-         "rseEmbeddedFireTvs": {{STRING}}
-     }
-  }
+"aace.vehicle": {
+    "deviceInfo": {
+        "manufacturer": "${DEVICE_MANUFACTURER}",
+        "model": "${DEVICE_MODEL}",
+        "platform": "${DEVICE_PLATFORM}",
+        "osVersion": "${DEVICE_OS_VERSION}",
+        "hardwareArch": "${DEVICE_HARDWARE_ARCH}",
+        "serialNumber":  "${DEVICE_SERIAL_NUMBER}"
+    },
+    "appInfo": {
+        "softwareVersion": "${APP_VERSION}"
+    },
+    "vehicleInfo": {
+        "make": "${VEHICLE_MAKE}",
+        "model": "${VEHICLE_MODEL}",
+        "year": "${VEHICLE_YEAR}",
+        "trim": "${VEHICLE_TRIM}",
+        "microphoneType": "${VEHICLE_MICROPHONE}",
+        "operatingCountry": "${VEHICLE_COUNTRY}",
+        "vehicleIdentifier": "${VEHICLE_IDENTIFIER}",
+        "engineType": "${VEHICLE_ENGINE_TYPE}",
+        "rseEmbeddedFireTvs": "${RSE_EMBEDDED_FIRE_TV_COUNT}"
+    }
 }
-
 ```
 The following table describes the properties in the configuration:
 
-| Property           | Type                | Required | Description                                                                                       | Example                          |
-| ------------------ | ------------------- | -------- | ------------------------------------------------------------------------------------------------- | -------------------------------- |
-| make               | String              | Yes      | The make of the vehicle                                                                           | —                                |
-| model              | String              | Yes      | The model of the vehicle                                                                          | —                                |
-| year               | Integer as a string | Yes      | The model year of the vehicle. The value must be an integer in the range 1900-2100.               | "2019"                           |
-| trim               | String              | No       | The trim package of the vehicle, identifying the vehicle's level of equipment or special features | "Sport"                          |
-| geography          | String              | No       | The location of the vehicle                                                                       | "US",<br>"US-North",<br> "WA"    |
-| version            | String              | No       | The client software version                                                                       | "4.0"                            |
-| os                 | String              | No       | The operating system used by the head unit                                                        | "AndroidOreo_8.1"                |
-| arch               | String              | No       | The hardware architecture used by the head unit                                                   | "x86_64"                         |
-| language           | String              | No       | The language or locale selected for Alexa by the vehicle owner                                    | "en-US",<br>"fr-CA"              |
-| microphone         | String              | No       | The type and arrangement of microphone used in the vehicle                                        | "7 mic array, centrally mounted" |
-| vehicleIdentifier  | String              | Yes      | An identifier for the vehicle                                                                     | "1234abcd"                       |
-| engineType         | String              | No       | The engine type of the vehicle. <br><br>**Accepted values:**<ul><li>`"GAS"`</li><li>`"ELECTRIC"`</li><li>`"HYBRID"`</li></ul> | "GAS" |
-| rseEmbeddedFireTvs | Integer as a string | No       | The number of RSE embedded FireTVs installed in the vehicle                                       | "1"                              |
-
->**Important!** To pass the Amazon certification process, the `vehicleIdentifier` value you provide must NOT be the vehicle identification number (VIN).
+| Property | Type | Required | Description | Example |
+| ---------| ---- | -------- | ----------- | ------- |
+| deviceInfo.<br>manufacturer | String | Yes | The manufacturer of the head unit hardware | "Alpine", "Pioneer" |
+| deviceInfo.<br>model | String | Yes | The model name of the head unit hardware | "Coral" |
+| deviceInfo.<br>platform | String | Yes | The head unit software platform or operating system name | "Android", "Ubuntu" |
+| deviceInfo.<br>osVersion | String | Yes | The version of the head unit operating system | "12", "18.04.6 LTS" |
+| deviceInfo.<br>hardwareArch | String | Yes | The hardware architecture of the head unit or CPU+instruction set | "arm64-v8a", "x86_64", "armv7hf", "armv8" |
+| deviceInfo.<br>serialNumber | String | Yes | The serial number of the head unit | "A01BCDEFGH2I" |
+| appInfo.<br>softwareVersion | String | Yes | The version of the Auto SDK client application | "1.0.1" |
+| vehicleInfo.<br>make | String | Yes | The make of the vehicle | "BMW", "Ford" |
+| vehicleInfo.<br>model | String | Yes | The model of the vehicle | "MDX", "Q5", "Accord" |
+| vehicleInfo.<br>year | String | Yes | The model year of the vehicle. The value must be an integer in the range 1900-2100 expressed as a string | "2023" |
+| vehicleInfo.<br>trim | String | No | The trim package of the vehicle, identifying the vehicle's level of equipment or special features | "Limited", "Base package", "Type S" |
+| vehicleInfo.<br>microphoneType | String | No |  The type and arrangement of microphone used in the vehicle | "7 mic array centrally mounted" |
+| vehicleInfo.<br>operatingCountry | String | Yes | The current (or intended, if current is not available) operating country for the vehicle. The value must be an ISO 3166 Alpha-2 country code | "US", "MX", "JP" |
+| vehicleInfo.<br>vehicleIdentifier | String | Yes | The automaker's identifier for the vehicle. The value should not be the vehicle identification number (VIN).| "12345ABCDE" |
+| vehicleInfo.<br>engineType | String | No | The type of engine in the vehicle. <br><br>**Accepted values:**<ul><li>`"GAS"`</li><li>`"ELECTRIC"`</li><li>`"HYBRID"`</li></ul> | "ELECTRIC" |
+| vehicleInfo.<br>rseEmbeddedFireTvs | String | No | The number of Rear Seat Entertainment embedded Fire TVs in the vehicle, expressed as a string | "2" |
 
 <details markdown="1">
-<summary>Click to expand or collapse details— Generate the configuration programmatically with the C++ factory function</summary>
+<summary>Click to expand or collapse details— Generate the configuration programmatically with the C++ factory functions</summary>
 
-Auto SDK provides the [`VehicleConfiguration::createVehicleInfoConfig()`](https://alexa.github.io/alexa-auto-sdk/docs/native/api/classes/classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad67c9d173ea737eb9d737db84b2d0ec1) factory function to generate the configuration programmatically. 
+Auto SDK provides the [`VehicleConfiguration`](https://alexa.github.io/alexa-auto-sdk/docs/native/api/classes/classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html) factory functions to generate the configuration programmatically. 
 
 
 ```c++
 #include <AACE/Vehicle/VehicleConfiguration.h>
 
-std::vector<aace::vehicle::config::VehicleConfiguration::VehicleProperty> vehicleProperties = {
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::MAKE, "SampleMake"},
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::MODEL, "SampleModel" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::YEAR, "2020" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::TRIM, "Sport" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::GEOGRAPHY, "US" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::VERSION, "4.0"},
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::OPERATING_SYSTEM, "AndroidOreo_8.1"},
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::HARDWARE_ARCH, "x86_64" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::MICROPHONE, "7 mic array, centrally mounted" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::LANGUAGE, "en-US" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::VEHICLE_IDENTIFIER, "1234abcd" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::ENGINE_TYPE, "GAS" },
-    { aace::vehicle::config::VehicleConfiguration::VehiclePropertyType::RSE_EMBEDDED_FIRETVS, "1" }
+std::vector<aace::vehicle::config::VehicleConfiguration::VehicleInfoProperty> vehicleProperties = {
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::MAKE, "SampleMake"},
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::MODEL, "SampleModel" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::YEAR, "2020" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::TRIM, "Sport" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::OPERATING_COUNTRY, "US" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::MICROPHONE_TYPE, "7 mic array, centrally mounted" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::VEHICLE_IDENTIFIER, "1234abcd" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::ENGINE_TYPE, "GAS" },
+    { aace::vehicle::config::VehicleConfiguration::VehicleInfoPropertyType::RSE_EMBEDDED_FIRE_TVS, "2" }
 };
 
 auto vehicleConfig = aace::vehicle::config::VehicleConfiguration::createVehicleInfoConfig(vehicleProperties);
 
+std::vector<aace::vehicle::config::VehicleConfiguration::DeviceInfoProperty> deviceProperties = {
+    { aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType::MANUFACTURER, "SampleManufacturer"},
+    { aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType::MODEL, "SampleModel" },
+    { aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType::SERIAL_NUMBER, "A01BCDEFGH2I" },
+    { aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType::PLATFORM, "Android" },
+    { aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType::OS_VERSION, "12" },
+    { aace::vehicle::config::VehicleConfiguration::DeviceInfoPropertyType::HARDWARE_ARCH, "arm64-v8a" }
+};
+
+auto deviceConfig = aace::vehicle::config::VehicleConfiguration::createDeviceInfoConfig(deviceProperties);
+
+std::vector<aace::vehicle::config::VehicleConfiguration::AppInfoProperty> appProperties = {
+    { aace::vehicle::config::VehicleConfiguration::AppInfoPropertyType::SOFTWARE_VERSION, "1.0.1"}
+};
+
+auto appConfig = aace::vehicle::config::VehicleConfiguration::createAppInfoConfig(appProperties);
+
 engine->configure(
     {
         // ...other config objects...,
-        vehicleConfig
+        vehicleConfig,
+        deviceConfig,
+        appConfig
     }
 );
 ```
@@ -183,6 +203,50 @@ engine->configure(
     {
         // ...other config objects...,
         curlConfig
+    }
+);
+```
+
+</details>
+
+### (Required) Metrics configuration
+
+Your application must provide the `aace.metrics` configuration specified below. The Engine uses the configured values for uploading metrics to Amazon metric services.
+
+```
+{
+    "aace.metrics": {
+        "metricStoragePath": ${METRIC_STORAGE_PATH,
+        "metricDeviceIdTag": "${METRIC_TAG}"
+    }
+}
+```
+
+The following table describes the properties in the configuration:
+
+| Property         | Type   | Required | Description                                                                              | Example                         |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------------------- | ------------------------------- |
+| metricStoragePath | String | Yes      | An absolute path to a directory where metrics may be stored prior to upload. The directory must exist and should not be used for any other purpose. | "/opt/AAC/data/metrics" |
+| metricDeviceIdTag      | String | Yes      | A tag that Auto SDK Engine will use in combination with DSN to generate a unique anonymous device identifier. Neither Alexa nor Auto SDK will store this tag and hence cannot reverse the hash to identify a single DSN from an individual metric. The metricDeviceIdTag may be any nonempty alphanumeric string that does not change across device reboots, factory resets, app data reset, or software updates. The recommended value is a 32 character string that is not the DSN or VIN. The value may be unique to an individual vehicle, provided it is stable, but it is not required to be unique. | "yXGO5U1ylqauXa5LwSx2ppQPFTQbFtu4" |
+
+<details markdown="1">
+<summary>Click to expand or collapse details— Generate the configuration programmatically with the C++ factory functions</summary>
+
+Auto SDK provides the [`MetricsConfiguration`](https://alexa.github.io/alexa-auto-sdk/docs/native/api/classes/classaace_1_1metrics_1_1config_1_1_metrics_configuration.html) factory functions to generate the configuration programmatically. 
+
+
+```c++
+#include <AACE/Metrics/MetricsConfiguration.h>
+
+auto metricTag = aace::metrics::config::MetricsConfiguration::createMetricsTagConfig("yXGO5U1ylqauXa5LwSx2ppQPFTQbFtu4");
+
+auto metricPath = aace::metrics::config::MetricsConfiguration::createMetricsStorageConfig("/opt/AAC/data/metrics");
+
+engine->configure(
+    {
+        // ...other config objects...,
+        metricTag,
+        metricPath
     }
 );
 ```

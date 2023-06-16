@@ -25,6 +25,7 @@ class AvsDeviceSdkConan(ConanFile):
         "with_latency_logs": [True, False],
         "build_testing": [True, False],
         "with_curl_http_version_2_prior_knowledge": [True, False],
+        "with_captions": [True, False],
     }
     default_options = {
         "with_opus": True,
@@ -32,6 +33,7 @@ class AvsDeviceSdkConan(ConanFile):
         "with_metrics": True,
         "with_sensitive_logs": False,
         "with_latency_logs": False,
+        "with_captions": True,
         "build_testing": False,
         "libcurl:shared": True,
         "libcurl:with_ssl": "openssl",
@@ -47,7 +49,9 @@ class AvsDeviceSdkConan(ConanFile):
     _source_subfolder = "source_subfolder"
 
     def requirements(self):
-        self.requires(f"libcurl/7.81.0@{self.user}/{self.channel}")
+        self.requires(f"libcurl/8.0.1@{self.user}/{self.channel}")
+        if self.options.with_captions:
+            self.requires(f"webvtt/1.0@{self.user}/{self.channel}")
 
     def source(self):
         tools.get(f"https://github.com/alexa/avs-device-sdk/archive/v{self.version}.tar.gz")
@@ -74,6 +78,12 @@ class AvsDeviceSdkConan(ConanFile):
         cmake.definitions["ACSDK_LATENCY_LOG"] = self.options.with_latency_logs
         cmake.definitions["RAPIDJSON_MEM_OPTIMIZATION"] = "OFF"
         cmake.definitions["BUILD_TESTING"] = "ON" if self.options.build_testing else "OFF"
+        cmake.definitions["CAPTIONS"] = "ON" if self.options.with_captions else "OFF"
+        if self.options.with_captions:   
+            logging.info("Caption is enabled.")
+            webvtt_root = self.deps_cpp_info["webvtt"].rootpath
+            cmake.definitions["LIBWEBVTT_LIB_PATH"] = os.path.join(webvtt_root, "lib/libwebvtt.a")
+            cmake.definitions["LIBWEBVTT_INCLUDE_DIR"] = os.path.join(webvtt_root, "include")
         if self.settings.os == "Android":
             cmake.definitions["ANDROID"] = "OFF"  # this is not a mistake!
         cmake.definitions["ACSDK_ENABLE_CURL_HTTP_VERSION_2_PRIOR_KNOWLEDGE"] = (

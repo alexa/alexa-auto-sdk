@@ -8,12 +8,12 @@ participant AuthorizationHandler  order 30
 participant "Auto SDK" as AutoSDK  order 40
 
 Application -> AuthorizationHandler : Logging out from CBL authorization.
-AuthorizationHandler -> AutoSDK : logout( "alexa:cbl" )
+AuthorizationHandler -> AutoSDK : Logout{ "alexa:cbl" }
 
 ... Clearing stored refresh token ...
-AutoSDK -> AuthorizationHandler : setAuthorizationData( "alexa:cbl", "refreshToken", "" )
+AutoSDK -> AuthorizationHandler : SetAuthorizationData{ "alexa:cbl", "refreshToken", "" }
 
 ... Notifying the Application as unauthorized ...
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", UNAUTHORIZED )
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "alexa:cbl", UNAUTHORIZED }
 
 @enduml

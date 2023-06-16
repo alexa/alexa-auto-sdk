@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public:
         if (AddressType::PHONE == type) {
             return AddressBookType::CONTACT == m_type;
         } else if (AddressType::POSTALADDRESS == type) {
-            return AddressBookType::NAVIGATION == m_type;
+            return (AddressBookType::NAVIGATION == m_type || AddressBookType::CONTACT == m_type);
         } else {
             return false;
         }

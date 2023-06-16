@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../migration/">
+      
       <link rel="icon" href="../../logo.png">
-      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.15">
+      <meta name="generator" content="mkdocs-1.4.3, mkdocs-material-9.1.16">
     
     
       
@@ -17,12 +23,13 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.c382b1dc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.26e3688c.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.cc9b2e1e.min.css">
-        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ecc896b0.min.css">
       
+      
+
     
     
     
@@ -35,10 +42,11 @@
       
     
     
-    <script>__md_scope=new URL("../..",location),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
+    
     
     
   </head>
@@ -77,7 +85,7 @@
 
   
 
-<header class="md-header md-header--lifted" data-md-component="header">
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="../.." title="Alexa Auto SDK" class="md-header__button md-logo" aria-label="Alexa Auto SDK" data-md-component="logo">
       
@@ -104,27 +112,31 @@
       </div>
     </div>
     
-      <form class="md-header__option" data-md-component="palette">
-        
+      
+        <form class="md-header__option" data-md-component="palette">
           
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+            
+              <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              </label>
+            
           
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+            
+            
+            
+            <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+            
+              <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+              </label>
+            
           
-            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            </label>
-          
-        
-          
-          
-          <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="red"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
-          
-            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
-            </label>
-          
-        
-      </form>
+        </form>
+      
     
     
     
@@ -142,11 +154,11 @@
       </label>
       <nav class="md-search__options" aria-label="Search">
         
-          <a href="javascript:void(0)" class="md-search__icon md-icon" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7 0-.24-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91 1.61 0 2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08Z"/></svg>
           </a>
         
-        <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
         </button>
       </nav>
@@ -160,7 +172,7 @@
           <div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
+          <ol class="md-search-result__list" role="presentation"></ol>
         </div>
       </div>
     </div>
@@ -172,7 +184,7 @@
         <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     alexa/alexa-auto-sdk
@@ -185,7 +197,7 @@
     
       
 <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
-  <div class="md-tabs__inner md-grid">
+  <div class="md-grid">
     <ul class="md-tabs__list">
       
         
@@ -316,7 +328,7 @@
       <a href="https://github.com/alexa/alexa-auto-sdk" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     alexa/alexa-auto-sdk
@@ -339,8 +351,9 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1" type="checkbox" id="__nav_1" checked>
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
       
       
         
@@ -369,7 +382,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Home" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_1">
           <span class="md-nav__icon md-icon"></span>
           Home
@@ -403,8 +416,9 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_3" type="checkbox" id="__nav_1_3" checked>
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" checked>
       
       
         
@@ -429,7 +443,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Releases" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="true">
         <label class="md-nav__title" for="__nav_1_3">
           <span class="md-nav__icon md-icon"></span>
           Releases
@@ -447,7 +461,7 @@
   
     <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
         
@@ -480,6 +494,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v43-released-on-2023-06-15" class="md-nav__link">
+    v4.3 Released on 2023-06-15
+  </a>
+  
+    <nav class="md-nav" aria-label="v4.3 Released on 2023-06-15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    Breaking Changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v42-released-on-2022-12-21" class="md-nav__link">
     v4.2 Released on 2022-12-21
   </a>
@@ -488,7 +543,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements" class="md-nav__link">
+  <a href="#enhancements_1" class="md-nav__link">
     Enhancements
   </a>
   
@@ -515,7 +570,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#resolved-issues" class="md-nav__link">
+  <a href="#resolved-issues_1" class="md-nav__link">
     Resolved Issues
   </a>
   
@@ -542,7 +597,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues" class="md-nav__link">
+  <a href="#known-issues_1" class="md-nav__link">
     Known Issues
   </a>
   
@@ -582,40 +637,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_1" class="md-nav__link">
-    Enhancements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resolved-issues_1" class="md-nav__link">
-    Resolved Issues
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#known-issues_1" class="md-nav__link">
-    Known Issues
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v410-released-on-2022-05-27" class="md-nav__link">
-    v4.1.0 released on 2022-05-27
-  </a>
-  
-    <nav class="md-nav" aria-label="v4.1.0 released on 2022-05-27">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#enhancements_2" class="md-nav__link">
     Enhancements
   </a>
@@ -642,6 +663,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#v410-released-on-2022-05-27" class="md-nav__link">
+    v4.1.0 released on 2022-05-27
+  </a>
+  
+    <nav class="md-nav" aria-label="v4.1.0 released on 2022-05-27">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_3" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues_3" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues_3" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v400-released-on-2021-12-15" class="md-nav__link">
     v4.0.0 released on 2021-12-15
   </a>
@@ -650,7 +705,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_3" class="md-nav__link">
+  <a href="#enhancements_4" class="md-nav__link">
     Enhancements
   </a>
   
@@ -664,14 +719,14 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#resolved-issues_3" class="md-nav__link">
+  <a href="#resolved-issues_4" class="md-nav__link">
     Resolved issues
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues_3" class="md-nav__link">
+  <a href="#known-issues_4" class="md-nav__link">
     Known issues
   </a>
   
@@ -688,40 +743,6 @@
   </a>
   
     <nav class="md-nav" aria-label="v3.3.0 released on 2021-09-30">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#enhancements_4" class="md-nav__link">
-    Enhancements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resolved-issues_4" class="md-nav__link">
-    Resolved Issues
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#known-issues_4" class="md-nav__link">
-    Known Issues
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v321-released-on-2021-08-06" class="md-nav__link">
-    v3.2.1 released on 2021-08-06
-  </a>
-  
-    <nav class="md-nav" aria-label="v3.2.1 released on 2021-08-06">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -751,11 +772,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v320-released-on-2021-05-19" class="md-nav__link">
-    v3.2.0 released on 2021-05-19
+  <a href="#v321-released-on-2021-08-06" class="md-nav__link">
+    v3.2.1 released on 2021-08-06
   </a>
   
-    <nav class="md-nav" aria-label="v3.2.0 released on 2021-05-19">
+    <nav class="md-nav" aria-label="v3.2.1 released on 2021-08-06">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -785,11 +806,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v310-released-on-2020-12-15" class="md-nav__link">
-    v3.1.0 released on 2020-12-15
+  <a href="#v320-released-on-2021-05-19" class="md-nav__link">
+    v3.2.0 released on 2021-05-19
   </a>
   
-    <nav class="md-nav" aria-label="v3.1.0 released on 2020-12-15">
+    <nav class="md-nav" aria-label="v3.2.0 released on 2021-05-19">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -808,6 +829,40 @@
         
           <li class="md-nav__item">
   <a href="#known-issues_7" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v310-released-on-2020-12-15" class="md-nav__link">
+    v3.1.0 released on 2020-12-15
+  </a>
+  
+    <nav class="md-nav" aria-label="v3.1.0 released on 2020-12-15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_8" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues_8" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues_8" class="md-nav__link">
     Known Issues
   </a>
   
@@ -834,21 +889,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_8" class="md-nav__link">
+  <a href="#enhancements_9" class="md-nav__link">
     Enhancements
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#resolved-issues_8" class="md-nav__link">
+  <a href="#resolved-issues_9" class="md-nav__link">
     Resolved Issues
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues_8" class="md-nav__link">
+  <a href="#known-issues_9" class="md-nav__link">
     Known Issues
   </a>
   
@@ -872,40 +927,6 @@
   </a>
   
     <nav class="md-nav" aria-label="v2.3.0 released on 2020-07-31">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#enhancements_9" class="md-nav__link">
-    Enhancements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resolved-issues_9" class="md-nav__link">
-    Resolved Issues
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#known-issues_9" class="md-nav__link">
-    Known Issues
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v221-released-on-2020-05-29" class="md-nav__link">
-    v2.2.1 released on 2020-05-29
-  </a>
-  
-    <nav class="md-nav" aria-label="v2.2.1 released on 2020-05-29">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -935,11 +956,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v220-released-on-2020-04-15" class="md-nav__link">
-    v2.2.0 released on 2020-04-15
+  <a href="#v221-released-on-2020-05-29" class="md-nav__link">
+    v2.2.1 released on 2020-05-29
   </a>
   
-    <nav class="md-nav" aria-label="v2.2.0 released on 2020-04-15">
+    <nav class="md-nav" aria-label="v2.2.1 released on 2020-05-29">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -969,11 +990,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v210-released-on-2019-12-19" class="md-nav__link">
-    v2.1.0 released on 2019-12-19:
+  <a href="#v220-released-on-2020-04-15" class="md-nav__link">
+    v2.2.0 released on 2020-04-15
   </a>
   
-    <nav class="md-nav" aria-label="v2.1.0 released on 2019-12-19:">
+    <nav class="md-nav" aria-label="v2.2.0 released on 2020-04-15">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1003,11 +1024,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v200-released-on-2019-09-10" class="md-nav__link">
-    v2.0.0 released on 2019-09-10:
+  <a href="#v210-released-on-2019-12-19" class="md-nav__link">
+    v2.1.0 released on 2019-12-19:
   </a>
   
-    <nav class="md-nav" aria-label="v2.0.0 released on 2019-09-10:">
+    <nav class="md-nav" aria-label="v2.1.0 released on 2019-12-19:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1037,11 +1058,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v163-released-on-2019-12-02" class="md-nav__link">
-    v1.6.3 released on 2019-12-02:
+  <a href="#v200-released-on-2019-09-10" class="md-nav__link">
+    v2.0.0 released on 2019-09-10:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.3 released on 2019-12-02:">
+    <nav class="md-nav" aria-label="v2.0.0 released on 2019-09-10:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1071,11 +1092,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v162-released-on-2019-10-11" class="md-nav__link">
-    v1.6.2 released on 2019-10-11:
+  <a href="#v163-released-on-2019-12-02" class="md-nav__link">
+    v1.6.3 released on 2019-12-02:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.2 released on 2019-10-11:">
+    <nav class="md-nav" aria-label="v1.6.3 released on 2019-12-02:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1105,11 +1126,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v161-released-on-2019-06-21" class="md-nav__link">
-    v1.6.1 released on 2019-06-21:
+  <a href="#v162-released-on-2019-10-11" class="md-nav__link">
+    v1.6.2 released on 2019-10-11:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.1 released on 2019-06-21:">
+    <nav class="md-nav" aria-label="v1.6.2 released on 2019-10-11:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1139,11 +1160,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v160-released-on-2019-05-16" class="md-nav__link">
-    v1.6.0 released on 2019-05-16:
+  <a href="#v161-released-on-2019-06-21" class="md-nav__link">
+    v1.6.1 released on 2019-06-21:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.0 released on 2019-05-16:">
+    <nav class="md-nav" aria-label="v1.6.1 released on 2019-06-21:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1173,11 +1194,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v150-released-on-2019-03-06" class="md-nav__link">
-    v1.5.0 released on 2019-03-06:
+  <a href="#v160-released-on-2019-05-16" class="md-nav__link">
+    v1.6.0 released on 2019-05-16:
   </a>
   
-    <nav class="md-nav" aria-label="v1.5.0 released on 2019-03-06:">
+    <nav class="md-nav" aria-label="v1.6.0 released on 2019-05-16:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1207,11 +1228,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v140-released-on-2018-12-17" class="md-nav__link">
-    v1.4.0 released on 2018-12-17:
+  <a href="#v150-released-on-2019-03-06" class="md-nav__link">
+    v1.5.0 released on 2019-03-06:
   </a>
   
-    <nav class="md-nav" aria-label="v1.4.0 released on 2018-12-17:">
+    <nav class="md-nav" aria-label="v1.5.0 released on 2019-03-06:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1241,11 +1262,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v131-released-on-2019-06-21" class="md-nav__link">
-    v1.3.1 released on 2019-06-21:
+  <a href="#v140-released-on-2018-12-17" class="md-nav__link">
+    v1.4.0 released on 2018-12-17:
   </a>
   
-    <nav class="md-nav" aria-label="v1.3.1 released on 2019-06-21:">
+    <nav class="md-nav" aria-label="v1.4.0 released on 2018-12-17:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1275,11 +1296,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v130-released-on-2018-11-20" class="md-nav__link">
-    v1.3.0 released on 2018-11-20:
+  <a href="#v131-released-on-2019-06-21" class="md-nav__link">
+    v1.3.1 released on 2019-06-21:
   </a>
   
-    <nav class="md-nav" aria-label="v1.3.0 released on 2018-11-20:">
+    <nav class="md-nav" aria-label="v1.3.1 released on 2019-06-21:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1309,11 +1330,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v120-released-on-2018-10-15" class="md-nav__link">
-    v1.2.0 released on 2018-10-15:
+  <a href="#v130-released-on-2018-11-20" class="md-nav__link">
+    v1.3.0 released on 2018-11-20:
   </a>
   
-    <nav class="md-nav" aria-label="v1.2.0 released on 2018-10-15:">
+    <nav class="md-nav" aria-label="v1.3.0 released on 2018-11-20:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1343,11 +1364,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v111-released-on-2018-09-10" class="md-nav__link">
-    v1.1.1 released on 2018-09-10:
+  <a href="#v120-released-on-2018-10-15" class="md-nav__link">
+    v1.2.0 released on 2018-10-15:
   </a>
   
-    <nav class="md-nav" aria-label="v1.1.1 released on 2018-09-10:">
+    <nav class="md-nav" aria-label="v1.2.0 released on 2018-10-15:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1377,11 +1398,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v110-released-on-2018-08-31" class="md-nav__link">
-    v1.1.0 released on 2018-08-31:
+  <a href="#v111-released-on-2018-09-10" class="md-nav__link">
+    v1.1.1 released on 2018-09-10:
   </a>
   
-    <nav class="md-nav" aria-label="v1.1.0 released on 2018-08-31:">
+    <nav class="md-nav" aria-label="v1.1.1 released on 2018-09-10:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1411,11 +1432,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v102-released-on-2018-08-08" class="md-nav__link">
-    v1.0.2 released on 2018-08-08:
+  <a href="#v110-released-on-2018-08-31" class="md-nav__link">
+    v1.1.0 released on 2018-08-31:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.2 released on 2018-08-08:">
+    <nav class="md-nav" aria-label="v1.1.0 released on 2018-08-31:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1445,11 +1466,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v101-released-on-2018-07-31" class="md-nav__link">
-    v1.0.1 released on 2018-07-31:
+  <a href="#v102-released-on-2018-08-08" class="md-nav__link">
+    v1.0.2 released on 2018-08-08:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.1 released on 2018-07-31:">
+    <nav class="md-nav" aria-label="v1.0.2 released on 2018-08-08:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1479,11 +1500,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v100-released-on-2018-06-29" class="md-nav__link">
-    v1.0.0 released on 2018-06-29:
+  <a href="#v101-released-on-2018-07-31" class="md-nav__link">
+    v1.0.1 released on 2018-07-31:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.0 released on 2018-06-29:">
+    <nav class="md-nav" aria-label="v1.0.1 released on 2018-07-31:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1494,7 +1515,41 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#resolved-issues_27" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#known-issues_27" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v100-released-on-2018-06-29" class="md-nav__link">
+    v1.0.0 released on 2018-06-29:
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.0 released on 2018-06-29:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_28" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues_28" class="md-nav__link">
     Known Issues
   </a>
   
@@ -1514,14 +1569,14 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_28" class="md-nav__link">
+  <a href="#enhancements_29" class="md-nav__link">
     Enhancements
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues_28" class="md-nav__link">
+  <a href="#known-issues_29" class="md-nav__link">
     Known Issues
   </a>
   
@@ -1550,8 +1605,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_3_3" type="checkbox" id="__nav_1_3_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3_3" >
       
       
         
@@ -1561,12 +1617,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_1_3_3">
+        <label class="md-nav__link" for="__nav_1_3_3" id="__nav_1_3_3_label" tabindex="0">
           Upgrade your Auto SDK version
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Upgrade your Auto SDK version" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_3_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1_3_3">
           <span class="md-nav__icon md-icon"></span>
           Upgrade your Auto SDK version
@@ -1638,8 +1694,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_1_5" type="checkbox" id="__nav_1_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
       
       
         
@@ -1649,12 +1706,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_1_5">
+        <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
           More
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="More" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_1_5">
           <span class="md-nav__icon md-icon"></span>
           More
@@ -1713,8 +1770,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
       
       
         
@@ -1724,12 +1782,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_2">
+        <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
           Explore Auto SDK
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Explore Auto SDK" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2">
           <span class="md-nav__icon md-icon"></span>
           Explore Auto SDK
@@ -1745,15 +1803,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
       
       
         
           
             
-          
-        
           
         
           
@@ -1773,7 +1830,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Auto SDK Concepts" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_1">
           <span class="md-nav__icon md-icon"></span>
           Auto SDK Concepts
@@ -1790,20 +1847,6 @@
     <li class="md-nav__item">
       <a href="../../explore/concepts/core-api-overview/" class="md-nav__link">
         Core API Overview
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../explore/concepts/android-api-overview/" class="md-nav__link">
-        Android API Overview
       </a>
     </li>
   
@@ -1840,8 +1883,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2" type="checkbox" id="__nav_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
       
       
         
@@ -1896,7 +1940,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Auto SDK Features" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2">
           <span class="md-nav__icon md-icon"></span>
           Auto SDK Features
@@ -1914,8 +1958,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_2" type="checkbox" id="__nav_2_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
       
       
         
@@ -1932,7 +1977,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Address Book" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_2">
           <span class="md-nav__icon md-icon"></span>
           Address Book
@@ -1957,8 +2002,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_3" type="checkbox" id="__nav_2_2_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3" >
       
       
         
@@ -1981,7 +2027,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Alexa" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_3">
           <span class="md-nav__icon md-icon"></span>
           Alexa
@@ -1999,49 +2045,50 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_3_2" type="checkbox" id="__nav_2_2_3_2" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_3_2" >
       
       
-        <label class="md-nav__link" for="__nav_2_2_3_2">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2_2_3_2" id="__nav_2_2_3_2_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_3_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_3_2">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -2281,8 +2328,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_4" type="checkbox" id="__nav_2_2_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_4" >
       
       
         
@@ -2299,7 +2347,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="APL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_4">
           <span class="md-nav__icon md-icon"></span>
           APL
@@ -2324,8 +2372,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_5" type="checkbox" id="__nav_2_2_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_5" >
       
       
         
@@ -2342,7 +2391,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Bluetooth" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_5">
           <span class="md-nav__icon md-icon"></span>
           Bluetooth
@@ -2367,8 +2416,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_6" type="checkbox" id="__nav_2_2_6" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_6" >
       
       
         
@@ -2385,7 +2435,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Car Control" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_6">
           <span class="md-nav__icon md-icon"></span>
           Car Control
@@ -2410,8 +2460,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_7" type="checkbox" id="__nav_2_2_7" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_7" >
       
       
         
@@ -2428,7 +2479,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="CBL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_7_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_7">
           <span class="md-nav__icon md-icon"></span>
           CBL
@@ -2453,8 +2504,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_8" type="checkbox" id="__nav_2_2_8" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_8" >
       
       
         
@@ -2471,7 +2523,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Connectivity" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_8_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_8">
           <span class="md-nav__icon md-icon"></span>
           Connectivity
@@ -2496,8 +2548,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_9" type="checkbox" id="__nav_2_2_9" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9" >
       
       
         
@@ -2520,7 +2573,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_9_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_9">
           <span class="md-nav__icon md-icon"></span>
           Core
@@ -2538,37 +2591,38 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_9_2" type="checkbox" id="__nav_2_2_9_2" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_9_2" >
       
       
-        <label class="md-nav__link" for="__nav_2_2_9_2">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_2_2_9_2" id="__nav_2_2_9_2_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_9_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_9_2">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -2724,8 +2778,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_10" type="checkbox" id="__nav_2_2_10" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_10" >
       
       
         
@@ -2742,7 +2797,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Custom Domain" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_10_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_10">
           <span class="md-nav__icon md-icon"></span>
           Custom Domain
@@ -2767,8 +2822,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_11" type="checkbox" id="__nav_2_2_11" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_11" >
       
       
         
@@ -2785,7 +2841,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Loopback Detector" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_11_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_11">
           <span class="md-nav__icon md-icon"></span>
           Loopback Detector
@@ -2810,8 +2866,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_12" type="checkbox" id="__nav_2_2_12" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_12" >
       
       
         
@@ -2828,7 +2885,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Messaging" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_12_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_12">
           <span class="md-nav__icon md-icon"></span>
           Messaging
@@ -2853,8 +2910,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_13" type="checkbox" id="__nav_2_2_13" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_13" >
       
       
         
@@ -2867,14 +2925,14 @@
         
         
         <div class="md-nav__link md-nav__link--index ">
-          <a href="../../explore/features/metrics-proxy/">Metrics Proxy</a>
+          <a href="../../explore/features/mobile-bridge/">Mobile Bridge</a>
           
         </div>
       
-      <nav class="md-nav" aria-label="Metrics Proxy" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_13_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_13">
           <span class="md-nav__icon md-icon"></span>
-          Metrics Proxy
+          Mobile Bridge
         </label>
         <ul class="md-nav__list" data-md-scrollfix>
           
@@ -2896,8 +2954,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_14" type="checkbox" id="__nav_2_2_14" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_14" >
       
       
         
@@ -2914,7 +2973,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Navigation" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_14_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_14">
           <span class="md-nav__icon md-icon"></span>
           Navigation
@@ -2939,8 +2998,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_15" type="checkbox" id="__nav_2_2_15" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_15" >
       
       
         
@@ -2957,7 +3017,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Phone Control" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_15_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_15">
           <span class="md-nav__icon md-icon"></span>
           Phone Control
@@ -2982,8 +3042,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_16" type="checkbox" id="__nav_2_2_16" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_16" >
       
       
         
@@ -3000,7 +3061,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="System Audio" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_16_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_16">
           <span class="md-nav__icon md-icon"></span>
           System Audio
@@ -3025,8 +3086,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_17" type="checkbox" id="__nav_2_2_17" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_17" >
       
       
         
@@ -3043,7 +3105,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Text-to-Speech" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_17_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_17">
           <span class="md-nav__icon md-icon"></span>
           Text-to-Speech
@@ -3068,8 +3130,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2_18" type="checkbox" id="__nav_2_2_18" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_18" >
       
       
         
@@ -3086,7 +3149,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Text-to-Speech Provider" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_18_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_2_2_18">
           <span class="md-nav__icon md-icon"></span>
           Text-to-Speech Provider
@@ -3126,19 +3189,14 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
       
       
         
           
             
-          
-        
-          
-        
-          
-        
           
         
       
@@ -3148,13 +3206,9 @@
         <div class="md-nav__link md-nav__link--index ">
           <a href="../../android/">Develop for Android</a>
           
-            <label for="__nav_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
         </div>
       
-      <nav class="md-nav" aria-label="Develop for Android" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_3">
           <span class="md-nav__icon md-icon"></span>
           Develop for Android
@@ -3163,700 +3217,6 @@
           
             
           
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
-      
-      
-      
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../android/aacs/sample-app/">Alexa Auto App</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Alexa Auto App" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_2">
-          <span class="md-nav__icon md-icon"></span>
-          Alexa Auto App
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3" type="checkbox" id="__nav_3_3" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../android/aacs/app-components/">App Components</a>
-          
-            <label for="__nav_3_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="App Components" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_3">
-          <span class="md-nav__icon md-icon"></span>
-          App Components
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-apis/" class="md-nav__link">
-        alexa-auto-apis
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_3_3" type="checkbox" id="__nav_3_3_3" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../android/aacs/app-components/alexa-auto-apl-renderer/">alexa-auto-apl-renderer</a>
-          
-            <label for="__nav_3_3_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="alexa-auto-apl-renderer" data-md-level="3">
-        <label class="md-nav__title" for="__nav_3_3_3">
-          <span class="md-nav__icon md-icon"></span>
-          alexa-auto-apl-renderer
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-apl-renderer/modules/apl-render/" class="md-nav__link">
-        APL Render
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-apps-common-ui/" class="md-nav__link">
-        alexa-auto-apps-common-ui
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-apps-common-util/" class="md-nav__link">
-        alexa-auto-apps-common-util
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-carcontrol/" class="md-nav__link">
-        alexa-auto-carcontrol
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-comms-ui/" class="md-nav__link">
-        alexa-auto-comms-ui
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-contacts/" class="md-nav__link">
-        alexa-auto-contacts
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-device-usage/" class="md-nav__link">
-        alexa-auto-device-usage
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-lwa-auth/" class="md-nav__link">
-        alexa-auto-lwa-auth
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-media-player/" class="md-nav__link">
-        alexa-auto-media-player
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-navigation/" class="md-nav__link">
-        alexa-auto-navigation
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-settings/" class="md-nav__link">
-        alexa-auto-settings
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-setup/" class="md-nav__link">
-        alexa-auto-setup
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-telephony/" class="md-nav__link">
-        alexa-auto-telephony
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-templateruntime-renderer/" class="md-nav__link">
-        alexa-auto-templateruntime-renderer
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-tts/" class="md-nav__link">
-        alexa-auto-tts
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-ux-restrictions/" class="md-nav__link">
-        alexa-auto-ux-restrictions
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-voice-interaction/" class="md-nav__link">
-        alexa-auto-voice-interaction
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/app-components/alexa-auto-voice-ui/" class="md-nav__link">
-        alexa-auto-voice-ui
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4" type="checkbox" id="__nav_3_4" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-        
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../android/aacs/">AACS</a>
-          
-            <label for="__nav_3_4">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="AACS" data-md-level="2">
-        <label class="md-nav__title" for="__nav_3_4">
-          <span class="md-nav__icon md-icon"></span>
-          AACS
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/service/" class="md-nav__link">
-        Configuration reference
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4_3" type="checkbox" id="__nav_3_4_3" >
-      
-      
-      
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../android/aacs/common/">Common utility libraries</a>
-          
-            <label for="__nav_3_4_3">
-              <span class="md-nav__icon md-icon"></span>
-            </label>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Common utility libraries" data-md-level="3">
-        <label class="md-nav__title" for="__nav_3_4_3">
-          <span class="md-nav__icon md-icon"></span>
-          Common utility libraries
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/common/ipc/" class="md-nav__link">
-        IPC
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/common/commonutils/" class="md-nav__link">
-        Common Utils
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../android/aacs/common/annotations/aacs-annotation-api/" class="md-nav__link">
-        Annotations
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-      
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_4_4" type="checkbox" id="__nav_3_4_4" >
-      
-      
-      
-        
-          
-            
-          
-        
-      
-      
-        
-        
-        <div class="md-nav__link md-nav__link--index ">
-          <a href="../../android/aacs/service/core-service/src/debug/java/com/amazon/alexaautoclientservice/">Instrumentation</a>
-          
-        </div>
-      
-      <nav class="md-nav" aria-label="Instrumentation" data-md-level="3">
-        <label class="md-nav__title" for="__nav_3_4_4">
-          <span class="md-nav__icon md-icon"></span>
-          Instrumentation
-        </label>
-        <ul class="md-nav__list" data-md-scrollfix>
-          
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
         </ul>
       </nav>
     </li>
@@ -3874,8 +3234,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
       
       
         
@@ -3902,7 +3263,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Develop with Native C++" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Develop with Native C++
@@ -3920,8 +3281,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
       
       
         
@@ -3931,12 +3293,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_4_2">
+        <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
           Build System
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Build System" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2">
           <span class="md-nav__icon md-icon"></span>
           Build System
@@ -3966,8 +3328,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2_2" type="checkbox" id="__nav_4_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2_2" >
       
       
         
@@ -3984,7 +3347,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="Builder Tool Command Reference" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_2_2">
           <span class="md-nav__icon md-icon"></span>
           Builder Tool Command Reference
@@ -4016,8 +3379,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
       
       
         
@@ -4034,7 +3398,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="C++ Sample App" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_3">
           <span class="md-nav__icon md-icon"></span>
           C++ Sample App
@@ -4059,8 +3423,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_4" type="checkbox" id="__nav_4_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
       
       
         
@@ -4077,7 +3442,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="API Reference" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_4_4">
           <span class="md-nav__icon md-icon"></span>
           API Reference
@@ -4110,8 +3475,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
       
       
         
@@ -4134,7 +3500,7 @@
           
         </div>
       
-      <nav class="md-nav" aria-label="AASB Message Reference" data-md-level="1">
+      <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5">
           <span class="md-nav__icon md-icon"></span>
           AASB Message Reference
@@ -4152,43 +3518,46 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
       
       
-        <label class="md-nav__link" for="__nav_5_2">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
           Modules
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Modules" data-md-level="2">
+      <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2">
           <span class="md-nav__icon md-icon"></span>
           Modules
@@ -4204,8 +3573,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_1" type="checkbox" id="__nav_5_2_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_1" >
       
       
         
@@ -4213,12 +3583,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_1">
+        <label class="md-nav__link" for="__nav_5_2_1" id="__nav_5_2_1_label" tabindex="0">
           Address Book
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Address Book" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_1">
           <span class="md-nav__icon md-icon"></span>
           Address Book
@@ -4234,8 +3604,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_1_1" type="checkbox" id="__nav_5_2_1_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_1_1" >
       
       
         
@@ -4243,12 +3614,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_1_1">
+        <label class="md-nav__link" for="__nav_5_2_1_1" id="__nav_5_2_1_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_1_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_1_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4292,8 +3663,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_2" type="checkbox" id="__nav_5_2_2" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_2" >
       
       
         
@@ -4301,12 +3673,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_2">
+        <label class="md-nav__link" for="__nav_5_2_2" id="__nav_5_2_2_label" tabindex="0">
           Alexa
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Alexa" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_2_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_2">
           <span class="md-nav__icon md-icon"></span>
           Alexa
@@ -4322,51 +3694,52 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_2_1" type="checkbox" id="__nav_5_2_2_1" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_2_1" >
       
       
-        <label class="md-nav__link" for="__nav_5_2_2_1">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_2_1" id="__nav_5_2_2_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_2_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_2_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4620,8 +3993,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_3" type="checkbox" id="__nav_5_2_3" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_3" >
       
       
         
@@ -4629,12 +4003,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_3">
+        <label class="md-nav__link" for="__nav_5_2_3" id="__nav_5_2_3_label" tabindex="0">
           APL
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="APL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_3_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_3">
           <span class="md-nav__icon md-icon"></span>
           APL
@@ -4650,8 +4024,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_3_1" type="checkbox" id="__nav_5_2_3_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_3_1" >
       
       
         
@@ -4659,12 +4034,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_3_1">
+        <label class="md-nav__link" for="__nav_5_2_3_1" id="__nav_5_2_3_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_3_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_3_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4708,8 +4083,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_4" type="checkbox" id="__nav_5_2_4" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_4" >
       
       
         
@@ -4717,12 +4093,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_4">
+        <label class="md-nav__link" for="__nav_5_2_4" id="__nav_5_2_4_label" tabindex="0">
           Car Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Car Control" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_4_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_4">
           <span class="md-nav__icon md-icon"></span>
           Car Control
@@ -4738,8 +4114,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_4_1" type="checkbox" id="__nav_5_2_4_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_4_1" >
       
       
         
@@ -4747,12 +4124,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_4_1">
+        <label class="md-nav__link" for="__nav_5_2_4_1" id="__nav_5_2_4_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_4_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_4_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4796,8 +4173,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5" type="checkbox" id="__nav_5_2_5" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_5" >
       
       
         
@@ -4805,12 +4183,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_5">
+        <label class="md-nav__link" for="__nav_5_2_5" id="__nav_5_2_5_label" tabindex="0">
           CBL
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="CBL" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_5_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_5">
           <span class="md-nav__icon md-icon"></span>
           CBL
@@ -4826,8 +4204,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_5_1" type="checkbox" id="__nav_5_2_5_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_5_1" >
       
       
         
@@ -4835,12 +4214,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_5_1">
+        <label class="md-nav__link" for="__nav_5_2_5_1" id="__nav_5_2_5_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_5_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_5_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4884,8 +4263,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6" type="checkbox" id="__nav_5_2_6" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6" >
       
       
         
@@ -4893,12 +4273,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_6">
+        <label class="md-nav__link" for="__nav_5_2_6" id="__nav_5_2_6_label" tabindex="0">
           Connectivity
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Connectivity" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_6_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_6">
           <span class="md-nav__icon md-icon"></span>
           Connectivity
@@ -4914,8 +4294,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_6_1" type="checkbox" id="__nav_5_2_6_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_6_1" >
       
       
         
@@ -4923,12 +4304,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_6_1">
+        <label class="md-nav__link" for="__nav_5_2_6_1" id="__nav_5_2_6_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_6_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_6_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -4972,8 +4353,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_7" type="checkbox" id="__nav_5_2_7" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7" >
       
       
         
@@ -4981,12 +4363,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_7">
+        <label class="md-nav__link" for="__nav_5_2_7" id="__nav_5_2_7_label" tabindex="0">
           Core
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Core" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_7_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_7">
           <span class="md-nav__icon md-icon"></span>
           Core
@@ -5002,37 +4384,38 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_7_1" type="checkbox" id="__nav_5_2_7_1" >
       
       
-      
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
-          
-        
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_7_1" >
       
       
-        <label class="md-nav__link" for="__nav_5_2_7_1">
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_7_1" id="__nav_5_2_7_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_7_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_7_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -5188,8 +4571,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_8" type="checkbox" id="__nav_5_2_8" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8" >
       
       
         
@@ -5197,12 +4581,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_8">
+        <label class="md-nav__link" for="__nav_5_2_8" id="__nav_5_2_8_label" tabindex="0">
           Custom Domain
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Custom Domain" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_8_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_8">
           <span class="md-nav__icon md-icon"></span>
           Custom Domain
@@ -5218,8 +4602,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_8_1" type="checkbox" id="__nav_5_2_8_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_8_1" >
       
       
         
@@ -5227,12 +4612,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_8_1">
+        <label class="md-nav__link" for="__nav_5_2_8_1" id="__nav_5_2_8_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_8_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_8_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -5276,8 +4661,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_9" type="checkbox" id="__nav_5_2_9" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_9" >
       
       
         
@@ -5285,12 +4671,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_9">
+        <label class="md-nav__link" for="__nav_5_2_9" id="__nav_5_2_9_label" tabindex="0">
           Messaging
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Messaging" data-md-level="3">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_9_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_9">
           <span class="md-nav__icon md-icon"></span>
           Messaging
@@ -5306,8 +4692,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_9_1" type="checkbox" id="__nav_5_2_9_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_9_1" >
       
       
         
@@ -5315,12 +4702,12 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_9_1">
+        <label class="md-nav__link" for="__nav_5_2_9_1" id="__nav_5_2_9_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_9_1_label" aria-expanded="false">
         <label class="md-nav__title" for="__nav_5_2_9_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
@@ -5364,8 +4751,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_10" type="checkbox" id="__nav_5_2_10" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_10" >
       
       
         
@@ -5373,13 +4761,103 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_10">
+        <label class="md-nav__link" for="__nav_5_2_10" id="__nav_5_2_10_label" tabindex="0">
+          Mobile Bridge
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_10_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_10">
+          <span class="md-nav__icon md-icon"></span>
+          Mobile Bridge
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_10_1" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_10_1" id="__nav_5_2_10_1_label" tabindex="0">
+          Interfaces
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_10_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_10_1">
+          <span class="md-nav__icon md-icon"></span>
+          Interfaces
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../aasb/mobile-bridge/MobileBridge/" class="md-nav__link">
+        MobileBridge
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_11" >
+      
+      
+        
+          
+        
+      
+      
+        <label class="md-nav__link" for="__nav_5_2_11" id="__nav_5_2_11_label" tabindex="0">
           Navigation
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Navigation" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_10">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_11_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_11">
           <span class="md-nav__icon md-icon"></span>
           Navigation
         </label>
@@ -5394,8 +4872,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_10_1" type="checkbox" id="__nav_5_2_10_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_11_1" >
       
       
         
@@ -5403,13 +4882,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_10_1">
+        <label class="md-nav__link" for="__nav_5_2_11_1" id="__nav_5_2_11_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
-        <label class="md-nav__title" for="__nav_5_2_10_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_11_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_11_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
         </label>
@@ -5452,8 +4931,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_11" type="checkbox" id="__nav_5_2_11" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_12" >
       
       
         
@@ -5461,13 +4941,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_11">
+        <label class="md-nav__link" for="__nav_5_2_12" id="__nav_5_2_12_label" tabindex="0">
           Phone Control
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Phone Control" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_11">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_12_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_12">
           <span class="md-nav__icon md-icon"></span>
           Phone Control
         </label>
@@ -5482,8 +4962,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_11_1" type="checkbox" id="__nav_5_2_11_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_12_1" >
       
       
         
@@ -5491,13 +4972,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_11_1">
+        <label class="md-nav__link" for="__nav_5_2_12_1" id="__nav_5_2_12_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
-        <label class="md-nav__title" for="__nav_5_2_11_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_12_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_12_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
         </label>
@@ -5540,8 +5021,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_12" type="checkbox" id="__nav_5_2_12" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_13" >
       
       
         
@@ -5549,13 +5031,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_12">
+        <label class="md-nav__link" for="__nav_5_2_13" id="__nav_5_2_13_label" tabindex="0">
           Text-to-Speech
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Text-to-Speech" data-md-level="3">
-        <label class="md-nav__title" for="__nav_5_2_12">
+      <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_5_2_13_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_13">
           <span class="md-nav__icon md-icon"></span>
           Text-to-Speech
         </label>
@@ -5570,8 +5052,9 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2_12_1" type="checkbox" id="__nav_5_2_12_1" >
       
+      
+      <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2_13_1" >
       
       
         
@@ -5579,13 +5062,13 @@
         
       
       
-        <label class="md-nav__link" for="__nav_5_2_12_1">
+        <label class="md-nav__link" for="__nav_5_2_13_1" id="__nav_5_2_13_1_label" tabindex="0">
           Interfaces
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Interfaces" data-md-level="4">
-        <label class="md-nav__title" for="__nav_5_2_12_1">
+      <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_5_2_13_1_label" aria-expanded="false">
+        <label class="md-nav__title" for="__nav_5_2_13_1">
           <span class="md-nav__icon md-icon"></span>
           Interfaces
         </label>
@@ -5661,6 +5144,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#v43-released-on-2023-06-15" class="md-nav__link">
+    v4.3 Released on 2023-06-15
+  </a>
+  
+    <nav class="md-nav" aria-label="v4.3 Released on 2023-06-15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking-changes" class="md-nav__link">
+    Breaking Changes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhancements" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v42-released-on-2022-12-21" class="md-nav__link">
     v4.2 Released on 2022-12-21
   </a>
@@ -5669,7 +5193,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements" class="md-nav__link">
+  <a href="#enhancements_1" class="md-nav__link">
     Enhancements
   </a>
   
@@ -5696,7 +5220,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#resolved-issues" class="md-nav__link">
+  <a href="#resolved-issues_1" class="md-nav__link">
     Resolved Issues
   </a>
   
@@ -5723,7 +5247,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues" class="md-nav__link">
+  <a href="#known-issues_1" class="md-nav__link">
     Known Issues
   </a>
   
@@ -5763,40 +5287,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_1" class="md-nav__link">
-    Enhancements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resolved-issues_1" class="md-nav__link">
-    Resolved Issues
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#known-issues_1" class="md-nav__link">
-    Known Issues
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v410-released-on-2022-05-27" class="md-nav__link">
-    v4.1.0 released on 2022-05-27
-  </a>
-  
-    <nav class="md-nav" aria-label="v4.1.0 released on 2022-05-27">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#enhancements_2" class="md-nav__link">
     Enhancements
   </a>
@@ -5823,6 +5313,40 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#v410-released-on-2022-05-27" class="md-nav__link">
+    v4.1.0 released on 2022-05-27
+  </a>
+  
+    <nav class="md-nav" aria-label="v4.1.0 released on 2022-05-27">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_3" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues_3" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues_3" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#v400-released-on-2021-12-15" class="md-nav__link">
     v4.0.0 released on 2021-12-15
   </a>
@@ -5831,7 +5355,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_3" class="md-nav__link">
+  <a href="#enhancements_4" class="md-nav__link">
     Enhancements
   </a>
   
@@ -5845,14 +5369,14 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#resolved-issues_3" class="md-nav__link">
+  <a href="#resolved-issues_4" class="md-nav__link">
     Resolved issues
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues_3" class="md-nav__link">
+  <a href="#known-issues_4" class="md-nav__link">
     Known issues
   </a>
   
@@ -5869,40 +5393,6 @@
   </a>
   
     <nav class="md-nav" aria-label="v3.3.0 released on 2021-09-30">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#enhancements_4" class="md-nav__link">
-    Enhancements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resolved-issues_4" class="md-nav__link">
-    Resolved Issues
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#known-issues_4" class="md-nav__link">
-    Known Issues
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v321-released-on-2021-08-06" class="md-nav__link">
-    v3.2.1 released on 2021-08-06
-  </a>
-  
-    <nav class="md-nav" aria-label="v3.2.1 released on 2021-08-06">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5932,11 +5422,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v320-released-on-2021-05-19" class="md-nav__link">
-    v3.2.0 released on 2021-05-19
+  <a href="#v321-released-on-2021-08-06" class="md-nav__link">
+    v3.2.1 released on 2021-08-06
   </a>
   
-    <nav class="md-nav" aria-label="v3.2.0 released on 2021-05-19">
+    <nav class="md-nav" aria-label="v3.2.1 released on 2021-08-06">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5966,11 +5456,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v310-released-on-2020-12-15" class="md-nav__link">
-    v3.1.0 released on 2020-12-15
+  <a href="#v320-released-on-2021-05-19" class="md-nav__link">
+    v3.2.0 released on 2021-05-19
   </a>
   
-    <nav class="md-nav" aria-label="v3.1.0 released on 2020-12-15">
+    <nav class="md-nav" aria-label="v3.2.0 released on 2021-05-19">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5989,6 +5479,40 @@
         
           <li class="md-nav__item">
   <a href="#known-issues_7" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v310-released-on-2020-12-15" class="md-nav__link">
+    v3.1.0 released on 2020-12-15
+  </a>
+  
+    <nav class="md-nav" aria-label="v3.1.0 released on 2020-12-15">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_8" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues_8" class="md-nav__link">
+    Resolved Issues
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues_8" class="md-nav__link">
     Known Issues
   </a>
   
@@ -6015,21 +5539,21 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#enhancements_8" class="md-nav__link">
+  <a href="#enhancements_9" class="md-nav__link">
     Enhancements
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#resolved-issues_8" class="md-nav__link">
+  <a href="#resolved-issues_9" class="md-nav__link">
     Resolved Issues
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#known-issues_8" class="md-nav__link">
+  <a href="#known-issues_9" class="md-nav__link">
     Known Issues
   </a>
   
@@ -6053,40 +5577,6 @@
   </a>
   
     <nav class="md-nav" aria-label="v2.3.0 released on 2020-07-31">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#enhancements_9" class="md-nav__link">
-    Enhancements
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resolved-issues_9" class="md-nav__link">
-    Resolved Issues
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#known-issues_9" class="md-nav__link">
-    Known Issues
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#v221-released-on-2020-05-29" class="md-nav__link">
-    v2.2.1 released on 2020-05-29
-  </a>
-  
-    <nav class="md-nav" aria-label="v2.2.1 released on 2020-05-29">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6116,11 +5606,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v220-released-on-2020-04-15" class="md-nav__link">
-    v2.2.0 released on 2020-04-15
+  <a href="#v221-released-on-2020-05-29" class="md-nav__link">
+    v2.2.1 released on 2020-05-29
   </a>
   
-    <nav class="md-nav" aria-label="v2.2.0 released on 2020-04-15">
+    <nav class="md-nav" aria-label="v2.2.1 released on 2020-05-29">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6150,11 +5640,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v210-released-on-2019-12-19" class="md-nav__link">
-    v2.1.0 released on 2019-12-19:
+  <a href="#v220-released-on-2020-04-15" class="md-nav__link">
+    v2.2.0 released on 2020-04-15
   </a>
   
-    <nav class="md-nav" aria-label="v2.1.0 released on 2019-12-19:">
+    <nav class="md-nav" aria-label="v2.2.0 released on 2020-04-15">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6184,11 +5674,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v200-released-on-2019-09-10" class="md-nav__link">
-    v2.0.0 released on 2019-09-10:
+  <a href="#v210-released-on-2019-12-19" class="md-nav__link">
+    v2.1.0 released on 2019-12-19:
   </a>
   
-    <nav class="md-nav" aria-label="v2.0.0 released on 2019-09-10:">
+    <nav class="md-nav" aria-label="v2.1.0 released on 2019-12-19:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6218,11 +5708,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v163-released-on-2019-12-02" class="md-nav__link">
-    v1.6.3 released on 2019-12-02:
+  <a href="#v200-released-on-2019-09-10" class="md-nav__link">
+    v2.0.0 released on 2019-09-10:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.3 released on 2019-12-02:">
+    <nav class="md-nav" aria-label="v2.0.0 released on 2019-09-10:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6252,11 +5742,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v162-released-on-2019-10-11" class="md-nav__link">
-    v1.6.2 released on 2019-10-11:
+  <a href="#v163-released-on-2019-12-02" class="md-nav__link">
+    v1.6.3 released on 2019-12-02:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.2 released on 2019-10-11:">
+    <nav class="md-nav" aria-label="v1.6.3 released on 2019-12-02:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6286,11 +5776,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v161-released-on-2019-06-21" class="md-nav__link">
-    v1.6.1 released on 2019-06-21:
+  <a href="#v162-released-on-2019-10-11" class="md-nav__link">
+    v1.6.2 released on 2019-10-11:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.1 released on 2019-06-21:">
+    <nav class="md-nav" aria-label="v1.6.2 released on 2019-10-11:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6320,11 +5810,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v160-released-on-2019-05-16" class="md-nav__link">
-    v1.6.0 released on 2019-05-16:
+  <a href="#v161-released-on-2019-06-21" class="md-nav__link">
+    v1.6.1 released on 2019-06-21:
   </a>
   
-    <nav class="md-nav" aria-label="v1.6.0 released on 2019-05-16:">
+    <nav class="md-nav" aria-label="v1.6.1 released on 2019-06-21:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6354,11 +5844,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v150-released-on-2019-03-06" class="md-nav__link">
-    v1.5.0 released on 2019-03-06:
+  <a href="#v160-released-on-2019-05-16" class="md-nav__link">
+    v1.6.0 released on 2019-05-16:
   </a>
   
-    <nav class="md-nav" aria-label="v1.5.0 released on 2019-03-06:">
+    <nav class="md-nav" aria-label="v1.6.0 released on 2019-05-16:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6388,11 +5878,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v140-released-on-2018-12-17" class="md-nav__link">
-    v1.4.0 released on 2018-12-17:
+  <a href="#v150-released-on-2019-03-06" class="md-nav__link">
+    v1.5.0 released on 2019-03-06:
   </a>
   
-    <nav class="md-nav" aria-label="v1.4.0 released on 2018-12-17:">
+    <nav class="md-nav" aria-label="v1.5.0 released on 2019-03-06:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6422,11 +5912,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v131-released-on-2019-06-21" class="md-nav__link">
-    v1.3.1 released on 2019-06-21:
+  <a href="#v140-released-on-2018-12-17" class="md-nav__link">
+    v1.4.0 released on 2018-12-17:
   </a>
   
-    <nav class="md-nav" aria-label="v1.3.1 released on 2019-06-21:">
+    <nav class="md-nav" aria-label="v1.4.0 released on 2018-12-17:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6456,11 +5946,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v130-released-on-2018-11-20" class="md-nav__link">
-    v1.3.0 released on 2018-11-20:
+  <a href="#v131-released-on-2019-06-21" class="md-nav__link">
+    v1.3.1 released on 2019-06-21:
   </a>
   
-    <nav class="md-nav" aria-label="v1.3.0 released on 2018-11-20:">
+    <nav class="md-nav" aria-label="v1.3.1 released on 2019-06-21:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6490,11 +5980,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v120-released-on-2018-10-15" class="md-nav__link">
-    v1.2.0 released on 2018-10-15:
+  <a href="#v130-released-on-2018-11-20" class="md-nav__link">
+    v1.3.0 released on 2018-11-20:
   </a>
   
-    <nav class="md-nav" aria-label="v1.2.0 released on 2018-10-15:">
+    <nav class="md-nav" aria-label="v1.3.0 released on 2018-11-20:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6524,11 +6014,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v111-released-on-2018-09-10" class="md-nav__link">
-    v1.1.1 released on 2018-09-10:
+  <a href="#v120-released-on-2018-10-15" class="md-nav__link">
+    v1.2.0 released on 2018-10-15:
   </a>
   
-    <nav class="md-nav" aria-label="v1.1.1 released on 2018-09-10:">
+    <nav class="md-nav" aria-label="v1.2.0 released on 2018-10-15:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6558,11 +6048,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v110-released-on-2018-08-31" class="md-nav__link">
-    v1.1.0 released on 2018-08-31:
+  <a href="#v111-released-on-2018-09-10" class="md-nav__link">
+    v1.1.1 released on 2018-09-10:
   </a>
   
-    <nav class="md-nav" aria-label="v1.1.0 released on 2018-08-31:">
+    <nav class="md-nav" aria-label="v1.1.1 released on 2018-09-10:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6592,11 +6082,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v102-released-on-2018-08-08" class="md-nav__link">
-    v1.0.2 released on 2018-08-08:
+  <a href="#v110-released-on-2018-08-31" class="md-nav__link">
+    v1.1.0 released on 2018-08-31:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.2 released on 2018-08-08:">
+    <nav class="md-nav" aria-label="v1.1.0 released on 2018-08-31:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6626,11 +6116,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v101-released-on-2018-07-31" class="md-nav__link">
-    v1.0.1 released on 2018-07-31:
+  <a href="#v102-released-on-2018-08-08" class="md-nav__link">
+    v1.0.2 released on 2018-08-08:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.1 released on 2018-07-31:">
+    <nav class="md-nav" aria-label="v1.0.2 released on 2018-08-08:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6660,16 +6150,23 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v100-released-on-2018-06-29" class="md-nav__link">
-    v1.0.0 released on 2018-06-29:
+  <a href="#v101-released-on-2018-07-31" class="md-nav__link">
+    v1.0.1 released on 2018-07-31:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.0 released on 2018-06-29:">
+    <nav class="md-nav" aria-label="v1.0.1 released on 2018-07-31:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#enhancements_27" class="md-nav__link">
     Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resolved-issues_27" class="md-nav__link">
+    Resolved Issues
   </a>
   
 </li>
@@ -6687,11 +6184,11 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#v100-beta-released-on-2018-04-29" class="md-nav__link">
-    v1.0.0 Beta released on 2018-04-29:
+  <a href="#v100-released-on-2018-06-29" class="md-nav__link">
+    v1.0.0 released on 2018-06-29:
   </a>
   
-    <nav class="md-nav" aria-label="v1.0.0 Beta released on 2018-04-29:">
+    <nav class="md-nav" aria-label="v1.0.0 released on 2018-06-29:">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6713,6 +6210,33 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#v100-beta-released-on-2018-04-29" class="md-nav__link">
+    v1.0.0 Beta released on 2018-04-29:
+  </a>
+  
+    <nav class="md-nav" aria-label="v1.0.0 Beta released on 2018-04-29:">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enhancements_29" class="md-nav__link">
+    Enhancements
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#known-issues_29" class="md-nav__link">
+    Known Issues
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6721,15 +6245,65 @@
               </div>
             
           
-          <div class="md-content" data-md-component="content">
-            <article class="md-content__inner md-typeset">
-              
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
                 
+                  
 
 
 <h1 id="change-log">Change Log<a class="headerlink" href="#change-log" title="Permanent link">&para;</a></h1>
-<h2 id="v42-released-on-2022-12-21">v4.2 Released on 2022-12-21<a class="headerlink" href="#v42-released-on-2022-12-21" title="Permanent link">&para;</a></h2>
+<h2 id="v43-released-on-2023-06-15">v4.3 Released on 2023-06-15<a class="headerlink" href="#v43-released-on-2023-06-15" title="Permanent link">&para;</a></h2>
+<h3 id="breaking-changes">Breaking Changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>AACS and the Alexa Auto App are no longer part of the Alexa Auto SDK. Please contact your Amazon SA partner for how to get newer version of AACS and Alexa Auto App.</li>
+</ul>
 <h3 id="enhancements">Enhancements<a class="headerlink" href="#enhancements" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Added new Mobile Bridge module that provides platform-agnostic implementation of 'Connect via Phone' functionality to automatically use customer's phone data to provide connectivtiy to Alexa in vehicle. For additional details, please contact your SA partner.</li>
+<li>Added <code>AlexaConfiguration::createMediaPlayerFingerprintConfig</code> for enabling Digital Rights Management (DRM) support</li>
+<li>Updated <code>AudioOutput</code> interface to provide info required for playing DRM-protected audio.</li>
+<li>Added the support to enable navigation to phone contact feature by uploading postal address while uploading phone contacts to cloud. <em>Note: the end-to-end feature to allow the user to navigate to a contact will be available once the cloud side changes are in place.</em></li>
+<li>Refactored metrics infrastructure and overhauled the implementation.</li>
+</ul>
+<h3 id="resolved-issues">Resolved Issues<a class="headerlink" href="#resolved-issues" title="Permanent link">&para;</a></h3>
+<p><strong>Communications</strong></p>
+<ul>
+<li>Fixed the issue that Alexa-to-Alexa calls do not work on Linux armv8 platforms</li>
+</ul>
+<p><strong>Local Voice Control</strong></p>
+<ul>
+<li>Fixed the issue that Alexa responds with an error to the utterance "Play FM radio" and requests to tune to a station name.</li>
+</ul>
+<h3 id="known-issues">Known Issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
+<p><strong>General</strong></p>
+<ul>
+<li>The <a href="#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards">Alexa Automotive UX guidelines</a> specify when to automatically dismiss a <code>TemplateRuntime</code> display card for each template type. The Engine publishes the <code>TemplateRuntime</code> interface messages <code>ClearTemplate</code> and <code>ClearPlayerInfo</code> based on the timeouts configured in the <code>aace.alexa.templateRuntimeCapabilityAgent</code> Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., <code>LocalSearchListTemplate2</code>) with a different timeout than other templates (e.g., <code>WeatherTemplate</code>). The configuration also does not provide a way for you to specify infinite timeout for <code>NowPlaying</code> cards. You must implement your application’s dismissal logic for display cards and media info accordingly.</li>
+<li>There is a rare race condition in which publishing the <code>AlexaClient.StopForegroundActivity</code> message does not cancel the active Alexa interaction. The race condition can happen when the application publishes the message at the beginning of the <code>THINKING</code> state <code>AlexaClient.DialogStateChanged</code> transition.</li>
+</ul>
+<p><strong>Car control</strong></p>
+<ul>
+<li>If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in the set from Alexa. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, Alexa retains endpoint 1 from set A, which might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try</li>
+</ul>
+<p><strong>Communications</strong></p>
+<ul>
+<li>The dual-tone multi-frequency (DTMF) does work correctly when selecting the number 1.</li>
+</ul>
+<p><strong>Entertainment</strong></p>
+<ul>
+<li>When music is playing, repeatedly pressing the “next” button to advance in the playlist restarts the current song.</li>
+<li>When using the LVC extension, if the application publishes the <code>MediaPlaybackRequestor.RequestMediaPlayback</code> AASB message before the Auto SDK Engine connects to Alexa cloud, media playback will not automatically resume as expected. The workaround is to wait for the connection to Alexa cloud to complete before publishing the <code>RequestMediaPlayback</code> message.</li>
+</ul>
+<p><strong>Local Voice Control</strong></p>
+<ul>
+<li>Some contacts in the addressbook are not resolved correctly in offline mode.</li>
+</ul>
+<p><strong>C++ sample app</strong></p>
+<ul>
+<li>The sample app may fail to handle synchronous-style <code>AASB messages</code> within the required timeout to construct device context for Alexa. As a result, some utterances may not work as expected.</li>
+</ul>
+<h2 id="v42-released-on-2022-12-21">v4.2 Released on 2022-12-21<a class="headerlink" href="#v42-released-on-2022-12-21" title="Permanent link">&para;</a></h2>
+<h3 id="enhancements_1">Enhancements<a class="headerlink" href="#enhancements_1" title="Permanent link">&para;</a></h3>
 <h4 id="auto-sdk">Auto SDK<a class="headerlink" href="#auto-sdk" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Added <code>MultiAgent</code> components in AVS Device SDK. All the AVS directives and events are tagged with assistant ID. With the new MultiAgent environment, agent-based metrics are also introduced. The metrics can now be filtered by assistants, programs, and sources.</li>
@@ -6742,7 +6316,7 @@
 </ul>
 <h4 id="alexa-auto-app">Alexa Auto App<a class="headerlink" href="#alexa-auto-app" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Renamed the AACS Sample App to Alexa Auto App. Any previous mentions of the name AACS Sample App should be treated the same as Alexa Auto App. </li>
+<li>Renamed the AACS Sample App to Alexa Auto App. Any previous mentions of the name AACS Sample App should be treated the same as Alexa Auto App.</li>
 <li>Added a landing page to Alexa Auto App. The landing page provides sample utterances for supported domains and UI to update the settings.</li>
 <li>The Alexa Auto App has an updated UI for setup and settings screens. These improvements scale responsively for medium landscape screens (approximately 1300 x 900 resolution and screen size ranging from 1100dp to 1549dp).</li>
 <li>Updated Alexa Auto App to post a <a href="https://developer.android.com/training/cars/notifications">notification</a> to the Notification Center when Alexa delivers a notification to the user. The user must ask Alexa to read their notifications to hear the notification content.</li>
@@ -6750,7 +6324,7 @@
 <li>Added SMS features to Alexa Auto App. The user can ask Alexa to read unread messages, send a message to a phone number or contact, and reply to a message using the primary bluetooth connected mobile phone.</li>
 <li>Removed the red voice chrome animation previously used when Alexa was not available. The voice chrome now uses the standard blue speaking animation as Alexa speaks an error prompt.</li>
 </ul>
-<h3 id="resolved-issues">Resolved Issues<a class="headerlink" href="#resolved-issues" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_1">Resolved Issues<a class="headerlink" href="#resolved-issues_1" title="Permanent link">&para;</a></h3>
 <h4 id="auto-sdk_1">Auto SDK<a class="headerlink" href="#auto-sdk_1" title="Permanent link">&para;</a></h4>
 <ul>
 <li>Fixed an issue in which the Engine would not send an <code>AudioOutput.Resume</code> message to the client app in cases where the client has not yet responded to the previous <code>AudioOutput.Pause</code> message. This could cause a state where the SDK thinks the transient pause initiated for user and Alexa dialog never finished, preventing any further Alexa media from playing until the head unit restarts.</li>
@@ -6785,7 +6359,7 @@
 <li>Fixed an external wake word engine integration issue.</li>
 <li>Improved app stability</li>
 </ul>
-<h3 id="known-issues">Known Issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_1">Known Issues<a class="headerlink" href="#known-issues_1" title="Permanent link">&para;</a></h3>
 <h4 id="auto-sdk_2">Auto SDK<a class="headerlink" href="#auto-sdk_2" title="Permanent link">&para;</a></h4>
 <p><strong>General</strong></p>
 <ul>
@@ -6820,11 +6394,11 @@
 <li>If there is no internet connection when the user launches Alexa for the first time in the ignition cycle, the “No Network Connection” message displays momentarily and disappears.</li>
 <li>The Alexa Auto App doesn’t reconnect to LVC when when the user switches the default assistant from Alexa to a different voice assistant and then back to Alexa. Alexa Auto App needs to be restarted (e.g., by a new ignition cycle) to reconnect to LVC.</li>
 <li>Alexa can take up to 90 seconds to reconnect when lost network connection is restored.</li>
-<li>If the user has two phones connected to the head unit and asks Alexa to read their SMS messages, the reply comes from the secondary phone instead of the primary phone. </li>
+<li>If the user has two phones connected to the head unit and asks Alexa to read their SMS messages, the reply comes from the secondary phone instead of the primary phone.</li>
 <li>When the user asks Alexa to read their messages after she has already read them, Alexa reads the same messages again instead of replying that there are no new messages to read.</li>
 </ul>
 <h2 id="v411-released-on-2022-80-08">v4.1.1 released on 2022-80-08<a class="headerlink" href="#v411-released-on-2022-80-08" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_1">Enhancements<a class="headerlink" href="#enhancements_1" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_2">Enhancements<a class="headerlink" href="#enhancements_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Improved Auto SDK AACS Sample App Setup and Settings UX.</li>
 <li>Updated APL renderer app component, as well as dependent APL Viewhost Android libraries (AARs). It is highly recommended you update to release 4.1.1 for APL integrations.<blockquote>
@@ -6832,13 +6406,13 @@
 </blockquote>
 </li>
 </ul>
-<h3 id="resolved-issues_1">Resolved Issues<a class="headerlink" href="#resolved-issues_1" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_2">Resolved Issues<a class="headerlink" href="#resolved-issues_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Improved the settings menu by expanding the clickable area of settings, and added missing descriptions for menu items.</li>
 <li>Fixed a race condition in which updating the Alexa language setting, and then navigating away from the menu page could crash the application without switching the language.</li>
 <li>Fixed an issue in which the Alexa comms permission screen did not render properly. Improved the margin alignment issue in the setup screens.</li>
 </ul>
-<h3 id="known-issues_1">Known Issues<a class="headerlink" href="#known-issues_1" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_2">Known Issues<a class="headerlink" href="#known-issues_2" title="Permanent link">&para;</a></h3>
 <p><strong>General</strong></p>
 <ul>
 <li>The <a href="#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards">Alexa Automotive UX guidelines</a> specify when to automatically dismiss a <code>TemplateRuntime</code> display card for each template type. The Engine publishes the <code>TemplateRuntime</code> interface messages <code>ClearTemplate</code> and <code>ClearPlayerInfo</code> based on the timeouts configured in the <code>aace.alexa.templateRuntimeCapabilityAgent</code> Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., <code>LocalSearchListTemplate2</code>) with a different timeout than other templates (e.g., <code>WeatherTemplate</code>). The configuration also does not provide a way for you to specify infinite timeout for <code>NowPlaying</code> cards. You must implement your application’s dismissal logic for display cards and media info accordingly.</li>
@@ -6878,7 +6452,7 @@
 <li>The sample app may fail to handle synchronous-style <code>AASB messages</code> within the required timeout to construct device context for Alexa. As a result, some utterances may not work as expected.</li>
 </ul>
 <h2 id="v410-released-on-2022-05-27">v4.1.0 released on 2022-05-27<a class="headerlink" href="#v410-released-on-2022-05-27" title="Permanent link">&para;</a></h2>
-<h4 id="enhancements_2">Enhancements<a class="headerlink" href="#enhancements_2" title="Permanent link">&para;</a></h4>
+<h4 id="enhancements_3">Enhancements<a class="headerlink" href="#enhancements_3" title="Permanent link">&para;</a></h4>
 <p><strong>Auto SDK</strong></p>
 <ul>
 <li>Added support to display a smart home dashboard using voice requests such as “Alexa, show me my smart home dashboard”. The user can use the dashboard to monitor and control the states of their smart home devices such as lights, plugs, switches, and thermostats. The smart home dashboard is powered by APL and updates to reflect the vehicle’s settings for day and night mode, custom themes, and driving state.</li>
@@ -6913,10 +6487,10 @@
 <li>Added a short "exit" animation to the voice chrome UI that displays on transitions from Speaking to Idle or Listening to Idle.</li>
 <li>Added support for handling Alexa's Language selection mismatch between system and Alexa supported languages during first-time user experience (FTUE) and subsequent language changes.</li>
 </ul>
-<h3 id="resolved-issues_2">Resolved Issues<a class="headerlink" href="#resolved-issues_2" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_3">Resolved Issues<a class="headerlink" href="#resolved-issues_3" title="Permanent link">&para;</a></h3>
 <p><strong>Auto SDK</strong></p>
 <ul>
-<li>Fixed an issue in which the CBL module did not check the network connection status when attempting to refresh an access token. If there was no network connection when the refresh was attempted, the token would not refresh immediately when connection was restored. </li>
+<li>Fixed an issue in which the CBL module did not check the network connection status when attempting to refresh an access token. If there was no network connection when the refresh was attempted, the token would not refresh immediately when connection was restored.</li>
 <li>Fixed an issue in which the “Alexa, stop” utterance did not stop music playback when audio ducking is enabled.</li>
 <li>Fixed periodic Engine shutdown crashes in <code>ContextManager</code>, <code>ExternalMediaPlayer</code>, and AACS.</li>
 <li>Fixed an issue in which the <code>Navigation module</code> inserted an invalid error code in the payload of the <code>ShowAlternativeRoutesFailed</code> event. Additionally added the <code>NOT_NAVIGATING</code> error code to the <code>Navigation AASB</code> interface. See the Navigation module documentation for info about which error codes to use.</li>
@@ -6928,14 +6502,14 @@
 </ul>
 <p><strong>AACS Sample App</strong></p>
 <ul>
-<li>Fixed the language selection screen in the AACS sample app when the Preview Mode feature is enabled.  </li>
+<li>Fixed the language selection screen in the AACS sample app when the Preview Mode feature is enabled.</li>
 <li>Fixed an issue in which the AACS sample app did not play alarms when the device is offline.</li>
 <li>Fixed an issue in which the display card for a second weather utterance closed too soon.</li>
 <li>Fixed an issue which the AACS sample app did not reset the contact permissions when switching accounts</li>
 <li>Fixed an issue in which the AACS sample app stopped music playback when the user tapped the screen showing a display card.</li>
 <li>Fixed an issue in which AACS did not play the Alexa confirmation speech when the user creates a notification while music is playing.</li>
 </ul>
-<h3 id="known-issues_2">Known Issues<a class="headerlink" href="#known-issues_2" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_3">Known Issues<a class="headerlink" href="#known-issues_3" title="Permanent link">&para;</a></h3>
 <p><strong>General</strong></p>
 <ul>
 <li>The <a href="#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards">Alexa Automotive UX guidelines</a> specify when to automatically dismiss a <code>TemplateRuntime</code> display card for each template type. The Engine publishes the <code>TemplateRuntime</code> interface messages <code>ClearTemplate</code> and <code>ClearPlayerInfo</code> based on the timeouts configured in the <code>aace.alexa.templateRuntimeCapabilityAgent</code> Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., <code>LocalSearchListTemplate2</code>) with a different timeout than other templates (e.g., <code>WeatherTemplate</code>). The configuration also does not provide a way for you to specify infinite timeout for <code>NowPlaying</code> cards. You must implement your application’s dismissal logic for display cards and media info accordingly.</li>
@@ -6975,7 +6549,7 @@
 <li>If an alert is going off while Alexa is speaking, the timer audio cancels the Alexa speech. timer is going off while Alexa is speaking, the timer audio cancels the Alexa speech.</li>
 </ul>
 <h2 id="v400-released-on-2021-12-15">v4.0.0 released on 2021-12-15<a class="headerlink" href="#v400-released-on-2021-12-15" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_3">Enhancements<a class="headerlink" href="#enhancements_3" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_4">Enhancements<a class="headerlink" href="#enhancements_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Deprecated the C++ and Java platform interfaces in favor of an asynchronous message-based API. Auto SDK client applications use the new <code>MessageBroker</code> to publish and subscribe to Alexa Auto Services Bridge (AASB) messages. The C++ sample app is refactored to use the new API to provide a reference implementation for Linux platforms. The Alexa Auto Client Service (AACS) sample app provides the reference implementation for Android platforms. See the <a href="../migration/">Auto SDK Migration Guide</a> for help migrating your application to use the new API.</p>
@@ -7002,7 +6576,7 @@
 <p>Added LVC support for Alexa Custom Assistant specialized handoffs. You can configure the default fallback and self-introduction prompts for your custom assistant while offline. For more information, see the <code>Alexa Custom Assistant</code> extension documentation.</p>
 </li>
 <li>
-<p>Integrated the Auto SDK Conan build system enhancements to AACS and the AACS sample app. You can use a single Gradle command to build AACS and the AACS sample app without using the Auto SDK Builder Tool directly. For build instructions, see the <a href="../../android/aacs/">AACS documentation</a>.</p>
+<p>Integrated the Auto SDK Conan build system enhancements to AACS and the AACS sample app. You can use a single Gradle command to build AACS and the AACS sample app without using the Auto SDK Builder Tool directly. For build instructions, see the <a href="../android/aacs/README.md">AACS documentation</a>.</p>
 </li>
 <li>
 <p>Added the following enhancements to the AACS sample app:</p>
@@ -7088,7 +6662,7 @@
 <p>Updated AASB configuration fields used for AACS. See the <a href="../migration/">migration guide</a> for details.</p>
 </li>
 </ul>
-<h3 id="resolved-issues_3">Resolved issues<a class="headerlink" href="#resolved-issues_3" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_4">Resolved issues<a class="headerlink" href="#resolved-issues_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Fixed an issue preventing the generic <code>DEFAULT</code> type <code>LocalMediaSource</code> from working in offline mode with LVC.</p>
@@ -7109,7 +6683,7 @@
 <p>Fixed an issue in which AACS did not acquire audio focus prior to playing Alexa speech.</p>
 </li>
 </ul>
-<h3 id="known-issues_3">Known issues<a class="headerlink" href="#known-issues_3" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_4">Known issues<a class="headerlink" href="#known-issues_4" title="Permanent link">&para;</a></h3>
 <p><strong>General</strong></p>
 <ul>
 <li>
@@ -7215,7 +6789,7 @@
 </li>
 </ul>
 <h2 id="v330-released-on-2021-09-30">v3.3.0 released on 2021-09-30<a class="headerlink" href="#v330-released-on-2021-09-30" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_4">Enhancements<a class="headerlink" href="#enhancements_4" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_5">Enhancements<a class="headerlink" href="#enhancements_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Added the <code>DeviceUsage</code> platform interface to provide the Alexa application network usage data to the Auto SDK Engine. The Auto SDK Engine emits this data as a metric to Amazon if Auto SDK is built with the <code>Device Client Metrics</code> extension. For more information, see the <a href="../../explore/features/core/">Core module documentation</a></p>
@@ -7264,7 +6838,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="resolved-issues_4">Resolved Issues<a class="headerlink" href="#resolved-issues_4" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_5">Resolved Issues<a class="headerlink" href="#resolved-issues_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Android 11 requires the attribute <code>android:foregroundServiceType</code> to be defined in services that require permissions such as microphone and location. This is added to the AACS Android Manifest file. Also, the <code>compileSdkVersion</code> and <code>targetSdkVersion</code> to are updated to 30 in <code>build.gradle</code>.</p>
@@ -7294,7 +6868,7 @@
 <p>Fixed an issue in which the Engine erroneously allowed 3,000 coordinates in the "shapes" array of navigation state queried via <code>Navigation::getNavigationState()</code>. The limit is updated to 100 coordinates.</p>
 </li>
 </ul>
-<h3 id="known-issues_4">Known Issues<a class="headerlink" href="#known-issues_4" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_5">Known Issues<a class="headerlink" href="#known-issues_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>General</p>
@@ -7403,7 +6977,7 @@
 <blockquote>
 <p><strong>Note:</strong> All Auto SDK 3.2 extensions are compatible with 3.2.1.</p>
 </blockquote>
-<h3 id="enhancements_5">Enhancements<a class="headerlink" href="#enhancements_5" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_6">Enhancements<a class="headerlink" href="#enhancements_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Added additional APIs to the <code>Connectivity</code> module, which enable the voice up-sell conversation between the user and Alexa to activate a trial data plan or a paid subscription plan. Your implementation should call <code>AlexaConnectivity::sendConnectivityEvent()</code> to notify the Engine of the data plan type. To respond, the Engine calls <code>AlexaConnectivity::connectivityEventResponse()</code>.</p>
@@ -7412,9 +6986,9 @@
 <p>Added the configuration field <code>aace.addressBook.cleanAllAddressBooksAtStart</code> to Engine configuration. This field specifies whether to automatically delete address books each time the Engine starts.</p>
 </li>
 </ul>
-<h3 id="resolved-issues_5">Resolved Issues<a class="headerlink" href="#resolved-issues_5" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_6">Resolved Issues<a class="headerlink" href="#resolved-issues_6" title="Permanent link">&para;</a></h3>
 <p>Fixed an issue in which wake words cannot be detected correctly when using the <code>SpeechRecognizer::startCapture()</code> API with an external wake word engine.</p>
-<h3 id="known-issues_5">Known Issues<a class="headerlink" href="#known-issues_5" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_6">Known Issues<a class="headerlink" href="#known-issues_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>General</p>
@@ -7503,7 +7077,7 @@
 </li>
 </ul>
 <h2 id="v320-released-on-2021-05-19">v3.2.0 released on 2021-05-19<a class="headerlink" href="#v320-released-on-2021-05-19" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_6">Enhancements<a class="headerlink" href="#enhancements_6" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_7">Enhancements<a class="headerlink" href="#enhancements_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Added the <code>DeviceSetup</code> platform interface that handles events and directives related to device setup during or after an out-of-the-box experience (OOBE). After the user login, Alexa is informed that device setup is complete and starts the on-boarding experience, for example, by starting a short first-time conversation. For more information, see the <a href="../../explore/features/alexa/">Alexa module documentation</a>.</p>
@@ -7599,10 +7173,10 @@
 <p>Improved the Auto SDK Voice Chrome extension to allow the height and width of the linear voice chrome to be controlled by the parent layout. Previously, the dimensions were fixed.</p>
 </li>
 </ul>
-<h3 id="resolved-issues_6">Resolved Issues<a class="headerlink" href="#resolved-issues_6" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_7">Resolved Issues<a class="headerlink" href="#resolved-issues_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
-<p>Disabled APL by default in AACS to make sure utterances like "tell me a joke" work correctly without handling APL. If your platform wants to implement APL, see the AACS <a href="../../android/aacs/service/">Configuration README</a> to enable it.</p>
+<p>Disabled APL by default in AACS to make sure utterances like "tell me a joke" work correctly without handling APL. If your platform wants to implement APL, see the AACS <a href="../android/aacs/service/README.md">Configuration README</a> to enable it.</p>
 </li>
 <li>
 <p>An SMS message can be sent to an Alexa contact correctly. A user request to send an SMS message to an Alexa contact no longer results in an Alexa-to-Alexa message.</p>
@@ -7629,7 +7203,7 @@
 <p>Fixed a race condition in <code>AuthorizationManager</code> during the Engine shutdown.</p>
 </li>
 </ul>
-<h3 id="known-issues_6">Known Issues<a class="headerlink" href="#known-issues_6" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_7">Known Issues<a class="headerlink" href="#known-issues_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>General</p>
@@ -7723,7 +7297,7 @@
 </li>
 </ul>
 <h2 id="v310-released-on-2020-12-15">v3.1.0 released on 2020-12-15<a class="headerlink" href="#v310-released-on-2020-12-15" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_7">Enhancements<a class="headerlink" href="#enhancements_7" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_8">Enhancements<a class="headerlink" href="#enhancements_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added the Authorization platform interface that replaces the CBL platform interface and the AuthProvider platform interface. For information about how the Alexa Auto SDK Engine handles authorization with the Authorization platform interface, see the <a href="../../explore/features/core/">Core module documentation</a>.</li>
 </ul>
@@ -7753,7 +7327,7 @@ Therefore, if the current device locale is different from the default locale, yo
 </blockquote>
 <ul>
 <li>
-<p>Added the Alexa Auto Client Service (AACS) sample app that demonstrates how an application uses AACS. The Auto SDK includes the app components used by the AACS sample app, which you can also use when developing an application that communicates with AACS. For information about the AACS sample app, see the <a href="../../android/aacs/sample-app/">AACS sample app documentation</a></p>
+<p>Added the Alexa Auto Client Service (AACS) sample app that demonstrates how an application uses AACS. The Auto SDK includes the app components used by the AACS sample app, which you can also use when developing an application that communicates with AACS. For information about the AACS sample app, see the <a href="../android/aacs/sample-app/README.md">AACS sample app documentation</a></p>
 </li>
 <li>
 <p>Added support for Digital Audio Broadcasting (DAB) radio. For more information about the DAB local media source, see the <a href="../../explore/features/alexa/">Alexa module documentation</a>.</p>
@@ -7775,10 +7349,10 @@ Therefore, if the current device locale is different from the default locale, yo
 <p>Added support for caching AASB message intent targets based on AASB Action. This enables you to define an intent filter with a subset of the possible actions for an AASB topic. For more information on specifying intent targets, see the AACS documentation.</p>
 </li>
 <li>
-<p>Added support for Text-to-Speech Service, which allows Android applications to interact with Android TTS APIs to convert text to speech. For information about the Text-to-Speech Service, see the <a href="../../android/aacs/app-components/alexa-auto-tts/">AACS TTS app component documentation</a>.</p>
+<p>Added support for Text-to-Speech Service, which allows Android applications to interact with Android TTS APIs to convert text to speech. For information about the Text-to-Speech Service, see the <a href="../android/aacs/app-components/alexa-auto-tts/README.md">AACS TTS app component documentation</a>.</p>
 </li>
 </ul>
-<h3 id="resolved-issues_7">Resolved Issues<a class="headerlink" href="#resolved-issues_7" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_8">Resolved Issues<a class="headerlink" href="#resolved-issues_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>On Android, the Engine returns the correct value (<code>UNDEFINED</code>) for requests to <code>LocationProvider.getLocation()</code> when the device does not have access to location. Previously the Engine populated the user geolocation with a default value when <code>Location.UNDEFINED</code> was returned in <code>LocationProvider.getLocation()</code>.</p>
@@ -7796,7 +7370,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <p>If you log out and log in, the client-side Do Not Disturb (DND) state is synchronized with Alexa.</p>
 </li>
 </ul>
-<h3 id="known-issues_7">Known Issues<a class="headerlink" href="#known-issues_7" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_8">Known Issues<a class="headerlink" href="#known-issues_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>General</p>
@@ -7901,7 +7475,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <h3 id="additional-changes">Additional Changes<a class="headerlink" href="#additional-changes" title="Permanent link">&para;</a></h3>
 <p>Starting with v3.1.0, the Local Voice Control (LVC) extension is no longer supported on ARM32 platforms.</p>
 <h2 id="v300-released-on-2020-10-09">v3.0.0 released on 2020-10-09<a class="headerlink" href="#v300-released-on-2020-10-09" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_8">Enhancements<a class="headerlink" href="#enhancements_8" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_9">Enhancements<a class="headerlink" href="#enhancements_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Added Alexa Auto Client Service (AACS), which enables OEMs of Android-based devices to simplify the process of integrating the Auto SDK. For more information about AACS, see the <a href="https://github.com/alexa/alexa-auto-sdk/blob/3.0/platforms/android/alexa-auto-client-service/README.md">AACS documentation</a>.</p>
@@ -7910,13 +7484,13 @@ Therefore, if the current device locale is different from the default locale, yo
 <p>Added support for removing local media sources at runtime, such as a USB drive or a Bluetooth device. Previously, if a user removed a USB drive and then requested to play music from the USB drive, the Auto SDK would attempt to play and not return an appropriate error message. This feature is enabled with an existing field in the <code>LocalMediaSource</code> platform interface state. For information about the platform interface state, see the Alexa module documentation.</p>
 </li>
 </ul>
-<h3 id="resolved-issues_8">Resolved Issues<a class="headerlink" href="#resolved-issues_8" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_9">Resolved Issues<a class="headerlink" href="#resolved-issues_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>On QNX, when a portion of music on Spotify is skipped, either by the user saying, "Skip forward," or by the user skipping to a different song, the volume is no longer reset to the default level.</li>
 <li>A user barging in when music is playing no longer hears an Alexa response to the barge-in request. Previously, this issue happened if the System Audio extension was used.</li>
 <li>When streaming music from Alexa, the user can switch to a local media source by using one utterance, such as "Alexa, play radio." Previously, Alexa would not switch to the local media source after the first utterance. The user needed to issue the request again before Alexa could play from the local media source.</li>
 </ul>
-<h3 id="known-issues_8">Known Issues<a class="headerlink" href="#known-issues_8" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_9">Known Issues<a class="headerlink" href="#known-issues_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>General</p>
@@ -7993,7 +7567,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <h3 id="additional-changes_1">Additional Changes<a class="headerlink" href="#additional-changes_1" title="Permanent link">&para;</a></h3>
 <p>Starting with Auto SDK v3.0, we no longer support the Automotive Grade Linux (AGL) Alexa Voice agent in the Auto SDK. If you intend to use the AGL Alexa Voice Agent, continue using Auto SDK v2.3.0, which is the last version that provides AGL support.</p>
 <h2 id="v230-released-on-2020-07-31">v2.3.0 released on 2020-07-31<a class="headerlink" href="#v230-released-on-2020-07-31" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_9">Enhancements<a class="headerlink" href="#enhancements_9" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_10">Enhancements<a class="headerlink" href="#enhancements_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added a new Messaging module that provides support for Short Message Service (SMS) to allow a user to send, reply to, and read messages through Alexa.</li>
 <li>Added support for zones to car control for online-only devices so the customer can target endpoints by location (e.g., “set the front fan to 7”). This feature was supported only with the Local Voice Control (LVC) extension, and endpoints belonged to exactly one zone. The features for online-only and LVC devices are at parity and now include assigning an endpoint to multiple zones and setting a default zone. Endpoints in the default zone take higher priority than endpoints not in the default zone when no zone is specified in an utterance.</li>
@@ -8013,7 +7587,7 @@ Therefore, if the current device locale is different from the default locale, yo
 * Updated radio tuning increments for “AM_RADIO” and “FM_RADIO” Local Media Source types to support the en_IN locale.
 * Alexa Voice Agent now supports AGL Itchy Icefish v9.0.2.
 * Language models for the Local Voice Control extension are now decoupled from the LVC.sh (Linux) binary.</p>
-<h3 id="resolved-issues_9">Resolved Issues<a class="headerlink" href="#resolved-issues_9" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_10">Resolved Issues<a class="headerlink" href="#resolved-issues_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed an issue in which navigation road regulation and maneuver events resulted in “INVALID_REQUEST_EXCEPTION" or "INTERNAL_SERVICE_EXCEPTION" error logs.</li>
 <li>Fixed several failing car control utterances including those for offline AC controls and those using the words “my” or “lights.”</li>
@@ -8028,7 +7602,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Fixed an issue on Android API 25 in which a large number of emitted logs could cause a crash due to a JNI local reference table overflow.</li>
 <li>Fixed an issue in which you experienced unexpected results if the local timezone of your device differed from the timezone configured through the Alexa companion app.</li>
 </ul>
-<h3 id="known-issues_9">Known Issues<a class="headerlink" href="#known-issues_9" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_10">Known Issues<a class="headerlink" href="#known-issues_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>General</p>
@@ -8082,24 +7656,24 @@ Therefore, if the current device locale is different from the default locale, yo
 </li>
 </ul>
 <h2 id="v221-released-on-2020-05-29">v2.2.1 released on 2020-05-29<a class="headerlink" href="#v221-released-on-2020-05-29" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_10">Enhancements<a class="headerlink" href="#enhancements_10" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_11">Enhancements<a class="headerlink" href="#enhancements_11" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added enhancements to the maccandroid module to allow <code>SupportedOperations</code> to be overridden to support custom actions.</li>
 <li>Enhanced the <code>TemplateRuntime</code> platform interface to support focus and audio player metadata in renderTemplate and renderPlayerInfo methods. This is a backward compatible change, see the <a href="../migration/#migrating-from-auto-sdk-v22-to-v221">migration guide</a> for details.</li>
 <li><code>SpeakerManager</code> is now a configurable option, enabled by default. When not enabled, user requests to change the volume or mute now have an appropriate Alexa response, e.g. "Sorry, I can't control the volume on your device".</li>
 </ul>
-<h3 id="resolved-issues_10">Resolved Issues<a class="headerlink" href="#resolved-issues_10" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_11">Resolved Issues<a class="headerlink" href="#resolved-issues_11" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed issues in the maccandroid module to a) rediscover media apps after getting the app removed callback, and b) change the behavior to only report unauthorized when the user specifically asks to play a media app.</li>
 <li>On the QNX platform, prevent unnecessary flushing for audio output.</li>
 </ul>
-<h3 id="known-issues_10">Known Issues<a class="headerlink" href="#known-issues_10" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_11">Known Issues<a class="headerlink" href="#known-issues_11" title="Permanent link">&para;</a></h3>
 <ul>
 <li>On the Android Sample App, media playback gets into "No Content Playing" state where all GUI playback control breaks, when pressing next after force closing an external media app.</li>
 <li>Playback controls in the C++ Sample App Playback Controller Menu are static text items and do not change visual state (e.g. add/remove, hilite, select) based on audio player metadata.</li>
 </ul>
 <h2 id="v220-released-on-2020-04-15">v2.2.0 released on 2020-04-15<a class="headerlink" href="#v220-released-on-2020-04-15" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_11">Enhancements<a class="headerlink" href="#enhancements_11" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_12">Enhancements<a class="headerlink" href="#enhancements_12" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added a Car Control module to support online-only car control use cases without the optional Local Voice Control (LVC) extension. The Car Control module provides the car control functionality introduced in Auto SDK 2.0.0 but does not require the LVC extension.</li>
 <li>Made various enhancements to the External Media Player (EMP) Adapter to improve EMP behavior and facilitate implementation of Alexa audio focus.</li>
@@ -8108,7 +7682,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Added support for specifying a custom volume range for voice interactions in implementations that use the optional Local Voice Control (LVC) extension.</li>
 <li>Separated the LVC language models into independent APKs rather than providing them directly in the LVC APK as was done in previous releases. One language model APK is provided for each supported locale (currently en-US, en-CA, and fr-CA).</li>
 </ul>
-<h3 id="resolved-issues_11">Resolved Issues<a class="headerlink" href="#resolved-issues_11" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_12">Resolved Issues<a class="headerlink" href="#resolved-issues_12" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed an issue where the CBL state did not change to stopped when you cancelled login with <code>CBL::cancel()</code>.</li>
 <li>Fixed an issue where volume adjustments were lost when pausing and resuming music.</li>
@@ -8120,7 +7694,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>With the exception of road regulation and maneuver events, the Alexa cloud no longer returns an <code>INVALID_REQUEST_EXCEPTION</code> or <code>INTERNAL_SERVICE_EXCEPTION</code> in response to navigation events sent by the Auto SDK.</li>
 <li>Alexa now prompts or notifies the clients and rejects the ping packet when the user deregisters from the companion app.</li>
 </ul>
-<h3 id="known-issues_11">Known Issues<a class="headerlink" href="#known-issues_11" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_12">Known Issues<a class="headerlink" href="#known-issues_12" title="Permanent link">&para;</a></h3>
 <ul>
 <li>General</li>
 <li>If the local timezone of your device differs from the timezone that was configured through the Alexa companion app, the user may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past". Auto SDK v2.2.0 adds support for setting the timezone of the vehicle, which allows your device to synchronize with the timezone set in the Alexa companion app; however, the Auto SDK currently does not receive a <code>SetTimeZone</code> directive when the timezone is changed from the companion app.</li>
@@ -8143,7 +7717,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>If you log out and log in, the client-side Do Not Disturb (DND) state may not be synchronized with the Alexa cloud.</li>
 </ul>
 <h2 id="v210-released-on-2019-12-19">v2.1.0 released on 2019-12-19:<a class="headerlink" href="#v210-released-on-2019-12-19" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_12">Enhancements<a class="headerlink" href="#enhancements_12" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_13">Enhancements<a class="headerlink" href="#enhancements_13" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Added Navigation enhancements to support the following features:</p>
@@ -8183,7 +7757,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <p>Added support for call display information change notifications (caller ID) to the optional Alexa Communication extension.</p>
 </li>
 </ul>
-<h3 id="resolved-issues_12">Resolved Issues<a class="headerlink" href="#resolved-issues_12" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_13">Resolved Issues<a class="headerlink" href="#resolved-issues_13" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed an issue where contact uploading failed for contacts without addresses.</li>
 <li>Fixed an issue where if the user rejected an incoming Alexa-to-Alexa call via voice, ringtones did not sound for subsequent incoming calls until the user either answered an incoming call via voice or made an outbound call.</li>
@@ -8192,7 +7766,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Fixed an issue where uttering "stop" when a timer sounded during an Alexa-to-Alexa call ended the call, not the timer.</li>
 <li>Added enhancements to the maccandroid module (Spotify) to simplify the <code>MACCPlayer</code> handler implementation. Rediscovery now occurs automatically, and the authorization TTS error events no longer occur repeatedly.</li>
 </ul>
-<h3 id="known-issues_12">Known Issues<a class="headerlink" href="#known-issues_12" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_13">Known Issues<a class="headerlink" href="#known-issues_13" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Alexa cloud currently returns an <code>INVALID_REQUEST_EXCEPTION</code> or <code>INTERNAL_SERVICE_EXCEPTION</code> in response to any navigation event sent by the Auto SDK. You may see a harmless error/exception in the logs.</li>
 <li>The CBL module uses a backoff when refreshing the access token after expiry. If internet is disconnected when the refresh is attempted, it could take up to a minute for the token to refresh when the internet connection is restored.</li>
@@ -8210,7 +7784,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>The External Media Player (EMP) Engine implementation does not wait for a dialog channel focus change to complete, such as after TTS, before executing an EMP directive, such as playing the CD player. As a result, you may see an unexpected sequence of Local Media Source playControl() method invocations such as play, then pause, followed by play again in quick succession.</li>
 </ul>
 <h2 id="v200-released-on-2019-09-10">v2.0.0 released on 2019-09-10:<a class="headerlink" href="#v200-released-on-2019-09-10" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_13">Enhancements<a class="headerlink" href="#enhancements_13" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_14">Enhancements<a class="headerlink" href="#enhancements_14" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>Added <strong>offline enhancements</strong> to improve offline car control support and add support for:</p>
@@ -8248,14 +7822,14 @@ Therefore, if the current device locale is different from the default locale, yo
 </blockquote>
 </li>
 </ul>
-<h3 id="resolved-issues_13">Resolved Issues<a class="headerlink" href="#resolved-issues_13" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_14">Resolved Issues<a class="headerlink" href="#resolved-issues_14" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed an issue where music streaming from online music service providers continued to play when the user switched to a local media source.</li>
 <li>Fixed an issue where an MACC app (Spotify) could automatically play after the first utterance.</li>
 <li>Fixed a race condition in the Navigation module that occasionally caused Cancel Navigation to fail.</li>
 <li>Fixed broken links in the documentation.</li>
 </ul>
-<h3 id="known-issues_13">Known Issues<a class="headerlink" href="#known-issues_13" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_14">Known Issues<a class="headerlink" href="#known-issues_14" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Calling numbers such as 1800xxxxxxx using utterances such as "Alexa call one eight double oh..." may return unexpected results. Similarly, calling numbers using utterances that include "triple", "hundred" and "thousand" and pressing special characters such as # or &ast; using utterances such as "Alexa press &ast;#" may return unexpected results. Therefore, when requesting Alexa to call or press digits, we recommend that your client application ignore special characters, dots, and non-numeric characters if not relevant to the context.</li>
 <li>The Engine may crash during shutdown due to a race condition in the Local Media Source Engine implementation. However, since shutdown is triggered when the car ignition is turned off, no direct customer impact is expected.</li>
@@ -8272,45 +7846,45 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.</li>
 </ul>
 <h2 id="v163-released-on-2019-12-02">v1.6.3 released on 2019-12-02:<a class="headerlink" href="#v163-released-on-2019-12-02" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_14">Enhancements<a class="headerlink" href="#enhancements_14" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_15">Enhancements<a class="headerlink" href="#enhancements_15" title="Permanent link">&para;</a></h3>
 <p>This release is for bug fixes only. There are no new features or enhancements.</p>
-<h3 id="resolved-issues_14">Resolved Issues<a class="headerlink" href="#resolved-issues_14" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_15">Resolved Issues<a class="headerlink" href="#resolved-issues_15" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed a race condition that could cause follow-ons to a TTS request (for example asking for movies nearby) not to play while Alexa is speaking or playing something.</li>
 </ul>
-<h3 id="known-issues_14">Known Issues<a class="headerlink" href="#known-issues_14" title="Permanent link">&para;</a></h3>
-<p>All known issues from v1.6.0.</p>
-<h2 id="v162-released-on-2019-10-11">v1.6.2 released on 2019-10-11:<a class="headerlink" href="#v162-released-on-2019-10-11" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_15">Enhancements<a class="headerlink" href="#enhancements_15" title="Permanent link">&para;</a></h3>
-<p>Added online entertainment enhancements to support tuning to a specific frequency or SiriusXM channel and tuning to radio presets.</p>
-<h3 id="resolved-issues_15">Resolved Issues<a class="headerlink" href="#resolved-issues_15" title="Permanent link">&para;</a></h3>
-<p>n/a</p>
 <h3 id="known-issues_15">Known Issues<a class="headerlink" href="#known-issues_15" title="Permanent link">&para;</a></h3>
 <p>All known issues from v1.6.0.</p>
-<h2 id="v161-released-on-2019-06-21">v1.6.1 released on 2019-06-21:<a class="headerlink" href="#v161-released-on-2019-06-21" title="Permanent link">&para;</a></h2>
+<h2 id="v162-released-on-2019-10-11">v1.6.2 released on 2019-10-11:<a class="headerlink" href="#v162-released-on-2019-10-11" title="Permanent link">&para;</a></h2>
 <h3 id="enhancements_16">Enhancements<a class="headerlink" href="#enhancements_16" title="Permanent link">&para;</a></h3>
-<p>This release of Alexa Auto SDK includes updates for music certification.</p>
+<p>Added online entertainment enhancements to support tuning to a specific frequency or SiriusXM channel and tuning to radio presets.</p>
 <h3 id="resolved-issues_16">Resolved Issues<a class="headerlink" href="#resolved-issues_16" title="Permanent link">&para;</a></h3>
+<p>n/a</p>
+<h3 id="known-issues_16">Known Issues<a class="headerlink" href="#known-issues_16" title="Permanent link">&para;</a></h3>
+<p>All known issues from v1.6.0.</p>
+<h2 id="v161-released-on-2019-06-21">v1.6.1 released on 2019-06-21:<a class="headerlink" href="#v161-released-on-2019-06-21" title="Permanent link">&para;</a></h2>
+<h3 id="enhancements_17">Enhancements<a class="headerlink" href="#enhancements_17" title="Permanent link">&para;</a></h3>
+<p>This release of Alexa Auto SDK includes updates for music certification.</p>
+<h3 id="resolved-issues_17">Resolved Issues<a class="headerlink" href="#resolved-issues_17" title="Permanent link">&para;</a></h3>
 <p>Resolved issues are limited to music certification updates:</p>
 <ul>
 <li>Added fixes from AVS Device SDK v1.12.1 for music certification.</li>
 <li>Fixed live radio offset for stations that use a dynamic window (<code>mime=audio/mp4a-latm</code>).</li>
 <li>Documentation updates.</li>
 </ul>
-<h3 id="known-issues_16">Known Issues<a class="headerlink" href="#known-issues_16" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_17">Known Issues<a class="headerlink" href="#known-issues_17" title="Permanent link">&para;</a></h3>
 <p>All known issues from v1.6.0.</p>
 <h2 id="v160-released-on-2019-05-16">v1.6.0 released on 2019-05-16:<a class="headerlink" href="#v160-released-on-2019-05-16" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_17">Enhancements<a class="headerlink" href="#enhancements_17" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_18">Enhancements<a class="headerlink" href="#enhancements_18" title="Permanent link">&para;</a></h3>
 <ul>
 <li>General availability for Linux target platforms, including: Linux x86-64, Linux ARM 64 (armv8a), and Linux ARM 32 (armv7a).</li>
 <li>Alexa Auto SDK v1.6.0 enhances the C++ Sample App by improving the reference implementation for Linux platforms. See the C++ sample app documentation for details.</li>
 </ul>
-<h3 id="resolved-issues_17">Resolved Issues<a class="headerlink" href="#resolved-issues_17" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_18">Resolved Issues<a class="headerlink" href="#resolved-issues_18" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed an issue where Alexa Auto SDK Engine becomes unresponsive if it receives a <code>Play</code> directive during shutdown.</li>
 <li>Made changes to External Media Player events to send the service id and agent details, which are now mandated by the Alexa Music service. If you are using previous versions with Local Media Source switching or third-party app with MACC, you should upgrade to Alexa Auto SDK v1.6.0 to continue using the corresponding functionality.</li>
 </ul>
-<h3 id="known-issues_17">Known Issues<a class="headerlink" href="#known-issues_17" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_18">Known Issues<a class="headerlink" href="#known-issues_18" title="Permanent link">&para;</a></h3>
 <ul>
 <li>If the local timezone of the device differs from the timezone that was configured through the Alexa companion app, you may experience unexpected behavior. For example, if your device shows 12pm PST, but the device on the Alexa companion app is configured with an EST timezone, then asking "Alexa set an alarm for 1pm today," will return, "Sorry I can't set alarms in the past.”</li>
 <li>If you play your notifications while music is playing, you will hear the music for a split second between the end of one notification and the start of the next.</li>
@@ -8318,7 +7892,7 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.</li>
 </ul>
 <h2 id="v150-released-on-2019-03-06">v1.5.0 released on 2019-03-06:<a class="headerlink" href="#v150-released-on-2019-03-06" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_18">Enhancements<a class="headerlink" href="#enhancements_18" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_19">Enhancements<a class="headerlink" href="#enhancements_19" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added a C++ sample application to demonstrate use cases that the Alexa Auto SDK supports. For details, see the C++ sample app documentation.</li>
 <li>Released the code for the AGL Alexa Voice Agent, a binding for Automotive Grade Linux powered by Alexa Auto SDK v1.5. The software is shipped as a standard AGL binding that exposes an API for speech recognition using the Alexa Voice Service. Please refer to the <a href="https://github.com/alexa/alexa-auto-sdk/blob/1.5/platforms/agl/alexa-voiceagent-service/README.md">AGL Alexa Voice Agent documentation</a> for instructions to build, install, and test the binding on an R-Car M3 board.</li>
@@ -8329,21 +7903,21 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Improved the usage and deployment of the Local Voice Control extension on Android. Please contact your SA or Partner Manager for more information.</li>
 <li>Updated the vehicle information configuration API to include a vehicle identifier. An <code>aace.vehicle.info.vehicleIdentifier</code> property of vehicle configuration is now available through the existing <code>VehicleConfiguration</code>.</li>
 </ul>
-<h3 id="resolved-issues_18">Resolved Issues<a class="headerlink" href="#resolved-issues_18" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_19">Resolved Issues<a class="headerlink" href="#resolved-issues_19" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Fixed an issue where barging in while many unprocessed Speak directives are queued could cause SpeechSynthesizer to become unresponsive or crash</li>
 <li>Added an <code>EXPECTING</code> state to the <code>AlexaClient DialogState</code> to accommodate multi-turn for hold-to-talk interactions. When more user input is required during an interaction, tap-to-talk interactions will transition directly from <code>EXPECTING</code> to <code>LISTENING</code> whereas hold-to-talk will remain in the <code>EXPECTING</code> state until listening is manually triggered.</li>
 <li>Fixed an issue where the Android Sample App could get stuck in a loop of INVALID_REQUEST_EXCEPTION errors being thrown repeatedly after MACCAndroidClient reported an error. Note: To fix this, the C++ <code>ExternalMediaAdapter::getState</code> method signature changed to allow the implementation to say whether the state it provides is valid. This change is not backward compatible.</li>
 <li>Fixed an issue where the Android Sample App created a syslog sink and logged VERBOSE in release builds. Note: As part of the fix, the default Engine logger sink id changed from <em>console</em> to <em>default</em>. Existing calls to <code>LoggerConfiguration::createLoggerRuleConfig</code> with sink id <code>"console"</code> should be changed to sink id <code>"default"</code>.</li>
 </ul>
-<h3 id="known-issues_18">Known Issues<a class="headerlink" href="#known-issues_18" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_19">Known Issues<a class="headerlink" href="#known-issues_19" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Alexa Auto SDK Engine becomes unresponsive if it receives a <code>Play</code> directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.</li>
 <li>When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.</li>
 <li>Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.</li>
 </ul>
 <h2 id="v140-released-on-2018-12-17">v1.4.0 released on 2018-12-17:<a class="headerlink" href="#v140-released-on-2018-12-17" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_19">Enhancements<a class="headerlink" href="#enhancements_19" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_20">Enhancements<a class="headerlink" href="#enhancements_20" title="Permanent link">&para;</a></h3>
 <ul>
 <li>
 <p>The Alexa Auto SDK now supports the Local Voice Control extension. The Local Voice Control extension enhances the Alexa Auto experience by providing voice-based car controls whether connected to the internet or not. In this release, the Local Voice Control extension will provision access only to the car’s climate control.</p>
@@ -8352,18 +7926,18 @@ Therefore, if the current device locale is different from the default locale, yo
 </blockquote>
 </li>
 </ul>
-<h3 id="resolved-issues_19">Resolved Issues<a class="headerlink" href="#resolved-issues_19" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_20">Resolved Issues<a class="headerlink" href="#resolved-issues_20" title="Permanent link">&para;</a></h3>
 <p>No resolved issues.</p>
-<h3 id="known-issues_19">Known Issues<a class="headerlink" href="#known-issues_19" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_20">Known Issues<a class="headerlink" href="#known-issues_20" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Alexa Auto SDK Engine becomes unresponsive if it receives a <code>Play</code> directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.</li>
 <li>When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.</li>
 <li>Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.</li>
 </ul>
 <h2 id="v131-released-on-2019-06-21">v1.3.1 released on 2019-06-21:<a class="headerlink" href="#v131-released-on-2019-06-21" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_20">Enhancements<a class="headerlink" href="#enhancements_20" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_21">Enhancements<a class="headerlink" href="#enhancements_21" title="Permanent link">&para;</a></h3>
 <p>This release of Alexa Auto SDK includes updates for music certification.</p>
-<h3 id="resolved-issues_20">Resolved Issues<a class="headerlink" href="#resolved-issues_20" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_21">Resolved Issues<a class="headerlink" href="#resolved-issues_21" title="Permanent link">&para;</a></h3>
 <p>Resolved issues are limited to music certification updates:</p>
 <ul>
 <li>Migrated to AVS Device SDK v1.12.1 for music certification. As part of the migration there is a new dependency on <code>openssl</code>. Developers using their own build system may need to make changes in order to accommodate this new dependency when linking AVS Device SDK.</li>
@@ -8381,10 +7955,10 @@ Therefore, if the current device locale is different from the default locale, yo
 <p>The platform interfaces have not changed, however the following C++ and Android enums are updated:
 * The enum class <code>DialogState</code> inserts the <code>EXPECTING</code> enum constant.
 * The enum class <code>ConnectionChangedReason</code> inserts <code>NONE</code>, <code>SUCCESS</code>, and <code>UNRECOVERABLE_ERROR</code> enum constants.</p>
-<h3 id="known-issues_20">Known Issues<a class="headerlink" href="#known-issues_20" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_21">Known Issues<a class="headerlink" href="#known-issues_21" title="Permanent link">&para;</a></h3>
 <p>All known issues from v1.3.0.</p>
 <h2 id="v130-released-on-2018-11-20">v1.3.0 released on 2018-11-20:<a class="headerlink" href="#v130-released-on-2018-11-20" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_21">Enhancements<a class="headerlink" href="#enhancements_21" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_22">Enhancements<a class="headerlink" href="#enhancements_22" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Android 8 and ARM v8a platform support.</li>
 <li>Making calls to contacts from a locally-paired mobile phone as long as the Alexa Auto SDK has a valid auth token. For details, see the <a href="https://github.com/alexa/alexa-auto-sdk/blob/1.3/modules/contact-uploader/README.md">Contact Uploader documentation</a>.</li>
@@ -8393,39 +7967,39 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Enhancement for 3rd party wake word engine to enable cloud based verification.</li>
 <li>Provides a way to override Template Runtime display card timeout values for RenderTemplate and RenderPlayerInfo by updating the <code>templateRuntimeCapabilityAgent</code> Engine configuration values.</li>
 </ul>
-<h3 id="resolved-issues_21">Resolved Issues<a class="headerlink" href="#resolved-issues_21" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_22">Resolved Issues<a class="headerlink" href="#resolved-issues_22" title="Permanent link">&para;</a></h3>
 <p>No resolved issues.</p>
-<h3 id="known-issues_21">Known Issues<a class="headerlink" href="#known-issues_21" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_22">Known Issues<a class="headerlink" href="#known-issues_22" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Alexa Auto SDK Engine becomes unresponsive if it receives a <code>Play</code> directive during shutdown. However, since shutdown is triggered when car ignition is turned off, there is no direct customer impact expected.</li>
 <li>When a timer sounds during an Alexa-to-Alexa call, uttering "stop" ends the call, not the timer.</li>
 <li>Multiple automotive devices using the same account at the same time can access contacts from phones paired across those devices.</li>
 </ul>
 <h2 id="v120-released-on-2018-10-15">v1.2.0 released on 2018-10-15:<a class="headerlink" href="#v120-released-on-2018-10-15" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_22">Enhancements<a class="headerlink" href="#enhancements_22" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_23">Enhancements<a class="headerlink" href="#enhancements_23" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Additional information related to the presentation of alerts is now available. The extended interface now includes Alert token, type, rendering time, and label if applicable when an alert is set and notification when an alert is deleted.</li>
 <li>In the Navigation platform interface, <code>SetDestination</code> now provides business hours and contact information for a returned location when available.</li>
 </ul>
-<h3 id="resolved-issues_22">Resolved Issues<a class="headerlink" href="#resolved-issues_22" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_23">Resolved Issues<a class="headerlink" href="#resolved-issues_23" title="Permanent link">&para;</a></h3>
 <ul>
 <li>If a location is not available, the location state is set to <code>unavailable</code>. Previously it was treated as <code>(0,0)</code>, which was a valid value for longitude and latitude.</li>
 <li>Fixed an issue related to stopping an alert where there could be up to a 10 second delay before the alert completely stopped.</li>
 <li>Fixed issue where the <code>TemplateRuntime</code> platform interface could not be registered before <code>AudioPlayer</code>.</li>
 </ul>
-<h3 id="known-issues_22">Known Issues<a class="headerlink" href="#known-issues_22" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_23">Known Issues<a class="headerlink" href="#known-issues_23" title="Permanent link">&para;</a></h3>
 <p>There are no known issues in this release.</p>
 <h2 id="v111-released-on-2018-09-10">v1.1.1 released on 2018-09-10:<a class="headerlink" href="#v111-released-on-2018-09-10" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_23">Enhancements<a class="headerlink" href="#enhancements_23" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_24">Enhancements<a class="headerlink" href="#enhancements_24" title="Permanent link">&para;</a></h3>
 <p>This release is for bug fixes only. There are no new features or enhancements.</p>
-<h3 id="resolved-issues_23">Resolved Issues<a class="headerlink" href="#resolved-issues_23" title="Permanent link">&para;</a></h3>
+<h3 id="resolved-issues_24">Resolved Issues<a class="headerlink" href="#resolved-issues_24" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Updated a dependency build recipe to skip the checksum verification to allow for document changes in the current tag.</li>
 </ul>
-<h3 id="known-issues_23">Known Issues<a class="headerlink" href="#known-issues_23" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_24">Known Issues<a class="headerlink" href="#known-issues_24" title="Permanent link">&para;</a></h3>
 <p>There are no known issues in this release.</p>
 <h2 id="v110-released-on-2018-08-31">v1.1.0 released on 2018-08-31:<a class="headerlink" href="#v110-released-on-2018-08-31" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_24">Enhancements<a class="headerlink" href="#enhancements_24" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_25">Enhancements<a class="headerlink" href="#enhancements_25" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Added support for choosing one of multiple network adaptors before starting the Engine.</li>
 <li>Added support for the latest Amazon Wakeword Engine.</li>
@@ -8444,21 +8018,21 @@ Therefore, if the current device locale is different from the default locale, yo
 </li>
 <li>Updated the builder script to confirm compliance with open source component licenses.</li>
 </ul>
-<h3 id="resolved-issues_24">Resolved Issues<a class="headerlink" href="#resolved-issues_24" title="Permanent link">&para;</a></h3>
-<p>There are no resolved issues in this release.</p>
-<h3 id="known-issues_24">Known Issues<a class="headerlink" href="#known-issues_24" title="Permanent link">&para;</a></h3>
-<p>There are no known issues in this release.</p>
-<h2 id="v102-released-on-2018-08-08">v1.0.2 released on 2018-08-08:<a class="headerlink" href="#v102-released-on-2018-08-08" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_25">Enhancements<a class="headerlink" href="#enhancements_25" title="Permanent link">&para;</a></h3>
-<p>This release is only for documentation updates. There are no new features or enhancements.</p>
 <h3 id="resolved-issues_25">Resolved Issues<a class="headerlink" href="#resolved-issues_25" title="Permanent link">&para;</a></h3>
-<p>Only name change updates were made to the documentation. There are no resolved issues in this release.</p>
+<p>There are no resolved issues in this release.</p>
 <h3 id="known-issues_25">Known Issues<a class="headerlink" href="#known-issues_25" title="Permanent link">&para;</a></h3>
 <p>There are no known issues in this release.</p>
-<h2 id="v101-released-on-2018-07-31">v1.0.1 released on 2018-07-31:<a class="headerlink" href="#v101-released-on-2018-07-31" title="Permanent link">&para;</a></h2>
+<h2 id="v102-released-on-2018-08-08">v1.0.2 released on 2018-08-08:<a class="headerlink" href="#v102-released-on-2018-08-08" title="Permanent link">&para;</a></h2>
 <h3 id="enhancements_26">Enhancements<a class="headerlink" href="#enhancements_26" title="Permanent link">&para;</a></h3>
-<p>This release is for bug fixes only. There are no new features or enhancements.</p>
+<p>This release is only for documentation updates. There are no new features or enhancements.</p>
 <h3 id="resolved-issues_26">Resolved Issues<a class="headerlink" href="#resolved-issues_26" title="Permanent link">&para;</a></h3>
+<p>Only name change updates were made to the documentation. There are no resolved issues in this release.</p>
+<h3 id="known-issues_26">Known Issues<a class="headerlink" href="#known-issues_26" title="Permanent link">&para;</a></h3>
+<p>There are no known issues in this release.</p>
+<h2 id="v101-released-on-2018-07-31">v1.0.1 released on 2018-07-31:<a class="headerlink" href="#v101-released-on-2018-07-31" title="Permanent link">&para;</a></h2>
+<h3 id="enhancements_27">Enhancements<a class="headerlink" href="#enhancements_27" title="Permanent link">&para;</a></h3>
+<p>This release is for bug fixes only. There are no new features or enhancements.</p>
+<h3 id="resolved-issues_27">Resolved Issues<a class="headerlink" href="#resolved-issues_27" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Engine now reconnects to Alexa when the <code>NetworkInfoProvider</code> updates the network status.</li>
 <li>All shared memory objects are now freed when the Engine object is disposed.</li>
@@ -8471,10 +8045,10 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Enabled capability registration for phone call control.</li>
 <li>We fixed an issue where the Android platform build failed on the initial attempt when using clean code.</li>
 </ul>
-<h3 id="known-issues_26">Known Issues<a class="headerlink" href="#known-issues_26" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_27">Known Issues<a class="headerlink" href="#known-issues_27" title="Permanent link">&para;</a></h3>
 <p>There are no known issues in this release.</p>
 <h2 id="v100-released-on-2018-06-29">v1.0.0 released on 2018-06-29:<a class="headerlink" href="#v100-released-on-2018-06-29" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_27"><strong>Enhancements</strong><a class="headerlink" href="#enhancements_27" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_28"><strong>Enhancements</strong><a class="headerlink" href="#enhancements_28" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Alexa Auto SDK now supports two <code>Navigation</code> directives.<ul>
 <li><strong><code>SetDestination</code></strong></li>
@@ -8489,20 +8063,20 @@ Therefore, if the current device locale is different from the default locale, yo
 </li>
 <li>Support for Amazon Wake Word Engine (WWE)</li>
 </ul>
-<h3 id="known-issues_27"><strong>Known Issues</strong><a class="headerlink" href="#known-issues_27" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_28"><strong>Known Issues</strong><a class="headerlink" href="#known-issues_28" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The Engine doesn't immediately reconnect to AVS when the <strong><code>NetworkInfoProvider</code></strong> updates network status.</li>
 <li>Some shared memory objects are not freed when the Engine object is disposed.</li>
 </ul>
 <p>Sample App issues are documented in the <a href="https://github.com/alexa/alexa-auto-sdk/blob/1.0/samples/android/README.md">Sample App README</a>.</p>
 <h2 id="v100-beta-released-on-2018-04-29">v1.0.0 Beta released on 2018-04-29:<a class="headerlink" href="#v100-beta-released-on-2018-04-29" title="Permanent link">&para;</a></h2>
-<h3 id="enhancements_28"><strong>Enhancements</strong><a class="headerlink" href="#enhancements_28" title="Permanent link">&para;</a></h3>
+<h3 id="enhancements_29"><strong>Enhancements</strong><a class="headerlink" href="#enhancements_29" title="Permanent link">&para;</a></h3>
 <p>The following enhancements were added to the Alexa Auto SDK since the last Alpha release (binary).</p>
 <ul>
 <li><code>SetDestination()</code> API added to the Navigation module</li>
 <li>Android Sample Application updated with a number of features such as rendering of Display Cards (Shopping List, Coffee Shops Nearby, etc), handling of the <code>SetDestination()</code> API, Notifications, LWA (Login with Amazon)</li>
 </ul>
-<h3 id="known-issues_28"><strong>Known Issues</strong><a class="headerlink" href="#known-issues_28" title="Permanent link">&para;</a></h3>
+<h3 id="known-issues_29"><strong>Known Issues</strong><a class="headerlink" href="#known-issues_29" title="Permanent link">&para;</a></h3>
 <p><strong><em>SDK:</em></strong></p>
 <ul>
 <li>While the SDK does build against Android API22 and above and runs successfully on Android O devices, our current testing shows a native-code linking error when actually running on API22 devices.</li>
@@ -8523,54 +8097,27 @@ Therefore, if the current device locale is different from the default locale, yo
 <li>Several minor documentation issues that will be addressed in the GA release</li>
 </ul>
 
-              
-            </article>
-          </div>
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
         </div>
         
-          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
             Back to top
-          </a>
+          </button>
         
       </main>
       
         <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Auto SDK Release Notes" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Auto SDK Release Notes
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../migration/" class="md-footer__link md-footer__link--next" aria-label="Next: Migration Guide" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              Migration Guide
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -8596,10 +8143,11 @@ Therefore, if the current device locale is different from the default locale, yo
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "search": "../../assets/javascripts/workers/search.2a1c317c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.indexes", "content.code.annotate", "content.tabs.link", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest"], "search": "../../assets/javascripts/workers/search.208ed371.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a6c66575.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a51614de.min.js"></script>
       
     
   </body>

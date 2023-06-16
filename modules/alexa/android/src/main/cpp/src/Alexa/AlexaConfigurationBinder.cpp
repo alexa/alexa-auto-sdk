@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -82,27 +82,23 @@ std::vector<TemplateRuntimeTimeout> JTemplateRuntimeTimeout::convert(jobjectArra
 
 // JNI
 extern "C" {
-JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDeviceInfoConfigBinder(
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_createAlexaClientInfoConfigBinder(
     JNIEnv* env,
     jobject obj,
-    jstring deviceSerialNumber,
     jstring clientId,
     jstring productId,
-    jstring manufacturerName,
-    jstring description) {
+    jstring amazonId) {
     try {
-        auto config = aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig(
-            JString(deviceSerialNumber).toStdStr(),
-            JString(clientId).toStdStr(),
-            JString(productId).toStdStr(),
-            JString(manufacturerName).toStdStr(),
-            JString(description).toStdStr());
-        ThrowIfNull(config, "createDeviceInfoConfigFailed");
+        auto config = aace::alexa::config::AlexaConfiguration::createAlexaClientInfoConfig(
+            JString(clientId).toStdStr(), JString(productId).toStdStr(), JString(amazonId).toStdStr());
+        ThrowIfNull(config, "createAlexaClientInfoConfigFailed");
 
         return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(
-            TAG, "Java_com_amazon_aace_alexa_config_AlexaConfigurationBinder_createDeviceInfoConfigBinder", ex.what());
+            TAG,
+            "Java_com_amazon_aace_alexa_config_AlexaConfigurationBinder_createAlexaClientInfoConfigBinder",
+            ex.what());
         return 0;
     }
 }
@@ -402,6 +398,24 @@ JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_cre
     } catch (const std::exception& ex) {
         AACE_JNI_ERROR(
             TAG, "Java_com_amazon_aace_alexa_config_AlexaConfiguration_createDuckingConfigBinder", ex.what());
+        return 0;
+    }
+}
+
+JNIEXPORT jlong JNICALL Java_com_amazon_aace_alexa_config_AlexaConfiguration_createMediaPlayerFingerprintConfigBinder(
+    JNIEnv* env,
+    jobject obj,
+    jstring package,
+    jstring buildType,
+    jstring versionNumber) {
+    try {
+        auto config = aace::alexa::config::AlexaConfiguration::createMediaPlayerFingerprintConfig(
+            JString(package).toStdStr(), JString(buildType).toStdStr(), JString(versionNumber).toStdStr());
+        ThrowIfNull(config, "createMediaPlayerFingerprintConfigFailed");
+
+        return reinterpret_cast<long>(new aace::jni::core::config::EngineConfigurationBinder(config));
+    } catch (const std::exception& ex) {
+        AACE_JNI_ERROR(TAG, __func__, ex.what());
         return 0;
     }
 }

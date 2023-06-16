@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
  * permissions and limitations under the License.
  */
 
-// JSON for Modern C++
-#include <nlohmann/json.hpp>
-
+#include <chrono>
+#include <sstream>
 #include <typeinfo>
+
+#include <nlohmann/json.hpp>
 #include <rapidjson/error/en.h>
 #include <rapidjson/pointer.h>
 #include <rapidjson/writer.h>
@@ -25,17 +26,20 @@
 
 #include <AVSCommon/Utils/HTTP/HttpResponseCode.h>
 
-#include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
-#include <AACE/Engine/Network/NetworkEngineService.h>
 #include <AACE/Engine/AddressBook/AddressBookCloudUploader.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Network/NetworkEngineService.h>
 
 namespace aace {
 namespace engine {
 namespace addressBook {
 
-using namespace aace::engine::utils::metrics;
 using namespace alexaClientSDK::avsCommon::utils::http;
+using namespace aace::engine::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.addressBook.addressBookCloudUploader");
@@ -61,38 +65,53 @@ static const int MAX_EVENT_RETRY = 3;
 /// Invalid Address Id
 static const std::string INVALID_ADDRESS_BOOK_SOURCE_ID = "INVALID";
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AddressBookCloudUploader";
-
-/// Metric for adding contact
-static const std::string METRIC_ADD_ADDRESS_BOOK_CONTACT = "Add.Contact";
-
-/// Count metric for adding navigation
-static const std::string METRIC_ADD_ADDRESS_BOOK_NAVIGATION = "Add.Navigation";
-
-/// Count metric for removing contact
-static const std::string METRIC_REMOVE_ADDRESS_BOOK_CONTACT = "Remove.Contact";
-
-/// Count metric for removing navigation address
-static const std::string METRIC_REMOVE_ADDRESS_BOOK_NAVIGATION = "Remove.Navigation";
-
-/// Latency metrics to track actual upload to cloud since add event
-static const std::string METRIC_TIME_TO_UPLOAD_SINCE_ADD = "Latency.Add";
-
-/// Latency metrics to track actual remove from cloud since remove event
-static const std::string METRIC_TIME_TO_UPLOAD_SINCE_REMOVE = "Latency.Remove";
-
-/// Latency metric uploading a one batch of entries to cloud (average time)
-static const std::string METRIC_TIME_TO_UPLOAD_ONE_BATCH = "Network.BatchUploadLatency";
-
-/// Metric for Bad User Input network response
-static const std::string METRIC_NETWORK_BAD_USER_INPUT = "Network.BadUserInput";
-
-/// Metric for any Network Error
-static const std::string METRIC_NETWORK_ERROR = "Network.Error";
-
 /// Address book AVS service type
 static const std::string ADDRESS_BOOK_SERVICE_TYPE_AVS = "AVS";
+
+/// Prefix for AddressBookCloudUploader metrics
+static const std::string METRIC_PREFIX = "ADDRESS_BOOK_CLOUD_UPLOADER-";
+
+/// Source name for Address Book request metrics
+static const std::string METRIC_SOURCE_ADDRESS_BOOK_REQUEST = METRIC_PREFIX + "AddressBookRequest";
+
+/// Request type metric dimension key
+static const std::string METRIC_REQUEST_TYPE = "AddressBookRequestType";
+
+/// AddressBook add request prefix
+static const std::string METRIC_REQUEST_TYPE_ADD_PREFIX = "Request.Add.";
+
+/// AddressBook remove request prefix
+static const std::string METRIC_REQUEST_TYPE_REMOVE_PREFIX = "Request.Remove.";
+
+/// Contacts type metric dimension
+static const std::string METRIC_ADDRESS_BOOK_TYPE_CONTACTS = "Contacts";
+
+/// Navigation type metric dimension
+static const std::string METRIC_ADDRESS_BOOK_TYPE_NAVIGATION = "Navigation";
+
+/// AddressBook uploader type metric dimension key
+static const std::string METRIC_ADDRESS_BOOK_UPLOADER_TYPE = "UploaderType";
+
+/// Cloud uploader type dimension
+static const std::string METRIC_UPLOADER_TYPE_CLOUD = "Cloud";
+
+/// Request success count metric key
+static const std::string METRIC_REQUEST_SUCCESS_COUNT = "RequestSuccessCount";
+
+/// Request latency metric key
+static const std::string METRIC_REQUEST_LATENCY = "RequestLatency";
+
+/// Number of batches to complete the request metric dimension key
+static const std::string METRIC_REQUEST_NUM_REQUEST_BATCHES = "NumRequestBatches";
+
+/// Request retry count metric dimension key
+static const std::string METRIC_REQUEST_RETRY_COUNT = "RequestRetryCount";
+
+/// Request failure count metric key
+static const std::string METRIC_REQUEST_FAILURE_COUNT = "RequestFailureCount";
+
+/// Request failure type metric dimension key
+static const std::string METRIC_REQUEST_FAILURE_TYPE = "RequestFailureType";
 
 using json = nlohmann::json;
 
@@ -107,9 +126,11 @@ std::shared_ptr<AddressBookCloudUploader> AddressBookCloudUploader::create(
     NetworkInfoObserver::NetworkStatus networkStatus,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     bool cleanAllAddressBooksAtStart) {
     try {
         auto addressBookCloudUploader = std::shared_ptr<AddressBookCloudUploader>(new AddressBookCloudUploader());
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
         ThrowIfNot(
             addressBookCloudUploader->initialize(
                 addressBookService,
@@ -118,6 +139,7 @@ std::shared_ptr<AddressBookCloudUploader> AddressBookCloudUploader::create(
                 networkStatus,
                 networkObserver,
                 alexaEndpoints,
+                metricRecorder,
                 cleanAllAddressBooksAtStart),
             "initializeAddressBookCloudUploaderFailed");
 
@@ -135,6 +157,7 @@ bool AddressBookCloudUploader::initialize(
     NetworkInfoObserver::NetworkStatus networkStatus,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> alexaEndpoints,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     bool cleanAllAddressBooksAtStart) {
     try {
         m_addressBookService = addressBookService;
@@ -142,6 +165,7 @@ bool AddressBookCloudUploader::initialize(
         m_deviceInfo = deviceInfo;
         m_networkStatus = networkStatus;
         m_networkObserver = networkObserver;
+        m_metricRecorder = metricRecorder;
 
         m_addressBookCloudUploaderRESTAgent = aace::engine::addressBook::AddressBookCloudUploaderRESTAgent::create(
             authDelegate, m_deviceInfo, alexaEndpoints);
@@ -183,6 +207,7 @@ void AddressBookCloudUploader::doShutdown() {
     m_authDelegate.reset();
     m_addressBookService.reset();
     m_addressBookCloudUploaderRESTAgent.reset();
+    m_metricRecorder.reset();
 }
 
 void AddressBookCloudUploader::onAuthStateChange(
@@ -224,17 +249,11 @@ void AddressBookCloudUploader::onNetworkInterfaceChangeStatusChanged(
 }
 
 bool AddressBookCloudUploader::addressBookAdded(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+    AACE_INFO(LX(TAG).d("addressBookSourceId", addressBookEntity->getSourceId()));
     std::string addressBookSourceId = INVALID_ADDRESS_BOOK_SOURCE_ID;
     try {
         ThrowIfNull(addressBookEntity, "invalidAddressBookEntity");
         addressBookSourceId = addressBookEntity->getSourceId();
-
-        // For Metrics
-        if (addressBookEntity->getType() == AddressBookType::CONTACT) {
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "addressBookAdded", METRIC_ADD_ADDRESS_BOOK_CONTACT, 1);
-        } else if (addressBookEntity->getType() == AddressBookType::NAVIGATION) {
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "addressBookAdded", METRIC_ADD_ADDRESS_BOOK_NAVIGATION, 1);
-        }
 
         std::lock_guard<std::mutex> guard(m_mutex);
         m_addressBookEventQ.emplace_back(Event::Type::ADD, addressBookEntity);
@@ -249,18 +268,11 @@ bool AddressBookCloudUploader::addressBookAdded(std::shared_ptr<AddressBookEntit
 }
 
 bool AddressBookCloudUploader::addressBookRemoved(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+    AACE_INFO(LX(TAG).d("addressBookSourceId", addressBookEntity->getSourceId()));
     std::string addressBookSourceId = INVALID_ADDRESS_BOOK_SOURCE_ID;
     try {
         ThrowIfNull(addressBookEntity, "invalidAddressBook");
         addressBookSourceId = addressBookEntity->getSourceId();
-
-        // For Metrics
-        if (addressBookEntity->getType() == AddressBookType::CONTACT) {
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "addressBookRemoved", METRIC_REMOVE_ADDRESS_BOOK_CONTACT, 1);
-        } else if (addressBookEntity->getType() == AddressBookType::NAVIGATION) {
-            emitCounterMetrics(
-                METRIC_PROGRAM_NAME_SUFFIX, "addressBookRemoved", METRIC_REMOVE_ADDRESS_BOOK_NAVIGATION, 1);
-        }
 
         std::lock_guard<std::mutex> guard(m_mutex);
         if (m_addressBookEventQ.size() > 0) {
@@ -505,98 +517,100 @@ public:
             }
 
             if (entryPayload.contains("postalAddresses") && !entryPayload["postalAddresses"].empty()) {
-                // Consider postal addresses  only when the address book type is NAVIGATION
-                if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
-                    if (!entryPayload["postalAddresses"].is_array()) {
-                        Throw("postalAddressesFieldIsNotAnArray");
+                if (!entryPayload["postalAddresses"].is_array()) {
+                    Throw("postalAddressesFieldIsNotAnArray");
+                }
+
+                if (!data.HasMember("addresses")) {
+                    auto addresses(rapidjson::kArrayType);
+                    data.AddMember("addresses", addresses, allocator);
+                }
+
+                auto& addresses = data["addresses"];
+
+                int counter = 0;
+                for (auto& postalAddress : entryPayload["postalAddresses"]) {
+                    if (++counter > MAX_ALLOWED_ADDRESSES_PER_ENTRY) {
+                        AACE_WARN(LX(TAG).m("maxAllowedPostalAddressEntriesReached"));
+                        success = false;
+                        break;  // bail out
                     }
 
-                    if (!data.HasMember("addresses")) {
-                        auto addresses(rapidjson::kArrayType);
-                        data.AddMember("addresses", addresses, allocator);
-                    }
-
-                    auto& addresses = data["addresses"];
-
-                    int counter = 0;
-                    for (auto& postalAddress : entryPayload["postalAddresses"]) {
-                        if (++counter > MAX_ALLOWED_ADDRESSES_PER_ENTRY) {
-                            AACE_WARN(LX(TAG).m("maxAllowedPostalAddressEntriesReached"));
-                            success = false;
-                            break;  // bail out
-                        }
-
-                        // clang-format off
-                        // Sanitize postal address fields types
-                        ThrowIfNot((postalAddress.contains("label") ? postalAddress["label"].is_string() : true), "postalAddressLabelInvalid");
-                        ThrowIfNot((postalAddress.contains("addressLine1") ? postalAddress["addressLine1"].is_string() : true), "postalAddressAddressLine1Invalid");
-                        ThrowIfNot((postalAddress.contains("addressLine2") ? postalAddress["addressLine2"].is_string() : true), "postalAddressAddressLine2Invalid");
-                        ThrowIfNot((postalAddress.contains("city") ? postalAddress["city"].is_string() : true), "postalAddressCityInvalid");
-                        ThrowIfNot((postalAddress.contains("stateOrRegion") ? postalAddress["stateOrRegion"].is_string() : true), "postalAddressStateOrRegionInvalid");
-                        ThrowIfNot((postalAddress.contains("districtOrCounty") ? postalAddress["districtOrCounty"].is_string() : true), "postalAddressDistrictOrCountyInvalid");
-                        ThrowIfNot((postalAddress.contains("postalCode") ? postalAddress["postalCode"].is_string() : true), "postalAddressPostalCodeInvalid");
-                        ThrowIfNot((postalAddress.contains("countryCode") ? postalAddress["countryCode"].is_string() : true), "postalAddressCountryCodeInvalid");
+                    // clang-format off
+                    // Sanitize postal address fields types
+                    ThrowIfNot((postalAddress.contains("label") ? postalAddress["label"].is_string() : true), "postalAddressLabelInvalid");
+                    ThrowIfNot((postalAddress.contains("addressLine1") ? postalAddress["addressLine1"].is_string() : true), "postalAddressAddressLine1Invalid");
+                    ThrowIfNot((postalAddress.contains("addressLine2") ? postalAddress["addressLine2"].is_string() : true), "postalAddressAddressLine2Invalid");
+                    ThrowIfNot((postalAddress.contains("city") ? postalAddress["city"].is_string() : true), "postalAddressCityInvalid");
+                    ThrowIfNot((postalAddress.contains("stateOrRegion") ? postalAddress["stateOrRegion"].is_string() : true), "postalAddressStateOrRegionInvalid");
+                    ThrowIfNot((postalAddress.contains("districtOrCounty") ? postalAddress["districtOrCounty"].is_string() : true), "postalAddressDistrictOrCountyInvalid");
+                    ThrowIfNot((postalAddress.contains("postalCode") ? postalAddress["postalCode"].is_string() : true), "postalAddressPostalCodeInvalid");
+                    ThrowIfNot((postalAddress.contains("countryCode") ? postalAddress["countryCode"].is_string() : true), "postalAddressCountryCodeInvalid");
+                    // Geo coordinates (latitude/longitude) are valid only for NAVIGATION, they are usually not available for phone CONTACT
+                    if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
                         ThrowIfNot(postalAddress.contains("latitudeInDegrees") && postalAddress["latitudeInDegrees"].is_number(), "postalAddressLatitudeInDegreesNotPresetOrInvalid");
                         ThrowIfNot(postalAddress.contains("longitudeInDegrees") && postalAddress["longitudeInDegrees"].is_number(), "postalAddressLongitudeInDegreesNotPresetOrInvalid");
                         ThrowIfNot((postalAddress.contains("accuracyInMeters") ? postalAddress["accuracyInMeters"].is_number() : true), "postalAddressAccuracyInMetersInvalid");
-                        // clang-format on
+                    }
+                    // clang-format on
 
-                        std::string label = postalAddress.value("label", "");
-                        std::string addressLine1 = postalAddress.value("addressLine1", "");
-                        std::string addressLine2 = postalAddress.value("addressLine2", "");
-                        std::string addressLine3 = postalAddress.value("addressLine3", "");
-                        std::string city = postalAddress.value("city", "");
-                        std::string stateOrRegion = postalAddress.value("stateOrRegion", "");
-                        std::string districtOrCounty = postalAddress.value("districtOrCounty", "");
-                        std::string postalCode = postalAddress.value("postalCode", "");
-                        std::string countryCode = postalAddress.value("countryCode", "");
-                        float latitudeInDegrees = postalAddress.value("latitudeInDegrees", 0.0f);
-                        float longitudeInDegrees = postalAddress.value("longitudeInDegrees", 0.0f);
-                        float accuracyInMeters = postalAddress.value("accuracyInMeters", 0.0f);
+                    std::string label = postalAddress.value("label", "");
+                    std::string addressLine1 = postalAddress.value("addressLine1", "");
+                    std::string addressLine2 = postalAddress.value("addressLine2", "");
+                    std::string addressLine3 = postalAddress.value("addressLine3", "");
+                    std::string city = postalAddress.value("city", "");
+                    std::string stateOrRegion = postalAddress.value("stateOrRegion", "");
+                    std::string districtOrCounty = postalAddress.value("districtOrCounty", "");
+                    std::string postalCode = postalAddress.value("postalCode", "");
+                    std::string countryCode = postalAddress.value("countryCode", "");
+                    float latitudeInDegrees = postalAddress.value("latitudeInDegrees", 0.0f);
+                    float longitudeInDegrees = postalAddress.value("longitudeInDegrees", 0.0f);
+                    float accuracyInMeters = postalAddress.value("accuracyInMeters", 0.0f);
 
-                        // Sanitize postal address fields sizes
-                        if (addressLine1.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
-                            AACE_WARN(LX(TAG)
-                                          .m("addressLine1ExceedsMaxCharacterSize")
-                                          .d("entryId", entryId)
-                                          .d("size", addressLine1.size())
-                                          .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
-                            success = false;
-                            continue;
-                        }
-                        if (addressLine2.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
-                            AACE_WARN(LX(TAG)
-                                          .m("addressLine2ExceedsMaxCharacterSize")
-                                          .d("entryId", entryId)
-                                          .d("size", addressLine2.size())
-                                          .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
-                            success = false;
-                            continue;
-                        }
-                        if (addressLine3.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
-                            AACE_WARN(LX(TAG)
-                                          .m("addressLine3ExceedsMaxCharacterSize")
-                                          .d("entryId", entryId)
-                                          .d("size", addressLine3.size())
-                                          .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
-                            success = false;
-                            continue;
-                        }
+                    // Sanitize postal address fields sizes
+                    if (addressLine1.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
+                        AACE_WARN(LX(TAG)
+                                      .m("addressLine1ExceedsMaxCharacterSize")
+                                      .d("entryId", entryId)
+                                      .d("size", addressLine1.size())
+                                      .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
+                        success = false;
+                        continue;
+                    }
+                    if (addressLine2.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
+                        AACE_WARN(LX(TAG)
+                                      .m("addressLine2ExceedsMaxCharacterSize")
+                                      .d("entryId", entryId)
+                                      .d("size", addressLine2.size())
+                                      .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
+                        success = false;
+                        continue;
+                    }
+                    if (addressLine3.size() > MAX_ALLOWED_ADDRESS_LINE_SIZE) {
+                        AACE_WARN(LX(TAG)
+                                      .m("addressLine3ExceedsMaxCharacterSize")
+                                      .d("entryId", entryId)
+                                      .d("size", addressLine3.size())
+                                      .d("maxSize", MAX_ALLOWED_ADDRESS_LINE_SIZE));
+                        success = false;
+                        continue;
+                    }
 
-                        int totalSize = label.size() + addressLine1.size() + addressLine2.size() + addressLine3.size() +
-                                        city.size() + stateOrRegion.size() + districtOrCounty.size() +
-                                        postalCode.size() + countryCode.size();
+                    int totalSize = label.size() + addressLine1.size() + addressLine2.size() + addressLine3.size() +
+                                    city.size() + stateOrRegion.size() + districtOrCounty.size() + postalCode.size() +
+                                    countryCode.size();
 
-                        if (totalSize > MAX_ALLOWED_CHARACTERS) {
-                            AACE_WARN(LX(TAG)
-                                          .m("postalAddressExceedsMaxCharacterSize")
-                                          .d("entryId", entryId)
-                                          .d("size", totalSize)
-                                          .d("maxSize", MAX_ALLOWED_CHARACTERS));
-                            success = false;
-                            continue;
-                        }
+                    if (totalSize > MAX_ALLOWED_CHARACTERS) {
+                        AACE_WARN(LX(TAG)
+                                      .m("postalAddressExceedsMaxCharacterSize")
+                                      .d("entryId", entryId)
+                                      .d("size", totalSize)
+                                      .d("maxSize", MAX_ALLOWED_CHARACTERS));
+                        success = false;
+                        continue;
+                    }
 
+                    if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
                         if (!(latitudeInDegrees >= -90 && latitudeInDegrees <= 90)) {
                             AACE_WARN(LX(TAG).m("latitudeInDegreesInvalid").d("latitudeInDegrees", latitudeInDegrees));
                             success = false;
@@ -609,45 +623,51 @@ public:
                             success = false;
                             continue;
                         }
-
                         if (accuracyInMeters < 0) {
                             AACE_WARN(LX(TAG).m("accuracyInMetersInvalid").d("accuracyInMeters", accuracyInMeters));
                             success = false;
                             continue;
                         }
+                    }
 
-                        rapidjson::Value address(rapidjson::kObjectType);
-                        address.AddMember("addressType", "postaladdress", allocator);
-                        if (!label.empty()) address.AddMember("rawType", label, allocator);
+                    rapidjson::Value address(rapidjson::kObjectType);
+                    address.AddMember("addressType", "postaladdress", allocator);
+                    if (!label.empty()) address.AddMember("rawType", label, allocator);
 
-                        rapidjson::Value postalAddressValue(rapidjson::kObjectType);
-                        if (!addressLine1.empty())
-                            postalAddressValue.AddMember("addressLine1", addressLine1, allocator);
-                        if (!addressLine2.empty())
-                            postalAddressValue.AddMember("addressLine2", addressLine2, allocator);
-                        if (!addressLine3.empty())
-                            postalAddressValue.AddMember("addressLine3", addressLine3, allocator);
-                        if (!city.empty()) postalAddressValue.AddMember("city", city, allocator);
-                        if (!stateOrRegion.empty())
-                            postalAddressValue.AddMember("stateOrRegion", stateOrRegion, allocator);
-                        if (!districtOrCounty.empty())
-                            postalAddressValue.AddMember("districtOrCounty", districtOrCounty, allocator);
-                        if (!postalCode.empty()) postalAddressValue.AddMember("postalCode", postalCode, allocator);
-                        if (!countryCode.empty()) postalAddressValue.AddMember("countryCode", countryCode, allocator);
+                    rapidjson::Value postalAddressValue(rapidjson::kObjectType);
+                    if (!addressLine1.empty()) postalAddressValue.AddMember("addressLine1", addressLine1, allocator);
+                    if (!addressLine2.empty()) postalAddressValue.AddMember("addressLine2", addressLine2, allocator);
+                    if (!addressLine3.empty()) postalAddressValue.AddMember("addressLine3", addressLine3, allocator);
+                    if (!city.empty()) postalAddressValue.AddMember("city", city, allocator);
+                    if (!stateOrRegion.empty()) postalAddressValue.AddMember("stateOrRegion", stateOrRegion, allocator);
+                    if (!districtOrCounty.empty())
+                        postalAddressValue.AddMember("districtOrCounty", districtOrCounty, allocator);
+                    if (!postalCode.empty()) postalAddressValue.AddMember("postalCode", postalCode, allocator);
+                    if (!countryCode.empty()) postalAddressValue.AddMember("countryCode", countryCode, allocator);
 
+                    // coordinates are valid only for NAVIGATION, not applicable when uploading CONTACT addresses
+                    if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
                         rapidjson::Value coordinate(rapidjson::kObjectType);
                         coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
                         coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
                         coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
                         postalAddressValue.AddMember("coordinate", coordinate, allocator);
-
-                        address.AddMember("postalAddress", postalAddressValue, allocator);
-
-                        addresses.PushBack(address, allocator);
+                    } else if (m_addressBookEntity->getType() == AddressBookType::CONTACT) {
+                        // cloud side has a bug which makes coordinates mandatory
+                        // place holder to add some default values TO BE REMOVED when issue is fixed on cloud
+                        latitudeInDegrees = 0.0f;
+                        longitudeInDegrees = 0.0f;
+                        accuracyInMeters = 0.0f;
+                        rapidjson::Value coordinate(rapidjson::kObjectType);
+                        coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
+                        coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
+                        coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
+                        postalAddressValue.AddMember("coordinate", coordinate, allocator);
                     }
-                } else {
-                    AACE_WARN(LX(TAG).m("postalAddressesNotSupportedInContactType"));
-                    success = false;
+
+                    address.AddMember("postalAddress", postalAddressValue, allocator);
+
+                    addresses.PushBack(address, allocator);
                 }
             }
             return success;
@@ -802,9 +822,11 @@ public:
             int totalCharSize = addressLine1.size() + addressLine2.size() + addressLine3.size() + city.size() +
                                 stateOrRegion.size() + districtOrCounty.size() + postalCode.size() + countryCode.size();
             ThrowIf(totalCharSize > MAX_ALLOWED_CHARACTERS, "postalAddressValueSizeExceedsLimit");
-            ThrowIfNot((latitudeInDegrees >= -90 && latitudeInDegrees <= 90), "latitudeInDegreesInvalid");
-            ThrowIfNot((longitudeInDegrees >= -180 && longitudeInDegrees <= 180), "longitudeInDegreesInvalid");
-            ThrowIf(accuracyInMeters < 0, "accuracyInMetersInvalid");
+            if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
+                ThrowIfNot((latitudeInDegrees >= -90 && latitudeInDegrees <= 90), "latitudeInDegreesInvalid");
+                ThrowIfNot((longitudeInDegrees >= -180 && longitudeInDegrees <= 180), "longitudeInDegreesInvalid");
+                ThrowIf(accuracyInMeters < 0, "accuracyInMetersInvalid");
+            }
 
             ThrowIfNot(
                 m_addressBookEntity->isAddressTypeSupported(AddressBookEntity::AddressType::POSTALADDRESS),
@@ -842,11 +864,25 @@ public:
             if (!postalCode.empty()) postalAddressValue.AddMember("postalCode", postalCode, allocator);
             if (!countryCode.empty()) postalAddressValue.AddMember("countryCode", countryCode, allocator);
 
-            rapidjson::Value coordinate(rapidjson::kObjectType);
-            coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
-            coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
-            if (accuracyInMeters > 0) coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
-            postalAddressValue.AddMember("coordinate", coordinate, allocator);
+            // coordinates are valid only for NAVIGATION, not applicable when uploading CONTACT addresses
+            if (m_addressBookEntity->getType() == AddressBookType::NAVIGATION) {
+                rapidjson::Value coordinate(rapidjson::kObjectType);
+                coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
+                coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
+                if (accuracyInMeters > 0) coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
+                postalAddressValue.AddMember("coordinate", coordinate, allocator);
+            } else if (m_addressBookEntity->getType() == AddressBookType::CONTACT) {
+                // cloud side has a bug which makes coordinates mandatory
+                // place holder to add some default values TO BE REMOVED when issue is fixed on cloud
+                latitudeInDegrees = 0.0f;
+                longitudeInDegrees = 0.0f;
+                accuracyInMeters = 0.0f;
+                rapidjson::Value coordinate(rapidjson::kObjectType);
+                coordinate.AddMember("latitudeInDegrees", latitudeInDegrees, allocator);
+                coordinate.AddMember("longitudeInDegrees", longitudeInDegrees, allocator);
+                coordinate.AddMember("accuracyInMeters", accuracyInMeters, allocator);
+                postalAddressValue.AddMember("coordinate", coordinate, allocator);
+            }
 
             address.AddMember("postalAddress", postalAddressValue, allocator);
 
@@ -871,15 +907,19 @@ private:
     std::unordered_map<std::string, rapidjson::SizeType> m_ids;
 };
 
-bool AddressBookCloudUploader::handleUpload(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+bool AddressBookCloudUploader::handleUpload(
+    std::shared_ptr<AddressBookEntity> addressBookEntity,
+    int& numBatches,
+    AddressBookOperationResultCode& result) {
     std::string addressBookSourceId = INVALID_ADDRESS_BOOK_SOURCE_ID;
     try {
+        result = AddressBookOperationResultCode::SUCCESS;
         addressBookSourceId = addressBookEntity->getSourceId();
 
         std::vector<std::shared_ptr<rapidjson::Document>> documents;
         auto factory = std::make_shared<AddressBookEntriesFactory>(addressBookEntity, documents);
 
-        AACE_INFO(LX(TAG, "handleUpload").m("GettingAddressBookEntries").d("addressBookSourceId", addressBookSourceId));
+        AACE_INFO(LX(TAG).m("GettingAddressBookEntries").d("addressBookSourceId", addressBookSourceId));
 
         if (!m_addressBookService->getEntries(addressBookSourceId, factory)) {
             // getEntries can return false, it probably means OEM was not successful in providing all the entries.
@@ -890,6 +930,7 @@ bool AddressBookCloudUploader::handleUpload(std::shared_ptr<AddressBookEntity> a
             return true;
         }
 
+        numBatches = documents.size();
         if (documents.size() <= 0) {
             // Its the empty document.
             AACE_WARN(LX(TAG, "handleUpload")
@@ -908,24 +949,17 @@ bool AddressBookCloudUploader::handleUpload(std::shared_ptr<AddressBookEntity> a
         }
 
         //Preparing for the upload
-        auto cloudAddressBookId = prepareForUpload(addressBookEntity);
+        std::string cloudAddressBookId;
+        result = prepareForUpload(addressBookEntity, cloudAddressBookId);
         ThrowIf(cloudAddressBookId.empty(), "prepareUploadFailed");
-
-        double uploadStartTimer = getCurrentTimeInMs();
 
         //Upload json document in a loop.
         for (auto document : documents) {
-            ThrowIfNot(upload(cloudAddressBookId, document), "uploadDocumentFailed");
+            result = uploadEntries(cloudAddressBookId, document);
+            ThrowIfNot(result == AddressBookOperationResultCode::SUCCESS, "uploadDocumentFailed");
         }
 
-        // It is assumed that between contacts and navigation addresses the difference is payload that should not
-        // influence the latency for uploading one batch of address book entries.
-        double totalDuration = getCurrentTimeInMs() - uploadStartTimer;
-        double timeToUploadOneBatch = totalDuration / documents.size();
-        emitTimerMetrics(
-            METRIC_PROGRAM_NAME_SUFFIX, "handleUpload", METRIC_TIME_TO_UPLOAD_ONE_BATCH, timeToUploadOneBatch);
-
-        AACE_INFO(LX(TAG, "handleUpload")
+        AACE_INFO(LX(TAG)
                       .m("SuccessfullyUploaded")
                       .d("addressBookSourceId", addressBookSourceId)
                       .d("numberOfEntries", numberOfEntries));
@@ -937,14 +971,23 @@ bool AddressBookCloudUploader::handleUpload(std::shared_ptr<AddressBookEntity> a
     }
 }
 
-bool AddressBookCloudUploader::handleRemove(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+bool AddressBookCloudUploader::handleRemove(
+    std::shared_ptr<AddressBookEntity> addressBookEntity,
+    AddressBookOperationResultCode& result) {
     std::string addressBookSourceId = INVALID_ADDRESS_BOOK_SOURCE_ID;
     try {
-        ThrowIfNot(m_addressBookCloudUploaderRESTAgent->isAccountProvisioned(), "accountNotProvisioned");
+        result = AddressBookOperationResultCode::SUCCESS;
+        if (!m_addressBookCloudUploaderRESTAgent->isAccountProvisioned()) {
+            result = AddressBookOperationResultCode::ERROR_ACCOUNT_NOT_PROVISIONED;
+            Throw("accountNotProvisioned");
+        }
 
         addressBookSourceId = addressBookEntity->getSourceId();
 
-        ThrowIfNot(deleteAddressBook(addressBookEntity), "addressBookDeleteFailed");
+        if (!deleteAddressBook(addressBookEntity)) {
+            result = AddressBookOperationResultCode::ERROR_DELETE_ADDRESS_BOOK_FAILED;
+            Throw("addressBookDeleteFailed");
+        }
 
         AACE_INFO(LX(TAG, "handleRemove")
                       .m("Removed Successfully")
@@ -953,7 +996,7 @@ bool AddressBookCloudUploader::handleRemove(std::shared_ptr<AddressBookEntity> a
 
         return true;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "handleRemove")
+        AACE_ERROR(LX(TAG, "handleRemoveFailed")
                        .d("addressBookType", addressBookEntity->getType())
                        .d("addressBookSourceId", addressBookSourceId)
                        .d("reason", ex.what()));
@@ -983,12 +1026,20 @@ void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
         }
 
         bool result = true;
-        if (Event::Type::INVALID != event.getType()) {
-            if (Event::Type::ADD == event.getType()) {
-                result = handleUpload(event.getAddressBookEntity());
-            } else if (Event::Type::REMOVE == event.getType()) {
-                result = handleRemove(event.getAddressBookEntity());
+        Event::Type eventType = event.getType();
+        if (Event::Type::INVALID != eventType) {
+            int numBatches = 0;
+            AddressBookOperationResultCode resultCode(AddressBookOperationResultCode::SUCCESS);
+            if (Event::Type::ADD == eventType) {
+                result = handleUpload(event.getAddressBookEntity(), numBatches, resultCode);
+            } else if (Event::Type::REMOVE == eventType) {
+                result = handleRemove(event.getAddressBookEntity(), resultCode);
             }
+
+            // Data for metrics
+            std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+            auto latency = std::chrono::duration_cast<std::chrono::milliseconds>(now - event.getEventCreateTime());
+            unsigned int retryCount = event.getRetryCount();
 
             bool enqueueBackPoppedEvent = false;
             if (!result) {
@@ -1000,8 +1051,16 @@ void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
                     if (event.getRetryCount() < MAX_EVENT_RETRY) {
                         enqueueBackPoppedEvent = true;
                     } else {
-                        AACE_INFO(LX(TAG, "eventLoop")
-                                      .m("maxRetryReachedDroppingtheEvent")
+                        submitAddressBookRequestResultMetrics(
+                            m_metricRecorder,
+                            eventType,
+                            latency,
+                            retryCount,
+                            numBatches,
+                            event.getAddressBookEntity()->getType(),
+                            resultCode);
+                        AACE_WARN(LX(TAG, "eventLoop")
+                                      .m("Max retry reached. Dropping the event")
                                       .d("addressBookSourceId", event.getAddressBookEntity()->getSourceId())
                                       .d("eventType", event.getType()));
                     }
@@ -1018,20 +1077,14 @@ void AddressBookCloudUploader::eventLoop(bool cleanAllAddressBooksAtStart) {
                     }
                 }
             } else {
-                // For Metrics
-                if (Event::Type::ADD == event.getType()) {
-                    emitTimerMetrics(
-                        METRIC_PROGRAM_NAME_SUFFIX,
-                        "eventLoop",
-                        METRIC_TIME_TO_UPLOAD_SINCE_ADD,
-                        getCurrentTimeInMs() - event.getEventCreateTime());
-                } else {
-                    emitTimerMetrics(
-                        METRIC_PROGRAM_NAME_SUFFIX,
-                        "eventLoop",
-                        METRIC_TIME_TO_UPLOAD_SINCE_REMOVE,
-                        getCurrentTimeInMs() - event.getEventCreateTime());
-                }
+                submitAddressBookRequestResultMetrics(
+                    m_metricRecorder,
+                    eventType,
+                    latency,
+                    retryCount,
+                    numBatches,
+                    event.getAddressBookEntity()->getType(),
+                    resultCode);
             }
         } else {
             AACE_WARN(LX(TAG, "eventLoop").m("invalidEventFromQueue"));
@@ -1061,68 +1114,66 @@ const Event AddressBookCloudUploader::popNextEventFromQ() {
     return Event::INVALID();
 }
 
-std::string AddressBookCloudUploader::prepareForUpload(std::shared_ptr<AddressBookEntity> addressBookEntity) {
+AddressBookOperationResultCode AddressBookCloudUploader::prepareForUpload(
+    std::shared_ptr<AddressBookEntity> addressBookEntity,
+    std::string& cloudAddressBookId) {
     AACE_DEBUG(LX(TAG));
-    try {
-        ThrowIfNot(m_addressBookCloudUploaderRESTAgent->isAccountProvisioned(), "accountNotProvisioned");
-
-        // Try to delete any previous address book in cloud.
-        ThrowIfNot(deleteAddressBook(addressBookEntity), "addressBookDeleteFailed");
-        auto cloudAddressBookId = createAddressBook(addressBookEntity);
-        ThrowIf(cloudAddressBookId.empty(), "addressBookCreateFailed");
-
-        return cloudAddressBookId;
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "prepareForUpload").d("reason", ex.what()));
-        return std::string();
+    if (!m_addressBookCloudUploaderRESTAgent->isAccountProvisioned()) {
+        AACE_ERROR(LX(TAG, "prepareForUploadFailed").d("reason", "accountNotProvisioned"));
+        return AddressBookOperationResultCode::ERROR_ACCOUNT_NOT_PROVISIONED;
     }
+
+    // Try to delete any previous address book in cloud.
+    if (!deleteAddressBook(addressBookEntity)) {
+        AACE_ERROR(LX(TAG, "prepareForUploadFailed").d("reason", "deletePreviousAddressBookFailed"));
+        return AddressBookOperationResultCode::ERROR_DELETE_ADDRESS_BOOK_FAILED;
+    }
+    cloudAddressBookId = createAddressBook(addressBookEntity);
+    if (cloudAddressBookId.empty()) {
+        AACE_ERROR(LX(TAG, "prepareForUploadFailed").d("reason", "addressBookCreateFailed"));
+        return AddressBookOperationResultCode::ERROR_CREATE_ADDRESS_BOOK_FAILED;
+    }
+    return AddressBookOperationResultCode::SUCCESS;
 }
 
-bool AddressBookCloudUploader::upload(
+AddressBookOperationResultCode AddressBookCloudUploader::uploadEntries(
     const std::string& cloudAddressBookId,
     std::shared_ptr<rapidjson::Document> document) {
     try {
-        AACE_DEBUG(LX(TAG, "upload").d("entries.Size()", document->FindMember("entries")->value.Size()));
+        AACE_DEBUG(LX(TAG).d("numEntries", document->FindMember("entries")->value.Size()));
+        HTTPResponse httpResponse;
+        auto flowState = UploadFlowState::POST;
+        AddressBookOperationResultCode resultCode = AddressBookOperationResultCode::SUCCESS;
 
-        ThrowIfNot(uploadEntries(cloudAddressBookId, document), "uploadEntriesFailed");
+        while (!m_isShuttingDown && flowState != UploadFlowState::FINISH) {
+            auto nextFlowState = UploadFlowState::ERROR;
 
-        return true;
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "upload").d("reason", ex.what()));
-        return false;
-    }
-}
+            AACE_DEBUG(LX(TAG).d("flowState", flowState));
 
-bool AddressBookCloudUploader::uploadEntries(
-    const std::string& cloudAddressBookId,
-    std::shared_ptr<rapidjson::Document> document) {
-    HTTPResponse httpResponse;
-    auto flowState = UploadFlowState::POST;
-    bool success = true;
-
-    while (!m_isShuttingDown && flowState != UploadFlowState::FINISH) {
-        auto nextFlowState = UploadFlowState::ERROR;
-
-        AACE_DEBUG(LX(TAG, "uploadEntries").d("flowState", flowState));
-
-        switch (flowState) {
-            case UploadFlowState::POST:
-                nextFlowState = handleUploadEntries(cloudAddressBookId, document, httpResponse);
-                break;
-            case UploadFlowState::PARSE:
-                nextFlowState = handleParseHTTPResponse(httpResponse);
-                break;
-            case UploadFlowState::ERROR:
-                nextFlowState = handleError(cloudAddressBookId);
-                success = false;
-                break;
-            case UploadFlowState::FINISH:
-                break;
+            switch (flowState) {
+                case UploadFlowState::POST:
+                    nextFlowState = handleUploadEntries(cloudAddressBookId, document, httpResponse);
+                    resultCode = httpResponseCodeToResult((HTTPResponseCode)httpResponse.code);
+                    break;
+                case UploadFlowState::PARSE:
+                    nextFlowState = handleParseHTTPResponse(httpResponse);
+                    if (nextFlowState == UploadFlowState::ERROR) {
+                        resultCode = AddressBookOperationResultCode::ERROR_HTTP_PARSE_RESPONSE_FAILED;
+                    }
+                    break;
+                case UploadFlowState::ERROR:
+                    nextFlowState = handleError(cloudAddressBookId);
+                    break;
+                case UploadFlowState::FINISH:
+                    break;
+            }
+            flowState = nextFlowState;
         }
-        flowState = nextFlowState;
+        return resultCode;
+    } catch (std::exception& ex) {
+        AACE_ERROR(LX(TAG, "uploadEntries failed").d("reason", ex.what()));
+        return AddressBookOperationResultCode::ERROR_UNKNOWN;
     }
-
-    return success;
 }
 
 AddressBookCloudUploader::UploadFlowState AddressBookCloudUploader::handleError(const std::string& cloudAddressBookId) {
@@ -1144,8 +1195,6 @@ AddressBookCloudUploader::UploadFlowState AddressBookCloudUploader::handleUpload
     try {
         httpResponse = m_addressBookCloudUploaderRESTAgent->uploadDocumentToCloud(document, addressBookId);
 
-        logNetworkMetrics(httpResponse);
-
         switch (httpResponse.code) {
             case HTTPResponseCode::SUCCESS_OK:
                 return UploadFlowState::PARSE;
@@ -1156,7 +1205,7 @@ AddressBookCloudUploader::UploadFlowState AddressBookCloudUploader::handleUpload
         return UploadFlowState::ERROR;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "handleUploadEntries").d("reason", ex.what()));
-        return UploadFlowState::ERROR;  //On exception return ERROR.
+        return UploadFlowState::ERROR;
     }
 }
 
@@ -1170,33 +1219,51 @@ AddressBookCloudUploader::UploadFlowState AddressBookCloudUploader::handleParseH
 
         // Continue to upload rest of the entries, even if there are one or more failed entries.
         if (failedEntries.size()) {
-            AACE_WARN(LX(TAG, "handleParse").d("NumberOfFailedEntries", failedEntries.size()));
+            AACE_WARN(LX(TAG).d("NumberOfFailedEntries", failedEntries.size()));
         }
 
         return UploadFlowState::FINISH;
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "handleParse").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return UploadFlowState::ERROR;
     }
 }
 
-void AddressBookCloudUploader::logNetworkMetrics(const HTTPResponse& httpResponse) {
-    switch (httpResponse.code) {
-        case HTTPResponseCode::SUCCESS_OK:
-            // Do Nothing
-            break;
-        case HTTPResponseCode::CLIENT_ERROR_BAD_REQUEST:
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "logNetworkMetrics", METRIC_NETWORK_BAD_USER_INPUT, 1);
-            break;
-        default:
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "logNetworkMetrics", METRIC_NETWORK_ERROR, 1);
+std::string AddressBookCloudUploader::getResultString(const AddressBookOperationResultCode& result) {
+    std::stringstream ss;
+    ss << result;
+    return ss.str();
+}
+
+AddressBookOperationResultCode AddressBookCloudUploader::httpResponseCodeToResult(HTTPResponseCode code) {
+    if (code == HTTPResponseCode::SUCCESS_OK) {
+        return AddressBookOperationResultCode::SUCCESS;
     }
+    if (code > HTTPResponseCode::SUCCESS_START_CODE && code <= HTTPResponseCode::SUCCESS_END_CODE) {
+        return AddressBookOperationResultCode::ERROR_HTTP_RESPONSE_MISSING_CONTENT;
+    }
+    if (code >= HTTPResponseCode::REDIRECTION_START_CODE && code <= HTTPResponseCode::REDIRECTION_END_CODE) {
+        return AddressBookOperationResultCode::ERROR_HTTP_UNHANDLED_REDIRECTION_RESPONSE;
+    }
+    if (code == HTTPResponseCode::CLIENT_ERROR_BAD_REQUEST) {
+        return AddressBookOperationResultCode::ERROR_HTTP_BAD_REQUEST;
+    }
+    if (code == HTTPResponseCode::CLIENT_ERROR_FORBIDDEN) {
+        return AddressBookOperationResultCode::ERROR_HTTP_FORBIDDEN;
+    }
+    if (code == HTTPResponseCode::CLIENT_ERROR_THROTTLING_EXCEPTION) {
+        return AddressBookOperationResultCode::ERROR_HTTP_THROTTLED;
+    }
+    if (code >= HTTPResponseCode::SERVER_ERROR_INTERNAL) {
+        return AddressBookOperationResultCode::ERROR_HTTP_SERVER_ERROR;
+    }
+    return AddressBookOperationResultCode::ERROR_UNKNOWN;
 }
 
 std::string AddressBookCloudUploader::createAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity) {
-    AACE_DEBUG(LX(TAG));
+    AACE_DEBUG(LX(TAG).d("addressBookSourceId", addressBookEntity->getSourceId()));
     try {
-        // Here DSN is used instead of addressBookSourceId as ER resoluton happens in cloud depends on the DSN
+        // Here DSN is used instead of addressBookSourceId as ER resolution happens in cloud depends on the DSN
         // present in the utterance request.
         auto dsn = m_deviceInfo->getDeviceSerialNumber();
 
@@ -1213,7 +1280,7 @@ std::string AddressBookCloudUploader::createAddressBook(std::shared_ptr<AddressB
 }
 
 bool AddressBookCloudUploader::deleteAddressBook(std::shared_ptr<AddressBookEntity> addressBookEntity) {
-    AACE_DEBUG(LX(TAG));
+    AACE_DEBUG(LX(TAG).d("addressBookSourceId", addressBookEntity->getSourceId()));
     try {
         // Use DSN to get the cloud address book Id. See above comment on why addressBookSourceId is not used.
         auto dsn = m_deviceInfo->getDeviceSerialNumber();
@@ -1235,8 +1302,75 @@ bool AddressBookCloudUploader::deleteAddressBook(std::shared_ptr<AddressBookEnti
         return true;
 
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "deleteAddressBook").d("reason", ex.what()));
+        AACE_ERROR(LX(TAG, "deleteAddressBookFailed").d("reason", ex.what()));
         return false;
+    }
+}
+
+void AddressBookCloudUploader::submitAddressBookRequestResultMetrics(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    Event::Type eventType,
+    std::chrono::milliseconds latency,
+    unsigned int retryCount,
+    unsigned int numBatchesInRequest,
+    AddressBookType addressBookType,
+    AddressBookOperationResultCode result) {
+    bool wasSuccess = result == AddressBookOperationResultCode::SUCCESS;
+    const std::string counterName = wasSuccess ? METRIC_REQUEST_SUCCESS_COUNT : METRIC_REQUEST_FAILURE_COUNT;
+
+    std::string addressBookTypeStr;
+    switch (addressBookType) {
+        case AddressBookType::CONTACT:
+            addressBookTypeStr = METRIC_ADDRESS_BOOK_TYPE_CONTACTS;
+            break;
+        case AddressBookType::NAVIGATION:
+            addressBookTypeStr = METRIC_ADDRESS_BOOK_TYPE_NAVIGATION;
+            break;
+        default:
+            AACE_WARN(LX(TAG).m("Skipping metric for unrecognized address book type"));
+            return;
+    }
+
+    std::string requestType;
+    switch (eventType) {
+        case Event::Type::ADD:
+            requestType = METRIC_REQUEST_TYPE_ADD_PREFIX + addressBookTypeStr;
+            break;
+        case Event::Type::REMOVE:
+            requestType = METRIC_REQUEST_TYPE_REMOVE_PREFIX + addressBookTypeStr;
+            break;
+        default:
+            AACE_WARN(LX(TAG).m("Skipping metric for unrecognized event type"));
+            return;
+    }
+
+    const std::string resultStr = getResultString(result);
+
+    std::vector<DataPoint> dps = {
+        CounterDataPointBuilder{}.withName(counterName).increment(1).build(),
+        StringDataPointBuilder{}.withName(METRIC_REQUEST_TYPE).withValue(requestType).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_ADDRESS_BOOK_UPLOADER_TYPE)
+            .withValue(METRIC_UPLOADER_TYPE_CLOUD)
+            .build(),
+        CounterDataPointBuilder{}.withName(METRIC_REQUEST_RETRY_COUNT).increment(retryCount).build(),
+        DurationDataPointBuilder{latency}.withName(METRIC_REQUEST_LATENCY).build()};
+    if (!wasSuccess) {
+        dps.push_back(StringDataPointBuilder{}.withName(METRIC_REQUEST_FAILURE_TYPE).withValue(resultStr).build());
+    }
+    if (numBatchesInRequest != 0) {
+        dps.push_back(CounterDataPointBuilder{}
+                          .withName(METRIC_REQUEST_NUM_REQUEST_BATCHES)
+                          .increment(numBatchesInRequest)
+                          .build());
+    }
+
+    auto metricBuilder = MetricEventBuilder().withSourceName(METRIC_SOURCE_ADDRESS_BOOK_REQUEST).withAlexaAgentId();
+    metricBuilder.addDataPoints(dps);
+    try {
+        recordMetric(recorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
     }
 }
 

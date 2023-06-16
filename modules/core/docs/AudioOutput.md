@@ -6,7 +6,7 @@ The core audio Engine service provides a mechanism for Engine components of any 
 
 ## Understand AudioOutput
 
-Your application subscribes to the outgoing `AudioOutput` AASB messages published by the Engine. When some Engine component needs to play audio, the Engine publishes `AudioOutput` messages that specify content to play with a `token` uniquely identifying the content. 
+Your application subscribes to the outgoing `AudioOutput` AASB messages published by the Engine. When some Engine component needs to play audio, the Engine publishes `AudioOutput` messages that specify content to play with a `token` uniquely identifying the content.
 
 To set up content for playback, the Engine includes an `audioType` in an `AudioOutput.Prepare` message. The Engine defines the following audio types for which it requests playback via `AudioOutput`:
 
@@ -67,11 +67,11 @@ When your application receives a `Prepare` message, use the `audioType` value in
 
 1. If the [`Prepare`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#prepare) message includes a `url` in its payload, begin downloading the content at the URL and preparing your media player for playback when the Engine requests it. URL-based content is used by the Alexa module's `AudioPlayer` interface, for example, to specify content provided by Amazon Music, Flash Briefing, Audible, TuneIn, and other media streaming skills.
 
-2. If the [`Prepare`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#prepare_1) message includes a `streamId`, the Engine will write the audio data directly to a `MessageStream` object that you retrieve through `MessageBroker`. Call `MessageBroker::openStream()`, specifying the `streamId` from the `Prepare` message and the operation mode `MessageStream::Mode::READ`. To retrieve the audio data for your buffer, repeatedly call `MessageStream::read()` on the stream object until `MessageStream::isClosed()` returns true, indicating the Engine has no more data to add to the stream. 
-   
+2. If the [`Prepare`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#prepare_1) message includes a `streamId`, the Engine will write the audio data directly to a `MessageStream` object that you retrieve through `MessageBroker`. Call `MessageBroker::openStream()`, specifying the `streamId` from the `Prepare` message and the operation mode `MessageStream::Mode::READ`. To retrieve the audio data for your buffer, repeatedly call `MessageStream::read()` on the stream object until `MessageStream::isClosed()` returns true, indicating the Engine has no more data to add to the stream.
+
    > **Important!:** Your application should use a separate thread to read the content from the stream into your media player's buffer. For some types of audio, the Engine can continuously write data to the stream for a long time and may request operations on the content playback in parallel. Your application may not block MessageBroker's outgoing thread or block operations on the content (such as play or pause) from happening immediately when requested.
 
-Keep track of the `token` and `channel` from the `Prepare` message since these values are used in further messages to and from the Engine for the content. 
+Keep track of the `token` and `channel` from the `Prepare` message since these values are used in further messages to and from the Engine for the content.
 
 After publishing a `Prepare` message, the Engine can optionally publish a [`MayDuck`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mayduck) message to indicate if your application is allowed to duck this particular audio item during its playback (for example, when an external application temporarily takes foreground audio focus but allows your Alexa app audio to play at a ducked volume). If you receive this message, your player is allowed to duck the audio during its playback any time the system requests it and report the ducking as outlined in [Duck audio](#duck-audio). If you do not receive a `MayDuck` message before receiving a `Play` message for the audio item, your application is not allowed to duck this audio content.
 
@@ -96,12 +96,12 @@ If you receive a [`GetNumBytesBuffered`](https://alexa.github.io/alexa-auto-sdk/
 If you receive a [`GetDuration`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#getduration) message, use the synchronous-style [reply message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#getdurationreply) to notify the Engine of the duration of the current audio item
 
 ### Handle a buffer underrun during playback
-    
+
 If your player encounters a buffer underrun during playback (i.e., your playback buffer has run out and is refilling slower than the rate needed for playback), you can notify the Engine by publishing a [`MediaStateChanged`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mediastatechanged) message with `state` set to `BUFFERING`. Publish another `MediaStateChanged` message with `state` set to `PLAYING` when the buffer is refilled.
 
 ### Handle an error during playback
 
-If your player encounters an error during playback, notify the Engine by publishing a [`MediaError`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mediaerror) message. Publishing this message indicates to the Engine that the player has stopped playback due to an error and cannot resume, so ensure you do not begin playback for this audio item after publishing a `MediaError` message. 
+If your player encounters an error during playback, notify the Engine by publishing a [`MediaError`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mediaerror) message. Publishing this message indicates to the Engine that the player has stopped playback due to an error and cannot resume, so ensure you do not begin playback for this audio item after publishing a `MediaError` message.
 
 After receiving `MediaError` for an audio item, the Engine will not request any more playback operations, such as play, pause, or resume, for this audio item. However, it is possible that the Engine can still query data about the audio item (see [Respond to queries about the playback](#respond-to-queries-about-the-playback)). The Engine expects the most recently known state of the audio in this case, so cache any retrievable data until the Engine prepares a new audio item with the same audio type.
 
@@ -111,12 +111,12 @@ The Engine can request your player to pause the content playback by publishing a
 
 > **Note:** The Engine uses the `Pause` and `Resume` messages for temporary operations, typically related to higher priority Alexa channels taking over. For example, the Engine will temporarily pause audio playing from the `AudioPlayer` channel when the `SpeechSynthesizer` channel needs to play Alexa speech. The Engine resumes the `AudioPlayer` audio when the `SpeechSynthesizer` audio is finished. For cases in which a user presses a pause button or makes a voice request to pause `AudioPlayer` streaming content, the Engine typically uses the `Stop` message for this sort of pause operation. When the user resumes the playback with the button or voice, the Engine will `Prepare` and `Play` a new audio item even though the content is the same.
 
-> **Important!** Do not publish a [`MediaStateChanged`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mediastatechanged) message with `state` set to `STOPPED` in an attempt to notify the Engine of some locally-initiated pause or stop operation. The `STOPPED` state has three interpretations in the Engine, and which one the Engine uses depends on its state prior to receiving the `STOPPED` state from your application. 
-> 
+> **Important!** Do not publish a [`MediaStateChanged`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mediastatechanged) message with `state` set to `STOPPED` in an attempt to notify the Engine of some locally-initiated pause or stop operation. The `STOPPED` state has three interpretations in the Engine, and which one the Engine uses depends on its state prior to receiving the `STOPPED` state from your application.
+>
 >   1. If you publish the `STOPPED` state after the Engine published `Pause` for the audio item, the Engine interprets the `STOPPED` as a successful pause. The Engine will `Resume` the audio when it needs to.
-> 
+>
 >   2. If you publish the `STOPPED` state after the Engine published `Stop` for the audio item, the Engine interprets the `STOPPED` as a successful stop. The Engine considers this media item complete and flushed from the buffer. The audio item is not resumable any more.
-> 
+>
 >   3. If you publish the `STOPPED` state proactively (i.e., not after a `Pause` or `Stop` request from the Engine), the Engine interprets this as meaning that the content is finished playing. If the Engine has more content in its queue, such as a subsequent track in a playlist, the Engine will continue to `Prepare` and `Play` the next item automatically.
 >
 > If you need to pause or stop audio playback for the `MUSIC` audio type due to a user button press or some system audio focus event, you must use the `PlaybackController` interface from the Alexa module to request the Engine to halt the playback. There is no AASB message to pause other audio types.
@@ -129,7 +129,7 @@ The Engine can request your player to stop the content playback by publishing a 
 
 #### Engine-initiated
 
-If your application has [enabled audio ducking for the music channel](#enable-music-ducking), the Engine can request your application to duck audio playback when a higher priority Alexa audio source temporarily needs the foreground audio focus rather than using the default behavior in which the Engine [pauses and resumes](#pause-and-resume-playback) the content. 
+If your application has [enabled audio ducking for the music channel](#enable-music-ducking), the Engine can request your application to duck audio playback when a higher priority Alexa audio source temporarily needs the foreground audio focus rather than using the default behavior in which the Engine [pauses and resumes](#pause-and-resume-playback) the content.
 
 For example, sometimes the `AudioPlayer` channel is streaming media when the user interrupts to ask Alexa a question. Without ducking enabled, the Engine requests your application to pause the active audio output on the music channel. When the user and Alexa finish their interaction, the Engine requests your application to resume the audio. With ducking enabled, the Engine requests your application to start ducking the music channel content for the duration of the user's interaction with Alexa and then restores the original volume of the music when the interaction is over.
 
@@ -141,7 +141,7 @@ If audio is active on the music channel *and* the Engine permitted the audio sou
 
 ### Mute audio
 
-The Engine can request your player to mute or unmute the content playback by publishing a [`MutedStateChanged`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mutedstatechanged) message. When you receive a `MutedStateChanged` message with `state` set to `MUTED`, you must mute the playback volume, preserving the state of the audio and continuing playback. When you receive a `MutedStateChanged` message with `state` set to `UNMUTED`, you must restore the playback volume, preserving the state of the audio and continuing playback. 
+The Engine can request your player to mute or unmute the content playback by publishing a [`MutedStateChanged`](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#mutedstatechanged) message. When you receive a `MutedStateChanged` message with `state` set to `MUTED`, you must mute the playback volume, preserving the state of the audio and continuing playback. When you receive a `MutedStateChanged` message with `state` set to `UNMUTED`, you must restore the playback volume, preserving the state of the audio and continuing playback.
 
 ### Change audio volume
 
@@ -254,13 +254,13 @@ class MyAudioOutputHandler {
     void MyAudioOutputHandler::handlePrepareStreamMessage(const std::string& message) {
         PrepareStreamMessage msg = json::parse(message);
         auto stream = m_messageBroker->openStream(msg.payload.streamId, MessageStream::Mode::READ);
-        
-        // Implement this stub to read the stream content into the media player buffer 
+
+        // Implement this stub to read the stream content into the media player buffer
         // Use a separate thread!
     }
 
     void MyAudioOutputHandler::handlePrepareURLMessage(const std::string& message) {
-        // Implement this stub to download the URL contents into the media player buffer 
+        // Implement this stub to download the URL contents into the media player buffer
         // Use a separate thread!
     }
 
@@ -356,8 +356,26 @@ class MyAudioOutputHandler {
 
 ![Duck_3rd](./diagrams/ducking_3p_event.png)
 
-## Use the AudioOutput interface in an Android application
+## Play DRM-protected audio
 
-Alexa Auto Client Service (AACS) provides a default implementation of `AudioOutput` for the audio types `TTS` and `MUSIC`. You can use the default implementation in your application instead of integrating directly with the `AudioInput` AASB messages yourself for these particular audio types. See the [Android documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/) for details about using the default implementation. 
+Digital Rights Management (DRM) uses encryption to secure music on the device. To play DRM-protected audio, your media player implementation generally has to make a key request, fetch a manifest, and download audio segments. Auto SDK 4.3 adds a `PlaybackContext` field in the [`AudioOutput.Prepare` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/core/AudioOutput/#prepare) to provide additional headers necessary for requesting DRM-related resources. Your media player implementation must include any headers from `PlaybackContext` as HTTP request headers in the HTTP request to download the media.
 
-For the remaining audio types, integrate with the AACS intents corresponding to the `AudioOutput` AASB messages in a similar manner to the description in [Use the AudioOutput interface in a native C++ application](#use-the-audiooutput-interface-in-a-native-c-application).
+To receive DRM-protected audio, configure Auto SDK with an allowed-listed media player fingerprint:
+
+```json
+{
+  "aace.alexa": {
+    "mediaPlayerFingerprint": {
+      "package": "<package>",
+      "buildType": "<buildType>",
+      "versionNumber": "<versionNumber>"
+    }
+  }
+}
+```
+
+* `package` is the unique identifier for the audio player software loaded on the device.
+* `buildType` is the audio player build type, for example, "DEBUG" or "RELEASE".
+* `versionNumber` identifies the version of the audio player loaded on your device.
+
+Contact your Amazon SA partner to allow-list your fingerprint configuration.

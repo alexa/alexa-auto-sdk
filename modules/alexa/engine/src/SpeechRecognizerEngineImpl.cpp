@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,20 +16,19 @@
 #include <climits>
 #include <exception>
 
+#include "AACE/Alexa/AlexaProperties.h"
 #include "AACE/Engine/Alexa/DeviceSettingsDelegate.h"
 #include "AACE/Engine/Alexa/SpeechRecognizerEngineImpl.h"
 #include "AACE/Engine/Alexa/WakewordObservableInterface.h"
 #include "AACE/Engine/Alexa/WakewordObserverInterface.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Alexa/AlexaProperties.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
+#include "AACE/Engine/Utils/Agent/AgentId.h"
 #include "AACE/Engine/Utils/String/StringUtils.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
 using namespace aace::engine::utils::string;
 
 /// The maximum number of readers of the stream.
@@ -43,14 +42,6 @@ static const std::chrono::milliseconds VERIFICATION_TIMEOUT = std::chrono::milli
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.SpeechRecognizerEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "SpeechRecognizerEngineImpl";
-
-/// Counter metrics for SpeechRecognizer Platform APIs
-static const std::string METRIC_SPEECHRECOGNIZER_START_CAPTURE = "StartCapture";
-static const std::string METRIC_SPEECHRECOGNIZER_STOP_CAPTURE = "StopCapture";
-static const std::string METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED = "WakewordDetected";
 
 static const std::string ASSISTANT_3P_STATE_ACTIVE = "ACTIVE";
 
@@ -159,8 +150,7 @@ bool SpeechRecognizerEngineImpl::initialize(
     const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> visualFocusManager,
     std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager,
-    std::shared_ptr<aace::engine::arbitrator::ArbitratorServiceInterface> arbitratorService)
-    {
+    std::shared_ptr<aace::engine::arbitrator::ArbitratorServiceInterface> arbitratorService) {
     try {
         // create the audio channel
         m_audioInputChannel = audioManager->openAudioInputChannel(
@@ -185,11 +175,10 @@ bool SpeechRecognizerEngineImpl::initialize(
             ThrowIfNot(deviceSettingsDelegate.configureLocaleSetting(assetsManager), "createLocaleSettingFailed");
         }
 
-        m_agentManager = agentManager;
-
         m_audioFocusManager = audioFocusManager;
         m_visualFocusManager = visualFocusManager;
-		
+
+        m_agentManager = agentManager;
         if (m_agentManager != nullptr) {
             m_agentManager->addAgentConnectionObserverInterface(
                 alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
@@ -283,8 +272,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
     std::shared_ptr<aace::engine::wakeword::WakewordManagerServiceInterface> wakewordService,
     const std::vector<std::shared_ptr<aace::engine::alexa::InitiatorVerifier>>& initiatorVerifiers,
     std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager,
-    std::shared_ptr<aace::engine::arbitrator::ArbitratorServiceInterface> arbitratorService
-    ) {
+    std::shared_ptr<aace::engine::arbitrator::ArbitratorServiceInterface> arbitratorService) {
     std::shared_ptr<SpeechRecognizerEngineImpl> speechRecognizerEngineImpl = nullptr;
 
     try {
@@ -304,7 +292,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
         ThrowIfNull(capabilityChangeNotifier, "invalidCapabilityChangeNotifier");
         ThrowIfNull(wakewordService, "invalidwakewordService");
         ThrowIfNull(arbitratorService, "invalidArbitratorService");
-	 ThrowIfNull(visualFocusManager, "invalidVisualFocusManager");
+        ThrowIfNull(visualFocusManager, "invalidVisualFocusManager");
 
         speechRecognizerEngineImpl = std::shared_ptr<SpeechRecognizerEngineImpl>(
             new SpeechRecognizerEngineImpl(speechRecognizerPlatformInterface, audioFormat));
@@ -333,8 +321,7 @@ std::shared_ptr<SpeechRecognizerEngineImpl> SpeechRecognizerEngineImpl::create(
                 initiatorVerifiers,
                 visualFocusManager,
                 agentManager,
-                arbitratorService
-                ),
+                arbitratorService),
             "initializeSpeechRecognizerEngineImplFailed");
 
         // set the platform engine interface reference
@@ -379,6 +366,7 @@ void SpeechRecognizerEngineImpl::doShutdown() {
     if (m_agentManager != nullptr) {
         m_agentManager->removeAgentConnectionObserverInterface(
             alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+        m_agentManager.reset();
     }
 
     if (m_arbitratorService != nullptr) {
@@ -500,20 +488,20 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
     uint64_t keywordEnd,
     const std::string& keyword) {
     AACE_INFO(LX(TAG).d("initiator", initiator));
-    std::stringstream ss;
-    ss << initiator;
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStartCapture", {METRIC_SPEECHRECOGNIZER_START_CAPTURE, ss.str()});
 
     std::lock_guard<std::mutex> lock(m_agentAvailabilityMutex);
-    if (m_connectionStatus != aace::alexa::AlexaClient::ConnectionStatus::CONNECTED && !m_agentAvailable) {
-        AACE_WARN(LX(TAG).d("reason", "No agent is connected").d("connectionStatus", m_connectionStatus).d("agentAvailable", m_agentAvailable));
+    if (m_connectionStatus != aace::alexa::AlexaClient::ConnectionStatus::CONNECTED && m_availableAgents.empty()) {
+        AACE_WARN(LX(TAG)
+                      .d("reason", "No agent is connected")
+                      .d("connectionStatus", m_connectionStatus)
+                      .d("numAvailalbeAgents", m_availableAgents.size()));
         return false;
     }
 
     // request dialog for registered agent from arbitrator if we are not already the active assistant
     if (m_isAgentRegistered && m_registeredAgentDialogId.empty()) {
         std::string mode = (initiator == Initiator::WAKEWORD) ? "WAKEWORD" : "GESTURE";
-        auto assistantId = std::to_string(ALEXA_ASSISTANT_ID);
+        auto assistantId = std::to_string(aace::engine::utils::agent::AGENT_ID_ALEXA);
 
         std::string dialogId;
         std::string reason;
@@ -600,7 +588,6 @@ bool SpeechRecognizerEngineImpl::onStartCapture(
 
 bool SpeechRecognizerEngineImpl::onStopCapture() {
     AACE_INFO(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStopCapture", {METRIC_SPEECHRECOGNIZER_STOP_CAPTURE});
     try {
         ThrowIfNot(m_audioInputProcessor->stopCapture().get(), "stopCaptureFailed");
         return true;
@@ -651,14 +638,14 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
         return;
     }
 
-    //if alexawakeword is disabled then return (assumption is that m_wakewordEnabled 
+    //if alexawakeword is disabled then return (assumption is that m_wakewordEnabled
     //applies to any AVS coformant agent wakeword here, if its name specific
     //shoudBlock should be used. But enabling through alexaproperty seems to
     //apply to any AVS alexa wakeword
-    if(m_wakewordEnabled == false) {
+    if (m_wakewordEnabled == false) {
         AACE_INFO(LX(TAG).d(" Disabled AVS wakeword detected ", keyword));
         return;
-    }		
+    }
     if (m_state == AudioInputProcessorObserverInterface::State::IDLE) {
         m_executor.submit([this, beginIndex, endIndex, keyword] {
             for (const auto& initiatorVerifier : m_initiatorVerifiers) {
@@ -667,8 +654,6 @@ void SpeechRecognizerEngineImpl::onKeyWordDetected(
                     return;
                 }
             }
-            emitCounterMetrics(
-                METRIC_PROGRAM_NAME_SUFFIX, "onKeyWordDetected", {METRIC_SPEECHRECOGNIZER_WAKEWORD_DETECTED});
 
             // Only notifies platform interface after passing wakeword verifiers,
             // otherwise earcon might still play even if keyword is dropped
@@ -702,24 +687,17 @@ void SpeechRecognizerEngineImpl::onConnectionStatusChanged(
 }
 
 void SpeechRecognizerEngineImpl::onAgentAvailabilityStateChanged(
-    alexaClientSDK::avsCommon::avs::AgentId::IdType id,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
     AvailabilityState status,
     const std::string& reason) {
     std::string availability = status == AvailabilityState::AVAILABLE ? "AVAILABLE" : "UNAVAILABLE";
-    AACE_INFO(LX(TAG).d("id", id).d("status", availability).d("reason", reason));
-
-    std::lock_guard<std::mutex> lock_map(m_agentAvailabilityMapMutex);
-    m_agentAvailabilityMap[id] = status == AvailabilityState::AVAILABLE;
+    AACE_INFO(LX(TAG).d("id", agentId).d("status", availability).d("reason", reason));
 
     std::lock_guard<std::mutex> lock(m_agentAvailabilityMutex);
     if (status == AvailabilityState::AVAILABLE) {
-        m_agentAvailable = true;
-        return;
-    }
-
-    m_agentAvailable = false;
-    for (const auto& availability : m_agentAvailabilityMap) {
-        if (availability.second) m_agentAvailable = true;
+        m_availableAgents.insert(agentId);
+    } else {
+        m_availableAgents.erase(agentId);
     }
 }
 
@@ -966,20 +944,16 @@ void SpeechRecognizerEngineImpl::onDialogTerminated(
                    .d("dialogId", dialogId)
                    .d("reason", reason));
     if (dialogId == m_registeredAgentDialogId) {
-
         // reset dialog Id
         std::lock_guard<std::mutex> lock(m_registeredAgentDialogIdMutex);
         m_registeredAgentDialogId = "";
 
-        //reset AVS state and stop audio and video focus in case we have. 
+        //reset AVS state and stop audio and video focus in case we have.
         //NOTE: also need to call cancelAlexaDialog once that code is checked in
-        if(m_audioFocusManager != nullptr)
-            m_audioFocusManager->stopForegroundActivity();
-        
-        if(m_visualFocusManager != nullptr)
-            m_visualFocusManager->stopForegroundActivity();
-        m_audioInputProcessor->resetState();
+        if (m_audioFocusManager != nullptr) m_audioFocusManager->stopForegroundActivity();
 
+        if (m_visualFocusManager != nullptr) m_visualFocusManager->stopForegroundActivity();
+        m_audioInputProcessor->resetState();
     }
 }
 
@@ -1001,7 +975,7 @@ void SpeechRecognizerEngineImpl::onAuthStateChange(
     AACE_INFO(LX(TAG).d("state", authState.str()).d("error", authError.str()));
     // register/deregister agent with Arbitrator
     try {
-        auto assistantId = std::to_string(ALEXA_ASSISTANT_ID);
+        auto assistantId = std::to_string(aace::engine::utils::agent::AGENT_ID_ALEXA);
         if (state == alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State::REFRESHED) {
             if (!m_isAgentRegistered) {
                 ThrowIfNull(m_arbitratorService, "invalidArbitratorServiceInterface");
@@ -1031,7 +1005,7 @@ void SpeechRecognizerEngineImpl::onDialogUXStateChanged(
     AACE_INFO(LX(TAG).d("agentId", agentId).d("newState", newState));
     try {
         // set dialog state with the arbitrator
-        auto assistantId = std::to_string(ALEXA_ASSISTANT_ID);
+        auto assistantId = std::to_string(aace::engine::utils::agent::AGENT_ID_ALEXA);
         AACE_DEBUG(
             LX(TAG).m("Registered Agent").d("assistantId", assistantId).d("dialogId", m_registeredAgentDialogId));
         if (m_isAgentRegistered && !m_registeredAgentDialogId.empty()) {

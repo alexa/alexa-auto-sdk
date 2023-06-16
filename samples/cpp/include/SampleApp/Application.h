@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@
 // Sample Agent Handler Interface
 #include "SampleApp/3PAgent/AgentHandler.h"
 #include "SampleApp/3PAgent/PryonliteVAD.h"
+#include "SampleApp/3PAgent/PrlAudioFile.h"
 #endif
 
 // Sample Location Interfaces
@@ -67,6 +68,7 @@
 #include "SampleApp/Alexa/SpeechRecognizerHandler.h"
 #include "SampleApp/Alexa/SpeechSynthesizerHandler.h"
 #include "SampleApp/Alexa/TemplateRuntimeHandler.h"
+#include "SampleApp/Alexa/CaptionPresenterHandler.h"
 #include "SampleApp/Alexa/AlexaSpeakerHandler.h"
 #include "SampleApp/Alexa/DoNotDisturbHandler.h"
 #include "SampleApp/Alexa/DeviceSetupHandler.h"

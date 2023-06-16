@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@
 #include <AVSCommon/SDKInterfaces/ContextManagerInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+
 #include "DisplayHandlerInterface.h"
 
 namespace aace {
@@ -41,10 +44,12 @@ class DisplayManagerCapabilityAgent
         , public std::enable_shared_from_this<DisplayManagerCapabilityAgent> {
 public:
     static std::shared_ptr<DisplayManagerCapabilityAgent> create(
-        std::shared_ptr<aace::engine::navigation::DisplayHandlerInterface> displayHandler,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
+        const std::shared_ptr<aace::engine::navigation::DisplayHandlerInterface>& displayHandler,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+            exceptionSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder);
 
     /**
      * Destructor.
@@ -109,10 +114,12 @@ public:
 
 private:
     DisplayManagerCapabilityAgent(
-        std::shared_ptr<aace::engine::navigation::DisplayHandlerInterface> displayHandler,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
+        const std::shared_ptr<aace::engine::navigation::DisplayHandlerInterface>& displayHandler,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+            exceptionSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder);
 
     // @name RequiresShutdown Functions
     /// @{
@@ -160,7 +167,9 @@ private:
      * @param [in] directiveName The name of the directive.
      * @param [in] agentId The @c AgentId::IdType of the agent to be set.
      */
-    void setEventAgentByDirective(const std::string& directiveName, alexaClientSDK::avsCommon::avs::AgentId::IdType agentId);
+    void setEventAgentByDirective(
+        const std::string& directiveName,
+        alexaClientSDK::avsCommon::avs::AgentId::IdType agentId);
 
     /**
      * Get the agent to tag the event.
@@ -194,6 +203,15 @@ private:
 
     /// Map that stores mapping of event name to agent id. Read and write access should be serialized by executor.
     std::unordered_map<std::string, alexaClientSDK::avsCommon::avs::AgentId::IdType> m_eventAgentMap;
+
+    /// The metric recorder.
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
+
+    /// Duration builder for ShowAltRoutes latency metric
+    aace::engine::metrics::DurationDataPointBuilder m_altRoutesDurationData;
+
+    /// Duration builder for ControlDisplay latency metric
+    aace::engine::metrics::DurationDataPointBuilder m_controlDisplayDurationData;
 };
 
 }  // namespace navigation

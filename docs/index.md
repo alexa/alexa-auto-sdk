@@ -19,7 +19,7 @@ Auto SDK is always improving. See the [Auto SDK release notes](./releases/index.
 * Read the [Explore Auto SDK Concepts](./explore/concepts/index.md) docs to learn how Auto SDK works and understand its core APIs.
 
 * Read the [Explore Auto SDK Features](./explore/features/index.md) docs to learn about all the different features Auto SDK provides.
-  
-* Follow the developer docs for [Android](./android/index.md) or [Native C++](./native/index.md) to guide you through integrating Auto SDK into your vehicle.
+
+* Follow the developer docs for [Native C++](./native/index.md) to guide you through integrating Auto SDK into your vehicle. If your vehicle uses the Android platform, follow the developer documentation for [Alexa Auto App](https://developer.amazon.com/en-US/docs/alexa/alexa-auto-app/overview.html) instead.
 
 * Use the [Auto SDK Migration Guide](./releases/migration.md) to ease your upgrade to the latest Auto SDK version.

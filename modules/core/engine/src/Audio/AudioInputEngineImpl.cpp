@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,24 +15,13 @@
 
 #include <AACE/Engine/Audio/AudioInputEngineImpl.h>
 #include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.audio.AudioInputEngineImpl");
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioInputEngineImpl";
-
-/// Counter metrics fpr AudioInput Platform APIs
-static const std::string METRIC_AUDIO_INPUT_WRITE = "Write";
-static const std::string METRIC_AUDIO_INPUT_START_AUDIO_INPUT = "StartAudioInput";
-static const std::string METRIC_AUDIO_INPUT_STOP_AUDIO_INPUT = "StopAudioInput";
-
 namespace aace {
 namespace engine {
 namespace audio {
-
-using namespace aace::engine::utils::metrics;
 
 AudioInputEngineImpl::AudioInputEngineImpl(std::shared_ptr<aace::audio::AudioInput> platformAudioInput) :
         m_platformAudioInput(platformAudioInput) {
@@ -69,7 +58,6 @@ AudioInputChannelInterface::ChannelId AudioInputEngineImpl::start(AudioWriteCall
         if (m_callbackMap.empty()) {
             // Release the lock temporarily so that audio data callback can acquire it and prevent deadlock
             callbackLock.unlock();
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "start", {METRIC_AUDIO_INPUT_START_AUDIO_INPUT});
             ThrowIfNot(m_platformAudioInput->startAudioInput(), "startPlatformAudioInputFailed");
             callbackLock.lock();
         }
@@ -101,7 +89,6 @@ void AudioInputEngineImpl::stop(ChannelId id) {
         // call the platform stopAudioInput() if the channel is the only channel
         // requesting audio from the audio provider
         if (shouldStopAudioInput) {
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "stop", {METRIC_AUDIO_INPUT_STOP_AUDIO_INPUT});
             ThrowIfNot(m_platformAudioInput->stopAudioInput(), "stopPlatformAudioInputFailed");
         }
     } catch (std::exception& ex) {
@@ -119,7 +106,7 @@ void AudioInputEngineImpl::doShutdown() {
 ssize_t AudioInputEngineImpl::write(const int16_t* data, const size_t size) {
     try {
         std::unique_lock<std::mutex> callbackLock(m_callbackMutex);
-        if (m_callbackMap.empty()){
+        if (m_callbackMap.empty()) {
             return 0;
         }
 

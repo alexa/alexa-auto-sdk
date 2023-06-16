@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -207,7 +207,7 @@ bool AASBAudioOutput::prepare(std::shared_ptr<aace::audio::AudioStream> stream, 
     }
 }
 
-bool AASBAudioOutput::prepare(const std::string& url, bool repeating) {
+bool AASBAudioOutput::prepare(const std::string& url, bool repeating, const AudioOutput::PlaybackContext& playbackContext) {
     try {
         AACE_VERBOSE(LX(TAG));
 
@@ -223,6 +223,14 @@ bool AASBAudioOutput::prepare(const std::string& url, bool repeating) {
         message.payload.token = m_currentToken;
         message.payload.url = url;
         message.payload.repeating = repeating;
+        message.payload.playbackContext.keyConfig = {
+            playbackContext.keyConfig.begin(), playbackContext.keyConfig.end()};
+        message.payload.playbackContext.manifestConfig = {
+            playbackContext.manifestConfig.begin(), playbackContext.manifestConfig.end()};
+        message.payload.playbackContext.audioSegmentConfig = {
+            playbackContext.audioSegmentConfig.begin(), playbackContext.audioSegmentConfig.end()};
+        message.payload.playbackContext.allConfig = {
+            playbackContext.allConfig.begin(), playbackContext.allConfig.end()};
 
         m_messageBroker_lock->publish(message.toString()).send();
 

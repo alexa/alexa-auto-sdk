@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,26 +17,14 @@
 #include <unordered_map>
 
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 #include "AACE/Engine/PropertyManager/PropertyManagerEngineImpl.h"
 
 namespace aace {
 namespace engine {
 namespace propertyManager {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.core.PropertyManagerEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "PropertyManagerEngineImpl";
-
-/// Counter metrics for PropertyManager Platform APIs
-static const std::string METRIC_PROPERTY_MANAGER_SET_PROPERTY = "setProperty";
-static const std::string METRIC_PROPERTY_MANAGER_PROPERTY_STATE_CHANGED = "propertyStateChanged";
-static const std::string METRIC_PROPERTY_MANAGER_GET_PROPERTY = "getProperty";
-static const std::string METRIC_PROPERTY_MANAGER_PROPERTY_CHANGED = "propertyChanged";
 
 PropertyManagerEngineImpl::PropertyManagerEngineImpl(
     std::shared_ptr<aace::propertyManager::PropertyManager> platformPropertyManagerInterface) :
@@ -80,7 +68,6 @@ std::shared_ptr<PropertyManagerEngineImpl> PropertyManagerEngineImpl::create(
 
 bool PropertyManagerEngineImpl::onSetProperty(const std::string& name, const std::string& value) {
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSetProperty", {METRIC_PROPERTY_MANAGER_SET_PROPERTY, name});
         auto m_propertyManagerServiceInterface_lock = m_propertyManagerServiceInterface.lock();
         ThrowIfNull(m_propertyManagerServiceInterface_lock, "invalidPropertyManagerServiceInterfaceInstance");
         ThrowIfNot(m_propertyManagerServiceInterface_lock->setProperty(name, value, true), "setPropertyFailed");
@@ -93,7 +80,6 @@ bool PropertyManagerEngineImpl::onSetProperty(const std::string& name, const std
 
 std::string PropertyManagerEngineImpl::onGetProperty(const std::string& name) {
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetProperty", {METRIC_PROPERTY_MANAGER_GET_PROPERTY, name});
         auto m_propertyManagerServiceInterface_lock = m_propertyManagerServiceInterface.lock();
         ThrowIfNull(m_propertyManagerServiceInterface_lock, "invalidPropertyManagerServiceInterfaceInstance");
         return m_propertyManagerServiceInterface_lock->getProperty(name);
@@ -104,8 +90,6 @@ std::string PropertyManagerEngineImpl::onGetProperty(const std::string& name) {
 }
 
 void PropertyManagerEngineImpl::handlePropertyChanged(const std::string& name, const std::string& value) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "handlePropertyChanged", {METRIC_PROPERTY_MANAGER_PROPERTY_CHANGED, name});
     if (m_platformPropertyManagerInterface != nullptr) {
         m_platformPropertyManagerInterface->propertyChanged(name, value);
     }
@@ -115,8 +99,6 @@ void PropertyManagerEngineImpl::propertyStateChanged(
     const std::string& name,
     const std::string& value,
     const aace::propertyManager::PropertyManager::PropertyState state) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "propertyStateChanged", {METRIC_PROPERTY_MANAGER_PROPERTY_STATE_CHANGED, name});
     if (m_platformPropertyManagerInterface != nullptr) {
         m_platformPropertyManagerInterface->propertyStateChanged(name, value, state);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -129,7 +129,8 @@ static const NamespaceAndName PLAY_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Pla
 static const NamespaceAndName LOGIN_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Login", AgentId::AGENT_ID_ALL};
 static const NamespaceAndName LOGOUT_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE, "Logout", AgentId::AGENT_ID_ALL};
 static const NamespaceAndName AUTHORIZEDISCOVEREDPLAYERS_DIRECTIVE{EXTERNALMEDIAPLAYER_NAMESPACE,
-                                                                   "AuthorizeDiscoveredPlayers", AgentId::AGENT_ID_ALL};
+                                                                   "AuthorizeDiscoveredPlayers",
+                                                                   AgentId::AGENT_ID_ALL};
 
 // The @c Transport control directive signatures.
 static const NamespaceAndName RESUME_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Play", AgentId::AGENT_ID_ALL};
@@ -142,23 +143,39 @@ static const NamespaceAndName REWIND_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "Re
 static const NamespaceAndName FASTFORWARD_DIRECTIVE{PLAYBACKCONTROLLER_NAMESPACE, "FastForward", AgentId::AGENT_ID_ALL};
 
 // The @c PlayList control directive signature.
-static const NamespaceAndName ENABLEREPEATONE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableRepeatOne", AgentId::AGENT_ID_ALL};
-static const NamespaceAndName ENABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableRepeat", AgentId::AGENT_ID_ALL};
-static const NamespaceAndName DISABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "DisableRepeat", AgentId::AGENT_ID_ALL};
-static const NamespaceAndName ENABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "EnableShuffle", AgentId::AGENT_ID_ALL};
-static const NamespaceAndName DISABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE, "DisableShuffle", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ENABLEREPEATONE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE,
+                                                        "EnableRepeatOne",
+                                                        AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ENABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE,
+                                                     "EnableRepeat",
+                                                     AgentId::AGENT_ID_ALL};
+static const NamespaceAndName DISABLEREPEAT_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE,
+                                                      "DisableRepeat",
+                                                      AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ENABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE,
+                                                      "EnableShuffle",
+                                                      AgentId::AGENT_ID_ALL};
+static const NamespaceAndName DISABLESHUFFLE_DIRECTIVE{PLAYLISTCONTROLLER_NAMESPACE,
+                                                       "DisableShuffle",
+                                                       AgentId::AGENT_ID_ALL};
 
 // The @c Seek control directive signature.
 static const NamespaceAndName SEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE, "SetSeekPosition", AgentId::AGENT_ID_ALL};
-static const NamespaceAndName ADJUSTSEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE, "AdjustSeekPosition", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName ADJUSTSEEK_DIRECTIVE{SEEKCONTROLLER_NAMESPACE,
+                                                   "AdjustSeekPosition",
+                                                   AgentId::AGENT_ID_ALL};
 
 // The @c favorites control directive signature.
 static const NamespaceAndName FAVORITE_DIRECTIVE{FAVORITESCONTROLLER_NAMESPACE, "Favorite", AgentId::AGENT_ID_ALL};
 static const NamespaceAndName UNFAVORITE_DIRECTIVE{FAVORITESCONTROLLER_NAMESPACE, "Unfavorite", AgentId::AGENT_ID_ALL};
 
 // The @c ExternalMediaPlayer context state signatures.
-static const NamespaceAndName SESSION_STATE{EXTERNALMEDIAPLAYER_STATE_NAMESPACE, EXTERNALMEDIAPLAYER_NAME, AgentId::AGENT_ID_ALL};
-static const NamespaceAndName PLAYBACK_STATE{PLAYBACKSTATEREPORTER_STATE_NAMESPACE, PLAYBACKSTATEREPORTER_NAME, AgentId::AGENT_ID_ALL};
+static const NamespaceAndName SESSION_STATE{EXTERNALMEDIAPLAYER_STATE_NAMESPACE,
+                                            EXTERNALMEDIAPLAYER_NAME,
+                                            AgentId::AGENT_ID_ALL};
+static const NamespaceAndName PLAYBACK_STATE{PLAYBACKSTATEREPORTER_STATE_NAMESPACE,
+                                             PLAYBACKSTATEREPORTER_NAME,
+                                             AgentId::AGENT_ID_ALL};
 
 /// The const char for the players key field in the context.
 static const char PLAYERS[] = "players";
@@ -730,7 +747,8 @@ void ExternalMediaPlayer::handleDirective(std::shared_ptr<DirectiveInfo> info) {
         return;
     }
 
-    NamespaceAndName directiveNamespaceAndName(info->directive->getNamespace(), info->directive->getName(), AgentId::AGENT_ID_ALL);
+    NamespaceAndName directiveNamespaceAndName(
+        info->directive->getNamespace(), info->directive->getName(), AgentId::AGENT_ID_ALL);
     auto handlerIt = m_directiveToHandlerMap.find(directiveNamespaceAndName);
     if (handlerIt == m_directiveToHandlerMap.end()) {
         AACE_ERROR(LX(TAG, "handleDirectivesFailed")
@@ -949,11 +967,6 @@ void ExternalMediaPlayer::handleLogout(std::shared_ptr<DirectiveInfo> info, Requ
 void ExternalMediaPlayer::handlePlay(std::shared_ptr<DirectiveInfo> info, RequestType request) {
     rapidjson::Document payload;
     std::string playerId = preprocessDirective(info, &payload);
-    if (playerId.empty()) {
-        AACE_ERROR(LX(TAG, "handleDirectiveFailed").d("reason", "nullPlayerId"));
-        sendExceptionEncounteredAndReportFailed(info, "No PlayerId in directive.");
-        return;
-    }
 
     std::string playbackContextToken;
     if (!jsonUtils::retrieveValue(payload, "playbackContextToken", &playbackContextToken)) {

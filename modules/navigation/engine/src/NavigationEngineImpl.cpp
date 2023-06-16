@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
 
 #include "AACE/Engine/Navigation/NavigationEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 #include <nlohmann/json.hpp>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -35,27 +33,8 @@ namespace aace {
 namespace engine {
 namespace navigation {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "NavigationEngineImpl";
-
-/// Counter Metrics for Navigation Platform APIs
-static const std::string METRIC_NAVIGATION_SHOW_PREVIOUS_WAYPOINTS = "ShowPreviousWaypoints";
-static const std::string METRIC_NAVIGATION_NAVIGATE_TO_PREVIOUS_WAYPOINT = "NavigateToPreviousWaypoint";
-static const std::string METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES = "ShowAlternativeRoutes";
-static const std::string METRIC_NAVIGATION_CONTROL_DISPLAY = "ControlDisplay";
-static const std::string METRIC_NAVIGATION_CANCEL_NAVIGATION = "CancelNavigation";
-static const std::string METRIC_NAVIGATION_GET_NAVIGATION_STATE = "GetNavigationState";
-static const std::string METRIC_NAVIGATION_START_NAVIGATION = "StartNavigation";
-static const std::string METRIC_NAVIGATION_ANNOUNCE_MANEUVER = "AnnounceManeuver";
-static const std::string METRIC_NAVIGATION_ANNOUNCE_ROADREGULATION = "AnnounceRoadRegulation";
-static const std::string METRIC_NAVIGATION_NAVIGATION_EVENT = "NavigationEvent";
-static const std::string METRIC_NAVIGATION_NAVIGATION_ERROR = "NavigationError";
-static const std::string METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES_SUCCEEDED = "ShowAlternativeRoutesSucceeded";
 
 static const std::string ALT_ROUTE_INQUERY_TYPE_DEFAULT = "DEFAULT";
 static const std::string ALT_ROUTE_INQUERY_TYPE_SHORTER_TIME = "SHORTER_TIME";
@@ -83,18 +62,24 @@ bool NavigationEngineImpl::initialize(
         capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) {
     try {
         m_navigationCapabilityAgent = NavigationCapabilityAgent::create(
-            shared_from_this(), exceptionSender, messageSender, contextManager, m_navigationProviderName);
+            shared_from_this(),
+            exceptionSender,
+            messageSender,
+            contextManager,
+            metricRecorder,
+            m_navigationProviderName);
         ThrowIfNull(m_navigationCapabilityAgent, "couldNotCreateNavigationCapabilityAgent");
 
         m_navigationAssistanceCapabilityAgent = navigationassistance::NavigationAssistanceCapabilityAgent::create(
-            shared_from_this(), exceptionSender, messageSender, contextManager);
+            shared_from_this(), exceptionSender, messageSender, contextManager, metricRecorder);
         ThrowIfNull(m_navigationAssistanceCapabilityAgent, "couldNotCreateNavigationAssistanceCapabilityAgent");
 
-        m_displayManagerCapabilityAgent =
-            DisplayManagerCapabilityAgent::create(shared_from_this(), exceptionSender, messageSender, contextManager);
+        m_displayManagerCapabilityAgent = DisplayManagerCapabilityAgent::create(
+            shared_from_this(), exceptionSender, messageSender, contextManager, metricRecorder);
         ThrowIfNull(m_displayManagerCapabilityAgent, "couldNotCreateDisplayManagerCapabilityAgent");
 
         // register capability with the default endpoint
@@ -117,18 +102,21 @@ std::shared_ptr<NavigationEngineImpl> NavigationEngineImpl::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     const std::string& navigationProviderName) {
     try {
         ThrowIfNull(navigationPlatformInterface, "nullNavigationPlatformInterface");
         ThrowIfNull(capabilitiesRegistrar, "nullCapabilitiesRegistrar");
         ThrowIfNull(exceptionSender, "nullPlatformInterface");
         ThrowIfNull(contextManager, "nullNavigationContextManager");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
 
         std::shared_ptr<NavigationEngineImpl> navigationEngineImpl = std::shared_ptr<NavigationEngineImpl>(
             new NavigationEngineImpl(navigationPlatformInterface, navigationProviderName));
 
         ThrowIfNot(
-            navigationEngineImpl->initialize(capabilitiesRegistrar, exceptionSender, messageSender, contextManager),
+            navigationEngineImpl->initialize(
+                capabilitiesRegistrar, exceptionSender, messageSender, contextManager, metricRecorder),
             "initializeNavigationEngineImplFailed");
 
         // set the platform engine interface reference
@@ -165,26 +153,17 @@ void NavigationEngineImpl::doShutdown() {
 void NavigationEngineImpl::showPreviousWaypoints(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
     setEventAgent(NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN, agentId);
-    emitCounterMetrics(std::to_string(agentId), 
-        METRIC_PROGRAM_NAME_SUFFIX, "showPreviousWaypoints", {METRIC_NAVIGATION_SHOW_PREVIOUS_WAYPOINTS});
     m_navigationPlatformInterface->showPreviousWaypoints();
 }
 
 void NavigationEngineImpl::navigateToPreviousWaypoint(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
     setEventAgent(NavigationEngineInterface::EventName::PREVIOUS_NAVIGATION_STARTED, agentId);
-    emitCounterMetrics(std::to_string(agentId), 
-        METRIC_PROGRAM_NAME_SUFFIX, "navigateToPreviousWaypoint", {METRIC_NAVIGATION_NAVIGATE_TO_PREVIOUS_WAYPOINT});
     m_navigationPlatformInterface->navigateToPreviousWaypoint();
 }
 
 void NavigationEngineImpl::showAlternativeRoutes(aace::engine::navigation::AlternativeRoutesQueryType queryType) {
     AACE_DEBUG(LX(TAG).d("queryType", queryType));
-
-    std::stringstream ss;
-    ss << queryType;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "showAlternativeRoutes", {METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES, ss.str()});
 
     aace::navigation::NavigationEngineInterface::AlternateRouteType type;
     switch (queryType) {
@@ -206,10 +185,6 @@ void NavigationEngineImpl::showAlternativeRoutes(aace::engine::navigation::Alter
 
 void NavigationEngineImpl::controlDisplay(aace::engine::navigation::DisplayMode mode) {
     AACE_DEBUG(LX(TAG).d("mode", mode));
-
-    std::stringstream ss;
-    ss << mode;
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "controlDisplay", {METRIC_NAVIGATION_CONTROL_DISPLAY, ss.str()});
 
     aace::navigation::Navigation::ControlDisplay type;
     switch (mode) {
@@ -271,44 +246,32 @@ void NavigationEngineImpl::controlDisplay(aace::engine::navigation::DisplayMode 
 void NavigationEngineImpl::startNavigation(AgentId::IdType agentId, const std::string& payload) {
     AACE_DEBUG(LX(TAG));
     setEventAgent(NavigationEngineInterface::EventName::NAVIGATION_STARTED, agentId);
-    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "startNavigation", {METRIC_NAVIGATION_START_NAVIGATION});
     m_navigationPlatformInterface->startNavigation(payload);
 }
 
 void NavigationEngineImpl::announceManeuver(const std::string& payload) {
     AACE_DEBUG(LX(TAG).sensitive("payload", payload));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "announceManeuver", {METRIC_NAVIGATION_ANNOUNCE_MANEUVER});
     m_navigationPlatformInterface->announceManeuver(payload);
 }
 
 void NavigationEngineImpl::announceRoadRegulation(aace::navigation::Navigation::RoadRegulation roadRegulation) {
     AACE_DEBUG(LX(TAG).d("roadRegulation", roadRegulation));
-
-    std::stringstream ss;
-    ss << roadRegulation;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "announceRoadRegulation", {METRIC_NAVIGATION_ANNOUNCE_ROADREGULATION, ss.str()});
     m_navigationPlatformInterface->announceRoadRegulation(roadRegulation);
 }
 
 void NavigationEngineImpl::cancelNavigation(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "cancelNavigation", {METRIC_NAVIGATION_CANCEL_NAVIGATION});
     m_navigationPlatformInterface->cancelNavigation();
 }
 
 std::string NavigationEngineImpl::getNavigationState(AgentId::IdType agentId) {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "getNavigationState", {METRIC_NAVIGATION_GET_NAVIGATION_STATE});
     return m_navigationPlatformInterface->getNavigationState();
 }
 
 void NavigationEngineImpl::onNavigationEvent(EventName event) {
     AACE_DEBUG(LX(TAG));
-    std::stringstream ss;
-    ss << event;
     AgentId::IdType agentId = getEventAgent(event);
-    emitCounterMetrics(std::to_string(agentId), METRIC_PROGRAM_NAME_SUFFIX, "onNavigationEvent", {METRIC_NAVIGATION_NAVIGATION_EVENT, ss.str()});
     switch (event) {
         case NavigationEngineInterface::EventName::NAVIGATION_STARTED:
         case NavigationEngineInterface::EventName::PREVIOUS_WAYPOINTS_SHOWN:
@@ -354,16 +317,7 @@ void NavigationEngineImpl::onNavigationError(
     aace::navigation::NavigationEngineInterface::ErrorCode code,
     const std::string& description) {
     AACE_DEBUG(LX(TAG));
-    std::stringstream errorType;
-    std::stringstream errorCode;
-    errorType << type;
-    errorCode << code;
     AgentId::IdType agentId = getErrorAgent(type);
-    emitCounterMetrics(
-        std::to_string(agentId), 
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onNavigationError",
-        {METRIC_NAVIGATION_NAVIGATION_ERROR, errorType.str(), errorCode.str()});
     switch (type) {
         case aace::navigation::NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED:
         case aace::navigation::NavigationEngineInterface::ErrorType::SHOW_PREVIOUS_WAYPOINTS_FAILED:
@@ -410,11 +364,6 @@ void NavigationEngineImpl::onNavigationError(
 }
 
 void NavigationEngineImpl::onShowAlternativeRoutesSucceeded(const std::string& payload) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onShowAlternativeRoutesSucceeded",
-        {METRIC_NAVIGATION_SHOW_ALTERNATIVE_ROUTES_SUCCEEDED});
-
     aace::engine::navigation::AlternativeRoutesQueryType queryType;
     std::vector<std::string> labels;
     std::vector<aace::engine::navigation::RouteSavings> savingsList;
@@ -691,7 +640,8 @@ AgentId::IdType NavigationEngineImpl::getEventAgent(NavigationEngineInterface::E
     return AgentId::AGENT_ID_NONE;
 }
 
-NavigationEngineInterface::EventName NavigationEngineImpl::getEventFromError(NavigationEngineInterface::ErrorType type) {
+NavigationEngineInterface::EventName NavigationEngineImpl::getEventFromError(
+    NavigationEngineInterface::ErrorType type) {
     NavigationEngineInterface::EventName event;
     switch (type) {
         case NavigationEngineInterface::ErrorType::NAVIGATION_START_FAILED:
@@ -782,7 +732,7 @@ NavigationEngineInterface::EventName NavigationEngineImpl::getEventFromError(Nav
             event = NavigationEngineInterface::EventName::CARPOOL_RULES_REGULATION_ANNOUNCED;
             break;
         default:
-            throw ("Invalid Navigation ErrorType");
+            throw("Invalid Navigation ErrorType");
             break;
     }
     return event;

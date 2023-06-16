@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -41,6 +41,9 @@ public:
 
     LogEntry& m(const char* message);
     LogEntry& m(const std::string& message);
+
+    LogEntry& e(const char* key, int errnum);
+    LogEntry& e(int errnum);
 
     const std::string& tag() const;
     const char* c_str() const;

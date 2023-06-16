@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -474,7 +474,10 @@ bool AudioOutputImpl::executePrepare(
     return true;
 }
 
-bool AudioOutputImpl::prepare(const std::string& url, bool repeating) {
+bool AudioOutputImpl::prepare(
+    const std::string& url,
+    bool repeating,
+    const aace::audio::AudioOutput::PlaybackContext& playbackContext) {
     return m_executor.submit([this, url, repeating]() { return executePrepare(url, nullptr, repeating); }).get();
 }
 
@@ -596,9 +599,10 @@ bool AudioOutputImpl::prepareStream(const std::shared_ptr<aace::audio::AudioStre
             }
 
             params->stream_type = AAL_STREAM_LPCM;
-            params->lpcm = {.sample_format = AAL_SAMPLE_FORMAT_S16LE,
-                            .channels = af.getNumChannels(),
-                            .sample_rate = (int)af.getSampleRate()};
+            params->lpcm = {
+                .sample_format = AAL_SAMPLE_FORMAT_S16LE,
+                .channels = af.getNumChannels(),
+                .sample_rate = (int)af.getSampleRate()};
             return params;
         });
         ThrowIfNull(m_player, "createPlayerFailed");

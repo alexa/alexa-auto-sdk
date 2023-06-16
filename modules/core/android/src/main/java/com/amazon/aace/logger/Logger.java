@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -42,11 +42,6 @@ abstract public class Logger extends PlatformInterface {
          * @hideinitializer
          */
         INFO("INFO"),
-        /**
-         * Log of a metric, enabled only for builds with metrics enabled
-         * @hideinitializer
-         */
-        METRIC("METRIC"),
         /**
          * Log of an event that may indicate a problem
          * @hideinitializer

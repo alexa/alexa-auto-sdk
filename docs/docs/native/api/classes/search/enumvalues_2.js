@@ -11,6 +11,5 @@ var searchData=
   ['connecting',['CONNECTING',['../classaace_1_1network_1_1_network_info_provider_engine_interface.html#a749ba056220c9a3bb9ed9e100fc8f0d1a9a14f95e151eec641316e7c784ce832d',1,'aace::network::NetworkInfoProviderEngineInterface']]],
   ['connection_5fthrottled',['CONNECTION_THROTTLED',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a8ca1e58168f20f0b69f8ae91fd3426f7',1,'aace::alexa::AlexaClient']]],
   ['connection_5ftimedout',['CONNECTION_TIMEDOUT',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a1e5d3c84593c457cee72e18634f28914',1,'aace::alexa::AlexaClient']]],
-  ['counter',['COUNTER',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5a125e831262b4dbbd68c6878c5d3759f6',1,'aace::metrics::MetricsUploader']]],
   ['critical',['CRITICAL',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786a99cd1c61610c76a57cb8d10d6df6b870',1,'aace::logger::LoggerEngineInterface']]]
 ];

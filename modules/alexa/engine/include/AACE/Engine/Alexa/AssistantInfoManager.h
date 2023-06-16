@@ -22,8 +22,6 @@
 #include <AVSCommon/AVS/AgentId.h>
 #include <AVSCommon/Utils/Optional.h>
 
-#define ALEXA_ASSISTANT_ID 2
-
 namespace aace {
 namespace engine {
 namespace alexa {
@@ -70,7 +68,6 @@ struct Assistant {
      */
     bool isLocal;
 };
-
 
 /**
  * This class provides APIs to allow other modules to add assistant info and 

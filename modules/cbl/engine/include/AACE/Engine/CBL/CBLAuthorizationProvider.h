@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <AACE/Engine/Authorization/AuthorizationProvider.h>
 #include <AACE/Engine/Alexa/AuthorizationAdapterInterface.h>
 #include <AACE/Engine/Alexa/AuthorizationManagerInterface.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include <AACE/Engine/Network/NetworkInfoObserver.h>
 #include <AACE/Engine/Network/NetworkObservableInterface.h>
 #include <AACE/Engine/PropertyManager/PropertyListenerInterface.h>
@@ -60,6 +61,7 @@ private:
         const std::string& service,
         std::shared_ptr<aace::engine::alexa::AuthorizationManagerInterface> authorizationManagerInterface,
         std::shared_ptr<CBLConfigurationInterface> configuration,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         bool enableUserProfile,
         std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier);
 
@@ -77,6 +79,7 @@ public:
         std::shared_ptr<CBLConfigurationInterface> configuration,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         bool enableUserProfile = false,
         std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier = nullptr);
 
@@ -215,6 +218,9 @@ private:
 
     /// Reference to access the authorization manager interface
     std::weak_ptr<aace::engine::alexa::AuthorizationManagerInterface> m_authorizationManager;
+
+    /// The metric recorder
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
 
     /// Reference to the @c CBLLegacyEventNotificationInterface to notify the (legacy) CBL states.
     std::shared_ptr<CBLLegacyEventNotificationInterface> m_legacyEventNotifier;

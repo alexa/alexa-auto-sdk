@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -69,18 +69,19 @@ TextToSpeechProviderEngine::TextToSpeechProviderEngine() : alexaClientSDK::avsCo
 
 bool TextToSpeechProviderEngine::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
-        capabilitiesRegistrar,
+    capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
     const std::string& voiceConfiguration,
-    std::shared_ptr<aace::engine::core::EngineContext> engineContext) {
+    std::shared_ptr<aace::engine::core::EngineContext> engineContext,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     try {
         if (!voiceConfiguration.empty()) {
             createVoiceIdMapping(voiceConfiguration);
         }
         m_textToSpeechProviderCapabilityAgent =
-            TextToSpeechProviderCapabilityAgent::create(shared_from_this(), exceptionSender, messageSender);
+            TextToSpeechProviderCapabilityAgent::create(shared_from_this(), exceptionSender, messageSender,agentManager);
         ThrowIfNull(m_textToSpeechProviderCapabilityAgent, "nullTextToSpeechProviderCapabilityAgent");
 
         connectionManager->addConnectionStatusObserver(shared_from_this());
@@ -99,6 +100,14 @@ bool TextToSpeechProviderEngine::initialize(
             "failedToAddListener");
 
         m_currentLocale = m_propertyManager_lock->getProperty(aace::alexa::property::LOCALE);
+        m_agentManager = agentManager;
+
+        //implement agentenablement observer interface and register for it
+        if (m_agentManager != nullptr) {
+            m_agentManager->addAgentConnectionObserverInterface(
+                alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+        }
+
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
@@ -108,12 +117,13 @@ bool TextToSpeechProviderEngine::initialize(
 
 std::shared_ptr<TextToSpeechProviderEngine> TextToSpeechProviderEngine::create(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
-        capabilitiesRegistrar,
+    capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::AVSConnectionManagerInterface> connectionManager,
     const std::string& voiceConfiguration,
-    std::shared_ptr<aace::engine::core::EngineContext> engineContext) {
+    std::shared_ptr<aace::engine::core::EngineContext> engineContext,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     try {
         auto textToSpeechProviderEngine = std::shared_ptr<TextToSpeechProviderEngine>(new TextToSpeechProviderEngine());
 
@@ -124,7 +134,8 @@ std::shared_ptr<TextToSpeechProviderEngine> TextToSpeechProviderEngine::create(
                 messageSender,
                 connectionManager,
                 voiceConfiguration,
-                engineContext),
+                engineContext,
+                agentManager),
             "initializeTextToSpeechProviderEngineFailed");
 
         return textToSpeechProviderEngine;
@@ -146,10 +157,9 @@ std::future<aace::engine::textToSpeech::PrepareSpeechResult> TextToSpeechProvide
         std::lock_guard<std::mutex> lock(m_mutex);
         ThrowIf(m_speechRequestsMap.find(speechId) != m_speechRequestsMap.end(), "requestWithDuplicateSpeechId");
 
-        auto connectionStatus = getCurrentConnectionStatus();
-        if (connectionStatus !=
-            alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED) {
-            AACE_ERROR(LX(TAG).m("Provider is not connected").d("connection status", connectionStatus));
+        if (!isConnected()) {
+            AACE_ERROR(LX(TAG).m("Provider is not connected").d("assistant not available", ""));
+
             prepareSpeechPromise->set_value(createPrepareSpeechFailedResponse(speechId, PROVIDER_NOT_CONNECTED));
             return prepareSpeechFuture;
         }
@@ -206,7 +216,7 @@ std::future<std::string> TextToSpeechProviderEngine::getCapabilities(const std::
             // Current locale is not in the supported locales list
             auto supportedLocales = m_voiceIdToLocalesMap.find(voiceId.first)->second;
             if (std::find(supportedLocales.begin(), supportedLocales.end(), m_currentLocale) ==
-                supportedLocales.end()) {
+                    supportedLocales.end()) {
                 AACE_ERROR(LX(TAG).m("Current locale is not supported").d("currentLocale", m_currentLocale));
                 getCapabilitiesPromise->set_value(EMPTY_STRING);
                 return getCapabilitiesPromiseFuture;
@@ -215,7 +225,7 @@ std::future<std::string> TextToSpeechProviderEngine::getCapabilities(const std::
             // clang-format off
             json voice = {
                 {VOICE_ID_KEY, voiceId.first},
-                {LOCALES_KEY , {m_currentLocale}}
+                {LOCALES_KEY, {m_currentLocale}}
             };
             // clang-format on
 
@@ -225,7 +235,7 @@ std::future<std::string> TextToSpeechProviderEngine::getCapabilities(const std::
         // clang-format off
         json defaultAlexaVoice = {
             {VOICE_ID_KEY, ALEXA_VOICE_ID},
-            {LOCALES_KEY , {m_currentLocale}}
+            {LOCALES_KEY, {m_currentLocale}}
         };
         // clang-format on
 
@@ -254,8 +264,8 @@ void TextToSpeechProviderEngine::prepareSpeechCompleted(
     auto it = m_speechRequestsMap.find(speechId);
     if (it == m_speechRequestsMap.end()) {
         AACE_WARN(LX(TAG)
-                      .m("No active request with matching speechId. Ignoring prepare speech response")
-                      .d("speech ID", speechId));
+                  .m("No active request with matching speechId. Ignoring prepare speech response")
+                  .d("speech ID", speechId));
         return;
     }
     auto prepareSpeechPromise = it->second;
@@ -270,8 +280,8 @@ void TextToSpeechProviderEngine::prepareSpeechFailed(const std::string& speechId
     auto it = m_speechRequestsMap.find(speechId);
     if (it == m_speechRequestsMap.end()) {
         AACE_WARN(LX(TAG)
-                      .m("No active request with matching speechId. Ignoring prepare speech response")
-                      .d("speech ID", speechId));
+                  .m("No active request with matching speechId. Ignoring prepare speech response")
+                  .d("speech ID", speechId));
         return;
     }
     auto prepareSpeechPromise = it->second;
@@ -295,10 +305,29 @@ void TextToSpeechProviderEngine::onConnectionStatusChanged(
 void TextToSpeechProviderEngine::onConnectionStatusChanged(
     const alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status status,
     const std::vector<
-        alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
-        engineStatuses) {
-    std::lock_guard<std::mutex> lock(m_connectionMutex);
+    alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::EngineConnectionStatus>&
+    engineStatuses) {
+    std::lock_guard<std::mutex> lock(m_aggregateConnectionMutex);
     m_connectionStatus = status;
+}
+void TextToSpeechProviderEngine::onAgentAvailabilityStateChanged(
+    alexaClientSDK::avsCommon::avs::AgentId::IdType id,
+    AvailabilityState status,
+    const std::string& reason) {
+    std::string availability = status == AvailabilityState::AVAILABLE ? "AVAILABLE" : "UNAVAILABLE";
+    AACE_INFO(LX(TAG).d("id", id).d("status", availability).d("reason", reason));
+
+    std::lock_guard<std::mutex> lock_map(m_aggregateConnectionMutex);
+    m_agentAvailabilityMap[id] = status == AvailabilityState::AVAILABLE;
+
+    if (status == AvailabilityState::AVAILABLE) {
+        m_agentAvailable = true;
+        return;
+    }
+    m_agentAvailable = false;
+    for (const auto& availability : m_agentAvailabilityMap) {
+        if (availability.second) m_agentAvailable = true;
+    }
 }
 
 void TextToSpeechProviderEngine::createVoiceIdMapping(const std::string& voiceConfiguration) {
@@ -327,9 +356,9 @@ bool TextToSpeechProviderEngine::validateLocale(const std::string& voiceId, cons
         AACE_DEBUG(LX(TAG).d("voiceId", voiceId).d("locale", locale));
         if (locale.empty()) {
             AACE_ERROR(LX(TAG)
-                           .m("Requested locale for preparing speech is empty")
-                           .d("locale", locale)
-                           .d("currentLocale", m_currentLocale));
+                       .m("Requested locale for preparing speech is empty")
+                       .d("locale", locale)
+                       .d("currentLocale", m_currentLocale));
             return false;
         }
 
@@ -342,9 +371,9 @@ bool TextToSpeechProviderEngine::validateLocale(const std::string& voiceId, cons
         // The requested locale for speech synthesis does not match the current locale
         if (!aace::engine::utils::string::equal(locale, m_currentLocale)) {
             AACE_ERROR(LX(TAG)
-                           .m("Requested locale for preparing speech is not the current locale")
-                           .d("locale", locale)
-                           .d("currentLocale", m_currentLocale));
+                       .m("Requested locale for preparing speech is not the current locale")
+                       .d("locale", locale)
+                       .d("currentLocale", m_currentLocale));
             return false;
         }
 
@@ -353,7 +382,7 @@ bool TextToSpeechProviderEngine::validateLocale(const std::string& voiceId, cons
         if (iterator != m_voiceIdToLocalesMap.end()) {
             auto supportedLocales = iterator->second;
             if (!supportedLocales.empty() &&
-                std::find(supportedLocales.begin(), supportedLocales.end(), m_currentLocale) ==
+                    std::find(supportedLocales.begin(), supportedLocales.end(), m_currentLocale) ==
                     supportedLocales.end()) {
                 AACE_ERROR(LX(TAG).m("Current locale is not supported").d("currentLocale", m_currentLocale));
                 return false;
@@ -366,16 +395,24 @@ bool TextToSpeechProviderEngine::validateLocale(const std::string& voiceId, cons
     }
 }
 
-alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status TextToSpeechProviderEngine::
-    getCurrentConnectionStatus() {
-    std::lock_guard<std::mutex> lock(m_connectionMutex);
-    return m_connectionStatus;
+
+bool TextToSpeechProviderEngine::isConnected() {
+    std::lock_guard<std::mutex> lock(m_aggregateConnectionMutex);
+    return (m_connectionStatus == alexaClientSDK::avsCommon::sdkInterfaces::ConnectionStatusObserverInterface::Status::CONNECTED ||
+            m_agentAvailable == true);
 }
+
 void TextToSpeechProviderEngine::doShutdown() {
     if (m_textToSpeechProviderCapabilityAgent != nullptr) {
         m_textToSpeechProviderCapabilityAgent->shutdown();
         m_textToSpeechProviderCapabilityAgent.reset();
     }
+
+    if (m_agentManager != nullptr) {
+        m_agentManager->removeAgentConnectionObserverInterface(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, shared_from_this());
+    }
+
     for (auto speechId : m_speechRequestsMap) {
         speechId.second.reset();
     }

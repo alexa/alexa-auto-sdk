@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['_7earbitrator',['~Arbitrator',['../classaace_1_1arbitrator_1_1_arbitrator.html#a25280d83ba99194ba8a2ed66d5791e0f',1,'aace::arbitrator::Arbitrator']]],
-  ['_7eauthorization',['~Authorization',['../classaace_1_1authorization_1_1_authorization.html#a31e6849b0c9fc20dd58b70fb68db89d2',1,'aace::authorization::Authorization']]],
-  ['_7ecarcontrol',['~CarControl',['../classaace_1_1car_control_1_1_car_control.html#a2a6f08b35b122c21fef79c0304a77d0a',1,'aace::carControl::CarControl']]]
+  ['zoom_5fin',['ZOOM_IN',['../classaace_1_1navigation_1_1_navigation.html#af03f492453f5b485bdf875b623b083d3a9fb15123c848cda02eec2316e765134a',1,'aace::navigation::Navigation']]],
+  ['zoom_5fout',['ZOOM_OUT',['../classaace_1_1navigation_1_1_navigation.html#af03f492453f5b485bdf875b623b083d3aa2ef1b00efd83e548ce99f6ead83bacd',1,'aace::navigation::Navigation']]]
 ];

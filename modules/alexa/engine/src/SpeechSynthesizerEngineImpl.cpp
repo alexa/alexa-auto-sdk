@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ bool SpeechSynthesizerEngineImpl::initialize(
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::captions::CaptionManagerInterface> captionManager,
     std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     try {
         ThrowIfNot(initializeAudioChannel(audioOutputChannel, speakerManager), "initializeAudioChannelFailed");
@@ -56,7 +57,7 @@ bool SpeechSynthesizerEngineImpl::initialize(
                 exceptionSender,
                 metricRecorder,
                 dialogUXStateAggregator,
-                nullptr,
+                captionManager,
                 nullptr,
                 agentManager);
         ThrowIfNull(m_speechSynthesizerCapabilityAgent, "couldNotCreateCapabilityAgent");
@@ -87,6 +88,7 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
+    std::shared_ptr<alexaClientSDK::captions::CaptionManagerInterface> captionManager,
     std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     std::shared_ptr<SpeechSynthesizerEngineImpl> speechSynthesizerEngineImpl = nullptr;
 
@@ -101,6 +103,9 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
         ThrowIfNull(attachmentManager, "invalidAttachmentManager");
         ThrowIfNull(dialogUXStateAggregator, "invalidDialogUXStateAggregator");
         ThrowIfNull(exceptionSender, "invalidExceptionSender");
+        #ifdef AAC_CAPTIONS
+        ThrowIfNull(captionManager, "invalidCaptionManager");
+        #endif
 
         // open the TTS audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel(
@@ -124,6 +129,7 @@ std::shared_ptr<SpeechSynthesizerEngineImpl> SpeechSynthesizerEngineImpl::create
                 speakerManager,
                 exceptionSender,
                 metricRecorder,
+                captionManager,
                 agentManager),
             "initializeSpeechSynthesizerEngineImplFailed");
 

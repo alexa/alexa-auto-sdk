@@ -26,7 +26,7 @@ Consider the following factors when choosing the protocol to use with Bluetooth:
 * Capabilities of the Bluetooth software stack, which includes the system service, driver, and firmware (e.g., whether the software supports RFCOMM or iAP2)
 * Capabilities of the Bluetooth chipset used on the head unit (e.g., single-mode or dual-mode)
 
-The following table shows the transport protocol to use based on the head unit chipset and the type of smartphone. 
+The following table shows the transport protocol to use based on the head unit chipset and the type of smartphone.
 
 >**Note:** To use Bluetooth for Mobile Authorization, you must use RFCOMM as the transport protocol.
 
@@ -38,8 +38,8 @@ The following table shows the transport protocol to use based on the head unit c
 ### Supporting Bluetooth Classic
 Follow one of these steps, depending on the transport protocol, to create a communication channel between the head unit and the phone:
 
-* For RFCOMM communication, assign an unused RFCOMM channel to the head unit to listen on. The implementation must register an SDP record with the local SDP server, which is part of the Bluetooth software stack. The server contains the specified UUID, service name, and auto-assigned channel. Remote Bluetooth devices can use the same UUID to query the SDP server and discover the channel to connect to. 
-  
+* For RFCOMM communication, assign an unused RFCOMM channel to the head unit to listen on. The implementation must register an SDP record with the local SDP server, which is part of the Bluetooth software stack. The server contains the specified UUID, service name, and auto-assigned channel. Remote Bluetooth devices can use the same UUID to query the SDP server and discover the channel to connect to.
+
     The SDP record is removed when the socket is closed or if the application closes unexpectedly. Android clients discover the head unit by using the method that is described in [BluetoothDevice.getUuids](https://developer.android.com/reference/android/bluetooth/BluetoothDevice#getUuids()).
 
 * For iAP2, allocate a communication channel with the specified protocol identifier. For information about iAP2, see the Accessory Interface Specification for Apple Devices.
@@ -122,8 +122,6 @@ class BluetoothProvider : public aace::core::PlatformInterface {
 ```
 
 >**Note:** Amazon does not provide reference implementation for Linux and QNX.
-
-For Android, AACS uses the `Bluetooth` module with the `Mobile Authorization` extension to enable a simplified user sign in experience on a bluetooth-paired phone. There is no setup required for the `Bluetooth` module beyond the setup to use the `Mobile Authorization` extension. See the Mobile Authorization extension documentation for details.
 
 ## Sequence Diagrams
 The sequence diagrams illustrate the flow for a Bluetooth Classic connection and the flow for a BLE connection.

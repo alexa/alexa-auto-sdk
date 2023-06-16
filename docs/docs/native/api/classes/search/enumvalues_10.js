@@ -5,8 +5,7 @@ var searchData=
   ['thumbs_5fdown',['THUMBS_DOWN',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8cad0f46468c4c82a194d3addf70a4fd30c',1,'aace::alexa::PlaybackControllerEngineInterface']]],
   ['thumbs_5fup',['THUMBS_UP',['../classaace_1_1alexa_1_1_playback_controller_engine_interface.html#a990f517d423450b712fcfd0488403e8ca0681d0f86db4139eecabf879c0c63f77',1,'aace::alexa::PlaybackControllerEngineInterface']]],
   ['timeout',['TIMEOUT',['../classaace_1_1cbl_1_1_c_b_l.html#a4a095678f1d75f972b59f09b7c3aae0aa070a0fb40f6c308ab544b227660aadff',1,'aace::cbl::CBL']]],
-  ['timer',['TIMER',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5ab127d163c55a6603f3a37ce3a642c36d',1,'aace::metrics::MetricsUploader']]],
   ['track',['TRACK',['../classaace_1_1alexa_1_1_external_media_adapter.html#a743163f79b264acddbcbac96a3d06836ab82057c0f8a7631cf533363631986a00',1,'aace::alexa::ExternalMediaAdapter']]],
   ['treble',['TREBLE',['../classaace_1_1alexa_1_1_equalizer_controller_engine_interface.html#a733a5c62b16ef4f62b5c94d16f314cb3a6481bb83f7c61a109bd727e3fa30917b',1,'aace::alexa::EqualizerControllerEngineInterface']]],
-  ['trim',['TRIM',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cfaa32049f307ffa78cf7b4586ac7d98e06',1,'aace::vehicle::config::VehicleConfiguration']]]
+  ['trim',['TRIM',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799aa32049f307ffa78cf7b4586ac7d98e06',1,'aace::vehicle::config::VehicleConfiguration']]]
 ];

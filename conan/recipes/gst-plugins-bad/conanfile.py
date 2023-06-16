@@ -25,7 +25,7 @@ class GStPluginsBadConan(ConanFile):
     default_options = dict({"shared": False, "fPIC": True}, **{f: "auto" for f in _features})
     exports_sources = ["patches/*.patch"]
     requires = [
-        "openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7",
+        "openssl/1.1.1s@#3eeebc156917046ee80533dbbb8f4671",
         "libxml2/2.9.10#7293e7b3f9703b324258194bb749ce85",
     ]
     build_requires = ["meson/0.56.2", "bison/3.7.1", "flex/2.6.4", "pkgconf/1.7.3"]

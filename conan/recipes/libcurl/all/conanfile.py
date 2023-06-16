@@ -10,7 +10,7 @@ class LibcurlConan(ConanFile):
     python_requires_extend = "aac-sdk-tools.BaseSdkDependency"
 
     name = "libcurl"
-    version = "7.81.0"
+    version = "8.0.1"
 
     description = "command line tool and library for transferring data with URLs"
     topics = ("conan", "curl", "libcurl", "data-transfer")
@@ -174,7 +174,7 @@ class LibcurlConan(ConanFile):
             if self.settings.os == "Neutrino":
                 self.requires("openssl/qnx7")
             else:
-                self.requires("openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7")
+                self.requires("openssl/1.1.1s@#3eeebc156917046ee80533dbbb8f4671")
         if self.options.with_zlib:
             self.requires("zlib/1.2.11#95482d4fb614fadd27775f2def0a5323")
 

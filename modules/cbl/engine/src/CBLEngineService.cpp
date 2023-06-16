@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "AACE/Engine/Authorization/AuthorizationServiceInterface.h"
 #include "AACE/Engine/CBL/CBLEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include <AACE/Engine/Network/NetworkInfoObserver.h>
 #include <AACE/Engine/Network/NetworkObservableInterface.h>
 #include <AACE/Engine/PropertyManager/PropertyManagerEngineService.h>
@@ -106,12 +107,18 @@ bool CBLEngineService::setup() {
             auto networkObserver =
                 getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>("aace.network");
 
+            auto metricService =
+                getContext()->getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>(
+                    "aace.metrics");
+            ThrowIfNull(metricService, "nullMetricRecorderServiceInterface");
+
             m_cblAuthorizationProvider = CBLAuthorizationProvider::create(
                 SERVICE_NAME,
                 alexaComponents->getAuthorizationManager(),
                 configuration,
                 networkObserver,
                 propertyManager,
+                metricService,
                 m_enableUserProfile);
             authorizationService->registerProvider(m_cblAuthorizationProvider, SERVICE_NAME);
         }
@@ -185,6 +192,10 @@ bool CBLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::cbl::
         auto networkObserver =
             getContext()->getServiceInterface<aace::engine::network::NetworkObservableInterface>("aace.network");
 
+        auto metricService =
+            getContext()->getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>("aace.metrics");
+        ThrowIfNull(metricService, "nullMetricRecorderServiceInterface");
+
         m_cblEngineImpl = aace::engine::cbl::CBLEngineImpl::create(
             cbl,
             alexaComponents->getAuthorizationManager(),
@@ -194,6 +205,7 @@ bool CBLEngineService::registerPlatformInterfaceType(std::shared_ptr<aace::cbl::
             localeAssetManager,
             networkObserver,
             propertyManager,
+            metricService,
             m_enableUserProfile);
         ThrowIfNull(m_cblEngineImpl, "createCBLEngineImplFailed");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,30 +14,50 @@
  */
 #include <AVSCommon/SDKInterfaces/LocalPlaybackHandlerInterface.h>
 
-#include "AACE/Engine/Alexa/PlaybackControllerEngineImpl.h"
-#include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
+#include <AACE/Engine/Alexa/PlaybackControllerEngineImpl.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
+using namespace aace::engine::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.PlaybackControllerEngineImpl");
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "PlaybackControllerEngineImpl";
+/// Source name for metrics from PlaybackController
+static const std::string METRIC_SOURCE = "PLAYBACK_CONTROLLER-ButtonPressed";
 
-/// Counter metrics for PlaybackController Platform APIs
-static const std::string METRIC_PLAYBACK_CONTROLLER_BUTTON_PRESSED = "ButtonPressed";
-static const std::string METRIC_PLAYBACK_CONTROLLER_TOGGLE_PRESSED = "TogglePressed";
+/// Metric key for button press count
+static const std::string METRIC_BUTTON_PRESSED_COUNT = "PlaybackButtonPressedCount";
+
+/// Metric key for button control type dimension
+static const std::string METRIC_BUTTON_CONTROL_TYPE = "ButtonType";
+
+static void submitButtonPressMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    const std::string& buttonType) {
+    auto metricBuilder = MetricEventBuilder().withSourceName(METRIC_SOURCE).withAlexaAgentId();
+    metricBuilder.addDataPoint(CounterDataPointBuilder{}.withName(METRIC_BUTTON_PRESSED_COUNT).increment(1).build());
+    metricBuilder.addDataPoint(
+        StringDataPointBuilder{}.withName(METRIC_BUTTON_CONTROL_TYPE).withValue(buttonType).build());
+    try {
+        recordMetric(recorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
 
 PlaybackControllerEngineImpl::PlaybackControllerEngineImpl(
-    std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface) :
+    std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
+    std::shared_ptr<MetricRecorderServiceInterface> metricRecorder) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
-        m_playbackControllerPlatformInterface(playbackControllerPlatformInterface) {
+        m_playbackControllerPlatformInterface(playbackControllerPlatformInterface),
+        m_metricRecorder(metricRecorder) {
 }
 
 bool PlaybackControllerEngineImpl::initialize(
@@ -70,7 +90,8 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
         capabilitiesRegistrar,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+    std::shared_ptr<MetricRecorderServiceInterface> metricRecorder) {
     std::shared_ptr<PlaybackControllerEngineImpl> playbackControllerEngineImpl = nullptr;
 
     try {
@@ -78,9 +99,10 @@ std::shared_ptr<PlaybackControllerEngineImpl> PlaybackControllerEngineImpl::crea
         ThrowIfNull(capabilitiesRegistrar, "invalidCapabilitiesRegistrar");
         ThrowIfNull(messageSender, "invalidMessageSender");
         ThrowIfNull(contextManager, "invalidContextManager");
+        ThrowIfNull(metricRecorder, "invalidMetricRecorder");
 
         playbackControllerEngineImpl = std::shared_ptr<PlaybackControllerEngineImpl>(
-            new PlaybackControllerEngineImpl(playbackControllerPlatformInterface));
+            new PlaybackControllerEngineImpl(playbackControllerPlatformInterface, metricRecorder));
 
         ThrowIfNot(
             playbackControllerEngineImpl->initialize(capabilitiesRegistrar, messageSender, contextManager),
@@ -107,6 +129,10 @@ void PlaybackControllerEngineImpl::doShutdown() {
     if (m_playbackControllerCapabilityAgent != nullptr) {
         m_playbackControllerCapabilityAgent->shutdown();
     }
+
+    if (!m_metricRecorder.expired()) {
+        m_metricRecorder.reset();
+    }
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> PlaybackControllerEngineImpl::
@@ -117,9 +143,8 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterfac
 void PlaybackControllerEngineImpl::onButtonPressed(PlaybackButton button) {
     AACE_DEBUG(LX(TAG).d("button", button));
     std::stringstream ss;
-    ss << static_cast<alexaClientSDK::avsCommon::avs::PlaybackButton>(button);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onButtonPressed", {METRIC_PLAYBACK_CONTROLLER_BUTTON_PRESSED, ss.str()});
+    ss << button;
+    submitButtonPressMetric(m_metricRecorder.lock(), ss.str());
     if (button == PlaybackButton::PAUSE) {
         AACE_DEBUG(LX(TAG).m("Using local stop for PAUSE button press"));
         // PlaybackOperation::STOP_PLAYBACK is used rather than PlaybackOperation::PAUSE_PLAYBACK so that AudioPlayer CA
@@ -135,9 +160,8 @@ void PlaybackControllerEngineImpl::onButtonPressed(PlaybackButton button) {
 void PlaybackControllerEngineImpl::onTogglePressed(PlaybackToggle toggle, bool action) {
     AACE_DEBUG(LX(TAG).d("toggle", toggle).d("action", action));
     std::stringstream ss;
-    ss << static_cast<alexaClientSDK::avsCommon::avs::PlaybackToggle>(toggle);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onTogglePressed", {METRIC_PLAYBACK_CONTROLLER_TOGGLE_PRESSED, ss.str()});
+    ss << toggle;
+    submitButtonPressMetric(m_metricRecorder.lock(), ss.str());
     m_playbackRouter->togglePressed(static_cast<alexaClientSDK::avsCommon::avs::PlaybackToggle>(toggle), action);
 }
 

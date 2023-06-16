@@ -1,4 +1,0 @@
-<paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <files-path path="models/" name="files/models"/>
-    <files-path path="/" name="files"/>
-</paths>

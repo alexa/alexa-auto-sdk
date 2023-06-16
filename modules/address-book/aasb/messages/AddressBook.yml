@@ -114,13 +114,16 @@ types:
         desc: Country name, or an empty string if not available.
       - name: latitudeInDegrees
         type: float
-        desc: Geo latitude in degrees.
+        desc: Geo latitude in degrees. Optional when AddressBookType is CONTACT.
+        default: 0.0f
       - name: longitudeInDegrees
         type: float
-        desc: Geo longitude in degrees.
+        desc: Geo longitude in degrees. Optional when AddressBookType is CONTACT.
+        default: 0.0f
       - name: accuracyInMeters
         type: float
-        desc: Accuracy in meters, or zero if not available.
+        desc: Accuracy in meters, or zero if not available. Optional when AddressBookType is CONTACT.
+        default: 0.0f
 
   - name: AddressBookType
     type: enum

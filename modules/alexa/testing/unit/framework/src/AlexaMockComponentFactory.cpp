@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 
 #include <AACE/Test/Unit/Alexa/AlexaMockComponentFactory.h>
 #include <acsdkShutdownManager/ShutdownManager.h>
+#include <Captions/LibwebvttParserAdapter.h>
 
 namespace aace {
 namespace test {
@@ -167,6 +168,15 @@ std::shared_ptr<aace::test::unit::alexa::MockDeviceSettingsDelegate> AlexaMockCo
     }
 
     return m_mockDeviceSettingsDelegate;
+}
+
+std::shared_ptr<aace::test::unit::core::MockMetricRecorderServiceInterface> AlexaMockComponentFactory::
+    getMetricRecorderServiceMock() {
+    if (m_mockMetricRecorderService == nullptr) {
+        m_mockMetricRecorderService = std::make_shared<aace::test::unit::core::MockMetricRecorderServiceInterface>();
+    }
+
+    return m_mockMetricRecorderService;
 }
 
 std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::test::MockContextManager> AlexaMockComponentFactory::
@@ -461,6 +471,14 @@ std::shared_ptr<alexaClientSDK::acsdkShutdownManager::ShutdownNotifier> AlexaMoc
             m_mockShutDownNotifier);
     }
     return m_mockShutDownNotifier;
+}
+
+std::shared_ptr<aace::test::unit::avs::MockCaptionManager> AlexaMockComponentFactory::getCaptionManager() {
+    if (m_mockCaptionManager == nullptr) {
+        m_mockCaptionManager = std::make_shared<aace::test::unit::avs::MockCaptionManager>();
+    }
+
+    return m_mockCaptionManager;
 }
 
 //

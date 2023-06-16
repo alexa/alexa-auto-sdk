@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,25 +15,13 @@
 
 #include <AACE/Engine/Alexa/AlexaSpeakerEngineImpl.h>
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaSpeakerEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaSpeakerEngineImpl";
-
-/// Counter metrics for Speaker Platform APIs
-static const std::string METRIC_SPEAKER_SPEAKER_SETTINGS_CHANGED = "SpeakerSettingsChanged";
-static const std::string METRIC_SPEAKER_LOCAL_SET_VOLUME = "LocalSetVolume";
-static const std::string METRIC_SPEAKER_LOCAL_ADJUST_VOLUME = "LocalAdjustVolume";
-static const std::string METRIC_SPEAKER_LOCAL_SET_MUTE = "LocalSetMute";
 
 AlexaSpeakerEngineImpl::AlexaSpeakerEngineImpl(
     std::shared_ptr<aace::alexa::AlexaSpeaker> alexaSpeakerPlatformInterface) :
@@ -132,8 +120,6 @@ void AlexaSpeakerEngineImpl::doShutdown() {
 void AlexaSpeakerEngineImpl::onLocalSetVolume(SpeakerType type, int8_t volume) {
     std::stringstream speakerType;
     speakerType << convert(type);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onLocalSetVolume", {METRIC_SPEAKER_LOCAL_SET_VOLUME, speakerType.str()});
     if (auto m_speakerManager_lock = m_speakerManager.lock()) {
         m_speakerManager_lock->setVolume(convert(type), volume);
     }
@@ -142,8 +128,6 @@ void AlexaSpeakerEngineImpl::onLocalSetVolume(SpeakerType type, int8_t volume) {
 void AlexaSpeakerEngineImpl::onLocalAdjustVolume(SpeakerType type, int8_t delta) {
     std::stringstream speakerType;
     speakerType << convert(type);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onLocalAdjustVolume", {METRIC_SPEAKER_LOCAL_ADJUST_VOLUME, speakerType.str()});
     if (auto m_speakerManager_lock = m_speakerManager.lock()) {
         m_speakerManager_lock->adjustVolume(convert(type), delta);
     }
@@ -152,8 +136,6 @@ void AlexaSpeakerEngineImpl::onLocalAdjustVolume(SpeakerType type, int8_t delta)
 void AlexaSpeakerEngineImpl::onLocalSetMute(SpeakerType type, bool mute) {
     std::stringstream speakerType;
     speakerType << convert(type);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onLocalSetMute", {METRIC_SPEAKER_LOCAL_SET_MUTE, speakerType.str()});
     if (auto m_speakerManager_lock = m_speakerManager.lock()) {
         m_speakerManager_lock->setMute(convert(type), mute);
     }

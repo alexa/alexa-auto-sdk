@@ -16,7 +16,8 @@
 #include <iostream>
 #include <utility>
 
-#include "AACE/Engine/Alexa/AssistantInfoManager.h"
+#include <AACE/Engine/Alexa/AssistantInfoManager.h>
+#include <AACE/Engine/Utils/Agent/AgentId.h>
 #include <AACE/Engine/Utils/JSON/JSON.h>
 #include <AACE/Engine/Utils/String/StringUtils.h>
 #include <AACE/Engine/Core/EngineMacros.h>
@@ -28,20 +29,18 @@ namespace alexa {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AssistantInfoManager");
 
+using namespace aace::engine::utils::agent;
+
 AssistantInfoManager::AssistantInfoManager() {
     // Insert AGENT_ID_NONE (0) and AGENT_ID_ALL (1) into the map to prevent undefined behavior
-    m_idToAssistants.insert(std::make_pair(
-        alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_NONE,
-        Assistant{alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_NONE, "", "", false}));
-    m_idToAssistants.insert(std::make_pair(
-        alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL,
-        Assistant{alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, "", "", false}));
+    m_idToAssistants.insert(std::make_pair(AGENT_ID_NONE, Assistant{AGENT_ID_NONE, "", "", false}));
+    m_idToAssistants.insert(std::make_pair(AGENT_ID_ALL, Assistant{AGENT_ID_ALL, "", "", false}));
 
     // Add Alexa by default
-    auto assistant = Assistant{.id = ALEXA_ASSISTANT_ID, .uuid = "", .name = ALEXA_ASSISTANT_NAME, .isLocal = false};
+    auto assistant = Assistant{.id = AGENT_ID_ALEXA, .uuid = "", .name = ALEXA_ASSISTANT_NAME, .isLocal = false};
 
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_idToAssistants.insert(std::make_pair(ALEXA_ASSISTANT_ID, assistant));
+    m_idToAssistants.insert(std::make_pair(AGENT_ID_ALEXA, assistant));
 
     // Set default policy
     m_policy = AssistantPolicy::ALEXA_ONLY;

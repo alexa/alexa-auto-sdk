@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 
 #include "AACE/Engine/CBL/CBLEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace cbl {
 
-using namespace aace::engine::utils::metrics;
 using namespace aace::cbl;
 using json = nlohmann::json;
 
@@ -35,19 +33,6 @@ static const std::string SERVICE_NAME = "alexa:cblEngineImpl";
 
 /// Timeout to wait for the callbacks from authorization provider.
 static const std::chrono::seconds TIMEOUT(2);
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "CBLEngineImpl";
-
-/// Counter metrics for CBL Platform APIs
-static const std::string METRIC_CBL_CBL_STATE_CHANGED = "CblStateChanged";
-static const std::string METRIC_CBL_CLEAR_REFRESH_TOKEN = "ClearRefreshToken";
-static const std::string METRIC_CBL_SET_REFRESH_TOKEN = "SetRefreshToken";
-static const std::string METRIC_CBL_GET_REFRESH_TOKEN = "GetRefreshToken";
-static const std::string METRIC_CBL_SET_USER_PROFILE = "SetUserProfile";
-static const std::string METRIC_CBL_START = "Start";
-static const std::string METRIC_CBL_CANCEL = "Cancel";
-static const std::string METRIC_CBL_RESET = "Reset";
 
 CBLEngineImpl::CBLEngineImpl(std::shared_ptr<CBL> cblPlatformInterface) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
@@ -64,6 +49,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     bool enableUserProfile) {
     std::shared_ptr<CBLEngineImpl> cblEngineImpl = nullptr;
 
@@ -81,6 +67,7 @@ std::shared_ptr<CBLEngineImpl> CBLEngineImpl::create(
                 localeAssetManager,
                 networkObserver,
                 propertyManager,
+                metricRecorder,
                 enableUserProfile),
             "initializeCBLEngineImplFailed");
 
@@ -105,10 +92,12 @@ bool CBLEngineImpl::initialize(
     std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     bool enableUserProfile) {
     try {
         ThrowIfNull(authorizationManagerInterface, "invalidAuthorizationManagerInterface");
         ThrowIfNull(deviceInfo, "invalidDeviceInfo");
+        ThrowIfNull(metricRecorder, "invalidMetricRecorder");
 
         auto configuration =
             CBLConfiguration::create(deviceInfo, codePairRequestTimeout, alexaEndpoints, localeAssetManager);
@@ -120,6 +109,7 @@ bool CBLEngineImpl::initialize(
             configuration,
             networkObserver,
             propertyManager,
+            metricRecorder,
             enableUserProfile,
             shared_from_this());
         ThrowIfNull(m_cblAuthorizationProvider, "createCBLAuthorizationProviderFailed");
@@ -145,7 +135,6 @@ void CBLEngineImpl::doShutdown() {
 
 void CBLEngineImpl::enable() {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "enable", {METRIC_CBL_GET_REFRESH_TOKEN});
     auto refreshToken = m_cblPlatformInterface->getRefreshToken();
     if (!refreshToken.empty()) {
         json refreshTokenJson;
@@ -161,21 +150,18 @@ void CBLEngineImpl::disable() {
 
 void CBLEngineImpl::onStart() {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onStart", {METRIC_CBL_START});
     // Explicit start, pass empty data.
     m_cblAuthorizationProvider->startAuthorizationLegacy("", true);
 }
 
 void CBLEngineImpl::onCancel() {
     AACE_DEBUG(LX(TAG));
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onCancel", {METRIC_CBL_CANCEL});
     m_cblAuthorizationProvider->cancelAuthorization();
 }
 
 void CBLEngineImpl::onReset() {
     AACE_DEBUG(LX(TAG));
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onReset", {METRIC_CBL_RESET});
         // Keeping the backward compatibility by synchronizing the logout process.
         if (!m_cblAuthorizationProvider->logout()) {
             Throw("logoutFailed");
@@ -269,8 +255,6 @@ void CBLEngineImpl::onEventReceived(const std::string& service, const std::strin
                     auto payload = requestPayload["payload"];
                     if (payload.find("name") != payload.end() && payload["name"].is_string() &&
                         payload.find("email") != payload.end() && payload["email"].is_string()) {
-                        emitCounterMetrics(
-                            METRIC_PROGRAM_NAME_SUFFIX, "onEventReceived", {METRIC_CBL_SET_USER_PROFILE});
                         m_cblPlatformInterface->setUserProfile(payload["name"], payload["email"]);
                     } else {
                         Throw("invalidNameOrEmail");
@@ -295,7 +279,6 @@ std::string CBLEngineImpl::onGetAuthorizationData(const std::string& service, co
         ThrowIf(service != SERVICE_NAME, "unexpectedService");
         if (key == "refreshToken") {
             json refreshTokenJson;
-            emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetAuthorizationData", {METRIC_CBL_GET_REFRESH_TOKEN});
             refreshTokenJson["refreshToken"] = m_cblPlatformInterface->getRefreshToken();
             return refreshTokenJson.dump();
         }
@@ -319,15 +302,11 @@ void CBLEngineImpl::onSetAuthorizationData(
             if (!data.empty()) {
                 auto refreshTokenJson = json::parse(data);
                 if (refreshTokenJson.contains("refreshToken") && refreshTokenJson["refreshToken"].is_string()) {
-                    emitCounterMetrics(
-                        METRIC_PROGRAM_NAME_SUFFIX, "onSetAuthorizationData", {METRIC_CBL_SET_REFRESH_TOKEN});
                     m_cblPlatformInterface->setRefreshToken(refreshTokenJson["refreshToken"]);
                 } else {
                     Throw("invalidrefreshToken");
                 }
             } else {
-                emitCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX, "onSetAuthorizationData", {METRIC_CBL_CLEAR_REFRESH_TOKEN});
                 m_cblPlatformInterface->clearRefreshToken();
             }
             return;
@@ -359,19 +338,6 @@ void CBLEngineImpl::cblStateChanged(
     const std::string& url,
     const std::string& code) {
     if (m_cblPlatformInterface) {
-        std::stringstream ssCblState;
-        ssCblState << state;
-        if (state == CBL::CBLState::STOPPING) {
-            std::stringstream ssReason;
-            ssReason << reason;
-            emitCounterMetrics(
-                METRIC_PROGRAM_NAME_SUFFIX,
-                "cblStateChanged",
-                {METRIC_CBL_CBL_STATE_CHANGED, ssCblState.str(), ssReason.str()});
-        } else {
-            emitCounterMetrics(
-                METRIC_PROGRAM_NAME_SUFFIX, "cblStateChanged", {METRIC_CBL_CBL_STATE_CHANGED, ssCblState.str()});
-        }
         m_cblPlatformInterface->cblStateChanged(state, reason, url, code);
     }
 }

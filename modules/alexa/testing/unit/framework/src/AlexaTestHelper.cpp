@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -25,52 +25,49 @@ namespace test {
 namespace unit {
 namespace alexa {
 
-static const std::string ALEXA_CONFIG =
-    "{"
-    "    \"aace.alexa\":{"
-    "        \"avsDeviceSDK\":{"
-    "            \"cblAuthDelegate\":{"
-    "                \"databaseFilePath\":\"cblAuthDelegate.db\""
-    "            },"
-    "            \"deviceInfo\":{"
-    "                \"deviceSerialNumber\":\"12345678\", "
-    "                \"clientId\":\"DummyClientId\","
-    "                \"productId\":\"DummyProductID\","
-    "                \"manufacturerName\":\"DummyManufacturerName\","
-    "                \"description\": \"desc\""
-    "            },"
-    "            \"capabilitiesDelegate\":{"
-    "                \"databaseFilePath\":\"capabilitiesDatabase.db\""
-    "            },"
-    "            \"miscDatabase\":{"
-    "                \"databaseFilePath\":\"miscDatabase.db\""
-    "            },"
-    "            \"alertsCapabilityAgent\":{"
-    "                \"databaseFilePath\":\"alerts.db\""
-    "            },"
-    "            \"settings\":{"
-    "                \"databaseFilePath\":\"settings.db\","
-    "                \"defaultAVSClientSettings\":{"
-    "                    \"locale\":\"en-US\""
-    "                }"
-    "            },"
-    "            \"bluetooth\" : {"
-    "                \"databaseFilePath\":\"bluetooth.db\""
-    "            },"
-    "            \"certifiedSender\":{"
-    "                \"databaseFilePath\":\"certifiedSender.db\""
-    "            },"
-    "            \"notifications\":{"
-    "                \"databaseFilePath\":\"notifications.db\""
-    "            },"
-    "            \"deviceSettings\": {"
-    "               \"databaseFilePath\": \"deviceSettings.db\","
-    "               \"defaultLocale\" : \"en-US\","
-    "               \"defaultTimezone\" :\"America/Vancouver\""
-    "           }"
-    "        }"
-    "    }"
-    "}";
+static const std::string ALEXA_CONFIG = R"({
+    "aace.alexa":{
+        "alexaClientInfo": {
+            "clientId":"DummyClientId",
+            "productId":"DummyProductID",
+            "amazonId": "AAAAAAAAAAAAAA"
+        },
+        "avsDeviceSDK":{
+            "cblAuthDelegate":{
+                "databaseFilePath":"cblAuthDelegate.db"
+            },
+            "capabilitiesDelegate":{
+                "databaseFilePath":"capabilitiesDatabase.db"
+            },
+            "miscDatabase":{
+                "databaseFilePath":"miscDatabase.db"
+            },
+            "alertsCapabilityAgent":{
+                "databaseFilePath":"alerts.db"
+            },
+            "settings":{
+                "databaseFilePath":"settings.db",
+                "defaultAVSClientSettings": {
+                    "locale":"en-US"
+                }
+            },
+            "bluetooth" : {
+                "databaseFilePath":"bluetooth.db"
+            },
+            "certifiedSender":{
+                "databaseFilePath":"certifiedSender.db"
+            },
+            "notifications":{
+                "databaseFilePath":"notifications.db"
+            },
+            "deviceSettings": {
+                "databaseFilePath": "deviceSettings.db",
+                "defaultLocale" : "en-US",
+                "defaultTimezone" :"America/Vancouver"
+            }
+        }
+    }
+})";
 
 static const std::string AVS_DEVICE_SDK_CONFIG =
     "{"

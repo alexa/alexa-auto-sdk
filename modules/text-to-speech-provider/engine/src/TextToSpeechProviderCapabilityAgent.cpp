@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -69,20 +69,69 @@ static const std::string EMPTY_STRING = "";
 std::shared_ptr<TextToSpeechProviderCapabilityAgent> TextToSpeechProviderCapabilityAgent::create(
     std::shared_ptr<aace::engine::textToSpeechProvider::TextToSpeechProviderInterface> textToSpeechProviderEngine,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) {
     try {
         ThrowIfNull(textToSpeechProviderEngine, "nullTextToSpeechProviderInterface");
         ThrowIfNull(exceptionSender, "nullExceptionSender");
         ThrowIfNull(messageSender, "nullMessageSender");
 
         auto textToSpeechProviderCapabilityAgent = std::shared_ptr<TextToSpeechProviderCapabilityAgent>(
-            new TextToSpeechProviderCapabilityAgent(textToSpeechProviderEngine, exceptionSender, messageSender));
+            new TextToSpeechProviderCapabilityAgent(textToSpeechProviderEngine, exceptionSender, messageSender, agentManager));
 
         ThrowIfNull(textToSpeechProviderCapabilityAgent, "nullTextToSpeechProviderCapabilityAgent");
+
+        textToSpeechProviderCapabilityAgent->initialize();
+
         return textToSpeechProviderCapabilityAgent;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
         return nullptr;
+    }
+}
+
+
+void TextToSpeechProviderCapabilityAgent::initialize() {
+    AACE_DEBUG(LX(TAG));
+	
+    if (m_agentManager) {
+        auto supportedAgentIds = m_agentManager->getAVSInterfaceEnabledAgentIds(HANDLE_SPEECH.nameSpace, HANDLE_SPEECH.name);
+        for (const auto& agentId : supportedAgentIds) {
+            m_agentManager->addAgentEnablementObserverInterface(agentId, shared_from_this());
+        }
+
+    }
+
+}
+
+void TextToSpeechProviderCapabilityAgent::onEnabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) {
+    AACE_DEBUG(LX(TAG));
+    if (m_agentManager) {
+        auto supportedAgentIds = m_agentManager->getAVSInterfaceEnabledAgentIds(HANDLE_SPEECH.nameSpace, HANDLE_SPEECH.name);
+        if (0 != supportedAgentIds.count(id)) {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            // Only insert enabled agent ID to m_enabledAgentIds when no agent ID is in m_enabledAgentIds 
+            // to make sure there's always only one agent enabled for the TTS provider  interface at one time.
+            //NOTE: The avsInterface config should be provided such that only one agent has this interface enabled
+            if (0 == m_enabledAgentIds.count(id)) {
+                m_enabledAgentIds.insert(id);
+                lock.unlock();
+            }
+        }
+    }
+}
+
+void TextToSpeechProviderCapabilityAgent::onDisabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) {
+    AACE_DEBUG(LX(TAG));
+    if (m_agentManager) {
+        auto supportedAgentIds = m_agentManager->getAVSInterfaceEnabledAgentIds(HANDLE_SPEECH.nameSpace, HANDLE_SPEECH.name);
+        if (0 != supportedAgentIds.count(id)) {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            if (m_enabledAgentIds.count(id)) {
+                m_enabledAgentIds.erase(id);
+                lock.unlock();
+            }
+        }
     }
 }
 
@@ -115,20 +164,32 @@ void TextToSpeechProviderCapabilityAgent::cancelDirective(std::shared_ptr<Direct
 alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration TextToSpeechProviderCapabilityAgent::getConfiguration()
     const {
     alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration configuration;
-    auto audioVisualBlockingPolicy = alexaClientSDK::avsCommon::avs::BlockingPolicy(
-        alexaClientSDK::avsCommon::avs::BlockingPolicy::MEDIUMS_AUDIO_AND_VISUAL, true);
-    configuration[HANDLE_SPEECH] = audioVisualBlockingPolicy;
+
+    if (!m_agentManager) {
+        configuration[HANDLE_SPEECH] = alexaClientSDK::avsCommon::avs::BlockingPolicy(alexaClientSDK::avsCommon::avs::BlockingPolicy::MEDIUMS_AUDIO_AND_VISUAL, true);
+    } else {
+        auto agents = m_agentManager->getAVSInterfaceEnabledAgentIds(HANDLE_SPEECH.nameSpace, HANDLE_SPEECH.name);
+		
+        for (const auto& agent : agents) {
+            alexaClientSDK::avsCommon::avs::NamespaceAndName handleSpeechDirective{HANDLE_SPEECH.nameSpace, HANDLE_SPEECH.name, agent};
+            configuration[handleSpeechDirective] = alexaClientSDK::avsCommon::avs::BlockingPolicy(alexaClientSDK::avsCommon::avs::BlockingPolicy::MEDIUMS_AUDIO_AND_VISUAL, true);
+        }
+    }
     return configuration;
+
 }
 
 TextToSpeechProviderCapabilityAgent::TextToSpeechProviderCapabilityAgent(
     std::shared_ptr<aace::engine::textToSpeechProvider::TextToSpeechProviderInterface> textToSpeechProviderEngine,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender) :
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager) :
         alexaClientSDK::avsCommon::avs::CapabilityAgent{NAMESPACE, exceptionSender},
         alexaClientSDK::avsCommon::utils::RequiresShutdown{"TextToSpeechProviderCapabilityAgent"},
         m_messageSender{messageSender},
-        m_textToSpeechProviderEngine{textToSpeechProviderEngine} {
+        m_textToSpeechProviderEngine{textToSpeechProviderEngine},
+        m_agentManager{agentManager} {
+
     m_capabilityConfigurations.insert(getTextToSpeechProviderConfiguration());
 }
 
@@ -258,9 +319,25 @@ void TextToSpeechProviderCapabilityAgent::executePrepareSpeech(
         if (!assistantId.empty()) {
             payload["assistantId"] = assistantId;
         }
-        auto sythesizeEvent = buildJsonEventString(SYNTHESIZE_EVENT, EMPTY_STRING, payload.dump());
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(sythesizeEvent.second);
-        m_messageSender->sendMessage(request);
+        auto synthesizeEvent = buildJsonEventString(SYNTHESIZE_EVENT, EMPTY_STRING, payload.dump());
+
+	 if (m_agentManager == nullptr) {
+            AACE_INFO(LX(TAG).m("No other applicable agents as Agent Manager is null, tagging Synthesize event with Alexa's ID"));
+            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(synthesizeEvent.second);
+            m_messageSender->sendMessage(request);
+            return;
+	 }
+	
+	 if (m_enabledAgentIds.size() > 0) {
+            // Note: Assumption here is that only one agent should support TTS interface as configured in the agentConfig
+            auto agentId = *m_enabledAgentIds.begin();
+            AACE_INFO(LX(TAG).m("Tagging synthesize event with agent Id").d("agentId", agentId));
+            auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, synthesizeEvent.second);
+            m_messageSender->sendMessage(request);
+        } else {
+            AACE_INFO(LX(TAG).m("No applicable agents are enabled. synthesize event is not sent."));
+        }
+
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG).d("reason", ex.what()));
     }

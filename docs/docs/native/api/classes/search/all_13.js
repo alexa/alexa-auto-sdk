@@ -1,9 +1,11 @@
 var searchData=
 [
-  ['wakeword',['WAKEWORD',['../classaace_1_1alexa_1_1_speech_recognizer_engine_interface.html#a32b21eebeb377059d5548e7297c0846bacb8de769bb1ad99fe7114fa74fc11e72',1,'aace::alexa::SpeechRecognizerEngineInterface::WAKEWORD()'],['../classaace_1_1arbitrator_1_1_arbitrator_engine_interface.html#accbfc012f9c6f67065343d8a44b23368acb8de769bb1ad99fe7114fa74fc11e72',1,'aace::arbitrator::ArbitratorEngineInterface::WAKEWORD()']]],
-  ['wakeworddetected',['wakewordDetected',['../classaace_1_1alexa_1_1_speech_recognizer.html#adb2ff621353bb47de5e4d1d41662b278',1,'aace::alexa::SpeechRecognizer']]],
-  ['wakewordindex',['WakeWordIndex',['../classaace_1_1wakeword_1_1_wakeword_manager_engine_interface.html#a72d9dc569eeab33723c0209f9531a5d5',1,'aace::wakeword::WakewordManagerEngineInterface']]],
-  ['wakewordmanagerengineinterface',['WakewordManagerEngineInterface',['../classaace_1_1wakeword_1_1_wakeword_manager_engine_interface.html',1,'aace::wakeword']]],
-  ['warn',['WARN',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786a32bd8a1db2275458673903bdb84cb277',1,'aace::logger::LoggerEngineInterface']]],
-  ['write_5ftimedout',['WRITE_TIMEDOUT',['../classaace_1_1alexa_1_1_alexa_client.html#a05af151f4b7fdd47b9ea56e504074e05a97af85d432104a37a1d183a76f05ad98',1,'aace::alexa::AlexaClient']]]
+  ['validationdata',['validationData',['../classaace_1_1alexa_1_1_external_media_adapter_engine_interface_1_1_discovered_player_info.html#a44eb13f37d92cad2d4d31ab0cda8b42e',1,'aace::alexa::ExternalMediaAdapterEngineInterface::DiscoveredPlayerInfo']]],
+  ['validationmethod',['validationMethod',['../classaace_1_1alexa_1_1_external_media_adapter_engine_interface_1_1_discovered_player_info.html#a564feaee70d1dda1b132669fa212b2c8',1,'aace::alexa::ExternalMediaAdapterEngineInterface::DiscoveredPlayerInfo']]],
+  ['vehicle_5fidentifier',['VEHICLE_IDENTIFIER',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799a85399bf95fd69bdc2f006fd5490aa748',1,'aace::vehicle::config::VehicleConfiguration']]],
+  ['vehicleconfiguration',['VehicleConfiguration',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html',1,'aace::vehicle::config']]],
+  ['vehicleinfoproperty',['VehicleInfoProperty',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6141ce9aa3d0bf653c0118aa1668728c',1,'aace::vehicle::config::VehicleConfiguration']]],
+  ['vehicleinfopropertytype',['VehicleInfoPropertyType',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799',1,'aace::vehicle::config::VehicleConfiguration']]],
+  ['verbose',['VERBOSE',['../classaace_1_1logger_1_1_logger_engine_interface.html#aa97c461bbc4f77638b45f7eb9271b786aec1f06e9fb39c4ef0729b3c7c9c8e8cc',1,'aace::logger::LoggerEngineInterface']]],
+  ['volumechanged',['volumeChanged',['../classaace_1_1alexa_1_1_external_media_adapter.html#ac73f6dd4d24881723c7237da431dea0d',1,'aace::alexa::ExternalMediaAdapter::volumeChanged()'],['../classaace_1_1alexa_1_1_local_media_source.html#aa4a2d08e30728bcfb35bcba0f4921aa1',1,'aace::alexa::LocalMediaSource::volumeChanged()'],['../classaace_1_1audio_1_1_audio_output.html#a1a6e4c80146a448b4532f80f613dba11',1,'aace::audio::AudioOutput::volumeChanged()']]]
 ];

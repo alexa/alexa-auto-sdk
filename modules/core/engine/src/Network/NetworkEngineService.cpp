@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "AACE/Engine/Network/NetworkEngineService.h"
 #include "AACE/Engine/Core/EngineMacros.h"
+#include "AACE/Engine/Metrics/MetricRecorderServiceInterface.h"
 #include "AACE/Engine/Utils/String/StringUtils.h"
 
 #include "AACE/Network/NetworkProperties.h"
@@ -96,8 +97,12 @@ bool NetworkEngineService::registerPlatformInterfaceType(
     try {
         ThrowIfNotNull(m_networkInfoProviderEngineImpl, "platformInterfaceAlreadyRegistered");
 
+        auto metricRecorder =
+            getContext()->getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>("aace.metrics");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
+
         // create the engine implementation
-        m_networkInfoProviderEngineImpl = NetworkInfoProviderEngineImpl::create();
+        m_networkInfoProviderEngineImpl = NetworkInfoProviderEngineImpl::create(metricRecorder);
         ThrowIfNull(m_networkInfoProviderEngineImpl, "createNetworkInfoProviderEngineImplFailed");
 
         // create the network observable interface
@@ -117,6 +122,13 @@ bool NetworkEngineService::registerPlatformInterfaceType(
         AACE_ERROR(LX(TAG, "registerPlatformInterfaceType<NetworkInfoProvider>").d("reason", ex.what()));
         return false;
     }
+}
+
+bool NetworkEngineService::stop() {
+    if (m_networkInfoProviderEngineImpl != nullptr) {
+        m_networkInfoProviderEngineImpl->stop();
+    }
+    return true;
 }
 
 bool NetworkEngineService::setProperty_networkInterface(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 #include <AACE/Test/Unit/Alexa/MockAuthorizationManager.h>
 #include <AACE/Test/Unit/Authorization/MockAuthorizationProviderListener.h>
+#include <AACE/Test/Unit/Metrics/MockMetricRecorderServiceInterface.h>
 
 #include <AACE/Engine/CBL/CBLAuthorizationProvider.h>
 #include <AACE/Engine/CBL/CBLConfigurationInterface.h>
@@ -98,6 +99,7 @@ public:
         m_mockNetworkObservableInterface = std::make_shared<testing::StrictMock<MockNetworkObservableInterface>>();
         m_mockPropertyManagerServiceInterface = std::make_shared<StrictMock<MockPropertyManagerServiceInterface>>();
         m_configuration = std::make_shared<NiceMock<MockCBLConfiguration>>();
+        m_mockMetricRecorder = std::make_shared<aace::test::unit::core::MockMetricRecorderServiceInterface>();
     }
 
     void TearDown() override {
@@ -119,7 +121,8 @@ protected:
             m_mockAuthorizationManager,
             m_configuration,
             m_mockNetworkObservableInterface,
-            m_mockPropertyManagerServiceInterface);
+            m_mockPropertyManagerServiceInterface,
+            m_mockMetricRecorder);
         cblAuthorizationProvider->setListener(m_mockAuthorizationProviderListener);
         return cblAuthorizationProvider;
     }
@@ -139,6 +142,9 @@ protected:
 
     /// The mocked @c CBLConfigurationInterface.
     std::shared_ptr<MockCBLConfiguration> m_configuration;
+
+    /// The mocked @c MetricRecorderServiceInterface
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_mockMetricRecorder;
 };
 
 TEST_F(CBLAuthorizationProviderTest, createWithNullParameters) {
@@ -147,11 +153,17 @@ TEST_F(CBLAuthorizationProviderTest, createWithNullParameters) {
         m_mockAuthorizationManager,
         m_configuration,
         m_mockNetworkObservableInterface,
-        m_mockPropertyManagerServiceInterface);
+        m_mockPropertyManagerServiceInterface,
+        m_mockMetricRecorder);
     ASSERT_EQ(cblAuthorizationProvider, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 
     auto cblAuthorizationProvider1 = aace::engine::cbl::CBLAuthorizationProvider::create(
-        "testMe", nullptr, m_configuration, m_mockNetworkObservableInterface, m_mockPropertyManagerServiceInterface);
+        "testMe",
+        nullptr,
+        m_configuration,
+        m_mockNetworkObservableInterface,
+        m_mockPropertyManagerServiceInterface,
+        m_mockMetricRecorder);
     ASSERT_EQ(cblAuthorizationProvider1, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 
     auto cblAuthorizationProvider2 = aace::engine::cbl::CBLAuthorizationProvider::create(
@@ -159,12 +171,27 @@ TEST_F(CBLAuthorizationProviderTest, createWithNullParameters) {
         m_mockAuthorizationManager,
         nullptr,
         m_mockNetworkObservableInterface,
-        m_mockPropertyManagerServiceInterface);
+        m_mockPropertyManagerServiceInterface,
+        m_mockMetricRecorder);
     ASSERT_EQ(cblAuthorizationProvider2, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 
     auto cblAuthorizationProvider3 = aace::engine::cbl::CBLAuthorizationProvider::create(
-        "testMe", m_mockAuthorizationManager, m_configuration, m_mockNetworkObservableInterface, nullptr);
+        "testMe",
+        m_mockAuthorizationManager,
+        m_configuration,
+        m_mockNetworkObservableInterface,
+        nullptr,
+        m_mockMetricRecorder);
     ASSERT_EQ(cblAuthorizationProvider3, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
+
+    auto cblAuthorizationProvider4 = aace::engine::cbl::CBLAuthorizationProvider::create(
+        "testMe",
+        m_mockAuthorizationManager,
+        m_configuration,
+        m_mockNetworkObservableInterface,
+        m_mockPropertyManagerServiceInterface,
+        nullptr);
+    ASSERT_EQ(cblAuthorizationProvider4, nullptr) << "CBLAuthorizationProvider pointer expected to be null!";
 }
 
 TEST_F(CBLAuthorizationProviderTest, simpleHappyUsecase) {

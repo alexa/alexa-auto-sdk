@@ -94,7 +94,7 @@ class MyTextToSpeechHandler {
         PrepareSpeechFailedMessage msg = json::parse(message);
         std::string speechId = msg.payload.speechId;
         std::string reason = msg.payload.reason;
-        
+
         prepareSpeechFailed(speechId, reason);
     }
 
@@ -139,7 +139,7 @@ class MyTextToSpeechHandler {
         const std::string& streamId,
         const std::string& metadata) {
         // Use MessageBroker openStream API to get the MessageStream
-        std::shared_ptr<MessageStream> preparedAudio = 
+        std::shared_ptr<MessageStream> preparedAudio =
                             m_messageBroker->openStream(msg.payload.streamId, MessageStream::Mode::READ);
 
         // Follow the UX guidelines in order to play the audio stream
@@ -158,7 +158,3 @@ class MyTextToSpeechHandler {
 ```
 
 </details>
-
-### Android Integration
-
-The Alexa Auto Client Service (AACS) provides the AACS Text-To-Speech Service to integrate the Auto SDK `Text-To-Speech` module on Android. See the AACS Text-To-Speech Service documentation for more information.

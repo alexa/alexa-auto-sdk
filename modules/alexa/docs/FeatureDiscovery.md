@@ -12,7 +12,8 @@ Auto SDK provides the [FeatureDiscovery](https://alexa.github.io/alexa-auto-sdk/
 
 ## GetFeatures Request
 The `GetFeatures` message requests the suggested utterances from Alexa. The `discoveryRequests` field is a string containing an escaped JSON with the following format:
-```
+
+```json
 [
     {
         "locale" : {{String}},
@@ -28,7 +29,7 @@ Definition of the DiscoveryRequests JSON array:
 
 | Property | Type | Required | Description |
 |-|-|-|-|
-| discoveryRequests | List\<DiscoveryRequest\> | Yes | An array of feature discovery requests |  
+| discoveryRequests | List\<DiscoveryRequest\> | Yes | An array of feature discovery requests |
 
 Definition of each DiscoveryRequest JSON Object:
 
@@ -43,7 +44,7 @@ Definition of each DiscoveryRequest JSON Object:
 
 
 ### Domain and EventType
-Each utterance configured in the Alexa cloud is associated with a scenario, which is a combination of `domain` and `eventType`. The combination determines where the utterance should be displayed. 
+Each utterance configured in the Alexa cloud is associated with a scenario, which is a combination of `domain` and `eventType`. The combination determines where the utterance should be displayed.
 When requesting Alexa utterances, your application must specify the `domain` and `eventType` values in the `GetFeatures` message payload.
 
 | Property | Type| Accepted Values |
@@ -69,13 +70,14 @@ The valid combinations of `domain` and `eventType` are as follows:
 | "LISTS" | "THINGS_TO_TRY"  | Hints displayed in the Things-to-Try settings menu under the "Lists" category. | "Alexa, what's on my to-do list?" |
 | "SHOPPING" | "THINGS_TO_TRY"  | Hints displayed in the Things-to-Try settings menu under the "Shopping" category. | "Alexa, reorder toothpaste."|
 | "QUESTIONS_ANSWERS" | "THINGS_TO_TRY"  | Hints displayed in the Things-to-Try settings menu under the "Questions and Answers" category. | "Alexa, how far away is the moon?"|
-| "SPORTS" | "THINGS_TO_TRY"  | Hints displayed in the Things-to-Try settings menu under the "Sports" category. | "Alexa, what's my sports update?"| 
+| "SPORTS" | "THINGS_TO_TRY"  | Hints displayed in the Things-to-Try settings menu under the "Sports" category. | "Alexa, what's my sports update?"|
 | "CALENDAR" | "THINGS_TO_TRY"  | Hints displayed in the Things-to-Try settings menu under the "Calendar" category. | "Alexa, add a 2:00 PM coffee chat to my calendar."|
 </details>
 
 ### GetFeatures Reply
 The `GetFeaturesReply` message returns the suggested utterances from the `GetFeatures` message request. The `discoveryResponses` field is a string containing an escaped JSON with the following format:
-```
+
+```json
 [
   {
     "domain" : {{String}},
@@ -88,7 +90,7 @@ The `GetFeaturesReply` message returns the suggested utterances from the `GetFea
        }
     ]
   }, ...
- 
+
 ]
 ```
 
@@ -96,7 +98,7 @@ Definition of DiscoveryResponses JSON array:
 
 | Property | Type | Required | Description |
 |-|-|-|-|
-| discoveryResponses | List\<DiscoveryResponse\> | Yes | An array of feature discovery responses |  
+| discoveryResponses | List\<DiscoveryResponse\> | Yes | An array of feature discovery responses |
 
 Definition of each DiscoveryResponse JSON Object:
 
@@ -124,8 +126,8 @@ Use the Engine's `MessageBroker` to publish `FeatureDiscovery` AASB messages and
 <br></br>
 
 ```cpp
-#include <AACE/Core/MessageBroker.h>
-#include <AASB/Message/Alexa/FeatureDiscovery/GetFeaturesMessage.h>
+#include "AACE/Core/MessageBroker.h"
+#include "AASB/Message/Alexa/FeatureDiscovery/GetFeaturesMessage.h"
 
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
@@ -146,6 +148,7 @@ class MyFeatureDiscoveryHandler {
         GetFeaturesMessageReply msg = json::parse(message);
         parseDiscoveryResponses(msg.payload.discoveryResponses);
     }
+
     void MyFeatureDiscoveryHandler::parseDiscoveryResponses(const std::string& discoveryResponses) {
         const auto& responseArray = json::parse(discoveryResponses);
         if (responseArray.empty()) {
@@ -163,21 +166,17 @@ class MyFeatureDiscoveryHandler {
             }
         }
     }
-    
+
     // Construct and send the FeatureDiscovery requests.
     void MyFeatureDiscoveryHandler::getFeatures(const std::string& domain) {
         json requestsArray = json::array();
         requestsArray.push_back({{"domain", domain}, {"eventType", "THINGS_TO_TRY"}, {"limit", 5}});
         GetFeaturesMessage msg;
         msg.payload.discoveryRequests = requestsArray.dump();
-        m_messageBroker->publish(msg.toString());
+        m_messageBroker->publish(msg);
     }
 };
 
 ```
 
 </details>
-
-### Android Integration
-
-The Alexa Auto Client Service (AACS) sample app provides a sample implementation to integrate the Auto SDK `FeatureDiscovery` messages on Android. See the [Alexa Auto Settings App Component](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-settings/) for the reference implementation.

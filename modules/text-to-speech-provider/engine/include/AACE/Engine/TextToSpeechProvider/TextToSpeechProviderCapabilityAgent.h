@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <AVSCommon/Utils/Threading/Executor.h>
 
 #include "AACE/Engine/TextToSpeechProvider/TextToSpeechProviderInterface.h"
+#include <acsdk/MultiAgentInterface/AgentManagerInterface.h>
 
 #include <nlohmann/json.hpp>
 
@@ -42,12 +43,14 @@ class TextToSpeechProviderCapabilityAgent
         : public alexaClientSDK::avsCommon::avs::CapabilityAgent
         , public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityConfigurationInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown
+	 , public alexaClientSDK::multiAgentInterface::observer::AgentEnablementObserverInterface
         , public std::enable_shared_from_this<TextToSpeechProviderCapabilityAgent> {
 public:
     static std::shared_ptr<TextToSpeechProviderCapabilityAgent> create(
         std::shared_ptr<aace::engine::textToSpeechProvider::TextToSpeechProviderInterface> textToSpeechProviderEngine,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager);
 
     /**
      * Destructor.
@@ -66,6 +69,13 @@ public:
     std::unordered_set<std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>>
     getCapabilityConfigurations() override;
 
+
+    /// @name AgentEnablementObserverInterface Functions
+    /// @{
+    void onEnabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) override;
+    void onDisabled(alexaClientSDK::avsCommon::avs::AgentId::IdType id) override;
+    /// @}
+
     // Function to initiate the prepare speech request
     void prepareSpeech(const std::string& speechId, const std::string& text, const std::string& assistantId);
 
@@ -73,7 +83,15 @@ private:
     TextToSpeechProviderCapabilityAgent(
         std::shared_ptr<aace::engine::textToSpeechProvider::TextToSpeechProviderInterface> textToSpeechProviderEngine,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> agentManager);
+
+    /**
+     * Initialize capability configuration & set provider for the states.
+     * @param states The vector of the state names this interface reports in its context.
+     */
+    void initialize();
+
 
     /// @name RequiresShutdown Functions
     /// @{
@@ -140,6 +158,14 @@ private:
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> m_messageSender;
 
     std::shared_ptr<aace::engine::textToSpeechProvider::TextToSpeechProviderInterface> m_textToSpeechProviderEngine;
+
+    /// The agent manager
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> m_agentManager;
+    
+    /// Enabled agents
+    std::unordered_set<alexaClientSDK::avsCommon::avs::AgentId::IdType> m_enabledAgentIds;
+    std::mutex m_mutex;
+
 };
 
 }  // namespace textToSpeechProvider

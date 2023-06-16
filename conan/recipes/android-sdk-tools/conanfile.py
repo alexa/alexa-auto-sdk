@@ -13,11 +13,17 @@ class AndroidSdkToolsConanFile(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     requires = ["zulu-openjdk/11.0.15"]
 
-    options = {"sdk_version": "ANY", "ndk_version": "ANY", "android_stl": ["c++_shared", "c++_static"]}
+    options = {
+        "sdk_version": "ANY",
+        "ndk_version": "ANY",
+        "cmake_version": "ANY",
+        "android_stl": ["c++_shared", "c++_static"],
+    }
     default_options = {
         "sdk_version": "7302050",
         # Sync with the version specified in `aacs/android/sample-app/alexa-auto-app/build.gradle`.
         "ndk_version": "23.2.8568313",  # r23c
+        "cmake_version": "3.22.1",
         "android_stl": "c++_shared",
     }
 
@@ -94,6 +100,11 @@ class AndroidSdkToolsConanFile(ConanFile):
                 f"{sdk_manager} --sdk_root={self.package_folder} --install 'ndk;{self.options.ndk_version}'",
                 run_environment=True,
             )
+            # install cmake
+            self.run(
+                f"{sdk_manager} --sdk_root={self.package_folder} --install 'cmake;{self.options.cmake_version}'",
+                run_environment=True,
+            )
 
     @property
     def _platform(self):
@@ -162,6 +173,10 @@ class AndroidSdkToolsConanFile(ConanFile):
         # ndk-build: https://developer.android.com/ndk/guides/ndk-build
         self.env_info.PATH.append(self._ndk_home)
 
+        # For packages that use cmake directly instead of Conan cmake generator
+        cmake_bin_dir = os.path.join(self._sdk_home, "cmake", str(self.options.cmake_version), "bin")
+        self.env_info.PATH.insert(0, cmake_bin_dir)
+
         # You should use the ANDROID_NDK_ROOT environment variable to indicate where the NDK is located.
         # That's what most NDK-related scripts use (inside the NDK, and outside of it).
         # https://groups.google.com/g/android-ndk/c/qZjhOaynHXc
@@ -192,6 +207,11 @@ class AndroidSdkToolsConanFile(ConanFile):
 
         logging.info(f"Creating ANDROID_NATIVE_API_LEVEL environment variable: {self.settings_target.os.api_level}")
         self.env_info.ANDROID_NATIVE_API_LEVEL = str(self.settings_target.os.api_level)
+
+        # export ANDROID_CMAKE_PROGRAM for use of cmake-wrapper
+        cmake_program = os.path.join(cmake_bin_dir, "cmake")
+        logging.info(f"Creating ANDROID_CMAKE_PROGRAM environment variable: {cmake_program}")
+        self.env_info.ANDROID_CMAKE_PROGRAM = cmake_program
 
         self.chmod_plus_x(os.path.join(self.package_folder, "cmake-wrapper"))
         cmake_wrapper = "cmake-wrapper.cmd" if self._build_os == "Windows" else "cmake-wrapper"

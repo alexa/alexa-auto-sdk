@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -96,12 +96,6 @@
 #define AACE_VERBOSE(entry)
 #endif  // AACE_DEBUG_LOG_ENABLED
 
-#ifdef AAC_METRICS_ENABLED
-#define AACE_METRIC(entry) AACE_LOG(AACE_LOG_LEVEL::METRIC, entry)
-#else  // AAC_METRICS_ENABLED
-#define AACE_METRIC(entry)
-#endif  // AAC_METRICS_ENABLED
-
 #define AACE_INFO(entry) AACE_LOG(AACE_LOG_LEVEL::INFO, entry)
 #define AACE_WARN(entry) AACE_LOG(AACE_LOG_LEVEL::WARN, entry)
 #define AACE_ERROR(entry) AACE_LOG(AACE_LOG_LEVEL::ERROR, entry)
@@ -116,5 +110,6 @@
 
 #define AACE_NOT_REACHED AACE_CRITICAL(DX.m("notReached").d("line", __LINE__).abortAfterEmission())
 #define AACE_NOT_IMPLEMENTED AACE_CRITICAL(DX.m("notImplemented").d("line", __LINE__).abortAfterEmission())
+#define AACE_ERROR_ABORT(entry) AACE_ERROR(DX.d("line", __LINE__).abortAfterEmission())
 
 #endif  // AACE_ENGINE_CORE_ENGINE_EXCEPTIONS_H

@@ -1,14 +1,14 @@
 var searchData=
 [
   ['dab',['DAB',['../classaace_1_1alexa_1_1_local_media_source.html#a193e995a51acffd671f2e9b93fe176b3ab30917aa48bf6125b9e85daf9c6eb5fc',1,'aace::alexa::LocalMediaSource']]],
-  ['datapoint',['Datapoint',['../classaace_1_1metrics_1_1_metrics_uploader_1_1_datapoint.html',1,'aace::metrics::MetricsUploader']]],
-  ['datapointtype',['DatapointType',['../classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5',1,'aace::metrics::MetricsUploader']]],
   ['datasourceupdate',['dataSourceUpdate',['../classaace_1_1apl_1_1_a_p_l.html#a2c8c2bc29a5c9b8f684069743b586bc5',1,'aace::apl::APL']]],
   ['default',['DEFAULT',['../classaace_1_1alexa_1_1_external_media_adapter.html#a4b57948f71acaa90e57d40dffb873eeea5b39c8b553c821e7cddc6da64b5bd2ee',1,'aace::alexa::ExternalMediaAdapter::DEFAULT()'],['../classaace_1_1alexa_1_1_local_media_source.html#a193e995a51acffd671f2e9b93fe176b3a5b39c8b553c821e7cddc6da64b5bd2ee',1,'aace::alexa::LocalMediaSource::DEFAULT()']]],
   ['defaultskilltoken',['defaultSkillToken',['../classaace_1_1alexa_1_1_external_media_adapter_1_1_authorized_player_info.html#a819a92a8ef3efd20ddf855b2d681146d',1,'aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo']]],
   ['deprecated_20list',['Deprecated List',['../deprecated.html',1,'']]],
   ['deregisteragent',['deregisterAgent',['../classaace_1_1arbitrator_1_1_arbitrator.html#ab9fe97006eebe051ecc9674148e7355e',1,'aace::arbitrator::Arbitrator']]],
   ['deviceconfigurationupdated',['deviceConfigurationUpdated',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a3d36c76efd0e96bd84196a8dcd5071de',1,'aace::phoneCallController::PhoneCallController']]],
+  ['deviceinfoproperty',['DeviceInfoProperty',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a5332999ec13b8c6206055a1cf234a9d6',1,'aace::vehicle::config::VehicleConfiguration']]],
+  ['deviceinfopropertytype',['DeviceInfoPropertyType',['../classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4',1,'aace::vehicle::config::VehicleConfiguration']]],
   ['devicesetup',['DeviceSetup',['../classaace_1_1alexa_1_1_device_setup.html',1,'aace::alexa']]],
   ['devicesetupengineinterface',['DeviceSetupEngineInterface',['../classaace_1_1alexa_1_1_device_setup_engine_interface.html',1,'aace::alexa']]],
   ['devicesetupstatuscodetostring',['deviceSetupStatusCodeToString',['../namespaceaace_1_1alexa.html#aa8e789fa621df6a2f846918564cdb3f2',1,'aace::alexa']]],

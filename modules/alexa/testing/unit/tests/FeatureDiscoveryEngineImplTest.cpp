@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <AACE/Engine/Alexa/FeatureDiscoveryEngineImpl.h>
 #include <AACE/Engine/Alexa/AlexaComponentInterface.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 
 using namespace aace::test::unit::alexa;
 class MockFeatureDiscoveryPlatformInterface : public aace::alexa::FeatureDiscovery {
@@ -61,8 +62,10 @@ public:
             std::shared_ptr<aace::engine::core::EngineServiceContext>(new aace::engine::core::EngineServiceContext(
                 std::dynamic_pointer_cast<aace::engine::core::EngineService>(shared_from_this())));
         m_mockPropertyManager = std::make_shared<aace::test::unit::core::MockPropertyManagerServiceInterface>();
+        m_mockMetricRecorder = std::make_shared<aace::test::unit::core::MockMetricRecorderServiceInterface>();
         m_mockAlexaEndpoint = std::make_shared<DummyAlexaEndpointInterface>();
         registerServiceInterface<aace::engine::propertyManager::PropertyManagerServiceInterface>(m_mockPropertyManager);
+        registerServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>(m_mockMetricRecorder);
         registerServiceInterface<aace::engine::alexa::AlexaEndpointInterface>(m_mockAlexaEndpoint);
     }
 
@@ -84,6 +87,7 @@ public:
 private:
     std::shared_ptr<aace::engine::core::EngineServiceContext> m_serviceContext;
     std::shared_ptr<aace::test::unit::core::MockPropertyManagerServiceInterface> m_mockPropertyManager;
+    std::shared_ptr<aace::test::unit::core::MockMetricRecorderServiceInterface> m_mockMetricRecorder;
     std::shared_ptr<aace::engine::alexa::AlexaEndpointInterface> m_mockAlexaEndpoint;
 };
 

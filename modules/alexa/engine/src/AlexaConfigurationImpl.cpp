@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,36 +27,22 @@ namespace config {
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.config.AlexaConfigurationImpl");
 
-std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createDeviceInfoConfig(
-    const std::string& deviceSerialNumber,
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createAlexaClientInfoConfig(
     const std::string& clientId,
     const std::string& productId,
-    const std::string& manufacturerName,
-    const std::string& description) {
+    const std::string& amazonId) {
     rapidjson::Document document(rapidjson::kObjectType);
     rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
-    rapidjson::Value avsDeviceSDKElement(rapidjson::kObjectType);
     rapidjson::Value deviceInfoElement(rapidjson::kObjectType);
 
-    deviceInfoElement.AddMember(
-        "deviceSerialNumber",
-        rapidjson::Value().SetString(deviceSerialNumber.c_str(), deviceSerialNumber.length()),
-        document.GetAllocator());
     deviceInfoElement.AddMember(
         "clientId", rapidjson::Value().SetString(clientId.c_str(), clientId.length()), document.GetAllocator());
     deviceInfoElement.AddMember(
         "productId", rapidjson::Value().SetString(productId.c_str(), productId.length()), document.GetAllocator());
     deviceInfoElement.AddMember(
-        "manufacturerName",
-        rapidjson::Value().SetString(manufacturerName.c_str(), manufacturerName.length()),
-        document.GetAllocator());
-    deviceInfoElement.AddMember(
-        "description",
-        rapidjson::Value().SetString(description.c_str(), description.length()),
-        document.GetAllocator());
+        "amazonId", rapidjson::Value().SetString(amazonId.c_str(), amazonId.length()), document.GetAllocator());
 
-    avsDeviceSDKElement.AddMember("deviceInfo", deviceInfoElement, document.GetAllocator());
-    aaceAlexaElement.AddMember("avsDeviceSDK", avsDeviceSDKElement, document.GetAllocator());
+    aaceAlexaElement.AddMember("alexaClientInfo", deviceInfoElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
 
     return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
@@ -423,6 +409,27 @@ std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::cre
     outputTypeElement.AddMember("ducking", duckingElement, document.GetAllocator());
     audioElement.AddMember("audioOutputType.music", outputTypeElement, document.GetAllocator());
     aaceAlexaElement.AddMember("audio", audioElement, document.GetAllocator());
+    document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
+    return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
+}
+
+std::shared_ptr<aace::core::config::EngineConfiguration> AlexaConfiguration::createMediaPlayerFingerprintConfig(
+    const std::string& package,
+    const std::string& buildType,
+    const std::string& versionNumber) {
+    rapidjson::Document document(rapidjson::kObjectType);
+    rapidjson::Value aaceAlexaElement(rapidjson::kObjectType);
+    rapidjson::Value mediaPlayerFingerprintElement(rapidjson::kObjectType);
+
+    mediaPlayerFingerprintElement.AddMember(
+        "package", rapidjson::Value().SetString(package.c_str(), package.length()), document.GetAllocator());
+    mediaPlayerFingerprintElement.AddMember(
+        "buildType", rapidjson::Value().SetString(buildType.c_str(), buildType.length()), document.GetAllocator());
+    mediaPlayerFingerprintElement.AddMember(
+        "versionNumber",
+        rapidjson::Value().SetString(versionNumber.c_str(), versionNumber.length()),
+        document.GetAllocator());
+    aaceAlexaElement.AddMember("mediaPlayerFingerprint", mediaPlayerFingerprintElement, document.GetAllocator());
     document.AddMember("aace.alexa", aaceAlexaElement, document.GetAllocator());
     return aace::core::config::StreamConfiguration::create(aace::engine::utils::json::toStream(document, true));
 }

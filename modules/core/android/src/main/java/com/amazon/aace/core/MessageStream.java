@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package com.amazon.aace.core;
 
 import com.amazon.aace.core.NativeRef;
 
-public class MessageStream extends NativeRef {
+public class MessageStream extends NativeRef implements AutoCloseable {
     /// An enumeration representing the stream operation mode.
     public enum Mode {
         /**
@@ -102,6 +102,11 @@ public class MessageStream extends NativeRef {
         return write(getNativeRef(), data, offset, size);
     }
 
+    @Override
+    public void close() {
+        close(getNativeRef());
+    }
+
     /**
      * @return @c true if the @c MessageStream is closed and no more data is available to read.
      */
@@ -129,6 +134,7 @@ public class MessageStream extends NativeRef {
     private native void disposeBinder(long nativeRef);
     private native int read(long nativeObject, byte[] data, long offset, long size);
     private native int write(long nativeObject, byte[] data, long offset, long size);
+    private native void close(long nativeObject);
     private native boolean isClosed(long nativeObject);
     private native Mode getMode(long nativeObject);
 }

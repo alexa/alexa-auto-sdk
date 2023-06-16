@@ -80,10 +80,6 @@ Auto SDK has dependencies on several third party packages (libraries and build t
 
 The Builder Tool is a script that can be used to build Auto SDK libraries for supported platforms. It improves the build process by wrapping underlying Conan commands and options with a simple command line interface. Although it is possible to use Conan by itself to build Auto SDK—see [Build with Conan directly](#build-with-conan-directly)—it is recommended to use the Builder Tool for common build tasks.
 
-### Alexa Auto Client Service
-
-Alexa Auto Client Service (AACS) is an Android service library that simplifies the process of integrating Auto SDK on Android-based devices. AACS has a dependency on Auto SDK native Android libraries, but can be built independently using standard Android development tools. For more information about building AACS, see the [Android developer documentation](../android/index.md).
-
 ## Build with Builder Tool
 
 The Builder Tool script, `build.py` is located in the `builder` directory of the SDK. It wraps underlying Conan commands, and simplifies building libraries for Auto SDK modules on supported platforms. Individual modules, components, and dependencies in the SDK are described as packages in the builder. Each package has a corresponding Conan recipe that is used to build and deploy the package to the cache located in the builder's home directory. An archive containing all of the specified build artifacts is created from the cache, and written to the `deploy` directory of the builder, after the build has completed. This section describes the most common commands used to build Auto SDK. For a complete reference to the Builder Tool command line interface, see [Builder Tool command reference](https://alexa.github.io/alexa-auto-sdk/docs/builder).

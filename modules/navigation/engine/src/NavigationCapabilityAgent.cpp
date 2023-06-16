@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  * permissions and limitations under the License.
  */
 #include <iostream>
+#include <stdexcept>
 
 #include <string>
 #include <rapidjson/error/en.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
+
 #include <AVSCommon/Utils/JSON/JSONUtils.h>
 
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+
 #include "AACE/Engine/Navigation/NavigationCapabilityAgent.h"
-#include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
@@ -29,6 +35,7 @@ namespace navigation {
 
 using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
 using NamespaceAndName = alexaClientSDK::avsCommon::avs::NamespaceAndName;
+using namespace aace::engine::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.navigation.NavigationCapabilityAgent");
@@ -40,10 +47,12 @@ static const std::string NAMESPACE{"Navigation"};
 static const NamespaceAndName START_NAVIGATION{NAMESPACE, "StartNavigation", AgentId::AGENT_ID_ALL};
 
 /// The ShowPreviousWaypoints directive signature.
-static const NamespaceAndName SHOW_PREVIOUS_WAYPOINTS{NAMESPACE,"ShowPreviousWaypoints", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName SHOW_PREVIOUS_WAYPOINTS{NAMESPACE, "ShowPreviousWaypoints", AgentId::AGENT_ID_ALL};
 
 /// The NavigateToPreviousWaypoint directive signature.
-static const NamespaceAndName NAVIGATE_TO_PREVIOUS_WAYPOINT{NAMESPACE, "NavigateToPreviousWaypoint", AgentId::AGENT_ID_ALL};
+static const NamespaceAndName NAVIGATE_TO_PREVIOUS_WAYPOINT{NAMESPACE,
+                                                            "NavigateToPreviousWaypoint",
+                                                            AgentId::AGENT_ID_ALL};
 
 /// The CancelNavigation directive signature.
 static const NamespaceAndName CANCEL_NAVIGATION{NAMESPACE, "CancelNavigation", AgentId::AGENT_ID_ALL};
@@ -51,7 +60,6 @@ static const NamespaceAndName CANCEL_NAVIGATION{NAMESPACE, "CancelNavigation", A
 /// The NavigationState context signature.
 static const NamespaceAndName NAVIGATION_STATE{NAMESPACE, "NavigationState", AgentId::AGENT_ID_ALL};
 
-/// Navigation capability constants
 /// Navigation interface type
 static const std::string NAVIGATION_CAPABILITY_INTERFACE_TYPE = "AlexaInterface";
 /// Navigation interface name
@@ -90,6 +98,109 @@ static const std::string START_NAVIGATION_ERROR = "StartNavigationError";
 static const std::string SHOW_PREVIOUS_WAYPOINTS_ERROR = "ShowPreviousWaypointsError";
 static const std::string NAVIGATE_TO_PREVIOUS_WAYPOINT_ERROR = "NavigateToPreviousWaypointError";
 
+/// Prefix for metrics emitted from the Navigation CA
+static const std::string METRIC_PREFIX = "NAVIGATION-";
+
+/// Navigation latency metric
+static const std::string METRIC_NAVIGATION_LATENCY = "NavigationControlLatencyValue";
+
+/// Navigation success count metric
+static const std::string METRIC_NAVIGATION_SUCCESS = "NavigationControlSuccessCount";
+
+/// Navigation type metric dimension
+static const std::string METRIC_NAVIGATION_CONTROL_TYPE = "NavigationControlEventType";
+
+/// Navigation error count metric
+static const std::string METRIC_NAVIGATION_ERROR = "NavigationControlErrorCount";
+
+/// Navigation error code metric dimension
+static const std::string METRIC_NAVIGATION_ERROR_CODE = "NavigationControlErrorCode";
+
+/**
+ * Creates and records a metric.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param activityName The activity name of the metric
+ * @param agentId The ID of the agent associated with the metric
+ * @param dataPoints The @c DataPoint objects to include in the MetricEvent
+*/
+static void submitMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const std::string& activityName,
+    const std::vector<DataPoint>& dataPoints) {
+    auto metricBuilder = MetricEventBuilder{}.withSourceName(activityName);
+    metricBuilder.withAgentId(agentId);
+    metricBuilder.addDataPoints(dataPoints);
+    auto metric = metricBuilder.build();
+    try {
+        recordMetric(metricRecorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
+
+/**
+ * Creates and records a metric for successful Navigation operations.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the navigation operation
+ *        latency
+ * @param eventType The type of the navigation operation. Use the directive
+ *        name.
+*/
+static void submitNavigationControlSuccessMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    const std::string& eventType) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_NAVIGATION_SUCCESS).increment(1).build(),
+        CounterDataPointBuilder{}.withName(METRIC_NAVIGATION_ERROR).increment(0).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_NAVIGATION_CONTROL_TYPE)
+            .withValue(eventType)
+            .build()};
+    submitMetric(metricRecorder, agentId, METRIC_PREFIX + eventType, dps);
+}
+
+/**
+ * Creates and records a metric for unsuccessful Navigation operations.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the navigation operation
+ *        latency
+ * @param eventType The type of the navigation operation. Use the directive
+ *        name.
+ * @param error The error reason. Use accepted values from events.
+*/
+static void submitNavigationControlErrorMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    const std::string& eventType,
+    const std::string& error) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_NAVIGATION_SUCCESS).increment(0).build(),
+        CounterDataPointBuilder{}.withName(METRIC_NAVIGATION_ERROR).increment(1).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_NAVIGATION_CONTROL_TYPE)
+            .withValue(eventType)
+            .build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_NAVIGATION_ERROR_CODE)
+            .withValue(error)
+            .build()};
+    submitMetric(metricRecorder, agentId, METRIC_PREFIX + eventType, dps);
+}
+
 /**
  * Creates the Navigation capability configuration.
  *
@@ -97,8 +208,8 @@ static const std::string NAVIGATE_TO_PREVIOUS_WAYPOINT_ERROR = "NavigateToPrevio
  */
 static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration> getNavigationCapabilityConfiguration( const std::string& navigationProviderName );
 
-std::shared_ptr<NavigationCapabilityAgent> NavigationCapabilityAgent::create( std::shared_ptr<NavigationHandlerInterface> navigationHandler, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender, std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager, const std::string& navigationProviderName )
+std::shared_ptr<NavigationCapabilityAgent> NavigationCapabilityAgent::create( const std::shared_ptr<NavigationHandlerInterface>& navigationHandler, const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>& exceptionSender, const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager, const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder, const std::string& navigationProviderName )
 {
     try
     {
@@ -106,8 +217,9 @@ std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterfac
         ThrowIfNull( exceptionSender, "nullExceptionSender" );
         ThrowIfNull( messageSender, "nullMessageSender" );
         ThrowIfNull( contextManager, "nullContextManager" );
+        ThrowIfNull( metricRecorder, "nullMetricRecorder" );
 
-        auto navigationCapabilityAgent = std::shared_ptr<NavigationCapabilityAgent>( new NavigationCapabilityAgent( navigationHandler, exceptionSender, contextManager, messageSender, navigationProviderName ) );
+        auto navigationCapabilityAgent = std::shared_ptr<NavigationCapabilityAgent>( new NavigationCapabilityAgent( navigationHandler, exceptionSender, contextManager, messageSender, metricRecorder, navigationProviderName ) );
 
         ThrowIfNull( navigationCapabilityAgent, "nullNavigationCapabilityAgent" );
 
@@ -171,16 +283,18 @@ alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration NavigationCapabili
 }
 
 NavigationCapabilityAgent::NavigationCapabilityAgent(
-        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        const std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface>& navigationHandler,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>& exceptionSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder,
         const std::string& navigationProviderName ) :
             alexaClientSDK::avsCommon::avs::CapabilityAgent{ NAMESPACE, exceptionSender },
             alexaClientSDK::avsCommon::utils::RequiresShutdown{"NavigationCapabilityAgent"},
             m_navigationHandler{ navigationHandler },
             m_contextManager{ contextManager },
-            m_messageSender{ messageSender } {
+            m_messageSender{ messageSender },
+            m_metricRecorder{metricRecorder} {
         m_capabilityConfigurations.insert( getNavigationCapabilityConfiguration( navigationProviderName ) );
 }
 
@@ -257,6 +371,7 @@ void NavigationCapabilityAgent::handleStartNavigationDirective( std::shared_ptr<
 
     auto agentId = info->directive->getAgentId();
     m_executor.submit([this, info, agentId]() {
+        m_startNavDurationData.startTimer();
         m_navigationHandler->startNavigation(agentId, info->directive->getPayload());
         setHandlingCompleted( info );
     });
@@ -266,6 +381,7 @@ void NavigationCapabilityAgent::handleShowPreviousWaypointsDirective( std::share
 {
     auto agentId = info->directive->getAgentId();
     m_executor.submit([this, info, agentId]() {
+        m_showWaypointsDurationData.startTimer();
         m_navigationHandler->showPreviousWaypoints(agentId);
         setHandlingCompleted( info );
     });
@@ -275,6 +391,7 @@ void NavigationCapabilityAgent::handleNavigateToPreviousWaypointDirective( std::
 {
     auto agentId = info->directive->getAgentId();
     m_executor.submit([this, info, agentId]() {
+        m_navToPreviousDurationData.startTimer();
         m_navigationHandler->navigateToPreviousWaypoint(agentId);
         setHandlingCompleted( info );
     });
@@ -428,6 +545,10 @@ std::string NavigationCapabilityAgent::getWaypointErrorCode( aace::navigation::N
 //
 
 void NavigationCapabilityAgent::startNavigationSuccess(AgentId::IdType agentId) {
+    DataPoint latencyDataPoint =
+            m_startNavDurationData.withName(METRIC_NAVIGATION_LATENCY).stopTimer().build();
+    submitNavigationControlSuccessMetric(m_metricRecorder, agentId, latencyDataPoint, START_NAVIGATION.name);
+
     std::string navigationState;
     navigationState = m_navigationHandler->getNavigationState(agentId);
     rapidjson::Document context( rapidjson::kObjectType );
@@ -462,6 +583,10 @@ void NavigationCapabilityAgent::startNavigationSuccess(AgentId::IdType agentId) 
 
 void NavigationCapabilityAgent::showPreviousWaypointsSuccess(AgentId::IdType agentId)
 {
+    DataPoint latencyDataPoint =
+            m_showWaypointsDurationData.withName(METRIC_NAVIGATION_LATENCY).stopTimer().build();
+    submitNavigationControlSuccessMetric(m_metricRecorder, agentId, latencyDataPoint, SHOW_PREVIOUS_WAYPOINTS.name);
+
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer( buffer );
@@ -474,6 +599,10 @@ void NavigationCapabilityAgent::showPreviousWaypointsSuccess(AgentId::IdType age
 
 void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess(AgentId::IdType agentId)
 {
+    DataPoint latencyDataPoint =
+            m_navToPreviousDurationData.withName(METRIC_NAVIGATION_LATENCY).stopTimer().build();
+    submitNavigationControlSuccessMetric(m_metricRecorder, agentId, latencyDataPoint, NAVIGATE_TO_PREVIOUS_WAYPOINT.name);
+
     std::string navigationState;
     navigationState = m_navigationHandler->getNavigationState(agentId);
     rapidjson::Document context( rapidjson::kObjectType );
@@ -504,6 +633,10 @@ void NavigationCapabilityAgent::navigateToPreviousWaypointSuccess(AgentId::IdTyp
 
 void NavigationCapabilityAgent::startNavigationError( AgentId::IdType agentId, std::string code, std::string description)
 {
+    DataPoint latencyDataPoint =
+            m_startNavDurationData.withName(METRIC_NAVIGATION_LATENCY).stopTimer().build();
+    submitNavigationControlErrorMetric(m_metricRecorder, agentId, latencyDataPoint, START_NAVIGATION.name, code);
+
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
 
@@ -521,6 +654,10 @@ void NavigationCapabilityAgent::startNavigationError( AgentId::IdType agentId, s
 
 void NavigationCapabilityAgent::navigateToPreviousWaypointError( AgentId::IdType agentId, std::string code, std::string description )
 {
+    DataPoint latencyDataPoint =
+            m_navToPreviousDurationData.withName(METRIC_NAVIGATION_LATENCY).stopTimer().build();
+    submitNavigationControlErrorMetric(m_metricRecorder, agentId, latencyDataPoint, NAVIGATE_TO_PREVIOUS_WAYPOINT.name, code);
+
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
     payload.AddMember("code", rapidjson::Value( code.c_str(), allocator ), allocator );
@@ -537,6 +674,10 @@ void NavigationCapabilityAgent::navigateToPreviousWaypointError( AgentId::IdType
 
 void NavigationCapabilityAgent::showPreviousWaypointsError( AgentId::IdType agentId, std::string code, std::string description )
 {
+    DataPoint latencyDataPoint =
+            m_showWaypointsDurationData.withName(METRIC_NAVIGATION_LATENCY).stopTimer().build();
+    submitNavigationControlErrorMetric(m_metricRecorder, agentId, latencyDataPoint, SHOW_PREVIOUS_WAYPOINTS.name, code);
+
     rapidjson::Document payload( rapidjson::kObjectType );
     rapidjson::Document::AllocatorType& allocator = payload.GetAllocator();
     payload.AddMember("code", rapidjson::Value( code.c_str(), allocator ), allocator );

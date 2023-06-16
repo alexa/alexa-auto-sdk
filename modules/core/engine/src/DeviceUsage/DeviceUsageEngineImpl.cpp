@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -14,9 +14,13 @@
  */
 
 #include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
-#include "AACE/Engine/DeviceUsage/DeviceUsageEngineImpl.h"
+#include <AACE/Engine/DeviceUsage/DeviceUsageEngineImpl.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Utils/Agent/AgentId.h>
 
 #include <nlohmann/json.hpp>
 
@@ -25,24 +29,32 @@ namespace engine {
 namespace deviceUsage {
 
 using nlohmann::json;
-using namespace aace::engine::utils::metrics;
+using namespace aace::engine::metrics;
+using namespace aace::engine::utils::agent;
 
 /// String to identify log entries originating from this file.
 static const std::string TAG("aace.deviceUsage.DeviceUsageEngineImpl");
 
 DeviceUsageEngineImpl::DeviceUsageEngineImpl(
-    std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface) :
-        m_deviceUsagePlatformInterface{deviceUsagePlatformInterface} {
+    std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface,
+    std::shared_ptr<MetricRecorderServiceInterface> metricRecorder) :
+        m_deviceUsagePlatformInterface{deviceUsagePlatformInterface}, m_metricRecorder{metricRecorder} {
 }
 
 std::shared_ptr<DeviceUsageEngineImpl> DeviceUsageEngineImpl::create(
-    std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface) {
+    std::shared_ptr<aace::deviceUsage::DeviceUsage> deviceUsagePlatformInterface,
+    std::shared_ptr<aace::engine::core::EngineContext> engineContext) {
     AACE_INFO(LX(TAG));
     try {
         ThrowIfNull(deviceUsagePlatformInterface, "invalidPlatformInterface");
+        ThrowIfNull(engineContext, "invalidEngineContext");
 
-        auto deviceUsageEngineImpl =
-            std::shared_ptr<DeviceUsageEngineImpl>(new DeviceUsageEngineImpl(deviceUsagePlatformInterface));
+        auto metricRecorder =
+            engineContext->getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>("aace.metrics");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
+
+        auto deviceUsageEngineImpl = std::shared_ptr<DeviceUsageEngineImpl>(
+            new DeviceUsageEngineImpl(deviceUsagePlatformInterface, metricRecorder));
 
         // Set the platform engine interface reference.
         deviceUsagePlatformInterface->setEngineInterface(deviceUsageEngineImpl);
@@ -88,33 +100,30 @@ void DeviceUsageEngineImpl::onReportNetworkDataUsage(const std::string& usage) {
                        .d("totalBytes", totalBytes));
 
         auto networkInterfaceType = dataUsage["networkInterfaceType"];
-        ThrowIf(networkInterfaceType.empty(), "emptynetworkInterfaceType");
+        ThrowIf(networkInterfaceType.empty(), "emptyNetworkInterfaceType");
 
         if (receivedBytes == 0 && transmittedBytes == 0 && totalBytes == 0) {
             AACE_DEBUG(LX(TAG).m("Not recording device usage since consumption is zero"));
         } else {
-            std::string dataPlanType = "";
+            std::vector<DataPoint> dps = {
+                CounterDataPointBuilder{}.withName("rxBytes").increment(receivedBytes).build(),
+                CounterDataPointBuilder{}.withName("txBytes").increment(transmittedBytes).build(),
+                CounterDataPointBuilder{}.withName("totalBytes").increment(totalBytes).build(),
+                CounterDataPointBuilder{}.withName("startTimeStamp").increment(startTimeStamp).build(),
+                CounterDataPointBuilder{}.withName("endTimeStamp").increment(endTimeStamp).build(),
+                StringDataPointBuilder{}.withName("networkInterfaceType").withValue(networkInterfaceType).build()};
 
             if (dataUsage.contains("dataPlanType") && dataUsage["dataPlanType"].is_string() &&
                 !dataUsage["dataPlanType"].empty()) {
-                dataPlanType = dataUsage["dataPlanType"];
+                std::string dataPlanType = dataUsage["dataPlanType"];
+                dps.push_back(StringDataPointBuilder{}.withName("dataPlanType").withValue(dataPlanType).build());
             }
 
-            if (dataPlanType.empty()) {
-                emitBufferedMetrics(
-                    "DeviceUsageEngineImpl",
-                    "onReportNetworkDataUsage",
-                    {{"rxBytes", receivedBytes}, {"txBytes", transmittedBytes}, {"totalBytes", totalBytes}},
-                    {{"networkInterfaceType", networkInterfaceType}},
-                    {{"startTimeStamp", startTimeStamp}, {"endTimeStamp", endTimeStamp}});
-            } else {
-                emitBufferedMetrics(
-                    "DeviceUsageEngineImpl",
-                    "onReportNetworkDataUsage",
-                    {{"rxBytes", receivedBytes}, {"txBytes", transmittedBytes}, {"totalBytes", totalBytes}},
-                    {{"networkInterfaceType", networkInterfaceType}, {"dataPlanType", dataPlanType}},
-                    {{"startTimeStamp", startTimeStamp}, {"endTimeStamp", endTimeStamp}});
-            }
+            auto metricBuilder = MetricEventBuilder()
+                                     .withSourceName("NetworkDataUsageReport")
+                                     .withAgentId(AGENT_ID_ALL)
+                                     .addDataPoints(dps);
+            recordMetric(m_metricRecorder.lock(), metricBuilder.build());
         }
 
     } catch (std::exception& ex) {

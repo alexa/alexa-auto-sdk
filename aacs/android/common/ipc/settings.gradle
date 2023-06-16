@@ -1,2 +1,0 @@
-include ':aacsipc'
-rootProject.name='ipc'

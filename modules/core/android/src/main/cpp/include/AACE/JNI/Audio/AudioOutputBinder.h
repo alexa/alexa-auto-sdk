@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public:
 
     // aace::audio::AudioOutput
     bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) override;
-    bool prepare(const std::string& url, bool repeating) override;
+    bool prepare(const std::string& url, bool repeating, const PlaybackContext& playbackContext) override;
     void mayDuck() override;
     bool play() override;
     bool stop() override;
@@ -100,11 +100,12 @@ public:
     }
 
     std::vector<std::pair<T, std::string>> getConfiguration() override {
-        return {{T::MEDIA_ERROR_UNKNOWN, "MEDIA_ERROR_UNKNOWN"},
-                {T::MEDIA_ERROR_INVALID_REQUEST, "MEDIA_ERROR_INVALID_REQUEST"},
-                {T::MEDIA_ERROR_SERVICE_UNAVAILABLE, "MEDIA_ERROR_SERVICE_UNAVAILABLE"},
-                {T::MEDIA_ERROR_INTERNAL_SERVER_ERROR, "MEDIA_ERROR_INTERNAL_SERVER_ERROR"},
-                {T::MEDIA_ERROR_INTERNAL_DEVICE_ERROR, "MEDIA_ERROR_INTERNAL_DEVICE_ERROR"}};
+        return {
+            {T::MEDIA_ERROR_UNKNOWN, "MEDIA_ERROR_UNKNOWN"},
+            {T::MEDIA_ERROR_INVALID_REQUEST, "MEDIA_ERROR_INVALID_REQUEST"},
+            {T::MEDIA_ERROR_SERVICE_UNAVAILABLE, "MEDIA_ERROR_SERVICE_UNAVAILABLE"},
+            {T::MEDIA_ERROR_INTERNAL_SERVER_ERROR, "MEDIA_ERROR_INTERNAL_SERVER_ERROR"},
+            {T::MEDIA_ERROR_INTERNAL_DEVICE_ERROR, "MEDIA_ERROR_INTERNAL_DEVICE_ERROR"}};
     }
 };
 
@@ -142,8 +143,9 @@ public:
     }
 
     std::vector<std::pair<T, std::string>> getConfiguration() override {
-        return {{T::REPORT_DUCKING_STARTED, "REPORT_DUCKING_STARTED"},
-                {T::REPORT_DUCKING_STOPPED, "REPORT_DUCKING_STOPPED"}};
+        return {
+            {T::REPORT_DUCKING_STARTED, "REPORT_DUCKING_STARTED"},
+            {T::REPORT_DUCKING_STOPPED, "REPORT_DUCKING_STOPPED"}};
     }
 };
 

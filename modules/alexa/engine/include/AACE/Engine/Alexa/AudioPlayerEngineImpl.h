@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <AVSCommon/SDKInterfaces/PlaybackHandlerInterface.h>
 #include <AVSCommon/SDKInterfaces/PlaybackRouterInterface.h>
 #include <AVSCommon/Utils/Metrics/MetricRecorderInterface.h>
+#include <Captions/CaptionManagerInterface.h>
 #include <ContextManager/ContextManager.h>
 #include <RegistrationManager/CustomerDataManagerInterface.h>
 
@@ -67,7 +68,9 @@ private:
             audioPlayerObserverDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
         std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager);
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager,
+        std::shared_ptr<alexaClientSDK::captions::CaptionManagerInterface> captionManager,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::Fingerprint& mediaPlayerFingerprint);
 
 public:
     static std::shared_ptr<AudioPlayerEngineImpl> create(
@@ -86,7 +89,9 @@ public:
             audioPlayerObserverDelegate,
         std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
         std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
-        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager);
+        std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager,
+        std::shared_ptr<alexaClientSDK::captions::CaptionManagerInterface> captionManager = nullptr,
+        const alexaClientSDK::avsCommon::utils::mediaPlayer::Fingerprint& mediaPlayerFingerprint = {});
 
     /// @name AudioPlayerEngineInterface functions
     /// @{

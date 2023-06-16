@@ -121,6 +121,9 @@ private:
 
     /// Speaker Type
     const alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface::Type m_type;
+
+    /// Indicates a pending volume change due to ducking
+    bool m_pendingSetUnduckedVolume;
 };
 }  // namespace alexa
 }  // namespace engine

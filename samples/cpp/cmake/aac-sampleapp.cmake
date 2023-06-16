@@ -35,6 +35,7 @@ if(AAC_VAD_ENABLE)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/3PAgent/AgentHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/3PAgent/PryonLiteVAD.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/3PAgent/PrlReadFrames.cpp
     )
 endif()
 
@@ -54,6 +55,7 @@ if(AAC_ALEXA)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/SpeechSynthesizerHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/TemplateRuntimeHandler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/AlexaSpeakerHandler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/Alexa/CaptionPresenterHandler.cpp
     )
 endif()
 
@@ -103,12 +105,6 @@ endif()
 if(AAC_CONNECTIVITY)
     set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
         ${CMAKE_CURRENT_SOURCE_DIR}/src/Connectivity/AlexaConnectivityHandler.cpp
-    )
-endif()
-
-if(AAC_DCM)
-    set(CXX_SOURCE_FILES ${CXX_SOURCE_FILES}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/DCM/DCMHandler.cpp
     )
 endif()
 

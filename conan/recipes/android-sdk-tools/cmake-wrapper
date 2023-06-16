@@ -22,9 +22,9 @@ done
 # https://github.com/conan-io/conan/issues/4629 set(CMAKE_FIND_ROOT_PATH_MODE_* ONLY) when cross-compiling, for Android at least
 
 if [ $BUILD == "yes" ]; then
-  cmake "$@"
+  $ANDROID_CMAKE_PROGRAM "$@"
 else
-  cmake \
+  $ANDROID_CMAKE_PROGRAM \
       -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=$CMAKE_FIND_ROOT_PATH_MODE_PROGRAM \
       -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=$CMAKE_FIND_ROOT_PATH_MODE_LIBRARY \
       -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=$CMAKE_FIND_ROOT_PATH_MODE_INCLUDE \

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -457,6 +457,18 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     authorizationHandler->saveDeviceInfo(jsonConfigs);
 
 #ifdef AAC_VAD_ENABLE
+    if (!arbitrator::AgentHandler::getPath(jsonConfigs)) {
+        console->printRuler();
+        console->printLine("Pryonlite configuration not found");
+        console->printRuler();
+        // Shutdown
+        if (!engine->shutdown()) {
+            console->printRuler();
+            console->printLine("Error: Engine could not be shutdown");
+            console->printRuler();
+        }
+        return Status::Failure;
+    }
     auto agentHandler = arbitrator::AgentHandler::create(activity, loggerHandler, messageBroker);
     Ensures(agentHandler != nullptr);
 #endif
@@ -534,6 +546,10 @@ Status Application::run(std::shared_ptr<ApplicationContext> applicationContext) 
     // Feature Discovery
     auto featureDiscoveryHandler = alexa::FeatureDiscoveryHandler::create(activity, loggerHandler, messageBroker);
     Ensures(featureDiscoveryHandler != nullptr);
+    
+    // CaptionPresenter
+    auto captionPresenterHandler = alexa::CaptionPresenterHandler::create(activity, loggerHandler, messageBroker);
+    Ensures(captionPresenterHandler != nullptr);
 #endif
 
     // Text To Speech Handler

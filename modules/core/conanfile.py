@@ -18,13 +18,6 @@ class AutoSdkModulePkg(ConanFile):
     python_requires = "aac-sdk-tools/1.0"
     python_requires_extend = "aac-sdk-tools.BaseSdkModule"
 
-    # conan dependencies needed for this package
-    requires = [
-        "rapidjson/1.1.0",
-        "nlohmann_json/3.8.0#d99228f0d54216a1cd1c1153873377c5",
-        "sqlite3/3.37.2#8e4989a1ee5d3237a25a911fbcb19097",
-    ]
-
     module_options = {
         "default_logger_enabled": [True, False],
         "default_logger_level": ["Default", "Verbose", "Info", "Metric", "Warn", "Error", "Critical"],
@@ -40,6 +33,15 @@ class AutoSdkModulePkg(ConanFile):
         "with_thread_moniker_logs": True,
         "sqlite3:build_executable": False,
     }
+
+    def requirements(self):
+        self.requires("rapidjson/1.1.0")
+        self.requires("nlohmann_json/3.8.0#d99228f0d54216a1cd1c1153873377c5")
+        self.requires("sqlite3/3.37.2#8e4989a1ee5d3237a25a911fbcb19097")
+        if self.settings.os == "Neutrino":
+            self.requires("openssl/qnx7")
+        else:
+            self.requires("openssl/1.1.1s@#3eeebc156917046ee80533dbbb8f4671")
 
     def configure(self):
         super(AutoSdkModulePkg, self).configure()

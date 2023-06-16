@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 #include <PlaybackController/PlaybackController.h>
 #include <PlaybackController/PlaybackRouter.h>
 
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+
 #include "AACE/Alexa/PlaybackController.h"
 
 namespace aace {
@@ -30,7 +32,9 @@ class PlaybackControllerEngineImpl
         : public aace::alexa::PlaybackControllerEngineInterface
         , public alexaClientSDK::avsCommon::utils::RequiresShutdown {
 private:
-    PlaybackControllerEngineImpl(std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface);
+    PlaybackControllerEngineImpl(
+        std::shared_ptr<aace::alexa::PlaybackController> playbackControllerPlatformInterface,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     bool initialize(
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
@@ -44,7 +48,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::endpoints::EndpointCapabilitiesRegistrarInterface>
             capabilitiesRegistrar,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::PlaybackRouterInterface> getPlaybackRouter();
 
@@ -60,6 +65,7 @@ private:
     std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackController>
         m_playbackControllerCapabilityAgent;
     std::shared_ptr<alexaClientSDK::capabilityAgents::playbackController::PlaybackRouter> m_playbackRouter;
+    std::weak_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
 };
 
 }  // namespace alexa

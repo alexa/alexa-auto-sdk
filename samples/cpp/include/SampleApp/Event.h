@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -133,7 +133,6 @@ enum class Event {
     onLogoutAuthProviderAuthorization,
 
     // 3P Agent
-    onVAD,
     onKWD,
     onDeactivated,
     registerSiriAgent,
@@ -142,6 +141,8 @@ enum class Event {
     onTTT,
     onSiriSPEAKING,
     onSiriNONE,
+    onMicAudio,
+    onAudioFile,
 
     //Device Setup Completed
     onDeviceSetupCompleted,
@@ -251,7 +252,6 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onToggleAutomaticResponses", Event::onToggleAutomaticResponses},
 
     // 3P Agent
-    {"onVAD" ,Event::onVAD},
     {"onKWD" ,Event::onKWD},
     {"onDeactivated" ,Event::onDeactivated},
     {"registerSiriAgent" ,Event::registerSiriAgent},
@@ -260,6 +260,8 @@ static const std::map<std::string, Event> EventEnumerator{
     {"onTTT" ,Event::onTTT},
     {"onSiriSPEAKING" ,Event::onSiriSPEAKING},
     {"onSiriNONE" ,Event::onSiriNONE},
+    {"onMicAudio" ,Event::onMicAudio},
+    {"onAudioFile" ,Event::onAudioFile},
 
     {"onPrepareSpeech", Event::onPrepareSpeech},
     {"onGetCapabilities", Event::onGetCapabilities},

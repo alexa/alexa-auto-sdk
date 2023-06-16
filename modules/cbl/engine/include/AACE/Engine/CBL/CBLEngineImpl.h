@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -26,14 +26,13 @@
 
 #include <AACE/CBL/CBL.h>
 #include <AACE/CBL/CBLEngineInterface.h>
-
 #include <AACE/Engine/Alexa/AlexaEndpointInterface.h>
 #include <AACE/Engine/Alexa/LocaleAssetsManager.h>
 #include <AACE/Engine/Authorization/AuthorizationProviderListenerInterface.h>
-#include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
-
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include <AACE/Engine/Network/NetworkInfoObserver.h>
 #include <AACE/Engine/Network/NetworkObservableInterface.h>
+#include <AACE/Engine/PropertyManager/PropertyManagerServiceInterface.h>
 
 #include "CBLAuthorizationProvider.h"
 #include "CBLConfiguration.h"
@@ -61,6 +60,7 @@ private:
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         bool enableUserProfile);
 
 public:
@@ -73,6 +73,7 @@ public:
         std::weak_ptr<aace::engine::alexa::LocaleAssetsManager> localeAssetManager,
         std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
         std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
         bool enableUserProfile);
 
     void enable();

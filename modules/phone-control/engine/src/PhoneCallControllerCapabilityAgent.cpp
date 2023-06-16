@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -57,10 +57,9 @@ static const std::string SEND_DTMF_SUCCEEDED = "SendDTMFSucceeded";
 static const std::string SEND_DTMF_FAILED = "SendDTMFFailed";
 static const std::string CALLER_ID_RECEIVED = "CallerIdReceived";
 
-static const NamespaceAndName CONTEXT_MANAGER_PHONE_CONTROL_STATE{
-    NAMESPACE,
-    "PhoneCallControllerState",
-    AgentId::AGENT_ID_ALL};
+static const NamespaceAndName CONTEXT_MANAGER_PHONE_CONTROL_STATE{NAMESPACE,
+                                                                  "PhoneCallControllerState",
+                                                                  AgentId::AGENT_ID_ALL};
 
 static const std::string CHANNEL_NAME =
     alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface::COMMUNICATIONS_CHANNEL_NAME;
@@ -68,13 +67,8 @@ static const std::string CHANNEL_NAME =
 static const std::string CALL_ID_KEY = "callId";
 
 // Events that are only expected to be sent as responses to directives.
-static const std::unordered_set<std::string> REPLY_EVENTS({
-    CALL_FAILED,
-    DIAL_STARTED,
-    REDIAL_STARTED,
-    SEND_DTMF_SUCCEEDED,
-    SEND_DTMF_FAILED
-});
+static const std::unordered_set<std::string> REPLY_EVENTS(
+    {CALL_FAILED, DIAL_STARTED, REDIAL_STARTED, SEND_DTMF_SUCCEEDED, SEND_DTMF_FAILED});
 
 static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>
 getPhoneCallControllerCapabilityConfiguration();
@@ -849,9 +843,12 @@ void PhoneCallControllerCapabilityAgent::releaseCommunicationsChannelFocus() {
     m_executor.submit([this] { m_focusManager->releaseChannel(CHANNEL_NAME, shared_from_this()); });
 }
 
-alexaClientSDK::avsCommon::avs::AgentId::IdType PhoneCallControllerCapabilityAgent::executeGetAgentByCallId(const std::string& callId, const std::string& eventName) {
+alexaClientSDK::avsCommon::avs::AgentId::IdType PhoneCallControllerCapabilityAgent::executeGetAgentByCallId(
+    const std::string& callId,
+    const std::string& eventName) {
     if (m_callAgentMap.find(callId) != m_callAgentMap.end()) {
-        return m_callAgentMap[callId];;
+        return m_callAgentMap[callId];
+        ;
     }
     AACE_INFO(LX(TAG).m("No agent is specified for the event."));
     if (REPLY_EVENTS.find(eventName) == REPLY_EVENTS.end()) {

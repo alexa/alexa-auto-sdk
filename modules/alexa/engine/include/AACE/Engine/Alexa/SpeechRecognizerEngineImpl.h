@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 
 #include <acsdk/MultiAgentInterface/AgentManagerInterface.h>
@@ -201,7 +200,7 @@ public:
     /// @name @c alexaClientSDK::multiAgentInterface::connection::AgentConnectionObserverInterface functions
     /// @{
     void onAgentAvailabilityStateChanged(
-        alexaClientSDK::avsCommon::avs::AgentId::IdType id,
+        alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
         AvailabilityState status,
         const std::string& reason) override;
     /// @}
@@ -356,24 +355,16 @@ private:
 
     aace::alexa::AlexaClient::ConnectionStatus m_connectionStatus;
 
-    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> m_agentManager;
-
-    std::unordered_map<alexaClientSDK::avsCommon::avs::AgentId::IdType, bool> m_agentAvailabilityMap;
-
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_audioFocusManager;
 
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::FocusManagerInterface> m_visualFocusManager;
 
     /**
-     * Mutex to serialize access to @c m_agentAvailabilityMap.
-     */
-    std::mutex m_agentAvailabilityMapMutex;
-
-    bool m_agentAvailable = false;
-    /**
-     * Mutex to serialize access to @c m_agentAvailable.
+     * Mutex to serialize access to @c m_availableAgents.
      */
     std::mutex m_agentAvailabilityMutex;
+    std::unordered_set<alexaClientSDK::avsCommon::avs::AgentId::IdType> m_availableAgents;
+    std::shared_ptr<alexaClientSDK::multiAgentInterface::AgentManagerInterface> m_agentManager;
 };
 
 static inline alexaClientSDK::avsCommon::avs::AgentInitiator convertInitiator(Initiator initiator) {

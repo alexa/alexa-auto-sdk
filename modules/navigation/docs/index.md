@@ -46,18 +46,6 @@ m_engine->configure(configurations);
 </details>
 <br/>
 
-### Android Integration
-
-To use the `Navigation` module Engine configuration with AACS, use *"aacs.navigation"* instead of *"aace.navigation"* in your AACS configuration file:
-
-```
-{
-    "aacs.navigation": {
-        "providerName": "{{STRING}}"
-    }
-}
-```
-
 ## Using the Navigation AASB Messages
 
 ### Providing the Current Navigation State
@@ -78,7 +66,7 @@ The following table explains the properties in the JSON.
 |-|-|-|-|
 | state | String | Yes | The navigation device state. <br><br>**Accepted values:** <ul><li>`"NAVIGATING"`: Navigation engine is navigating to a predefined destination set. </li> <li>`"NOT_NAVIGATING"`: Navigation is not in progress.</li></ul> |
 | shapes | Array of double arrays | Yes | The array contains an ordered list of coordinates depicting the route from the source to the destination. The coordinate is a latitude-longitude pair (in that order) specified as an array of doubles. The array can be empty. The maximum number of coordinates is 100.<br><br> **Special considerations:** <ul><li>The set of coordinates might not represent the complete route.</li><li>Shapes are provider specific. The shape of a route can correspond to one of these versions: a complete route, a route for a viewport, or a route defined for a certain distance.</li><li>One mile spacing between each coordinate in the shapes array is recommended.</li><li>The coordinates in the array are ordered in the same direction as the user is driving.</li></ul>
-| waypoints | Array | Yes | List of objects, each representing a waypoint that is a stop on the route. Expand the section below for more information. <br><br> **Note:** Can be empty except when `state` is `"NAVIGATING"`.   
+| waypoints | Array | Yes | List of objects, each representing a waypoint that is a stop on the route. Expand the section below for more information. <br><br> **Note:** Can be empty except when `state` is `"NAVIGATING"`.
 
 <details markdown="1"><summary>Click to expand or collapse the properties of <code>waypoints</code> object</summary>
 
@@ -87,7 +75,7 @@ The following table explains the properties in the JSON.
 | Property | Type | Required | Description |
 |-|-|-|-|
 | type | String | Yes | Type of the location on the route. <br><br>**Accepted values:** <ul><li>`SOURCE`: The location from which the user starts driving.</li><li>`DESTINATION`: Final location to which the user wants to navigate to.</li><li>`INTERIM`: Intermediate stop where the user wants to navigate to before reaching the destination.</ul>
-| estimatedTimeOfArrival | Object | Yes (Applicable only if `type` is `"DESTINATION"` or `"INTERIM"`.) | Time of arrival at the waypoint, specified in the ISO-8601 time format. 
+| estimatedTimeOfArrival | Object | Yes (Applicable only if `type` is `"DESTINATION"` or `"INTERIM"`.) | Time of arrival at the waypoint, specified in the ISO-8601 time format.
 | estimatedTimeOfArrival.ideal | String | No | Expected arrival time without considering traffic, diversions, etc.
 | estimatedTimeOfArrival.predicted | String | Yes | Expected arrival time, after considering traffic conditions. If the ideal ETA and predicted ETA match, only the predicted ETA will be populated.
 | address | Object | No | Address of the waypoint specified in multiple string fields, such as `addressLine1`, `city`, etc. <br><br>**Note:** `countryCode` is a 3-letter country code in ISO 3166-1 alpha-3 format.
@@ -97,7 +85,7 @@ The following table explains the properties in the JSON.
 
 </details>
 
-<details markdown="1"><summary>Click to expand or collapse the properties of <code>pointOfInterest</code> object</summary> 
+<details markdown="1"><summary>Click to expand or collapse the properties of <code>pointOfInterest</code> object</summary>
 
 </br>
 
@@ -108,7 +96,7 @@ The following table explains the properties in the JSON.
 | hoursOfOperation.dayOfWeek | String | Y | Day of week for this day. <br><br>**Accepted values:** `"MONDAY"`, `"TUESDAY"`, `"WEDNESDAY"`, `"THURSDAY"`, `"FRIDAY"`, `"SATURDAY"`, `"SUNDAY"`.
 | hoursOfOperation.hours | Array | Yes | List of times when the POI is open or closed for the day, specified in ISO 8601 format with the timezone offset (time difference from UTC). <br></br>Properties in the array are:<ul><li>`open`: Time at which the POI is open.</li><li>`close`: Time at which the POI is closed.</li></ul>Timezone considerations:<ul><li>If the user and the POI are in different timezones, hours are converted to the timezone of the POI.</li><li>If timezone offset is omitted, the time is assumed to be a UTC time and then converted to the POI's timezone.</li></ul>**Note:** Hours for the next 7 days are provided by the data provider.
 | hoursOfOperation.type | String | Yes | Status of the current operation. <br><br>**Accepted values:** `"OPEN_DURING_HOURS"`, `"OPEN_24_HOURS"`, `"CLOSED"`, `"UNKNOWN"`, `"HOLIDAY"`.
-| phoneNumber | String | No | Phone number of the POI in E.164 format. 	
+| phoneNumber | String | No | Phone number of the POI in E.164 format.
 
 </details>
 
@@ -216,7 +204,7 @@ The following table explains the properties in the JSON.
     ],
     ...
   ]
-}   
+}
 ```
 </details>
 
@@ -267,7 +255,7 @@ The following table explains the properties in the JSON.
                "city": "{{STRING}}",
                "districtOrCounty": "{{STRING}}",
                "stateOrRegion": "{{STRING}}",
-               "countryCode": "{{STRING}}", 
+               "countryCode": "{{STRING}}",
                "postalCode": "{{STRING}}"
           },
           "coordinate":[
@@ -306,7 +294,7 @@ The following table explains the properties in the JSON.
         }
       }
     ]
-  }      
+  }
 }
 ```
 
@@ -339,7 +327,7 @@ To stop navigation, the Engine publishes the [`CancelNavigation` message](https:
 
 ### Adding a Waypoint
 
-If the user wants to add a waypoint, the Engine publishes the [`StartNavigation` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/navigation/Navigation/index.html#startnavigation). 
+If the user wants to add a waypoint, the Engine publishes the [`StartNavigation` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/navigation/Navigation/index.html#startnavigation).
 
 If navigation is in progress or route is present, the route to the final destination is changed by including the additional waypoint. Your implementation should calculate or re-calculate the route with the information of the waypoint.
 
@@ -408,12 +396,12 @@ The following table explains the properties in the JSON.
 | Property | Type | Required | Description |
 |-|-|-|-|
 | type | String | Yes | Specifies the type of information requested. <br><br>**Accepted values:** <ul><li>`"TURN"`:  The user asks about a turn. (e.g., "What's my next turn?")</li><li>`"EXIT"`: The user asks about a freeway exit. (e.g., "What's my next exit?")</li><li>`"ENTER"`: The user asks about how to get onto a street. (e.g., "Which lane should I be to get onto the US-101?")</li><li>`"MERGE"`: The user asks about the merge onto a street. (e.g., "Alexa, which lane do i need to merge onto the highway?")</li><li>`"LANE"`: The user asks for lane guidance. (e.g., "Alexa, which lane to take?")</li></ul>
-| targetLocation | Object | No | Describes the location for which maneuver information is requested. If the target location is a POI, user place, or street address, Alexa provides at least one field in this object. If the utterance does not include a location (e.g., "Alexa, what's my next turn?"), `targetLocation` is omitted.  
+| targetLocation | Object | No | Describes the location for which maneuver information is requested. If the target location is a POI, user place, or street address, Alexa provides at least one field in this object. If the utterance does not include a location (e.g., "Alexa, what's my next turn?"), `targetLocation` is omitted.
 | targetLocation.name | String | No | Specifies the name of the location (e.g., "HOME" or "WORK") for which the user requests the maneuver instruction.
 | targetLocation.address | Object | No | Specifies the address for which the user requests the maneuver instruction. The object contains multiple string fields, which together form the complete address.
 | targetLocation.coordinate | Array | No | The array value specifies the latitude and longitude of the target location. Data type for the values in the array is double.
 
-<details markdown="1"><summary>Click to expand or collapse the <code>AnnounceManeuver</code> message schema</summary> 
+<details markdown="1"><summary>Click to expand or collapse the <code>AnnounceManeuver</code> message schema</summary>
 
 </br>
 
@@ -422,10 +410,10 @@ The following table explains the properties in the JSON.
   "type": "{{STRING}}",
   "targetLocation" : {
         "name": "{{STRING}}",
-        "address": { 
-            "addressLine1": "{{STRING}}", 
-            "addressLine2": "{{STRING}}", 
-            "addressLine3": "{{STRING}}", 
+        "address": {
+            "addressLine1": "{{STRING}}",
+            "addressLine2": "{{STRING}}",
+            "addressLine3": "{{STRING}}",
             "city": "{{STRING}}",
             "districtOrCounty": "{{STRING}}",
             "stateOrRegion": "{{STRING}}",
@@ -447,11 +435,11 @@ Your implementation should provide the navigation instruction as follows:
 
 * If `targetLocation` is omitted, announce the next maneuver along the route.
 * If `targetLocation` is specified and the location is along the route, announce the maneuver about the location. If `targetLocation` is specified but the location is not along the route, calculate the route to the location, announce maneuver from the user's current location to the target location, and inform the user the target location is NOT along the current route.
- 
+
 If the device can provide the maneuver instruction successfully, your implementation should publish the [`NavigationEvent` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/navigation/Navigation/index.html#navigationevent) with one of the following events:
 
 > **events:** `TURN_GUIDANCE_ANNOUNCED`, `EXIT_GUIDANCE_ANNOUNCED`, `ENTER_GUIDANCE_ANNOUNCED`, `MERGE_GUIDANCE_ANNOUNCED`, `LANE_GUIDANCE_ANNOUNCED`
-  
+
 Otherwise, your implementation should publish the [`NavigationError` message](https://alexa.github.io/alexa-auto-sdk/docs/aasb/navigation/Navigation/index.html#navigationerror) with a type and code from the following:
 
 > **types:** `TURN_GUIDANCE_FAILED`, `EXIT_GUIDANCE_FAILED`, `ENTER_GUIDANCE_FAILED`, `MERGE_GUIDANCE_FAILED`, `LANE_GUIDANCE_FAILED`
@@ -529,12 +517,12 @@ The following table explains the properties in the JSON.
 | inquiryType | String | Yes | The type of alternative routes based on the user's preference. <br><br>**Accepted values:** <ul><li>`"DEFAULT"`, which means there is no preference as to whether the alternate route saves time or distance.</li><li>`"SHORTER_TIME"`, which means the alternate route saves time.</li><li>`"SHORTER_DISTANCE"`, which means the alternate route saves distance.</li></ul>
 | alternateRoute | Object | Yes | Information about the best route that matches the preference specified by `inquiryType`.
 | alternateRoute.labels | Array of strings |Yes | Unique names within a route (e.g., names of highways) used to distinguish between alternative routes. Each label might contain the direction of the route.
-| alternateRoute.savings | Array | No | List of savings achieved by the route. 
+| alternateRoute.savings | Array | No | List of savings achieved by the route.
 | alternateRoute.savings.type | String | Yes | The type of savings. <br><br>**Accepted values:** `"DISTANCE"` or `"TIME"`.
 | alternateRoute.savings.amount | Float | Yes | The amount of savings achieved by the route. Alexa uses prescribed unit to convert the amount of savings to improve user experience, if needed.
 | alternateRoute.savings.unit | String | Yes | Measurement unit of the savings. <br><br>**Accepted values:** `"MINUTE"`, `"HOUR"`, `"YARD"`, `"FOOT"`, `"MILE"`, `"METER"`, or `"KILOMETER"`.
 
-<details markdown="1"><summary>Click to expand or collapse the <code>ShowAlternativeRoutesSucceeded</code> message schema</summary> 
+<details markdown="1"><summary>Click to expand or collapse the <code>ShowAlternativeRoutesSucceeded</code> message schema</summary>
 
 </br>
 
@@ -550,7 +538,7 @@ The following table explains the properties in the JSON.
               "amount": {{FLOAT}},
               "unit": "{{STRING}}"
           }
-      ]              
+      ]
   }
 }
 ```
@@ -767,7 +755,7 @@ void MyNavigationHandler::subscribeToAASBMessages() {
   }
 
   bool NavigationHandler::cancelNavigation() {
-    // Clear the navigation state 
+    // Clear the navigation state
   }
 
   std::string NavigationHandler::getNavigationState() {
@@ -776,10 +764,6 @@ void MyNavigationHandler::subscribeToAASBMessages() {
 
 };
 ```
- 
+
  </details>
  </br>
-
-### Android Integration
-
-The Alexa Auto Client Service (AACS) provides the `Navigation App Component` to integrate the Auto SDK `Navigation` module on Android. See the [AACS Navigation App Component](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-navigation/) documentation for more information.

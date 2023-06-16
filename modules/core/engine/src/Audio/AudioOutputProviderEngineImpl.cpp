@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,27 +13,16 @@
  * permissions and limitations under the License.
  */
 
-#include <sstream>
-
 #include <AACE/Engine/Audio/AudioOutputProviderEngineImpl.h>
 #include <AACE/Engine/Audio/AudioOutputEngineImpl.h>
 #include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.audio.AudioOutputProviderEngineImpl");
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioOutputProviderEngineImpl";
-
-/// Counter metrics for AudioOutputProvider Platform API
-static const std::string METRIC_AUDIO_OUTPUT_PROVIDER_OPEN_CHANNEL = "OpenChannel";
-
 namespace aace {
 namespace engine {
 namespace audio {
-
-using namespace aace::engine::utils::metrics;
 
 AudioOutputProviderEngineImpl::AudioOutputProviderEngineImpl(
     std::shared_ptr<aace::audio::AudioOutputProvider> platformAudioOutputProviderInterface) :
@@ -56,10 +45,6 @@ std::shared_ptr<AudioOutputChannelInterface> AudioOutputProviderEngineImpl::open
     const std::string& name,
     aace::audio::AudioOutputProvider::AudioOutputType audioOutputType) {
     try {
-        std::stringstream type;
-        type << audioOutputType;
-        emitCounterMetrics(
-            METRIC_PROGRAM_NAME_SUFFIX, "openChannel", {METRIC_AUDIO_OUTPUT_PROVIDER_OPEN_CHANNEL, type.str()});
         // get the audio input instance from the platform
         auto platformAudioOutput = m_platformAudioOutputProviderInterface->openChannel(name, audioOutputType);
         ThrowIfNull(platformAudioOutput, "invalidPlatformAudioOutput");

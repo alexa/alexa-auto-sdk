@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -65,9 +65,6 @@ char LogFormatter::getLevelCh(const LogFormatter::Level& level) const {
             break;
         case Level::WARN:
             levelCh = 'W';
-            break;
-        case Level::METRIC:
-            levelCh = 'M';
             break;
         default:
             levelCh = '?';
@@ -236,8 +233,6 @@ Color ColorLogFormatter::getLevelColor(const LogFormatter::Level& level) {
             return Color::FG_DARK_GRAY;
         case Level::INFO:
             return Color::FG_WHITE;
-        case Level::METRIC:
-            return Color::FG_LIGHT_BLUE;
         case Level::WARN:
             return Color::FG_YELLOW;
         case Level::ERROR:

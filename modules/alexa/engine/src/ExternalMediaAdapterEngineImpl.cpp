@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 #include "AACE/Engine/Alexa/ExternalMediaAdapterEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
@@ -28,8 +27,6 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 static const uint8_t MAX_SPEAKER_VOLUME = 100;
 
 // String to identify log entries originating from this file.
@@ -38,35 +35,18 @@ static const std::string TAG("aace.alexa.ExternalMediaAdapterEngineImpl");
 // external media player agent constant
 static const std::string EXTERNAL_MEDIA_PLAYER_AGENT = "Alexa Auto SDK";
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "ExternalMediaAdapterEngineImpl";
-
-/// Counter metrics for ExternalMediaPlayer Platform APIs
-static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGIN = "Login";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGOUT = "Logout";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAY = "Play";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAY_CONTROL = "PlayControl";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_SEEK = "Seek";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_ADJUST_SEEK = "AdjustSeek";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_AUTHORIZE = "Authorize";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_GET_OFFSET = "GetOffset";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_VOLUME_CHANGED = "VolumeChanged";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_MUTED_STATE_CHANGED = "MutedStateChanged";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_REPORT_DISCOVERED_PLAYERS = "ReportDiscoveredPlayers";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_REQUEST_TOKEN = "RequestToken";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGIN_COMPLETE = "LoginComplete";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_LOGOUT_COMPLETE = "LogoutComplete";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAYER_EVENT = "PlayerEvent";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_PLAYER_ERROR = "PlayerError";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_SET_FOCUS = "SetFocus";
-static const std::string METRIC_EXTERNALMEDIAPLAYER_REMOVE_DISCOVERED_PLAYER = "RemoveDiscoveredPlayer";
-
 ExternalMediaAdapterEngineImpl::ExternalMediaAdapterEngineImpl(
     std::shared_ptr<aace::alexa::ExternalMediaAdapter> platformMediaAdapter,
     std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
-    std::shared_ptr<FocusHandlerInterface> focusHandler) :
-        aace::engine::alexa::ExternalMediaAdapterHandler(discoveredPlayerSender, focusHandler),
-        m_platformMediaAdapter(platformMediaAdapter) {
+    std::shared_ptr<FocusHandlerInterface> focusHandler,
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) :
+        aace::engine::alexa::ExternalMediaAdapterHandler(
+            discoveredPlayerSender,
+            focusHandler,
+            messageSender,
+            metricRecorder),
+        m_platformMediaAdapter{platformMediaAdapter} {
 }
 
 std::shared_ptr<ExternalMediaAdapterEngineImpl> ExternalMediaAdapterEngineImpl::create(
@@ -74,19 +54,22 @@ std::shared_ptr<ExternalMediaAdapterEngineImpl> ExternalMediaAdapterEngineImpl::
     std::shared_ptr<DiscoveredPlayerSenderInterface> discoveredPlayerSender,
     std::shared_ptr<FocusHandlerInterface> focusHandler,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
+    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder) {
     std::shared_ptr<ExternalMediaAdapterEngineImpl> externalMediaAdapterEngineImpl = nullptr;
 
     try {
         ThrowIfNull(platformMediaAdapter, "invalidPlatformMediaAdapter");
         ThrowIfNull(discoveredPlayerSender, "invalidDiscoveredPlayerSender");
         ThrowIfNull(focusHandler, "invalidFocusHandler");
+        ThrowIfNull(messageSender, "invalidMessageSender");
 
         // create the external media adapter engine implementation
-        externalMediaAdapterEngineImpl = std::shared_ptr<ExternalMediaAdapterEngineImpl>(
-            new ExternalMediaAdapterEngineImpl(platformMediaAdapter, discoveredPlayerSender, focusHandler));
+        externalMediaAdapterEngineImpl =
+            std::shared_ptr<ExternalMediaAdapterEngineImpl>(new ExternalMediaAdapterEngineImpl(
+                platformMediaAdapter, discoveredPlayerSender, focusHandler, messageSender, metricRecorder));
         ThrowIfNot(
-            externalMediaAdapterEngineImpl->initialize(messageSender, speakerManager),
+            externalMediaAdapterEngineImpl->initialize(speakerManager),
             "initializeExternalMediaAdapterEngineImplFailed");
 
         // register the platforms engine interface
@@ -103,12 +86,8 @@ std::shared_ptr<ExternalMediaAdapterEngineImpl> ExternalMediaAdapterEngineImpl::
 }
 
 bool ExternalMediaAdapterEngineImpl::initialize(
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::SpeakerManagerInterface> speakerManager) {
     try {
-        ThrowIfNull(messageSender, "invalidMessageSender");
-        m_messageSender = messageSender;
-
         // initialize the adapter handler
         ThrowIfNot(initializeAdapterHandler(speakerManager), "initializeAdapterHandlerFailed");
 
@@ -121,7 +100,6 @@ bool ExternalMediaAdapterEngineImpl::initialize(
 
 bool ExternalMediaAdapterEngineImpl::handleAuthorization(
     const std::vector<aace::alexa::ExternalMediaAdapter::AuthorizedPlayerInfo>& authorizedPlayerList) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleAuthorization", {METRIC_EXTERNALMEDIAPLAYER_AUTHORIZE});
     try {
         ThrowIfNot(m_platformMediaAdapter->authorize(authorizedPlayerList), "platformMediaAdapterAuthorizeFailed");
 
@@ -138,7 +116,6 @@ bool ExternalMediaAdapterEngineImpl::handleLogin(
     const std::string& userName,
     bool forceLogin,
     std::chrono::milliseconds tokenRefreshInterval) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleLogin", {METRIC_EXTERNALMEDIAPLAYER_LOGIN});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->login(localPlayerId, accessToken, userName, forceLogin, tokenRefreshInterval),
@@ -152,10 +129,8 @@ bool ExternalMediaAdapterEngineImpl::handleLogin(
 }
 
 bool ExternalMediaAdapterEngineImpl::handleLogout(const std::string& localPlayerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleLogout", {METRIC_EXTERNALMEDIAPLAYER_LOGOUT});
     try {
         ThrowIfNot(m_platformMediaAdapter->logout(localPlayerId), "platformMediaAdapterLogoutFailed");
-
         return true;
     } catch (std::exception& ex) {
         AACE_ERROR(LX(TAG, "handleLogout").d("reason", ex.what()).d("localPlayerId", localPlayerId));
@@ -172,7 +147,6 @@ bool ExternalMediaAdapterEngineImpl::handlePlay(
     aace::alexa::ExternalMediaAdapter::Navigation navigation,
     const std::string& playbackSessionId,
     const std::string& skillToken) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handlePlay", {METRIC_EXTERNALMEDIAPLAYER_PLAY});
     try {
         // note: playRequestor.id not needed by client for now
         ThrowIfNot(
@@ -192,8 +166,6 @@ bool ExternalMediaAdapterEngineImpl::handlePlayControl(
     aace::alexa::ExternalMediaAdapter::PlayControlType playControlType) {
     std::stringstream type;
     type << playControlType;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "handlePlayControl", {METRIC_EXTERNALMEDIAPLAYER_PLAY_CONTROL, type.str()});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->playControl(localPlayerId, playControlType),
@@ -210,7 +182,6 @@ bool ExternalMediaAdapterEngineImpl::handlePlayControl(
 }
 
 bool ExternalMediaAdapterEngineImpl::handleSeek(const std::string& localPlayerId, std::chrono::milliseconds offset) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSeek", {METRIC_EXTERNALMEDIAPLAYER_SEEK});
     try {
         ThrowIfNot(m_platformMediaAdapter->seek(localPlayerId, offset), "platformMediaAdapterSeekFailed");
 
@@ -224,7 +195,6 @@ bool ExternalMediaAdapterEngineImpl::handleSeek(const std::string& localPlayerId
 bool ExternalMediaAdapterEngineImpl::handleAdjustSeek(
     const std::string& localPlayerId,
     std::chrono::milliseconds deltaOffset) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleAdjustSeek", {METRIC_EXTERNALMEDIAPLAYER_ADJUST_SEEK});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->adjustSeek(localPlayerId, deltaOffset), "platformMediaAdapterAdjustSeekFailed");
@@ -360,7 +330,6 @@ bool ExternalMediaAdapterEngineImpl::handleGetAdapterState(
 }
 
 std::chrono::milliseconds ExternalMediaAdapterEngineImpl::handleGetOffset(const std::string& localPlayerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleGetOffset", {METRIC_EXTERNALMEDIAPLAYER_GET_OFFSET});
     try {
         // get the external media adapter offset from the platform interface
         return m_platformMediaAdapter->getOffset(localPlayerId);
@@ -371,7 +340,6 @@ std::chrono::milliseconds ExternalMediaAdapterEngineImpl::handleGetOffset(const 
 }
 
 bool ExternalMediaAdapterEngineImpl::handleSetVolume(int8_t volume) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSetVolume", {METRIC_EXTERNALMEDIAPLAYER_VOLUME_CHANGED});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->volumeChanged((float)volume / MAX_SPEAKER_VOLUME),
@@ -384,7 +352,6 @@ bool ExternalMediaAdapterEngineImpl::handleSetVolume(int8_t volume) {
 }
 
 bool ExternalMediaAdapterEngineImpl::handleSetMute(bool mute) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "handleSetMute", {METRIC_EXTERNALMEDIAPLAYER_MUTED_STATE_CHANGED});
     try {
         ThrowIfNot(
             m_platformMediaAdapter->mutedStateChanged(
@@ -405,10 +372,6 @@ bool ExternalMediaAdapterEngineImpl::handleSetMute(bool mute) {
 
 void ExternalMediaAdapterEngineImpl::onReportDiscoveredPlayers(
     const std::vector<DiscoveredPlayerInfo>& discoveredPlayers) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onReportDiscoveredPlayers",
-        {METRIC_EXTERNALMEDIAPLAYER_REPORT_DISCOVERED_PLAYERS});
     try {
         reportDiscoveredPlayers(discoveredPlayers);
     } catch (std::exception& ex) {
@@ -417,12 +380,12 @@ void ExternalMediaAdapterEngineImpl::onReportDiscoveredPlayers(
 }
 
 void ExternalMediaAdapterEngineImpl::onRequestToken(const std::string& localPlayerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onRequestToken", {METRIC_EXTERNALMEDIAPLAYER_REQUEST_TOKEN});
     try {
         ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
 
         auto event = createExternalMediaPlayerEvent(localPlayerId, "RequestToken");
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
+        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(
+            alexaClientSDK::avsCommon::avs::AgentId::AGENT_ID_ALL, event);
 
         auto m_messageSender_lock = m_messageSender.lock();
         ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
@@ -434,74 +397,15 @@ void ExternalMediaAdapterEngineImpl::onRequestToken(const std::string& localPlay
 }
 
 void ExternalMediaAdapterEngineImpl::onLoginComplete(const std::string& localPlayerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onLoginComplete", {METRIC_EXTERNALMEDIAPLAYER_LOGIN_COMPLETE});
-    try {
-        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
-
-        auto event = createExternalMediaPlayerEvent(localPlayerId, "Login");
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
-
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-
-        m_messageSender_lock->sendMessage(request);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onLoginComplete").d("reason", ex.what()).d("localPlayerId", localPlayerId));
-    }
+    loginComplete(localPlayerId);
 }
 
 void ExternalMediaAdapterEngineImpl::onLogoutComplete(const std::string& localPlayerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onLogoutComplete", {METRIC_EXTERNALMEDIAPLAYER_LOGOUT_COMPLETE});
-    try {
-        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
-
-        auto event = createExternalMediaPlayerEvent(localPlayerId, "Logout");
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
-
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-
-        m_messageSender_lock->sendMessage(request);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onLogoutComplete").d("reason", ex.what()).d("localPlayerId", localPlayerId));
-    }
+    logoutComplete(localPlayerId);
 }
 
 void ExternalMediaAdapterEngineImpl::onPlayerEvent(const std::string& localPlayerId, const std::string& eventName) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onPlayerEvent", {METRIC_EXTERNALMEDIAPLAYER_PLAYER_EVENT, eventName});
-    try {
-        AACE_INFO(LX(TAG).d("eventName", eventName).d("localPlayerId", localPlayerId));
-        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
-
-        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_STARTED) == 0 ||
-            eventName.compare(aace::engine::alexa::TRACK_CHANGED) == 0 ||
-            eventName.compare(aace::engine::alexa::PLAYBACK_STARTED) == 0) {
-            AACE_DEBUG(LX(TAG).d("Setting focus for localPlayerId:", localPlayerId));
-            ThrowIfNot(setFocus(localPlayerId, true), "setFocusFailed");
-        }
-
-        if (eventName.compare(aace::engine::alexa::PLAYBACK_SESSION_ENDED) == 0) {
-            ThrowIfNot(setFocus(localPlayerId, false), "setFocusFailed");
-        }
-
-        auto event = createExternalMediaPlayerEvent(
-            localPlayerId,
-            "PlayerEvent",
-            true,
-            [eventName](rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
-                payload.AddMember(
-                    "eventName", rapidjson::Value().SetString(eventName.c_str(), eventName.length()), allocator);
-            });
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
-
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-
-        m_messageSender_lock->sendMessage(request);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()).d("localPlayerId", localPlayerId));
-    }
+    playerEvent(localPlayerId, eventName);
 }
 
 void ExternalMediaAdapterEngineImpl::onPlayerError(
@@ -510,48 +414,10 @@ void ExternalMediaAdapterEngineImpl::onPlayerError(
     long code,
     const std::string& description,
     bool fatal) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onPlayerError",
-        {METRIC_EXTERNALMEDIAPLAYER_PLAYER_ERROR, errorName, std::to_string(code)});
-    try {
-        AACE_INFO(
-            LX(TAG).d("errorName", errorName).d("localPlayerId", localPlayerId).d("code", code).d("fatal", fatal));
-        ThrowIfNot(validatePlayer(localPlayerId), "invalidPlayerId");
-
-        auto event = createExternalMediaPlayerEvent(
-            localPlayerId,
-            "PlayerError",
-            true,
-            [errorName, code, description, fatal](
-                rapidjson::Value::Object& payload, rapidjson::Value::AllocatorType& allocator) {
-                payload.AddMember(
-                    "errorName", rapidjson::Value().SetString(errorName.c_str(), errorName.length()), allocator);
-                payload.AddMember("code", rapidjson::Value().SetInt64(code), allocator);
-                payload.AddMember(
-                    "description", rapidjson::Value().SetString(description.c_str(), description.length()), allocator);
-                payload.AddMember("fatal", rapidjson::Value().SetBool(fatal), allocator);
-            });
-        auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(event);
-
-        // cases where we should abandon focus
-        if (errorName.compare(aace::engine::alexa::UNPLAYABLE_BY_AUTHORIZATION) == 0 ||
-            errorName.compare(aace::engine::alexa::UNPLAYABLE_BY_STREAM_CONCURRENCY) == 0 ||
-            (errorName.compare(aace::engine::alexa::INTERNAL_ERROR) == 0 && fatal)) {
-            ThrowIfNot(setFocus(localPlayerId, false), "setFocusFailed");
-        }
-
-        auto m_messageSender_lock = m_messageSender.lock();
-        ThrowIfNull(m_messageSender_lock, "invalidMessageSender");
-
-        m_messageSender_lock->sendMessage(request);
-    } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG, "onPlayerError").d("reason", ex.what()).d("localPlayerId", localPlayerId));
-    }
+    playerError(localPlayerId, errorName, code, description, fatal);
 }
 
 void ExternalMediaAdapterEngineImpl::onSetFocus(const std::string& localPlayerId) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onSetFocus", {METRIC_EXTERNALMEDIAPLAYER_SET_FOCUS});
     try {
         ThrowIfNot(setFocus(localPlayerId, true), "setFocusFailed");
     } catch (std::exception& ex) {
@@ -560,8 +426,6 @@ void ExternalMediaAdapterEngineImpl::onSetFocus(const std::string& localPlayerId
 }
 
 void ExternalMediaAdapterEngineImpl::onRemoveDiscoveredPlayer(const std::string& localPlayerId) {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onRemoveDiscoveredPlayer", {METRIC_EXTERNALMEDIAPLAYER_REMOVE_DISCOVERED_PLAYER});
     try {
         ThrowIfNot(removeDiscoveredPlayer(localPlayerId), "removeDiscoveredPlayerFailed");
     } catch (std::exception& ex) {

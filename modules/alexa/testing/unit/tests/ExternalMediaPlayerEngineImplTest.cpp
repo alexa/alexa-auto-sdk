@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -74,6 +74,7 @@ TEST_F(ExternalMediaPlayerEngineImplTest, getAdapterStatesAndShutdown) {
         m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),      // ExceptionEncounteredSenderInterface
         m_alexaMockFactory->getPlaybackRouterMock(),                           // PlaybackRouterInterface
         std::make_shared<aace::engine::alexa::AudioPlayerObserverDelegate>(),  // AudioPlayerObserverDelegate
+        m_alexaMockFactory->getMetricRecorderServiceMock(),                    // MetricRecorderServiceInterface
         std::make_shared<MockExternalMediaAdapterRegistrationInterface>(),  // ExternalMediaAdapterRegistrationInterface
         false                                                               // duckingEnabled
     );

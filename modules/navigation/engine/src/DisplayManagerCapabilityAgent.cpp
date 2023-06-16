@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
  * permissions and limitations under the License.
  */
 #include <iostream>
+#include <stdexcept>
 
 #include <string>
 #include <nlohmann/json.hpp>
@@ -22,14 +23,19 @@
 
 #include <AVSCommon/Utils/JSON/JSONUtils.h>
 
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
+
 #include "AACE/Engine/Navigation/DisplayManagerCapabilityAgent.h"
-#include "AACE/Engine/Core/EngineMacros.h"
 
 namespace aace {
 namespace engine {
 namespace navigation {
 
 using AgentId = alexaClientSDK::avsCommon::avs::AgentId;
+using namespace aace::engine::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("DisplayManagerCapabilityAgent");
@@ -38,11 +44,14 @@ static const std::string TAG("DisplayManagerCapabilityAgent");
 static const std::string NAMESPACE{"Navigation.DisplayManager"};
 
 /// The @c ControlDisplay directive signature.
-static const alexaClientSDK::avsCommon::avs::NamespaceAndName CONTROL_DISPLAY{NAMESPACE, "ControlDisplay", AgentId::AGENT_ID_ALL};
+static const alexaClientSDK::avsCommon::avs::NamespaceAndName CONTROL_DISPLAY{NAMESPACE,
+                                                                              "ControlDisplay",
+                                                                              AgentId::AGENT_ID_ALL};
 
 /// The @c ShowAlternativeRoutes directive signature.
 static const alexaClientSDK::avsCommon::avs::NamespaceAndName SHOW_ALTERNATIVE_ROUTES{NAMESPACE,
-                                                                                      "ShowAlternativeRoutes", AgentId::AGENT_ID_ALL};
+                                                                                      "ShowAlternativeRoutes",
+                                                                                      AgentId::AGENT_ID_ALL};
 /// @c AlexaInterface interface name.
 static const std::string ALEXA_INTERFACE_TYPE = "AlexaInterface";
 
@@ -89,6 +98,42 @@ static const std::unordered_map<std::string, AlternativeRoutesQueryType> alterna
     {"SHORTER_TIME", AlternativeRoutesQueryType::SHORTER_TIME},
     {"SHORTER_DISTANCE", AlternativeRoutesQueryType::SHORTER_DISTANCE}};
 
+/// Prefix for metrics emitted from the DisplayManager CA
+static const std::string METRIC_PREFIX = "DISPLAY_MANAGER-";
+
+/// Activity name for metrics related to ShowAlternativeRoutes directives
+static const std::string METRIC_SHOW_ALT_ROUTES_ACTIVITY = METRIC_PREFIX + SHOW_ALTERNATIVE_ROUTES.name;
+
+/// ShowAlternativeRoutes latency metric
+static const std::string METRIC_SHOW_ALT_ROUTES_LATENCY = "ShowAltRoutesLatencyValue";
+
+/// ShowAlternativeRoutes success count metric
+static const std::string METRIC_SHOW_ALT_ROUTES_SUCCESS = "ShowAltRoutesSuccessCount";
+
+/// ShowAlternativeRoutes error count metric
+static const std::string METRIC_SHOW_ALT_ROUTES_ERROR = "ShowAltRoutesErrorCount";
+
+/// ShowAlternativeRoutes alternative route type dimension
+static const std::string METRIC_SHOW_ALT_ROUTES_TYPE = "AltRoutesType";
+
+/// Activity name for metrics related to ControlDisplay directives
+static const std::string METRIC_CONTROL_DISPLAY_ACTIVITY = METRIC_PREFIX + CONTROL_DISPLAY.name;
+
+/// ControlDisplay latency metric
+static const std::string METRIC_CONTROL_DISPLAY_LATENCY = "ControlDisplayLatencyValue";
+
+/// ControlDisplay success count metric
+static const std::string METRIC_CONTROL_DISPLAY_SUCCESS = "ControlDisplaySuccessCount";
+
+/// ControlDisplay error count metric
+static const std::string METRIC_CONTROL_DISPLAY_ERROR = "ControlDisplayErrorCount";
+
+/// ControlDisplay display type metric dimension
+static const std::string METRIC_CONTROL_DISPLAY_TYPE = "ControlDisplayType";
+
+/// DisplayManager error code metric dimension
+static const std::string METRIC_DISPLAY_MANAGER_ERROR_CODE = "DisplayManagerErrorCode";
+
 /**
  * Creates the Display Manager capability configuration.
  *
@@ -97,19 +142,170 @@ static const std::unordered_map<std::string, AlternativeRoutesQueryType> alterna
 static std::shared_ptr<alexaClientSDK::avsCommon::avs::CapabilityConfiguration>
 getDisplayManagerCapabilityConfiguration();
 
+/**
+ * Creates and records a metric.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param activityName The activity name of the metric
+ * @param agentId The ID of the agent associated with the metric
+ * @param dataPoints The @c DataPoint objects to include in the MetricEvent
+*/
+static void submitMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const std::string& activityName,
+    const std::vector<DataPoint>& dataPoints) {
+    auto metricBuilder = MetricEventBuilder{}.withSourceName(activityName);
+    metricBuilder.withAgentId(agentId);
+    metricBuilder.addDataPoints(dataPoints);
+    auto metric = metricBuilder.build();
+    try {
+        recordMetric(metricRecorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
+
+/**
+ * Creates and records a metric for ControlDisplay success.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the ControlDisplay
+ *        operation latency
+ * @param displayMode The relevant @c DisplayMode of the ControlDisplay
+ *        operation
+*/
+static void submitControlDisplaySuccessMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    DisplayMode displayMode) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_CONTROL_DISPLAY_SUCCESS).increment(1).build(),
+        CounterDataPointBuilder{}.withName(METRIC_CONTROL_DISPLAY_ERROR).increment(0).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_CONTROL_DISPLAY_TYPE)
+            .withValue(displayModeToString(displayMode))
+            .build()};
+    submitMetric(metricRecorder, agentId, METRIC_CONTROL_DISPLAY_ACTIVITY, dps);
+}
+
+/**
+ * Creates and records a metric for ControlDisplay error
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events.
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the ControlDisplay
+ *        operation latency
+ * @param displayMode The relevant @c DisplayMode of the ControlDisplay
+ *        operation
+ * @param error The relevant @c DisplayControlError of the ControlDisplay
+ *        operation
+*/
+static void submitControlDisplayErrorMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    DisplayMode displayMode,
+    DisplayControlError error) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_CONTROL_DISPLAY_SUCCESS).increment(0).build(),
+        CounterDataPointBuilder{}.withName(METRIC_CONTROL_DISPLAY_ERROR).increment(1).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_CONTROL_DISPLAY_TYPE)
+            .withValue(displayModeToString(displayMode))
+            .build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_DISPLAY_MANAGER_ERROR_CODE)
+            .withValue(displayControlErrorToString(error))
+            .build()};
+    submitMetric(metricRecorder, agentId, METRIC_CONTROL_DISPLAY_ACTIVITY, dps);
+}
+
+/**
+ * Creates and records a metric for ShowAlternativeRoutes success.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the ShowAlternativeRoutes
+ *        operation latency
+ * @param type The relevant @c AlternativeRoutesQueryType of the
+ *        ShowAlternativeRoutes operation
+*/
+static void submitShowAltRoutesSuccessMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    AlternativeRoutesQueryType type) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_SHOW_ALT_ROUTES_SUCCESS).increment(1).build(),
+        CounterDataPointBuilder{}.withName(METRIC_SHOW_ALT_ROUTES_ERROR).increment(0).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_SHOW_ALT_ROUTES_TYPE)
+            .withValue(altRoutesQueryTypeToString(type))
+            .build()};
+    submitMetric(metricRecorder, agentId, METRIC_SHOW_ALT_ROUTES_ACTIVITY, dps);
+}
+
+/**
+ * Creates and records a metric for ShowAlternativeRoutes error.
+ * 
+ * @param metricRecorder The @c MetricRecorderInterface that records Metric
+ *        events
+ * @param agentId The ID of the agent associated with the event
+ * @param latencyDataPoint The @c DataPoint containing the ShowAlternativeRoutes
+ *        operation latency
+ * @param type The relevant @c AlternativeRoutesQueryType of the
+ *        ShowAlternativeRoutes operation
+ * @param error The relevant @c AlternativeRoutesQueryError of the
+ *        ShowAlternativeRoutes operation
+*/
+static void submitShowAltRoutesErrorMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& metricRecorder,
+    alexaClientSDK::avsCommon::avs::AgentId::IdType agentId,
+    const DataPoint& latencyDataPoint,
+    AlternativeRoutesQueryType type,
+    AlternativeRoutesQueryError error) {
+    std::vector<DataPoint> dps = {
+        latencyDataPoint,
+        CounterDataPointBuilder{}.withName(METRIC_SHOW_ALT_ROUTES_SUCCESS).increment(0).build(),
+        CounterDataPointBuilder{}.withName(METRIC_SHOW_ALT_ROUTES_ERROR).increment(1).build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_SHOW_ALT_ROUTES_TYPE)
+            .withValue(altRoutesQueryTypeToString(type))
+            .build(),
+        StringDataPointBuilder{}
+            .withName(METRIC_DISPLAY_MANAGER_ERROR_CODE)
+            .withValue(altRoutesErrorToString(error))
+            .build()};
+    submitMetric(metricRecorder, agentId, METRIC_SHOW_ALT_ROUTES_ACTIVITY, dps);
+}
+
 std::shared_ptr<DisplayManagerCapabilityAgent> DisplayManagerCapabilityAgent::create(
-    std::shared_ptr<DisplayHandlerInterface> displayHandler,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) {
+    const std::shared_ptr<DisplayHandlerInterface>& displayHandler,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+        exceptionSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+    const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder) {
     try {
         ThrowIfNull(displayHandler, "nullDisplayHandler");
         ThrowIfNull(exceptionSender, "nullExceptionSender");
         ThrowIfNull(messageSender, "nullMessageSender");
         ThrowIfNull(contextManager, "nullContextManager");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
 
-        auto displayManagerCapabilityAgent = std::shared_ptr<DisplayManagerCapabilityAgent>(
-            new DisplayManagerCapabilityAgent(displayHandler, exceptionSender, messageSender, contextManager));
+        auto displayManagerCapabilityAgent =
+            std::shared_ptr<DisplayManagerCapabilityAgent>(new DisplayManagerCapabilityAgent(
+                displayHandler, exceptionSender, messageSender, contextManager, metricRecorder));
 
         ThrowIfNull(displayManagerCapabilityAgent, "nullDisplayManagerCapabilityAgent");
 
@@ -164,15 +360,18 @@ alexaClientSDK::avsCommon::avs::DirectiveHandlerConfiguration DisplayManagerCapa
 }
 
 DisplayManagerCapabilityAgent::DisplayManagerCapabilityAgent(
-    std::shared_ptr<DisplayHandlerInterface> displayHandler,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-    std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager) :
+    const std::shared_ptr<DisplayHandlerInterface>& displayHandler,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+        exceptionSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+    const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+    const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder) :
         alexaClientSDK::avsCommon::avs::CapabilityAgent{NAMESPACE, exceptionSender},
         alexaClientSDK::avsCommon::utils::RequiresShutdown{"DisplayManagerCapabilityAgent"},
         m_displayHandler{displayHandler},
         m_contextManager{contextManager},
-        m_messageSender{messageSender} {
+        m_messageSender{messageSender},
+        m_metricRecorder{metricRecorder} {
     m_capabilityConfigurations.insert(getDisplayManagerCapabilityConfiguration());
 }
 
@@ -239,6 +438,7 @@ void DisplayManagerCapabilityAgent::handleControlDisplayDirective(std::shared_pt
     if (iter != controlDisplayStringToEnumMap.end()) {
         aace::engine::navigation::DisplayMode control = iter->second;
         m_executor.submit([this, info, control]() {
+            m_controlDisplayDurationData.startTimer();
             m_displayHandler->controlDisplay(control);
             setHandlingCompleted(info);
             auto agentId = info->directive->getAgentId();
@@ -289,6 +489,7 @@ void DisplayManagerCapabilityAgent::handleShowAlternativeRoutesDirective(std::sh
     AlternativeRoutesQueryType alternateRouteType = alternateRouteTypeStringToEnumMap.find(mode)->second;
 
     m_executor.submit([this, info, alternateRouteType]() {
+        m_altRoutesDurationData.startTimer();
         m_displayHandler->showAlternativeRoutes(alternateRouteType);
         setHandlingCompleted(info);
         auto agentId = info->directive->getAgentId();
@@ -319,14 +520,17 @@ void DisplayManagerCapabilityAgent::controlDisplaySucceeded(aace::engine::naviga
 
     m_executor.submit([this, displayMode]() {
         try {
+            auto agentId = getEventAgent(CONTROL_DISPLAY_SUCCEEDED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            DataPoint latencyDataPoint =
+                m_controlDisplayDurationData.withName(METRIC_CONTROL_DISPLAY_LATENCY).stopTimer().build();
+            submitControlDisplaySuccessMetric(m_metricRecorder, agentId, latencyDataPoint, displayMode);
             // clang-format off
             nlohmann::json payload = {
                 {"mode", displayModeToString(displayMode)}
             };
             // clang-format on
             auto event = buildJsonEventString(CONTROL_DISPLAY_SUCCEEDED, "", payload.dump());
-            auto agentId = getEventAgent(CONTROL_DISPLAY_SUCCEEDED);
-            AACE_DEBUG(LX(TAG).d("agentId", agentId));
             auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
@@ -343,6 +547,12 @@ void DisplayManagerCapabilityAgent::controlDisplayFailed(
 
     m_executor.submit([this, displayMode, error, description]() {
         try {
+            auto agentId = getEventAgent(CONTROL_DISPLAY_FAILED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+
+            DataPoint latencyDataPoint =
+                m_controlDisplayDurationData.withName(METRIC_CONTROL_DISPLAY_LATENCY).stopTimer().build();
+            submitControlDisplayErrorMetric(m_metricRecorder, agentId, latencyDataPoint, displayMode, error);
             // clang-format off
             nlohmann::json payload = {
                 {"mode", displayModeToString(displayMode)},
@@ -353,8 +563,6 @@ void DisplayManagerCapabilityAgent::controlDisplayFailed(
                 payload["description"] = description;
             }
             auto event = buildJsonEventString(CONTROL_DISPLAY_FAILED, "", payload.dump());
-            auto agentId = getEventAgent(CONTROL_DISPLAY_FAILED);
-            AACE_DEBUG(LX(TAG).d("agentId", agentId));
             auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
@@ -369,6 +577,12 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesSucceeded(
     AACE_INFO(LX(TAG).d("queryType", queryType));
     m_executor.submit([this, queryType, route]() {
         try {
+            auto agentId = getEventAgent(SHOW_ALTERNATIVE_ROUTES_SUCCEEDED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            DataPoint latencyDataPoint =
+                m_altRoutesDurationData.withName(METRIC_SHOW_ALT_ROUTES_LATENCY).stopTimer().build();
+            submitShowAltRoutesSuccessMetric(m_metricRecorder, agentId, latencyDataPoint, queryType);
+
             // clang-format off
             nlohmann::json payload = {
                 {"inquiryType", altRoutesQueryTypeToString(queryType)},
@@ -376,8 +590,6 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesSucceeded(
             };
             // clang-format on
             auto event = buildJsonEventString(SHOW_ALTERNATIVE_ROUTES_SUCCEEDED, "", payload.dump());
-            auto agentId = getEventAgent(SHOW_ALTERNATIVE_ROUTES_SUCCEEDED);
-            AACE_DEBUG(LX(TAG).d("agentId", agentId));
             auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
@@ -394,6 +606,12 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesFailed(
 
     m_executor.submit([this, queryType, error, description]() {
         try {
+            auto agentId = getEventAgent(SHOW_ALTERNATIVE_ROUTES_FAILED);
+            AACE_DEBUG(LX(TAG).d("agentId", agentId));
+            DataPoint latencyDataPoint =
+                m_altRoutesDurationData.withName(METRIC_SHOW_ALT_ROUTES_LATENCY).stopTimer().build();
+            submitShowAltRoutesErrorMetric(m_metricRecorder, agentId, latencyDataPoint, queryType, error);
+
             // clang-format off
             nlohmann::json payload = {
                 {"inquiryType", altRoutesQueryTypeToString(queryType)},
@@ -404,8 +622,6 @@ void DisplayManagerCapabilityAgent::showAlternativeRoutesFailed(
                 payload["description"] = description;
             }
             auto event = buildJsonEventString(SHOW_ALTERNATIVE_ROUTES_FAILED, "", payload.dump());
-            auto agentId = getEventAgent(SHOW_ALTERNATIVE_ROUTES_FAILED);
-            AACE_DEBUG(LX(TAG).d("agentId", agentId));
             auto request = std::make_shared<alexaClientSDK::avsCommon::avs::MessageRequest>(agentId, event.second);
             m_messageSender->sendMessage(request);
         } catch (nlohmann::json::exception& ex) {
@@ -420,7 +636,7 @@ DisplayManagerCapabilityAgent::getCapabilityConfigurations() {
 }
 
 void DisplayManagerCapabilityAgent::setEventAgentByDirective(
-    const std::string& directiveName, 
+    const std::string& directiveName,
     alexaClientSDK::avsCommon::avs::AgentId::IdType agentId) {
     if (directiveName == CONTROL_DISPLAY.name) {
         m_eventAgentMap[CONTROL_DISPLAY_SUCCEEDED] = agentId;
@@ -433,7 +649,8 @@ void DisplayManagerCapabilityAgent::setEventAgentByDirective(
     }
 }
 
-alexaClientSDK::avsCommon::avs::AgentId::IdType DisplayManagerCapabilityAgent::getEventAgent(const std::string& eventName) {
+alexaClientSDK::avsCommon::avs::AgentId::IdType DisplayManagerCapabilityAgent::getEventAgent(
+    const std::string& eventName) {
     if (m_eventAgentMap.find(eventName) != m_eventAgentMap.end()) {
         return m_eventAgentMap[eventName];
     }

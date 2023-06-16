@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,6 +27,9 @@
 #include <AVSCommon/Utils/Threading/Executor.h>
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+
 #include "NavigationHandlerInterface.h"
 
 namespace aace {
@@ -42,10 +45,12 @@ class NavigationCapabilityAgent
         , public std::enable_shared_from_this<NavigationCapabilityAgent> {
 public:
     static std::shared_ptr<NavigationCapabilityAgent> create(
-        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
+        const std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface>& navigationHandler,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+            exceptionSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder,
         const std::string& navigationProviderName);
 
     /**
@@ -92,10 +97,12 @@ public:
 
 private:
     NavigationCapabilityAgent(
-        std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface> navigationHandler,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface> exceptionSender,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        const std::shared_ptr<aace::engine::navigation::NavigationHandlerInterface>& navigationHandler,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>&
+            exceptionSender,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface>& contextManager,
+        const std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface>& messageSender,
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder,
         const std::string& navigationProviderName);
 
     // @name RequiresShutdown Functions
@@ -175,7 +182,7 @@ private:
     // Executor functions for navigation event handling
     void executeNavigationEvent(AgentId::IdType agentId, aace::navigation::NavigationEngineInterface::EventName event);
     void executeNavigationError(
-        AgentId::IdType agentId, 
+        AgentId::IdType agentId,
         aace::navigation::NavigationEngineInterface::ErrorType type,
         aace::navigation::NavigationEngineInterface::ErrorCode code,
         const std::string& description);
@@ -224,6 +231,14 @@ private:
 
     /// The last known NavigationState payload
     std::string m_navigationStatePayload;
+
+    /// The metric recorder.
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
+
+    // Duration builders for navigation latency metrics
+    aace::engine::metrics::DurationDataPointBuilder m_startNavDurationData;
+    aace::engine::metrics::DurationDataPointBuilder m_showWaypointsDurationData;
+    aace::engine::metrics::DurationDataPointBuilder m_navToPreviousDurationData;
 };
 
 }  // namespace navigation

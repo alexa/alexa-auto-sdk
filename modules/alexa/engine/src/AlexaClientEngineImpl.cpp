@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,25 +17,13 @@
 
 #include "AACE/Engine/Alexa/AlexaClientEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AlexaClientEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AlexaClientEngineImpl";
-
-/// Counter metrics for Alexa Client Platform APIs
-static const std::string METRIC_ALEXA_CLIENT_DIALOG_STATE_CHANGED = "DialogStateChanged";
-static const std::string METRIC_ALEXA_CLIENT_AUTH_STATE_CHANGED = "AuthStateChanged";
-static const std::string METRIC_ALEXA_CLIENT_CONNECTION_STATUS_CHANGED = "ConnectionStatusChanged";
-static const std::string METRIC_ALEXA_CLIENT_STOP_FOREGROUND_ACTIVITY = "StopForegroundActivity";
 
 AlexaClientEngineImpl::AlexaClientEngineImpl(
     std::shared_ptr<aace::alexa::AlexaClient> alexaClientPlatformInterface,
@@ -72,14 +60,6 @@ std::shared_ptr<AlexaClientEngineImpl> AlexaClientEngineImpl::create(
 void AlexaClientEngineImpl::onAuthStateChange(
     alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::State state,
     alexaClientSDK::avsCommon::sdkInterfaces::AuthObserverInterface::Error error) {
-    std::stringstream authState;
-    std::stringstream authError;
-    authState << state;
-    authError << error;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onAuthStateChange",
-        {METRIC_ALEXA_CLIENT_AUTH_STATE_CHANGED, authState.str(), authError.str()});
     m_alexaClientPlatformInterface->authStateChanged(
         static_cast<aace::alexa::AlexaClient::AuthState>(state),
         static_cast<aace::alexa::AlexaClient::AuthError>(error));
@@ -132,19 +112,9 @@ void AlexaClientEngineImpl::onConnectionStatusChanged(
             break;
         }
     }
-    std::stringstream connectionStatus;
-    std::stringstream changedReason;
-    connectionStatus << status;
-    changedReason << reason;
 
     if (status != m_connectionStatus) {
         m_connectionStatus = status;
-
-        emitCounterMetrics(
-            METRIC_PROGRAM_NAME_SUFFIX,
-            "onConnectionStatusChanged",
-            {METRIC_ALEXA_CLIENT_CONNECTION_STATUS_CHANGED, connectionStatus.str(), changedReason.str()});
-
         m_alexaClientPlatformInterface->connectionStatusChanged(convertConnectionStatus(status), convertReason(reason));
     }
 
@@ -159,12 +129,6 @@ void AlexaClientEngineImpl::onDialogUXStateChanged(
     DialogUXState newState) {
     AACE_INFO(LX(TAG).d("agentId", agentId).d("newState", newState));
     try {
-        std::stringstream dialogState;
-        dialogState << newState;
-        emitCounterMetrics(
-            METRIC_PROGRAM_NAME_SUFFIX,
-            "onDialogUXStateChanged",
-            {METRIC_ALEXA_CLIENT_DIALOG_STATE_CHANGED, dialogState.str()});
         m_alexaClientPlatformInterface->dialogStateChanged(agentId, convertDialogState(newState));
 
         // Still call the old API for backwards compatibility
@@ -177,8 +141,6 @@ void AlexaClientEngineImpl::onDialogUXStateChanged(
 
 // AlexaClientEngineInterface
 void AlexaClientEngineImpl::onStopForegroundActivity() {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onStopForegroundActivity", {METRIC_ALEXA_CLIENT_STOP_FOREGROUND_ACTIVITY});
     m_audioFocusManager->stopForegroundActivity();
     m_visualFocusManager->stopForegroundActivity();
 }

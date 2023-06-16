@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <AASB/Engine/Alexa/AASBSpeechSynthesizer.h>
 #include <AASB/Engine/Alexa/AASBTemplateRuntime.h>
 #include <AASB/Engine/Alexa/AASBGlobalPreset.h>
+#include <AASB/Engine/Alexa/AASBCaptionPresenter.h>
 #include <AACE/Engine/Core/EngineMacros.h>
 
 // LocalMediaSource Handlers
@@ -74,7 +75,8 @@ AASBAlexaEngineService::AASBAlexaEngineService(const aace::engine::core::Service
              "PlaybackController",
              "SpeechRecognizer",
              "SpeechSynthesizer",
-             "TemplateRuntime"}) {
+             "TemplateRuntime",
+             "CaptionPresenter"}) {
 }
 
 bool AASBAlexaEngineService::configureMessageInterface(
@@ -256,6 +258,13 @@ bool AASBAlexaEngineService::postRegister() {
             auto featureDiscovery = AASBFeatureDiscovery::create(aasbServiceInterface->getMessageBroker());
             ThrowIfNull(featureDiscovery, "invalidFeatureDiscoveryHandler");
             context->registerPlatformInterface(featureDiscovery);
+        }
+        
+        // CaptionPresenter
+        if (isInterfaceEnabled("CaptionPresenter")) {
+            auto captionPresenter = AASBCaptionPresenter::create(aasbServiceInterface->getMessageBroker());
+            ThrowIfNull(captionPresenter, "invalidCaptionPresenterHandler");
+            context->registerPlatformInterface(captionPresenter);
         }
 
         return true;

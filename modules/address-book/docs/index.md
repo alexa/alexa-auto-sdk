@@ -68,18 +68,6 @@ m_engine->configure(configurations);
 
 </details>
 
-### Android Integration
-
-To use the `Address Book` module Engine configuration with AACS, use *"aacs.addressBook"* instead of *"aace.addressBook"* in your AACS configuration file:
-
-```
-{
-    "aacs.addressBook": {
-        "cleanAllAddressBooksAtStart": {{BOOLEAN}}
-    }
-}
-```
-
 ## Using the Address Book Module AASB Messages
 
 ### Uploading an Address Book
@@ -245,7 +233,3 @@ class MyAddressBookHandler {
 ```
 
 </details>
-
-### Android Integration
-
-The Alexa Auto Client Service (AACS) provides the `AACS Contacts Library` to integrate the Auto SDK `Address Book` module on Android. See the [AACS Contacts Library documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-contacts) for more information.

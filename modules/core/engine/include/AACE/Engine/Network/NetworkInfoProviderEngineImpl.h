@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 #include <mutex>
 #include <memory>
 
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 #include "AACE/Engine/Network/NetworkObservableInterface.h"
 #include "AACE/Network/NetworkEngineInterfaces.h"
 
@@ -33,10 +35,12 @@ class NetworkInfoProviderEngineImpl
         : public aace::network::NetworkInfoProviderEngineInterface
         , public NetworkObservableInterface {
 private:
-    NetworkInfoProviderEngineImpl() = default;
+    NetworkInfoProviderEngineImpl(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder);
 
 public:
-    static std::shared_ptr<NetworkInfoProviderEngineImpl> create();
+    static std::shared_ptr<NetworkInfoProviderEngineImpl> create(
+        const std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface>& metricRecorder);
 
     // aace::engine::network::NetworkObservableInterface
     void addObserver(std::shared_ptr<NetworkInfoObserver> observer) override;
@@ -48,9 +52,34 @@ public:
     bool setNetworkInterface(const std::string& networkInterface);
     bool setNetworkHttpProxyHeader(const std::string& headers);
 
+    /**
+     * Handle any operations required when the Engine is stopped.
+     */
+    void stop();
+
 private:
+    /**
+     * Set of network info observers. Access is serialized by @c m_mutex.
+     */
     std::unordered_set<std::shared_ptr<NetworkInfoObserver>> m_observers;
+
+    /**
+     * Whether there is an internet connection. Access is serialized by
+     * @c m_mutex.
+    */
+    bool m_isConnected;
+
+    /// Mutex to serialize access to member variables.
     std::mutex m_mutex;
+
+    /// The metric recorder.
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
+
+    /// Builder for network connection time metric.
+    aace::engine::metrics::DurationDataPointBuilder m_connectedDuration;
+
+    /// Builder for network disconnection time metric.
+    aace::engine::metrics::DurationDataPointBuilder m_disconnectedDuration;
 };
 
 }  // namespace network

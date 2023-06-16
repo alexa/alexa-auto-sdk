@@ -10,29 +10,29 @@ The head unit device acting as an Alexa Auto SDK client is an "endpoint" that co
 
 ### Capabilities
 
-In the utterance "Alexa, turn on the AC", "turn on" corresponds to a specific capability configured for the "AC" endpoint. Defining an endpoint declares a vehicle feature to be controllable, and defining capabilities on the endpoint declares *how* the endpoint can be controlled. 
+In the utterance "Alexa, turn on the AC", "turn on" corresponds to a specific capability configured for the "AC" endpoint. Defining an endpoint declares a vehicle feature to be controllable, and defining capabilities on the endpoint declares *how* the endpoint can be controlled.
 
 Car Control supports four capability interfaces that can be declared alone or in combination for a particular endpoint to model its individual control experience:
 
 * **Power Controller** controls the overall power state of an endpoint. For example, configuring an "AC" endpoint with a Power Controller capability enables utterances such as "Alexa, turn on the AC" and "Alexa, power off the AC".
-  
-* **Toggle Controller** controls a particular named property of an endpoint that can be turned on and off. For example, configuring a "windshield" endpoint with a "defroster" Toggle Controller capability instance enables utterances such as "Alexa, turn on the windshield defroster." 
-  
+
+* **Toggle Controller** controls a particular named property of an endpoint that can be turned on and off. For example, configuring a "windshield" endpoint with a "defroster" Toggle Controller capability instance enables utterances such as "Alexa, turn on the windshield defroster."
+
 * **Mode Controller** controls a particular named property of an endpoint that can be set to a discrete value from a defined set of values. For example, if an ambient light endpoint has red and green color settings, configuring an "ambient light" endpoint with a "color" Mode Controller capability instance enables utterances such as "Alexa, set the ambient light color to red" and "Alexa, change the ambient light to green."
-  
-* **Range Controller** controls a particular named property of an endpoint that can be set to a numeric value within a range. For example, if a fan endpoint has a speed property with settings 1 through 3, configuring a "fan" endpoint with a "speed" Range Controller capability instance enables utterances such as "Alexa, set the fan speed to 2." You can configure names, such as "medium", for a range value to enable additional utterances such as "Alexa, set the fan to medium" to set the fan speed setting to 2. 
+
+* **Range Controller** controls a particular named property of an endpoint that can be set to a numeric value within a range. For example, if a fan endpoint has a speed property with settings 1 through 3, configuring a "fan" endpoint with a "speed" Range Controller capability instance enables utterances such as "Alexa, set the fan speed to 2." You can configure names, such as "medium", for a range value to enable additional utterances such as "Alexa, set the fan to medium" to set the fan speed setting to 2.
 
 #### Capability Primitives and Semantic Annotations
 
-Toggle Controller, Mode Controller, and Range Controller are known as "capability primitives." You can use multiple instances of the same capability primitive interface on an endpoint under different instance names. For example, a heater endpoint might have intensity and position properties that are both best modeled as modes. You can declare an "intensity" Mode Controller instance and a "position" Mode Controller instance on the same "heater" endpoint so the user can target each property separately. 
+Toggle Controller, Mode Controller, and Range Controller are known as "capability primitives." You can use multiple instances of the same capability primitive interface on an endpoint under different instance names. For example, a heater endpoint might have intensity and position properties that are both best modeled as modes. You can declare an "intensity" Mode Controller instance and a "position" Mode Controller instance on the same "heater" endpoint so the user can target each property separately.
 
 To provide intuitive experiences for users, capability primitives offer "semantic annotations" for the devices to map specific utterances to the behaviors of capability instances. For example, if the vehicle uses a Range Controller to control a window, a user would prefer to say "Alexa, open the window" over the default utterances of the Range Controller such as "Alexa, set the window height to 0". For any endpoint to which the "open", "close", "raise", or "lower" concepts apply, you can configure the capability primitive instances of the endpoint with a "semantics" object that maps user utterances for these actions to the appropriate capability directives. Each action (e.g., "open") is allowed only once per endpoint since the action expresses intent to control the endpoint as a whole.
 
 The actions specified in configuration are action IDs rather than literal strings, which ensures Alexa recognizes all synonyms and translations for the action in the user utterance. The supported actions are "Alexa.Actions.Open", "Alexa.Actions.Close", "Alexa.Actions.Raise", and "Alexa.Actions.Lower."
-    
+
 ### Zones
 
-Each endpoint can belong to zero, one, or many "zones." Zones, configured with member endpoints, define named regions of the vehicle and allow users to target endpoints by location. Zones are essential for unambiguous targeting of endpoints that have friendly names that overlap with other endpoints. For example, defining "driver" and "passenger" zones and assigning distinct "seat" endpoints to each allows proper control of the "driver seat" and the "passenger seat" independently. 
+Each endpoint can belong to zero, one, or many "zones." Zones, configured with member endpoints, define named regions of the vehicle and allow users to target endpoints by location. Zones are essential for unambiguous targeting of endpoints that have friendly names that overlap with other endpoints. For example, defining "driver" and "passenger" zones and assigning distinct "seat" endpoints to each allows proper control of the "driver seat" and the "passenger seat" independently.
 
 Assigning one zone in particular as the "default" enables endpoints in this zone to take precedence over endpoints sharing the same friendly name but not in the default zone when the user does not specify a zone in the utterance. This is useful for distinguishing "zoneless" endpoints from "zoned" endpoints with the same name when it is most likely that the user intends to target the "zoneless" one. For example, consider a vehicle with zone IDs "zone.all", "zone.rear", and "zone.left" with a distinct fan endpoint in each zone. If the user says "Alexa, turn on the fan", it is most likely that he wants to turn on the fan that refers to the vehicle as a whole because there is no natural way to specify its location. You can ensure that Alexa will resolve this utterance to the fan in the "all" zone by assigning "zone.all" as the default zone.
 
@@ -427,11 +427,6 @@ The automotive catalog of assets defines assets for every feature officially sup
 ##### (Local Voice Control) Custom Assets for Linux Integration
 The default LVC app configuration for Linux expects any custom assets to be defined in a file called `assets.json` located at `/opt/LVC/data/led-service/assets/assets.json`. Use this path when you configure the `aace.carControl.assets.customAssetsPath` field in the `Car Control` module configuration.
 
-##### (Local Voice Control) Custom Assets for Android Integration
-Local Voice Control Android integrations using the LVC APK implement the `ILVCClient` interface to configure Local Voice Control in the LVC APK (See the LVC extension documentation for more details). The "CarControl.CustomAssetsFilePath" field of the `ILVCClient.getConfiguration()` configuration schema specifies a path to the custom assets definition file, which must be accessible to the processes running the LVC APK services.
-
-When you integrate with AACS, you do not need to provide the `CarControl.CustomAssetsFilePath` field in any AACS configuration message; instead, your application should directly share permissions to the custom assets definition file using the AACS file sharing protocol. AACS will create a local copy of the file and use the path to its local copy to configure the LVC APK.
-
 ### Sample Configuration
 
 The `Car Control` module provides a [sample JSON file](https://github.com/alexa/alexa-auto-sdk/blob/master/modules/car-control/assets/CarControlConfig.json) to configure the Auto SDK Engine with a vehicle fully equipped for every use case officially supported for car control. This file models each supported endpoint with a configuration of capabilities and zones that ensures all supported utterances for that endpoint work as expected. It is recommended that you construct the configuration for your application by selecting the parts of this sample that describe features supported by your vehicle. Make adjustments to the endpoints, such as modifying modes and range settings, as needed.
@@ -497,7 +492,7 @@ config
             "passenger.cupholder",
             "passenger.armrest",
             "passenger.seat",
-            "passenger.window" 
+            "passenger.window"
         })
     .createZone("zone.front")
         .addAssetId(alexa::location::FRONT)
@@ -556,7 +551,7 @@ config
             "rear.driver.cupholder",
             "rear.driver.armrest",
             "rear.driver.seat",
-            "rear.driver.window"  
+            "rear.driver.window"
         })
     .createZone("zone.rear.passenger")
         .addAssetId(alexa::location::REAR_PASSENGER)
@@ -599,7 +594,7 @@ config
         })
     .setDefaultZone("zone.default")
 
-    // "Car" 
+    // "Car"
     .createEndpoint("car")
         .addAssetId(alexa::device::CAR)
         .addToggleController("recirculate", false)
@@ -632,7 +627,7 @@ config
             .addAssetId(alexa::setting::WINDOW_LOCK)
         .addToggleController("autoBrakeHold", false)
             .addAssetId(alexa::setting::AUTO_BRAKE_HOLD)
-    
+
     // Ambient Light
     .createEndpoint("ambient.light")
         .addAssetId(alexa::device::AMBIENT_LIGHT)
@@ -679,7 +674,7 @@ config
             .addValue("HIGH")
                 .addAssetId(alexa::value::HIGH)
                 .addAssetId(alexa::value::MAXIMUM)
-    
+
     // Front Air Conditioner
     .createEndpoint("front.ac")
         .addAssetId(alexa::device::AIR_CONDITIONER)
@@ -702,7 +697,7 @@ config
             .addValue("HIGH")
                 .addAssetId(alexa::value::HIGH)
                 .addAssetId(alexa::value::MAXIMUM)
-    
+
     // Rear Air Conditioner
     .createEndpoint("rear.ac")
         .addAssetId(alexa::device::AIR_CONDITIONER)
@@ -741,7 +736,7 @@ config
             .addPreset(10)
                 .addAssetId(alexa::value::HIGH)
                 .addAssetId(alexa::value::MAXIMUM)
-    
+
     // Driver Fan
     .createEndpoint("driver.fan")
         .addAssetId(alexa::device::FAN)
@@ -757,7 +752,7 @@ config
             .addPreset(10)
                 .addAssetId(alexa::value::HIGH)
                 .addAssetId(alexa::value::MAXIMUM)
-    
+
     // Passenger Fan
     .createEndpoint("passenger.fan")
         .addAssetId(alexa::device::FAN)
@@ -789,7 +784,7 @@ config
             .addPreset(10)
                 .addAssetId(alexa::value::HIGH)
                 .addAssetId(alexa::value::MAXIMUM)
-    
+
     // Rear Fan
     .createEndpoint("rear.fan")
         .addAssetId(alexa::device::FAN)
@@ -884,7 +879,7 @@ config
                 .addAssetId(alexa::setting::WINDSHIELD_VENTS)
             .addValue("MIX")
                 .addAssetId(alexa::setting::MIX_VENTS)
-    
+
     // Driver Vent
     .createEndpoint("driver.vent")
         .addAssetId(alexa::device::VENT)
@@ -959,7 +954,7 @@ config
                 .addAssetId(alexa::setting::WINDSHIELD_VENTS)
             .addValue("MIX")
                 .addAssetId(alexa::setting::MIX_VENTS)
-        
+
     // Rear Passenger Vent
     .createEndpoint("rear.passenger.vent")
         .addAssetId(alexa::device::VENT)
@@ -1004,7 +999,7 @@ config
                 .addAssetId(alexa::setting::WINDSHIELD_VENTS)
             .addValue("MIX")
                 .addAssetId(alexa::setting::MIX_VENTS)
-    
+
     // Climate Control
     .createEndpoint("climatecontrol")
         .addAssetId(alexa::device::CLIMATE_CONTROL)
@@ -1044,7 +1039,7 @@ config
             .addPreset(90)
                 .addAssetId(alexa::value::HIGH)
                 .addAssetId(alexa::value::MAXIMUM)
-    
+
     // Passenger Heater
     .createEndpoint("passenger.heater")
         .addAssetId(alexa::device::HEATER)
@@ -1463,7 +1458,7 @@ config
                 .addAssetId(alexa::value::POSITION_TWO)
             .addValue("THREE")
                 .addAssetId(alexa::value::POSITION_THREE)
-    
+
     // Rear Seat
     .createEndpoint("rear.seat")
         .addAssetId(alexa::device::SEAT)
@@ -1995,7 +1990,7 @@ config
             .addAssetId(alexa::value::NOTIFICATIONS_PAGE)
             .addActionTurnOff({action::CLOSE})
             .addActionTurnOn({action::OPEN})
-    
+
     // 360 Camera
     .createEndpoint("360Camera")
         .addAssetId(alexa::device::CAMERA_360)
@@ -2074,32 +2069,6 @@ configuration.push_back(config);
 ```
 </details>
 
-### Configuration for Android Integration
-
-To use the `Car Control` module Engine configuration with AACS, use *"aacs.carControl"* instead of *"aace.carControl"* in your AACS configuration file:
-
-```
-{
-    "aacs.carControl": {
-        "endpoints": [
-            // list of endpoint definitions
-        ],
-        "zones": [
-            // list of zone definitions
-        ],
-        "defaultZoneID": "{{STRING}}",
-        "assets": {
-            "customAssetsPath": "{{STRING}}"
-        },
-    }
-}
-
-```
-
-<details markdown="1"><summary>Click to expand or collapse details for Android integration without AACS</summary>
-<br>
-AACS is the recommended way to integrate Auto SDK for Android. However, if your integration does not use AACS, you can use the Java factory class [com.amazon.aace.carControl.CarControlConfiguration](https://gitlab.automotive.alexa.a2z.com/alexa-auto-hut/aac-sdk/-/blob/3.3/platforms/android/modules/car-control/src/main/java/com/amazon/aace/carControl/CarControlConfiguration.java) to programmatically construct the `EngineConfiguration` in the proper format, as shown in the example below.
-
 ###### CarControlConfiguration Java sample code
 ```java
 import com.amazon.aace.carControl.CarControlAssets;
@@ -2155,7 +2124,7 @@ config.createZone("zone.passenger")
         "passenger.cupholder",
         "passenger.armrest",
         "passenger.seat",
-        "passenger.window" 
+        "passenger.window"
     });
 config.createZone("zone.front")
     .addAssetId(CarControlAssets.Location.FRONT)
@@ -2214,7 +2183,7 @@ config.createZone("zone.rear.driver")
         "rear.driver.cupholder",
         "rear.driver.armrest",
         "rear.driver.seat",
-        "rear.driver.window"  
+        "rear.driver.window"
     });
 config.createZone("zone.rear.passenger")
     .addAssetId(CarControlAssets.Location.REAR_PASSENGER)
@@ -2257,7 +2226,7 @@ config.createZone("zone.thirdRow")
     });
 config.setDefaultZone("zone.default");
 
-// "Car" 
+// "Car"
 config.createEndpoint("car")
     .addAssetId(CarControlAssets.Device.CAR)
     .addToggleController("recirculate", false)
@@ -2617,7 +2586,7 @@ config.createEndpoint("rear.driver.vent")
             .addAssetId(CarControlAssets.Setting.WINDSHIELD_VENTS)
         .addValue("MIX")
             .addAssetId(CarControlAssets.Setting.MIX_VENTS);
-    
+
 // Rear Passenger Vent
 config.createEndpoint("rear.passenger.vent")
     .addAssetId(CarControlAssets.Device.VENT)
@@ -3863,7 +3832,7 @@ class MyCarControlHandler {
     // Handle the messages from the Engine for "SetControllerValue" action
     void MyCarControlHandler::handleSetControllerValueMessage(const std::string& message) {
         json msgJson = json::parse(message);
-        
+
         std::string capabilityType = msgJson["payload"]["capabilityType"];
         if (capabilityType.compare("POWER") == 0) {
             SetPowerControllerValueMessage msg = json::parse(message);
@@ -3883,8 +3852,8 @@ class MyCarControlHandler {
     }
 
     void MyCarControlHandler::setPowerControllerValue(
-        const std::string& messageId, 
-        const std::string& endpointId, 
+        const std::string& messageId,
+        const std::string& endpointId,
         bool turnOn) {
         if (turnOn) {
             // Power on the endpoint represented by endpointId.
@@ -3896,9 +3865,9 @@ class MyCarControlHandler {
     }
 
     void MyCarControlHandler::setToggleControllerValue(
-        const std::string& messageId, 
-        const std::string& endpointId, 
-        const std::string& instanceId, 
+        const std::string& messageId,
+        const std::string& endpointId,
+        const std::string& instanceId,
         bool turnOn) {
         if (turnOn) {
             // Turn on the endpoint property represented by endpointId and instanceId.
@@ -3915,7 +3884,7 @@ class MyCarControlHandler {
         const std::string& instanceId,
         double value) {
         // Set the numeric setting of the property represented by endpointId and instanceId to the specified value.
-        // When complete, call sendSetControllerValueMessageReply() with messageId and the result   
+        // When complete, call sendSetControllerValueMessageReply() with messageId and the result
     }
 
     void MyCarControlHandler::setModeControllerValue(
@@ -3937,7 +3906,7 @@ class MyCarControlHandler {
     // Handle the messages from the Engine for "AdjustControllerValue" action
     void MyCarControlHandler::handleAdjustControllerValueMessage(const std::string& message) {
         json msgJson = json::parse(message);
-        
+
         std::string capabilityType = msgJson["payload"]["capabilityType"];
         if (capabilityType.compare("RANGE") == 0) {
             AdjustRangeControllerValueMessage msg = json::parse(message);
@@ -3978,7 +3947,3 @@ class MyCarControlHandler {
 
 ```
 </details>
-
-### AACS Android integration
-
-The Alexa Auto Client Service (AACS) provides the `AACS Car Control Library` to integrate the Auto SDK `Car Control` module on Android. See the [AACS Car Control Library documentation](https://alexa.github.io/alexa-auto-sdk/docs/android/aacs/app-components/alexa-auto-carcontrol/) for more information.

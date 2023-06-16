@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
 #ifndef AACE_ENGINE_METRICS_METRIC_EVENT_H
 #define AACE_ENGINE_METRICS_METRIC_EVENT_H
 
+#include <chrono>
 #include <string>
 #include <unordered_map>
+#include <vector>
+
+#include <AACE/Engine/Metrics/DataPoint.h>
+#include <AACE/Engine/Metrics/MetricContext.h>
 
 namespace aace {
 namespace engine {
@@ -26,167 +31,103 @@ namespace metrics {
 class MetricEvent {
 public:
     /**
-     * An enum class to represent the metric types: One of CT (counter), TI (timer), DV (discrete value)
-     */
-    enum class MetricDataType { TI, DV, CT };
-
-    /**
-     * An enum class to represent upload priority: One of HI (high) or NR (normal). Default is NR.
-     */
-    enum class MetricPriority { NR, HI };
-
-    /**
-     * An enum class to indicate if the metric event should be buffered: One of BF (buffer) or NB (No-buffer). Default is NB.
-     */
-    enum class MetricBufferType { BF, NB };
-
-    /**
-     * An enum class to indicate if the metric event should be tagged with a unique identifier: One of UNIQ (unique) or NUNI (Non-unique). Default is NUNI.
-     */
-    enum class MetricIdentityType { UNIQ, NUNI };
-
-    /**
      * Constructor.
      *
-     * @param program The name that indicates where the event came from / who reported.
-     * @param source The name that provides additional contextual information about how the event happened.
-     */
-    MetricEvent(const std::string& program, const std::string& source);
-
-    /**
-     * Constructor.
-     *
-     * @param program The name that indicates where the event came from / who reported.
-     * @param source The name that provides additional contextual information about how the event happened.
-     * @param priority The priority of the metric.
-     */
-    MetricEvent(const std::string& program, const std::string& source, MetricPriority priority);
-
-    /**
-     * Constructor.
-     *
-     * @param program The name that indicates where the event came from / who reported.
-     * @param source The name that provides additional contextual information about how the event happened.
-     * @param bufferType Enum to indicate if the metric needs to be buffered
-     */
-    MetricEvent(const std::string& program, const std::string& source, MetricBufferType bufferType);
-
-    /**
-     * Constructor.
-     *
-     * @param program The name that indicates where the event came from / who reported.
-     * @param source The name that provides additional contextual information about how the event happened.
-     * @param identityType Enum to indicate metric identity type.
+     * @param programName The program name of the metric. A product name,
+     *        application, or service to which the metric belongs.
+     * @param sourceName The source name of the metric. A method or other 
+     *        software component identifying the source of the metric. The 
+     *        combination of program and source uniquely identify the metric.
+     * @param metricContext The contextual properties related to recording the
+     *        metric.
+     * @param dataPoints A map of @c DataPoint objects, keyed by data point
+     *        name. Data points in the map are numeric values and optional
+     *        string dimensions comprising the metric.
+     * @param timestamp The timestamp at which this metric event was created.
      */
     MetricEvent(
-        const std::string& program,
-        const std::string& source,
-        MetricBufferType bufferType,
-        MetricIdentityType identityType);
+        const std::string& programName,
+        const std::string& sourceName,
+        MetricContext metricContext,
+        const std::unordered_map<std::string, DataPoint>& dataPoints,
+        std::chrono::steady_clock::time_point timestamp);
 
     /**
-     * Constructor.
+     * Get the program name of the metric.
      *
-     * @param program The name that indicates where the event came from / who reported.
-     * @param source The name that provides additional contextual information about how the event happened.
+     * @return The program name
      */
-    MetricEvent(
-        const std::string& program,
-        const std::string& source,
-        MetricPriority priority,
-        MetricBufferType bufferType,
-        MetricIdentityType identityType);
+    std::string getProgramName() const;
 
     /**
-     * Add timer data to the metric event.
+     * Get the source name of the metric.
      *
-     * @param name The name describing the datapoint being captured.
-     * @param value The time in milliseconds.
+     * @return The source name
      */
-    void addTimer(const std::string& name, double value);
+    std::string getSourceName() const;
 
     /**
-     * Add string data to the metric event. 
+     * Get the @c MetricContext of the metric event.
      *
-     * @param name The name describing the datapoint being captured.
-     * @param value The string that represents the value.
+     * @return The @c MetricContext
      */
-    void addString(const std::string& name, const std::string& value);
+    const MetricContext& getMetricContext() const;
 
     /**
-     * Add counter data to the metric event. 
+     * Get a @c DataPoint object by name
      *
-     * @param name The name describing the datapoint being captured.
-     * @param value The number that represents frequency or count.
+     * @param name The name of the data point
+     * @param dataType The @c DataType of the data point
+     * @return The data point. @c Datapoint::isValid() returns false if the
+     *         requested name does not exist in the set of data points.
      */
-    void addCounter(const std::string& name, int value);
+    DataPoint getDataPoint(const std::string& name, DataType dataType) const;
 
     /**
-     * Print the metric event data via logger in a standardized metric format for an unknown context.
+     * Get the list of data points for the metric event.
+     *
+     * @return The list of @c DataPoint
      */
-    void record();
+    std::vector<DataPoint> getDataPoints() const;
 
     /**
-     * Print the metric event data via logger in a standardized metric format for the provided context.
+     * Get the timestamp of when the metric event was created as a system clock
+     * time point.
+     *
+     * @return The timestamp of creation
      */
-    void record(const std::string& context);
+    std::chrono::system_clock::time_point getSystemClockTimestamp() const;
+
+    /**
+     * Get the timestamp of when the metric event was created as a steady clock
+     * time point.
+     *
+     * @return The timestamp of creation
+     */
+    std::chrono::steady_clock::time_point getSteadyClockTimestamp() const;
 
 private:
     /**
-     * Convert MetricPriority enum to String representation. 
-     *
-     * @param priority The enum to convert.
+     * The program name of the metric. A product name, application, or service
+     * to which the metric belongs.
      */
-    static std::string priorityToString(MetricPriority priority);
+    std::string m_programName;
 
     /**
-     * Convert MetricDataType enum to String representation. 
-     *
-     * @param priority The enum to convert.
+     * The source name of the metric. A method or other software component
+     * identifying the source of the metric. The combination of program and
+     * source uniquely identify the metric.
      */
-    static std::string dataTypeToString(MetricDataType dataPoint);
+    std::string m_sourceName;
 
-    /**
-     * Convert MetricDataType enum to String representation.
-     *
-     * @param type The buffer type enum to convert.
-     */
-    static std::string bufferTypeToString(MetricBufferType type);
+    /// The metric context of the metric event
+    MetricContext m_metricContext;
 
-    /**
-     * Convert MetricIdentityType enum to String representation.
-     *
-     * @param type The metric identity type enum to convert.
-     */
-    static std::string identityTypeToString(MetricIdentityType type);
+    /// The map of data points of the metric event, keyed by data point name
+    std::unordered_map<std::string, DataPoint> m_dataPoints;
 
-    /**
-     * Helper method to append data to the string log that is being built. 
-     *
-     * @param name The name describing the datapoint being captured.
-     * @param value The string that represents the value.
-     * @param type The type of metric (timer, counter, string).
-     * @param sampleCount The frequency or count of the datapoint.
-     */
-    void addDataToLog(std::string name, std::string value, MetricDataType type, std::string sampleCount);
-
-    /// Name that indicates where the event came from / who reported.
-    std::string m_program;
-
-    /// Name that provides additional contextual information about how the event happened.
-    std::string m_source;
-
-    /// A string that follows a standard format to capture metric datapoints.
-    std::string m_metricLog;
-
-    /// Priority of the metric (High or Normal).
-    MetricPriority m_priority;
-
-    /// Buffer type of the metric (Buffer or No-Buffer).
-    MetricBufferType m_bufferType;
-
-    /// Identity type of the metric (Unique or Non-unique).
-    MetricIdentityType m_identityType;
+    /// The timestamp of when the metric event was created
+    std::chrono::steady_clock::time_point m_timestamp;
 };
 
 }  // namespace metrics

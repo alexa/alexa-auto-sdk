@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,15 +17,13 @@
 
 #include "AACE/Engine/Alexa/AudioPlayerEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 #include <AVSCommon/Utils/MediaPlayer/PooledMediaPlayerFactory.h>
 #include <AVSCommon/Utils/MediaPlayer/PooledMediaResourceProvider.h>
+#include <AVSCommon/AVS/FocusState.h>
 
 namespace aace {
 namespace engine {
 namespace alexa {
-
-using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AudioPlayerEngineImpl");
@@ -35,14 +33,6 @@ static const std::string CONTENT_CHANNEL_NAME{"Content"};
 
 /// The interface name for the AudioActivityTracker content channel.
 static const std::string CONTENT_INTERFACE_NAME{"AudioPlayer"};
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioPlayerEngineImpl";
-
-/// Counter metrics for AudioPlayer Platform APIs
-static const std::string METRIC_AUDIO_PLAYER_PLAYER_ACTIVITY_CHANGED = "PlayerActivityChanged";
-static const std::string METRIC_AUDIO_PLAYER_GET_PLAYER_POSITION = "GetPlayerPosition";
-static const std::string METRIC_AUDIO_PLAYER_GET_PLAYER_DURATION = "GetPlayerDuration";
 
 AudioPlayerEngineImpl::AudioPlayerEngineImpl(std::shared_ptr<aace::alexa::AudioPlayer> audioPlayerPlatformInterface) :
         AudioChannelEngineImpl(
@@ -66,13 +56,17 @@ bool AudioPlayerEngineImpl::initialize(
         audioPlayerObserverDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
     std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager) {
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager,
+    std::shared_ptr<alexaClientSDK::captions::CaptionManagerInterface> captionManager,
+    const alexaClientSDK::avsCommon::utils::mediaPlayer::Fingerprint& mediaPlayerFingerprint) {
     try {
         ThrowIfNot(initializeAudioChannel(audioOutputChannel, speakerManager), "initializeAudioChannelFailed");
         std::vector<std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ChannelVolumeInterface>>
             audioChannelVolumeInterfaces{getChannelVolumeInterface()};
+
         auto provider = alexaClientSDK::avsCommon::utils::mediaPlayer::PooledMediaResourceProvider::
-            createPooledMediaResourceProviderInterface({shared_from_this()}, audioChannelVolumeInterfaces);
+            createPooledMediaResourceProviderInterface(
+                {shared_from_this()}, audioChannelVolumeInterfaces, mediaPlayerFingerprint);
 
         m_activityTracker = activityTrackerInterface;
 
@@ -85,7 +79,7 @@ bool AudioPlayerEngineImpl::initialize(
             exceptionSender,
             playbackRouter,
             customerDataManager,
-            nullptr,
+            captionManager,
             metricRecorder);
         ThrowIfNull(m_audioPlayerCapabilityAgent, "couldNotCreateCapabilityAgent");
 
@@ -121,7 +115,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
         audioPlayerObserverDelegate,
     std::shared_ptr<alexaClientSDK::avsCommon::utils::metrics::MetricRecorderInterface> metricRecorder,
     std::shared_ptr<alexaClientSDK::afml::ActivityTrackerInterface> activityTrackerInterface,
-    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager) {
+    std::shared_ptr<alexaClientSDK::registrationManager::CustomerDataManagerInterface> customerDataManager,
+    std::shared_ptr<alexaClientSDK::captions::CaptionManagerInterface> captionManager,
+    const alexaClientSDK::avsCommon::utils::mediaPlayer::Fingerprint& mediaPlayerFingerprint) {
     std::shared_ptr<AudioPlayerEngineImpl> audioPlayerEngineImpl = nullptr;
 
     try {
@@ -139,6 +135,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
         ThrowIfNull(metricRecorder, "invalidMetricRecorder");
         ThrowIfNull(activityTrackerInterface, "invalidActivityTrackerInterface");
         ThrowIfNull(customerDataManager, "invalidCustomerDataManager");
+#ifdef AAC_CAPTIONS
+        ThrowIfNull(captionManager, "invalidCaptionManager");
+#endif
 
         // open the Music audio channel
         auto audioOutputChannel = audioManager->openAudioOutputChannel(
@@ -162,7 +161,9 @@ std::shared_ptr<AudioPlayerEngineImpl> AudioPlayerEngineImpl::create(
                 audioPlayerObserverDelegate,
                 metricRecorder,
                 activityTrackerInterface,
-                customerDataManager),
+                customerDataManager,
+                captionManager,
+                mediaPlayerFingerprint),
             "initializeAudioPlayerEngineImplFailed");
 
         // set the platform's engine interface reference
@@ -201,12 +202,10 @@ void AudioPlayerEngineImpl::doShutdown() {
 // AudioPlayerEngineInterface
 //
 int64_t AudioPlayerEngineImpl::onGetPlayerPosition() {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetPlayerPosition", {METRIC_AUDIO_PLAYER_GET_PLAYER_POSITION});
     return getMediaPosition();
 }
 
 int64_t AudioPlayerEngineImpl::onGetPlayerDuration() {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetPlayerDuration", {METRIC_AUDIO_PLAYER_GET_PLAYER_DURATION});
     return getMediaDuration();
 }
 
@@ -230,10 +229,6 @@ void AudioPlayerEngineImpl::onPlayerActivityChanged(
     const Context& context) {
     std::stringstream activityState;
     activityState << static_cast<aace::alexa::AudioPlayer::PlayerActivity>(state);
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX,
-        "onPlayerActivityChanged",
-        {METRIC_AUDIO_PLAYER_PLAYER_ACTIVITY_CHANGED, activityState.str()});
     m_audioPlayerPlatformInterface->playerActivityChanged(static_cast<aace::alexa::AudioPlayer::PlayerActivity>(state));
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #define AACE_AUDIO_AUDIO_OUTPUT_H
 
 #include <memory>
+#include <map>
 
 #include "AudioEngineInterfaces.h"
 #include "AudioStream.h"
@@ -94,10 +95,56 @@ public:
      * @param [in] stream The @c AudioStream object that provides the platform implementation
      * audio data to play.
      * @param [in] repeating @c true if the platform should loop the audio when playing.
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool prepare(std::shared_ptr<AudioStream> stream, bool repeating) = 0;
+
+    /**
+     * Context related to playback of an audio item.
+     */
+    struct PlaybackContext {
+        typedef std::map<std::string, std::string> HeaderConfig;
+
+        /**
+         * Headers to use when fetching encryption keys. The map contains up to
+         * 20 pairs of header name and value. Header names may be
+         * "Authorization" or strings prefixed with "x-", containing up to 256
+         * characters. Values may contain up to 4096 characters.
+         */
+        HeaderConfig keyConfig;
+
+        /**
+         * Headers to use when fetching manifests. The map contains up to 20
+         * pairs of header name and value. Header names may be "Authorization"
+         * or strings prefixed with "x-", containing up to 256 characters.
+         * Values may contain up to 4096 characters.
+         */
+        HeaderConfig manifestConfig;
+
+        /**
+         * Headers to use when fetching audio chunks described in the manifest.
+         * The map contains up to 20 pairs of header name and value. Header
+         * names may be "Authorization" or strings prefixed with "x-",
+         * containing up to 256 characters. Values may contain up to 4096
+         * characters.
+         */
+        HeaderConfig audioSegmentConfig;
+
+        /**
+         * A catch-all list of headers to use in all URL requests. The map
+         * contains up to 20 pairs of header name and value. The headers in
+         * @c keyConfig, @c manifestConfig, and @c audioSegmentConfig take
+         * priority over the "all" headers, and hence any name-value pairs in
+         * the higher priority lists must overwrite any pair with the same
+         * name from @c allConfig.
+         *
+         * Header names may be "Authorization" or strings prefixed with "x-",
+         * containing up to 256 characters. Values may contain up to 4096
+         * characters.
+         */
+        HeaderConfig allConfig;
+    };
 
     /**
      * Notifies the platform implementation to prepare for playback of a
@@ -106,16 +153,17 @@ public:
      *
      * @param [in] url The URL audio source to set in the platform media player
      * @param [in] repeating @c true if the platform should loop the audio when playing.
+     * @param [in] playbackContext The context related to playback of an audio item.
      * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
-    virtual bool prepare(const std::string& url, bool repeating) = 0;
+    virtual bool prepare(const std::string& url, bool repeating, const PlaybackContext& playbackContext) = 0;
 
     /**
      * Notifies the platform implementation only if prepared media allows platform interface to duck the volume
      * if any high priority audio stream is in the focus. If platform interface ducks the volume, report the
      * state using @c audioFocusEvent always. If @c mayDuck is not called, platform interface can assume that media
-     * is not allowed to duck. 
+     * is not allowed to duck.
      */
     virtual void mayDuck() = 0;
 
@@ -124,7 +172,7 @@ public:
      * the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING
      * when the media player begins playing the audio or @c mediaError() if an error occurs.
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool play() = 0;
@@ -133,10 +181,10 @@ public:
      * Notifies the platform implementation to stop playback of the current audio source. After returning @c true,
      * the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED
      * when the media player stops playing the audio or immediately if it is already stopped, or @c mediaError() if an error occurs.
-     * A subsequent call to @c play() will be preceded by calls to @c prepare() 
+     * A subsequent call to @c play() will be preceded by calls to @c prepare()
      * and @c setPosition().
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool stop() = 0;
@@ -145,10 +193,10 @@ public:
      * Notifies the platform implementation to pause playback of the current audio source. After returning @c true,
      * the platform implementation must call @c mediaStateChanged() with @c MediaState.STOPPED
      * when the media player pauses the audio or @c mediaError() if an error occurs.
-     * A subsequent call to @c resume() will not be preceded by calls to @c prepare() 
+     * A subsequent call to @c resume() will not be preceded by calls to @c prepare()
      * and @c setPosition().
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool pause() = 0;
@@ -158,7 +206,7 @@ public:
      * the platform implementation must call @c mediaStateChanged() with @c MediaState.PLAYING
      * when the media player resumes the audio or @c mediaError() if an error occurs.
      *
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool resume() = 0;
@@ -184,7 +232,7 @@ public:
      * If the audio source is not playing, the most recent position played
      * should be returned.
      *
-     * @return The platform media player's playback position in milliseconds, 
+     * @return The platform media player's playback position in milliseconds,
      * or @c TIME_UNKNOWN if the current media position is unknown or invalid.
      */
     virtual int64_t getPosition() = 0;
@@ -194,7 +242,7 @@ public:
      * in the platform media player.
      *
      * @param [in] position The playback position in milliseconds to set in the platform media player
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool setPosition(int64_t position) = 0;
@@ -220,7 +268,7 @@ public:
      *
      * @param [in] volume The volume to set on the output channel. @c volume
      * is in the range [0,1].
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool volumeChanged(float volume) = 0;
@@ -231,7 +279,7 @@ public:
      *
      * @param [in] state The muted state to apply to the output channel. @c MutedState::MUTED when
      * the output channel be muted, @c MutedState::UNMUTED when unmuted
-     * @return @c true if the platform implementation successfully handled the call, 
+     * @return @c true if the platform implementation successfully handled the call,
      * else @c false
      */
     virtual bool mutedStateChanged(MutedState state) = 0;

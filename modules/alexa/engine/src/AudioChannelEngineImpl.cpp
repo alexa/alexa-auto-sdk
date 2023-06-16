@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 
 #include "AACE/Engine/Alexa/AudioChannelEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include "AACE/Engine/Alexa/ChannelVolumeManager.h"
 
 #include <stdexcept>
@@ -24,21 +23,12 @@ namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 static const uint8_t MAX_SPEAKER_VOLUME = 100;
 static const uint8_t MIN_SPEAKER_VOLUME = 0;
 static const uint8_t DEFAULT_SPEAKER_VOLUME = 50;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.AudioChannelEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AudioChannelEngineImpl";
-
-/// Counter metric for AudioOutput Platform APIs
-static const std::string METRIC_AUDIO_OUTPUT_MEDIA_STATE_CHANGED = "MediaStateChanged";
-static const std::string METRIC_AUDIO_OUTPUT_MEDIA_ERROR = "MediaError";
 
 #define LXT LX(TAG).d("name", m_name)
 
@@ -166,10 +156,6 @@ void AudioChannelEngineImpl::setMediaStateChangeInitiator(MediaStateChangeInitia
 
 void AudioChannelEngineImpl::onMediaStateChanged(MediaState state) {
     auto id = m_currentId;
-    std::stringstream mediaState;
-    mediaState << state;
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onMediaStateChanged", {METRIC_AUDIO_OUTPUT_MEDIA_STATE_CHANGED, mediaState.str()});
     m_executor.submit([this, id, state] { executeMediaStateChanged(id, state); });
 }
 
@@ -316,9 +302,6 @@ void AudioChannelEngineImpl::executeMediaStateChanged(SourceId id, MediaState st
 }
 
 void AudioChannelEngineImpl::onMediaError(MediaError error, const std::string& description) {
-    std::stringstream mediaError;
-    mediaError << error;
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onMediaError", {METRIC_AUDIO_OUTPUT_MEDIA_ERROR, mediaError.str()});
     AACE_VERBOSE(LXT.d("error", error));
 
     auto id = m_currentId;
@@ -738,9 +721,15 @@ alexaClientSDK::avsCommon::utils::mediaPlayer::MediaPlayerInterface::SourceId Au
         m_url = url;
         m_currentId = nextId();
 
+        audio::AudioOutputChannelInterface::PlaybackContext ctx;
+        ctx.audioSegmentConfig = playbackContext.audioSegmentConfig;
+        ctx.keyConfig = playbackContext.keyConfig;
+        ctx.manifestConfig = playbackContext.manifestConfig;
+        ctx.allConfig = playbackContext.allConfig;
+
         auto outputChannel = m_audioOutputChannel;
         if (outputChannel != nullptr) {
-            ThrowIfNot(outputChannel->prepare(m_url, repeat), "audioOutputChannelPrepareFailed");
+            ThrowIfNot(outputChannel->prepare(m_url, repeat, ctx), "audioOutputChannelPrepareFailed");
             if (config.mediaDescription.mixingBehavior == MixingBehavior::BEHAVIOR_DUCK) {
                 m_mayDuck = true;
                 outputChannel->mayDuck();

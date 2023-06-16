@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@
 #include <AVSCommon/SDKInterfaces/MessageSenderInterface.h>
 #include <AVSCommon/SDKInterfaces/MessageRequestObserverInterface.h>
 #include <AVSCommon/Utils/Threading/Executor.h>
+
+#include <AACE/Engine/Metrics/DurationDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 
 namespace aace {
 namespace engine {
@@ -50,27 +53,49 @@ private:
      * Constructor.
      *
      * @param messageSender The message sender of the capability agent.
+     * @param exceptionSender The message sender for exceptions.
+     * @param metricRecorder The metric recorder.
      * @return A @c std::shared_ptr to the new @c MediaPlaybackRequestor instance.
      */
     MediaPlaybackRequestor(
         std::shared_ptr<MessageSenderInterface> messageSender,
-        std::shared_ptr<ExceptionEncounteredSenderInterface> exceptionSender);
+        std::shared_ptr<ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
+
+    /**
+     * Create a MediaPlaybackRequestor metric with the specified data and submit
+     * it to the @c MetricRecorderServiceInterface for recording.
+     * @return @c true if recording succeeded, else @c false
+     */
+    bool submitMetric(
+        uint32_t eventCount,
+        uint32_t errorCount,
+        const std::string& eventType,
+        long long timeSinceBoot,
+        aace::engine::metrics::DataPoint sendLatencyData,
+        const std::string& errorReason = "SUCCESS");
 
     /// The @c MessageSenderInterface for sending events.
     std::shared_ptr<MessageSenderInterface> m_messageSender;
     std::shared_ptr<ExceptionEncounteredSenderInterface> m_exceptionSender;
     std::promise<bool> m_sendMessagePromise;
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
+    aace::engine::metrics::DurationDataPointBuilder m_sendLatencyDuration;
+    long long m_timeSinceBootMillis;
 
 public:
     /**
      * Creates a new @c MediaPlaybackRequestor instance.
      *
      * @param messageSender The message sender of the capability agent.
+     * @param exceptionSender The message sender for exceptions
+     * @param metricRecorder The metric recorder
      * @return A @c std::shared_ptr to the new @c MediaPlaybackRequestor instance.
      */
     static std::shared_ptr<MediaPlaybackRequestor> createMediaPlaybackRequestor(
         std::shared_ptr<MessageSenderInterface> messageSender,
-        std::shared_ptr<ExceptionEncounteredSenderInterface> exceptionSender);
+        std::shared_ptr<ExceptionEncounteredSenderInterface> exceptionSender,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     /**
      * Destructor.
@@ -105,6 +130,13 @@ public:
     /// @name RequiresShutdown Functions
     /// @{
     void doShutdown();
+
+    /**
+     * Create a MediaPlaybackRequestor error metric with the specified data
+     * and submit it to the @c MetricRecorderServiceInterface for recording.
+     * @return @c true if recording succeeded, else @c false
+     */
+    bool submitMediaRequestErrorMetric(long long timeSinceBoot, const std::string& errorReason);
 };
 
 }  // namespace alexa

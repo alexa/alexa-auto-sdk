@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,15 +18,12 @@
 #include "AACE/Engine/Core/EngineMacros.h"
 #include "AACE/Engine/TextToSpeech/TextToSpeechEngineImpl.h"
 #include "AACE/Engine/TextToSpeech/TextToSpeechSynthesizerInterface.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include "AACE/Engine/Utils/String/StringUtils.h"
 #include <nlohmann/json.hpp>
 
 namespace aace {
 namespace engine {
 namespace textToSpeech {
-
-using namespace aace::engine::utils::metrics;
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.textToSpeech.TextToSpeechEngineImpl");
@@ -49,8 +46,6 @@ static const std::string EMPTY_STRING = "";
 static const std::string METRIC_PROGRAM_NAME_SUFFIX = "TextToSpeechEngineImpl";
 
 /// Counter metrics for TextToSpeech Platform APIs
-static const std::string METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH = "PrepareSpeech";
-static const std::string METRIC_TEXT_TO_SPEECH_GET_CAPABILITIES = "GetCapabilities";
 static const std::string METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH_COMPLETED = "PrepareSpeechCompleted";
 static const std::string METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH_FAILED = "PrepareSpeechFailed";
 static const std::string METRIC_TEXT_TO_SPEECH_CAPABILITIES_RECEIVED = "CapabilitiesReceived";
@@ -93,7 +88,6 @@ bool TextToSpeechEngineImpl::onPrepareSpeech(
     const std::string& provider,
     const std::string& options) {
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onPrepareSpeech", METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH, 1);
         AACE_INFO(LX(TAG)
                       .sensitive("speechId", speechId)
                       .sensitive("text", text)
@@ -113,7 +107,6 @@ bool TextToSpeechEngineImpl::onPrepareSpeech(
 }
 bool TextToSpeechEngineImpl::onGetCapabilities(const std::string& requestId, const std::string& provider) {
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onGetCapabilities", METRIC_TEXT_TO_SPEECH_GET_CAPABILITIES, 1);
         ThrowIf(requestId.empty(), "emptyRequestId");
         auto m_textToSpeechServiceInterface_lock = m_textToSpeechServiceInterface.lock();
         ThrowIfNull(m_textToSpeechServiceInterface_lock, "nullTextToSpeechServiceInterface");
@@ -152,11 +145,6 @@ bool TextToSpeechEngineImpl::executeOnPrepareSpeech(
                     auto prepareSpeechFuture = textToSpeechProvider->prepareSpeech(speechId, text, requestPayload);
                     auto status = prepareSpeechFuture.wait_for(DEFAULT_REQUEST_TIMEOUT);
                     if (status == std::future_status::timeout) {
-                        emitCounterMetrics(
-                            METRIC_PROGRAM_NAME_SUFFIX,
-                            "executeOnPrepareSpeech",
-                            METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH_FAILED,
-                            1);
                         textToSpeechPlatformInterface->prepareSpeechFailed(speechId, REQUEST_TIMED_OUT);
                     } else {
                         auto prepareSpeechResult = prepareSpeechFuture.get();
@@ -165,29 +153,14 @@ bool TextToSpeechEngineImpl::executeOnPrepareSpeech(
                         auto metadata = prepareSpeechResult.getSpeechMetadata();
                         auto synthesizedSpeech = prepareSpeechResult.getPreparedAudio();
                         if (!failureReason.empty()) {
-                            emitCounterMetrics(
-                                METRIC_PROGRAM_NAME_SUFFIX,
-                                "executeOnPrepareSpeech",
-                                METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH_FAILED,
-                                1);
                             textToSpeechPlatformInterface->prepareSpeechFailed(speechId, failureReason);
                         } else {
-                            emitCounterMetrics(
-                                METRIC_PROGRAM_NAME_SUFFIX,
-                                "executeOnPrepareSpeech",
-                                METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH_COMPLETED,
-                                1);
                             textToSpeechPlatformInterface->prepareSpeechCompleted(
                                 speechId, synthesizedSpeech, metadata);
                         }
                     }
                 } catch (std::exception& ex) {
                     AACE_ERROR(LX(TAG).d("reason", ex.what()));
-                    emitCounterMetrics(
-                        METRIC_PROGRAM_NAME_SUFFIX,
-                        "executeOnPrepareSpeech",
-                        METRIC_TEXT_TO_SPEECH_PREPARE_SPEECH_FAILED,
-                        1);
                     textToSpeechPlatformInterface->prepareSpeechFailed(speechId, INTERNAL_ERROR);
                 }
             });
@@ -210,11 +183,6 @@ bool TextToSpeechEngineImpl::executeOnGetCapabilities(
             auto capabilitiesFuture = textToSpeechProvider->getCapabilities(requestId);
             try {
                 auto status = capabilitiesFuture.wait_for(DEFAULT_REQUEST_TIMEOUT);
-                emitCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX,
-                    "executeOnGetCapabilities",
-                    METRIC_TEXT_TO_SPEECH_CAPABILITIES_RECEIVED,
-                    1);
                 if (status == std::future_status::timeout) {
                     textToSpeechPlatformInterface->capabilitiesReceived(requestId, EMPTY_STRING);
                 } else {

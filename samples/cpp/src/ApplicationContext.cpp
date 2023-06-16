@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -247,14 +247,6 @@ bool ApplicationContext::isConnectivitySupported() {
 #else
     return false;
 #endif  // CONNECTIVITY
-}
-
-bool ApplicationContext::isDcmSupported() {
-#ifdef AAC_DCM
-    return true;
-#else
-    return false;
-#endif  // DCM
 }
 
 bool ApplicationContext::isLocalVoiceControlSupported() {

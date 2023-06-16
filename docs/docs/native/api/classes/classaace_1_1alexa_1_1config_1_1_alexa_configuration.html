@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">4.2</span>
+   &#160;<span id="projectnumber">4.3</span>
    </div>
   </td>
  </tr>
@@ -93,8 +93,8 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:aceaa112768e13cd30722766cc9d1a2c6"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aceaa112768e13cd30722766cc9d1a2c6">createDeviceInfoConfig</a> (const std::string &amp;deviceSerialNumber, const std::string &amp;clientId, const std::string &amp;productId, const std::string &amp;manufacturerName, const std::string &amp;description)</td></tr>
-<tr class="separator:aceaa112768e13cd30722766cc9d1a2c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab68d4bbf4f8116b7416ec6604579d532"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#ab68d4bbf4f8116b7416ec6604579d532">createAlexaClientInfoConfig</a> (const std::string &amp;clientId, const std::string &amp;productId, const std::string &amp;amazonId)</td></tr>
+<tr class="separator:ab68d4bbf4f8116b7416ec6604579d532"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5205a15e4b9f8596a6aff6e4c26595fa"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5205a15e4b9f8596a6aff6e4c26595fa">createNotificationsConfig</a> (const std::string &amp;databaseFilePath)</td></tr>
 <tr class="separator:a5205a15e4b9f8596a6aff6e4c26595fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d38a056525d20aad2114677d8d461ae"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5d38a056525d20aad2114677d8d461ae">createCertifiedSenderConfig</a> (const std::string &amp;databaseFilePath)</td></tr>
@@ -125,6 +125,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:aac1f2b1ed508bf0b0d481195660c6cca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe49171331c4e53d147979638cea07a3"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#abe49171331c4e53d147979638cea07a3">createDuckingConfig</a> (bool duckingEnabled)</td></tr>
 <tr class="separator:abe49171331c4e53d147979638cea07a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c9a09fbc66098c407234c0862fa78d4"><td class="memItemLeft" align="right" valign="top">static std::shared_ptr&lt; <a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5c9a09fbc66098c407234c0862fa78d4">createMediaPlayerFingerprintConfig</a> (const std::string &amp;package, const std::string &amp;buildType, const std::string &amp;versionNumber)</td></tr>
+<tr class="separator:a5c9a09fbc66098c407234c0862fa78d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A factory interface for creating Alexa configuration objects </p>
@@ -209,8 +211,8 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aceaa112768e13cd30722766cc9d1a2c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aceaa112768e13cd30722766cc9d1a2c6">&#9670;&nbsp;</a></span>createDeviceInfoConfig()</h2>
+<a id="ab68d4bbf4f8116b7416ec6604579d532"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab68d4bbf4f8116b7416ec6604579d532">&#9670;&nbsp;</a></span>createAlexaClientInfoConfig()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -219,14 +221,8 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::alexa::config::AlexaConfiguration::createDeviceInfoConfig </td>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::alexa::config::AlexaConfiguration::createAlexaClientInfoConfig </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>deviceSerialNumber</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>clientId</em>, </td>
         </tr>
@@ -240,13 +236,7 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>manufacturerName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>description</em>&#160;</td>
+          <td class="paramname"><em>amazonId</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -260,14 +250,12 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Factory method used to programmatically generate device info configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;deviceInfo&quot;:</div><div class="line">  {</div><div class="line">    &quot;deviceSerialNumber&quot;: &quot;&lt;DEVICE_SERIAL_NUMBER&gt;&quot;</div><div class="line">    &quot;clientId&quot;: &quot;&lt;CLIENT_ID&gt;&quot;,</div><div class="line">    &quot;productId&quot;: &quot;&lt;PRODUCT_ID&gt;&quot;</div><div class="line">    &quot;manufacturerName&quot;: &quot;&lt;MANUFACTURER_NAME&gt;&quot;</div><div class="line">    &quot;description&quot;: &quot;&lt;DESCRIPTION&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<p>Factory function used to programmatically generate alexa client device info configuration data. The data generated by this function is equivalent to providing the following JSON values in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;alexaClientInfo&quot;: {</div><div class="line">      &quot;clientId&quot;: &quot;&lt;CLIENT_ID&gt;&quot;,</div><div class="line">      &quot;productId&quot;: &quot;&lt;PRODUCT_ID&gt;&quot;,</div><div class="line">      &quot;amazonId&quot;: &quot;&lt;AMAZON_ID&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">deviceSerialNumber</td><td>The device serial number used to authorize the client with AVS </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">clientId</td><td>The client ID used to authorize the client with AVS </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">productId</td><td>The product ID used to authorize the client with AVS </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">manufacturerName</td><td>The manufacturer name of the product </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">description</td><td>The description of the product </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">clientId</td><td>The client ID of the product in the AVS developer console </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">productId</td><td>The product ID of the product in the AVS developer console </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">amazonId</td><td>The Amazon ID of the product in the AVS developer portal </td></tr>
   </table>
   </dd>
 </dl>
@@ -298,7 +286,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate notifications configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;notifications&quot;:</div><div class="line">  {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;notifications&quot;: {</div><div class="line">        &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent notifications data. The database will be created on initialization if it does not already exist. </td></tr>
   </table>
@@ -331,7 +319,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate certified sender configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;certifiedSender&quot;:</div><div class="line">  {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;certifiedSender&quot;: {</div><div class="line">        &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent certified sender data. The database will be created on initialization if it does not already exist. </td></tr>
   </table>
@@ -364,7 +352,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate capabilities delegate configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;capabilitiesDelegate&quot;:</div><div class="line">  {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;capabilitiesDelegate&quot;: {</div><div class="line">        &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store device capabilities. The database will be created on initialization if it does not already exist. </td></tr>
   </table>
@@ -418,7 +406,7 @@ Static Public Member Functions</h2></td></tr>
 <li>CURLOPT_INTERFACE if present, specifies a value for the libcurl property CURLOPT_INTERFACE.</li>
 </ul>
 <p>The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">    &quot;libcurlUtils&quot; : {</div><div class="line">        &quot;CURLOPT_CAPATH&quot; : &quot;&lt;CA_CERTIFICATES_FILE_PATH&gt;&quot;,</div><div class="line">        &quot;CURLOPT_INTERFACE&quot; : &quot;&lt;NETWORK_INTERFACE_NAME&gt;&quot;,</div><div class="line">        &quot;CURLOPT_PROXY&quot; : &quot;&lt;PROXY_ADDRESS&gt;&quot;</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;libcurlUtils&quot;: {</div><div class="line">        &quot;CURLOPT_CAPATH&quot;: &quot;&lt;CA_CERTIFICATES_FILE_PATH&gt;&quot;,</div><div class="line">        &quot;CURLOPT_INTERFACE&quot;: &quot;&lt;NETWORK_INTERFACE_NAME&gt;&quot;,</div><div class="line">        &quot;CURLOPT_PROXY&quot;: &quot;&lt;PROXY_ADDRESS&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">certsPath</td><td>The file path to the directory holding CA certificates </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">iface</td><td>The specific network interface to use. This can be a network interface name, an IP address or a host name. Default to the system's primary network interface. </td></tr>
@@ -464,7 +452,7 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000010">Deprecated:</a></b></dt><dd>Use <code><a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#acbe8018cdf55ec51b7f2feccf4a9bab5">AlexaConfiguration::createDeviceSettingsConfig()</a></code>.</dd></dl>
 <p>Factory method used to programmatically generate settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;settings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;defaultAVSClientSettings&quot;: {</div><div class="line">       &quot;locale&quot;: &quot;&lt;LOCALE&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;deviceSettings&quot;: {</div><div class="line">        &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">        &quot;defaultAVSClientSettings&quot;: {</div><div class="line">          &quot;locale&quot;: &quot;&lt;LOCALE&gt;&quot;</div><div class="line">        }</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent settings data. The database will be created on initialization if it does not already exist. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">locale</td><td>The current locale setting on the client. Default to "en-US". </td></tr>
@@ -526,7 +514,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate device settings configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;deviceSettings&quot;: {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">    &quot;locales&quot;: [&lt;LIST_OF_LOCALE_STRINGS&gt;],</div><div class="line">    &quot;defaultLocale&quot;: &quot;&lt;DEFAULT_LOCALE_STRING&gt;&quot;,</div><div class="line">    &quot;localeCombinations&quot;: [[&lt;LOCALE_STRING_PAIR&gt;]],</div><div class="line">    &quot;defaultTimezone&quot;: &quot;&lt;TIMEZONE&gt;&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;deviceSettings&quot;: {</div><div class="line">        &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">        &quot;locales&quot;: [&lt;LIST_OF_LOCALE_STRINGS&gt;],</div><div class="line">        &quot;defaultLocale&quot;: &quot;&lt;DEFAULT_LOCALE_STRING&gt;&quot;,</div><div class="line">        &quot;localeCombinations&quot;: [[&lt;LOCALE_STRING_PAIR&gt;]],</div><div class="line">        &quot;defaultTimezone&quot;: &quot;&lt;TIMEZONE&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent settings data. The database will be created on initialization if it does not already exist. </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">locales</td><td>A list of locales supported by the device. The default is ["en-US","en-GB","de-DE", "en-IN","en-CA","ja-JP","en-AU","fr-FR","it-IT","es-ES","es-MX","fr-CA","es-US","hi-IN","pt-BR","ar-SA"]. For the accepted values, refer to <a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales">https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/system.html#locales</a> </td></tr>
@@ -563,7 +551,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate misc storage configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;miscDatabase&quot;:</div><div class="line">  {</div><div class="line">    &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;,</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;avsDeviceSDK&quot;: {</div><div class="line">      &quot;miscDatabase&quot;: {</div><div class="line">        &quot;databaseFilePath&quot;: &quot;&lt;SQLITE_DATABASE_FILE_PATH&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">databaseFilePath</td><td>The file path to the SQLite database used to store persistent misc storage data. The database will be created on initialization if it does not already exist. </td></tr>
   </table>
@@ -596,7 +584,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate speaker manager configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;speakerManager&quot;: {</div><div class="line">         &quot;enabled&quot;: [true|false]</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;speakerManager&quot;: {</div><div class="line">      &quot;enabled&quot;: [true|false]</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">enabled</td><td>Enable or disable the speaker manager (default is enabled) </td></tr>
   </table>
@@ -629,7 +617,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate system configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;system&quot;: {</div><div class="line">         &quot;firmwareVersion&quot;: &quot;&lt;FIRMWARE_VERSION&gt;&quot;</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;system&quot;: {</div><div class="line">      &quot;firmwareVersion&quot;: &quot;&lt;FIRMWARE_VERSION&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">firmwareVersion</td><td>The firmware version of the client device </td></tr>
   </table>
@@ -662,7 +650,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate encoder configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;speechRecognizer&quot;: {</div><div class="line">         &quot;encoder&quot;: {</div><div class="line">              &quot;name&quot;: &quot;&lt;ENCODER_NAME&gt;&quot;</div><div class="line">         }</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;speechRecognizer&quot;: {</div><div class="line">      &quot;encoder&quot;: {</div><div class="line">        &quot;name&quot;: &quot;&lt;ENCODER_NAME&gt;&quot;</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">encoderName</td><td>The encoder codec name to be used </td></tr>
   </table>
@@ -699,7 +687,7 @@ Static Public Member Functions</h2></td></tr>
 <li>displayCardAudioPlaybackFinishedTimeout If present, specifies the values in milli seconds to control the timeout of display card at the FINISHED state of AudioPlayback.</li>
 <li>displayCardAudioPlaybackStoppedPausedTimeout If present, specifies the values in milli seconds to control the timeout of display card at STOP or PAUSE state of AudioPlayback. The data generated by this method is equivalent to providing the following JSON values in a configuration:</li>
 </ul>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;templateRuntimeCapabilityAgent&quot;: {</div><div class="line">     &quot;displayCardTTSFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,</div><div class="line">     &quot;displayCardAudioPlaybackFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,</div><div class="line">     &quot;displayCardAudioPlaybackStoppedPausedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;templateRuntimeCapabilityAgent&quot;: {</div><div class="line">      &quot;displayCardTTSFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,</div><div class="line">      &quot;displayCardAudioPlaybackFinishedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;,</div><div class="line">      &quot;displayCardAudioPlaybackStoppedPausedTimeout&quot;: &lt;TIMEOUT_IN_MS&gt;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">timeoutList</td><td>A list of <code>TemplateRuntimeTimeout</code> type and value pairs </td></tr>
   </table>
@@ -732,7 +720,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate external media player configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;externalMediaPlayer&quot;: {</div><div class="line">         &quot;agent&quot;: &quot;&lt;agent&gt;&quot;</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;externalMediaPlayer&quot;: {</div><div class="line">      &quot;agent&quot;: &quot;&lt;agent&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">agent</td><td>The external media player agent </td></tr>
   </table>
@@ -787,7 +775,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate equalizer controller configuration data. This is an optional configuration, and default settings will be used if configuration is not provided. This method produces configuration data according to the JSON structure in the sample below.</p>
-<div class="fragment"><div class="line">&quot;equalizer&quot;: {</div><div class="line">    &quot;bands&quot;: {</div><div class="line">        &quot;BASS&quot;: true,</div><div class="line">        &quot;MIDRANGE&quot;: false,</div><div class="line">        &quot;TREBLE&quot;: true</div><div class="line">    },</div><div class="line">    &quot;defaultState&quot;: {</div><div class="line">        &quot;bands&quot;: {</div><div class="line">            &quot;BASS&quot;: 4,</div><div class="line">            &quot;TREBLE&quot;: -1</div><div class="line">        }</div><div class="line">    },</div><div class="line">    &quot;minLevel&quot;: -6,</div><div class="line">    &quot;maxLevel&quot;: 6</div><div class="line">}</div></div><!-- fragment --><p>The configuration branches are used as follows:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;equalizer&quot;: {</div><div class="line">      &quot;bands&quot;: {</div><div class="line">        &quot;BASS&quot;: true,</div><div class="line">        &quot;MIDRANGE&quot;: false,</div><div class="line">        &quot;TREBLE&quot;: true</div><div class="line">      },</div><div class="line">    &quot;defaultState&quot;: {</div><div class="line">      &quot;bands&quot;: {</div><div class="line">        &quot;BASS&quot;: 4,</div><div class="line">        &quot;TREBLE&quot;: -1</div><div class="line">      }</div><div class="line">    },</div><div class="line">    &quot;minLevel&quot;: -6,</div><div class="line">    &quot;maxLevel&quot;: 6</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><p>The configuration branches are used as follows:</p>
 <ul>
 <li>equalizer.bands: Specifies which bands are supported by the device and will be enabled for control with Alexa. Each child key is the name of an Alexa-supported band ("BASS", "MIDRANGE", or "TREBLE") and value is whether the device supports the band. Only bands explicitly declared supported will be enabled in the SDK and Alexa. Omitting this branch enables all bands by default.</li>
 </ul>
@@ -834,7 +822,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate auth provider configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;authProvider&quot;: {</div><div class="line">         &quot;providers&quot;: [&lt;LIST_OF_PROVIDER_NAMES_STRINGS&gt;]</div><div class="line">     }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;authProvider&quot;: {</div><div class="line">      &quot;providers&quot;: [&lt;LIST_OF_PROVIDER_NAMES_STRINGS&gt;]</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">providerNames</td><td>The list of auth providers </td></tr>
   </table>
@@ -867,7 +855,7 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Factory method used to programmatically generate music ducking configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
-<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">     &quot;audio&quot; : {</div><div class="line">         &quot;audioOutputType.music&quot;: {</div><div class="line">             &quot;ducking&quot;: {</div><div class="line">                 &quot;enabled&quot; : [true|false]</div><div class="line">             }</div><div class="line">         }</div><div class="line">     }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;audio&quot;: {</div><div class="line">      &quot;audioOutputType.music&quot;: {</div><div class="line">        &quot;ducking&quot;: {</div><div class="line">          &quot;enabled&quot;: [true|false]</div><div class="line">        }</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">duckingEnabled</td><td><code>true</code> if ducking is enabled </td></tr>
   </table>
@@ -876,12 +864,65 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a5c9a09fbc66098c407234c0862fa78d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c9a09fbc66098c407234c0862fa78d4">&#9670;&nbsp;</a></span>createMediaPlayerFingerprintConfig()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::shared_ptr&lt;<a class="el" href="classaace_1_1core_1_1config_1_1_engine_configuration.html">aace::core::config::EngineConfiguration</a>&gt; aace::alexa::config::AlexaConfiguration::createMediaPlayerFingerprintConfig </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>package</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>buildType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>versionNumber</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Factory method used to programmatically generate media player fingerprint configuration data. The data generated by this method is equivalent to providing the following JSON values in a configuration file:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;aace.alexa&quot;: {</div><div class="line">    &quot;mediaPlayerFingerprint&quot;: {</div><div class="line">      &quot;package&quot;: &quot;&lt;package&gt;&quot;,</div><div class="line">      &quot;buildType&quot;: &quot;&lt;buildType&gt;&quot;,</div><div class="line">      &quot;versionNumber&quot;: &quot;&lt;versionNumber&gt;&quot;</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a href="https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/audioplayer.html#capability-assertion">https://developer.amazon.com/en-US/docs/alexa/alexa-voice-service/audioplayer.html#capability-assertion</a></dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">package</td><td>Unique identifier for the audio player software loaded on the device. </td></tr>
+    <tr><td class="paramname">buildType</td><td>The audio player build type. </td></tr>
+    <tr><td class="paramname">versionNumber</td><td>Identifies the version of the audio player loaded on your device. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::shared_ptr&lt;aace::core::config::EngineConfiguration&gt; </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <html>
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 4.2 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.3 - Copyright 2017-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

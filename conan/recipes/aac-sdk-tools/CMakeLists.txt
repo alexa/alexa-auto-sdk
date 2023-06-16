@@ -7,6 +7,11 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 # include the generated aac cmake file
 include(${CMAKE_BINARY_DIR}/aacbuildinfo.cmake)
 
+# set up default compiler settings for every module
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 #include any additional cmake files defined by the project
 file(GLOB cmake_files ${CMAKE_BINARY_DIR}/cmake/*.cmake)
 foreach(file ${cmake_files})
@@ -15,11 +20,6 @@ endforeach(file)
 
 # run the conan setup script
 conan_basic_setup(${CONAN_SETUP_OPTIONS})
-
-# set up default compiler settings for every module
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(AutoSdkModule ${AAC_SOURCES})
 

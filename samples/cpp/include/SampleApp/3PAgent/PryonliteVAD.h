@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
 #ifndef PRYONLITE_VAD
 #define PRYONLITE_VAD
 
-#include "pryon_lite_PRL2010.h"
+#include <aal/aal.h>
+#include <aal/common.h>
+#include <AACE/Core/MessageBroker.h>
 #include "AgentPryonListenerInterface.h"
 #include "AgentHandler.h"
-#include "SampleApp/Logger/LoggerHandler.h"
-#include <AACE/Core/MessageBroker.h>
+#include "PrlAudioFile.h"
+#include "pryon_lite_PRL2010.h"
 #include "SampleApp/Activity.h"
+#include "SampleApp/Logger/LoggerHandler.h"
 
+#include <memory>
 #include <mutex>
 #include <fstream>
 
@@ -29,8 +33,7 @@
 namespace sampleApp{
     
 namespace arbitrator{
-
-class PryonLiteVAD{
+class PryonLiteVAD {
 private:
     std::weak_ptr<logger::LoggerHandler> m_loggerHandler{};
     std::weak_ptr<AgentPryonListenerInterface> m_listener{};
@@ -44,18 +47,58 @@ public:
     template <typename... Args>
     static auto create(Args&&... args) -> std::shared_ptr<PryonLiteVAD> {
         return std::shared_ptr<PryonLiteVAD>(new PryonLiteVAD(args...));
-        }
+    }
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////   Mic Audio   //////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+public:
+    /**
+     * Destructor for Mic Recorder
+     */
+    ~PryonLiteVAD();
+    /**
+     * Opens Mic channel and Audio
+     */
+    bool startMicAudio();
+    /**
+     * Closes Mic channel and Audio
+     */
+    bool stopMicAudio();
+    /**
+     * Pushes Audio Sample to Pryonlite
+     */
+    void onStreamDataCallback(const int16_t* data, const size_t length);
+
+private:    
+    /**
+     * Creates a recorder for Mic Audio
+     */
+    aal_handle_t createRecorder(int m_moduleId, int m_sampleRate);
+
+    // To get the ModuleId for the recorder, default module is "GStreamer"
+    int getmoduleId(const std::string target);
+
+    // name (empty string)
+    std::string m_name;
+    // It should be initialized with null pointer
+    aal_handle_t m_recorder = nullptr;
+    // Name of the device (empty string)
+    std::string m_deviceName;
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////   Mic Audio   //////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 private:
     /**
-     * @brief 
-     * 
      * Loads the given model file into memory.
      *
      * @param fileMem[out] The object into which the file will be loaded into.
      * @param filePath The path to the file to load into memory.
-     * @param return @c true if the file was successfully loaded into memory and @c
-     * false otherwise.
+     * @param return @c true if the file was successfully loaded into memory and 
+     *        @c false otherwise.
      */
     bool loadFileIntoMemory(std::vector<char>* fileMem, const std::string& filePath);
     /**
@@ -71,12 +114,7 @@ private:
      * @param handle A handle to the PryonLite engine instance.
      * @param vadEvent VAD State Transition information.
      */
-    static void vadEventHandler(PryonLiteV2Handle *handle, const PryonLiteVadEvent* vadEvent);
-    /**
-     *  Checks for VAD Begin, if not continues pushing Samples, else starts the calculation for VAD Timestamp.
-     */
-    void checkForVADBegin(std::vector<std::pair<ssize_t, std::chrono::time_point<std::chrono::system_clock>>>& startTsBuffer, 
-                          std::vector<std::pair<ssize_t, std::chrono::time_point<std::chrono::system_clock>>>& endTsBuffer);
+    void vadEventHandler(PryonLiteV2Handle *handle, const PryonLiteVadEvent* vadEvent);
 
 private:
     /// The listener interface for the handler event.
@@ -91,10 +129,6 @@ private:
     void showMessage(const std::string& message);
 
 public:
-    /// The number of samples to feed to the PryonLite engine per iteration. This
-    /// is supplied by PryonLite.
-    int32_t m_pryonLiteSamplesPerPush;
-
     /// Console
     std::weak_ptr<View> m_console{};
 
@@ -104,8 +138,6 @@ public:
     /// The memory allocated to hold PryonLite engine instance.
     std::vector<char> m_engineMem;
 
-    // VAD TimestampCalculation
-    void VADtimesstamp();
 public:
     /**
      * Initializes and creates PryonLite engine that the client will be primarily interacting with. This function should
@@ -131,28 +163,17 @@ public:
      * 
      */
     void destroy();
-    /* 
-     * Set the stopThread bool to True (For setting KWD Mode, need to stop all loops).
-     */
-    void returnBoolThread(bool& stopthread);
-private:
     /**
-     * @param m_stream The stream from which detection happens.
-     * @param m_path The path to that stream.
+     * @brief Feed Audio Method to get the VAD Callback, if voice activity is there.
      * 
      */
-    void feedAudio(std::ifstream& m_stream, std::string& m_path);
-
-    // File stream
-    std::ifstream m_stream;
-
-    // path to audio file
-    std::string m_path;
-    
-    ssize_t read(char* data, const size_t size,  std::ifstream& m_stream);
-
-    // thread for pushing audio samples
-    std::thread m_feedAudioThread;
+    void feedAudio();
+    /**
+     * @brief Get the Wav File Path
+     * 
+     * @param path 
+     */
+    void getWavFilePath(std::string& path);
 };
 
 

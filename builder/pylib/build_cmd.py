@@ -142,13 +142,14 @@ class BuilderHandler(BaseHandler):
             "-o",
             f"with_sensitive_logs={self.get_arg('with_sensitive_logs',False)}",
             "-o",
-            f"with_metrics={self.get_arg('with_metrics',False)}",
+            f"with_metrics={self.get_arg('with_metrics',True)}",
             "-o",
             f"with_sampleapp={self.get_arg('with_sampleapp',False)}",
             "-o",
             f"with_docs={self.get_arg('with_docs',True)}",
             "-s",
             f"build_type={'Debug' if self.get_arg('debug') else 'Release'}",
+            "--update",  # update recipes to newer or pinned revision
         ]
 
         # set the build_name option if specified

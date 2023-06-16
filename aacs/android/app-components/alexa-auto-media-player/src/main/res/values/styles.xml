@@ -1,7 +1,0 @@
-<resources>
-    <style name="MediaText">
-        <item name="android:textColor">#232F3E</item>
-        <item name="android:textSize">@dimen/media_default_screen_hint_text_size</item>
-        <item name="android:layout_gravity">center</item>
-    </style>
-</resources>

@@ -291,7 +291,7 @@ class BaseSdkModule(object):
             self.add_requirement(req)
         # add gtest requirement if building with unit tests
         if self.options.get_safe("with_unit_tests", default=False):
-            self.requires("gtest/1.8.1")
+            self.requires("gtest/1.8.1#376c83e4d37ba70c76fe5e869e69841a")
             self.options["gtest"].no_main = False
 
     def build_requirements(self):
@@ -299,6 +299,9 @@ class BaseSdkModule(object):
             self.build_requires(f"aac-tool-a2ml/{self.version}")
         if self.options.get_safe("with_android_libs", default=False):
             self.build_requires(f"gradle/7.0@aac-sdk/{self.version}")
+        if self.options.get_safe("with_unit_tests", default=False):
+            self.build_requires("gtest/1.8.1#376c83e4d37ba70c76fe5e869e69841a")
+            self.options["gtest"].no_main = False
 
     def config_options(self):
         if not self.settings.os == "Android":
@@ -368,6 +371,9 @@ class BaseSdkModule(object):
     def package_info(self):
         self.cpp_info.defines = ["AAC_" + self.module_name.replace("-", "_").upper()]
         self.cpp_info.libs = tools.collect_libs(self)
+        # Pass along coverage flags for integration tests on linux x86
+        if self.options.with_coverage_tests and self.settings.os == "Linux" and self.settings.arch == "x86_64":
+            self.cpp_info.sharedlinkflags.append("-fprofile-arcs -ftest-coverage")
         self.user_info.module_deps = ",".join(self.deps_cpp_info.deps)
         self.user_info.aac_export_includes = json.dumps([{"pattern": "*", "src": os.path.abspath("public")}])
         if self.options.with_messages:

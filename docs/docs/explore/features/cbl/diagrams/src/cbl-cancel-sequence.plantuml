@@ -8,8 +8,8 @@ participant AuthorizationHandler  order 30
 participant "Auto SDK" as AutoSDK  order 40
 
 Application -> AuthorizationHandler : Canceling CBL authorization flow.
-AuthorizationHandler -> AutoSDK : cancelAuthorization( "alexa:cbl" )
+AuthorizationHandler -> AutoSDK : CancelAuthorization{ "alexa:cbl" }
 
-AutoSDK -> AuthorizationHandler : authorizationStateChanged( "alexa:cbl", UNAUTHORIZED )
+AutoSDK -> AuthorizationHandler : AuthorizationStateChanged{ "alexa:cbl", UNAUTHORIZED }
 
 @enduml

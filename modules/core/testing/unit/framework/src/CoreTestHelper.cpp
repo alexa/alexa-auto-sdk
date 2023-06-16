@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,9 +28,36 @@ namespace core {
 
 static const std::string DEFAULT_CONFIG =
     "{"
-    "    \"aace.storage\":{"
-    "        \"localStoragePath\":\"storage.db\","
-    "        \"storageType\":\"sqlite\""
+    "    \"aace.storage\": {"
+    "        \"localStoragePath\": \"storage.db\","
+    "        \"storageType\": \"sqlite\""
+    "    },"
+    "    \"aace.metrics\": {"
+    "        \"metricDeviceIdTag\": \"sampleHashForUniqueId\","
+    "        \"metricStoragePath\": \"metrics/\","
+    "        \"buildType\": \"Debug\""
+    "    },"
+    "    \"aace.vehicle\": {"
+    "        \"deviceInfo\": {"
+    "            \"manufacturer\": \"Apple\","
+    "            \"model\": \"MacBook Pro\","
+    "            \"serialNumber\": \"1234567890000\","
+    "            \"osVersion\": \"13.2.1\","
+    "            \"hardwareArch\": \"x86_64\","
+    "            \"platform\": \"macOS\""
+    "        },"
+    "        \"appInfo\": {"
+    "            \"softwareVersion\": \"4.2-dev\""
+    "        },"
+    "        \"vehicleInfo\": {"
+    "            \"make\": \"Amazon sample make\","
+    "            \"model\": \"Amazon sample model\","
+    "            \"year\": \"2020\","
+    "            \"trim\": \"Standard\","
+    "            \"microphoneType\": \"Single\","
+    "            \"operatingCountry\": \"US\","
+    "            \"vehicleIdentifier\": \"Sample Identifier ABC\""
+    "        }"
     "    }"
     "}";
 

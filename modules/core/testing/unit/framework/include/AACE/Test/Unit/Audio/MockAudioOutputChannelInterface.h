@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ namespace audio {
 class MockAudioOutputChannelInterface : public aace::engine::audio::AudioOutputChannelInterface {
 public:
     MOCK_METHOD2(prepare, bool(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating));
-    MOCK_METHOD2(prepare, bool(const std::string& url, bool repeating));
+    MOCK_METHOD3(prepare, bool(const std::string& url, bool repeating, const PlaybackContext& playbackContext));
     MOCK_METHOD0(play, bool());
     MOCK_METHOD0(stop, bool());
     MOCK_METHOD0(pause, bool());

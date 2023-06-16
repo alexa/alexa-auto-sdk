@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 #include <AACE/Audio/AudioOutput.h>
 
+#include <map>
+
 namespace aace {
 namespace engine {
 namespace audio {
@@ -29,7 +31,24 @@ public:
     using MutedState = aace::audio::AudioOutput::MutedState;
 
     virtual bool prepare(std::shared_ptr<aace::audio::AudioStream> stream, bool repeating) = 0;
-    virtual bool prepare(const std::string& url, bool repeating) = 0;
+
+    struct PlaybackContext {
+        typedef std::map<std::string, std::string> HeaderConfig;
+
+        /// Headers to be sent while fetching license.
+        HeaderConfig keyConfig;
+
+        /// Headers to be sent while fetching manifest.
+        HeaderConfig manifestConfig;
+
+        /// Headers to be sent while fetching data segments.
+        HeaderConfig audioSegmentConfig;
+
+        /// Headers to be sent for all out going requests.
+        HeaderConfig allConfig;
+    };
+
+    virtual bool prepare(const std::string& url, bool repeating, const PlaybackContext& playbackContext) = 0;
     virtual void mayDuck() = 0;
     virtual bool play() = 0;
     virtual bool stop() = 0;

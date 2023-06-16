@@ -23,7 +23,7 @@
   <td id="projectlogo"><img alt="Logo" src="aace-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Alexa Auto SDK
-   &#160;<span id="projectnumber">4.2</span>
+   &#160;<span id="projectnumber">4.3</span>
    </div>
   </td>
  </tr>
@@ -162,6 +162,9 @@ $(function() {
 <li>AlexaPresentationTimeoutType
 : <a class="el" href="classaace_1_1apl_1_1config_1_1_a_p_l_configuration.html#a812a021a78a91ecaa55208dc13f9c161">aace::apl::config::APLConfiguration</a>
 </li>
+<li>allConfig
+: <a class="el" href="structaace_1_1audio_1_1_audio_output_1_1_playback_context.html#ac4707b9c530b3ca28c61f70f9f61f3e1">aace::audio::AudioOutput::PlaybackContext</a>
+</li>
 <li>announceManeuver()
 : <a class="el" href="classaace_1_1navigation_1_1_navigation.html#af9e3309727e67403e92f31356b8998b7">aace::navigation::Navigation</a>
 </li>
@@ -170,6 +173,12 @@ $(function() {
 </li>
 <li>answer()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a749bb2ec8ad7bdb0efacd3c333aa4b00">aace::phoneCallController::PhoneCallController</a>
+</li>
+<li>AppInfoProperty
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad1749dfe4e50445cb62e7626b437959b">aace::vehicle::config::VehicleConfiguration</a>
+</li>
+<li>AppInfoPropertyType
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ab40ee885032d9c31ea4e73d7ba0d5e37">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>artistId
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ae8e46c9953136f5180b5d7a9d324b502">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
@@ -191,8 +200,11 @@ $(function() {
 <li>audioFocusEvent()
 : <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a8c7eb63ef509c2e39888c0b841f1be5d">aace::audio::AudioOutput</a>
 </li>
+<li>audioSegmentConfig
+: <a class="el" href="structaace_1_1audio_1_1_audio_output_1_1_playback_context.html#a555caa0ac1db7903218633b9286bacad">aace::audio::AudioOutput::PlaybackContext</a>
+</li>
 <li>AudioStreamProperty()
-: <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a19a7611c34e77b001d97cc4b911362fb">aace::audio::AudioStreamProperty</a>
+: <a class="el" href="classaace_1_1audio_1_1_audio_stream_property.html#a3ae61e4591b926ae67ab2985e6f1cd72">aace::audio::AudioStreamProperty</a>
 </li>
 <li>AuthError
 : <a class="el" href="classaace_1_1alexa_1_1_auth_provider.html#a6f44b8c435407a4ff782fd931afc05ab">aace::alexa::AuthProvider</a>
@@ -349,8 +361,14 @@ $(function() {
 <li>createAddressBookConfig()
 : <a class="el" href="classaace_1_1address_book_1_1config_1_1_address_book_configuration.html#a4363e6e7ef7334f5ac9264725040e595">aace::addressBook::config::AddressBookConfiguration</a>
 </li>
+<li>createAlexaClientInfoConfig()
+: <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#ab68d4bbf4f8116b7416ec6604579d532">aace::alexa::config::AlexaConfiguration</a>
+</li>
 <li>createAlexaPresentationTimeoutConfig()
 : <a class="el" href="classaace_1_1apl_1_1config_1_1_a_p_l_configuration.html#a56ef719eddebda92b88505f908a8d85b">aace::apl::config::APLConfiguration</a>
+</li>
+<li>createAppInfoConfig()
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#af9b945da4022c8d26e5c9e262a463fd5">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>createAuthProviderConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aac1f2b1ed508bf0b0d481195660c6cca">aace::alexa::config::AlexaConfiguration</a>
@@ -377,7 +395,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a221fd921e3b5f297a99520a6e09c283d">aace::alexa::config::AlexaConfiguration</a>
 </li>
 <li>createDeviceInfoConfig()
-: <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#aceaa112768e13cd30722766cc9d1a2c6">aace::alexa::config::AlexaConfiguration</a>
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ac387e37d94a56609326a51118a5b5d40">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>createDeviceSettingsConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#acbe8018cdf55ec51b7f2feccf4a9bab5">aace::alexa::config::AlexaConfiguration</a>
@@ -406,6 +424,15 @@ $(function() {
 <li>createLoggerRuleConfig()
 : <a class="el" href="classaace_1_1logger_1_1config_1_1_logger_configuration.html#a9875f58897e59ce67932f1c4f9edf085">aace::logger::config::LoggerConfiguration</a>
 </li>
+<li>createMediaPlayerFingerprintConfig()
+: <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5c9a09fbc66098c407234c0862fa78d4">aace::alexa::config::AlexaConfiguration</a>
+</li>
+<li>createMetricsStorageConfig()
+: <a class="el" href="classaace_1_1metrics_1_1config_1_1_metrics_configuration.html#aa752d0fd9f9e78031c6c3fe2e9422e44">aace::metrics::config::MetricsConfiguration</a>
+</li>
+<li>createMetricsTagConfig()
+: <a class="el" href="classaace_1_1metrics_1_1config_1_1_metrics_configuration.html#afcce4e6108fd83b2a6f9d4941db80e35">aace::metrics::config::MetricsConfiguration</a>
+</li>
 <li>createMiscStorageConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a500f37306f03ef987e8d014cb7b64470">aace::alexa::config::AlexaConfiguration</a>
 </li>
@@ -414,9 +441,6 @@ $(function() {
 </li>
 <li>createNotificationsConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a5205a15e4b9f8596a6aff6e4c26595fa">aace::alexa::config::AlexaConfiguration</a>
-</li>
-<li>createOperatingCountryConfig()
-: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a469681a9d4866c0e898f512fe98eb8ab">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>createSettingsConfig()
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a08aee7c879ef040c17d32bd9a781a940">aace::alexa::config::AlexaConfiguration</a>
@@ -437,7 +461,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1config_1_1_alexa_configuration.html#a89e139921c42c3078c70cd40cdeb0881">aace::alexa::config::AlexaConfiguration</a>
 </li>
 <li>createVehicleInfoConfig()
-: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ad67c9d173ea737eb9d737db84b2d0ec1">aace::vehicle::config::VehicleConfiguration</a>
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a96bba0d6fb87613c8301d8961b25b903">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>createZone()
 : <a class="el" href="classaace_1_1car_control_1_1config_1_1_car_control_configuration.html#ab7480ff4128eda5b72dbfbed9da5dcbe">aace::carControl::config::CarControlConfiguration</a>
@@ -446,9 +470,6 @@ $(function() {
 
 
 <h3><a id="index_d"></a>- d -</h3><ul>
-<li>DatapointType
-: <a class="el" href="classaace_1_1metrics_1_1_metrics_uploader.html#a67e6fa51b9ef4b8a9b293870363eb4b5">aace::metrics::MetricsUploader</a>
-</li>
 <li>dataSourceUpdate()
 : <a class="el" href="classaace_1_1apl_1_1_a_p_l.html#a2c8c2bc29a5c9b8f684069743b586bc5">aace::apl::APL</a>
 </li>
@@ -460,6 +481,12 @@ $(function() {
 </li>
 <li>deviceConfigurationUpdated()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a3d36c76efd0e96bd84196a8dcd5071de">aace::phoneCallController::PhoneCallController</a>
+</li>
+<li>DeviceInfoProperty
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a5332999ec13b8c6206055a1cf234a9d6">aace::vehicle::config::VehicleConfiguration</a>
+</li>
+<li>DeviceInfoPropertyType
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae4b58f9dd91c015120344afcfc6649e4">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>dial()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#a398192e0728d2e352483c6967419aba4">aace::phoneCallController::PhoneCallController</a>
@@ -692,6 +719,13 @@ $(function() {
 </ul>
 
 
+<h3><a id="index_k"></a>- k -</h3><ul>
+<li>keyConfig
+: <a class="el" href="structaace_1_1audio_1_1_audio_output_1_1_playback_context.html#ae05f674b211e1a140bb9ae99e35a8d97">aace::audio::AudioOutput::PlaybackContext</a>
+</li>
+</ul>
+
+
 <h3><a id="index_l"></a>- l -</h3><ul>
 <li>largeURL
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_1_1_playback_state.html#ae3eb99c0fa114617ef22978c6b12596f">aace::alexa::ExternalMediaAdapter::PlaybackState</a>
@@ -738,7 +772,7 @@ $(function() {
 : <a class="el" href="classaace_1_1alexa_1_1_alexa_speaker.html#a3bd38cc6bcdda25f00af7b57e8e1c324">aace::alexa::AlexaSpeaker</a>
 </li>
 <li>Location()
-: <a class="el" href="classaace_1_1location_1_1_location.html#af72835578a771a956936116f9597a10e">aace::location::Location</a>
+: <a class="el" href="classaace_1_1location_1_1_location.html#a2fee1df1854e9ae0f8a279ef0fe4bae9">aace::location::Location</a>
 </li>
 <li>LocationServiceAccess
 : <a class="el" href="classaace_1_1location_1_1_location_provider_engine_interface.html#af50b4c69d527d2c4eb15ca5b9169799c">aace::location::LocationProviderEngineInterface</a>
@@ -773,6 +807,9 @@ $(function() {
 
 
 <h3><a id="index_m"></a>- m -</h3><ul>
+<li>manifestConfig
+: <a class="el" href="structaace_1_1audio_1_1_audio_output_1_1_playback_context.html#a92e54c00d9c6c19f3392f236f4e9db3d">aace::audio::AudioOutput::PlaybackContext</a>
+</li>
 <li>mayDuck()
 : <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a662b7237e069d491c278b3175b3246a8">aace::audio::AudioOutput</a>
 </li>
@@ -914,7 +951,7 @@ $(function() {
 : <a class="el" href="classaace_1_1messaging_1_1_messaging.html#abc8737f2c9a630793c570482266c0c55">aace::messaging::Messaging</a>
 </li>
 <li>play()
-: <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#a159219dfe69cbb6b937edb97c52619db">aace::alexa::ExternalMediaAdapter</a>
+: <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#a744856c875bd6e2187584af95ccdf62f">aace::alexa::ExternalMediaAdapter</a>
 , <a class="el" href="classaace_1_1alexa_1_1_local_media_source.html#a1a1f194d9ecc288b70fa09a04d937e8e">aace::alexa::LocalMediaSource</a>
 , <a class="el" href="classaace_1_1audio_1_1_audio_output.html#a5318ee52ef7ec7216ede5d09b7099c80">aace::audio::AudioOutput</a>
 </li>
@@ -1000,9 +1037,6 @@ $(function() {
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
-<li>record()
-: <a class="el" href="classaace_1_1metrics_1_1_metrics_uploader.html#aed82a63aeae759182dd2f9d744b729f9">aace::metrics::MetricsUploader</a>
-</li>
 <li>redial()
 : <a class="el" href="classaace_1_1phone_call_controller_1_1_phone_call_controller.html#aa4487723257e8e3ac2b7ba8c335b461d">aace::phoneCallController::PhoneCallController</a>
 </li>
@@ -1350,11 +1384,11 @@ $(function() {
 <li>validationMethod
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter_engine_interface_1_1_discovered_player_info.html#a564feaee70d1dda1b132669fa212b2c8">aace::alexa::ExternalMediaAdapterEngineInterface::DiscoveredPlayerInfo</a>
 </li>
-<li>VehicleProperty
-: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a8c75abd04aaf80ed9057f1b940e83bd7">aace::vehicle::config::VehicleConfiguration</a>
+<li>VehicleInfoProperty
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6141ce9aa3d0bf653c0118aa1668728c">aace::vehicle::config::VehicleConfiguration</a>
 </li>
-<li>VehiclePropertyType
-: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#a6aa7ee80198586f3a51d0c0f8fb542cf">aace::vehicle::config::VehicleConfiguration</a>
+<li>VehicleInfoPropertyType
+: <a class="el" href="classaace_1_1vehicle_1_1config_1_1_vehicle_configuration.html#ae9d59c34a7c8b17e2608ac0b9b328799">aace::vehicle::config::VehicleConfiguration</a>
 </li>
 <li>volumeChanged()
 : <a class="el" href="classaace_1_1alexa_1_1_external_media_adapter.html#ac73f6dd4d24881723c7237da431dea0d">aace::alexa::ExternalMediaAdapter</a>
@@ -1390,7 +1424,7 @@ $(function() {
   <body>
     <hr style="height:1px;border-width:0;color:gray;background-color:gray">
     <p style="text-align:left;">
-      Alexa Auto SDK 4.2 - Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+      Alexa Auto SDK 4.3 - Copyright 2017-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
       <span style="float:right;">
         Licensed under the <a HREF=http://aws.amazon.com/apache2.0/>Apache License, Version 2.0</a>
       </span>

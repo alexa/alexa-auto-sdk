@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 #include <AVSCommon/SDKInterfaces/CapabilityConfigurationInterface.h>
 #include <AVSCommon/Utils/Optional.h>
 
-#include "AACE/Engine/Vehicle/VehiclePropertyInterface.h"
+#include "AACE/Engine/Vehicle/VehicleConfigServiceInterface.h"
 
 #include <rapidjson/document.h>
 
@@ -35,18 +35,19 @@ class VehicleData : public alexaClientSDK::avsCommon::sdkInterfaces::CapabilityC
 public:
     /// Aliases for readability
     /// @{
-    using VehiclePropertyMap = aace::engine::vehicle::VehiclePropertyMap;
-    using VehiclePropertyType = aace::vehicle::config::VehicleConfiguration::VehiclePropertyType;
     using CapabilityConfiguration = alexaClientSDK::avsCommon::avs::CapabilityConfiguration;
     /// @}
 
     /**
      * Create a VehicleData capability provider.
      *
-     * @param vehiclePropertyMap A map of @c VehiclePropertyType keys to the values set in "aace.vehicle" configuration
-     * @return A shared pointer to a @c VehicleData, or @c nullptr if construction fails due to invalid arguments
+     * @param vehicleService The @c VehicleServiceInterface that provides the
+     *        vehicle configuration values
+     * @return A shared pointer to a @c VehicleData, or @c nullptr if
+     *         construction fails due to invalid arguments
      */
-    static std::shared_ptr<VehicleData> create(const VehiclePropertyMap& vehiclePropertyMap);
+    static std::shared_ptr<VehicleData> create(
+        const std::shared_ptr<aace::engine::vehicle::VehicleConfigServiceInterface>& vehicleService);
 
     /// @name CapabilityConfigurationInterface methods
     /// @{
@@ -69,21 +70,7 @@ private:
      * configuration fails
      */
     static std::shared_ptr<CapabilityConfiguration> getVehicleDataCapabilityConfiguration(
-        const VehiclePropertyMap& vehiclePropertyMap);
-
-    /**
-     * Retrieves the setting from @c vehiclePropertyMap for the @c VehiclePropertyType represented by the
-     * provided string. For example, capability attribute "MICROPHONE_TYPE" returns the OEM setting for the
-     * VehiclePropertyType::MICROPHONE property.
-     *
-     * @param attribute The key of an attribute (analytics, resources, or additional) used in
-     *        Alexa.Automotive.VehicleData capability configuration
-     * @return An optional value containing the OEM setting from @c VehicleConfiguration corresponding to the provided 
-     *        key if present, else an uninitialized value
-     */
-    static alexaClientSDK::avsCommon::utils::Optional<std::string> getPropertyByAttribute(
-        const std::string& attribute,
-        const VehiclePropertyMap& vehiclePropertyMap);
+        const std::shared_ptr<aace::engine::vehicle::VehicleConfigServiceInterface>& vehicleService);
 
     /**
      * Utility function to generate a rapidjson::Value representation of an analytics data object for capability

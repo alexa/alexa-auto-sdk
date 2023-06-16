@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ bool AudioOutputHandler::prepare(std::shared_ptr<aace::audio::AudioStream> strea
     }
 }
 
-bool AudioOutputHandler::prepare(const std::string& url, bool repeating) {
+bool AudioOutputHandler::prepare(const std::string& url, bool repeating, const aace::audio::AudioOutput::PlaybackContext&) {
     try_with_context {
         jboolean result;
         ThrowIfNot(

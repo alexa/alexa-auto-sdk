@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@
 #include <AVSCommon/Utils/Error/SuccessResult.h>
 #include <RegistrationManager/CustomerDataManagerInterface.h>
 
-#include "AACE/Alexa/AlexaEngineInterfaces.h"
-#include "AACE/Alexa/EqualizerController.h"
-#include "AACE/Engine/Core/EngineMacros.h"
+#include <AACE/Alexa/AlexaEngineInterfaces.h>
+#include <AACE/Alexa/EqualizerController.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
 
 namespace aace {
 namespace engine {
@@ -57,6 +58,7 @@ public:
      * @param exceptionEncounteredSender Interface to report exceptions to AVS
      * @param contextManager Interface to provide equalizer state to AVS
      * @param messageSender Interface to send events to AVS
+     * @param metricRecorder The metric recorder
      *
      * @return A new instance of @c EqualizerControllerEngineImpl on success, @c nullptr otherwise
      */
@@ -69,7 +71,8 @@ public:
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ExceptionEncounteredSenderInterface>
             exceptionEncounteredSender,
         std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::ContextManagerInterface> contextManager,
-        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender);
+        std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MessageSenderInterface> messageSender,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     // EqualizerInterface functions
     virtual void setEqualizerBandLevels(
@@ -98,8 +101,11 @@ private:
      * EqualizerControllerEngineImpl constructor
      *
      * @param equalizerPlatformInterface The associated @c EqualizerController platform interface instance
+     * @param metricRecorder The metric recorder instance to record metrics
      */
-    EqualizerControllerEngineImpl(std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface);
+    EqualizerControllerEngineImpl(
+        std::shared_ptr<aace::alexa::EqualizerController> equalizerPlatformInterface,
+        std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder);
 
     /**
      * Initialize the @c EqualizerControllerEngineImpl instance
@@ -248,6 +254,9 @@ private:
 
     /// The component for providing equalizer capabilities and configuration settings
     std::shared_ptr<alexaClientSDK::acsdkEqualizerInterfaces::EqualizerConfigurationInterface> m_configuration;
+
+    /// The metric recorder
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> m_metricRecorder;
 };
 
 }  // namespace alexa

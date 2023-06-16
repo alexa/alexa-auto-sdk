@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,26 +15,13 @@
 
 #include "AACE/Engine/Alexa/TemplateRuntimeEngineImpl.h"
 #include "AACE/Engine/Core/EngineMacros.h"
-#include "AACE/Engine/Utils/Metrics/Metrics.h"
 
 namespace aace {
 namespace engine {
 namespace alexa {
 
-using namespace aace::engine::utils::metrics;
-
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.alexa.TemplateRuntimeEngineImpl");
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "TemplateRuntimeEngineImpl";
-
-/// Counter metrics for TemplateRuntime Platform APIs
-static const std::string METRIC_TEMPLATERUNTIME_RENDER_TEMPLATE = "RenderTemplate";
-static const std::string METRIC_TEMPLATERUNTIME_CLEAR_TEMPLATE = "ClearTemplate";
-static const std::string METRIC_TEMPLATERUNTIME_RENDER_PLAYER_INFO = "RenderPlayerInfo";
-static const std::string METRIC_TEMPLATERUNTIME_CLEAR_PLAYER_INFO = "ClearPlayerInfo";
-static const std::string METRIC_TEMPLATERUNTIME_DISPLAY_CARD_CLEARED = "DisplayCardCleared";
 
 // Convert AVS FocusState type to an AACE FocusState type for use in the platform interface.
 static aace::alexa::FocusState convertFocusState(alexaClientSDK::avsCommon::avs::FocusState focusState) {
@@ -181,12 +168,10 @@ void TemplateRuntimeEngineImpl::renderTemplateCard(
     const std::string& token,
     const std::string& jsonPayload,
     alexaClientSDK::avsCommon::avs::FocusState focusState) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderTemplateCard", {METRIC_TEMPLATERUNTIME_RENDER_TEMPLATE});
     m_templateRuntimePlatformInterface->renderTemplate(jsonPayload, convertFocusState(focusState));
 }
 
 void TemplateRuntimeEngineImpl::clearTemplateCard(const std::string& token) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearTemplateCard", {METRIC_TEMPLATERUNTIME_CLEAR_TEMPLATE});
     m_templateRuntimePlatformInterface->clearTemplate();
 }
 
@@ -196,7 +181,6 @@ void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
     alexaSmartScreenSDK::smartScreenSDKInterfaces::AudioPlayerInfo audioPlayerInfo,
     alexaClientSDK::avsCommon::avs::FocusState focusState,
     std::shared_ptr<alexaClientSDK::avsCommon::sdkInterfaces::MediaPropertiesInterface> mediaProperties) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "renderPlayerInfoCard", {METRIC_TEMPLATERUNTIME_RENDER_PLAYER_INFO});
     m_templateRuntimePlatformInterface->renderPlayerInfo(
         jsonPayload,
         convertPlayerActivity(audioPlayerInfo.audioPlayerState),
@@ -205,7 +189,6 @@ void TemplateRuntimeEngineImpl::renderPlayerInfoCard(
 }
 
 void TemplateRuntimeEngineImpl::clearPlayerInfoCard(const std::string& token) {
-    emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "clearPlayerInfoCard", {METRIC_TEMPLATERUNTIME_CLEAR_PLAYER_INFO});
     m_templateRuntimePlatformInterface->clearPlayerInfo();
 }
 
@@ -234,8 +217,6 @@ void TemplateRuntimeEngineImpl::setRenderPlayerInfoCardsProviderInterface(
 // TemplateRuntimeEngineInterface
 //
 void TemplateRuntimeEngineImpl::onDisplayCardCleared() {
-    emitCounterMetrics(
-        METRIC_PROGRAM_NAME_SUFFIX, "onDisplayCardCleared", {METRIC_TEMPLATERUNTIME_DISPLAY_CARD_CLEARED});
     if (m_templateRuntimeCapabilityAgent != nullptr) {
         m_templateRuntimeCapabilityAgent->displayCardCleared();
     }

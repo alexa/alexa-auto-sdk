@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -96,7 +96,8 @@ protected:
             m_alexaMockFactory->getDialogUXStateAggregatorMock(),
             m_alexaMockFactory->getSpeakerManagerInterfaceMock(),
             m_alexaMockFactory->getExceptionEncounteredSenderInterfaceMock(),
-            m_alexaMockFactory->getMetricRecorder());
+            m_alexaMockFactory->getMetricRecorder(),
+            m_alexaMockFactory->getCaptionManager());
 
         return speechSynthesizerEngineImpl;
     }

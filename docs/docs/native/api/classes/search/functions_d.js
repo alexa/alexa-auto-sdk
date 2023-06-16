@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['record',['record',['../classaace_1_1metrics_1_1_metrics_uploader.html#aed82a63aeae759182dd2f9d744b729f9',1,'aace::metrics::MetricsUploader']]],
   ['redial',['redial',['../classaace_1_1phone_call_controller_1_1_phone_call_controller.html#aa4487723257e8e3ac2b7ba8c335b461d',1,'aace::phoneCallController::PhoneCallController']]],
   ['registeragent',['registerAgent',['../classaace_1_1arbitrator_1_1_arbitrator.html#a3c46449d3762ddd573bb7f0ff358cf2b',1,'aace::arbitrator::Arbitrator']]],
   ['registerplatforminterface',['registerPlatformInterface',['../classaace_1_1core_1_1_engine.html#abab09ff31a4c13f8841bc124d87c24eb',1,'aace::core::Engine::registerPlatformInterface(std::shared_ptr&lt; aace::core::PlatformInterface &gt; platformInterface)=0'],['../classaace_1_1core_1_1_engine.html#a5b1e5999b008bee74249d162c95be7c7',1,'aace::core::Engine::registerPlatformInterface(std::initializer_list&lt; std::shared_ptr&lt; aace::core::PlatformInterface &gt;&gt; platformInterfaceList)=0']]],

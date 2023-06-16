@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -28,14 +28,16 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
-#include <AVSCommon/Utils/LibcurlUtils/HttpResponseCodes.h>
+#include <AVSCommon/Utils/HTTP/HttpResponseCode.h>
 #include <AVSCommon/Utils/Logger/Logger.h>
 #include <AVSCommon/Utils/RetryTimer.h>
 
 #include <AACE/Alexa/AlexaProperties.h>
-#include "AACE/Engine/CBL/CBLAuthorizationProvider.h"
-#include "AACE/Engine/Core/EngineMacros.h"
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
+#include <AACE/Engine/CBL/CBLAuthorizationProvider.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/CounterDataPointBuilder.h>
+#include <AACE/Engine/Metrics/MetricEventBuilder.h>
+#include <AACE/Engine/Metrics/StringDataPointBuilder.h>
 
 namespace aace {
 namespace engine {
@@ -43,10 +45,11 @@ namespace cbl {
 
 using namespace aace::engine::authorization;
 using namespace aace::engine::alexa;
-using namespace aace::engine::utils::metrics;
+using namespace aace::engine::metrics;
 using namespace alexaClientSDK::avsCommon::sdkInterfaces;
 using namespace alexaClientSDK::avsCommon::utils::libcurlUtils;
 using namespace rapidjson;
+using HTTPResponseCode = alexaClientSDK::avsCommon::utils::http::HTTPResponseCode;
 using json = nlohmann::json;
 
 // String to identify log entries originating from this file.
@@ -169,32 +172,65 @@ static const std::string AUTHORIZATION_REQUEST_TYPE_USER_PROFILE = "user-profile
 /// Authorization request type cbl code
 static const std::string AUTHORIZATION_REQUEST_TYPE_CBL_CODE = "cbl-code";
 
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "CBLAuthorizationProvider";
+/// Prefix for metrics emitted from CBLAuthorizationProviders
+static const std::string METRIC_PREFIX = "CBL-";
 
-/// Metric for CBL timeout
-static const std::string METRIC_CODEPAIRREQUEST_TIMEOUT = "CodePairRequestTimeOut";
+/// Source name for CBL request metrics
+static const std::string METRIC_SOURCE_CBL_REQUEST = METRIC_PREFIX + "CblRequest";
 
-/// Metric for failed code pair request
-static const std::string METRIC_CODEPAIRREQUEST_FAILED = "CodePairRequestFailed";
+/// CBL request success count metric
+static const std::string METRIC_REQUEST_SUCCESS_COUNT = "CblRequestSuccessCount";
 
-/// Metric for successful code pair request
-static const std::string METRIC_CODEPAIRREQUEST_SUCCESS = "CodePairRequestSuccess";
+/// CBL request type metric dimension key
+static const std::string METRIC_REQUEST_TYPE = "CblRequestType";
 
-/// Metric for expired code pair
-static const std::string METRIC_CODEPAIR_EXPIRED = "CodePairExpired";
+/// Code pair request metric dimension value
+static const std::string METRIC_CODE_PAIR_REQUEST = "CodePairRequest";
 
-/// Metric for failed request for token
-static const std::string METRIC_REQUESTTOKEN_FAILED = "RequestTokenFailed";
+/// Device tokens request metric dimension value
+static const std::string METRIC_DEVICE_TOKENS_REQUEST = "DeviceTokensRequest";
 
-/// Metric for successful request for token
-static const std::string METRIC_REQUESTTOKEN_SUCCESS = "RequestTokenSuccess";
+/// Refreshing token request metric dimension value
+static const std::string METRIC_DEVICE_REFRESH_REQUEST = "RefreshingTokenRequest";
 
-/// Metric for failed refresh of token
-static const std::string METRIC_REFRESHTOKEN_FAILED = "RefreshTokenFailed";
+/// User profile request metric dimension value
+static const std::string METRIC_USER_PROFILE_REQUEST = "UserProfileRequest";
 
-/// Metric for successful refresh of token
-static const std::string METRIC_REFRESHTOKEN_SUCCESS = "RefreshTokenSuccess";
+/// Cancel auth request metric dimension value
+static const std::string METRIC_CANCEL_REQUEST = "CancelAuthorization";
+
+/// Logout request metric dimension value
+static const std::string METRIC_LOGOUT_REQUEST = "Logout";
+
+/// Deregister request metric dimension value
+static const std::string METRIC_DEREGISTER_REQUEST = "Deregister";
+
+/// CBL request error count metric key
+static const std::string METRIC_REQUEST_ERROR_COUNT = "CblRequestFailureCount";
+
+/// CBL request failure reason metric dimension key
+static const std::string METRIC_REQUEST_FAILURE_REASON = "CblRequestFailureReason";
+
+/// Timeout metric dimension value
+static const std::string METRIC_FAILURE_TIMEOUT = "TIMEOUT";
+
+/// Code pair expired metric dimension value
+static const std::string METRIC_FAILURE_CODE_PAIR_EXPIRED = "CODE_PAIR_EXPIRED";
+
+/// Unavailable auth listener metric dimension value
+static const std::string METRIC_REQUEST_FAILURE_NO_LISTENER = "AUTH_LISTENER_UNAVAILABLE";
+
+/// Illegal current state metric dimension value
+static const std::string METRIC_REQUEST_ILLEGAL_STATE = "ILLEGAL_STATE";
+
+/// Malformed response metric dimension value
+static const std::string METRIC_REQUEST_FAILURE_MALFORMED_RESPONSE = "MALFORMED_RESPONSE";
+
+/// Generic failure metric dimension value
+static const std::string METRIC_REQUEST_INTERNAL_ERROR = "INTERNAL_ERROR";
+
+// Success metric dimension value
+static const std::string METRIC_REQUEST_SUCCESS = "SUCCESS";
 
 /// Map error names from @c LWA to @c AuthObserverInterface::Error values.
 static const std::unordered_map<std::string, AuthObserverInterface::Error> g_nameToErrorMap = {
@@ -208,6 +244,56 @@ static const std::unordered_map<std::string, AuthObserverInterface::Error> g_nam
     {"slow_down", AuthObserverInterface::Error::SLOW_DOWN},
     {"unauthorized_client", AuthObserverInterface::Error::UNAUTHORIZED_CLIENT},
     {"unsupported_grant_type", AuthObserverInterface::Error::UNSUPPORTED_GRANT_TYPE}};
+
+static std::string authErrorToString(AuthObserverInterface::Error error) {
+    std::stringstream ss;
+    ss << error;
+    return ss.str();
+}
+
+/**
+ * Records a metric with the specified data points.
+ * Uses the default context for CBLAuthorizationProvider.
+ */
+static void submitMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    const std::string& source,
+    const std::vector<DataPoint>& dataPoints) {
+    auto metricBuilder = MetricEventBuilder()
+                             .withSourceName(source)
+                             .withAlexaAgentId()
+                             .withIdentityType(IdentityType::UNIQUE)
+                             .withPriority(Priority::HIGH)
+                             .withBufferType(BufferType::SKIP_BUFFER);
+    metricBuilder.addDataPoints(dataPoints);
+    try {
+        recordMetric(recorder, metricBuilder.build());
+    } catch (std::invalid_argument& ex) {
+        AACE_ERROR(LX(TAG).m("Failed to record metric").d("reason", ex.what()));
+    }
+}
+
+/// Record a success count metric of the specified type
+static void submitSuccessMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    const std::string& requestType) {
+    std::vector<DataPoint> dps = {
+        CounterDataPointBuilder{}.withName(METRIC_REQUEST_SUCCESS_COUNT).increment(1).build(),
+        StringDataPointBuilder{}.withName(METRIC_REQUEST_TYPE).withValue(requestType).build()};
+    submitMetric(recorder, METRIC_SOURCE_CBL_REQUEST, dps);
+}
+
+/// Record an error count metric of the specified type
+static void submitErrorMetric(
+    const std::shared_ptr<MetricRecorderServiceInterface>& recorder,
+    const std::string& requestType,
+    const std::string& errorReason) {
+    std::vector<DataPoint> dps = {
+        CounterDataPointBuilder{}.withName(METRIC_REQUEST_ERROR_COUNT).increment(1).build(),
+        StringDataPointBuilder{}.withName(METRIC_REQUEST_TYPE).withValue(requestType).build(),
+        StringDataPointBuilder{}.withName(METRIC_REQUEST_FAILURE_REASON).withValue(errorReason).build()};
+    submitMetric(recorder, METRIC_SOURCE_CBL_REQUEST, dps);
+}
 
 /**
  * Helper function to convert from @c LWA error names to @c AuthObserverInterface::Error values.
@@ -273,12 +359,16 @@ static AuthObserverInterface::Error mapHTTPCodeToError(long code) {
         case HTTPResponseCode::SUCCESS_OK:
             error = AuthObserverInterface::Error::SUCCESS;
             break;
-
-        case HTTPResponseCode::BAD_REQUEST:
+        case HTTPResponseCode::CLIENT_ERROR_BAD_REQUEST:
+        case HTTPResponseCode::CLIENT_ERROR_THROTTLING_EXCEPTION:
             error = AuthObserverInterface::Error::INVALID_REQUEST;
             break;
-
-        case HTTPResponseCode::SERVER_INTERNAL_ERROR:
+        case HTTPResponseCode::CLIENT_ERROR_FORBIDDEN:
+            error = AuthObserverInterface::Error::UNAUTHORIZED_CLIENT;
+            break;
+        case HTTPResponseCode::SERVER_ERROR_INTERNAL:
+        case HTTPResponseCode::SERVER_ERROR_NOT_IMPLEMENTED:
+        case HTTPResponseCode::SERVER_UNAVAILABLE:
             error = AuthObserverInterface::Error::SERVER_ERROR;
             break;
 
@@ -343,6 +433,7 @@ std::shared_ptr<CBLAuthorizationProvider> CBLAuthorizationProvider::create(
     std::shared_ptr<CBLConfigurationInterface> configuration,
     std::shared_ptr<aace::engine::network::NetworkObservableInterface> networkObserver,
     std::shared_ptr<aace::engine::propertyManager::PropertyManagerServiceInterface> propertyManager,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     bool enableUserProfile,
     std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier) {
     AACE_DEBUG(LX(TAG));
@@ -351,9 +442,15 @@ std::shared_ptr<CBLAuthorizationProvider> CBLAuthorizationProvider::create(
         ThrowIfNull(authorizationManagerInterface, "invalidAuthorizationManagerInterface");
         ThrowIfNull(configuration, "nullCBLAuthDelegateConfiguration");
         ThrowIfNull(propertyManager, "nullPropertyManagerServiceInterface");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
 
         auto cblAuthorizationProvider = std::shared_ptr<CBLAuthorizationProvider>(new CBLAuthorizationProvider(
-            service, authorizationManagerInterface, configuration, enableUserProfile, legacyEventNotifier));
+            service,
+            authorizationManagerInterface,
+            configuration,
+            metricRecorder,
+            enableUserProfile,
+            legacyEventNotifier));
         ThrowIfNull(cblAuthorizationProvider, "createFailed");
 
         ThrowIfNot(cblAuthorizationProvider->initialize(propertyManager, networkObserver), "initializeFailed");
@@ -369,6 +466,7 @@ CBLAuthorizationProvider::CBLAuthorizationProvider(
     const std::string& service,
     std::shared_ptr<AuthorizationManagerInterface> authorizationManagerInterface,
     std::shared_ptr<CBLConfigurationInterface> configuration,
+    std::shared_ptr<aace::engine::metrics::MetricRecorderServiceInterface> metricRecorder,
     bool enableUserProfile,
     std::shared_ptr<CBLLegacyEventNotificationInterface> legacyEventNotifier) :
         alexaClientSDK::avsCommon::utils::RequiresShutdown(TAG),
@@ -389,6 +487,7 @@ CBLAuthorizationProvider::CBLAuthorizationProvider(
         m_service(service),
         m_currentAuthState(AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED),
         m_authorizationManager(authorizationManagerInterface),
+        m_metricRecorder{metricRecorder},
         m_legacyEventNotifier(legacyEventNotifier) {
 }
 
@@ -523,9 +622,10 @@ bool CBLAuthorizationProvider::startAuthorization(const std::string& data) {
 bool CBLAuthorizationProvider::cancelAuthorization() {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIf(
-            m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED,
-            "notSupportedWhenUnauthorized");
+        if (m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED) {
+            submitErrorMetric(m_metricRecorder, METRIC_CANCEL_REQUEST, METRIC_REQUEST_ILLEGAL_STATE);
+            Throw("notSupportedWhenUnauthorized");
+        }
 
         stopAuthFlowThread(false);
 
@@ -536,7 +636,11 @@ bool CBLAuthorizationProvider::cancelAuthorization() {
             m_executor.submit([this]() {
                 try {
                     auto listener = getAuthorizationProviderListener();
-                    ThrowIfNull(listener, "invalidListenerReference");
+                    if (listener == nullptr) {
+                        submitErrorMetric(m_metricRecorder, METRIC_CANCEL_REQUEST, METRIC_REQUEST_FAILURE_NO_LISTENER);
+                        Throw("invalidListenerReference");
+                    }
+                    submitSuccessMetric(m_metricRecorder, METRIC_CANCEL_REQUEST);
                     listener->onAuthorizationStateChanged(
                         m_service, AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED);
                 } catch (std::exception& ex) {
@@ -554,9 +658,10 @@ bool CBLAuthorizationProvider::cancelAuthorization() {
 bool CBLAuthorizationProvider::logout() {
     AACE_DEBUG(LX(TAG));
     try {
-        ThrowIf(
-            m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING,
-            "notAllowedDuringAuthorizing");
+        if (m_currentAuthState == AuthorizationProviderListenerInterface::AuthorizationState::AUTHORIZING) {
+            submitErrorMetric(m_metricRecorder, METRIC_LOGOUT_REQUEST, METRIC_REQUEST_ILLEGAL_STATE);
+            Throw("notAllowedDuringAuthorizing");
+        }
         stopAuthFlowThread(false);
         m_executor.submit([this]() {
             try {
@@ -566,12 +671,17 @@ bool CBLAuthorizationProvider::logout() {
                 auto result = authorizationManager_lock->logout(m_service);
                 if (!result) {
                     auto listener = getAuthorizationProviderListener();
-                    ThrowIfNull(listener, "invalidListenerReference");
+                    if (listener == nullptr) {
+                        submitErrorMetric(m_metricRecorder, METRIC_LOGOUT_REQUEST, METRIC_REQUEST_FAILURE_NO_LISTENER);
+                        Throw("invalidListenerReference");
+                    }
+                    submitErrorMetric(m_metricRecorder, METRIC_LOGOUT_REQUEST, METRIC_REQUEST_INTERNAL_ERROR);
                     listener->onAuthorizationError(m_service, "LOGOUT_FAILED");
-                    Throw("logoutFailed");
+                    Throw("cblIsNotTheActiveAuthorizationProvider");
                 }
+                submitSuccessMetric(m_metricRecorder, METRIC_LOGOUT_REQUEST);
             } catch (std::exception& ex) {
-                AACE_ERROR(LX(TAG, "logoutInsideExecutor").d("reason", ex.what()));
+                AACE_ERROR(LX(TAG, "logoutFailed").d("reason", ex.what()));
             }
         });
         return true;
@@ -698,32 +808,23 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingCo
             std::chrono::steady_clock::now() + m_configuration->getCodePairRequestTimeout();
         while (!isStopping()) {
             if (std::chrono::steady_clock::now() >= codePairRequestTimeout) {
-                emitUniqueCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingCodePair", METRIC_CODEPAIRREQUEST_TIMEOUT, 1);
+                submitErrorMetric(m_metricRecorder, METRIC_CODE_PAIR_REQUEST, METRIC_FAILURE_TIMEOUT);
                 m_stateChangeReason = AUTHORIZATION_ERROR_REASON_TIMEOUT;
                 return FlowState::STOPPING;
             }
 
             auto result = receiveCodePairResponse(requestCodePair());
-            std::stringstream codePairResult;
-            codePairResult << result;
-            if (result == AuthObserverInterface::Error::SUCCESS) {
-                emitUniqueCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingCodePair", METRIC_CODEPAIRREQUEST_SUCCESS, 1);
-            } else {
-                emitUniqueCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX,
-                    "handleRequestingCodePair",
-                    {METRIC_CODEPAIRREQUEST_FAILED, codePairResult.str()});
-            }
+            const std::string resultStr = authErrorToString(result);
             switch (result) {
                 case AuthObserverInterface::Error::SUCCESS:
+                    submitSuccessMetric(m_metricRecorder, METRIC_CODE_PAIR_REQUEST);
                     return FlowState::REQUESTING_TOKEN;
                 case AuthObserverInterface::Error::UNKNOWN_ERROR:
                 case AuthObserverInterface::Error::AUTHORIZATION_FAILED:
                 case AuthObserverInterface::Error::SERVER_ERROR:
                 case AuthObserverInterface::Error::AUTHORIZATION_EXPIRED:
                 case AuthObserverInterface::Error::INVALID_CODE_PAIR:
+                    submitErrorMetric(m_metricRecorder, METRIC_CODE_PAIR_REQUEST, resultStr);
                 case AuthObserverInterface::Error::AUTHORIZATION_PENDING:
                 case AuthObserverInterface::Error::SLOW_DOWN:
                     break;
@@ -733,6 +834,7 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingCo
                 case AuthObserverInterface::Error::UNSUPPORTED_GRANT_TYPE:
                 case AuthObserverInterface::Error::INTERNAL_ERROR:
                 case AuthObserverInterface::Error::INVALID_CBL_CLIENT_ID: {
+                    submitErrorMetric(m_metricRecorder, METRIC_CODE_PAIR_REQUEST, resultStr);
                     setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);
                     m_stateChangeReason = AUTHORIZATION_ERROR_REASON_UNKNOWN_ERROR;
                     return FlowState::STOPPING;
@@ -764,26 +866,16 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingTo
         while (!isStopping()) {
             // If the code pair expired, stop
             if (std::chrono::steady_clock::now() >= m_codePairExpirationTime) {
-                emitUniqueCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingToken", METRIC_CODEPAIR_EXPIRED, 1);
+                submitErrorMetric(m_metricRecorder, METRIC_DEVICE_TOKENS_REQUEST, METRIC_FAILURE_CODE_PAIR_EXPIRED);
                 m_stateChangeReason = AUTHORIZATION_ERROR_REASON_CODE_PAIR_EXPIRED;
                 return FlowState::STOPPING;
             }
 
             auto result = receiveTokenResponse(requestToken(), true);
-            std::stringstream requestTokenResult;
-            requestTokenResult << result;
-            if (result == AuthObserverInterface::Error::SUCCESS) {
-                emitUniqueCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX, "handleRequestingToken", METRIC_REQUESTTOKEN_SUCCESS, 1);
-            } else {
-                emitUniqueCounterMetrics(
-                    METRIC_PROGRAM_NAME_SUFFIX,
-                    "handleRequestingToken",
-                    {METRIC_REQUESTTOKEN_FAILED, requestTokenResult.str()});
-            }
+            const std::string resultStr = authErrorToString(result);
             switch (result) {
                 case AuthObserverInterface::Error::SUCCESS:
+                    submitSuccessMetric(m_metricRecorder, METRIC_DEVICE_TOKENS_REQUEST);
                     if (m_enableUserProfile) {
                         handleRequestingUserProfile();
                     }
@@ -793,12 +885,14 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingTo
                 case AuthObserverInterface::Error::UNKNOWN_ERROR:
                 case AuthObserverInterface::Error::AUTHORIZATION_FAILED:
                 case AuthObserverInterface::Error::SERVER_ERROR:
+                    submitErrorMetric(m_metricRecorder, METRIC_DEVICE_TOKENS_REQUEST, resultStr);
                 case AuthObserverInterface::Error::AUTHORIZATION_PENDING:
                     break;
                 case AuthObserverInterface::Error::SLOW_DOWN:
                     interval = std::min(interval * TOKEN_REQUEST_SLOW_DOWN_FACTOR, MAX_TOKEN_REQUEST_INTERVAL);
                     break;
                 case AuthObserverInterface::Error::AUTHORIZATION_EXPIRED:
+                    submitErrorMetric(m_metricRecorder, METRIC_DEVICE_TOKENS_REQUEST, resultStr);
                     if (m_explicitAuthorizationRequest) {
                         // Fall back to requesting code pair state if the application provides an invalid refresh token during
                         // explicit start of CBL authorization.
@@ -811,6 +905,7 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingTo
                         return FlowState::STOPPING;
                     }
                 case AuthObserverInterface::Error::INVALID_CODE_PAIR:
+                    submitErrorMetric(m_metricRecorder, METRIC_DEVICE_TOKENS_REQUEST, resultStr);
                     return FlowState::REQUESTING_CODE_PAIR;
                 case AuthObserverInterface::Error::UNAUTHORIZED_CLIENT:
                 case AuthObserverInterface::Error::INVALID_REQUEST:
@@ -818,6 +913,7 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRequestingTo
                 case AuthObserverInterface::Error::UNSUPPORTED_GRANT_TYPE:
                 case AuthObserverInterface::Error::INTERNAL_ERROR:
                 case AuthObserverInterface::Error::INVALID_CBL_CLIENT_ID: {
+                    submitErrorMetric(m_metricRecorder, METRIC_DEVICE_TOKENS_REQUEST, resultStr);
                     setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);
                     m_stateChangeReason = AUTHORIZATION_ERROR_REASON_UNKNOWN_ERROR;
                     return FlowState::STOPPING;
@@ -893,33 +989,27 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
 
                 auto result = receiveTokenResponse(requestRefresh(), false);
                 m_refreshToken.clear();
-                std::stringstream refreshTokenResult;
-                refreshTokenResult << result;
-                if (result == AuthObserverInterface::Error::SUCCESS) {
-                    emitUniqueCounterMetrics(
-                        METRIC_PROGRAM_NAME_SUFFIX, "handleRefreshingToken", METRIC_REQUESTTOKEN_SUCCESS, 1);
-                } else {
-                    emitUniqueCounterMetrics(
-                        METRIC_PROGRAM_NAME_SUFFIX,
-                        "handleRefreshingToken",
-                        {METRIC_REQUESTTOKEN_FAILED, refreshTokenResult.str()});
-                }
+                const std::string resultStr = authErrorToString(result);
                 switch (result) {
                     case AuthObserverInterface::Error::SUCCESS:
+                        submitSuccessMetric(m_metricRecorder, METRIC_DEVICE_REFRESH_REQUEST);
                         m_retryCount = 0;
                         nextState = AuthObserverInterface::State::REFRESHED;
                         break;
                     case AuthObserverInterface::Error::UNKNOWN_ERROR:
                     case AuthObserverInterface::Error::SERVER_ERROR:
                     case AuthObserverInterface::Error::AUTHORIZATION_FAILED:
+                        submitErrorMetric(m_metricRecorder, METRIC_DEVICE_REFRESH_REQUEST, resultStr);
                     case AuthObserverInterface::Error::AUTHORIZATION_PENDING:
                     case AuthObserverInterface::Error::SLOW_DOWN:
                         m_timeToRefresh = calculateTimeToRetry(m_retryCount++);
                         break;
                     case AuthObserverInterface::Error::INVALID_CODE_PAIR:
+                        submitErrorMetric(m_metricRecorder, METRIC_DEVICE_REFRESH_REQUEST, resultStr);
                         clearRefreshToken();
                         return FlowState::REQUESTING_CODE_PAIR;
                     case AuthObserverInterface::Error::AUTHORIZATION_EXPIRED:
+                        submitErrorMetric(m_metricRecorder, METRIC_DEVICE_REFRESH_REQUEST, resultStr);
                         clearRefreshToken();
                         if (m_explicitAuthorizationRequest) {
                             // Fall back to requesting code pair state if the application provides an invalid refresh token during
@@ -941,6 +1031,7 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleRefreshingTo
                     case AuthObserverInterface::Error::UNSUPPORTED_GRANT_TYPE:
                     case AuthObserverInterface::Error::INTERNAL_ERROR:
                     case AuthObserverInterface::Error::INVALID_CBL_CLIENT_ID: {
+                        submitErrorMetric(m_metricRecorder, METRIC_DEVICE_REFRESH_REQUEST, resultStr);
                         clearRefreshToken();
                         setAuthState(AuthObserverInterface::State::UNRECOVERABLE_ERROR);
                         m_stateChangeReason = AUTHORIZATION_ERROR_REASON_UNKNOWN_ERROR;
@@ -1002,31 +1093,39 @@ CBLAuthorizationProvider::FlowState CBLAuthorizationProvider::handleStopping() {
 }
 
 void CBLAuthorizationProvider::handleRequestingUserProfile() {
+    AACE_DEBUG(LX(TAG));
+    std::string responseCodeStr = METRIC_REQUEST_SUCCESS;
     try {
-        AACE_DEBUG(LX(TAG));
-
         auto response = requestUserProfile();
-        ThrowIfNot(response.code == HTTPResponseCode::SUCCESS_OK, "Error making request");
+        if (response.code != HTTPResponseCode::SUCCESS_OK) {
+            responseCodeStr = authErrorToString(mapHTTPCodeToError(response.code));
+            Throw("Error making request");
+        }
 
         std::string name;
         std::string email;
 
         Document document;
-        ThrowIf(document.Parse(response.body.c_str()).HasParseError(), "Could not parse response");
-
+        if (document.Parse(response.body.c_str()).HasParseError()) {
+            responseCodeStr = METRIC_REQUEST_FAILURE_MALFORMED_RESPONSE;
+            Throw("Could not parse response");
+        }
         auto root = document.GetObject();
-
         if (root.HasMember("name") && root["name"].IsString()) {
             name = root["name"].GetString();
         }
-        ThrowIf(name.empty(), "Missing name in response payload");
-
+        if (name.empty()) {
+            responseCodeStr = METRIC_REQUEST_FAILURE_MALFORMED_RESPONSE;
+            Throw("Missing name in response payload");
+        }
         if (root.HasMember("email") && root["email"].IsString()) {
             email = root["email"].GetString();
         }
-        ThrowIf(email.empty(), "Missing email in response payload");
-
-        AACE_DEBUG(LX(TAG).d("name", name).d("email", email));
+        if (email.empty()) {
+            responseCodeStr = METRIC_REQUEST_FAILURE_MALFORMED_RESPONSE;
+            Throw("Missing email in response payload");
+        }
+        AACE_DEBUG(LX(TAG).sensitive("name", name).sensitive("email", email));
 
         // clang-format off
         json requestJson = {
@@ -1036,12 +1135,21 @@ void CBLAuthorizationProvider::handleRequestingUserProfile() {
                 {"email", email}
             }}
         };
+        // Submit success metric since request was successful, but still allow
+        // recording an failure if the result cannot be reported to the app
+        submitSuccessMetric(m_metricRecorder, METRIC_USER_PROFILE_REQUEST);
         // clang-format on
         auto listener = getAuthorizationProviderListener();
-        ThrowIfNull(listener, "invalidListenerReference");
+        if (listener == nullptr) {
+            responseCodeStr = METRIC_REQUEST_FAILURE_NO_LISTENER;
+            Throw("invalidListenerReference");
+        }
         listener->onEventReceived(m_service, requestJson.dump());
     } catch (std::exception& ex) {
-        AACE_ERROR(LX(TAG).d("reason", ex.what()));
+        AACE_ERROR(
+            LX(TAG, "handleRequestingUserProfileFailed").d("reason", ex.what()).d("responseCode", responseCodeStr));
+        submitErrorMetric(m_metricRecorder, METRIC_USER_PROFILE_REQUEST, responseCodeStr);
+        return;
     }
 }
 
@@ -1367,7 +1475,11 @@ void CBLAuthorizationProvider::deregister() {
     stopAuthFlowThread(true, false);
 
     auto listener = getAuthorizationProviderListener();
-    ThrowIfNull(listener, "invalidListenerReference");
+    if (listener == nullptr) {
+        submitErrorMetric(m_metricRecorder, METRIC_DEREGISTER_REQUEST, METRIC_REQUEST_FAILURE_NO_LISTENER);
+        Throw("invalidListenerReference");
+    }
+    submitSuccessMetric(m_metricRecorder, METRIC_DEREGISTER_REQUEST);
     listener->onAuthorizationStateChanged(
         m_service, AuthorizationProviderListenerInterface::AuthorizationState::UNAUTHORIZED);
 

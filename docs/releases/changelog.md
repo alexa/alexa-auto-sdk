@@ -1,5 +1,58 @@
 # Change Log
 
+## v4.3 Released on 2023-06-15
+
+### Breaking Changes
+
+* AACS and the Alexa Auto App are no longer part of the Alexa Auto SDK. Please contact your Amazon SA partner for how to get newer version of AACS and Alexa Auto App.
+
+### Enhancements
+
+* Added new Mobile Bridge module that provides platform-agnostic implementation of 'Connect via Phone' functionality to automatically use customer's phone data to provide connectivtiy to Alexa in vehicle. For additional details, please contact your SA partner.
+* Added `AlexaConfiguration::createMediaPlayerFingerprintConfig` for enabling Digital Rights Management (DRM) support
+* Updated `AudioOutput` interface to provide info required for playing DRM-protected audio.
+* Added the support to enable navigation to phone contact feature by uploading postal address while uploading phone contacts to cloud. *Note: the end-to-end feature to allow the user to navigate to a contact will be available once the cloud side changes are in place.*
+* Refactored metrics infrastructure and overhauled the implementation.
+
+### Resolved Issues
+
+**Communications**
+
+* Fixed the issue that Alexa-to-Alexa calls do not work on Linux armv8 platforms
+
+**Local Voice Control**
+
+* Fixed the issue that Alexa responds with an error to the utterance "Play FM radio" and requests to tune to a station name.
+
+### Known Issues
+
+**General**
+
+* The [Alexa Automotive UX guidelines](#https://developer.amazon.com/en-US/docs/alexa/alexa-auto/display-cards.html#dismiss-display-cards) specify when to automatically dismiss a `TemplateRuntime` display card for each template type. The Engine publishes the `TemplateRuntime` interface messages `ClearTemplate` and `ClearPlayerInfo` based on the timeouts configured in the `aace.alexa.templateRuntimeCapabilityAgent` Engine configuration. However, the configuration does not provide enough granularity to specify timeouts for different types of display cards. Consequently, there is no way for your application to configure automatically dismissing local search templates (e.g., `LocalSearchListTemplate2`) with a different timeout than other templates (e.g., `WeatherTemplate`). The configuration also does not provide a way for you to specify infinite timeout for `NowPlaying` cards. You must implement your application’s dismissal logic for display cards and media info accordingly.
+* There is a rare race condition in which publishing the `AlexaClient.StopForegroundActivity` message does not cancel the active Alexa interaction. The race condition can happen when the application publishes the message at the beginning of the `THINKING` state `AlexaClient.DialogStateChanged` transition.
+
+**Car control**
+
+* If you configure the Auto SDK Engine and connect to Alexa using a set of endpoint configurations, you cannot delete any endpoint in the set from Alexa. For example, after you configure set A with endpoints 1, 2, and 3, if you change your car control configuration during development to set B with endpoints 2, 3, and 4, Alexa retains endpoint 1 from set A, which might interfere with resolving the correct endpoint ID for your utterances. However, any endpoint configurations with matching IDs override previous configurations. For example, the configuration of endpoint 2 in set B replaces endpoint 2 in set A. During development, limit configuration changes to create only supersets of previous endpoint configurations. Work with your Solutions Architect or Partner Manager to produce the correct configuration on the first try
+
+**Communications**
+
+* The dual-tone multi-frequency (DTMF) does work correctly when selecting the number 1.
+
+**Entertainment**
+
+* When music is playing, repeatedly pressing the “next” button to advance in the playlist restarts the current song.
+* When using the LVC extension, if the application publishes the `MediaPlaybackRequestor.RequestMediaPlayback` AASB message before the Auto SDK Engine connects to Alexa cloud, media playback will not automatically resume as expected. The workaround is to wait for the connection to Alexa cloud to complete before publishing the `RequestMediaPlayback` message.
+
+**Local Voice Control**
+
+* Some contacts in the addressbook are not resolved correctly in offline mode.
+
+**C++ sample app**
+
+* The sample app may fail to handle synchronous-style `AASB messages` within the required timeout to construct device context for Alexa. As a result, some utterances may not work as expected.
+
+
 ## v4.2 Released on 2022-12-21
 
 ### Enhancements
@@ -15,7 +68,7 @@
 * Updated the Auto SDK to use AVS Device SDK Version 1.26.0. For information about this version of AVS Device SDK, see the [AVS Documentation](https://developer.amazon.com/en-US/docs/alexa/avs-device-sdk-1-2x/release-notes.html#version-1260).
 
 #### Alexa Auto App
-* Renamed the AACS Sample App to Alexa Auto App. Any previous mentions of the name AACS Sample App should be treated the same as Alexa Auto App. 
+* Renamed the AACS Sample App to Alexa Auto App. Any previous mentions of the name AACS Sample App should be treated the same as Alexa Auto App.
 * Added a landing page to Alexa Auto App. The landing page provides sample utterances for supported domains and UI to update the settings.
 * The Alexa Auto App has an updated UI for setup and settings screens. These improvements scale responsively for medium landscape screens (approximately 1300 x 900 resolution and screen size ranging from 1100dp to 1549dp).
 * Updated Alexa Auto App to post a [notification](https://developer.android.com/training/cars/notifications) to the Notification Center when Alexa delivers a notification to the user. The user must ask Alexa to read their notifications to hear the notification content.
@@ -95,7 +148,7 @@
 * If there is no internet connection when the user launches Alexa for the first time in the ignition cycle, the “No Network Connection” message displays momentarily and disappears.
 * The Alexa Auto App doesn’t reconnect to LVC when when the user switches the default assistant from Alexa to a different voice assistant and then back to Alexa. Alexa Auto App needs to be restarted (e.g., by a new ignition cycle) to reconnect to LVC.
 * Alexa can take up to 90 seconds to reconnect when lost network connection is restored.
-* If the user has two phones connected to the head unit and asks Alexa to read their SMS messages, the reply comes from the secondary phone instead of the primary phone. 
+* If the user has two phones connected to the head unit and asks Alexa to read their SMS messages, the reply comes from the secondary phone instead of the primary phone.
 * When the user asks Alexa to read their messages after she has already read them, Alexa reads the same messages again instead of replying that there are no new messages to read.
 
 
@@ -193,7 +246,7 @@
 
 **Auto SDK**
 
-* Fixed an issue in which the CBL module did not check the network connection status when attempting to refresh an access token. If there was no network connection when the refresh was attempted, the token would not refresh immediately when connection was restored. 
+* Fixed an issue in which the CBL module did not check the network connection status when attempting to refresh an access token. If there was no network connection when the refresh was attempted, the token would not refresh immediately when connection was restored.
 * Fixed an issue in which the “Alexa, stop” utterance did not stop music playback when audio ducking is enabled.
 * Fixed periodic Engine shutdown crashes in `ContextManager`, `ExternalMediaPlayer`, and AACS.
 * Fixed an issue in which the `Navigation module` inserted an invalid error code in the payload of the `ShowAlternativeRoutesFailed` event. Additionally added the `NOT_NAVIGATING` error code to the `Navigation AASB` interface. See the Navigation module documentation for info about which error codes to use.
@@ -205,7 +258,7 @@
 
 **AACS Sample App**
 
-* Fixed the language selection screen in the AACS sample app when the Preview Mode feature is enabled.  
+* Fixed the language selection screen in the AACS sample app when the Preview Mode feature is enabled.
 * Fixed an issue in which the AACS sample app did not play alarms when the device is offline.
 * Fixed an issue in which the display card for a second weather utterance closed too soon.
 * Fixed an issue which the AACS sample app did not reset the contact permissions when switching accounts

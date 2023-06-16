@@ -66,7 +66,7 @@ class Nghttp2Conan(ConanFile):
             self.requires("openssl/qnx7")
         else:
             self.requires(
-                "openssl/1.1.1l#d46932f87aae423e548c9f3cd887dba7"
+                "openssl/1.1.1s@#3eeebc156917046ee80533dbbb8f4671"
             )  # always set openssl dependency - (aac) fix for with_app=False
         if self.options.with_app:
             self.requires("c-ares/1.17.1")

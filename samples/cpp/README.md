@@ -23,7 +23,7 @@ When you follow the instructions to [set up your security profile](https://devel
 
 ### Optional device capabilities
 
-In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, Local Voice Control (LVC), and Device Client Metrics (DCM)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](https://alexa.github.io/alexa-auto-sdk/docs/help) page.
+In order to use certain optional Alexa Auto SDK functionality (for example, AmazonLite Wake Word, Alexa Communications, and Local Voice Control (LVC)) with the Sample App, your product must be placed on the allow list by Amazon. Copy the product's **Amazon ID** from the Developer Console and follow the directions on the [Need Help?](https://alexa.github.io/alexa-auto-sdk/docs/help) page.
 
 >**Note:** Most of the commands that follow are meant to be run from this `alexa-auto-sdk` directory.
 
@@ -172,12 +172,12 @@ Every request to AVS requires an Login with Amazon (LWA) access token. Code-Base
 
 1. Press `A`, the Sample App displays the below message:
 
-    ```shell
-    ################################################################################
-    #                                                                              #
-    #                              Authorization Menu                              #
-    #                                                                              #
-    ################################################################################
+```shell
+################################################################################
+#                                                                              #
+#                              Authorization Menu                              #
+#                                                                              #
+################################################################################
 
     [ 1 ]    Start CBL Authorization
     [ esc ]  Go back
@@ -185,7 +185,7 @@ Every request to AVS requires an Login with Amazon (LWA) access token. Code-Base
     
 2. Press `1` to start the CBL authorization. The Sample App displays messages, including a code and a URL in a format similar to the following:
 
-    ```
+```
     ###########################
               123456     
     ############################################
@@ -350,7 +350,34 @@ In VAD mode, the sample app demonstrates how to:
 1. Create an instance of PryonLite VAD/SRD with parameters for SRD config and register for VAD detection callback.
 2. Feed audio to the PryonLite VAD/SRD instance (in 10 ms chunks), keep track of (save) the timestamps and the offsets of the chunks and calculate the Start Of Speech (SoS) timestamp using the offset given by the PryonLite instance and the saved timestamps.
 3. Create a requestSiri event with the SoS timestamp to send to the device.
-**Note** Items 2 and 3 above are not supported in Release 4.2        
+
+#### VAD Mode - Voice Activity Detection
+
+    There are 2 options to enable VAD feature.
+    * Mic Audio 
+    * Audio File 
+    
+```shell
+
+################################################################################
+#                                                                              #
+#                              VAD Mode Menu                                   #   
+#                                                                              #
+################################################################################
+
+    [ 1 ]    Mic Audio
+    [ 2 ]    Audio File Input
+    [ esc ]  Go back
+```
+In order to enable this feature, a config for PryonLiteVAD which is given below should be added in the SampleApp Config, to provide path to Pryonlite models which are copied over to the `share/amazonlite/models` folder, after untarring the `.tgz` file. In future if in Amazonlite package, model file inside Pryonlite package, update this file name `(.bin)` as well in this config. (name of model file can be found inside `share/amazonlite/models` folder).
+
+```shell
+    "pryonLiteVAD": {
+        "rootPath": "${PATH_TO_WW_LOCALE_MODELS}",
+        "models": "H.ar-SA+de-DE+en-AU+en-CA+en-GB+en-IN+en-US+es-MX+es-US+fr-CA+fr-FR+hi-IN+it-IT+ja-JP+pt-BR.alexa+siri.bin"
+    }
+
+```     
 
 If the Keyword Detection mode, the app demonstrates how to:
 
@@ -362,11 +389,13 @@ If the Keyword Detection mode, the app demonstrates how to:
 6. Create a requestSiri event with the start of the keyword timestamp to send to the device.
 
 
+
+
 ## Troubleshooting
 
 * When interacting with Alexa, if the Dialog State goes from `LISTENING` immediately to `IDLE`, you might not be logged in. Try [logging into your account via CBL](#authenticate-with-avs-using-code-based-linking-cbl) by tapping `A` from the Main Menu.
 
- >**Note:** For security reasons, authentication is not persisted if you quit the Sample App.  Upon relaunch, you must re-authenticate via CBL.  Restarting the app using the menu system, however, preserves authentication.
+    **Note:** For security reasons, authentication is not persisted if you quit the Sample App.  Upon relaunch, you must re-authenticate via CBL.  Restarting the app using the menu system, however, preserves authentication.
 
 * If the device serial number is not unique, the authentication state bounces between `PENDING` and `CONNECTED` states:
 
@@ -381,4 +410,3 @@ If the Keyword Detection mode, the app demonstrates how to:
     ```
 
 To resolve this, edit the `samples/cpp/assets/config.json` file and choose a unique serial number.
-

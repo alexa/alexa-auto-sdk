@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
 
 #include <typeinfo>
 
+#include <AACE/Engine/Alexa/AlexaEngineService.h>
+#include <AACE/Engine/Core/EngineMacros.h>
+#include <AACE/Engine/Metrics/MetricRecorderServiceInterface.h>
+
 #include "AACE/Engine/Navigation/NavigationEngineService.h"
-#include "AACE/Engine/Alexa/AlexaEngineService.h"
-#include "AACE/Engine/Core/EngineMacros.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
@@ -102,12 +104,17 @@ bool NavigationEngineService::registerPlatformInterfaceType(std::shared_ptr<aace
         auto contextManager = alexaComponents->getContextManager();
         ThrowIfNull(contextManager, "contextManagerInvalid");
 
+        auto metricRecorder =
+            getContext()->getServiceInterface<aace::engine::metrics::MetricRecorderServiceInterface>("aace.metrics");
+        ThrowIfNull(metricRecorder, "nullMetricRecorder");
+
         m_navigationEngineImpl = aace::engine::navigation::NavigationEngineImpl::create(
             navigation,
             defaultCapabilitiesRegistrar,
             exceptionSender,
             messageSender,
             contextManager,
+            metricRecorder,
             m_navigationProviderName);
         ThrowIfNull(m_navigationEngineImpl, "createNavigationEngineImplFailed");
 

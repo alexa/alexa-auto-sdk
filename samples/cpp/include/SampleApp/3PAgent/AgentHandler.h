@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -57,6 +57,14 @@ public:
         KWD,
         // Deactivation Mode.
         DEACTIVATED,
+    };
+
+    /// The enum of type of Audio Input
+    enum class AudioType{
+        // Mic Audio
+        MIC_AUDIO,
+        // Audio File
+        AUDIO_FILE,
     };
 
 private:
@@ -204,10 +212,17 @@ private:
      *  Provides the implementation to calculate Start of Speech timestamp.
      */
     std::chrono::time_point<std::chrono::system_clock> calculateStartOfKeywordTimeStamp(int& beginIndex, int& endIndex);
+    
+public:
     /**
-     *  Method for handshake between SIRI and SampleApp for Timestamp in NTP. 
+     *  Method for handshake between SIRI and SampleApp for Timestamp in NTP.
+     * @param Timestamp and corresponding Message 
      */
-    void requestSiri(std::chrono::time_point<std::chrono::system_clock>& timeStamp);
+    void requestSiri(std::chrono::time_point<std::chrono::system_clock>& timeStamp, std::string& message);
+    /**
+     *  get the Path to sampleApp folder. 
+     */
+    static bool getPath(const std::vector<json>& jsons);
 
 private:
     /**
@@ -225,11 +240,14 @@ private:
     void showMessage(const std::string& message);
 
 private:
+    /**
+     * @brief Pryonlite is initialized and Audio is Fed of Type: Mic Audio or Audio File.
+     * 
+     */
+    void VADFeedAudio(AgentHandler::AudioType type);
+    
     // Console
     std::weak_ptr<View> m_console{};
-
-    /// The thread to process the @c Pryonlite_engine
-    std::thread m_pryonLiteVADThread;
 };
 
 }  // namespace arbitrator

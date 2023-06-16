@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="ttt_icon_height">45dp</dimen>
-    <dimen name="ttt_card_height">100dp</dimen>
-    <dimen name="ttt_card_width">180dp</dimen>
-</resources>

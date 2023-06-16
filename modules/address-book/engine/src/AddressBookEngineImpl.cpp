@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -19,22 +19,12 @@
 #include <rapidjson/writer.h>
 
 #include <AACE/Engine/Core/EngineMacros.h>
-#include <AACE/Engine/Utils/Metrics/Metrics.h>
 #include <AACE/Engine/AddressBook/AddressBookEngineImpl.h>
 #include <AACE/AddressBook/AddressBook.h>
 
 namespace aace {
 namespace engine {
 namespace addressBook {
-
-using namespace aace::engine::utils::metrics;
-
-/// Program Name for Metrics
-static const std::string METRIC_PROGRAM_NAME_SUFFIX = "AddressBookEngineImpl";
-
-/// Counter metrics for AddressBook Platform APIs
-static const std::string METRIC_ADD_ADDRESS_BOOK = "AddAddressBook";
-static const std::string METRIC_REMOVE_ADDRESS_BOOK = "RemoveAddressBook";
 
 // String to identify log entries originating from this file.
 static const std::string TAG("aace.engine.addressBook.addressBookEngineImpl");
@@ -127,8 +117,8 @@ bool AddressBookEngineImpl::onAddAddressBook(
     const std::string& addressBookSourceId,
     const std::string& name,
     const AddressBookType type) {
+    AACE_INFO(LX(TAG).d("addressBookSourceId", addressBookSourceId).d("type", type));
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onAddAddressBook", METRIC_ADD_ADDRESS_BOOK, 1);
         ThrowIf(addressBookSourceId.empty(), "addressBookSourceIdInvalid");
         std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -152,9 +142,8 @@ bool AddressBookEngineImpl::onAddAddressBook(
 }
 
 bool AddressBookEngineImpl::onRemoveAddressBook(const std::string& addressBookSourceId) {
+    AACE_INFO(LX(TAG).d("addressBookSourceId", addressBookSourceId));
     try {
-        emitCounterMetrics(METRIC_PROGRAM_NAME_SUFFIX, "onRemoveAddressBook", METRIC_REMOVE_ADDRESS_BOOK, 1);
-
         std::lock_guard<std::mutex> guard(m_mutex);
 
         if (!addressBookSourceId.empty()) {
@@ -199,6 +188,7 @@ bool AddressBookEngineImpl::onRemoveAddressBook(const std::string& addressBookSo
 bool AddressBookEngineImpl::getEntries(
     const std::string& addressBookSourceId,
     std::weak_ptr<aace::addressBook::AddressBook::IAddressBookEntriesFactory> factory) {
+    AACE_DEBUG(LX(TAG).d("addressBookSourceId", addressBookSourceId));
     std::lock_guard<std::mutex> guard(m_mutex);
     return m_platformInterface->getEntries(addressBookSourceId, factory);
 }

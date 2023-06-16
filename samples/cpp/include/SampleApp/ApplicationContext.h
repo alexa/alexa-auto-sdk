@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -101,7 +101,6 @@ public:
     auto isAudioFileSupported() -> bool;
     auto isAutoAuthorizationDisabled() -> bool;
     auto isConnectivitySupported() -> bool;
-    auto isDcmSupported() -> bool;
     auto isLocalVoiceControlSupported() -> bool;
     auto isLogEnabled() -> bool;
     auto isSingleThreadedUI() -> bool;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ static std::chrono::steady_clock::time_point calculateTimeToRetry(int retryCount
     if (retryCount < 0) {
         retryCount = 0;
     } else if ((size_t)retryCount >= retryBackoffTimes.size()) {
-        retryCount = retryBackoffTimes.size() - 1;
+        retryCount = (size_t)retryBackoffTimes.size() - 1;
     }
     auto randSecs = rand() % retryBackoffTimes[retryCount];
 
@@ -333,15 +333,25 @@ void AuthProviderAuthorizationHandler::saveDeviceInfo(const std::vector<json>& j
     // Look for device info
     for (auto const& config : jsons) {
         try {
-            if (config.contains("aace.alexa") && config["aace.alexa"].contains("avsDeviceSDK") &&
-                config["aace.alexa"]["avsDeviceSDK"].contains("deviceInfo")) {
-                auto deviceInfo = config["aace.alexa"]["avsDeviceSDK"]["deviceInfo"];
+            if (config.contains("aace.alexa") && config["aace.alexa"].contains("alexaClientInfo")) {
+                auto deviceInfo = config["aace.alexa"]["alexaClientInfo"];
                 m_clientId = deviceInfo["clientId"];
-                m_deviceSerialNumber = deviceInfo["deviceSerialNumber"];
                 m_productId = deviceInfo["productId"];
             }
+            if (config.contains("aace.vehicle") && config["aace.vehicle"].contains("deviceInfo")) {
+                auto deviceInfo = config["aace.vehicle"]["deviceInfo"];
+                m_deviceSerialNumber = deviceInfo["serialNumber"];
+            }
         } catch (json::exception& e) {
+            log(logger::LoggerHandler::Level::CRITICAL, e.what());
         }
+    }
+    if (m_clientId.empty() || m_deviceSerialNumber.empty() || m_productId.empty()) {
+        std::stringstream ss;
+        ss << "Missing required config fields"
+           << "m_clientId" << m_clientId << "m_deviceSerialNumber" << m_deviceSerialNumber << "m_productId"
+           << m_productId << std::endl;
+        log(logger::LoggerHandler::Level::CRITICAL, ss.str());
     }
 }
 

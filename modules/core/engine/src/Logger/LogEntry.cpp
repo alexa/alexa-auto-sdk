@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -13,10 +13,10 @@
  * permissions and limitations under the License.
  */
 
+#include "AACE/Engine/Logger/LogEntry.h"
+
 #include <cstring>
 #include <iomanip>
-
-#include "AACE/Engine/Logger/LogEntry.h"
 
 namespace aace {
 namespace engine {
@@ -87,6 +87,27 @@ LogEntry& LogEntry::m(const std::string& message) {
     prefixMessage();
     m_stream << message;
     return *this;
+}
+
+LogEntry& LogEntry::e(const char* key, int errnum) {
+    prefixKeyValuePair();
+    m_stream << key << KEY_VALUE_SEPARATOR << errnum;
+#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600 || __DARWIN_C_LEVEL >= 200112L) && !_GNU_SOURCE
+    char errmsg[256];
+    int ret = strerror_r(errnum, errmsg, sizeof(errmsg));
+    if (ret == 0) {
+        m_stream << SECTION_SEPARATOR << errmsg;
+    }
+#elif _GNU_SOURCE
+    char buf[256];
+    char* errmsg = strerror_r(errnum, buf, sizeof(buf));
+    m_stream << SECTION_SEPARATOR << errmsg;
+#endif
+    return *this;
+}
+
+LogEntry& LogEntry::e(int errnum) {
+    return e("errno", errnum);
 }
 
 const std::string& LogEntry::tag() const {

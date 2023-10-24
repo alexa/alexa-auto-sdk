@@ -1,240 +1,235 @@
 topic: AudioOutput
 namespace: aasb.message.audio.audioOutput
 path: Audio/AudioOutput
+desc: >
+  The `AudioOutput` interface provides AASB messages for the Engine to request your application to play audio or perform operations on the audio.
+  Multiple audio channels may be active at a time, so the Engine identifies each one by a `channel` name. Any individual audio item playing on a channel is uniquely identified by a `token`.
+  See the [AudioOutput integration guide](https://alexa.github.io/alexa-auto-sdk/docs/explore/features/core/AudioOutput/) for detailed information about how to integrate the messages of the `AudioOutput` interface in your application.
 
 messages:
-  - action: GetNumBytesBuffered
-    direction: outgoing
-    desc: Returns the amount of audio data buffered.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
-    reply:
-      - name: bufferedBytes
-        type: int
-        desc: The number of bytes of the audio data buffered, or 0 if it's unknown.
-
-  - action: Resume
-    direction: outgoing
-    desc: Notifies the platform implementation to resume an audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
-
-  - action: Play
-    direction: outgoing
-    desc: Notifies the platform implementation to play an audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source being played.
-
-  - action: SetPosition
-    direction: outgoing
-    desc: >
-      Notifies the platform implementation to set the playback position of the current
-      audio source in the platform media player.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
-      - name: position
-        type: int
-        desc: The playback position in milliseconds to set in the platform media player.
-
   - action: Prepare
     direction: outgoing
-    desc: Notifies the platform implementation to prepare an audio URL for playback.
+    desc: Requests the application to prepare audio from the specified URL for playback. Do not begin playback until receiving a `Play` message.
     name: PrepareURL
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: audioType
         type: AudioOutputAudioType
         desc: The type of audio data to be played.
       - name: token
-        desc: A unique token for this audio source.
+        desc: The token to uniquely identifies the requested audio item. All further messages for the same audio item use the same `token` and `channel` name.
       - name: source
-        desc: Stream source description. # TODO: update!
+        desc: The source type of the audio data to download.
         value: URL
       - name: url
-        desc: The URL audio stream being provided.
+        desc: The URL of the audio to download.
       - name: repeating
         type: bool
-        desc: True if the platform should loop the audio when playing.
+        desc: Whether the application should repeat playback of the audio once it finishes.
       - name: playbackContext
         type: PlaybackContext
-        desc: The context related to playback of an audio item.
-
-  - action: GetPosition
-    direction: outgoing
-    desc: >
-      Returns the current playback position of the platform media player. If the audio
-      source is not playing, the most recent position played should be returned.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
-    reply:
-      - name: position
-        type: int
-        desc: The platform media player's playback position in milliseconds.
-
-  - action: Pause
-    direction: outgoing
-    desc: Notifies the platform implementation to pause an audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source being paused.
-
-  - action: MediaError
-    direction: incoming
-    desc: Notifies the Engine of an error during audio playback.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
-      - name: error
-        type: MediaError
-        desc: The error encountered by the platform media player during playback.
-      - name: description
-        desc: A description of the error.
-        default: ""
-
-  - action: GetDuration
-    direction: outgoing
-    desc: Request the duration of the current audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
-    reply:
-      - name: duration
-        type: int
-        desc: >
-          The duration of the current audio source. If the duration is unknown,
-          then -1 should be returned.
-
-  - action: Stop
-    direction: outgoing
-    desc: Notifies the platform implementation to stop an audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: token
-        desc: The unique token of the audio source.
+        desc: Additional context related to playback of the audio item.
 
   - action: Prepare
     direction: outgoing
-    desc: Notifies the platform implementation to prepare an audio stream for playback.
+    desc: Requests the application to prepare audio from a stream. Open the stream in the Engine by calling `MessageBroker::openStream()`, specifying the `streamId` and the operation mode `MessageStream::Mode::READ`. To retrieve the audio data for your buffer, repeatedly call `MessageStream::read()` on the stream object until `MessageStream::isClosed()` returns true. Do not begin playback until receiving a `Play` message.
     name: PrepareStream
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: audioType
         type: AudioOutputAudioType
         desc: The type of audio data to be played.
       - name: token
         desc: A unique token for this audio stream.
       - name: source
-        desc: Stream source description. # TODO: update!
+        desc: The source type of the audio data to download.
         value: STREAM
       - name: streamId
-        desc: The URL audio stream being provided.
+        desc: The ID of the stream in the Engine. Use the ID when invoking `MessageBroker` for the stream's data.
       - name: repeating
         type: bool
-        desc: True if the platform should loop the audio when playing.
+        desc: Whether the application should repeat playback of the audio once it finishes.
       - name: encoding
         type: AudioStreamEncoding
-        desc: The stream encoding format if known.
+        desc: The stream encoding format, if known.
       - name: properties
         type: dict
-        desc: List of properties associated with the audio stream.
-
-  - action: MutedStateChanged
-    direction: outgoing
-    desc: Notifies the platform implementation that the muted state has changed for an audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: state
-        type: MutedState
-        desc: The muted state to apply to the audio source.
-
-  - action: VolumeChanged
-    direction: outgoing
-    desc: Notifies the platform implementation that the volume has changed for an audio source.
-    payload:
-      - name: channel
-        desc: Name of the channel that is providing audio.
-      - name: volume
-        type: float
-        desc: The volume to set on the audio source. The volume is in the range [0,1].
+        desc: A list of properties associated with the audio stream.
 
   - action: MayDuck
     direction: outgoing
-    desc: Notifies the platform implementation only if prepared media may duck the volume.
+    desc: Notifies the application if the specified audio item is allowed to attenuate and play concurrently alongside a higher priority channel.
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: token
-        desc: The unique token of the audio source.
+        desc: The token that uniquely identifies the requested audio item.
 
-  - action: StartDucking
+  - action: Play
     direction: outgoing
-    desc: Notifies the platform implementation to move the playback in background. If platform implementation supports audio ducking, reduce the media player volume according to platform guidelines.
+    desc: Requests the application to play the specified audio item. The application is required to respond with either a `MediaStateChanged` message with state `PLAYING` when the playback starts or a `MediaError` message if playback is not possible.
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: token
-        desc: The unique token of the audio source.
+        desc: The token that uniquely identifies the requested audio item.
 
-  - action: StopDucking
+  - action: Pause
     direction: outgoing
-    desc: Notifies the platform implementation to move the playback in foreground. If platform implementation supports audio ducking, restore the media player volume to original value.
+    desc: Requests the application to pause the specified audio item. The application is required to respond with either a `MediaStateChanged` message with state `STOPPED` when the playback pauses or a `MediaError` message if pausing is not possible.
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: token
-        desc: The unique token of the audio source.
+        desc: The unique token of the audio source being paused.
+
+  - action: Resume
+    direction: outgoing
+    desc: Requests the application to resume the specified audio item. The application is required to respond with either a `MediaStateChanged` message with state `PLAYING` when the playback resumes or a `MediaError` message if resuming is not possible.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+
+  - action: Stop
+    direction: outgoing
+    desc: Notifies the application to stop the specified audio item. The application is required to respond with either a `MediaStateChanged` message with state `STOPPED` when the playback stops or a `MediaError` message if stopping is not possible.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
 
   - action: MediaStateChanged
     direction: incoming
-    desc: >
-      Notifies the Engine of an audio playback state change in the platform implementation. Must be
-      called when the platform media player transitions between stopped and playing states.
+    desc: Notifies the Engine of an audio playback state change in the application. `Play`, `Pause`, `Stop`, and `Resume` messages all require a `MediaStateChanged` or `MediaError` response. `MediaStateChanged` with state `STOPPED` that is not in response to `Pause` or `Stop` is treated as playback finishing, so media may advance to the next item in a playlist if applicable.
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: token
-        desc: The unique token of the audio source.
+        desc: The token that uniquely identifies the requested audio item.
       - name: state
         type: MediaState
-        desc: The new playback state of the platform media player.
+        desc: The new playback state of the media player.
+
+  - action: MediaError
+    direction: incoming
+    desc: Notifies the Engine of an error during audio playback. Use this message if playback encounters a fatal error that stops playback such that it cannot resume or in place of a `MediaStateChanged` message if a requested operation like `Pause` or `Play` cannot be performed.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+      - name: error
+        type: MediaError
+        desc: The type of error.
+      - name: description
+        desc: A brief description of the error.
+        default: ""
+
+  - action: SetPosition
+    direction: outgoing
+    desc: Requests the application to seek to a specific offset in the specified audio item.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+      - name: position
+        type: int
+        desc: The playback position in milliseconds to set in the media player.
+
+  - action: GetPosition
+    direction: outgoing
+    desc: Requests the current playback position of the specified audio item. Respond with the synchronous-style reply message. If the specififed audio source is not playing, use the most recent position.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+    reply:
+      - name: position
+        type: int
+        desc: The playback position in milliseconds.
+
+  - action: GetDuration
+    direction: outgoing
+    desc: Requests the duration of the specified audio item. Respond with the synchronous-style reply message.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+    reply:
+      - name: duration
+        type: int
+        desc: The duration of the audio item. If the duration is unknown due to an error, reply with -1.
+
+  - action: GetNumBytesBuffered
+    direction: outgoing
+    desc: Requests the total number of bytes buffered for the specified audio item. Respond to the message with its synchronous-style reply.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+    reply:
+      - name: bufferedBytes
+        type: int
+        desc: The total number of bytes of audio data buffered. Use 0 if there is no audio buffered yet or the number is unknown.
+
+  - action: VolumeChanged
+    direction: outgoing
+    desc: Notifies the application that the volume has changed for the specified audio item.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: volume
+        type: float
+        desc: The volume to set on the audio channel. The volume is in the range [0,1] and should be used as a multiplier for the platform-specific player's actual volume range.
+
+  - action: MutedStateChanged
+    direction: outgoing
+    desc: Notifies the application that the mute state has changed for the specified audio item.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: state
+        type: MutedState
+        desc: The muted state to apply to the audio channel.
+
+  - action: StartDucking
+    direction: outgoing
+    desc: Notifies the application to attenuate playback for the specified audio item. The ducking implementation the application should may be platform-specific.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
+
+  - action: StopDucking
+    direction: outgoing
+    desc: Notifies the application to restore the playback of the specified audio item to a non-attenuated state.
+    payload:
+      - name: channel
+        desc: The name of the audio channel that provides this audio item.
+      - name: token
+        desc: The token that uniquely identifies the requested audio item.
 
   - action: AudioFocusEvent
     direction: incoming
-    desc: >
-      Report the engine about the Audio Focus action. Request engine to perform the action mentioned in the parameter.
+    desc: Notify the Engine of an audio focus event affecting the application's playback.
     payload:
       - name: channel
-        desc: Name of the channel that is providing audio.
+        desc: The name of the audio channel that provides this audio item.
       - name: token
-        desc: The unique token of the audio source.
+        desc: The token that uniquely identifies the requested audio item.
       - name: focusAction
         type: FocusAction
-        desc: Report the engine what focus action client has taken due to the external audio focus event.
+        desc: The type of the focus event.
 
 types:
   - name: AudioStreamProperty
@@ -247,16 +242,18 @@ types:
 
   - name: MediaState
     type: enum
+    desc: Describes the state of the audio item in the media player.
     values:
       - name: STOPPED
-        desc: The audio source is not currently playing. It may have paused, stopped, or finished.
+        desc: The media player has stopped playing the audio item. The playback may have paused, stopped, or finished, and the interpretation by the Engine depends on whether the Engine has requested a playback-controlling operation.
       - name: PLAYING
-        desc: The audio source is currently playing.
+        desc: The media player has started playing the audio item. The playback may be starting for the first time, resuming from pause, or recovering from a buffer underrun.
       - name: BUFFERING
-        desc: The audio source is currently buffering data.
+        desc: The media player encountered a buffer underrun that prevents normal playback.
 
   - name: MediaError
     type: enum
+    desc: Describes an error encountered by the media player related to playback for the audio item.
     values:
       - name: MEDIA_ERROR_UNKNOWN
         desc: An unknown error occurred.
@@ -267,13 +264,13 @@ types:
       - name: MEDIA_ERROR_INTERNAL_SERVER_ERROR
         desc: The server accepted the request but was unable to process it as expected.
       - name: MEDIA_ERROR_INTERNAL_DEVICE_ERROR
-        desc: There was an internal error on the client.
+        desc: There was an internal error on the device.
 
   - name: AudioOutputAudioType
     type: enum
     values:
       - name: TTS
-        desc: Text-to-Speech audio type.
+        desc: Text-to-Speech audio type. E.g., Alexa's response as part of a dialog with the user.
       - name: MUSIC
         desc: Music audio type.
       - name: NOTIFICATION
@@ -319,9 +316,9 @@ types:
     type: enum
     values:
       - name: REPORT_DUCKING_STARTED
-        desc: This action informs Alexa engine that ducking is initiated by platform interface. Highly recommended to provide information so that engine would not override the action.
+        desc: Notifies the Engine that the application has attenuated the audio playback.
       - name: REPORT_DUCKING_STOPPED
-        desc: This action informs Alexa engine that ducking is stopped by platform interface. Highly recommended to provide information so that engine can duck if required.
+        desc: Notifies the Engine that the application has restored the audio playback from the attenuated state.
 
   - name: PlaybackContext
     type: struct
